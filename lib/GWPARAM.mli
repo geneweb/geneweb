@@ -4,15 +4,23 @@ val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
 val cnt_dir : string ref
-val sock_dir : string ref
 val bases : string ref
+
 val reorg : bool ref
+(** set to true when base is in reorg format *)
+
 val force : bool ref
+(** force creation of database if already existing *)
 
-type init_s = { status : bool; bname : string }
-
-val init_done : init_s ref
 val config_reorg : string -> string
+val config_legacy : string -> string
+
+val cache_d : string -> string
+(** [cache_d bname] Directory of the binary caches of base [bname], written by
+    cache_files and read by chk_data: bases/bname.gwb/caches, whatever the base
+    format, next to the caches of the cousins tool. Unlike
+    bases/etc/bname/cache, which holds the .gz datalists that browsers download,
+    it is never served. *)
 
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
@@ -27,66 +35,25 @@ val lang_d : my_fun_3 ref
 val bpath : my_fun_2 ref
 val portraits_d : my_fun_2 ref
 val images_d : my_fun_2 ref
-
-type syslog_level =
-  [ `LOG_EMERG  (** A panic condition. *)
-  | `LOG_ALERT
-    (** A condition that should be corrected immediately,
-                                    such as a corrupted system database. *)
-  | `LOG_CRIT  (** Critical conditions, such as hard device errors. *)
-  | `LOG_ERR  (** Errors. *)
-  | `LOG_WARNING  (** Warning messages.  *)
-  | `LOG_DEBUG
-    (** Conditions that are not error conditions,
-                                    but that may require special handling. *)
-  | `LOG_INFO  (** Informational messages. *)
-  | `LOG_NOTICE
-    (** Messages that contain information
-                                    normally of use only when debugging a program.  *)
-  ]
-(** The level of log gravity. See SYSLOG(3) *)
+val albums_d : my_fun_2 ref
 
 (* S: Move it to gwd_lib?  *)
 
-val output_error :
-  (?headers:string list ->
-  ?content:Adef.safe_string ->
-  Config.config ->
-  Def.httpStatus ->
-  unit)
-  ref
-(** [!output_error ?headers ?content conf status] default function that send the http status [status].
-    Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
-*)
-
-val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
-(** Check if a person should be displayed or not *)
-
-val syslog : (syslog_level -> string -> unit) ref
-(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
-
-val wrap_output :
-  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
-(** [wrap_output conf title content]
-    Wrap the display of [title] and [content] in a defined template.
-*)
-
-val init : string -> unit
-(** Function called before gwd starts
-    e.g. inititialise assets folders in Secure module. *)
-
-val init_etc : string -> unit
-(** Function called before gwd starts
-    e.g. inititialise etc folders in reorg mode. *)
+val init : unit -> unit
+(** Function called to initialize path functions based on the reorg flag. *)
 
 val is_reorg_base : string -> bool
-(** returns true if mybase.gwb/config/mybase.gwf exists *)
+(** returns true iff mybase.gwb/config/mybase.gwf exists *)
 
-val test_reorg : string -> unit
-(** set reorg to true if !reorg of is_reorg_base; then calls init *)
+val set_reorg : string -> bool option -> unit
+(** if bool option = Some bool -> set reorg to bool if bool option = None -> set
+    reorg according to is_reorg_base; call init *)
 
-val test_base : string -> unit
-(** for gwc and ged2gwb, test_reorg, alert if base exists and force is not set *)
+val check_base_exists : string -> unit
+(** Check if database exists and exit if so (unless -f flag is set) *)
+
+val create_base_and_config : string -> string
+(** Create base directory and configuration. *)
 
 module Default : sig
   val config : string -> string
@@ -98,6 +65,7 @@ module Default : sig
   val config_d : string -> string
   val lang_d : string -> string -> string
   val images_d : string -> string
+  val albums_d : string -> string
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)
@@ -113,42 +81,70 @@ module Legacy : sig
   val config_d : string -> string
   val lang_d : string -> string -> string
   val images_d : string -> string
+  val albums_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
-
-  val output_error :
-    ?headers:string list ->
-    ?content:Adef.safe_string ->
-    Config.config ->
-    Def.httpStatus ->
-    unit
-  (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
-      If the current lang is not available, use `en` *)
-
-  val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
-  (** Calculate the access rights to the person's information in
-      according to his age.
-      Returns (in the order of the tests) :
-      - `true` if requester is wizard or friend or person is public
-      - `true` if person has at least one title and {i public_if_title}
-        is set to {i yes} in gwf config file
-      - `false` if person is alive and {i private_years} > 0
-      - `true` if person is older (depending on the date of
-        birth or baptism date) then {i privates_years}
-      - `false` if person is younger (depending on the date of
-        birth or baptism date) then {i privates_years}
-      - `true` if person has been deceased for more than {i privates_years}
-      - `false` if person has been deceased for less than {i privates_years}
-      - `true` if person is between 80 and 120 years old and he is not beeing
-        private and  {i public_if_no_date} is set to {i yes} in gwf config file
-      - `true` if person has been married for more than {i private_years}
-      - `false` otherwise
-  *)
-
-  val syslog : syslog_level -> string -> unit
-  (** Prints on stderr using `"[date]: level message"` format. *)
-
-  val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
-  (** Display in a very basic HTML doc, with no CSS or JavaScript. *)
+  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
 end
+
+val output_error :
+  ?headers:string list ->
+  ?content:Adef.safe_string ->
+  Config.config ->
+  Geneweb_http.Code.status ->
+  unit
+(** If [?content] is not set, sends page content from
+    [/etc/<status-code>-<lang>.html]. If the current lang is not available, use
+    `en` *)
+
+val is_semi_public : Geneweb_db.Driver.person -> bool
+(** determines if the person has SemiPublic status *)
+
+val split_key : string -> string * string * string
+(** split a key of the form first_name.occ surname into its three components the
+    .occ part may be absent. No spaces in first_name and surnames *)
+
+val person_of_string_user_key :
+  Geneweb_db.Driver.base -> string -> Geneweb_db.Driver.iper option
+(** [person_of_string_user_key base key] resolves a user/person key
+    ([first_name.occ surname], '+' allowed for spaces) to an individual. It
+    tries {!split_key} (first-space split) then the occ-aware dot-key parser, so
+    it also resolves multi-word first names. *)
+
+val is_related :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** determines if the person is a descendant a sibling or an ancestor of
+    conf.userkey. conf.userkey is the person visiting the base the search for
+    ancestors is limited to 3 generations *)
+
+type view = As_is | As_friend | As_visitor
+
+val p_auth :
+  ?view:view ->
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  bool
+(** Calculate the access rights to the person's information in according to his
+    age. Returns (in the order of the tests) :
+    - `true` if requester is wizard or friend or person is public
+    - `true` if person has at least one title and {i public_if_title} is set to
+      {i yes} in gwf config file
+    - `false` if person is alive and {i private_years} > 0
+    - `true` if person is older (depending on the date of birth or baptism date)
+      then {i privates_years}
+    - `false` if person is younger (depending on the date of birth or baptism
+      date) then {i privates_years}
+    - `true` if person has been deceased for more than {i privates_years}
+    - `false` if person has been deceased for less than {i privates_years}
+    - `true` if person is between 80 and 120 years old and he is not beeing
+      private and {i public_if_no_date} is set to {i yes} in gwf config file
+    - `true` if person has been married for more than {i private_years}
+    - `false` otherwise *)
+
+val p_auth_sp :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** returns p_auth or true if both user and p are SemiPublic *)
+
+val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
+(** Display in a very basic HTML doc, with no CSS or JavaScript. *)

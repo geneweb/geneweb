@@ -2,9 +2,20 @@
 
 open Config
 open Def
-open Gwdb
+
+let src = Logs.Src.create ~doc:"Util" "UTIL"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Code = Geneweb_http.Code
 
 let is_welcome = ref false
+let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
+
+let p_getenv_notrim env label =
+  Option.map (Mutil.gen_decode false) (List.assoc_opt label env)
 
 let print_default_gwf_file bname =
   let gwf =
@@ -42,8 +53,7 @@ let print_default_gwf_file bname =
         List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
         close_out oc
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
-        (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
+      Log.warn (fun k -> k "Error while creating %s or %s" config_d fname)
 
 let rec cut_at_equal i s =
   if i = String.length s then (s, "")
@@ -69,47 +79,51 @@ let read_base_env bname gw_prefix debug =
       close_in ic;
       List.rev env
     with Sys_error error ->
-      !GWPARAM.syslog `LOG_WARNING
-        (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
-           error fname);
+      Log.warn (fun k ->
+          k "Error %s while loading %s, using empty config" error fname);
       []
   in
-  let fname1 = !GWPARAM.config bname in
-  if Sys.file_exists fname1 then load_file fname1
-  else
-    let fname2 = Filename.concat gw_prefix "a.gwf" in
-    if Sys.file_exists fname2 then (
-      if debug then
-        !GWPARAM.syslog `LOG_WARNING
-          (Printf.sprintf "Using configuration from %s\n%!" fname2);
-      load_file fname2)
-    else (
-      if debug then
-        !GWPARAM.syslog `LOG_WARNING
-          (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
-             fname2);
-      [])
+  let fname = !GWPARAM.config bname in
+  if Sys.file_exists fname then load_file fname
+  else (
+    if debug then
+      Log.info (fun k ->
+          k "No configuration file found (%s), see %s for example" fname
+            (Filename.concat gw_prefix "a.gwf"));
+    [])
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
-  (*Printf.eprintf "Errors set_vars:\n";
+  let disabled =
+    match p_getenv conf.env "cgl" with
+    | Some "on" -> true
+    | _ -> (
+        match p_getenv conf.env "templ" with
+        | Some t when t <> "" -> true
+        | _ -> false)
+  in
+  if disabled then ()
+  else begin
+    (*Printf.eprintf "Errors set_vars:\n";
     List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
-  let errors_undef = List.sort_uniq compare errors_undef in
-  let errors_undef =
-    List.filter
-      (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
-      errors_undef
-  in
-  let nb_errors =
-    nb_errors + List.length errors_undef + List.length errors_other
-  in
-  let err_list1 = String.concat "," errors_undef in
-  let err_list2 = String.concat "," errors_other in
-  match List.assoc_opt "hide_querytime_bugs" conf.base_env with
-  | Some "yes" -> ()
-  | _ ->
-      Output.print_sstring conf
-        (Printf.sprintf
-           {|<script>
+    let errors_undef = List.sort_uniq compare errors_undef in
+    let errors_undef =
+      List.filter
+        (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
+        errors_undef
+    in
+    let nb_errors =
+      nb_errors + List.length errors_undef + List.length errors_other
+    in
+    let err_list1 = String.concat "," errors_undef in
+    let err_list2 = String.concat "," errors_other in
+    match
+      (List.assoc_opt "hide_querytime_bugs" conf.base_env, conf.predictable_mode)
+    with
+    | _, true | Some "yes", _ -> ()
+    | _, _ ->
+        Output.print_sstring conf
+          (Printf.sprintf
+             {|<script>
   var q_time = %.3f;
   var nb_errors = %d;
   var errors_list = "\u{000A}%s%s";
@@ -130,16 +144,17 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
       home_errors.title = nb_errors +" error(s)!";
       home_errors.classList.remove("d-none");
     }
-    if (errors_list != "") {
+    if (errors_list != "\u{000A}") {
       home_errors.title = home_errors.title + errors_list + ".";
     }
   }
 </script>|}
-           query_time nb_errors
-           (if errors_undef <> [] then
-            Printf.sprintf "Unbound variable(s): %s. " err_list1
-           else "")
-           err_list2)
+             query_time nb_errors
+             (if errors_undef <> [] then
+                Printf.sprintf "Unbound variable(s): %s. " err_list1
+              else "")
+             err_list2)
+  end
 
 let escape_aux count blit str =
   let strlen = String.length str in
@@ -156,8 +171,8 @@ let escape_aux count blit str =
   in
   loop 0 0
 
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
+(** [escape_html str] replaces '&', '"', '<' and '>' with their corresponding
+    character entities (using entity number) *)
 let escape_html s : Adef.escaped_string =
   escape_aux
     (function '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -185,9 +200,9 @@ let escape_html s : Adef.escaped_string =
 
 let esc x = (escape_html x :> Adef.safe_string)
 
-(** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"' and '\''] should be the only
-    dangerous character here. *)
+(** [escape_attribute str] only escapes double quote and ampersand. Since we
+    will return normalized HTML, ['"' and '\''] should be the only dangerous
+    character here. *)
 let escape_attribute =
   escape_aux
     (function '&' | '"' | '\'' -> 5 (* "&#xx;" *) | _ -> 1)
@@ -205,8 +220,25 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
+let event_symbol conf name =
+  let default =
+    match name with
+    | "birth" -> "o"
+    | "baptism" -> "~"
+    | "marriage" -> "&"
+    | "death" -> "+"
+    | "burial" -> "x"
+    | _ -> ""
+  in
+  let s =
+    match List.assoc_opt ("evt_symbol_" ^ name) conf.base_env with
+    | Some s when s <> "" -> s
+    | _ -> default
+  in
+  (escape_html s :> string)
+
 let is_hide_names conf p =
-  if conf.hide_names || get_access p = Private then true else false
+  if conf.hide_names && Driver.get_access p = Private then true else false
 
 let search_in_path p s =
   let rec loop = function
@@ -219,7 +251,39 @@ let search_in_path p s =
 
 let search_in_assets = search_in_path Secure.assets
 
+let hash_file file =
+  try Some (Digest.to_hex (Digest.file file)) with Sys_error _ -> None
+
+let hash_cache = Hashtbl.create 100
+
+let hash_file_cached file =
+  try
+    let stats = Unix.stat file in
+    let mtime = stats.st_mtime in
+    match Hashtbl.find hash_cache file with
+    | cached_mtime, hash when Float.equal cached_mtime mtime -> Some hash
+    | _ -> (
+        match hash_file file with
+        | Some hash ->
+            Hashtbl.replace hash_cache file (mtime, hash);
+            Some hash
+        | None -> None)
+    | exception Not_found -> (
+        match hash_file file with
+        | Some hash ->
+            Hashtbl.replace hash_cache file (mtime, hash);
+            Some hash
+        | None -> None)
+  with Unix.Unix_error _ -> None
+
 (* Internationalization *)
+
+let start_with s i p =
+  i + String.length p <= String.length s
+  && String.lowercase_ascii (String.sub s i (String.length p)) = p
+
+let starts_with s p =
+  String.length p <= String.length s && String.sub s 0 (String.length p) = p
 
 let start_with_vowel conf s =
   if String.length s > 0 then
@@ -255,6 +319,14 @@ let nth_field w n =
   let i1, i2 = nth_field_abs w n in
   let i1, i2 = if i2 = i1 then nth_field_abs w 0 else (i1, i2) in
   String.sub w i1 (i2 - i1)
+
+let nb_fields s =
+  let rec loop cnt i =
+    if i = String.length s then cnt
+    else if s.[i] = '/' then loop (cnt + 1) (i + 1)
+    else loop cnt (i + 1)
+  in
+  loop 1 0
 
 let tnf s = "[" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
@@ -326,8 +398,11 @@ let simple_decline conf wt =
   in
   loop 0
 
-let gen_decline conf wt s1 s2 s2_raw =
-  let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
+let gen_decline_args conf wt args =
+  let arg c =
+    let n = Char.code c - Char.code '1' in
+    if n >= 0 && n < Array.length args then Some args.(n) else None
+  in
   let len = String.length wt in
   let rec loop i =
     if i = len then ""
@@ -335,25 +410,25 @@ let gen_decline conf wt s1 s2 s2_raw =
       let s, i =
         match wt.[i] with
         | '%' when i + 1 < len -> (
-            match string_of wt.[i + 1] with
-            | Some s -> (s, i + 1)
+            match arg wt.[i + 1] with
+            | Some (s, _) -> (s, i + 1)
             | None -> ("%", i))
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' -> (
             let c = wt.[i + 1] in
-            match string_of wt.[i + 4] with
-            | Some s -> (Mutil.decline c s, i + 4)
+            match arg wt.[i + 4] with
+            | Some (s, _) -> (Mutil.decline c s, i + 4)
             | None -> (":", i))
         | '[' -> (
             try
               let j = String.index_from wt i ']' in
               let k = String.index_from wt i '|' in
               if k < j && j + 2 < len && wt.[j + 1] = '%' then
-                match string_of wt.[j + 2] with
-                | Some s ->
+                match arg wt.[j + 2] with
+                | Some (s, raw) ->
                     let s =
-                      if start_with_vowel conf s2_raw then
-                        String.sub wt (k + 1) (j - k - 1) ^ s (*    [aa|bb]  *)
-                      else String.sub wt (i + 1) (k - i - 1) ^ s (* i  k  j  *)
+                      if start_with_vowel conf raw then
+                        String.sub wt (k + 1) (j - k - 1) ^ s
+                      else String.sub wt (i + 1) (k - i - 1) ^ s
                     in
                     (s, j + 2)
                 | None -> raise Not_found
@@ -364,6 +439,12 @@ let gen_decline conf wt s1 s2 s2_raw =
       s ^ loop (i + 1)
   in
   loop 0
+
+let gen_decline conf wt s1 s2 s2_raw =
+  gen_decline_args conf wt [| (s1, s2_raw); (s2, s2_raw) |]
+
+let transl_args conf key args =
+  gen_decline_args conf (transl conf key) (Array.of_list args)
 
 let transl_a_of_b conf x y1 y2 =
   gen_decline conf (transl_nth conf "%1 of %2" 0) x y1 y2
@@ -418,7 +499,6 @@ let ftransl conf s = valid_format s (transl conf (string_of_format s))
 let ftransl_nth conf s p =
   valid_format s (transl_nth conf (string_of_format s) p)
 
-let fdecline w s = valid_format w (gen_decline_basic (string_of_format w) s)
 let translate_eval s = Translate.eval (Mutil.nominative s)
 
 (* *)
@@ -426,11 +506,6 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 let get_referer conf =
   let referer = Mutil.extract_param "referer: " '\n' conf.request in
   escape_html referer
-
-let begin_centered conf =
-  Output.printf conf
-    "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
-    conf.border
 
 let end_centered conf = Output.print_sstring conf "</td></tr></table>\n"
 
@@ -469,21 +544,21 @@ let string_of_ctime conf =
     lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 
 let html ?(content_type = "text/html") conf =
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
+  Output.header conf "Content-type: %s; charset=utf-8" content_type;
   if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Date: %s" (string_of_ctime conf);
-  Output.header conf "Connection: close";
-  Output.header conf "Content-type: %s; charset=%s" content_type charset
+  Output.header conf "Connection: close"
 
 let unauthorized conf auth_type =
-  Output.status conf Def.Unauthorized;
+  Output.status conf Code.Unauthorized;
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-  Output.header conf "Content-type: text/html; charset=%s" conf.charset;
-  Output.print_sstring conf "<head><title>Access failed</title></head>\n";
-  Output.print_sstring conf "<body><h1>Access failed</h1>\n";
-  Output.printf conf "<ul><li>%s</ul>\n" auth_type;
-  Output.print_sstring conf "</body>\n</html>\n"
+  html conf;
+  Output.printf conf
+    {|<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Access failed</title></head>
+<body><h1>Access failed</h1><p>%s</p></body></html>|}
+    (escape_html auth_type :> string)
 
 let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
     ?(senv = true) conf : Adef.escaped_string =
@@ -507,8 +582,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
       match String.split_on_char '_' commd with
       | b :: _p -> b
       | [] ->
-          !GWPARAM.syslog `LOG_ERR
-            (Format.sprintf "Poorly formatted command: %s" commd);
+          Log.err (fun k -> k "Poorly formatted command: %s" commd);
           commd
   in
   let s =
@@ -576,7 +650,6 @@ let default_safe_html_allowed_tags =
     ("http://www.w3.org/1999/xhtml", "map");
     ("http://www.w3.org/1999/xhtml", "object");
     ("http://www.w3.org/1999/xhtml", "ol");
-    ("http://www.w3.org/1999/xhtml", "ol");
     ("http://www.w3.org/1999/xhtml", "p");
     ("http://www.w3.org/1999/xhtml", "param");
     ("http://www.w3.org/1999/xhtml", "pre");
@@ -604,30 +677,27 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else if Sys.file_exists !allowed_tags_file then
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-            let ns, tag =
-              match String.split_on_char ' ' tag with
-              | [ ns; tag ] -> (ns, tag)
-              | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
-              | _ -> assert false
-            in
-            loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-            close_in ic;
-            tags
-      in
-      loop []
-    else
-      let str =
-        Printf.sprintf "Requested allowed_tags file (%s) absent"
-          !allowed_tags_file
-      in
-      !GWPARAM.syslog `LOG_WARNING str;
-      default_safe_html_allowed_tags)
+     else if Sys.file_exists !allowed_tags_file then
+       let ic = open_in !allowed_tags_file in
+       let rec loop tags =
+         match input_line ic with
+         | tag ->
+             let ns, tag =
+               match String.split_on_char ' ' tag with
+               | [ ns; tag ] -> (ns, tag)
+               | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
+               | _ -> assert false
+             in
+             loop ((ns, String.lowercase_ascii tag) :: tags)
+         | exception End_of_file ->
+             close_in ic;
+             tags
+       in
+       loop []
+     else (
+       Log.warn (fun k ->
+           k "Requested allowed_tags file (%s) absent" !allowed_tags_file);
+       default_safe_html_allowed_tags))
 
 (* Few notes:
 
@@ -676,7 +746,10 @@ let safe_html_aux escape_text escape_attribute s =
         | `OK :: tl ->
             stack := tl;
             `End_element
-        | _ -> failwith (__FILE__ ^ " " ^ string_of_int __LINE__))
+        | _ ->
+            Log.warn (fun k ->
+                k "safe_html: unexpected End_element with empty tag stack");
+            `Comment "")
     | e -> e
   in
   string s
@@ -727,24 +800,22 @@ let hidden_input_s conf k v = aux_input_s conf (Adef.encoded "hidden") k v
 let hidden_input conf k v = hidden_input_s conf k (Mutil.decode v)
 let hidden_env_aux conf = List.iter (fun (k, v) -> hidden_input conf k v)
 
-let hidden_env conf =
+let hidden_env ?(senv = true) conf =
   hidden_env_aux conf conf.henv;
-  hidden_env_aux conf conf.senv
+  if senv then hidden_env_aux conf conf.senv
 
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
-
-let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
   try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
   with Failure _ -> None
 
 let nobtit conf base p =
-  Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
+  Driver.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years a lim =
-  if a.year > lim then true
+  if a.Adef.year > lim then true
   else if a.year < lim then false
   else a.month > 0 || a.day > 0
 
@@ -769,38 +840,87 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = !GWPARAM.p_auth conf base p
+let age_days conf _base p =
+  match Date.od_of_cdate (Driver.get_birth p) with
+  | Some (Dgreg (birth_dmy, cal)) -> (
+      let from =
+        if birth_dmy.day > 0 && birth_dmy.month > 0 then Adef.Dgregorian
+        else cal
+      in
+      try
+        let birth_sdn = Date.to_sdn ~from birth_dmy in
+        let end_sdn =
+          match Date.date_of_death (Driver.get_death p) with
+          | Some (Dgreg (death_dmy, cal2)) ->
+              let from2 =
+                if death_dmy.day > 0 && death_dmy.month > 0 then Adef.Dgregorian
+                else cal2
+              in
+              Some (Date.to_sdn ~from:from2 death_dmy)
+          | _ -> (
+              match Driver.get_death p with
+              | NotDead | DontKnowIfDead ->
+                  Some (Date.to_sdn ~from:Dgregorian conf.today)
+              | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> None)
+        in
+        match end_sdn with
+        | Some e when e >= birth_sdn -> Some (e - birth_sdn)
+        | _ -> None
+      with _ -> None)
+  | _ -> None
 
-let is_restricted (conf : config) base (ip : iper) =
+let authorized_age conf base p = GWPARAM.p_auth conf base p
+
+let is_restricted (conf : config) base (ip : Driver.iper) =
   let fct p =
-    (not (is_quest_string (get_surname p)))
-    && (not (is_quest_string (get_first_name p)))
+    (not (Driver.Istr.is_quest (Driver.get_surname p)))
+    && (not (Driver.Istr.is_quest (Driver.get_first_name p)))
     && not (authorized_age conf base p)
   in
-  if conf.use_restrict then base_visible_get base fct ip else false
+  if conf.use_restrict then Driver.base_visible_get base fct ip else false
 
-let pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip else poi base ip
+let pget_opt conf base ip =
+  if is_restricted conf base ip then None else Some (Driver.poi base ip)
 
-let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
+let pget conf base ip =
+  if is_restricted conf base ip then Driver.empty_person base ip
+  else Driver.poi base ip
+
+(* Visibility of a person in search results.  Shared by SearchName and
+   Some, which read persons straight from the name indexes (poi, not pget)
+   and used to re-implement the test with small differences. *)
+let visible_in_search conf base p =
+  let empty_or_quest istr =
+    Driver.Istr.is_empty istr || Driver.Istr.is_quest istr
+  in
+  (not (empty_or_quest (Driver.get_surname p)))
+  && (not (empty_or_quest (Driver.get_first_name p)))
+  && Name.lower (Driver.sou base (Driver.get_surname p)) <> ""
+  && Name.lower (Driver.sou base (Driver.get_first_name p)) <> ""
+  && (not (is_hide_names conf p && not (authorized_age conf base p)))
+  && not (is_restricted conf base (Driver.get_iper p))
+
+let visible_in_search_ip conf base ip =
+  visible_in_search conf base (Driver.poi base ip)
+
+let string_gen_person base p =
+  Futil.map_person_ps (fun p -> p) (Driver.sou base) p
 
 let string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
+  Futil.map_family_ps (fun p -> p) (fun f -> f) (Driver.sou base) fam
 
-let is_hidden p = is_empty_string (get_surname p)
+let is_hidden p = Driver.Istr.is_empty (Driver.get_surname p)
 
 let is_empty_name p =
-  Gwdb.is_quest_string (Gwdb.get_surname p)
-  && Gwdb.is_quest_string (Gwdb.get_first_name p)
+  Driver.Istr.is_quest (Driver.get_surname p)
+  && Driver.Istr.is_quest (Driver.get_first_name p)
 
 let is_public conf base p =
-  get_access p = Public
+  Driver.get_access p = Public
   || conf.public_if_titles
-     && get_access p = IfTitles
+     && Driver.get_access p = IfTitles
      && nobtit conf base p <> []
-  || is_old_person conf (gen_person_of_person p)
-
-let is_semi_public _conf _base p = get_access p = SemiPublic
+  || is_old_person conf (Driver.gen_person_of_person p)
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
@@ -808,17 +928,15 @@ let is_semi_public _conf _base p = get_access p = SemiPublic
 
 (* ********************************************************************** *)
 
-(** [Description] : Vrai si la personne est accessible par sa clé,
-                    Faux sinon.
+(** [Description] : Vrai si la personne est accessible par sa clé, Faux sinon.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-      - fn   : prénom de la personne
-      - sn   : patronyme de la personne
-    [Retour] :
-      - bool : Vrai si la personne est accessible par sa clé, faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person
+    - fn : prénom de la personne
+    - sn : patronyme de la personne [Retour] :
+    - bool : Vrai si la personne est accessible par sa clé, faux sinon. [Rem] :
+      Exporté en clair hors de ce module. *)
 let accessible_by_key conf base p fn sn =
   conf.access_by_key
   && (not (fn = "?" || sn = "?"))
@@ -830,18 +948,23 @@ let accessible_by_key conf base p fn sn =
 
 (* ********************************************************************** *)
 
-(** [Description] : Renvoie les paramètres URL pour l'accès à la nième
-                    personne.
+let access_status p =
+  match Driver.get_access p with
+  | Private -> "Private"
+  | SemiPublic -> "SemiPublic"
+  | Public -> "Public"
+  | IfTitles -> "IfTitles"
+
+(** [Description] : Renvoie les paramètres URL pour l'accès à la nième personne.
     [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
-    - p    : person
-      [Retour] : string
-      [Rem] : Exporté en clair hors de ce module.                           *)
+    - n : la nième personne (e.g. : calcul de parenté entre p1 et p2)
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces_n conf base n x : Adef.escaped_string =
-  let first_name = p_first_name base x in
-  let surname = p_surname base x in
+  let first_name = Driver.p_first_name base x in
+  let surname = Driver.p_surname base x in
   if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
     "p" ^<^ n ^^^ "="
@@ -849,15 +972,10 @@ let acces_n conf base n x : Adef.escaped_string =
     ^^^ "&n" ^<^ n ^^^ "="
     ^<^ (Mutil.encode (Name.lower surname) :> Adef.escaped_string)
     ^^^
-    if get_occ x <> 0 then "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
+    if Driver.get_occ x <> 0 then
+      "&oc" ^<^ n ^>^ "=" ^ string_of_int (Driver.get_occ x)
     else Adef.escaped ""
-  else
-    "i" ^<^ n ^^^ "="
-    ^<^ string_of_iper (get_iper x)
-    ^<^
-    if conf.wizard && get_occ x <> 0 then
-      "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
-    else Adef.escaped ""
+  else "i" ^<^ n ^>^ "=" ^ Driver.Iper.to_string (Driver.get_iper x)
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)
@@ -866,39 +984,45 @@ let acces_n conf base n x : Adef.escaped_string =
 
 (** [Description] : Renvoie les paramètres URL pour l'accès à la personne.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : person [Retour] : string [Rem] : Exporté en clair hors de ce module.
+*)
 let acces conf base x = acces_n conf base (Adef.escaped "") x
 
 (**/**)
 
 let restricted_txt = Adef.safe "....."
-let x_x_txt = Adef.safe "x x"
 
-let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
-    ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
+let private_txt conf k =
+  match k with
+  | "p" -> transl conf "hidden first_name"
+  | "n" -> transl conf "hidden surname"
+  | _ -> transl conf "hidden person"
+
+let gen_person_text ?(escape = true) ?(html = true) ?(sn = true)
+    ?(p_first_name = Driver.p_first_name) ?(p_surname = Driver.p_surname) conf
+    base p =
   let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if chk && is_hide_names conf p && not (authorized_age conf base p) then
-    x_x_txt
-  else
+  else if GWPARAM.p_auth_sp conf base p then
     let beg =
-      match (sou base (get_public_name p), get_qualifiers p) with
+      match
+        (Driver.sou base (Driver.get_public_name p), Driver.get_qualifiers p)
+      with
       | "", nn :: _ ->
           esc (p_first_name base p)
           ^^^ (if html then " <em>" else " ")
-          ^<^ esc (sou base nn)
+          ^<^ esc (Driver.sou base nn)
           ^>^ if html then "</em>" else ""
       | "", [] -> esc (p_first_name base p)
-      | n, nn :: _ -> esc n ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+      | n, nn :: _ -> esc n ^^^ " <em>" ^<^ esc (Driver.sou base nn) ^>^ "</em>"
       | n, [] -> esc n
     in
     if sn then
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
+  else Adef.safe (private_txt conf "")
 
 let main_title conf base p =
   let titles = nobtit conf base p in
@@ -908,30 +1032,33 @@ let main_title conf base p =
 
 let titled_person_text conf base p t : Adef.safe_string =
   if List.assoc_opt "print_advanced_title" conf.base_env = Some "yes" then
-    let estate = sou base t.t_place in
-    let surname = p_surname base p in
+    let estate = Driver.sou base t.t_place in
+    let surname = Driver.p_surname base p in
     (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
     (*     fonction du nom public et sobriquet                           *)
     if Name.strip_lower estate = Name.strip_lower surname then
-      match (t.t_name, get_qualifiers p) with
-      | Tname n, [] -> (esc (sou base n) :> Adef.safe_string)
+      match (t.t_name, Driver.get_qualifiers p) with
+      | Tname n, [] -> (esc (Driver.sou base n) :> Adef.safe_string)
       | Tname n, nn :: _ ->
-          (esc (sou base n) :> Adef.safe_string)
+          (esc (Driver.sou base n) :> Adef.safe_string)
           ^^^ " <em>"
-          ^<^ (esc (sou base nn) :> Adef.safe_string)
+          ^<^ (esc (Driver.sou base nn) :> Adef.safe_string)
           ^>^ "</em>"
       | _ -> gen_person_text ~sn:false conf base p
     else
       let elen = String.length estate in
       let slen = String.length surname in
       if elen < slen && String.sub surname (slen - elen) elen = estate then
-        match (t.t_name, get_qualifiers p) with
-        | Tname n, [] -> esc (sou base n)
+        match (t.t_name, Driver.get_qualifiers p) with
+        | Tname n, [] -> esc (Driver.sou base n)
         | Tname n, nn :: _ ->
-            esc (sou base n) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+            esc (Driver.sou base n)
+            ^^^ " <em>"
+            ^<^ esc (Driver.sou base nn)
+            ^>^ "</em>"
         | _ ->
             gen_person_text
               ~p_surname:(fun _ _ ->
@@ -940,10 +1067,10 @@ let titled_person_text conf base p t : Adef.safe_string =
       else
         match t.t_name with
         | Tname s -> (
-            let s = esc (sou base s) in
-            match get_qualifiers p with
+            let s = esc (Driver.sou base s) in
+            match Driver.get_qualifiers p with
             | [] -> s
-            | nn :: _ -> s ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>")
+            | nn :: _ -> s ^^^ " <em>" ^<^ esc (Driver.sou base nn) ^>^ "</em>")
         | _ -> gen_person_text conf base p
   else gen_person_text conf base p
 
@@ -953,22 +1080,23 @@ let titled_person_text conf base p t : Adef.safe_string =
 (* *********************************************************************** *)
 
 (** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
-                    domaine.
-    [Args] :
-      - base : base de donnée
-      - t    : le titre de noblesse que l'on veut afficher
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+    domaine. [Args] :
+    - base : base de donnée
+    - t : le titre de noblesse que l'on veut afficher [Retour] : string [Rem] :
+      Non exporté en clair hors de ce module. *)
 let one_title_text base t : Adef.safe_string =
-  let place = sou base t.t_place in
-  let s = sou base t.t_ident in
+  let place = Driver.sou base t.t_place in
+  let s = Driver.sou base t.t_ident in
   let s = if place = "" then s else s ^ " " ^ place in
   " <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
 let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
-  "<a href=\""
-  ^<^ (commd conf ^^^ href :> Adef.safe_string)
-  ^^^ "\">" ^<^ s ^>^ "</a>"
+  let cancel_links = p_getenv conf.env "cgl" = Some "on" in
+  if cancel_links then s
+  else
+    "<a href=\""
+    ^<^ (commd conf ^^^ href :> Adef.safe_string)
+    ^^^ "\">" ^<^ s ^>^ "</a>"
 
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
@@ -980,9 +1108,9 @@ let mod_ind_link conf p (s : Adef.safe_string) =
   if is_hidden p || cgl || not conf.wizard then s
   else
     let s = (s :> string) in
-    let href = "m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
+    let href = "m=MOD_IND&i=" ^ Driver.Iper.to_string (Driver.get_iper p) in
     let txt =
-      if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
+      if s = "" then {|<i class="fa fa-wrench fa-xs ms-1" alt=" (edit)"></i>|}
       else s
     in
     Format.sprintf {|<a href="%s%s">%s</a>|} (commd conf :> string) href txt
@@ -992,14 +1120,19 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
   in
-  let iper = get_iper p in
+  let iper = Driver.get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
-  if is_hidden p || cgl then s
+  if (not (GWPARAM.p_auth conf base p)) || cgl then s
   else
+    let excl =
+      match p_getenv conf.env "m" with
+      | None | Some ("" | "R" | "RL" | "RLM") -> [ "em"; "ei"; "et" ]
+      | _ -> []
+    in
     "<a href=\""
-    ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
+    ^<^ (commd ~excl conf ^^^ acces conf base p :> Adef.safe_string)
     ^^^ (if with_id then "\" id=\"i" else "")
-    ^<^ (if with_id then string_of_iper iper else "")
+    ^<^ (if with_id then Driver.Iper.to_string iper else "")
     ^<^ "\">" ^<^ s ^>^ "</a>"
 
 let reference = reference_flags true
@@ -1010,26 +1143,26 @@ let reference_noid = reference_flags false
 
 (* ************************************************************************* *)
 
-(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir
-                    une boucle. Si il n'y a pas d'ambiguité, alors on renvoie
-                    un lien vers la famille à modifier, sinon, on renvoie un
-                    lien vers le menu général de mise à jour.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - p    : person
-      - s    : la clé de la personne sous forme de string
-    [Retour] :
-      - string : retourne un lien de mise à jour soit vers la famille
-                 contenant la boucle, soit vers le menu de mise à jour.
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir une
+    boucle. Si il n'y a pas d'ambiguité, alors on renvoie un lien vers la
+    famille à modifier, sinon, on renvoie un lien vers le menu général de mise à
+    jour. [Args] :
+    - conf : configuration
+    - base : base
+    - p : person
+    - s : la clé de la personne sous forme de string [Retour] :
+    - string : retourne un lien de mise à jour soit vers la famille contenant la
+      boucle, soit vers le menu de mise à jour. [Rem] : Exporté en clair hors de
+      ce module. *)
 let update_family_loop conf base p s =
   if is_hidden p then s
   else
-    let iper = get_iper p in
-    let list = get_family p in
+    let iper = Driver.get_iper p in
+    let list = Driver.get_family p in
     let list =
-      Array.map (fun ifam -> (ifam, get_children (foi base ifam))) list
+      Array.map
+        (fun ifam -> (ifam, Driver.get_children (Driver.foi base ifam)))
+        list
     in
     let res =
       Array.fold_left
@@ -1040,14 +1173,14 @@ let update_family_loop conf base p s =
     if conf.wizard then
       match res with
       | [ res ] ->
-          let iper = string_of_iper iper in
-          let ifam = string_of_ifam res in
+          let iper = Driver.Iper.to_string iper in
+          let ifam = Driver.Ifam.to_string res in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
           ^>^ "</a>"
       | _ ->
-          let iper = string_of_iper iper in
+          let iper = Driver.Iper.to_string iper in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
           ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
@@ -1073,19 +1206,6 @@ let referenced_person_text conf base p =
 let referenced_person_text_without_surname conf base p =
   reference conf base p (gen_person_text ~sn:false conf base p)
 
-let person_text_without_title conf base p =
-  match main_title conf base p with
-  | Some t -> (
-      if eq_istr t.t_place (get_surname p) then
-        gen_person_text ~sn:false conf base p
-      else
-        match (t.t_name, get_qualifiers p) with
-        | Tname s, nn :: _ ->
-            esc (sou base s) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
-        | Tname s, _ -> esc (sou base s)
-        | _ -> gen_person_text conf base p)
-  | None -> gen_person_text conf base p
-
 let person_title conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
@@ -1094,17 +1214,19 @@ let person_title conf base p =
   else Adef.safe ""
 
 let make_key base p =
-  (Name.lower (sou base p.first_name), Name.lower (sou base p.surname), p.occ)
+  ( Name.lower (Driver.sou base p.first_name),
+    Name.lower (Driver.sou base p.surname),
+    p.occ )
 
 let name_key base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Mutil.get_particle (Driver.base_particles base) s in
   if part = "" then s
   else
     let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 
 let surname_particle base s =
-  let part = Mutil.get_particle (Gwdb.base_particles base) s in
+  let part = Mutil.get_particle (Driver.base_particles base) s in
   let len = String.length part in
   if len = 0 then ""
   else if part.[len - 1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
@@ -1112,7 +1234,7 @@ let surname_particle base s =
 
 let surname_without_particle base s =
   let part_len =
-    String.length (Mutil.get_particle (Gwdb.base_particles base) s)
+    String.length (Mutil.get_particle (Geneweb_db.Driver.base_particles base) s)
   in
   String.sub s part_len (String.length s - part_len)
 
@@ -1137,7 +1259,9 @@ let create_env s =
         Adef.encoded (String.sub s (succ i) (String.length s - succ i)) )
     else separate (succ i) s
   in
-  List.map (separate 0) (get_assoc 0 0)
+  List.filter_map
+    (fun s -> if s = "" then None else Some (separate 0 s))
+    (get_assoc 0 0)
 
 let std_color conf (s : Adef.safe_string) =
   "<span style=\"color:" ^<^ conf.highlight ^<^ "\">" ^<^ s ^>^ "</span>"
@@ -1198,7 +1322,7 @@ let string_of_pevent_name conf base epers_name =
   | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
   | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
   | Epers_Will -> Adef.safe @@ transl conf "will"
-  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | Epers_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
 
 let string_of_fevent_name conf base = function
   | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
@@ -1213,7 +1337,7 @@ let string_of_fevent_name conf base = function
   | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
   | Efam_PACS -> Adef.safe @@ transl conf "PACS"
   | Efam_Residence -> Adef.safe @@ transl conf "residence"
-  | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | Efam_Name n -> (escape_html (Driver.sou base n) :> Adef.safe_string)
 
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in
@@ -1246,153 +1370,224 @@ let string_of_witness_kind_raw witness_kind =
   Adef.safe s
 
 let bpath bname = !GWPARAM.bpath bname
-let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
-let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
-let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
-    =
-  if conf.debug then
-    match Filename.extension (fname :> string) with
-    | ".css" | ".js" ->
-        Output.print_sstring conf "\n/* ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " */\n"
-    | _ ->
-        Output.print_sstring conf "\n<!-- ";
-        Output.print_string conf k;
-        Output.print_sstring conf " ";
-        Output.print_string conf fname;
-        Output.print_sstring conf " -->\n"
+(* Cached [dir_listing_cache_ttl] seconds. [None] = directory absent/unreadable. *)
+let dir_listing_cache :
+    (string, float * (string, unit) Hashtbl.t option) Hashtbl.t =
+  Hashtbl.create 16
 
-let include_begin = include_begin_end_aux (Adef.safe "begin")
-let include_end = include_begin_end_aux (Adef.safe "end")
+let dir_listing_cache_ttl = 60.0 (* seconds *)
+
+let dir_listing dir =
+  let now = Unix.time () in
+  let recompute () =
+    let listing =
+      try
+        let tbl = Hashtbl.create 16 in
+        Filesystem.walk_folder
+          (fun entry () ->
+            match entry with
+            | Filesystem.File fl | Filesystem.Dir fl ->
+                Hashtbl.replace tbl (Filename.basename fl) ()
+            | Filesystem.Exn { exn; bt; _ } ->
+                Printexc.raise_with_backtrace exn bt)
+          dir ();
+        Some tbl
+      with Unix.Unix_error _ -> None
+    in
+    Hashtbl.replace dir_listing_cache dir (now, listing);
+    listing
+  in
+  match Hashtbl.find dir_listing_cache dir with
+  | checked_at, listing when now -. checked_at < dir_listing_cache_ttl ->
+      listing
+  | _ -> recompute ()
+  | exception Not_found -> recompute ()
+
+let parse_file_cached fl = Geneweb_templ.Parser.parse_file ~src:(`File fl) fl
+let dir_exists_cached dir = dir_listing dir <> None
+
+(* [filename] may itself contain subdirectory components (e.g.
+   "js/foo.js", "modules/arbre_h6.css"): split it once so that what gets
+   cached is the listing of the directory that actually holds it, not a
+   nonexistent flat lookup key. For the common case of a flat template
+   name, [sub_dir] is ["."] and this collapses to caching [dir] itself. *)
+let find_file_in_directories directories filename =
+  let sub_dir = Filename.dirname filename in
+  let base_name = Filename.basename filename in
+  let rec search = function
+    | [] -> None
+    | dir :: remaining -> (
+        let full_dir =
+          if sub_dir = Filename.current_dir_name then dir
+          else Filename.concat dir sub_dir
+        in
+        match dir_listing full_dir with
+        | Some entries when Hashtbl.mem entries base_name ->
+            Some (Filename.concat dir filename)
+        | _ -> search remaining)
+  in
+  search directories
+
+(* ************************************************************************ *)
+(*  [Func] generate_search_directories : config -> string list              *)
+(* ************************************************************************ *)
+
+(** Generates the ordered list of search directories for template files.
+
+    The search is done in this order:
+    - bases/etc/mybase/templx/ (template [templx] in mybase)
+    - bases/etc/mybase/ (default template in mybase)
+    - bases/etc/templx/ (template [templx] shared across all bases, if it
+      exists)
+    - bases/etc/ (shared default across all bases, if it exists)
+    - gw/etc/templx/ (template [templx] in etc)
+    - gw/etc/ (default template in etc)
+
+    The [templx] level of both [bases/etc/mybase/] and the two "shared"
+    directories above is only probed if it actually exists (checked via a
+    short-lived cache, see [dir_exists_cached] / [dir_listing]): most
+    installations never create a per-template folder, so this keeps its cost to
+    one cached [Sys.readdir] every [dir_listing_cache_ttl] seconds instead of
+    one stat() per template lookup.
+
+    The template configuration variable can contain:
+    - template=templ1,templ2: allows only these templates
+    - template=*: allows all templates
+
+    @param conf base configuration
+    @return ordered list of directories to traverse *)
+
+let generate_search_directories conf =
+  let base_etc = !GWPARAM.etc_d conf.bname in
+  let shared_etc = Filename.concat (Secure.base_dir ()) "etc" in
+  let asset_dirs = Secure.assets () in
+  let configured_templates, allow_all =
+    try
+      let templates =
+        List.assoc "template" conf.base_env
+        |> String.split_on_char ',' |> List.map String.trim
+        |> List.filter (( <> ) "")
+      in
+      let allow_all = List.mem "*" templates in
+      let explicit_templates = List.filter (( <> ) "*") templates in
+      (explicit_templates, allow_all)
+    with Not_found -> ([ conf.bname ], true)
+  in
+  let current_template =
+    match p_getenv conf.env "templ" with
+    | Some t when allow_all || List.mem t configured_templates -> Some t
+    | _ -> List.nth_opt configured_templates 0
+  in
+  let template_dirs =
+    match current_template with
+    | Some t ->
+        let templx_dir = Filename.concat base_etc t in
+        if dir_exists_cached templx_dir then [ templx_dir; base_etc ]
+        else [ base_etc ]
+    | None -> [ base_etc ]
+  in
+  let shared_dirs =
+    let candidates =
+      match current_template with
+      | Some t -> [ Filename.concat shared_etc t; shared_etc ]
+      | None -> [ shared_etc ]
+    in
+    List.filter dir_exists_cached candidates
+  in
+  let asset_template_dirs =
+    List.concat
+      (List.map
+         (fun asset_dir ->
+           let etc_dir = Filename.concat asset_dir "etc" in
+           match current_template with
+           | Some t -> [ Filename.concat etc_dir t; etc_dir ]
+           | None -> [ etc_dir ])
+         asset_dirs)
+  in
+  template_dirs @ shared_dirs @ asset_template_dirs
+
+(* ************************************************************************ *)
+(*  [Func] find_template_file : config -> string -> bool -> string          *)
+(* ************************************************************************ *)
+
+(** Generic function to find a file in the template hierarchy.
+    @param conf base configuration
+    @param fname file name
+    @param auto_txt
+      if [true], automatically adds [.txt] extension for compatibility
+    @return full path to the found file*)
+
+let find_template_file conf fname auto_txt =
+  let normalized_fname =
+    List.fold_left Filename.concat "" (String.split_on_char '/' fname)
+  in
+  let final_fname =
+    (* Only append ".txt" to a bare name (no extension at all): a name
+       that already carries its own extension (e.g. an "%include"'d
+       "foo.js" or "foo.css") must be looked up as-is. Checking only for
+       an existing ".txt" suffix (as before) let any other extension
+       silently turn into "foo.js.txt", which then could never be found
+       since real assets are never named that way. *)
+    if auto_txt && Filename.extension normalized_fname = "" then
+      normalized_fname ^ ".txt"
+    else normalized_fname
+  in
+  let search_dirs = generate_search_directories conf in
+  match find_file_in_directories search_dirs final_fname with
+  | Some path -> path
+  | None -> search_in_assets (Filename.concat "etc" final_fname)
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
-
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin vers le fichier de template passé
-                    en paramètre.
-    [Args] :
-      - conf  : configuration de la base
-      - fname : le fichier de template
-    [Retour] :
-      - string : le chemin vers le fichier de template
+(** Find an HTML template file with automatic. For compatibility, it
+    automatically adds the [.txt] extension to the filename.
 
-    On cherche le fichier dans cet ordre :
-    etc_d vaut :
-    - bases/etc/mybase       en mode classique
-    - bases/mybase.gwb/etc/  en mode reorg
-    on cherche dans :
-    - etc_d/templx/name.txt  (base specific)
-    - etc_d/name.txt         (base specific)
-    - gw/etc/templx/name.txt (distribution)
-    - gw/etc/name.txt        (distribution)
+    @param conf base configuration
+    @param fname file name (without [.txt] extension)
+    @return full path to the found file *)
 
-    [Rem] : Exporté en clair hors de ce module.                             *)
+let etc_file_name conf fname = find_template_file conf fname true
 
-let etc_file_name conf fname =
-  (* On recherche si dans le nom du fichier, on a specifié son *)
-  (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
-  (* on le reconstitue avec le bon dir_separateur *)
-  let fname =
-    List.fold_left Filename.concat "" (String.split_on_char '/' fname)
-  in
-  let file_exist dir =
-    (* etc_d/templx/name.txt or etc_d/name.txt *)
-    let fn =
-      String.concat Filename.dir_sep
-        (if dir <> "" then [ !GWPARAM.etc_d conf.bname; dir; fname ^ ".txt" ]
-        else [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ])
-    in
-    if Sys.file_exists fn then fn
-    else
-      (* etc_d/name.txt *)
-      let fn =
-        String.concat Filename.dir_sep
-          [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ]
-      in
-      (* on a déjà testé le cas dir = "" *)
-      if dir <> "" && Sys.file_exists fn then fn
-      else
-        (* assets/templx/name.txt or assets/name.txt *)
-        let fn =
-          search_in_assets
-            (String.concat Filename.dir_sep
-               (if dir <> "" then [ "etc"; dir; fname ^ ".txt" ]
-               else [ "etc"; fname ^ ".txt" ]))
-        in
-        if Sys.file_exists fn then fn
-        else
-          (* assets/name.txt *)
-          let fn =
-            search_in_assets
-              (String.concat Filename.dir_sep [ "etc"; fname ^ ".txt" ])
-          in
-          (* on a déjà testé le cas dir = "" *)
-          if dir <> "" && Sys.file_exists fn then fn else ""
-  in
-  (* Recherche le fichier template par défaut dans la liste des      *)
-  (* dossiers template définis par la variable gwf                   *)
-  (* template = templ1,templ2,*                                      *)
-  (* la valeur * autorise tous les templates                         *)
-  let rec default_templ config_templ std_fname =
-    match config_templ with
-    | [] | [ "*" ] -> std_fname
-    | x :: l -> (
-        match file_exist x with "" -> default_templ l std_fname | s -> s)
-  in
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with Not_found -> [ conf.bname; "*" ]
-  in
-  (* the current template folder *)
-  let dir =
-    match p_getenv conf.env "templ" with
-    | Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None -> (
-        match config_templ with [] | [ "*" ] -> "" | x :: _ -> x)
-  in
-  (* default template file (gw/etc/fname.txt) *)
-  let std_fname = search_in_assets (Filename.concat "etc" (fname ^ ".txt")) in
+(* ************************************************************************ *)
+(*  [Fonc] resolve_asset_file : config -> string -> string                  *)
+(* ************************************************************************ *)
 
-  (* On cherche le fichier template dans l'ordre de file_exist.   *)
-  (* Si on ne trouve rien, alors on cherche le premier template   *)
-  (* par défaut tel que défini par la variable template du gwf    *)
-  match file_exist dir with
-  | "" -> default_templ config_templ std_fname
-  | s -> s
+(** Resolves asset files (CSS/JS/fonts) while respecting the template hierarchy.
+    Does not add [.txt] extension.
+
+    @param conf base configuration
+    @param fname asset file name with its extension
+    @return full path to the asset *)
+
+let resolve_asset_file conf fname = find_template_file conf fname false
 
 let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
-    !GWPARAM.syslog `LOG_ERR
-      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
+    Log.err (fun k -> k "Error opening file %s in open_etc_file: %s" fname e);
     None
 
-let include_template conf env fname failure =
+(* Detect if a template file is a full HTML page *)
+let is_full_html_template conf fname =
   match open_etc_file conf fname with
-  | Some (ic, fname) ->
-      include_begin conf (esc fname);
-      copy_from_templ conf env ic;
-      include_end conf (esc fname)
-  | None -> failure ()
-
-let body_prop conf =
-  try match List.assoc "body_prop" conf.base_env with "" -> "" | s -> " " ^ s
-  with Not_found -> ""
+  | None -> false
+  | Some (ic, _) ->
+      let rec check_lines n =
+        if n <= 0 then false
+        else
+          try
+            let line = input_line ic in
+            let normalized = String.trim line |> String.lowercase_ascii in
+            if normalized = "<!doctype html>" then true else check_lines (n - 1)
+          with End_of_file -> false
+      in
+      let result = check_lines 3 in
+      close_in ic;
+      result
 
 let get_server_string conf =
   if not conf.cgi then Mutil.extract_param "host: " '\r' conf.request
@@ -1409,6 +1604,19 @@ let get_request_string conf =
     let script_name = try Sys.getenv "SCRIPT_NAME" with Not_found -> "" in
     let query_string = try Sys.getenv "QUERY_STRING" with Not_found -> "" in
     script_name ^ "?" ^ query_string
+
+let get_protocol conf =
+  let forwarded_proto =
+    Mutil.extract_param "x-forwarded-proto: " '\r' conf.request
+  in
+  if String.lowercase_ascii forwarded_proto = "https" then "https"
+  else
+    let host = get_server_string conf in
+    if
+      String.length host > 4
+      && String.sub host (String.length host - 4) 4 = ":443"
+    then "https"
+    else "http"
 
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
@@ -1431,10 +1639,6 @@ let message_to_wizard conf =
 let doctype = Adef.safe "<!DOCTYPE html>"
 
 let http_string s i =
-  let start_with s i p =
-    i + String.length p <= String.length s
-    && String.lowercase_ascii (String.sub s i (String.length p)) = p
-  in
   let http = "http://" in
   let https = "https://" in
   let http, start_with_http =
@@ -1463,12 +1667,14 @@ let http_string s i =
     in
     let j =
       let rec loop j =
-        match s.[j - 1] with
-        | ')' | ',' | '.' | ':' | ';' ->
-            if s.[j - 1] = ')' && par = 0 then j
-            else if s.[j - 1] = ')' && par < 0 then j - 1
-            else loop (j - 1)
-        | _ -> j
+        if j = 0 then j
+        else
+          match s.[j - 1] with
+          | ')' | ',' | '.' | ':' | ';' ->
+              if s.[j - 1] = ')' && par = 0 then j
+              else if s.[j - 1] = ')' && par < 0 then j - 1
+              else loop (j - 1)
+          | _ -> j
       in
       loop j
     in
@@ -1577,6 +1783,10 @@ let expand_env =
         loop 0
     | _ -> s
 
+(* in srcfileDisplay, there is a macro function with many more macros! *)
+(* not necessarily easy to transpose in this context (base absent) *)
+(* Warning: env is not the classical environment! *)
+(* it is: (char * (unit -> string)) list (see Perso.get_note_or_source) *)
 let string_with_macros conf env s =
   let start_with s i p =
     i + String.length p <= String.length s
@@ -1674,6 +1884,13 @@ let string_with_macros conf env s =
   in
   loop Out 0
 
+let body_prop conf =
+  try
+    match List.assoc "body_prop" conf.base_env with
+    | "" -> ""
+    | s -> " " ^ string_with_macros conf [] s
+  with Not_found -> ""
+
 let place_of_string conf place =
   match List.assoc_opt "place" conf.base_env with
   | Some gwf_place ->
@@ -1729,7 +1946,7 @@ let raw_string_of_place _conf place =
 
 let string_of_place _conf place = raw_string_of_place _conf place |> escape_html
 let menu_threshold = 20
-let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
+let is_number t = t <> "" && match t.[0] with '1' .. '9' -> true | _ -> false
 
 let hexa_string s =
   let s' = Bytes.create (2 * String.length s) in
@@ -1739,55 +1956,64 @@ let hexa_string s =
   done;
   Bytes.unsafe_to_string s'
 
-let print_alphab_list conf crit print_elem liste =
+let print_alphab_list conf ?(prefix = "") crit print_elem liste =
   let len = List.length liste in
-  if len > menu_threshold then (
-    Output.print_sstring conf "<p>\n";
-    (let _ =
-       List.fold_left
-         (fun last e ->
-           let t = crit e in
-           let same_than_last =
-             match last with Some t1 -> t = t1 | _ -> false
-           in
-           if not same_than_last then
-             Output.printf conf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t;
-           Some t)
-         None liste
-     in
-     ());
-    Output.print_sstring conf "</p>\n");
-  Output.print_sstring conf "<ul>\n";
-  (let _ =
-     List.fold_left
-       (fun last e ->
-         let t = crit e in
-         let same_than_last =
-           match last with Some t1 -> t = t1 | _ -> false
-         in
-         if len > menu_threshold || is_number t then (
-           (match last with
-           | Some _ ->
-               if not same_than_last then
-                 Output.print_sstring conf "</ul>\n</li>\n"
-           | _ -> ());
-           if not same_than_last then (
-             Output.print_sstring conf "<li>\n";
-             Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-             Output.print_sstring conf "<ul>\n"));
-         Output.print_sstring conf "<li>\n  ";
-         print_elem e;
-         Output.print_sstring conf "</li>\n";
-         Some t)
-       None liste
-   in
-   ());
-  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
-  Output.print_sstring conf "</ul>\n"
+  if liste = [] then Output.print_sstring conf "<ul></ul>\n"
+  else (
+    if len > menu_threshold then (
+      let buf = Buffer.create 512 in
+      Buffer.add_string buf "<p>\n";
+      let module StrSet = Set.Make (String) in
+      let seen = ref StrSet.empty in
+      List.iter
+        (fun e ->
+          let t = crit e in
+          if not (StrSet.mem t !seen) then (
+            seen := StrSet.add t !seen;
+            Printf.bprintf buf "<a href=\"#%sai%s\">%s</a>\n" prefix
+              (hexa_string t) t))
+        liste;
+      Buffer.add_string buf "</p>\n";
+      Output.print_sstring conf (Buffer.contents buf));
+    if len > menu_threshold then
+      Output.print_sstring conf "<ul class=\"pl-0\">\n"
+    else Output.print_sstring conf "<ul class=\"pl-4\">\n";
+    let rec process_groups current_group current_index = function
+      | [] when current_group <> [] ->
+          print_group (List.rev current_group) current_index
+      | [] -> ()
+      | e :: rest ->
+          let t = crit e in
+          if len > menu_threshold || is_number t then
+            if current_index = None || Some t <> current_index then (
+              if current_group <> [] then
+                print_group (List.rev current_group) current_index;
+              process_groups [ e ] (Some t) rest)
+            else process_groups (e :: current_group) current_index rest
+          else print_group (e :: rest) (Some "")
+    and print_group items index_opt =
+      let index = match index_opt with Some t -> t | None -> "" in
+      if len > menu_threshold && index <> "" then
+        Output.printf conf
+          "<li class=\"li-none\">\n\
+           <a id=\"%sai%s\">%s</a>\n\
+           <ul class=\"fa-ul\">\n"
+          prefix (hexa_string index) index;
+      List.iter
+        (fun e ->
+          Output.print_sstring conf "<li><span class=\"fa-li\">\n";
+          print_elem e;
+          Output.print_sstring conf "</span></li>\n")
+        items;
+      if len > menu_threshold && index <> "" then
+        Output.print_sstring conf "</ul>\n</li>\n"
+    in
+    process_groups [] None liste;
+    Output.print_sstring conf "</ul>\n")
 
 let relation_txt conf sex fam =
   let is = index_of_sex sex in
-  match get_relation fam with
+  match Driver.get_relation fam with
   | NotMarried | NoSexesCheckNotMarried ->
       ftransl_nth conf "relationship%t to" is
   | MarriageContract -> ftransl_nth conf "marriage contract%t with" is
@@ -1802,7 +2028,7 @@ let relation_txt conf sex fam =
 let relation_date conf fam : Adef.safe_string =
   Adef.safe
   @@
-  match Date.cdate_to_dmy_opt (get_marriage fam) with
+  match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
   | None -> ""
   | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
 
@@ -1810,51 +2036,43 @@ let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
-    if not (eq_istr (get_surname p) (get_surname fath)) then
-      gen_person_text conf base fath
+    if not (Driver.Istr.equal (Driver.get_surname p) (Driver.get_surname fath))
+    then gen_person_text conf base fath
     else gen_person_text ~sn:false conf base fath
   in
-  let a = pget conf base (get_iper p) in
-  let ifam =
-    match get_parents a with
-    | Some ifam ->
-        let cpl = foi base ifam in
-        let fath =
-          let fath = pget conf base (get_father cpl) in
-          if p_first_name base fath = "?" then None else Some fath
-        in
-        let moth =
-          let moth = pget conf base (get_mother cpl) in
-          if p_first_name base moth = "?" then None else Some moth
-        in
-        Some (fath, moth)
-    | None -> None
-  in
-  match ifam with
-  | Some (None, None) | None -> Adef.safe ""
-  | Some (fath, moth) ->
-      let s =
-        match (fath, moth) with
-        | Some fath, None -> print_father fath
-        | None, Some moth -> gen_person_text conf base moth
-        | Some fath, Some moth ->
+  let a = pget conf base (Driver.get_iper p) in
+  match Driver.get_parents a with
+  | None -> Adef.safe ""
+  | Some ifam ->
+      let cpl = Driver.foi base ifam in
+      let fath = pget conf base (Driver.get_father cpl) in
+      let moth = pget conf base (Driver.get_mother cpl) in
+      let fath_valid = Driver.p_first_name base fath <> "?" in
+      let moth_valid = Driver.p_first_name base moth <> "?" in
+      if (not fath_valid) && not moth_valid then Adef.safe ""
+      else
+        let s =
+          if fath_valid && moth_valid then
             print_father fath ^^^ " " ^<^ transl_nth conf "and" 0 ^<^ " "
             ^<^ gen_person_text conf base moth
-        | _ -> Adef.safe ""
-      in
-      let is = index_of_sex (get_sex p) in
-      let s = (s :> string) in
-      transl_a_of_gr_eq_gen_lev conf
-        (transl_nth conf "son/daughter/child" is)
-        s s
-      |> translate_eval |> Adef.safe
+          else if fath_valid then print_father fath
+          else gen_person_text conf base moth
+        in
+        let is = index_of_sex (Driver.get_sex p) in
+        transl_a_of_gr_eq_gen_lev conf
+          (transl_nth conf "son/daughter/child" is)
+          (s :> string)
+          (s :> string)
+        |> translate_eval |> Adef.safe
 
-let husband_wife conf base p all =
+let husband_wife ?(buf : Buffer.t option) conf base p all =
+  let families = Driver.get_family p in
+  let nb_fam = Array.length families in
   let multiple =
     let rec loop i kind =
-      if i < Array.length (get_family p) then
-        let fam = foi base (get_family p).(i) in
-        let cur_type = get_relation fam in
+      if i < nb_fam then
+        let fam = Driver.foi base families.(i) in
+        let cur_type = Driver.get_relation fam in
         if i = 0 then loop (i + 1) cur_type
         else if cur_type = kind then loop (i + 1) kind
         else -1
@@ -1863,59 +2081,73 @@ let husband_wife conf base p all =
     loop 0 NoMention
   in
   let relation =
-    if Array.length (get_family p) > 0 then
+    if nb_fam > 0 then
       if multiple >= 0 then
-        let fam = foi base (get_family p).(0) in
-        Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-        |> translate_eval |> Adef.safe
-      else transl conf "marriages with" |> Adef.safe
-    else Adef.safe ""
+        let fam = Driver.foi base families.(0) in
+        Printf.sprintf (relation_txt conf (Driver.get_sex p) fam) (fun () -> "")
+        |> translate_eval
+      else transl conf "marriages with"
+    else ""
   in
-  let nb_fam = Array.length (get_family p) in
-  let res =
-    let rec loop i res =
-      if i < nb_fam then
-        let fam = foi base (get_family p).(i) in
-        let conjoint = Gutil.spouse (get_iper p) fam in
-        let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
-          let res =
-            res
-            ^>^ translate_eval
-                  ((if nb_fam > 1 then Format.sprintf " &%d " (i + 1) else " ")
-                   ^<^ gen_person_text conf base conjoint
-                   ^^^ relation_date conf fam
-                    :> string)
-            ^ ","
-          in
-          if all then loop (i + 1) res else res
-        else loop (i + 1) res ^>^ " ? ?,"
-      else res
+  let sep idx =
+    if nb_fam > 1 && idx > 0 then
+      Format.sprintf ", &<sup><small>%d</small></sup> " (idx + 1)
+    else if idx > 0 then ", "
+    else ""
+  in
+  let spouses =
+    let _, lst =
+      Array.to_list families
+      |> List.fold_left
+           (fun (i, acc) ifam ->
+             let fam = Driver.foi base ifam in
+             let sp = Gutil.spouse (Driver.get_iper p) fam |> pget conf base in
+             if is_empty_name sp then (i, acc)
+             else
+               let txt =
+                 (translate_eval (sep i)
+                  ^<^ gen_person_text conf base sp
+                  ^^^ relation_date conf fam
+                   :> string)
+               in
+               (i + 1, txt :: acc))
+           (0, [])
     in
-    loop 0 relation
+    let xs = List.rev lst in
+    if all then xs else match xs with [] -> [] | hd :: _ -> [ hd ]
   in
-  let res = (res :> string) in
-  (* suppress last , *)
-  let res =
-    if String.length res > 1 && res.[String.length res - 1] = ',' then
-      String.sub res 0 (String.length res - 1)
-    else res
-  in
-  Adef.safe res
+  match buf with
+  | Some b ->
+      if spouses <> [] then (
+        Buffer.add_string b ", ";
+        Buffer.add_string b relation;
+        Buffer.add_char b ' ';
+        Buffer.add_string b (String.concat "" spouses));
+      Adef.safe ""
+  | None ->
+      let full_text =
+        match spouses with
+        | [] -> ""
+        | _ -> ", " ^ relation ^ " " ^ String.concat "" spouses
+      in
+      Adef.safe full_text
 
 let first_child conf base p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Driver.get_sex p) in
   let rec loop i =
-    if i < Array.length (get_family p) then
-      let fam = foi base (get_family p).(i) in
-      let ct = get_children fam in
+    if i < Array.length (Driver.get_family p) then
+      let fam = Driver.foi base (Driver.get_family p).(i) in
+      let ct = Driver.get_children fam in
       if Array.length ct > 0 then
         let enfant = pget conf base ct.(0) in
         let child =
           if is_hide_names conf enfant && not (authorized_age conf base enfant)
           then Adef.safe "xx"
-          else if not (eq_istr (get_surname p) (get_surname enfant)) then
-            gen_person_text conf base enfant
+          else if
+            not
+              (Driver.Istr.equal (Driver.get_surname p)
+                 (Driver.get_surname enfant))
+          then gen_person_text conf base enfant
           else gen_person_text ~sn:false conf base enfant
         in
         let child = (child :> string) in
@@ -1926,40 +2158,40 @@ let first_child conf base p =
   in
   loop 0
 
-let specify_homonymous conf base p specify_public_name =
-  match (get_public_name p, get_qualifiers p) with
-  | n, nn :: _ when sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ sou base n);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ sou base nn);
-      Output.print_sstring conf "</em>"
-  | _, nn :: _ when specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ p_first_name base p);
-      Output.print_sstring conf " <em>";
-      Output.print_string conf (esc @@ sou base nn);
-      Output.print_sstring conf "</em>"
-  | n, [] when sou base n <> "" && specify_public_name ->
-      Output.print_sstring conf " ";
-      Output.print_string conf (esc @@ sou base n)
-  | _, _ ->
-      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-      (* la personne, donc on affiche les informations sur les parents,   *)
-      (* le mariage et/ou le premier enfant.                              *)
+let specify_homonymous conf base p pn =
+  let buf = Buffer.create 128 in
+  let pub_name = Driver.get_public_name p in
+  let pub_name_str = Driver.sou base pub_name in
+  let first_name = Driver.p_first_name base p in
+  let qualifiers = Driver.get_qualifiers p in
+  (match qualifiers with
+  | nn :: _ when pn ->
+      Buffer.add_char buf ' ';
+      if pub_name_str <> "" then
+        Buffer.add_string buf (esc pub_name_str :> string)
+      else Buffer.add_string buf (esc first_name :> string);
+      Buffer.add_string buf " <em>";
+      Buffer.add_string buf (esc (Driver.sou base nn) :> string);
+      Buffer.add_string buf "</em>"
+  | [] when pub_name_str <> "" && pn ->
+      if first_name <> pub_name_str then (
+        Buffer.add_char buf ' ';
+        Buffer.add_char buf '(';
+        Buffer.add_string buf (esc pub_name_str :> string);
+        Buffer.add_char buf ')')
+  | _ ->
       let cop = child_of_parent conf base p in
       if (cop :> string) <> "" then (
-        Output.print_sstring conf ", ";
-        Output.print_string conf cop);
+        Buffer.add_string buf ", ";
+        Buffer.add_string buf (cop :> string));
       let hw = husband_wife conf base p true in
       if (hw :> string) = "" then (
         let fc = first_child conf base p in
         if (fc :> string) <> "" then (
-          Output.print_sstring conf ", ";
-          Output.print_string conf fc))
-      else (
-        Output.print_sstring conf ", ";
-        Output.print_string conf hw)
+          Buffer.add_string buf ", ";
+          Buffer.add_string buf (fc :> string)))
+      else Buffer.add_string buf (hw :> string));
+  if Buffer.length buf > 0 then Output.print_sstring conf (Buffer.contents buf)
 
 let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
     =
@@ -1974,52 +2206,91 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
   | None, _, Some x, y -> if y = "" then (Some x, p1) else (Some x, p2)
 
 let get_approx_birth_date_place conf base p =
-  let birth = Date.od_of_cdate (get_birth p) in
-  let birth_place = string_of_place conf (sou base (get_birth_place p)) in
-  let baptism = Date.od_of_cdate (get_baptism p) in
-  let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
+  let birth = Date.od_of_cdate (Driver.get_birth p) in
+  let birth_place =
+    string_of_place conf (Driver.sou base (Driver.get_birth_place p))
+  in
+  let baptism = Date.od_of_cdate (Driver.get_baptism p) in
+  let baptism_place =
+    string_of_place conf (Driver.sou base (Driver.get_baptism_place p))
+  in
   get_approx_date_place birth
     (birth_place :> Adef.safe_string)
     baptism
     (baptism_place :> Adef.safe_string)
 
 let get_approx_death_date_place conf base p =
-  let death = Date.date_of_death (get_death p) in
-  let death_place = string_of_place conf (sou base (get_death_place p)) in
+  let death = Date.date_of_death (Driver.get_death p) in
+  let death_place =
+    string_of_place conf (Driver.sou base (Driver.get_death_place p))
+  in
   let buri =
-    match get_burial p with
+    match Driver.get_burial p with
     | Buried cd | Cremated cd -> Date.od_of_cdate cd
     | UnknownBurial -> None
   in
-  let buri_place = string_of_place conf (sou base (get_burial_place p)) in
+  let buri_place =
+    string_of_place conf (Driver.sou base (Driver.get_burial_place p))
+  in
   get_approx_date_place death
     (death_place :> Adef.safe_string)
     buri
     (buri_place :> Adef.safe_string)
 
 let string_of_decimal_num conf f =
-  let s = string_of_float f in
-  let b = Buffer.create 20 in
-  let rec loop i =
-    if i = String.length s then Buffer.contents b
-    else (
-      (match s.[i] with
-      | '.' ->
-          if i = String.length s - 1 then ()
-          else Buffer.add_string b (transl conf "(decimal separator)")
-      | x -> Buffer.add_char b x);
-      loop (i + 1))
-  in
-  loop 0
+  let abs_f = abs_float f in
+  if abs_f >= 0.001 && abs_f < 1000000.0 then
+    let s = Printf.sprintf "%.6f" f in
+    let s = Str.global_replace (Str.regexp "0+$") "" s in
+    let s = Str.global_replace (Str.regexp "\\.$") "" s in
+    let sig_digits =
+      (* can be replaced with a String.fold_left if Ocaml >= 4.14 *)
+      let rec count_digits acc i =
+        if i >= String.length s then acc
+        else
+          let c = s.[i] in
+          if c >= '0' && c <= '9' && not (acc = 0 && c = '0') then
+            count_digits (acc + 1) (i + 1)
+          else count_digits acc (i + 1)
+      in
+      count_digits 0 0
+    in
+    let needs_approx = sig_digits > 4 in
+    let localized =
+      let sep = transl conf "(decimal separator)" in
+      let dec_char = if String.length sep > 0 then sep.[0] else '.' in
+      String.map (function '.' -> dec_char | c -> c) s
+    in
+    if needs_approx then "≃ " ^ localized else localized
+  else if abs_f > 0.0 then
+    let log_val = log10 abs_f in
+    let exp = int_of_float (floor log_val) in
+    let mantissa = f /. (10.0 ** float_of_int exp) in
+    let m_str = Printf.sprintf "%.3f" mantissa in
+    let m_str = Str.global_replace (Str.regexp "0+$") "" m_str in
+    let m_str = Str.global_replace (Str.regexp "\\.$") "" m_str in
+    let m_loc =
+      let sep = transl conf "(decimal separator)" in
+      let dec_char = if String.length sep > 0 then sep.[0] else '.' in
+      String.map (function '.' -> dec_char | c -> c) m_str
+    in
+    let exp_str =
+      if exp < 0 then "−" ^ string_of_int (abs exp) else string_of_int exp
+    in
+    Printf.sprintf "<span class=\"text-nowrap\">≃ %s × 10<sup>%s</sup></span>"
+      m_loc exp_str
+  else "0"
 
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
-  | Some i when i <> "" ->
-      let i = Gwdb.iper_of_string i in
-      if Gwdb.iper_exists base i then
-        let p = pget conf base i in
-        if is_hidden p then None else Some p
-      else None
+  | Some i when i <> "" -> (
+      try
+        let i = Geneweb_db.Driver.Iper.of_string i in
+        if Geneweb_db.Driver.iper_exists base i then
+          let p = pget conf base i in
+          if is_hidden p then None else Some p
+        else None
+      with Failure _ -> None)
   | _ -> (
       match (p_getenv conf.env env_p, p_getenv conf.env env_n) with
       | None, Some n -> (
@@ -2033,7 +2304,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           | None -> None)
       | Some p, Some n -> (
           let occ = Option.value ~default:0 (p_getint conf.env env_occ) in
-          match person_of_key base p n occ with
+          match Driver.person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
@@ -2052,18 +2323,22 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
-  let auth, fn, sn =
-    match person_of_key base fn sn oc with
-    | Some ip ->
-        if authorized_age conf base (pget conf base ip) then
-          let p = poi base ip in
-          (true, sou base (get_first_name p), sou base (get_surname p))
-        else (false, "x", "x")
-    | None -> (false, fn, sn)
+  let auth =
+    match Driver.person_of_key base fn sn oc with
+    | Some ip -> authorized_age conf base (pget conf base ip)
+    | None -> false
   in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> (true, fn, sn)
-  | Some _ | None -> (auth, fn, sn)
+  | Some "off" -> true
+  | Some _ | None -> auth
+
+let mark_if_not_public conf base (fn, sn, oc) =
+  match p_getenv conf.env "red_if_not_public" with
+  | Some "on" -> (
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> Driver.get_access (Driver.poi base ip) <> Public
+      | None -> false)
+  | _ -> false
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with
@@ -2106,9 +2381,9 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   let sosa_ref_key =
     match snd conf.default_sosa_ref with
     | Some p ->
-        p_first_name base p ^ "."
-        ^ string_of_int (get_occ p)
-        ^ " " ^ p_surname base p
+        Driver.p_first_name base p ^ "."
+        ^ string_of_int (Driver.get_occ p)
+        ^ " " ^ Driver.p_surname base p
     | None -> ""
   in
   let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
@@ -2118,10 +2393,10 @@ let update_gwf_sosa conf base (ip, (fn, sn, occ)) =
 let create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   | Some "no_tsfile" ->
-      let () = load_ascends_array base in
-      let () = load_couples_array base in
+      let () = Driver.load_ascends_array base in
+      let () = Driver.load_couples_array base in
       Consang.topological_sort base (pget conf)
-  | Some "no_tstab" -> Gwdb.iper_marker (Gwdb.ipers base) 0
+  | Some "no_tstab" -> Driver.iper_marker (Driver.ipers base) 0
   | _ ->
       let bfile = bpath (conf.bname ^ ".gwb") in
       let tstab_file =
@@ -2131,29 +2406,26 @@ let create_topological_sort conf base =
       in
       Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
-          Lock.control (Mutil.lock_file bfile) false
-            ~onerror:(fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              Consang.topological_sort base (pget conf))
-            (fun () ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
-              let tstab = Consang.topological_sort base (pget conf) in
-              if conf.use_restrict && (not conf.wizard) && not conf.friend then
-                base_visible_write base;
-              tstab))
+          Driver.load_ascends_array base;
+          Driver.load_couples_array base;
+          let tstab = Consang.topological_sort base (pget conf) in
+          (* FIXME: we silently ignores error if we cannot lock the database. *)
+          let on_exn _exn _bt = () in
+          if conf.use_restrict && (not conf.wizard) && not conf.friend then
+            Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bfile)
+              (fun () -> Driver.base_visible_write base);
+          tstab)
 
 let p_of_sosa conf base sosa p0 =
   let path = Sosa.branches sosa in
   let rec aux acc = function
     | [] -> Some acc
     | hd :: tl -> (
-        match get_parents acc with
+        match Driver.get_parents acc with
         | Some ifam ->
-            let cpl = foi base ifam in
-            if hd = 0 then aux (pget conf base (get_father cpl)) tl
-            else aux (pget conf base (get_mother cpl)) tl
+            let cpl = Driver.foi base ifam in
+            if hd = 0 then aux (pget conf base (Driver.get_father cpl)) tl
+            else aux (pget conf base (Driver.get_mother cpl)) tl
         | None -> None)
   in
   aux p0 path
@@ -2167,11 +2439,12 @@ let branch_of_sosa conf base sosa p =
   let rec loop pl p = function
     | [] -> Some (p :: pl)
     | male :: tl -> (
-        match get_parents p with
+        match Driver.get_parents p with
         | Some ifam ->
-            let cpl = foi base ifam in
-            if male then loop (p :: pl) (pget conf base @@ get_father cpl) tl
-            else loop (p :: pl) (pget conf base @@ get_mother cpl) tl
+            let cpl = Driver.foi base ifam in
+            if male then
+              loop (p :: pl) (pget conf base @@ Driver.get_father cpl) tl
+            else loop (p :: pl) (pget conf base @@ Driver.get_mother cpl) tl
         | _ -> None)
   in
   loop [] p (expand [] sosa)
@@ -2182,37 +2455,241 @@ let sosa_of_branch ipl =
   List.fold_left
     (fun b p ->
       let b = Sosa.twice b in
-      match get_sex p with
+      match Driver.get_sex p with
       | Male -> b
       | Female -> Sosa.inc b 1
       | Neuter -> assert false)
     Sosa.one ipl
 
 (* FIXME: remove this and use sosa_of_branch only *)
-let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
+let old_sosa_of_branch conf base (ipl : (Driver.iper * sex) list) =
   sosa_of_branch (List.map (fun (ip, _) -> pget conf base ip) ipl)
 
 (* FIXME: remove this and use branch_of_sosa only *)
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
-  |> Option.map @@ List.map (fun p -> (get_iper p, get_sex p))
+  |> Option.map @@ List.map (fun p -> (Driver.get_iper p, Driver.get_sex p))
 
-let gen_only_printable or_nl s =
-  let s' =
-    let conv_char i =
-      if Char.code s.[i] > 127 then s.[i]
+type char_category = [ `Control | `Invisible | `Space | `ZeroWidth ]
+
+(* Table des caractères problématiques indésirables
+   Association code point héxadécimaux -> nom officiel Unicode et catégorie *)
+let problem_chars =
+  [
+    (* Caractères de contrôle ASCII (0x00-0x1F sauf \n et \t) *)
+    (0x0000, "NULL", `Control);
+    (0x0001, "START OF HEADING", `Control);
+    (0x0002, "START OF TEXT", `Control);
+    (0x0003, "END OF TEXT", `Control);
+    (0x0004, "END OF TRANSMISSION", `Control);
+    (0x0005, "ENQUIRY", `Control);
+    (0x0006, "ACKNOWLEDGE", `Control);
+    (0x0007, "BELL", `Control);
+    (0x0008, "BACKSPACE", `Control);
+    (* 0x0009 = TAB - on peut le garder *)
+    (* 0x000A = LF - on peut le garder *)
+    (0x000B, "VERTICAL TAB", `Control);
+    (0x000C, "FORM FEED", `Control);
+    (0x000D, "CARRIAGE RETURN", `Control);
+    (0x000E, "SHIFT OUT", `Control);
+    (0x000F, "SHIFT IN", `Control);
+    (0x0010, "DATA LINK ESCAPE", `Control);
+    (0x0011, "DEVICE CONTROL ONE", `Control);
+    (0x0012, "DEVICE CONTROL TWO", `Control);
+    (0x0013, "DEVICE CONTROL THREE", `Control);
+    (0x0014, "DEVICE CONTROL FOUR", `Control);
+    (0x0015, "NEGATIVE ACKNOWLEDGE", `Control);
+    (0x0016, "SYNCHRONOUS IDLE", `Control);
+    (0x0017, "END OF TRANSMISSION BLOCK", `Control);
+    (0x0018, "CANCEL", `Control);
+    (0x0019, "END OF MEDIUM", `Control);
+    (0x001A, "SUBSTITUTE", `Control);
+    (0x001B, "ESCAPE", `Control);
+    (0x001C, "FILE SEPARATOR", `Control);
+    (0x001D, "GROUP SEPARATOR", `Control);
+    (0x001E, "RECORD SEPARATOR", `Control);
+    (0x001F, "UNIT SEPARATOR", `Control);
+    (0x007F, "DELETE", `Control);
+    (* C1 Controls (0x80-0x9F) - often encoding issues *)
+    (0x0080, "PADDING CHARACTER", `Control);
+    (0x0081, "HIGH OCTET PRESET", `Control);
+    (0x0082, "BREAK PERMITTED HERE", `Control);
+    (0x0083, "NO BREAK HERE", `Control);
+    (0x0084, "INDEX", `Control);
+    (0x0085, "NEXT LINE", `Control);
+    (0x0086, "START OF SELECTED AREA", `Control);
+    (0x0087, "END OF SELECTED AREA", `Control);
+    (0x0088, "CHARACTER TABULATION SET", `Control);
+    (0x0089, "CHARACTER TABULATION WITH JUSTIFICATION", `Control);
+    (0x008A, "LINE TABULATION SET", `Control);
+    (0x008B, "PARTIAL LINE FORWARD", `Control);
+    (0x008C, "PARTIAL LINE BACKWARD", `Control);
+    (0x008D, "REVERSE LINE FEED", `Control);
+    (0x008E, "SINGLE SHIFT TWO", `Control);
+    (0x008F, "SINGLE SHIFT THREE", `Control);
+    (0x0090, "DEVICE CONTROL STRING", `Control);
+    (0x0091, "PRIVATE USE ONE", `Control);
+    (0x0092, "PRIVATE USE TWO", `Control);
+    (0x0093, "SET TRANSMIT STATE", `Control);
+    (0x0094, "CANCEL CHARACTER", `Control);
+    (0x0095, "MESSAGE WAITING", `Control);
+    (0x0096, "START OF GUARDED AREA", `Control);
+    (0x0097, "END OF GUARDED AREA", `Control);
+    (0x0098, "START OF STRING", `Control);
+    (0x0099, "SINGLE GRAPHIC CHARACTER INTRODUCER", `Control);
+    (0x009A, "SINGLE CHARACTER INTRODUCER", `Control);
+    (0x009B, "CONTROL SEQUENCE INTRODUCER", `Control);
+    (0x009C, "STRING TERMINATOR", `Control);
+    (0x009D, "OPERATING SYSTEM COMMAND", `Control);
+    (0x009E, "PRIVACY MESSAGE", `Control);
+    (0x009F, "APPLICATION PROGRAM COMMAND", `Control);
+    (* Caractères invisibles Unicode *)
+    (0x00AD, "SOFT HYPHEN", `Invisible);
+    (0x034F, "COMBINING GRAPHEME JOINER", `Invisible);
+    (0x0600, "ARABIC NUMBER SIGN", `Invisible);
+    (0x0601, "ARABIC SIGN SANAH", `Invisible);
+    (0x0602, "ARABIC FOOTNOTE MARKER", `Invisible);
+    (0x0603, "ARABIC SIGN SAFHA", `Invisible);
+    (0x06DD, "ARABIC END OF AYAH", `Invisible);
+    (0x070F, "SYRIAC ABBREVIATION MARK", `Invisible);
+    (0x0F0C, "TIBETAN MARK DELIMITER", `Invisible);
+    (0x115F, "HANGUL CHOSEONG FILLER", `Invisible);
+    (0x1160, "HANGUL JUNGSEONG FILLER", `Invisible);
+    (0x1680, "OGHAM SPACE MARK", `Invisible);
+    (0x180E, "MONGOLIAN VOWEL SEPARATOR", `Invisible);
+    (* Espaces Unicode variés *)
+    (0x2000, "EN QUAD", `Space);
+    (0x2001, "EM QUAD", `Space);
+    (0x2002, "EN SPACE", `Space);
+    (0x2003, "EM SPACE", `Space);
+    (0x2004, "THREE-PER-EM SPACE", `Space);
+    (0x2005, "FOUR-PER-EM SPACE", `Space);
+    (0x2006, "SIX-PER-EM SPACE", `Space);
+    (0x2007, "FIGURE SPACE", `Space);
+    (0x2008, "PUNCTUATION SPACE", `Space);
+    (0x2009, "THIN SPACE", `Space);
+    (0x200A, "HAIR SPACE", `Space);
+    (0x205F, "MEDIUM MATHEMATICAL SPACE", `Space);
+    (0x3000, "IDEOGRAPHIC SPACE", `Space);
+    (* Zero-width *)
+    (0x200B, "ZERO WIDTH SPACE", `ZeroWidth);
+    (0x200C, "ZERO WIDTH NON-JOINER", `ZeroWidth);
+    (0x200D, "ZERO WIDTH JOINER", `ZeroWidth);
+    (0x200E, "LEFT-TO-RIGHT MARK", `ZeroWidth);
+    (0x200F, "RIGHT-TO-LEFT MARK", `ZeroWidth);
+    (0x2060, "WORD JOINER", `ZeroWidth);
+    (0x2061, "FUNCTION APPLICATION", `ZeroWidth);
+    (0x2062, "INVISIBLE TIMES", `ZeroWidth);
+    (0x2063, "INVISIBLE SEPARATOR", `ZeroWidth);
+    (0x2064, "INVISIBLE PLUS", `ZeroWidth);
+    (0x206A, "INHIBIT SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206B, "ACTIVATE SYMMETRIC SWAPPING", `ZeroWidth);
+    (0x206C, "INHIBIT ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206D, "ACTIVATE ARABIC FORM SHAPING", `ZeroWidth);
+    (0x206E, "NATIONAL DIGIT SHAPES", `ZeroWidth);
+    (0x206F, "NOMINAL DIGIT SHAPES", `ZeroWidth);
+    (0xFEFF, "ZERO WIDTH NO-BREAK SPACE", `ZeroWidth);
+  ]
+
+let problem_chars_tbl =
+  let tbl = Hashtbl.create 100 in
+  List.iter
+    (fun (code, name, cat) -> Hashtbl.add tbl code (name, cat))
+    problem_chars;
+  tbl
+
+let get_problem_char_name code =
+  match Hashtbl.find_opt problem_chars_tbl code with
+  | Some (name, _) -> Some name
+  | None -> None
+
+let get_problem_chars_codes category =
+  problem_chars
+  |> List.filter_map (fun (code, _, cat) ->
+      if cat = category then Some code else None)
+
+type clean_options = {
+  remove_control : bool; (* Supprimer caractères de contrôle ASCII *)
+  remove_invisible : bool; (* Supprimer caractères invisibles Unicode *)
+  remove_zero_width : bool; (* Supprimer caractères largeur zéro *)
+  normalize_spaces : bool; (* Remplacer espaces exotiques par espace normal *)
+  keep_newlines : bool; (* Garder les sauts de ligne *)
+  keep_tabs : bool; (* Garder les tabulations *)
+}
+
+let default_clean_options =
+  {
+    remove_control = true;
+    remove_invisible = true;
+    remove_zero_width = true;
+    normalize_spaces = true;
+    keep_newlines = false;
+    keep_tabs = false;
+  }
+
+let get_unicode_point s i =
+  let n = Char.code (String.get s i) in
+  if n < 0x80 then (n, 1)
+  else if n <= 0xdf && i + 1 < String.length s then
+    (((n - 0xc0) lsl 6) lor (0x7f land Char.code (String.get s (i + 1))), 2)
+  else if n <= 0xef && i + 2 < String.length s then
+    let n' = n - 0xe0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    ((n' lsl 6) lor (0x7f land m), 3)
+  else if i + 3 < String.length s then
+    let n' = n - 0xf0 in
+    let m = Char.code (String.get s (i + 1)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 2)) in
+    let n' = (n' lsl 6) lor (0x7f land m) in
+    let m = Char.code (String.get s (i + 3)) in
+    ((n' lsl 6) lor (0x7f land m), 4)
+  else (n, 1)
+
+let clean_string ?(options = default_clean_options) s =
+  let buf = Buffer.create (String.length s) in
+  let len = String.length s in
+  let rec process i =
+    if i >= len then Buffer.contents buf
+    else
+      let code, nb_bytes = get_unicode_point s i in
+      if code = 0x0A && options.keep_newlines then (
+        Buffer.add_char buf '\n';
+        process (i + nb_bytes))
+      else if code = 0x09 && options.keep_tabs then (
+        Buffer.add_char buf '\t';
+        process (i + nb_bytes))
       else
-        match s.[i] with
-        | ' ' .. '~' | '\160' .. '\255' -> s.[i]
-        | '\n' -> if or_nl then '\n' else ' '
-        | _ -> ' '
-    in
-    String.init (String.length s) conv_char
+        match Hashtbl.find_opt problem_chars_tbl code with
+        | Some (_, `Control) when options.remove_control ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | Some (_, `Invisible) when options.remove_invisible ->
+            process (i + nb_bytes)
+        | Some (_, `ZeroWidth) when options.remove_zero_width ->
+            process (i + nb_bytes)
+        | Some (_, `Space) when options.normalize_spaces ->
+            Buffer.add_char buf ' ';
+            process (i + nb_bytes)
+        | _ ->
+            for j = i to i + nb_bytes - 1 do
+              Buffer.add_char buf s.[j]
+            done;
+            process (i + nb_bytes)
   in
-  String.trim s'
+  process 0
 
-let only_printable_or_nl = gen_only_printable true
-let only_printable = gen_only_printable false
+let only_printable s =
+  clean_string ~options:default_clean_options s |> String.trim
+
+let only_printable_or_nl s =
+  clean_string
+    ~options:
+      { default_clean_options with keep_newlines = true; keep_tabs = false }
+    s
+  |> String.trim
 
 let relation_type_text conf t n =
   match t with
@@ -2251,19 +2728,21 @@ exception Ok
 let has_nephews_or_nieces conf base p =
   try
     let a = p in
-    match get_parents a with
+    match Driver.get_parents a with
     | Some ifam ->
-        let fam = foi base ifam in
+        let fam = Driver.foi base ifam in
         Array.iter
           (fun ip ->
-            if ip = get_iper p then ()
+            if ip = Driver.get_iper p then ()
             else
               Array.iter
                 (fun ifam ->
-                  if Array.length (get_children (foi base ifam)) > 0 then
-                    raise Ok)
-                (get_family (pget conf base ip)))
-          (get_children fam);
+                  if
+                    Array.length (Driver.get_children (Driver.foi base ifam))
+                    > 0
+                  then raise Ok)
+                (Driver.get_family (pget conf base ip)))
+          (Driver.get_children fam);
         false
     | _ -> false
   with Ok -> true
@@ -2289,19 +2768,8 @@ let is_that_user_and_password auth_scheme user passwd =
         in
         that_response_would_be = ds.ds_response
 
-let browser_doesnt_have_tables conf =
-  let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
-  String.lowercase_ascii user_agent = "lynx"
-
-let of_course_died conf p =
-  match Date.cdate_to_dmy_opt (get_birth p) with
-  | Some d ->
-      (* TODO this value should be defined elsewhere *)
-      conf.today.year - d.year > conf.private_years + 20
-  | None -> false
-
 let escache_value base =
-  let t = Gwdb.date_of_last_change base in
+  let t = Driver.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
   Adef.encoded (string_of_int v)
 
@@ -2348,7 +2816,7 @@ let update_wf_trace conf fname =
     let dtlen = String.length dt in
     let rec loop found r = function
       | x :: l ->
-          if String.length x > dtlen + 2 then
+          if String.length x >= dtlen + 2 then
             let u = String.sub x (dtlen + 1) (String.length x - dtlen - 1) in
             if u = conf.user then loop true ((dt, u) :: r) l
             else loop found ((String.sub x 0 dtlen, u) :: r) l
@@ -2363,21 +2831,20 @@ let test_cnt_d conf =
   let config_d = !GWPARAM.config_d conf.bname in
   let cnt_d = !GWPARAM.cnt_d conf.bname in
   (if not (Sys.file_exists config_d) then
-   try Unix.mkdir config_d 0o755
-   with Unix.Unix_error (_, _, _) ->
-     !GWPARAM.syslog `LOG_WARNING
-       (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+     try Unix.mkdir config_d 0o755
+     with Unix.Unix_error (_, _, _) ->
+       Log.warn (fun k ->
+           k "Failure when creating config_dir (util): %s" config_d));
   if not (Sys.file_exists cnt_d) then
     try Unix.mkdir cnt_d 0o755
     with Unix.Unix_error (_, _, _) ->
-      !GWPARAM.syslog `LOG_WARNING
-        (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
+      Log.warn (fun k -> k "Failure when creating cnt_dir (util): %s" cnt_d)
   else ();
   cnt_d
 
 let commit_patches conf base =
   let _ = test_cnt_d in
-  Gwdb.commit_patches base;
+  Driver.commit_patches base;
   conf.henv <-
     List.map
       (fun (k, v) -> if k = "escache" then (k, escache_value base) else (k, v))
@@ -2449,52 +2916,59 @@ let read_gen_auth_file fname base_file =
   with Sys_error _ -> []
 
 let start_equiv_with case_sens s m i =
-  let rec test i j =
-    if j = String.length s then Some i
-    else if i = String.length m then None
-    else if case_sens then if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+  if String.length s = 0 then Some i
+  else
+    let rec test i j =
+      if j = String.length s then Some i
+      else if i = String.length m then None
+      else if case_sens then
+        if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+      else
+        match Name.next_chars_if_equiv m i s j with
+        | Some (i, j) -> test i j
+        | None -> None
+    in
+    if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
     else
-      match Name.next_chars_if_equiv m i s j with
+      match Name.next_chars_if_equiv m i s 0 with
       | Some (i, j) -> test i j
       | None -> None
-  in
-  if case_sens then if m.[i] = s.[0] then test (i + 1) 1 else None
-  else
-    match Name.next_chars_if_equiv m i s 0 with
-    | Some (i, j) -> test i j
-    | None -> None
 
 let rec in_text case_sens s m =
   let rec loop in_tag i =
-    if i = String.length m then false
+    if i >= String.length m then false
     else if in_tag then loop (m.[i] <> '>') (i + 1)
     else if m.[i] = '<' then loop true (i + 1)
     else if m.[i] = '[' && i + 1 < String.length m && m.[i + 1] = '[' then
       match NotesLinks.misc_notes_link m i with
       | NotesLinks.WLpage (j, _, _, _, text)
-      | NotesLinks.WLperson (j, _, Some text, _)
+      | NotesLinks.WLperson (j, _, Some text, _, _)
       | NotesLinks.WLwizard (j, _, text) ->
           if in_text case_sens s text then true else loop false j
-      | NotesLinks.WLperson (j, (fn, sn, _), None, _) ->
+      | NotesLinks.WLperson (j, (fn, sn, _), None, _, _) ->
           if in_text case_sens s (fn ^ " " ^ sn) then true else loop false j
+      | NotesLinks.WLimage (j, _, alt, _) ->
+          if in_text case_sens s alt then true else loop false j
       | NotesLinks.WLnone (j, _) -> loop false j
     else
       match start_equiv_with case_sens s m i with
       | Some _ -> true
-      | None -> loop false (i + 1)
+      | None -> loop false (Utf8.next m i)
   in
   loop false 0
 
 let html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   let rec loop in_tag i len =
-    if i = String.length s then Buff.get len
+    if i >= String.length s then Buff.get len
     else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
     else if s.[i] = '<' then loop true (i + 1) (Buff.store len s.[i])
     else
       match start_equiv_with case_sens h s i with
       | Some j -> loop false j (Buff.mstore len (ht i j))
-      | None -> loop false (i + 1) (Buff.store len s.[i])
+      | None ->
+          let i' = Utf8.next s i in
+          loop false i' (Buff.mstore len (String.sub s i (i' - i)))
   in
   loop false 0 0
 
@@ -2556,8 +3030,7 @@ let dispatch_in_columns ncol list order =
   (len_list, ini_list)
 
 let print_in_columns conf ncols len_list list wprint_elem =
-  begin_centered conf;
-  Output.printf conf "<table width=\"95%%\" border=\"%d\">\n" conf.border;
+  Output.printf conf "<table class=\"w-auto\">\n";
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
   (let _ =
      List.fold_left
@@ -2570,13 +3043,21 @@ let print_in_columns conf ncols len_list list wprint_elem =
              match list with
              | (kind, ord, elem) :: list ->
                  if n = len then
-                   Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
+                   Output.printf conf "<td width=\"%d%%\">\n" (100 / ncols)
                  else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
                  if !kind <> Elem then (
-                   Output.printf conf "<h3 class=\"subtitle mx-3\">%s%s</h3>\n"
-                     (if ord = "" then "..." else String.make 1 ord.[0])
+                   let letter =
+                     if ord = "" then "…" else String.make 1 ord.[0]
+                   in
+                   let id_attr =
+                     if !kind = HeadElem then Printf.sprintf " id=\"%s\"" letter
+                     else ""
+                   in
+                   Output.printf conf
+                     "<h3%s class=\"subtitle pb-1 mx-3\">%s%s</h3>\n" id_attr
+                     letter
                      (if !kind = HeadElem then ""
-                     else " (" ^ transl conf "continued" ^ ")");
+                      else " (" ^ transl conf "continued" ^ ")");
                    Output.print_sstring conf "<ul>\n");
                  Output.print_sstring conf "<li>";
                  wprint_elem elem;
@@ -2598,10 +3079,12 @@ let wprint_in_columns conf order wprint_elem list =
     | Some n -> max 1 n
     | None ->
         let len_list = List.length list in
-        if len_list < 10 then 1
-        else if len_list < 100 then 2
-        else if len_list < 200 then 3
-        else 4
+        if len_list < 40 then 1
+        else if len_list < 80 then 2
+        else if len_list < 120 then 3
+        else if len_list < 160 then 4
+        else if len_list < 200 then 5
+        else 6
   in
   let len_list, list = dispatch_in_columns ncols list order in
   print_in_columns conf ncols len_list list wprint_elem
@@ -2611,14 +3094,12 @@ let wprint_in_columns conf order wprint_elem list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Retourne la sous liste de taille size composée des
-                    éléments 0 à (size - 1)
-    [Args] :
-      - size : la taille de la nouvelle liste
-      - list : la liste originiale
-    [Retour] :
-      - list : la nouvelle liste de taille size
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Retourne la sous liste de taille size composée des éléments
+    0 à (size - 1) [Args] :
+    - size : la taille de la nouvelle liste
+    - list : la liste originiale [Retour] :
+    - list : la nouvelle liste de taille size [Rem] : Exporté en clair hors de
+      ce module. *)
 let reduce_list size list =
   let rec loop size cnt reduced_list list =
     if cnt >= size then reduced_list
@@ -2635,12 +3116,10 @@ let reduce_list size list =
 
 (* ********************************************************************** *)
 
-(** [Description] : Affiche un tips.
-    [Args] :
-      - conf : configuration de la base
-      - s    : le contenu du tips
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Affiche un tips. [Args] :
+    - conf : configuration de la base
+    - s : le contenu du tips [Retour] : Néant [Rem] : Non exporté en clair hors
+      de ce module. *)
 let gen_print_tips conf s =
   Output.print_sstring conf "<div class=\"tips alert alert-warning\"";
   Output.print_sstring conf " role=\"alert\">";
@@ -2680,11 +3159,9 @@ let get_opt conf evar default =
   | _ -> failwith "bad get_opt parameter"
 
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
-                    données et renvoie la concaténation de ces options.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    données et renvoie la concaténation de ces options. [Args] :
+    - conf : configuration de la base [Retour] : string [Rem] : Exporté en clair
+      hors de ce module. *)
 let display_options conf =
   let img = get_opt conf "im" true in
   let mar = get_opt conf "ma" true in
@@ -2701,18 +3178,16 @@ let display_options conf =
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
 (* On en profite aussi pour stocker la date de la dernière visite.          *)
-type cache_visited_t = (string, (iper * string) list) Hashtbl.t
+type cache_visited_t = (string, (Driver.iper * string) list) Hashtbl.t
 
 (* ************************************************************************ *)
 (*  [Fonc] cache_visited : config -> string                                 *)
 
 (* ************************************************************************ *)
 
-(** [Description] : Renvoie le chemin du fichier de cache.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Renvoie le chemin du fichier de cache. [Args] :
+    - config : configuration de la base [Retour] : unit [Rem] : Exporté en clair
+      hors de ce module. *)
 let cache_visited conf =
   let bname =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
@@ -2727,9 +3202,9 @@ let cache_visited conf =
 
 (** [Description] : List le fichier de cache des dernières fiches visités.
     [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : Hashtbl des user => dernières visites
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    - fname : le fichier de cache (qui se trouve dans base.gwb) [Retour] :
+      Hashtbl des user => dernières visites [Rem] : Exporté en clair hors de ce
+      module. *)
 let read_visited conf =
   let fname = cache_visited conf in
   try
@@ -2744,12 +3219,10 @@ let read_visited conf =
 
 (* ************************************************************************ *)
 
-(** [Description] : Met à jour le fichier de cache des visites.
-    [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-      - ht    : le compteur de visite
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Met à jour le fichier de cache des visites. [Args] :
+    - fname : le fichier de cache (qui se trouve dans base.gwb)
+    - ht : le compteur de visite [Retour] : unit [Rem] : Non exporté en clair
+      hors de ce module. *)
 let write_visited conf ht =
   let fname = cache_visited conf in
   try
@@ -2763,13 +3236,10 @@ let write_visited conf ht =
 
 (* ************************************************************************ *)
 
-(** [Description] : Vérifie si le user est ami ou magicien et met à jour
-                    le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - ip   : iper
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Vérifie si le user est ami ou magicien et met à jour le
+    fichier de cache. [Args] :
+    - conf : configuration de la base
+    - ip : iper [Retour] : unit [Rem] : Exporté en clair hors de ce module. *)
 let record_visited conf ip =
   if conf.friend || conf.wizard then
     let ht = read_visited conf in
@@ -2803,30 +3273,16 @@ let array_mem_witn conf base x a =
   let rec loop i =
     if i = Array.length a then None
     else if x = fst a.(i) then
-      Some (string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
+      Some
+        (string_of_witness_kind conf
+           (Driver.get_sex @@ Driver.poi base x)
+           (snd a.(i)))
     else loop (i + 1)
   in
   loop 0
 
-let nb_char_occ c s =
-  let cnt = ref 0 in
-  String.iter (fun x -> if x = c then incr cnt) s;
-  !cnt
-
-module IperSet = Set.Make (struct
-  type t = iper
-
-  let compare = Stdlib.compare
-end)
-
-module IfamSet = Set.Make (struct
-  type t = ifam
-
-  let compare = Stdlib.compare
-end)
-
 let select_masc conf base ips =
-  let poi = if conf.wizard || conf.friend then poi else pget conf in
+  let poi = if conf.wizard || conf.friend then Driver.poi else pget conf in
   let fam = Hashtbl.create 1024 in
   let asc = Hashtbl.create 1024 in
   let add_asc gen i p =
@@ -2843,9 +3299,9 @@ let select_masc conf base ips =
           | _ ->
               Hashtbl.replace fam ifam gen;
               if gen = max_gen then (
-                let cpl = foi base ifam in
-                let fa = get_father cpl in
-                let mo = get_mother cpl in
+                let cpl = Driver.foi base ifam in
+                let fa = Driver.get_father cpl in
+                let mo = Driver.get_mother cpl in
                 add_asc gen fa (poi base fa);
                 add_asc gen mo (poi base mo);
                 loop tl)
@@ -2853,7 +3309,7 @@ let select_masc conf base ips =
                 let pgen = gen + 1 in
                 let aux acc i =
                   let p = poi base i in
-                  match get_parents p with
+                  match Driver.get_parents p with
                   | None ->
                       add_asc gen i p;
                       acc
@@ -2864,16 +3320,16 @@ let select_masc conf base ips =
                           Hashtbl.replace fam pifam (pgen + 1);
                           (pgen, pifam) :: acc)
                 in
-                let cpl = foi base ifam in
-                let fa = get_father cpl in
-                let mo = get_mother cpl in
+                let cpl = Driver.foi base ifam in
+                let fa = Driver.get_father cpl in
+                let mo = Driver.get_mother cpl in
                 loop (aux (aux tl fa) mo))
     in
     loop
   in
   List.iter
     (fun (ip, max_gen) ->
-      match get_parents @@ poi base ip with
+      match Driver.get_parents @@ poi base ip with
       | Some ifam -> select_masc max_gen [ (1, ifam) ]
       | None -> ())
     ips;
@@ -2889,11 +3345,11 @@ let select_desc conf base gen_desc ips =
       Hashtbl.replace desc ip p;
       Array.iter
         (fun ifam ->
-          let sp = Gutil.spouse ip (foi base ifam) in
+          let sp = Gutil.spouse ip (Driver.foi base ifam) in
           Hashtbl.replace desc sp (pget conf base sp))
-        (get_family p);
+        (Driver.get_family p);
       if gen > gen_desc then
-        List.iter (loop_desc (gen - 1)) @@ children_of_p base p)
+        List.iter (loop_desc (gen - 1)) @@ Driver.children_of_p base p)
   in
   List.iter (fun (ip, gen) -> loop_desc gen ip) ips;
   desc
@@ -2903,46 +3359,6 @@ let select_mascdesc conf base ips gen_desc =
   let ips = Hashtbl.fold (fun ip (gen, _) acc -> (ip, gen) :: acc) asc [] in
   let r = select_desc conf base gen_desc ips in
   r
-
-let auth_warning conf base w =
-  let pauth p = authorized_age conf base p in
-  let fauth ifam =
-    let fam = foi base ifam in
-    pauth (get_father fam |> poi base) && pauth (get_mother fam |> poi base)
-  in
-  match w with
-  | BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
-  | BirthAfterDeath p -> pauth p
-  | ChildrenNotInOrder (ifam, _, elder, x) ->
-      pauth elder && pauth x && fauth ifam
-  | CloseChildren (ifam, c1, c2) -> pauth c1 && pauth c2 && fauth ifam
-  | DeadOld (p, _) -> pauth p
-  | DeadTooEarlyToBeFather (father, child) -> pauth father && pauth child
-  | DistantChildren (ifam, p1, p2) -> pauth p1 && pauth p2 && fauth ifam
-  | FEventOrder (p, _, _) -> pauth p
-  | FWitnessEventAfterDeath (p, _, fam) -> pauth p && fauth fam
-  | FWitnessEventBeforeBirth (p, _, fam) -> pauth p && fauth fam
-  | IncoherentSex (p, _, _) -> pauth p
-  | IncoherentAncestorDate (anc, p) -> pauth anc && pauth p
-  | MarriageDateAfterDeath p -> pauth p
-  | MarriageDateBeforeBirth p -> pauth p
-  | MotherDeadBeforeChildBirth (mother, child) -> pauth mother && pauth child
-  | ParentBornAfterChild (parent, child) -> pauth parent && pauth child
-  | ParentTooOld (p, _, c) -> pauth p && pauth c
-  | ParentTooYoung (p, _, c) -> pauth p && pauth c
-  | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
-  | PossibleDuplicateFamHomonymous (f1, f2, p) ->
-      fauth f1 && fauth f2 && pauth p
-  | PEventOrder (p, _, _) -> pauth p
-  | PWitnessEventAfterDeath (p, _, origin) -> pauth p && pauth origin
-  | PWitnessEventBeforeBirth (p, _, origin) -> pauth p && pauth origin
-  | TitleDatesError (p, _) -> pauth p
-  | UndefinedSex p -> pauth p
-  | YoungForMarriage (_, _, fam) -> fauth fam
-  | OldForMarriage (_, _, fam) -> fauth fam
-  | ChangedOrderOfChildren _ | ChangedOrderOfMarriages _
-  | ChangedOrderOfFamilyEvents _ | ChangedOrderOfPersonEvents _ ->
-      false
 
 let name_with_roman_number str =
   let rec loop found len i =
@@ -2984,9 +3400,9 @@ let designation base p = Gutil.designation base p |> escape_html
 let has_children base u =
   Array.exists
     (fun ifam ->
-      let des = foi base ifam in
-      Array.length (get_children des) > 0)
-    (get_family u)
+      let des = Driver.foi base ifam in
+      Array.length (Driver.get_children des) > 0)
+    (Driver.get_family u)
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
@@ -3001,3 +3417,280 @@ let get_bases_list ?(format_fun = fun x -> x) () =
   Unix.closedir dh;
   list := List.sort compare !list;
   !list
+
+let extract_value delimiter s =
+  let len = String.length s in
+  let rec loop equal_pos i =
+    if i = len then equal_pos
+    else
+      let c = s.[i] in
+      match equal_pos with
+      | Some _ when c = delimiter ->
+          (* The line contains several delimiters. *)
+          None
+      | None when c = delimiter ->
+          (* We found the first delimiter. *)
+          loop (Some i) (i + 1)
+      | _ -> loop equal_pos (i + 1)
+  in
+  match loop None 0 with
+  | Some i -> String.sub s (i + 1) (len - i - 1)
+  | None -> raise Not_found
+
+let sys_to_note_link p =
+  let dir_sep = Filename.dir_sep.[0] in
+  String.split_on_char dir_sep p
+  |> String.concat (String.make 1 NotesLinks.char_dir_sep)
+
+let note_link_to_sys p =
+  String.split_on_char NotesLinks.char_dir_sep p
+  |> String.concat Filename.dir_sep
+
+(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
+let string_for_all pred s =
+  let len = String.length s in
+  let rec loop i =
+    if i >= len then true
+    else if pred (String.get s i) then loop (i + 1)
+    else false
+  in
+  loop 0
+
+let url_has_pnoc_params env =
+  List.exists
+    (fun (key, _) ->
+      String.length key >= 2
+      && (String.get key 0 = 'p' || String.get key 0 = 'n')
+      && string_for_all
+           (function '0' .. '9' -> true | _ -> false)
+           (String.sub key 1 (String.length key - 1)))
+    env
+
+let normalize_person_pool_url conf base target_module assoc_txt_opt =
+  let converted_params = ref [] in
+  let new_index = ref 1 in
+  let preserve_text = target_module = "RLM" in
+  let rec loop i =
+    let k = string_of_int i in
+    let has_i = p_getenv conf.env ("i" ^ k) <> None in
+    let has_p = p_getenv conf.env ("p" ^ k) <> None in
+    if has_i || has_p then (
+      (if has_i then (
+         let id = Option.get (p_getenv conf.env ("i" ^ k)) in
+         let txt_param =
+           if preserve_text then
+             match p_getenv conf.env ("t" ^ k) with
+             | Some txt when txt <> "" ->
+                 "&t" ^ string_of_int !new_index ^ "="
+                 ^ (Mutil.encode txt :> string)
+             | _ -> ""
+           else ""
+         in
+         converted_params :=
+           ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+           :: !converted_params;
+         incr new_index)
+       else
+         match find_person_in_env conf base k with
+         | Some p ->
+             let id = Driver.Iper.to_string (Driver.get_iper p) in
+             let txt_param =
+               if preserve_text then
+                 match p_getenv conf.env ("t" ^ k) with
+                 | Some txt when txt <> "" ->
+                     (match assoc_txt_opt with
+                     | Some assoc_txt ->
+                         Hashtbl.add assoc_txt (Driver.get_iper p) txt
+                     | None -> ());
+                     "&t" ^ string_of_int !new_index ^ "="
+                     ^ (Mutil.encode txt :> string)
+                 | _ -> ""
+               else ""
+             in
+             converted_params :=
+               ("i" ^ string_of_int !new_index ^ "=" ^ id ^ txt_param)
+               :: !converted_params;
+             incr new_index
+         | None -> ());
+      loop (i + 1))
+  in
+  loop 1;
+  (commd conf :> string)
+  ^ "m=" ^ target_module ^ "&"
+  ^ String.concat "&" (List.rev !converted_params)
+
+(* Génère un overlay de chargement avec traduction possible *)
+let print_loading_overlay conf ?custom_translation_key () =
+  let translation_key =
+    Option.value custom_translation_key ~default:"waiting overlay"
+  in
+  let title = Utf8.capitalize_fst (transl_nth conf translation_key 0) in
+  let subtitle = Utf8.capitalize_fst (transl_nth conf translation_key 1) in
+  Output.printf conf
+    {|<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="visually-hidden">Loading…</span>
+    </div>
+    <h4>%s</h4>
+    <p>%s</p>
+  </div>
+</div>
+|}
+    title subtitle
+
+type evar_button = { evar : string; text : string }
+
+let evar_buttons conf _query_string evar_l title_text =
+  let all_conf_env = conf.env in
+  let buttons =
+    List.fold_left
+      (fun acc { evar; text } ->
+        let toggle = p_getenv conf.env evar = None in
+        let all_conf_but_evar =
+          List.fold_left
+            (fun acc (k, v) -> if k = evar then acc else (k, v) :: acc)
+            [] all_conf_env
+          |> List.rev
+        in
+        let toggle_url =
+          Printf.sprintf "%s%s%s"
+            (commd conf :> string)
+            (List.map
+               (fun (k, v) ->
+                 if Mutil.decode v = "" then Printf.sprintf "%s" k
+                 else Printf.sprintf "%s=%s" k (Mutil.decode v))
+               all_conf_but_evar
+            |> String.concat "&")
+            (if toggle then "&" ^ evar else "")
+        in
+        let verb = if toggle then "add" else "delete" in
+        let button_text =
+          transl_nth conf text 0 |> transl_decline conf verb
+          |> Utf8.capitalize_fst
+        in
+        acc
+        ^ Printf.sprintf
+            {|<a href="%s"
+            class="btn btn-outline-secondary btn-sm ms-auto">
+            <i class="fa fa-%s me-1"></i>%s</a>|}
+            toggle_url
+            (if toggle then "plus" else "minus")
+            button_text)
+      "" evar_l
+  in
+
+  Output.printf conf
+    {|<div class="d-flex align-items-center mb-3">
+        <h1 class="h2 mb-0">%s</h1>
+        %s
+      </div>|}
+    title_text buttons
+
+let order =
+  [
+    "b";
+    "lang";
+    "templ";
+    "iz";
+    "pz";
+    "nz";
+    "ocz";
+    "m";
+    "em";
+    "t";
+    "et";
+    "i";
+    "p";
+    "n";
+    "oc";
+    "wide";
+    "im";
+    "sp";
+    "ma";
+    "v";
+  ]
+
+let reorder (conf : Config.config) url_env =
+  (* Determine if lang parameter should be included *)
+  let should_keep_lang =
+    match List.assoc_opt "lang" url_env with
+    | None -> false
+    | Some lang -> conf.default_lang <> lang
+  in
+
+  (* Check if a parameter should be included in the URL *)
+  let should_include_param k v =
+    match k with
+    | "lang" -> should_keep_lang
+    | "oc" | "ocz" -> v <> "" && v <> "0"
+    | _ -> v <> ""
+  in
+
+  (* Process parameters in the specified order *)
+  let ordered_params, processed_keys =
+    List.fold_left
+      (fun (params, keys) k ->
+        match List.assoc_opt k url_env with
+        | None -> (params, keys)
+        | Some v when should_include_param k v ->
+            (Format.sprintf "%s=%s" k v :: params, k :: keys)
+        | Some _ -> (params, keys))
+      ([], []) order
+  in
+
+  (* Process remaining parameters not in order *)
+  let unordered_params =
+    List.fold_left
+      (fun acc (k, v) ->
+        if List.mem k processed_keys || not (should_include_param k v) then acc
+        else Format.sprintf "%s=%s" k v :: acc)
+      [] url_env
+  in
+
+  String.concat "&" (List.rev ordered_params @ List.rev unordered_params)
+
+let url_set_aux conf url evar_l str_l =
+  (* Extract base URL before query string *)
+  let href =
+    match String.split_on_char '?' url with
+    | [] ->
+        Log.warn (fun k -> k "Empty Url");
+        ""
+    | server :: _ -> server
+  in
+
+  (* Pad str_l to match evar_l length with empty strings *)
+  let str_l =
+    List.mapi
+      (fun i _ -> if i < List.length str_l then List.nth str_l i else "")
+      evar_l
+  in
+
+  (* Merge and deduplicate conf environment lists (latest values take precedence) *)
+  let all_conf_env = conf.henv @ conf.senv @ conf.env in
+  let conf_map =
+    List.fold_left
+      (fun acc (k, v) -> (k, v) :: List.remove_assoc k acc)
+      [] all_conf_env
+  in
+
+  (* Build URL parameters from evar_l and str_l *)
+  let url_env =
+    List.fold_left2
+      (fun acc evar str -> if str <> "" then (evar, str) :: acc else acc)
+      [] evar_l str_l
+    |> List.rev
+  in
+
+  (* Add remaining conf parameters not in evar_l *)
+  let url_env =
+    List.fold_left
+      (fun acc (k, v) ->
+        if List.mem k evar_l || k = "notif" then acc
+        else (k, Adef.as_string v) :: acc)
+      url_env conf_map
+    |> List.rev
+  in
+
+  Format.sprintf "%s?%s" href (reorder conf url_env)

@@ -1,0 +1,37 @@
+(test
+ (package geneweb)
+ (name test)
+ (modules
+  test
+  sosa_test
+  place_test
+  calendar_test
+  wiki_test
+  merge_test
+  util_test
+  dag2html_test
+  oidc_test
+  userkey_test
+  cache_test
+  blank_name_test)
+ (libraries alcotest geneweb geneweb.oidc fmt))
+
+(test
+ (package geneweb)
+ (deps
+  (:dict ./dict.txt))
+ (name search_test)
+ (libraries fmt qcheck qcheck-alcotest geneweb_util geneweb_search)
+ (action
+  (run %{test} %{dict})))
+
+(test
+ (package geneweb)
+ (name heap_test)
+ (libraries qcheck qcheck-alcotest geneweb_search))
+
+(test
+ (package geneweb)
+ (name url_test)
+ (modules url_test)
+ (libraries alcotest geneweb_http fmt))

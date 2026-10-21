@@ -1,19 +1,28 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
+module Collection = Geneweb_db.Collection
 
 let all = ref false
 let statistics = ref false
 let detail = ref 0
 let ignore = ref []
-let output = ref ""
+let output = ref None
 let ignore_files = ref true
 let ask_for_delete = ref 0
 let cnt_for_delete = ref 0
 let exact = ref false
-let gwd_port = ref 2317
-let server = ref "127.0.0.1"
+let bname = ref None
+let is_html () = !output <> None
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
+
+let format_date () =
+  let t = Unix.localtime (Unix.gettimeofday ()) in
+  Printf.sprintf "%02d/%02d/%04d %02d:%02d:%02d" t.Unix.tm_mday
+    (t.Unix.tm_mon + 1) (t.Unix.tm_year + 1900) t.Unix.tm_hour t.Unix.tm_min
+    t.Unix.tm_sec
 
 let rec merge_families ifaml1f ifaml2f =
   match (ifaml1f, ifaml2f) with
@@ -28,131 +37,113 @@ let rec merge_families ifaml1f ifaml2f =
   | ifaml1, [] -> ifaml1
   | [], ifaml2 -> ifaml2
 
-let rec filter f = function
-  | x :: l -> if f x then x :: filter f l else filter f l
-  | [] -> []
-
 let connected_families base ifam cpl =
   let rec loop ifaml ipl_scanned = function
     | ip :: ipl ->
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
-          let u = poi base ip in
-          let ifaml1 = Array.to_list (get_family u) in
+          let u = Driver.poi base ip in
+          let ifaml1 = Array.to_list (Driver.get_family u) in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
             List.fold_right
               (fun ifam ipl ->
-                let cpl = foi base ifam in
-                get_father cpl :: get_mother cpl :: ipl)
+                let cpl = Driver.foi base ifam in
+                Driver.get_father cpl :: Driver.get_mother cpl :: ipl)
               ifaml1 ipl
           in
           loop ifaml (ip :: ipl_scanned) ipl
     | [] -> ifaml
   in
-  loop [ ifam ] [] [ get_father cpl ]
+  loop [ ifam ] [] [ Driver.get_father cpl ]
 
 let neighbourgs base ifam =
-  let fam = foi base ifam in
+  let fam = Driver.foi base ifam in
   let ifaml = connected_families base ifam fam in
   let ifaml =
-    match get_parents (poi base (get_father fam)) with
+    match Driver.get_parents (Driver.poi base (Driver.get_father fam)) with
     | Some ifam -> ifam :: ifaml
     | None -> ifaml
   in
   let ifaml =
-    match get_parents (poi base (get_mother fam)) with
+    match Driver.get_parents (Driver.poi base (Driver.get_mother fam)) with
     | Some ifam -> ifam :: ifaml
     | None -> ifaml
   in
   List.fold_left
     (fun ifaml ip ->
-      let u = poi base ip in
+      let u = Driver.poi base ip in
       List.fold_left
         (fun ifaml ifam -> ifam :: ifaml)
         ifaml
-        (Array.to_list (get_family u)))
+        (Array.to_list (Driver.get_family u)))
     ifaml
-    (Array.to_list (get_children fam))
+    (Array.to_list (Driver.get_children fam))
 
 let utf8_designation base p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let s = first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname in
+  let first_name = Driver.p_first_name base p in
+  let surname = Driver.p_surname base p in
+  let s = first_name ^ "." ^ string_of_int (Driver.get_occ p) ^ " " ^ surname in
   if first_name = "?" || surname = "?" then
-    s ^ " (i=" ^ string_of_iper (get_iper p) ^ ")"
+    "i=" ^ Driver.Iper.to_string (Driver.get_iper p)
   else s
 
-let wiki_designation base basename p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let s =
-    "[[" ^ first_name ^ "/" ^ surname ^ "/"
-    ^ string_of_int (get_occ p)
-    ^ "/" ^ first_name ^ "."
-    ^ string_of_int (get_occ p)
-    ^ " " ^ surname ^ "]]"
-  in
+let wiki_designation base p =
+  let first_name = Driver.p_first_name base p in
+  let surname = Driver.p_surname base p in
   if first_name = "?" || surname = "?" then
-    let indx = string_of_iper (get_iper p) in
-    s ^ " <a href=\"http://" ^ !server ^ ":" ^ string_of_int !gwd_port ^ "/"
-    ^ basename ^ "?i=" ^ indx ^ "\">(i=" ^ indx ^ ")</a><br>"
-  else s ^ "<br>"
+    let indx = Driver.Iper.to_string (Driver.get_iper p) in
+    Printf.sprintf {|<a href="%%si=%s">i=%s</a>|} indx indx
+  else
+    "[[" ^ first_name ^ "/" ^ surname ^ "/"
+    ^ string_of_int (Driver.get_occ p)
+    ^ "/" ^ first_name ^ "."
+    ^ string_of_int (Driver.get_occ p)
+    ^ " " ^ surname ^ "]]"
 
-let print_family base basename ifam =
-  let fam = foi base ifam in
-  let p = poi base (get_father fam) in
-  if !output <> "" then (
-    if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?" then
-      Printf.eprintf "i=%s" (string_of_iper (get_iper p))
-    else Printf.eprintf "  - %s" (utf8_designation base p);
-    Printf.eprintf "\n";
-    Printf.eprintf "  - %s\n"
-      (utf8_designation base (poi base (get_mother fam)));
-    flush stderr);
-  if sou base (get_first_name p) = "?" || sou base (get_surname p) = "?" then
-    let indx = string_of_iper (get_iper p) in
-    Printf.printf "  - <a href=\"http://%s:%d/%s?i=%s\">i=%s</a><br>" !server
-      !gwd_port basename indx indx
-  else Printf.printf "  - %s" (wiki_designation base basename p);
-  Printf.printf "\n";
-  Printf.printf "  - %s\n"
-    (wiki_designation base basename (poi base (get_mother fam)))
+let print_family base ifam =
+  let fam = Driver.foi base ifam in
+  let father = Driver.poi base (Driver.get_father fam) in
+  let mother = Driver.poi base (Driver.get_mother fam) in
+  if not (is_html ()) then (
+    Printf.eprintf "    %s & %s\n"
+      (utf8_designation base father)
+      (utf8_designation base mother);
+    flush stderr)
+  else
+    Printf.printf "%s</td><td>%s</td></tr>\n"
+      (wiki_designation base father)
+      (wiki_designation base mother)
 
 let kill_family base ip =
   let u = { family = Array.of_list [] } in
-  patch_union base ip u
+  Driver.patch_union base ip u
 
 let kill_parents base ip =
   let a = { parents = None; consang = Adef.fix (-1) } in
-  patch_ascend base ip a
+  Driver.patch_ascend base ip a
 
 let effective_del base (ifam, fam) =
-  kill_family base (get_father fam);
-  kill_family base (get_mother fam);
-  Array.iter (kill_parents base) (get_children fam);
-  Gwdb.delete_family base ifam
+  kill_family base (Driver.get_father fam);
+  kill_family base (Driver.get_mother fam);
+  Array.iter (kill_parents base) (Driver.get_children fam);
+  Driver.delete_family base ifam
 
-let move base basename =
-  load_ascends_array base;
-  load_unions_array base;
-  load_couples_array base;
-  load_descends_array base;
-  Printf.printf "<h3>Connected components of base %s</h3><br>\n" basename;
-  let ic = Unix.open_process_in "date" in
-  let date = input_line ic in
-  let () = close_in ic in
-  Printf.printf "Computed on %s<br><br>\n" date;
+let compute_connex base basename =
+  Driver.load_ascends_array base;
+  Driver.load_unions_array base;
+  Driver.load_couples_array base;
+  Driver.load_descends_array base;
+  let date = format_date () in
   flush stderr;
-  let mark = Gwdb.ifam_marker (Gwdb.ifams base) false in
-  let min = ref max_int in
-  let max = ref 0 in
+  let mark = Driver.ifam_marker (Driver.ifams base) false in
   let hts = Hashtbl.create 100 in
-  Gwdb.Collection.iter
+  let components = ref [] in
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
-      let origin_file = get_origin_file fam in
-      if List.mem (sou base origin_file) !ignore then ()
+      let fam = Driver.foi base ifam in
+      let origin_file = Driver.get_origin_file fam in
+      if List.mem (Driver.sou base origin_file) !ignore then ()
       else
         let nb, ifaml =
           let rec loop nb rfaml = function
@@ -160,10 +151,13 @@ let move base basename =
             | ifam :: ifaml ->
                 let j = ifam in
                 if
-                  (not (Gwdb.Marker.get mark j))
-                  && (!ignore_files || eq_istr (get_origin_file fam) origin_file)
+                  (not (Collection.Marker.get mark j))
+                  && (!ignore_files
+                     || Driver.Istr.equal
+                          (Driver.get_origin_file fam)
+                          origin_file)
                 then (
-                  Gwdb.Marker.set mark j true;
+                  Collection.Marker.set mark j true;
                   let nl = neighbourgs base ifam in
                   let rfaml =
                     if nb > !detail then
@@ -177,100 +171,165 @@ let move base basename =
           in
           loop 0 [] [ ifam ]
         in
-        if nb > 0 && (!all || nb <= !min) then (
-          if nb <= !min then min := nb;
-          if nb >= !max then max := nb;
-          if !output <> "" then (
-            Printf.eprintf "Connex component \"%s\" length %d\n"
-              (sou base origin_file) nb;
-            flush stderr);
-          Printf.printf "Connex component \"%s\" length %d<br>\n"
-            (sou base origin_file) nb;
-          if !detail == nb then List.iter (print_family base basename) ifaml
-          else print_family base basename ifam;
-          if !statistics then
-            match Hashtbl.find_opt hts nb with
-            | None -> Hashtbl.add hts nb 1
-            | Some n ->
-                Hashtbl.replace hts nb (n + 1);
-                flush stdout;
-                let check_ask =
-                  if !exact then nb = !ask_for_delete else nb <= !ask_for_delete
-                in
-                if !ask_for_delete > 0 && check_ask then (
-                  (* if -o file, repeat branch definition to stderr! *)
-                  Printf.eprintf "Delete up to %d branches of size %s %d ?\n"
-                    !cnt_for_delete
-                    (if !exact then "=" else "<=")
-                    !ask_for_delete;
+        if nb > 0 then (
+          let dominated = ref false in
+          List.iter
+            (fun (_, sz, _, _) ->
+              if (not !all) && sz < nb then dominated := true)
+            !components;
+          if !all || not !dominated then (
+            let origin = Driver.sou base origin_file in
+            let families = if !detail == nb then ifaml else [ ifam ] in
+            components := (origin, nb, families, ifam) :: !components;
+            (if !statistics then
+               match Hashtbl.find_opt hts nb with
+               | None -> Hashtbl.add hts nb 1
+               | Some n -> Hashtbl.replace hts nb (n + 1));
+            let check_ask =
+              if !exact then nb = !ask_for_delete else nb <= !ask_for_delete
+            in
+            if !ask_for_delete > 0 && check_ask then (
+              Printf.eprintf "Delete up to %d branches of size %s %d ?\n"
+                !cnt_for_delete
+                (if !exact then "=" else "<=")
+                !ask_for_delete;
+              flush stderr;
+              let r =
+                if !cnt_for_delete > 0 then "y"
+                else if not (Unix.isatty Unix.stdin) then (
+                  Printf.eprintf
+                    "Delete requires -cnt in non-interactive mode, skipping.\n";
                   flush stderr;
-                  let r =
-                    if !cnt_for_delete > 0 then "y"
-                    else (
-                      Printf.eprintf "Delete that branch (y/N) ?";
-                      flush stderr;
-                      input_line stdin)
-                  in
-                  if r = "y" then (
-                    decr cnt_for_delete;
-                    List.iter
-                      (fun ifam ->
-                        let fam = foi base ifam in
-                        effective_del base (ifam, fam))
-                      ifaml;
-                    Printf.eprintf "%d families deleted\n" (List.length ifaml);
-                    flush stderr)
-                  else (
-                    Printf.printf "Nothing done.\n";
-                    flush stdout))))
-    (Gwdb.ifams base);
-  if !ask_for_delete > 0 then Gwdb.commit_patches base;
-  if !statistics then (
-    Printf.printf "<br>\nStatistics:<br>\n";
+                  "n")
+                else (
+                  Printf.eprintf "Delete that branch (y/N) ?";
+                  flush stderr;
+                  input_line stdin)
+              in
+              if r = "y" then (
+                decr cnt_for_delete;
+                List.iter
+                  (fun ifam ->
+                    let fam = Driver.foi base ifam in
+                    effective_del base (ifam, fam))
+                  ifaml;
+                Printf.eprintf "%d families deleted\n" (List.length ifaml);
+                flush stderr)
+              else (
+                Printf.printf "Nothing done.\n";
+                flush stdout)))))
+    (Driver.ifams base);
+  if !ask_for_delete > 0 then Driver.commit_patches base;
+  let components =
+    List.sort (fun (_, a, _, _) (_, b, _, _) -> compare b a) !components
+  in
+  let origins =
+    List.sort_uniq String.compare (List.map (fun (o, _, _, _) -> o) components)
+  in
+  let single_origin = List.length origins <= 1 in
+  if is_html () then (
+    Printf.printf "<h3>Connected components of base %s</h3>\n" basename;
+    Printf.printf "Computed on %s<br>\n" date;
+    Printf.printf {|<table border="1" cellpadding="4" |};
+    Printf.printf {|cellspacing="0">|};
+    Printf.printf "\n";
+    if single_origin then
+      Printf.printf "<tr><th>Size</th><th>Father</th><th>Mother</th></tr>\n"
+    else
+      Printf.printf
+        "<tr><th>Origin</th><th>Size</th><th>Father</th><th>Mother</th></tr>\n")
+  else (
+    Printf.eprintf "Connected components of base %s\n" basename;
+    Printf.eprintf "Computed on %s\n\n" date);
+  List.iter
+    (fun (origin, nb, families, _ifam) ->
+      if not (is_html ()) then (
+        Printf.eprintf "Connex component \"%s\" length %d\n" origin nb;
+        flush stderr)
+      else if single_origin then Printf.printf "<tr><td>%d</td><td>" nb
+      else Printf.printf "<tr><td>%s</td><td>%d</td><td>" origin nb;
+      match families with
+      | [] -> if is_html () then Printf.printf "</td><td></td></tr>\n"
+      | first :: rest ->
+          print_family base first;
+          List.iter
+            (fun ifam ->
+              if is_html () then
+                if single_origin then Printf.printf "<tr><td></td><td>"
+                else Printf.printf "<tr><td></td><td></td><td>";
+              print_family base ifam)
+            rest)
+    components;
+  if is_html () then Printf.printf "</table>\n";
+  if !statistics then
     let ls = Hashtbl.fold (fun nb n ls -> (nb, n) :: ls) hts [] in
     let ls = List.sort compare ls in
     let ls = List.rev ls in
-    List.iter (fun (nb, n) -> Printf.printf "%d(%d) " nb n) ls;
-    Printf.printf "\n")
+    if is_html () then (
+      Printf.printf
+        "<h4 class=\"mt-3\">Statistics</h4>\n\
+         <table class=\"mt-3\" border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n\
+         <tr><th>Size</th><th>Count</th></tr>\n";
+      List.iter
+        (fun (nb, n) -> Printf.printf "<tr><td>%d</td><td>%d</td></tr>\n" nb n)
+        ls;
+      Printf.printf "</table>\n")
+    else (
+      Printf.eprintf "\nStatistics:\n";
+      List.iter (fun (nb, n) -> Printf.eprintf "  %6d (%d)\n" nb n) ls;
+      Printf.eprintf "\n")
 
-let bname = ref ""
-let usage = "usage: " ^ Sys.argv.(0) ^ " <base>"
+let usage =
+  "usage: " ^ Sys.argv.(0) ^ " [options] <base>\nexample: " ^ Sys.argv.(0)
+  ^ " -a -s -o base.gwb/notes_d/connex.txt -bd <bases_dir> base"
 
 let speclist =
   [
-    ( "-gwd_p",
-      Arg.Int (fun x -> gwd_port := x),
-      "<number> Specify the port number of gwd (default = "
-      ^ string_of_int !gwd_port ^ "); > 1024 for normal users." );
-    ( "-server",
-      Arg.String (fun x -> server := x),
-      "<string> Name of the server (default is 127.0.0.1)." );
-    ("-a", Arg.Set all, " all connex components");
-    ("-s", Arg.Set statistics, " produce statistics");
-    ("-d", Arg.Int (fun x -> detail := x), "<int> detail for this length");
-    ( "-i",
-      Arg.String (fun x -> ignore := x :: !ignore),
-      "<file> ignore this file" );
-    ("-bf", Arg.Clear ignore_files, " by origin files");
-    ( "-del",
-      Arg.Int (fun i -> ask_for_delete := i),
-      "<int> ask for deleting branches whose size <= that value" );
+    ("-a", Arg.Set all, " List all connected components.");
+    ("-bf", Arg.Clear ignore_files, " Group by origin file.");
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ( "-cnt",
       Arg.Int (fun i -> cnt_for_delete := i),
-      "<int> delete cnt branches whose size <= -del value" );
-    ( "-exact",
-      Arg.Set exact,
-      " delete only branches whose size strictly = -del value" );
-    ("-o", Arg.String (fun x -> output := x), "<file> output to this file");
+      "<int> Delete up to n branches of size <= -del value." );
+    ( "-d",
+      Arg.Int (fun x -> detail := x),
+      "<int> Show detail for components of this size." );
+    ( "-del",
+      Arg.Int (fun i -> ask_for_delete := i),
+      "<int> Prompt for deleting branches of size <= n." );
+    ("-exact", Arg.Set exact, " With -del, match size exactly instead of <=.");
+    ( "-i",
+      Arg.String (fun x -> ignore := x :: !ignore),
+      "<file> Ignore this origin file." );
+    ( "-o",
+      Arg.String (fun x -> output := Some x),
+      "<file> Write HTML output to file (default: text to stderr)." );
+    ("-s", Arg.Set statistics, " Print component size statistics.");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
-let main () =
-  Arg.parse speclist (fun s -> bname := s) usage;
+let () =
+  Arg.parse speclist (fun s -> bname := Some s) usage;
+  Secure.set_base_dir !bases_dir;
+  (match !output with
+  | Some file ->
+      let file =
+        if Filename.is_relative file then Filename.concat !bases_dir file
+        else file
+      in
+      let oc = open_out file in
+      Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
+  | None -> ());
+  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
+  let run () =
+    Driver.with_database bpath (fun base -> compute_connex base bpath)
+  in
   if !ask_for_delete > 0 then
-    Lock.control (Mutil.lock_file !bname) false
-      (fun () -> move (Gwdb.open_base !bname) !bname)
-      ~onerror:Lock.print_try_again
-  else move (Gwdb.open_base !bname) !bname
-
-let _ = main ()
+    let lock_file = Mutil.lock_file bpath in
+    let on_exn exn bt =
+      Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+      exit 2
+    in
+    Lock.control ~on_exn ~wait:true ~lock_file run
+  else run ()

@@ -393,6 +393,6 @@
       %if;(item.3 = 1)%incr_count;%end;
     %end;
   %end;
-  <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)] </td></tr>
+  <tr><td colspan="7">[*total][:] %count; [person/persons]n</td></tr>
 </tbody>
 </table>

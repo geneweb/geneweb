@@ -6,9 +6,6 @@
       <table style="position:absolute;top:50px;float:%if;(evar.m="D" and evar.t="T" and (evar.slices="" or evar.slices !="on"))
         left;left:10px;%else;right;right:10px;%end;">
         <tr><td>
-          %if;(referer != "")
-            <a href="%referer;"><img src="%images_prefix;left.png" %wid_hei;left.png; alt="&lt;&lt;" title="[*back]"></a>
-          %end;
           <a href="%prefix;"><img src="%images_prefix;up.png" %wid_hei;up.pnd; alt="^^" title="[*home]"></a>
           <a href="%url_set.cgl.on;" target="_blank"><img style="border-width: thin"%sp;
             src="%images_prefix;right.png"%wid_hei;right.png; alt="" title="[*cancel GeneWeb links]"></a>

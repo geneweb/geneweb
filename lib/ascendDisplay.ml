@@ -1,8 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
-open Util
+module Driver = Geneweb_db.Driver
+module Iper = Driver.Iper
 
 let limit_by_tree conf =
   match List.assoc_opt "max_anc_tree" conf.base_env with
@@ -14,31 +14,30 @@ let print_ancestors_dag conf base v p =
   let set =
     (* TODO this should be a get_ancestors_set lvl ip *)
     let rec loop set lev ip =
-      let set = Dag.Pset.add ip set in
+      let set = Iper.Set.add ip set in
       if lev <= 0 then set
       else
-        match get_parents (pget conf base ip) with
+        match Driver.get_parents (Util.pget conf base ip) with
         | Some ifam ->
-            let cpl = foi base ifam in
+            let cpl = Driver.foi base ifam in
             let get_left, get_right =
-              match p_getenv conf.env "mf" with
-              | Some "1" -> (get_father, get_mother)
-              | _ -> (get_mother, get_father)
+              match Util.p_getenv conf.env "mf" with
+              | Some "1" -> (Driver.get_father, Driver.get_mother)
+              | _ -> (Driver.get_mother, Driver.get_father)
             in
             let set = loop set (lev - 1) (get_left cpl) in
             loop set (lev - 1) (get_right cpl)
         | None -> set
     in
-    loop Dag.Pset.empty v (get_iper p)
+    loop Iper.Set.empty v (Driver.get_iper p) |> Iper.Set.elements
   in
   let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
-  (* Récupère les options d'affichage. *)
   let options = Util.display_options conf in
   let vbar_txt ip =
-    let p = pget conf base ip in
+    let p = Util.pget conf base ip in
     Printf.sprintf {|%s%s&m=A&t=T&dag=on&v=%d%s |}
-      (commd conf :> string)
-      (acces conf base p :> string)
+      (Util.commd conf :> string)
+      (Util.acces conf base p :> string)
       v
       (options :> string)
     |> Adef.escaped
@@ -53,7 +52,7 @@ let print conf base p =
   match
     ( Util.p_getenv conf.env "t",
       Util.p_getenv conf.env "dag",
-      p_getint conf.env "v" )
+      Util.p_getint conf.env "v" )
   with
   | Some "T", Some "on", Some v -> print_ancestors_dag conf base v p
   | _ ->

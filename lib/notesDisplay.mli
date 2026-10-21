@@ -1,21 +1,108 @@
+module Driver = Geneweb_db.Driver
+
 val print_linked_list :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  Driver.base ->
+  ?person:Driver.person ->
+  (Driver.iper, Driver.ifam) Def.NLDB.page list ->
   unit
-(** Displays the page list in argument *)
+(** [print_linked_list conf base ?person pgl] renders [pgl], a list of pages
+    (individuals, families, wiki notes, wizard notes, gallery notes) that link
+    to some reference. The rendering layout is selected from the URL parameter
+    [type]:
+    - [Some "gallery"] → a thumbnail wall ({!print_linked_list_gallery}): for
+      each gallery note, the thumbnails of images where [person] appears are
+      shown (if [person] is given; otherwise a single default thumbnail per
+      gallery note).
+    - any other value → a standard table ({!print_linked_list_standard}) with
+      one row per linked page.
 
-val print : Config.config -> Gwdb.base -> unit
-(** Displays the base notes *)
+    When [person] is provided, links to gallery notes carry that person's
+    identifier as a URL fragment (via {!Util.acces}, honouring [access_by_key])
+    so that downstream pages can restrict to galleries where the person appears.
+*)
 
-val print_mod : Config.config -> Gwdb.base -> unit
-(** Displays a text form for notes creation/edition *)
+val print_what_links : Config.config -> Driver.base -> string -> unit
+(** [print_what_links conf base fnotes] renders the page backlinks for a
+    miscellaneous note identified by [fnotes] (its filename). Outputs the
+    standard HTML header/trailer, a title [linked pages: fnotes], and delegates
+    the list rendering to {!print_linked_list} with no [person] scope. *)
 
-val print_mod_ok : Config.config -> Gwdb.base -> unit
-(** Updates notes *)
+val print_what_links_p : Config.config -> Driver.base -> Driver.person -> unit
+(** [print_what_links_p conf base p] renders the linked-pages view for person
+    [p] (URL [m=LINKED&p=...&n=...] or [m=LINKED&i=N]). Checks
+    {!Util.authorized_age}; on denial, outputs an "incorrect request" page.
+    Otherwise, looks up the NLDB entries for [p]'s canonical key [(fn, sn, oc)]
+    via {!Notes.links_to_ind}, then renders the result with {!print_linked_list}
+    scoped on [p]. The page title is either [linked pages] (default) or
+    [linked galleries] (when [type=gallery] is set in the URL environment). *)
 
-val print_misc_notes : Config.config -> Gwdb.base -> unit
-(** Displays a menu to search in notes *)
+val print : Config.config -> Driver.base -> unit
+(** [print conf base] renders the base-wide notes page (URL [m=NOTES] without
+    [f], or with [f] pointing to a specific miscellaneous note). Renders a
+    standard wiki-formatted note page. *)
 
-val print_misc_notes_search : Config.config -> Gwdb.base -> unit
-(** Same as `print_misc_notes`, with a default search *)
+val print_mod : Config.config -> Driver.base -> unit
+(** [print_mod conf base] renders the edit form for a note. Reads the target
+    note via [f] in the URL environment. Serves the plain textarea form. If the
+    note has a [RESTRICT] header listing non-authorized keys, refuses the edit
+    with an explanatory page. *)
+
+val print_gallery_json : Config.config -> Driver.base -> unit
+(** [print_gallery_json conf base] outputs the gallery note content as JSON (no
+    HTML wrapping) for the gallery viewer. The payload is run through
+    {!Notes.mark_pnocs_validity} to annotate each map entry with its [valid]
+    flag, then {!Notes.safe_gallery} to sanitize embedded HTML in [alt], [desc],
+    [title], [chronicle] fields. *)
+
+val print_mod_gallery_json : Config.config -> Driver.base -> unit
+(** [print_mod_gallery_json conf base] returns the gallery note content
+    formatted for AJAX consumption by the gallery editor. Computes a digest over
+    the raw [k=v\n] header lines and the body for concurrent-edit detection,
+    then annotates map entries via {!Notes.mark_pnocs_validity} before
+    serialization. *)
+
+val print_mod_ok : Config.config -> Driver.base -> unit
+(** [print_mod_ok conf base] processes the POST submission of an edited note.
+    Writes the new content, updates the notes-links database ([nldb]) and the
+    per-person [cache_linked_pages] counters accordingly, handles key renames
+    and merges if the note was a gallery (via {!Notes.update_cache_linked_pages}
+    and {!Notes.rewrite_key}), and records a history entry. Redirects to the
+    view page on success. *)
+
+val print_gallery : Config.config -> Driver.base -> unit
+(** [print_gallery conf base] renders the gallery viewer template
+    [notes_gallery] for the note identified by [f] in the URL environment. The
+    note content is fetched asynchronously by the template via
+    [m=GALLERY&ajax=on] (handled by {!print_gallery_json}). Refuses access if
+    the note has a [RESTRICT] header listing non-authorized keys *)
+
+val print_mod_gallery : Config.config -> Driver.base -> unit
+(** [print_mod_gallery conf base] renders the gallery editor template
+    [notes_upd_gallery]. With [new] in the URL env, serves an empty editor for a
+    brand-new gallery (the user supplies the filename via the form). Otherwise
+    loads the existing note identified by [f]. Refuses access on [RESTRICT]
+    mismatch. *)
+
+val print_mod_gallery_ok :
+  Geneweb_http.Connection.t -> Config.config -> Driver.base -> unit
+(** [print_mod_gallery_ok conf base] processes the POST submission of an edited
+    or newly-created gallery: validates the digest and commits to disk via
+    {!Wiki.do_mod_ok}, then issues an HTTP 302 redirect to
+    [m=GALLERY&f=<saved_fname>]. The standard Post/Redirect/Get pattern: the
+    browser ends up on the gallery viewer URL with no double POST on refresh. *)
+
+val print_misc_notes : Config.config -> Driver.base -> unit
+(** [print_misc_notes conf base] renders the directory listing of miscellaneous
+    notes. Navigates the notes filesystem tree, showing subdirectories and notes
+    at the current level, plus a search box. The current subdirectory is taken
+    from the [d] URL parameter (empty = root). Also appends any loose files
+    present under the notes directory that are not (yet) referenced in the
+    database, under a "files not in db" heading. *)
+
+val print_misc_notes_search : Config.config -> Driver.base -> unit
+(** [print_misc_notes_search conf base] dispatches a text search request: reads
+    [s] (the search string) from the URL and [c=on] for case sensitivity, walks
+    the notes database, and renders the first matching note (via
+    {!print_whole_notes} with search highlighting) or falls back to
+    {!print_misc_notes} if no match is found. *)

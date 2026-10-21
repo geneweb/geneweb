@@ -1,43 +1,34 @@
-<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
+<!-- $Id: home.txt v7.1 03/04/2026 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference][:]
   <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
-%end;
-%define;get_random(xxx)
-  %random.init;
-  %random.xxx;
 %end;
 %define;dice()
   %random.init;
   %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
 %end;
-%let;random_index;%if;(nb_persons.v!=0)%apply;get_random(nb_persons.v)%end;%in;
-%if;(not cancel_links)
-  <div class="d-flex flex-column fix_top fix_left home-xs">
-    <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
+%if;(not cancel_links and e.templ="")
+  <div class="d-flex flex-column fix_top fix_left home-xs d-print-none">
+    <a class="btn btn-sm btn-link p-0 border-0" href="%prefix_no_senv;" title="[*home]">%nn;
       <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
-      <i class="sr-only">[*home]</i>%nn;
+      <span class="visually-hidden">[*home]</span>%nn;
     </a>
-    %if;(referer!="")
-      <a tabindex="2" role="button" class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
-        <i class="fa fa-arrow-left-long fa-fw fa-xs fa-icon" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*back]</span>%nn;
-      </a>
-    %end;
-    <a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+    <button type="button" class="btn btn-sm btn-link p-0 border-0" data-bs-toggle="modal" data-bs-target="#searchmodal"
       accesskey="S" title="[*search/case sensitive]0">%nn;
       <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
-      <span class="sr-only">[*search/case sensitive]0</span>%nn;
-    </a>
-    %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
-    %if;(nb_persons.v!=0)
-      <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
-        href="%if;(rng=1)%apply;url_set%with;i/p/n/oc%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
-          title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*random individual]</span>%nn;
+      <span class="visually-hidden">[*search/case sensitive]0</span>%nn;
+    </button>
+    %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and (e.m="A" or e.m="C"
+      or e.m="D" or e.m="F" or e.m="LINKED" or e.m="R"))1%end;%in;
+    %if;(nb_persons.v!=0 and not predictable_mode)
+      <a class="btn btn-sm btn-link p-0 border-0 fa-icon"
+        href="%if;(rng=1)%apply;url_set%with;rnd%and;1%end;%else;%prefix;rnd=1%end;"
+        title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;">
+        <i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
+        <span class="visually-hidden">[*random individual]</span>%nn;
       </a>
     %end;
-    %if;(b.hide_querytime_bugs!="yes")
+    %if;(b.hide_querytime_bugs!="yes" and not predictable_mode)
       <div class="btn btn-sm p-0 border-0" id="q_time">%nn;
         <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>%nn;
       </div>
@@ -45,54 +36,58 @@
         <i class="fa fa-bug fa-fw fa-xs p-0"></i>%nn;
       </div>
     %end;
-    %if;(b.alt_serv_base!="" and (roglo!=1 or (roglo=1 and wizard)) and not cgi)
-      <a role="button" class="btn btn-sm btn-link p-0 border-0 fa-icon"
+    %if;(b.alt_serv_base!="" and (not roglo or (roglo and wizard)) and not cgi)
+      <a class="btn btn-sm btn-link p-0 border-0 fa-icon"
         href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
-          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"
-        title="[*go to alt base]0%if;(b.roglo=1) Roglo%end;%sp;
+          %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w" and env.key!="file")&%env.key;=%env.val;%end;%end;"
+        title="[*go to alt base]0%sp;
           %if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?…
-          %if;(e.i!="")[go to alt base]1%end;">
-       <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i></a>
+          %if;(e.i!="")[go to alt base]1%end;">%nn;
+       <i class="fa fa-arrow-right%if;wizard; text-success%end; fa-fw fa-xs p-0"></i>
       </a>
     %end;
   </div>
-  <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+  <div class="modal fade" id="searchmodal" tabindex="-1" aria-labelledby="searchpopup" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="ModalSearch">
-          <form id="collapse_search" method="get" action="%prefix;">
-            %hidden;
-            <input type="hidden" name="m" value="S">
-            <div class="d-flex flex-column flex-md-row justify-content-center">
-              <h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h3>
-              <div class="col-12 col-md-8 mt-2 mt-md-0">
-                %if;(browsing_with_sosa_ref)
-                  <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
-                %end;
-                <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg no-clear-button" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
-                  autofocus>
-                <label class="sr-only" for="p">Search firstname</label>
-                <input type="search" id="p" class="form-control form-control-lg no-clear-button mt-2" name="p" placeholder="[*first name/first names]0">
-                <div class="d-flex align-items-center ml-2 flex-nowrap">
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*all-hlp]">
-                    <input class="form-check-input" type="checkbox" name="all" id="all" value="on">
-                    <label class="form-check-label" for="all">[*all]</label>
-                  </div>
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*order-hlp]">
-                    <input class="form-check-input" type="checkbox" name="order" id="order" value="on">
-                    <label class="form-check-label" for="order">[*order]</label>
-                  </div>
-                  <div class="form-check form-check-inline" data-toggle="tooltip" data-placement="bottom" title="[*exact-hlp]">
-                    <input class="form-check-input" type="checkbox" name="exact" id="exact" value="on">
-                    <label class="form-check-label" for="exact">[*exact]</label>
-                  </div>
-                </div>
-              </div>
-              <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
+        <form class="modal-body" method="get" action="%prefix;">
+          <h2 class="visually-hidden" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h2>
+          %hidden_no_senv;
+          <input type="hidden" name="m" value="S">
+          %if;(browsing_with_sosa_ref)
+            <p class="mb-2">%apply;display_sosa_ref%with;%sosa_ref;%end;</p>
+          %end;
+          <input type="search" id="hs_fullname" class="form-control form-control-lg no-clear-button"
+            name="pn" aria-labelledby="searchpopup" autofocus
+            placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end; [or] [key]0">
+          <div class="row g-2 mt-1">
+            <div class="col-sm-6">
+              <label class="visually-hidden" for="hs_p">[*first name/first names]2</label>
+              <input type="search" id="hs_p" class="form-control form-control-lg no-clear-button"
+                name="p" placeholder="[*first name/first names]2">
             </div>
-          </form>
-        </div>
+            <div class="col-sm-6">
+              <label class="visually-hidden" for="hs_n">[*surname/surnames]0</label>
+              <input type="search" id="hs_n" class="form-control form-control-lg no-clear-button"
+                name="n" placeholder="[*surname/surnames]0">
+            </div>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+            <span class="ms-1 me-2">[*first name/first names]1</span>
+            <div class="form-check form-check-inline" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*order hlp]">
+              <input class="form-check-input" type="checkbox" name="p_order" id="hs_p_order" value="on">
+              <label class="form-check-label" for="hs_p_order">[order]</label>
+            </div>
+            <div class="form-check form-check-inline" data-bs-toggle="tooltip" data-bs-placement="bottom"
+              title="[*not exact]1, [phonetic variants] [not exact hlp]">
+              <input class="form-check-input" type="checkbox" name="p_exact" id="hs_p_exact" value="off">
+              <label class="form-check-label" for="hs_p_exact">[not exact]0</label>
+            </div>
+            <button type="submit" class="btn btn-primary ms-auto">%nn;
+              <i class="fa fa-magnifying-glass me-2" aria-hidden="true"></i>[*search/case sensitive]0%nn;
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

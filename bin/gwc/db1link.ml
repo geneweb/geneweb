@@ -3,6 +3,7 @@
 open Geneweb
 open Gwcomp
 open Def
+module Driver = Geneweb_db.Driver
 
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
@@ -31,16 +32,16 @@ type union = int Def.gen_union
 type family = (int, int, int) Def.gen_family
 (** Family's entry in the base *)
 
-type couple = int Def.gen_couple
+type couple = int Adef.gen_couple
 (** Family's couple entry in the base *)
 
 type descend = int Def.gen_descend
 (** Family's descendants entry in the base *)
 
 type ('person, 'string) gen_min_person = {
-  mutable m_first_name : 'string;
-  mutable m_surname : 'string;
-  mutable m_occ : int;
+  m_first_name : 'string;
+  m_surname : 'string;
+  m_occ : int;
   mutable m_rparents : ('person, 'string) gen_relation list;
   mutable m_related : int list;
   mutable m_pevents : ('person, 'string) gen_pers_event list;
@@ -69,8 +70,10 @@ type cbase = {
       (* Data base notes and extended page structure *)
   mutable c_bnotes : Def.base_notes;
 }
-(** State of the base collecting all information at link time used to
-    create further Geneweb database *)
+(** State of the base collecting all information at link time used to create
+    further Geneweb database *)
+
+type bnotes = Merge | Erase | First | Drop
 
 type file_info = {
   (* current .gw filename *)
@@ -78,7 +81,7 @@ type file_info = {
   mutable f_curr_gwo_file : string;
       (* all persons from current file should be separated  *)
   mutable f_separate : bool; (* behavior for base notes from current file *)
-  mutable f_bnotes : [ `merge | `erase | `first | `drop ];
+  mutable f_bnotes : bnotes;
       (* shift all persons from the current file with the given number *)
   mutable f_shift : int;
       (* Table that associates person's names hash and its occurence number
@@ -91,10 +94,10 @@ type file_info = {
 type gen = {
   (* Table that associates unique string to its position inside
      [g_base]'s unique string array *)
-  mutable g_strings : (string, int) Hashtbl.t;
+  g_strings : (string, int) Hashtbl.t;
   (* Table that associates person's names hash with the index of
      person's entry inside the [g_base].*)
-  mutable g_names : (int, int) Hashtbl.t;
+  g_names : (int, int) Hashtbl.t;
   (* Counter of persons inside [g_base] *)
   mutable g_pcnt : int;
   (* Counter of families inside [g_base] *)
@@ -108,8 +111,8 @@ type gen = {
   (* Wizard notes (wizard id and note's content) *)
   mutable g_wiznotes : (string * string) list;
   g_patch_p : (int, person) Hashtbl.t;
-      (** Array that for every person from [g_base] says if he
-        was defined before *)
+      (** Array that for every person from [g_base] says if he was defined
+          before *)
   mutable g_def : bool array;
   (* Table that associates person's first and last name with
      the next availiable occurence number for the person with
@@ -131,19 +134,24 @@ type gen = {
 }
 (** Global linker state *)
 
+exception Critical_import_error of string
+
 (** Set [gen.g_errored] telling that an error was occured *)
-let check_error gen = gen.g_errored <- true
+let check_error ?(critical = false) gen msg =
+  gen.g_errored <- true;
+  if critical then raise (Critical_import_error msg)
 
 (** Function that will be called if base's checker will find an error *)
 let set_error base gen x =
   Printf.printf "\nError: ";
   Check.print_base_error stdout base x;
-  check_error gen
+  check_error gen ""
 
 (** Function that will be called if base's checker will find a warning *)
-let set_warning base x =
-  Printf.printf "Warning: ";
-  Check.print_base_warning stdout base x
+let set_warning base no_warn x =
+  if not no_warn then (
+    Printf.printf "Warning: ";
+    Check.print_base_warning stdout base x)
 
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
@@ -183,9 +191,9 @@ let input_item_value ic = input_value ic
 (** Empty string *)
 let no_string = ""
 
-(** Stores unique string (if not already present) inside the base's string array and
-    associate this string to its index in mentioned array. Extens array if needed.
-    Returns associated index. *)
+(** Stores unique string (if not already present) inside the base's string array
+    and associate this string to its index in mentioned array. Extens array if
+    needed. Returns associated index. *)
 let unique_string gen x =
   try Hashtbl.find gen.g_strings x
   with Not_found ->
@@ -226,9 +234,10 @@ let no_family gen =
   let des = { children = [||] } in
   (fam, cpl, des)
 
-(** Initialises [min_person] with occurence number and index of [p] for first name and
-    index of [n] for surname in [base]. Other fields are initialised with default value.
-    Returns also empty [ascend] and [union] attached to the considered person. *)
+(** Initialises [min_person] with occurence number and index of [p] for first
+    name and index of [n] for surname in [base]. Other fields are initialised
+    with default value. Returns also empty [ascend] and [union] attached to the
+    considered person. *)
 let make_person gen p n occ : min_person * ascend * union =
   let empty_string = unique_string gen "" in
   let p =
@@ -249,8 +258,8 @@ let make_person gen p n occ : min_person * ascend * union =
 (** Dummy [min_person] with its empty [ascend] and [union]. *)
 let no_person gen = make_person gen "" "" 0
 
-(** Extends person's acendant's and union's arrays inside [gen.g_base]
-    if needed. *)
+(** Extends person's acendant's and union's arrays inside [gen.g_base] if
+    needed. *)
 let new_iper gen =
   if gen.g_pcnt = Array.length gen.g_base.c_persons then (
     let per_arr = gen.g_base.c_persons in
@@ -271,8 +280,8 @@ let new_iper gen =
     Array.blit gen.g_def 0 new_def 0 (Array.length gen.g_def);
     gen.g_def <- new_def)
 
-(** Extends family's couple's and decendant's arrays inside [gen.g_base]
-    if needed. *)
+(** Extends family's couple's and decendant's arrays inside [gen.g_base] if
+    needed. *)
 let new_ifam gen =
   if gen.g_fcnt = Array.length gen.g_base.c_families then (
     let fam_arr = gen.g_base.c_families in
@@ -290,15 +299,15 @@ let new_ifam gen =
     Array.blit des_arr 0 new_des_arr 0 (Array.length des_arr);
     gen.g_base.c_descends <- new_des_arr)
 
-(** Convert [string Def.gen_title_name] to [int Def.gen_title_name].
-    If title is [Tname] stores title name as a string in the base. *)
+(** Convert [string Def.gen_title_name] to [int Def.gen_title_name]. If title is
+    [Tname] stores title name as a string in the base. *)
 let title_name_unique_string gen = function
   | Tmain -> Tmain
   | Tname n -> Tname (unique_string gen n)
   | Tnone -> Tnone
 
-(** Convert [(string Def.gen_title] to [int Def.gen_title] and insert
-    all related to title information in the base. *)
+(** Convert [(string Def.gen_title] to [int Def.gen_title] and insert all
+    related to title information in the base. *)
 let title_unique_string gen t =
   {
     t_name = title_name_unique_string gen t.t_name;
@@ -317,8 +326,8 @@ let person_hash first_name surname =
   Hashtbl.hash s
 
 (** Returns index of a person's entry inside the [gen.base] that has the same
-    first name, surname and occurence number. Raises [Not_found] if person
-    is not found. *)
+    first name, surname and occurence number. Raises [Not_found] if person is
+    not found. *)
 let find_person_by_global_name gen first_name surname occ =
   let first_name = Mutil.nominative first_name in
   let surname = Mutil.nominative surname in
@@ -343,8 +352,8 @@ let find_person_by_global_name gen first_name surname occ =
   loop ipl
 
 (** Returns index of a person's entry inside the [gen.base] that has the same
-    first name, surname and occurence number. Searches only persons defined
-    in the current file. Raises [Not_found] if person is not found. *)
+    first name, surname and occurence number. Searches only persons defined in
+    the current file. Raises [Not_found] if person is not found. *)
 let find_person_by_local_name gen first_name surname occ =
   let first_name = Mutil.nominative first_name in
   let surname = Mutil.nominative surname in
@@ -375,9 +384,8 @@ let find_person_by_name gen first_name surname occ =
     find_person_by_local_name gen first_name surname occ
   else find_person_by_global_name gen first_name surname occ
 
-(** Add entry in the global names table [gen.g_names] for the giving
-    first and last names associated to the index of their person's entry
-    in [base]. *)
+(** Add entry in the global names table [gen.g_names] for the giving first and
+    last names associated to the index of their person's entry in [base]. *)
 let add_person_by_name gen first_name surname int =
   let s = Name.crush_lower (Mutil.nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in
@@ -402,27 +410,23 @@ let find_first_available_occ gen fn sn occ =
   in
   loop occ
 
-(** Insert person's reference in the base and modifies all coresponding
-    fields in [gen] and returns its entry and entry's index in the base.
-    In details:
+(** Insert person's reference in the base and modifies all coresponding fields
+    in [gen] and returns its entry and entry's index in the base. In details:
 
-      - if considered person doesn't exists in the base (wasn't defined or
-        referenced before) then function:
+    - if considered person doesn't exists in the base (wasn't defined or
+      referenced before) then function:
 
-        - maps its key (names and occurence number) within the varius
-          hash tables
-        - creates entry (of type [min_gen]) for the giving person and his
-          ascendants and union in the base.
-        - initialises its entry (with key information)
-        - stores marker in the [gen.g_per] channel telling that person
-        wasn't defined.
-        - stores in [gen.g_per_index] position where marker was stored in
-          [gen.g_per].
+    - maps its key (names and occurence number) within the varius hash tables
+    - creates entry (of type [min_gen]) for the giving person and his ascendants
+      and union in the base.
+    - initialises its entry (with key information)
+    - stores marker in the [gen.g_per] channel telling that person wasn't
+      defined.
+    - stores in [gen.g_per_index] position where marker was stored in
+      [gen.g_per].
 
-      - if considered person was referenced or defined before then doesn't do
-        anything (just returns its entry and entry's index in the base)
-
-     *)
+    - if considered person was referenced or defined before then doesn't do
+      anything (just returns its entry and entry's index in the base) *)
 let insert_undefined gen key =
   (* shift person's occurence *)
   let occ = key.pk_occ + gen.g_file_info.f_shift in
@@ -461,8 +465,8 @@ let insert_undefined gen key =
       gen.g_pcnt <- gen.g_pcnt + 1;
       (* strore names locally *)
       (if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-       let h = person_hash key.pk_first_name key.pk_surname in
-       Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
+         let h = person_hash key.pk_first_name key.pk_surname in
+         Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
       (* write start position of person in [g_per] *)
       seek_out gen.g_per_index (sizeof_long * i);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
@@ -484,39 +488,35 @@ let insert_undefined gen key =
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
-      check_error gen);
+      check_error gen "");
   (x, ip)
 
-(** Insert person's definition in the base and modifies all coresponding
-    fields in [gen] and returns its entry and entry's index in the base.
-    In details:
+(** Insert person's definition in the base and modifies all coresponding fields
+    in [gen] and returns its entry and entry's index in the base. In details:
 
     - if considered person doesn't exists in the base (wasn't defined or
       referenced before) then function:
 
-        - maps its key (names and occurence number) within the varius
-          hash tables
-        - creates entry (of type [min_gen]) for the giving person and his
-          ascendants and union in the base.
-        - initialises its entry (with key information)
-        - marks it as defined
-        - convert [(_,_,string) gen_person] to [person] (sex, events, titles
-          and related persons stays uninitialised) and stores it in the
-          [gen.g_per] channel.
-        - stores in [gen.g_per_index] position where person was stored in
-          [gen.g_per].
+    - maps its key (names and occurence number) within the varius hash tables
+    - creates entry (of type [min_gen]) for the giving person and his ascendants
+      and union in the base.
+    - initialises its entry (with key information)
+    - marks it as defined
+    - convert [(_,_,string) gen_person] to [person] (sex, events, titles and
+      related persons stays uninitialised) and stores it in the [gen.g_per]
+      channel.
+    - stores in [gen.g_per_index] position where person was stored in
+      [gen.g_per].
 
     - if considered person was referenced before (but not defined) then
       function:
 
-        - get person's entry and its index from the base
-        - marks it as defined
-        - convert [(_,_,string) gen_person] to [person] (sex, events and
-          related persons stays uninitialised) and stores it in the
-          [gen.g_per] channel.
-        - updates previus index in [gen.g_per_index] in order to point to
-          the definition instead of pointing to the reference.
-*)
+    - get person's entry and its index from the base
+    - marks it as defined
+    - convert [(_,_,string) gen_person] to [person] (sex, events and related
+      persons stays uninitialised) and stores it in the [gen.g_per] channel.
+    - updates previus index in [gen.g_per_index] in order to point to the
+      definition instead of pointing to the reference. *)
 let insert_person gen so =
   (* shift person's occurence *)
   let occ = so.occ + gen.g_file_info.f_shift in
@@ -555,16 +555,18 @@ let insert_person gen so =
       gen.g_pcnt <- gen.g_pcnt + 1;
       (* strore names locally *)
       (if so.first_name <> "?" && so.surname <> "?" then
-       let h = person_hash so.first_name so.surname in
-       Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
+         let h = person_hash so.first_name so.surname in
+         Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
       (x, i)
   in
   (* if person wad defined before (not just referenced) *)
   if gen.g_def.(ip) then (
-    (* print error about person beeing already defined *)
-    Printf.printf "\nError: Person already defined: \"%s%s %s\"\n" so.first_name
-      (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
-      so.surname;
+    let person_str =
+      Printf.sprintf "%s%s %s" so.first_name
+        (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+        so.surname
+    in
+    Printf.printf "\nError: Person already defined: \"%s\"\n" person_str;
     if
       p_first_name gen.g_base x <> so.first_name
       || p_surname gen.g_base x <> so.surname
@@ -574,7 +576,7 @@ let insert_person gen so =
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
     flush stdout;
-    check_error gen)
+    check_error gen "")
   else (* else set it as defined *)
     gen.g_def.(ip) <- true;
   if not gen.g_errored then
@@ -583,6 +585,14 @@ let insert_person gen so =
       || sou gen.g_base x.m_surname <> so.surname
     then (
       (* print error about person defined with two spellings *)
+      let msg =
+        Printf.sprintf "Two spellings: \"%s%s %s\" vs \"%s%s %s\"" so.first_name
+          (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
+          so.surname
+          (p_first_name gen.g_base x)
+          (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+          (p_surname gen.g_base x)
+      in
       Printf.printf "\nError: Person defined with two spellings:\n";
       Printf.printf "  \"%s%s %s\"\n" so.first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
@@ -592,7 +602,7 @@ let insert_person gen so =
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
-      check_error gen);
+      check_error ~critical:true gen msg);
   if not gen.g_errored then (
     let empty_string = unique_string gen "" in
     (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
@@ -646,9 +656,9 @@ let insert_person gen so =
     output_item_value gen.g_per (x : person));
   (x, ip)
 
-(** Insert definition or reference in [gen] and returns its entry and
-    entry's index in the [gen.g_base]. Calls [insert_person] for definition
-    and [insert_undefined] for reference. *)
+(** Insert definition or reference in [gen] and returns its entry and entry's
+    index in the [gen.g_base]. Calls [insert_person] for definition and
+    [insert_undefined] for reference. *)
 let insert_somebody gen = function
   | Undefined key -> insert_undefined gen key
   | Defined so -> insert_person gen so
@@ -668,7 +678,8 @@ let check_parents_not_already_defined gen ix fath moth =
         \    - \"%s\",\n\
          because this persons still exists as child of\n\
         \    - \"%s\"\n\
-        \    - \"%s\"." (designation gen.g_base x)
+        \    - \"%s\"."
+        (designation gen.g_base x)
         (designation gen.g_base fath)
         (designation gen.g_base moth)
         (designation gen.g_base (poi gen.g_base p))
@@ -678,11 +689,21 @@ let check_parents_not_already_defined gen ix fath moth =
               x.birth := Adef.cdate_None;
               x.death := DontKnowIfDead;
       *)
-      check_error gen
+      let msg =
+        Printf.sprintf
+          "Cannot add \"%s\" as child of \"%s\" and \"%s\" (already child of \
+           \"%s\" and \"%s\")"
+          (designation gen.g_base x)
+          (designation gen.g_base fath)
+          (designation gen.g_base moth)
+          (designation gen.g_base (poi gen.g_base p))
+          (designation gen.g_base (poi gen.g_base m))
+      in
+      check_error ~critical:true gen msg
   | _ -> ()
 
-(** Assign sex to the person's entry if it's unitialised.
-    Print message if sexes are different. *)
+(** Assign sex to the person's entry if it's unitialised. Print message if sexes
+    are different. *)
 let notice_sex gen p s =
   if p.m_sex = Neuter then p.m_sex <- s
   else if p.m_sex <> s && s <> Neuter then
@@ -690,8 +711,8 @@ let notice_sex gen p s =
       (p_first_name gen.g_base p)
       (p_surname gen.g_base p)
 
-(** Convert [string Def.gen_fam_event_name] to [int Def.gen_fam_event_name].
-    If event is [Efam_Name] stores event name as a string in the base. *)
+(** Convert [string Def.gen_fam_event_name] to [int Def.gen_fam_event_name]. If
+    event is [Efam_Name] stores event name as a string in the base. *)
 let fevent_name_unique_string gen = function
   | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
     | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
@@ -852,24 +873,22 @@ let update_fevents_with_family gen fam =
   in
   { fam with fevents }
 
-(** Insert family in the base and modifies all coresponding
-    fields in [gen] and returns its entry and entry's index in the base.
-    In details function does:
+(** Insert family in the base and modifies all coresponding fields in [gen] and
+    returns its entry and entry's index in the base. In details function does:
 
     - inserts father and mother in the person's base
-    - insert every witness in the person's base and associate father
-      as a related person.
+    - insert every witness in the person's base and associate father as a
+      related person.
     - order, convert, adjust and insert events
     - insert every children in the person's base
-    - creates entry (of type [family]) for the giving family and its
-      couple and descendants in the base.
+    - creates entry (of type [family]) for the giving family and its couple and
+      descendants in the base.
     - associate father's and mother's union to the current family
-    - associate every children's ascendants to the current family
-      (current couple, since it has the same index)
+    - associate every children's ascendants to the current family (current
+      couple, since it has the same index)
     - stores family in the [gen.g_fam] channel.
     - stores in [gen.g_fam_index] position where person was stored in
-      [gen.g_index].
-*)
+      [gen.g_index]. *)
 let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let fath, ifath, moth, imoth =
     match
@@ -1035,7 +1054,7 @@ let insert_pevents fname gen sb pevtl =
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
-    check_error gen)
+    check_error gen "")
   else
     (* sort evenets *)
     let pevents =
@@ -1073,8 +1092,8 @@ let insert_pevents fname gen sb pevtl =
     (* add events to the person's entry in the base *)
     p.m_pevents <- pevents
 
-(** Insert person's notes in the base and associate it to the referenced
-    with [key] person *)
+(** Insert person's notes in the base and associate it to the referenced with
+    [key] person *)
 let insert_notes fname gen key str =
   let occ = key.pk_occ + gen.g_file_info.f_shift in
   match
@@ -1089,7 +1108,7 @@ let insert_notes fname gen key str =
           key.pk_first_name
           (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
-        check_error gen)
+        check_error gen "")
       else p.m_notes <- unique_string gen str
   | None ->
       Printf.printf "File \"%s\"\n" fname;
@@ -1099,11 +1118,11 @@ let insert_notes fname gen key str =
         key.pk_surname;
       flush stdout
 
-(** Changes [gen.g_base.c_bnotes] to take into account [nfname] page
-    and its content [str] that is treated by the way mentioned in
+(** Changes [gen.g_base.c_bnotes] to take into account [nfname] page and its
+    content [str] that is treated by the way mentioned in
     [gen.g_file_info.f_bnotes]. *)
 let insert_bnotes fname gen nfname str =
-  if gen.g_file_info.f_bnotes <> `drop then
+  if gen.g_file_info.f_bnotes <> Drop then
     let old_nread = gen.g_base.c_bnotes.nread in
     (* Convert path notation from 'dir1:dir2:file' to 'dir1/dir2/file'
        (if a valid path) *)
@@ -1117,20 +1136,19 @@ let insert_bnotes fname gen nfname str =
     let bnotes =
       let str =
         match gen.g_file_info.f_bnotes with
-        | `drop -> assert false
-        | `erase -> str
-        | `merge -> old_nread nfname RnAll ^ str
-        | `first -> (
-            match old_nread nfname RnAll with "" -> str | str -> str)
+        | Drop -> assert false
+        | Erase -> str
+        | Merge -> old_nread nfname RnAll ^ str
+        | First -> ( match old_nread nfname RnAll with "" -> str | str -> str)
       in
       {
         nread = (fun f n -> if f = nfname then str else old_nread f n);
         norigin_file = fname;
         efiles =
           (if nfname <> "" then
-           let efiles = gen.g_base.c_bnotes.efiles () in
-           fun () -> nfname :: efiles
-          else gen.g_base.c_bnotes.efiles);
+             let efiles = gen.g_base.c_bnotes.efiles () in
+             fun () -> nfname :: efiles
+           else gen.g_base.c_bnotes.efiles);
       }
     in
     gen.g_base.c_bnotes <- bnotes
@@ -1141,8 +1159,8 @@ let insert_wiznote gen wizid str =
 
 let map_option f = function Some x -> Some (f x) | None -> None
 
-(** Insert parent in the base and adjust his sex if needed. Concerned
-    person is added in the list of parent's related persons. *)
+(** Insert parent in the base and adjust his sex if needed. Concerned person is
+    added in the list of parent's related persons. *)
 let insert_relation_parent gen ip s k =
   let par, ipar = insert_somebody gen k in
   par.m_related <- ip :: par.m_related;
@@ -1150,8 +1168,8 @@ let insert_relation_parent gen ip s k =
   ipar
 
 (** Convert [(Dune__exe.Gwcomp.somebody, string) Def.gen_relation] to
-    [(int, int) Def.gen_relation] and insert all related to relation
-    information in the base. *)
+    [(int, int) Def.gen_relation] and insert all related to relation information
+    in the base. *)
 let insert_relation gen ip r =
   {
     r_type = r.r_type;
@@ -1165,13 +1183,15 @@ let insert_relation gen ip r =
 let insert_relations fname gen sb sex rl =
   (* insert concerned person *)
   let p, ip = insert_somebody gen sb in
-  if p.m_rparents <> [] then (
-    Printf.printf "\nFile \"%s\"" fname;
-    Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
-      (sou gen.g_base p.m_first_name)
-      (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
-      (sou gen.g_base p.m_surname);
-    check_error gen)
+  if p.m_rparents <> [] then
+    if !Gwcomp.roglo_special then ()
+    else (
+      Printf.printf "\nFile \"%s\"" fname;
+      Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
+        (sou gen.g_base p.m_first_name)
+        (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
+        (sou gen.g_base p.m_surname);
+      check_error gen "")
   else (
     notice_sex gen p sex;
     let rl = List.map (insert_relation gen ip) rl in
@@ -1530,8 +1550,8 @@ let convert_persons per_index_ic per_ic persons =
 (** File containing the particles to use *)
 let particules_file = ref ""
 
-(** Returns list of particles from the file. If filename is empty string
-    then returns default particles list *)
+(** Returns list of particles from the file. If filename is empty string then
+    returns default particles list *)
 let input_particles = function
   | "" -> Mutil.default_particles
   | file -> Mutil.input_particles file
@@ -1551,7 +1571,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic =
+let make_base bname gen per_index_ic per_ic k =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1603,12 +1623,13 @@ let make_base bname gen per_index_ic per_ic =
     gen.g_base.c_strings <- [||];
     a
   in
-  Gwdb.make bname
+  Driver.make bname
     (input_particles !particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
       strings,
       gen.g_base.c_bnotes )
+    k
 
 (** Write content in the file *)
 let write_file_contents fname text =
@@ -1640,8 +1661,8 @@ let output_command_line bdir =
   close_out oc
 
 (** Link .gwo files and create a database. *)
-let link next_family_fun bdir =
-  let tmp_dir = Filename.concat "gw_tmp" bdir in
+let link ?(no_warn = false) next_family_fun bdir =
+  let tmp_dir = Filename.concat bdir "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
@@ -1654,7 +1675,7 @@ let link next_family_fun bdir =
       f_curr_gwo_file = "";
       f_separate = false;
       f_shift = 0;
-      f_bnotes = `merge;
+      f_bnotes = Merge;
     }
   in
   let gen =
@@ -1699,20 +1720,24 @@ let link next_family_fun bdir =
   Hashtbl.clear gen.g_strings;
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
-  let base = make_base bdir gen per_index_ic per_ic in
+  make_base bdir gen per_index_ic per_ic @@ fun base ->
   Hashtbl.clear gen.g_patch_p;
   Gc.full_major ();
   close_in per_index_ic;
   close_in per_ic;
   if !do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base) ignore;
+    Check.check_base base (set_error base gen) (set_warning base no_warn) ignore;
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
-    if !do_consang then ignore @@ ConsangAll.compute base true;
-    Gwdb.sync base;
+    if !do_consang then (
+      ignore @@ ConsangAll.compute base true;
+      Driver.sync base);
     output_wizard_notes bdir gen.g_wiznotes;
     output_command_line bdir;
+    Mutil.rm_rf tmp_dir;
     true)
   else (
-    Mutil.rm_rf bdir;
+    Mutil.rm_rf tmp_dir;
+    Printf.eprintf "*** database NOT created due to errors\n";
+    flush stderr;
     false)

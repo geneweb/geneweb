@@ -1,0 +1,22 @@
+(executable
+ (name templ_test)
+ (libraries fmt geneweb_templ geneweb_compat))
+
+(rule
+ (deps
+  (:template template.html)
+  (glob_files ./*.html))
+ (action
+  (with-stdout-to
+   template.out
+   (run ./templ_test.exe %{template}))))
+
+(rule
+ (package geneweb)
+ (alias runtest)
+ (action
+  (progn
+   (diff template.expected template.out)
+   (run
+    printf
+    "Testing `[1mtempl_test[0m'\n  [32m[OK][0m template parsing matches template.expected\n"))))

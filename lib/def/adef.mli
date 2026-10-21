@@ -19,7 +19,8 @@ external fix_repr : fix -> int = "%identity"
 val no_consang : fix
 (** No consanguinity *)
 
-(** Date data type that can be either concrete date associated to a calendar or a textual form of the date. *)
+(** Date data type that can be either concrete date associated to a calendar or
+    a textual form of the date. *)
 type date = Dgreg of dmy * calendar | Dtext of string
 
 (** Supported calendars *)
@@ -51,9 +52,9 @@ type cdate =
   | Cdate of date
   | Cnone
 
-type 'person gen_couple
-(** Polymorphic type to represent a family's couple.
-    Couple consists of the father and of the mother. *)
+type 'person gen_couple = private { father : 'person; mother : 'person }
+(** Polymorphic type to represent a family's couple. Couple consists of the
+    father and of the mother. *)
 
 val father : 'a gen_couple -> 'a
 (** Get father from couple *)
@@ -65,16 +66,16 @@ val couple : 'a -> 'a -> 'a gen_couple
 (** [couple f m] creates a couple from father [f] and mother [m] *)
 
 val parent : 'a array -> 'a gen_couple
-(** Create [gen_couple] from array. First element of array should be father, second - mother  *)
+(** Create [gen_couple] from array. First element of array should be father,
+    second - mother *)
 
 val parent_array : 'a gen_couple -> 'a array
-(** Returns array from [gen_couple]. First element of array is father, second - mother  *)
+(** Returns array from [gen_couple]. First element of array is father, second -
+    mother *)
 
-val multi_couple : 'a -> 'a -> 'a gen_couple
-(** @deprecated Use [couple] instead *)
-
-val multi_parent : 'a array -> 'a gen_couple
-(** @deprecated Use [parent] instead *)
+val map_couple_p : ('a -> 'b) -> 'a gen_couple -> 'b gen_couple
+(** Convert generic type used to represent father and mother inside
+    [Def.gen_couple] into another one. *)
 
 type +'a astring = private string
 type safe_string = [ `encoded | `escaped | `safe ] astring
@@ -90,3 +91,12 @@ val escaped : string -> escaped_string
 val encoded : string -> encoded_string
 val as_string : 'a astring -> string
 val safe_fn : (string -> string) -> 'a astring -> 'a astring
+
+val pp_cdate : Format.formatter -> cdate -> unit
+(** Printer for [cdate] *)
+
+val show_fix : fix -> string
+(** Convert [fix] to string *)
+
+val pp_fix : Format.formatter -> fix -> unit
+(** Printer for [fix] *)

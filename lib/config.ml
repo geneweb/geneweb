@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-open Gwdb
-
 type auth_scheme_kind =
   | NoAuth
   | TokenAuth of token_auth_scheme
@@ -33,7 +30,7 @@ and digest_auth_scheme = {
 }
 
 type output_conf = {
-  status : Def.httpStatus -> unit;
+  status : Geneweb_http.Code.status -> unit;
   header : string -> unit;
   body : string -> unit;
   flush : unit -> unit;
@@ -51,24 +48,28 @@ type config = {
   debug : bool;
   query_start : float;
   friend : bool;
+  oidc : bool;  (** the current session was established through OIDC (SSO) *)
+  semi_public : bool;
   just_friend_wizard : bool;
   user : string;
   username : string;
   userkey : string;
+  consent : bool;
+  user_iper : Geneweb_db.Driver.iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
   highlight : string;
   lang : string;
   vowels : string list;
+  base_lang : string;
   default_lang : string;
   browser_lang : string;
-  default_sosa_ref : iper * Gwdb.person option;
-  multi_parents : bool;
+  default_sosa_ref : Geneweb_db.Driver.iper * Geneweb_db.Driver.person option;
   authorized_wizards_notes : bool;
   public_if_titles : bool;
   public_if_no_date : bool;
-  mutable setup_link : bool;
+  setup_link : bool;
   access_by_key : bool;
   private_years : int;
   private_years_death : int;
@@ -89,22 +90,20 @@ type config = {
   denied_titles : string list Lazy.t;
   request : string list;
   lexicon : (string, string) Hashtbl.t;
-  mutable charset : string;
+  charset : string;
   is_rtl : bool;
   left : string;
   right : string;
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : dmy;
+  today : Adef.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float; (* TODO verify usefulness *)
   mutable output_conf : output_conf;
   (* HTTP printer *)
-  (* prefix for image urls:
-     the value of argument -images_url if specified, otherwise
-     command ^ "?m=IM&v=" in CGI mode
+  (* prefix for image urls: the value of -images_prefix in CGI mode,
      "images" otherwise *)
   gw_prefix : string;
   images_prefix : string;
@@ -113,14 +112,15 @@ type config = {
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
      if false, the base name is the last element of the uri path: .../base?... *)
   cgi : bool;
-  forced_plugins : string list;
-  plugins : string list;
+  allowed_plugins : string list;
+  secret_salt : string option;
+  predictable_mode : bool;
 }
 
 (**/**)
 
-(** A dummy {!type:config} value, with uninitialized fields.
-    Used for testing purpose *)
+(** A dummy {!type:config} value, with uninitialized fields. Used for testing
+    purpose *)
 let empty =
   {
     from = "";
@@ -132,20 +132,24 @@ let empty =
     debug = false;
     query_start = 0.;
     friend = false;
+    oidc = false;
+    semi_public = false;
     just_friend_wizard = false;
     user = "";
     username = "";
     userkey = "";
+    consent = false;
+    user_iper = None;
     auth_scheme = NoAuth;
     command = "";
     indep_command = "";
     highlight = "";
     lang = "";
     vowels = [];
+    base_lang = "";
     default_lang = "";
     browser_lang = "";
-    default_sosa_ref = (Gwdb.dummy_iper, None);
-    multi_parents = false;
+    default_sosa_ref = (Geneweb_db.Driver.Iper.dummy, None);
     authorized_wizards_notes = false;
     public_if_titles = false;
     public_if_no_date = false;
@@ -159,8 +163,8 @@ let empty =
     no_image = false;
     no_note = false;
     bname = "";
-    nb_of_persons = -1;
-    nb_of_families = -1;
+    nb_of_persons = 0;
+    nb_of_families = 0;
     cgi_passwd = "";
     env = [];
     senv = [];
@@ -177,7 +181,7 @@ let empty =
     auth_file = "";
     border = 0;
     n_connect = None;
-    today = { Def.day = 0; month = 0; year = 0; delta = 0; prec = Def.Sure };
+    today = { Adef.day = 0; month = 0; year = 0; delta = 0; prec = Adef.Sure };
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;
@@ -187,8 +191,9 @@ let empty =
     cgi = false;
     output_conf =
       { status = ignore; header = ignore; body = ignore; flush = ignore };
-    forced_plugins = [];
-    plugins = [];
+    allowed_plugins = [];
+    secret_salt = None;
+    predictable_mode = false;
   }
 
 (**/**)

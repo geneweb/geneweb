@@ -2,10 +2,9 @@
 
 open Geneweb
 open Config
-open Def
-open TemplAst
 open Util
 open Forum
+module Gutil = Geneweb_db.Gutil
 
 type 'a env =
   | Vmess of message * message option * MF.pos * MF.pos * string option
@@ -13,7 +12,7 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
@@ -45,14 +44,14 @@ let print_foreach conf _base print_ast eval_expr =
                 if accessible && is_visible conf mess then (
                   let next_pos = MF.rpos_in ic in
                   let vmess = Vmess (mess, prev_mess, pos, next_pos, None) in
-                  let env = ("mess", vmess) :: env in
+                  let env = Templ.Env.add "mess" vmess env in
                   List.iter (print_ast env ()) al;
                   loop (Some mess) (i + 1))
                 else loop prev_mess i
             | None -> MF.not_a_pos
         in
         (if to_pos = MF.not_a_pos then ()
-        else try MF.rseek_in ic to_pos with Sys_error _ -> ());
+         else try MF.rseek_in ic to_pos with Sys_error _ -> ());
         let pos = loop None 0 in
         (match get_env "pos" env with Vpos r -> r := pos | _ -> ());
         MF.close_in ic
@@ -60,16 +59,19 @@ let print_foreach conf _base print_ast eval_expr =
   in
   print_foreach
 
-let str_val x = VVstring x
+let str_val x = Templ.VVstring x
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
-  VVstring ((x :> Adef.safe_string) :> string)
+  Templ.VVstring ((x :> Adef.safe_string) :> string)
 
 let rec eval_var conf base env _xx _loc = function
-  | [ "can_post" ] -> VVbool (can_post conf)
+  | [ "can_post" ] -> Templ.VVbool (can_post conf)
   | [ "is_moderated_forum" ] -> VVbool (moderators conf <> [])
   | [ "is_moderator" ] -> VVbool (is_moderator conf)
   | "message" :: sl -> eval_message_var conf base env sl
+  | [ "permalink" ] ->
+      Templ.VVstring
+        (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "pos" ] -> (
       match get_env "pos" env with
       | Vpos r -> safe_val (MF.string_of_pos !r)
@@ -197,6 +199,7 @@ and eval_message_text_var conf base str so = function
             Wiki.wi_mode = "NOTES";
             Wiki.wi_file_path = Notes.file_path conf base;
             Wiki.wi_person_exists = person_exists conf base;
+            Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
             Wiki.wi_always_show_link = conf.wizard || conf.friend;
           }
         in
@@ -241,19 +244,24 @@ and eval_message_string_var conf str so = function
       safe_val s
   | _ -> raise Not_found
 
+let print conf base env =
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf base;
+        eval_transl = (fun _ -> Templ.eval_transl conf);
+        eval_predefined_apply = (fun _ -> raise Not_found);
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf base;
+      }
+  in
+  Templ.output conf ifun env () "forum"
+
 let visualize conf base mess =
   let vmess = Vmess (mess, None, MF.not_a_pos, MF.not_a_pos, None) in
-  let env = [ ("mess", vmess) ] in
-  Hutil.interp conf "forum"
-    {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
-    }
-    env ()
+  let env = Templ.Env.empty |> Templ.Env.add "mess" vmess in
+  print conf base env
 
 let message_txt conf n =
   transl_nth conf "message/previous message/previous messages/next message" n
@@ -296,38 +304,18 @@ let print_valid_ok conf pos del =
 let print_forum_message conf base r so =
   let env =
     match r with
-    | Some (acc, mess, pos, next_pos) ->
-        if acc && is_visible conf mess then
-          [
-            ("mess", Vmess (mess, None, pos, next_pos, so));
-            ("pos", Vpos (ref pos));
-          ]
-        else [ ("pos", Vpos (ref MF.not_a_pos)) ]
-    | None -> [ ("pos", Vpos (ref MF.not_a_pos)) ]
+    | Some (acc, mess, pos, next_pos) when acc && is_visible conf mess ->
+        Templ.Env.empty
+        |> Templ.Env.add "mess" (Vmess (mess, None, pos, next_pos, so))
+        |> Templ.Env.add "pos" (Vpos (ref pos))
+    | Some _ | None ->
+        Templ.Env.empty |> Templ.Env.add "pos" (Vpos (ref MF.not_a_pos))
   in
-  Hutil.interp conf "forum"
-    {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
-    }
-    env ()
+  print conf base env
 
 let print_forum_headers conf base =
-  let env = [ ("pos", Vpos (ref MF.not_a_pos)) ] in
-  Hutil.interp conf "forum"
-    {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf base;
-    }
-    env ()
+  let env = Templ.Env.empty |> Templ.Env.add "pos" (Vpos (ref MF.not_a_pos)) in
+  print conf base env
 
 let valid_forum_message conf base pos =
   match get_message conf pos with
@@ -377,7 +365,7 @@ let print_add_ok conf base =
       m_email = email;
       m_access = "";
       m_subject = subject;
-      m_wiki = "";
+      m_wiki = "on";
       m_text = text;
     }
   in

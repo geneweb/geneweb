@@ -1,10 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
-open Gwdb
-open TemplAst
 open Util
+module Driver = Geneweb_db.Driver
 
 type counter = {
   mutable welcome_cnt : int;
@@ -25,7 +23,7 @@ let count conf =
   let _ = Util.test_cnt_d conf in
   let fname = !GWPARAM.adm_file (conf.bname ^ ".txt") in
   try
-    let ic = Secure.open_in fname in
+    Secure.with_open_in_text fname @@ fun ic ->
     let rd =
       try
         let wc = int_of_string (input_line ic) in
@@ -52,7 +50,6 @@ let count conf =
           normal_cnt = 0;
         }
     in
-    close_in ic;
     rd
   with _ ->
     {
@@ -68,7 +65,7 @@ let write_counter conf r =
   let cnt_d = Util.test_cnt_d conf in
   let fname = Filename.concat cnt_d (conf.bname ^ ".txt") in
   try
-    let oc = Secure.open_out_bin fname in
+    Secure.with_open_out_bin fname @@ fun oc ->
     output_string oc (string_of_int r.welcome_cnt);
     output_string oc "\n";
     output_string oc (string_of_int r.request_cnt);
@@ -80,8 +77,7 @@ let write_counter conf r =
     output_string oc (string_of_int r.friend_cnt);
     output_string oc "\n";
     output_string oc (string_of_int r.normal_cnt);
-    output_string oc "\n";
-    close_out oc
+    output_string oc "\n"
   with _ -> ()
 
 let set_wizard_and_friend_traces conf =
@@ -108,13 +104,15 @@ let set_wizard_and_friend_traces conf =
       update_wf_trace conf fname
 
 let incr_counter f conf =
-  if conf.bname = "" then None
-  else
-    let _ = Util.test_cnt_d conf in
-    let lname = !GWPARAM.adm_file (conf.bname ^ ".lck") in
-    Lock.control lname true
-      ~onerror:(fun () -> None)
-      (fun () ->
+  let bpath = !GWPARAM.bpath conf.bname in
+  if conf.bname = "" || not (Sys.file_exists bpath) then None
+  else (
+    ignore (Util.test_cnt_d conf : string);
+    let lock_file = !GWPARAM.adm_file (conf.bname ^ ".lck") in
+    (* FIXME: we silently ignore errors if we cannot acquire the lock on the
+       database. *)
+    let on_exn _exn _bt = None in
+    Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
         let r = count conf in
         f r;
         if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
@@ -122,7 +120,7 @@ let incr_counter f conf =
         else r.normal_cnt <- r.normal_cnt + 1;
         write_counter conf r;
         set_wizard_and_friend_traces conf;
-        Some (r.welcome_cnt, r.request_cnt, r.start_date))
+        Some (r.welcome_cnt, r.request_cnt, r.start_date)))
 
 let incr_welcome_counter =
   incr_counter (fun r -> r.welcome_cnt <- r.welcome_cnt + 1)
@@ -167,7 +165,7 @@ let string_of_start_date conf =
   let r = count conf in
   match extract_date r.start_date with
   | Some (d, m, y) ->
-      Dgreg
+      Adef.Dgreg
         ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, Dgregorian)
       |> DateDisplay.string_of_date conf
   | _ -> Util.safe_html r.start_date
@@ -204,7 +202,7 @@ let macro conf base = function
         if s = "" then Adef.safe "20"
         else (Util.escape_html s :> Adef.safe_string)
       with Not_found -> Adef.safe "20")
-  | 'n' -> string_of_int_sep_aux conf (nb_of_persons base)
+  | 'n' -> string_of_int_sep_aux conf (Driver.nb_of_persons base)
   | 'N' -> (
       try
         (List.assoc "base_notes_title" conf.base_env |> Util.escape_html
@@ -223,10 +221,7 @@ let macro conf base = function
         Adef.safe (": " ^ conf.user)
       else Adef.safe ""
   | 'v' -> Adef.safe Version.ver
-  | 'w' ->
-      let s = Hutil.link_to_referer conf in
-      if (s :> string) = "" then Adef.safe "&nbsp;" else s
-  | 'W' -> (Util.get_referer conf :> Adef.safe_string)
+  | 'w' | 'W' -> Adef.safe ""
   | '/' -> Adef.safe ""
   | c -> Adef.safe ("%" ^ String.make 1 c)
 
@@ -303,7 +298,6 @@ type src_mode = Lang | Source
 
 let rec copy_from_stream conf base strm mode =
   let echo = ref true in
-  let no_tables = browser_doesnt_have_tables conf in
   let push_echo, pop_echo =
     let stack = ref [] in
     ( (fun x ->
@@ -323,10 +317,10 @@ let rec copy_from_stream conf base strm mode =
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
-    | 'l' -> no_tables
-    | 'm' -> Gwdb.read_nldb base <> []
-    | 'n' -> not (base_notes_are_empty base "")
-    | 'o' -> Sys.file_exists (WiznotesDisplay.dir conf base)
+    | 'l' -> false
+    | 'm' -> not (Driver.nldb_is_empty base)
+    | 'n' -> not (Driver.base_notes_are_empty base "")
+    | 'o' -> Sys.file_exists (WiznotesDisplay.wiz_dir conf base)
     | 'p' -> (
         match List.assoc_opt (get_variable strm) conf.base_env with
         | Some "" | None -> false
@@ -350,24 +344,6 @@ let rec copy_from_stream conf base strm mode =
     while true do
       match Stream.next strm with
       | '[' -> src_translate conf base true strm echo mode
-      | '<' when no_tables && !echo -> (
-          let c = Stream.next strm in
-          let slash, c = if c = '/' then ("/", Stream.next strm) else ("", c) in
-          let atag, c =
-            let rec loop len = function
-              | ('>' | ' ' | '\n') as c -> (Buff.get len, c)
-              | c -> loop (Buff.store len c) (Stream.next strm)
-            in
-            loop 0 c
-          in
-          match atag with
-          | "table" | "tr" | "td" ->
-              let rec loop = function
-                | '>' -> ()
-                | _ -> loop (Stream.next strm)
-              in
-              loop c
-          | _ -> Output.printf conf "<%s%s%c" slash atag c)
       | '%' -> (
           let c = Stream.next strm in
           match c with
@@ -377,7 +353,7 @@ let rec copy_from_stream conf base strm mode =
           | '%' -> Output.print_sstring conf "%"
           | '[' | ']' -> Output.printf conf "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> Templ.include_hed_trl conf "hed"
+          | 'j' -> Templ.output_simple conf Templ.Env.empty "hed"
           | 'P' ->
               let _ = Stream.next strm in
               ()
@@ -433,9 +409,9 @@ and copy_from_file conf base name mode =
     | Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
-  match try Some (Secure.open_in fname) with Sys_error _ -> None with
-  | Some ic -> copy_from_channel conf base ic mode
-  | None ->
+  match Secure.open_in fname with
+  | ic -> copy_from_channel conf base ic mode
+  | exception Sys_error _ ->
       Output.printf conf "<em>... file not found: \"%s.txt\"</em><br>" name
 
 and copy_from_channel conf base ic mode =
@@ -449,13 +425,16 @@ let gen_print mode conf base fname =
   let channel =
     match mode with
     | Lang -> (
-        try Some (Secure.open_in (lang_file_name conf fname))
-        with Sys_error _ -> (
-          try Some (Secure.open_in (any_lang_file_name conf fname))
-          with Sys_error _ -> None))
+        match Secure.open_in @@ lang_file_name conf fname with
+        | ic -> Some ic
+        | exception Sys_error _ -> (
+            match Secure.open_in @@ any_lang_file_name conf fname with
+            | ic -> Some ic
+            | exception Sys_error _ -> None))
     | Source -> (
-        try Some (Secure.open_in (source_file_name conf fname))
-        with Sys_error _ -> None)
+        match Secure.open_in (source_file_name conf fname) with
+        | ic -> Some ic
+        | exception Sys_error _ -> None)
   in
   match channel with
   | Some ic ->
@@ -475,35 +454,36 @@ let print_source = gen_print Source
 
 (* welcome page *)
 
-type 'a env = Vsosa_ref of person option Lazy.t | Vother of 'a | Vnone
+type 'a env = Vsosa_ref of Driver.person option Lazy.t | Vother of 'a | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
 let eval_var conf base env () _loc = function
-  | [ "base"; "has_notes" ] -> VVbool (not (base_notes_are_empty base ""))
+  | [ "base"; "has_notes" ] ->
+      Templ.VVbool (not (Driver.base_notes_are_empty base ""))
   | [ "base"; "name" ] -> VVstring conf.bname
   | [ "base"; "nb_persons"; "v" ] ->
-      VVstring (string_of_int (Gwdb.nb_of_persons base))
+      VVstring (string_of_int (Driver.nb_of_persons base))
   | [ "base"; "nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (nb_of_persons base))
+           (Driver.nb_of_persons base))
   | [ "base"; "real_nb_persons"; "v" ] ->
-      VVstring (string_of_int (Gwdb.nb_of_real_persons base))
+      VVstring (string_of_int (Driver.nb_of_real_persons base))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
-           (Gwdb.nb_of_real_persons base))
+           (Driver.nb_of_real_persons base))
   | [ "browsing_with_sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found)
   | [ "has_history" ] -> VVbool (Sys.file_exists (History.file_name conf))
-  | [ "has_misc_notes" ] -> VVbool (Gwdb.read_nldb base <> [])
+  | [ "has_misc_notes" ] -> VVbool (not (Driver.nldb_is_empty base))
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "nb_accesses" ] ->
       let r = count conf in
@@ -521,6 +501,8 @@ let eval_var conf base env () _loc = function
           r.welcome_cnt
       in
       VVstring s
+  | [ "permalink" ] ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (
@@ -535,13 +517,15 @@ let eval_var conf base env () _loc = function
   | [ "start_date" ] ->
       VVstring (string_of_start_date conf : Adef.safe_string :> string)
   | [ "wiznotes_dir_exists" ] ->
-      VVbool (Sys.file_exists (WiznotesDisplay.dir conf base))
+      VVbool (Sys.file_exists (WiznotesDisplay.wiz_dir conf base))
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
 
 let eval_predefined_apply conf _env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
   | "a_of_b2", [ s1; s2; s3 ] ->
@@ -550,37 +534,56 @@ let eval_predefined_apply conf _env f vl =
   | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
+let propose_base conf =
+  let title _ = Output.print_sstring conf "Base" in
+  Hutil.header conf title;
+  Output.print_sstring conf {|<ul><li><form method="GET" action="|};
+  Output.print_sstring conf conf.indep_command;
+  Output.print_sstring conf {|">|};
+  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |};
+  Output.print_sstring conf
+    {|<button type="submit" class="btn btn-secondary btn-lg">|};
+  Util.transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf "</button></li></ul>";
+  Hutil.trailer conf
+
 let print_welcome conf base =
   Util.is_welcome := true;
+  Fun.protect ~finally:(fun () -> Util.is_welcome := false) @@ fun () ->
   let env =
     let sosa_ref_l =
       let sosa_ref () = Util.find_sosa_ref conf base in
       Lazy.from_fun sosa_ref
     in
-    [ ("sosa_ref", Vsosa_ref sosa_ref_l) ]
+    Templ.Env.empty |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref_l)
   in
-  Hutil.interp conf "welcome"
-    {
-      Templ.eval_var = eval_var conf base;
-      Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
-      Templ.eval_predefined_apply = eval_predefined_apply conf;
-      Templ.get_vother;
-      Templ.set_vother;
-      Templ.print_foreach = print_foreach conf;
-    }
-    env ()
+  let ifun =
+    Templ.
+      {
+        eval_var = eval_var conf base;
+        eval_transl = (fun _env -> Templ.eval_transl conf);
+        eval_predefined_apply = eval_predefined_apply conf;
+        get_vother;
+        set_vother;
+        print_foreach = print_foreach conf;
+      }
+  in
+  Templ.output conf ifun env () "welcome"
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then
-    Hutil.interp conf fname
-      {
-        Templ.eval_var = eval_var conf base;
-        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = eval_predefined_apply conf;
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = print_foreach conf;
-      }
-      [] ()
+    let ifun =
+      Templ.
+        {
+          eval_var = eval_var conf base;
+          eval_transl = (fun _env -> Templ.eval_transl conf);
+          eval_predefined_apply = eval_predefined_apply conf;
+          get_vother;
+          set_vother;
+          print_foreach = print_foreach conf;
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () fname
   else gen_print Lang conf base fname

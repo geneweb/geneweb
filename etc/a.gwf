@@ -158,9 +158,18 @@
 # or file://…
 #images_path=
 
-# “Birth/death symbols” in dates (default: christians’ one)
+# Date-display symbols for births and deaths (e.g. “° 1830”, “† 1912”).
+# The christian convention is ° and †.
 #birth_symbol=°
 #death_symbol=†
+
+# Compact event markers for the m=L “list by place” view. Independent from the
+# date symbols above; when unset they default to o ~ & + x.
+#evt_symbol_birth=o
+#evt_symbol_baptism=~
+#evt_symbol_marriage=&
+#evt_symbol_death=+
+#evt_symbol_burial=x
 
 # Hide “search by titles” be on the welcome page.
 #propose_titles=no
@@ -168,6 +177,12 @@
 # Hide wizards "add family" button on welcome page (forbid also adding
 # families not connected to the rest on the database).
 #propose_add_family=no
+
+# Reduce place on person pages: collapse repeated comma-separated places
+# ("Town, County, State, Country"). The first occurrence is shown in full;
+# later identical places are reduced to their first comma-segment,
+# wrapped in <abbr title="full place"> for print.
+#reduce_place=yes
 
 # Hide “Places/surname” button on welcome page.
 # By default button is accessible.
@@ -226,9 +241,14 @@
 # Maximum level of displayed cousins.
 #max_cousins_level=6
 
-# Use cache file “cache_cousins” for cousins tool (m=C).
+# Use cache file for cousins tool (m=C).
+# disabled by default
 # Usefull when self has a lot of relationships.
 #cache_cousins_tool=yes
+
+# Cache time-to-live in hours (files older than this are auto-deleted)
+# Default: 1 hour. Set to 0 to disable auto-cleanup (permanent cache)
+#cache_cousins_ttl=1
 
 # Number of latest events (birth, death) displayed in statistics.
 #latest_event=20
@@ -253,11 +273,107 @@
 # Path to store all the histories (default "history_d").
 #history_path=
 
+# =============================================================================
+# Datalist autocompletion (browser cache files)
+# =============================================================================
+# Enable autocompletion for form inputs.
+# Suggestions are loaded from compressed cache files (.gz) generated
+# from your Geneweb database.
+#
+# Cache files are created in: bases/etc/<base>/cache/
+# using the "cache_files" tool (gwsetup or command line).
+#
+# The visitor's browser downloads the files of the options set below:
+# anyone can, whatever the access rights to the base. gwd serves them
+# itself; in CGI mode, the web server must serve them as static files
+# under the first directory of the gwd URL (for /geneweb/gwd:
+# /geneweb/bases/etc/<base>/cache/).
+#
+#
+# IMPORTANT:
+# - Cache files are NOT generated nor updated automatically.
+# - You must regenerate them manually after data changes.
+#
+# Set the desired options below to 1 to enable autocompletion
+# for the corresponding fields.
+#
+# First names and surnames
+# Used in: welcome page, individual and family modification forms, gallery
+#datalist_fnames=1
+#datalist_snames=1
+#
+# Places, occupations and sources
+# Used in: individual and family modification forms
+#datalist_places=1
+#datalist_occupations=1
+#datalist_sources=1
+#
+# Public names, qualifiers and aliases
+# Used in: individual modification form
+#datalist_pub_names=1
+#datalist_qualifiers=1
+#datalist_aliases=1
+#
+# Nobility titles and domains
+# Used in: welcome page and individual modification forms
+#datalist_titles=1
+#datalist_estates=1
+
+# =============================================================================
+# RPC autocompletion server
+# =============================================================================
+# On large bases, the welcome page and the individual and family forms can
+# query the RPC server (rpc_server, shipped with GeneWeb) while typing,
+# instead of loading whole .gz lists into the page. Every field of these
+# pages that offers autocompletion is then served, whatever the
+# datalist_xxx options above. The gallery keeps using the .gz files.
+#
+# Launch the server on the base's cache directory (every .gz file found
+# there is loaded, one index per field type):
+#   rpc_server --idx bases/etc/<base>/cache
+# Default port 8080; with --crt <file> --key <file> (TLS), 8443.
+#
+# The datalist_xxx options above then only select the .gz files loaded
+# when the server is, or becomes, unreachable. Without any of them, the
+# fields have no suggestions in that case (recommended on very large bases),
+# and only the server reads the .gz files: gwd does not serve them, and in
+# CGI mode the web server need not.
+#rpc_datalist=1
+#
+# Address of the server, as seen by the visitor's BROWSER (it is the
+# browser that connects, not gwd):
+#
+#   host or host:port     ws://host:port/search; port defaults to 8080
+#   /search               same host as the GeneWeb page, through a reverse
+#                         proxy forwarding /search to the server (Apache:
+#                         mod_proxy_wstunnel)
+#   ws://... or wss://... full URL, used as is
+#
+# Except for a full URL, ws:// or wss:// follows the page (http or https).
+# A page served over https may only open wss://, which requires the server
+# to run with a TLS certificate (rpc_server --crt <file> --key <file>,
+# default port 8443) or behind a TLS proxy.
+# Default: 127.0.0.1, the visitor's own computer: only useful to test on
+# the computer running the server.
+#rpc_server_url=192.168.1.10
+#rpc_server_url=/search
+#rpc_server_url=wss://rpc.myserver.org:8443/search
+#
+# Log the autocompletion activity in the browser console.
+#rpc_debug=yes
+
 # Indicate that the present database has been renamed to “newname”.
 #renamed=newname
 
 # Indicate that the database has been moved to “new.adress” website.
 #moved=https://new.address:2317/…
+
+# Gzip compression for HTML responses
+# Controls gzip compression level for dynamically generated HTML and JSON.
+# - 0: disabled (no compression, enables progressive HTML rendering)
+# - 1-9: compression level (1=fastest, 9=smallest, 6=default balance)
+# Static assets (JS/CSS) use pre-compressed .gz files when available.
+#gzip_html_compression=6
 
 # Templates.
 #
@@ -301,17 +417,13 @@
 # show the environment variables of the command gwd.
 #expand_env=yes
 
-# Customise the individual page.
-# Full documentation https://geneweb.tuxfamily.org/wiki/templates
-# Each module is defined by a unique letter between a-z.
-# There is already a bunch of modules already defined in etc/perso_utils.txt
-# You may add three w,x,z modules with file_1/2/3.txt should be in
-# bases/etc/<basename>/modules (base specific),
-# bases/etc/modules (all bases), or
-# gw/etc/modules (the distribution), the search being in that order.
-#perso_module_w=file_1
-#perso_module_x=file_2
-#perso_module_z=file_3
+# Display occupation in homonyms lists (name conflict resolution page)
+# Useful for bases where occupation helps distinguish individuals
+# (e.g., "Weaver Josef Kastner" vs "Shoemaker Josef Kastner")
+#   0 or absent: disabled
+#   yes : enabled, no truncation
+#   n : truncate to n characters with ellipsis
+#occu_in_homonyms=5
 
 # The display on perso pages will be governed by a vector defining
 # a selection of modules and the order in which they are displayed.
@@ -325,8 +437,39 @@
 # By default when not set (or 'zz'), the display is a static choice of module.
 #p_mod=
 
-# Limits the results of Books (m=MOD_DATA) accessible by wizard
+# For module "documents"
+# Display the "Documents" section on individual page: carrousel images
+# as a thumbnail grid, with filename/note/source shown in a tooltip.
+#show_documents=yes
+
+# For module "documents"
+# Width of each thumbnail in the documents grid in pixels. Default 150.
+#documents_width=180
+
+# Customise the individual page.
+# Full documentation https://geneweb.tuxfamily.org/wiki/templates
+# Each module is defined by a unique letter between a-z.
+# There is already a bunch of modules already defined in etc/perso_utils.txt
+# You may add three w,x,z modules with file_1/2/3.txt should be in
+# bases/etc/<basename>/modules (base specific),
+# bases/etc/modules (all bases), or
+# gw/etc/modules (the distribution), the search being in that order.
+#perso_module_w=file_1
+#perso_module_x=file_2
+#perso_module_z=file_3
+
+# Limits the results of all books (m=MOD_DATA) accessible by wizard
 #book_max_results=1000
+
+# Limits the results of data typographic checker (m=CHK_DATA) accessible by wizard
+# This variable allows to set up the maximum number of entries with errors
+# that can be displayed at a single time to avoid server timeout on large databases.
+# Default value if not specified is 500.
+# If specified as empty string, no limit will be applied.
+# Examples:
+#   chk_data_max_results=1500    # Limit to 1 500 entries
+#   chk_data_max_results=        # No limit (may cause timeout on large bases)
+#chk_data_max_results=500
 
 # This variable allows to set up the maximum number of updates
 # that can be done at a single time.
@@ -357,6 +500,9 @@
 
 # Disable the forum (all the request on the forum are “incorect request”.
 #disable_forum=yes
+
+# Hide number of connected users/friends/wizards in footer (copyr template).
+#hide_connections=yes
 
 # Manitou is a wizard who can:
 # - delete any forum message
@@ -390,6 +536,12 @@
 #                  style="welcome_logo_style">
 #welcome_logo=
 #welcome_logo_style=
+
+# Bootstrap 5 displays hyperlinks underlined by default (unlike version 4)
+# Underlines improve accessibility by making links distinguishable without
+# relying on color alone, which benefits color-blind and low-vision users.
+# Set to “no” to remove underlines from all links.
+#underline_hyperlink=no
 
 # css_prop
 # The file stylesheet.css must be in the directory "css".
@@ -453,22 +605,6 @@
 # estate ... and print something clever.
 #print_advanced_title=yes
 
-# Load datalists for autocompletion. These options allow to provide
-# suggestions for various inputs in individual and family forms.
-# The lists are populated with values extracted from your Geneweb database
-# using the “cache_files" tool in gwsetup or in command line. They are not
-# automatically updated: regenerate them to ensure that the data is up-to-date.
-#datalist_aliases=1
-#datalist_estates=1
-#datalist_fnames=1
-#datalist_occupations=1
-#datalist_places=1
-#datalist_pub_names=1
-#datalist_qualifiers=1
-#datalist_snames=1
-#datalist_titles=1
-#datalist_sources=1
-
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
 # individual and finally the action performed.
@@ -496,14 +632,6 @@
 # There is no default here.
 #default_image_no=
 
-# for carrousel.txt use a reorg flag (not set by default)
-# to access a specific bases subdirectories organisation:
-# bases/<basename>.gwb/documents/portraits
-# bases/<basename>.gwb/documents/images
-# Warning: complete work never merged in geneweb/master branch,
-#          (TODO need a ref here) so flag not to be set.
-#reorg=on
-_
 # for carrousel.txt
 # dump sent image, if detected as empty type, in a 'bad-image' file
 # old parameter since version 4.02, defaut is to ignore.
@@ -516,16 +644,14 @@ _
 # may be set to "always" or "never".
 #has_events=
 
+# Display notes and sources as tooltips on NMBDS events
+# (birth, baptism, marriage, death, burial) in individual page header.
+# Enabled by default. Set to "no" to disable these tooltips.
+#event_tooltips=no
+
 # for wiki syntax since version 5.00, TODO what purpose ?
 # notes alias file is <basename>.gwb/notes.alias by default, or specified here
 #notes_alias_file=
-
-# Display in red color not existing person or do not if var is set to off.
-#red_if_not_exist=off
-
-# in gwd/request.ml use Perso.interp_templ or person_selected if var is set
-# TODO what purpose ?
-#ptempl=yes
 
 # By default generated web pages have robots content="none"
 # except if robot_index=yes defined since PR #1728  in version 7.1
@@ -536,6 +662,37 @@ _
 # list of plugins to activate in this base, from previously loaded gwd plugins
 # since version 7.0. Details on https://geneweb.tuxfamily.org/wiki/plugins
 #plugins=
+
+# Activates Roglo-specific template, not active by defaut.
+#roglo=yes
+
+# Alternative Geneweb server/base
+# If set, display a button in home bar to jump to another Geneweb base.
+# Used to link related bases (e.g. private/public, test/production).
+#
+# Alternative server address (optional).
+# If empty, use current server address.
+#alt_serv_adr=
+#
+# Alternative base name (mandatory to enable the button).
+#alt_serv_base=
+#
+# Optional title for the alternative base (used in tooltip).
+# If empty, base name is used.
+#alt_serv_title=
+
+# red_if_not_exist forces links to appear as existing even if person is missing
+# or not accessible. Breaks red/blue link semantics.
+# LEGACY: Kept for backward compatibility. Do not use.
+#red_if_not_exist=off
+
+# in gwd/request.ml use Perso.interp_templ or person_selected if var is set
+# LEGACY: kept for backward compatibility, purpose unclear…
+#ptempl=yes
+
+# in etc/updfam.txt legacy option to handle multiple parents (>2)
+# DEV: do not use in new setups
+#multi_parents=yes
 
 ### templm specific parameters ######################################
 
@@ -565,7 +722,6 @@ _
 #event_age=yes
 
 # for templm, jquery functions:
-# TODO obsolete description versus current source code.
 # on individual page, display numbers of ascendants, descendants, implexes
 # on individual & family forms, search for places, sources, occupations
 #    and search for witnesses
@@ -593,10 +749,6 @@ _
 # for templm, In family form, if variable is set
 # if no mariage comment, then union comment is moved to mariage comment.
 #move_comment=yes
-
-# is used in etc/updfam.txt
-# TODO do not understand purpose
-#multi_parents=yes
 
 # for templm, In form pages,
 # if uppercase is set, then able to change the list of particles
@@ -627,3 +779,82 @@ _
 # or to only one if variable is set
 # if not set, then togle checkbox accessible on individual page.
 #wide=on
+
+# =============================================================================
+# OpenID Connect (SSO) login
+# =============================================================================
+# When "oidc_provider_url" is set, gwd exposes single sign-on through an
+# OpenID Connect provider (Keycloak, Authentik, Google, etc.) using the
+# Authorization Code Flow. Users reach it with "m=OIDC_LOGIN" and are logged
+# out with "m=OIDC_LOGOUT". On success a session cookie (gw_oidc_<base>) grants
+# wizard or friend access, mapped from a claim in the id_token (see below).
+#
+# HTTPS is mandatory: gwd must be served over TLS (the session cookie is
+# "Secure"), and "oidc_provider_url" MUST be https (http is accepted only for
+# loopback hosts, for local testing), since the id_token is trusted via TLS to
+# the provider rather than by checking its signature.
+#
+# Enabling OIDC (setting "oidc_provider_url") disables the legacy "no wizard
+# password configured => every visitor is a wizard" default for this base:
+# access then comes from OIDC, or from an explicitly configured wizard/friend
+# password. Plain visitor access is unchanged.
+#
+# Runtime requirements: OIDC is available only on UNIX (it draws its randomness
+# from /dev/urandom), and gwd shells out to the "curl" binary for the discovery
+# and token HTTP calls, so curl must be installed and on gwd's PATH.
+
+# Provider issuer URL. Must be https (see above). Its discovery document is
+# fetched from "<oidc_provider_url>/.well-known/openid-configuration". Leaving
+# this empty disables OIDC for the base.
+
+# Note: m=OIDC_LOGIN / m=OIDC_LOGOUT are GET requests and the login "state" is
+# not bound to the browser, so a residual login/logout CSRF exists; SameSite=Lax
+# on the cookie mitigates it. Prefer trusted links for these actions.
+#oidc_provider_url=https://idp.example.org/realms/main
+
+# OAuth2 client credentials registered with the provider for this base.
+#oidc_client_id=
+
+# Client secret. Prefer "oidc_client_secret_file" (path to a file whose first
+# line holds the secret) so the secret is not stored in the .gwf itself.
+# If both are set, the file takes precedence.
+#oidc_client_secret=
+#oidc_client_secret_file=
+
+# Redirect URI registered with the provider. It must point back at this base;
+# the provider appends "code" and "state", which gwd auto-detects as the
+# callback (no "m=" needed).
+#oidc_redirect_uri=https://geneweb.example.org/mybase
+
+# Claim used as the user identity. Falls back to "sub" if absent.
+#oidc_user_claim=email
+
+# Claim inspected for role/group membership (scalar or array), e.g.
+# "realm_access.roles" for Keycloak or "groups" for Authentik. Leave empty to
+# grant every authenticated user visitor access only.
+#oidc_role_claim=
+
+# Values within "oidc_role_claim" that grant wizard and friend access. A user
+# with neither role is logged in as a plain visitor.
+#oidc_wizard_role=
+#oidc_friend_role=
+
+# Optional claim carrying the GeneWeb person key ("first_name.occ surname") to
+# associate the logged-in user with a database individual. Leave empty to skip.
+#oidc_person_key_claim=
+
+# Provider name shown on the welcome-page login button, after the translated
+# "connect with" (e.g. "Google" -> "Connect with Google"). Defaults to "SSO".
+#oidc_provider_name=
+
+# Lifetime in seconds of the OIDC session cookie. The session is sliding:
+# every authenticated request re-issues the cookie with a renewed expiry, so
+# this is an inactivity timeout, not a fixed delay since login. Defaults to
+# the global -login-timeout value (1800 seconds).
+#oidc_session_timeout=
+
+# Optional absolute limit in seconds on the OIDC session, counted from login:
+# once reached, the session is refused even if the user is active and they
+# must log in again. The sliding inactivity timeout above still applies before
+# that. Leave empty for no absolute limit.
+#oidc_session_max_age=

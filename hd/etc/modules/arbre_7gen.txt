@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_7gen.txt v7.0 27/06/2018 18:47:46 $ -->
+<!-- $Id: modules/arbre_7gen.txt v7.1 17/12/2025 16:04:35 $ -->
 %define;descendants(curlev, maxlev, f_cnt)
   <ul>
   %if;(has_families)
@@ -76,10 +76,10 @@
 %let;sbcol;20%%%in;
 %let;chcol;40%%%in;
 <h2>[*preview family tree]</h2>
-   <table style="border:0;width:100%%;cellspacing:0;cellpading:0"> %( Titres %)
+   <table style="border:0;width:100%%;cellspacing:0;cellpadding:0"> %( Titres %)
      <tr>
        <td style="width:%gpcol;">
-         <table style="width:100%%;border:0;cellspacing:0;cellpading:0"> %( Titres %)
+         <table style="width:100%%;border:0;cellspacing:0;cellpadding:0"> %( Titres %)
            <tr>
              <td style="width:41%%"></td>
              <td style="width:41%%"></td>
@@ -102,7 +102,7 @@
          </table>
        </td>
        <td style="width:%sbcol;">
-         <table style="border:0;width:100%%;cellspacing:0;cellpading:0">
+         <table style="border:0;width:100%%;cellspacing:0;cellpadding:0">
            <tr><td>&nbsp;</td></tr>
            <tr>
              <td style="text-align:center;valign:middle"><b>%self;</b></td>
@@ -135,7 +135,7 @@
        </td>
 
        <td style="width:%chcol;">
-         <table style="border:0;width:100%%;cellspacing:0;cellpading:0">
+         <table style="border:0;width:100%%;cellspacing:0;cellpadding:0">
            <tr>
            <ul><li><span class="highlight_hg"><b>[*the children]</b></span></li>
              <ul><li><span class="highlight_hg"><b>[*the grandchildren]</b></span></li>
@@ -149,12 +149,12 @@
      </tr>
    </table> %( Titres %)
 
- <table style="width:100%%;border:0;cellspacing:0;cellpading:0"> %( Listes %)
+ <table style="width:100%%;border:0;cellspacing:0;cellpadding:0"> %( Listes %)
    <tr>
      %( Parents, grand-parents... %)
      <td style="width=%gpcol;">
        %if;has_parents;
-       <table style="width:100%%;border:0;cellspacing:0;cellpading:0">
+       <table style="width:100%%;border:0;cellspacing:0;cellpadding:0">
        <tr>
          <td style="width:41%%"></td>
          <td style="width:41%%"></td>

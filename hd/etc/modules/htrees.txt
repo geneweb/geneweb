@@ -21,5 +21,4 @@ Options
   %include;modules/arbre_hi_tools
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
-%else;
 %end;

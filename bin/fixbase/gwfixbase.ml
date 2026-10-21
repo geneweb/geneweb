@@ -1,17 +1,59 @@
 open Geneweb
-open Gwdb
+module Driver = Geneweb_db.Driver
+module Dirs = Geneweb_dirs
+module Gutil = Geneweb_db.Gutil
+module Collection = Geneweb_db.Collection
+
+let nb_ind_init = ref 0
+
+let dump_persons bname ofile =
+  Driver.with_database bname @@ fun base ->
+  let nb_ind = Driver.nb_of_persons base in
+  let nb_fam = Driver.nb_of_families base in
+  let undef = ref 0 in
+  let result =
+    Collection.fold
+      (fun acc p ->
+        let designation = Gutil.designation base p in
+        let head =
+          String.sub designation 0 (min 3 (String.length designation))
+          |> Name.lower
+        in
+        if designation <> "?.0 ?" then (head, designation) :: acc
+        else (
+          incr undef;
+          acc))
+      [] (Driver.persons base)
+    |> List.sort (fun (h1, _) (h2, _) -> String.compare h1 h2)
+  in
+  let oc = if ofile <> "" then Some (open_out ofile) else None in
+  List.iter
+    (fun (_, d) ->
+      match oc with
+      | Some oc -> output_string oc (d ^ "\n")
+      | None -> print_endline d)
+    result;
+  let real_count = List.length result in
+  let check = real_count + !undef in
+  Printf.eprintf "Base %s\n" bname;
+  Printf.eprintf "Final state: %d persons (initial value %d), %d families\n"
+    nb_ind !nb_ind_init nb_fam;
+  Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
+    real_count !undef real_count !undef check !nb_ind_init
 
 let aux txt
     (fn :
-      ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
-    ~v1 ~v2 base n cnt =
+      ?report:(Fixbase.patch -> unit) ->
+      (int -> int -> unit) ->
+      Driver.base ->
+      unit) ~v1 ~v2 base n cnt =
   let string_of_patch =
-    let string_of_p i = Gutil.designation base (poi base i) in
+    let string_of_p i = Gutil.designation base (Driver.poi base i) in
     let string_of_f i =
-      let fam = foi base i in
+      let fam = Driver.foi base i in
       Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam)
-        (string_of_p @@ get_mother fam)
+        (string_of_p @@ Driver.get_father fam)
+        (string_of_p @@ Driver.get_mother fam)
     in
     function
     | Fixbase.Fix_NBDS ip ->
@@ -24,11 +66,13 @@ let aux txt
     | Fix_AddedChild ifam ->
         Printf.sprintf "Added child in: %s" (string_of_f ifam)
     | Fix_RemovedUnion (ip, ifam) ->
-        Printf.sprintf "Removing ifam %s from [%s] unions" (string_of_ifam ifam)
+        Printf.sprintf "Removing ifam %s from [%s] unions"
+          (Driver.Ifam.to_string ifam)
           (string_of_p ip)
     | Fix_RemovedDuplicateUnion (ip, ifam) ->
         Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
-          (string_of_ifam ifam) (string_of_p ip)
+          (Driver.Ifam.to_string ifam)
+          (string_of_p ip)
     | Fix_AddedRelatedFromPevent (ip, ip2) | Fix_AddedRelatedFromFevent (ip, ip2)
       ->
         Printf.sprintf "Added related %s to %s" (string_of_p ip2)
@@ -42,13 +86,14 @@ let aux txt
     | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
         Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
           (match ifam_opt with
-          | Some i -> "ifam " ^ string_of_ifam i
+          | Some i -> "ifam " ^ Driver.Ifam.to_string i
           | None -> (
               match iper_opt with
-              | Some i -> "iper " ^ string_of_iper i
+              | Some i -> "iper " ^ Driver.Iper.to_string i
               | None -> assert false))
           (match opt with
-          | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
+          | Some (i, i') ->
+              Driver.Istr.to_string i ^ " -> " ^ Driver.Istr.to_string i'
           | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
@@ -108,20 +153,19 @@ let fix_utf8_sequence =
 
 let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
 
-let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
+let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key bname =
+    ~invalid_utf8 ~key =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
-  let base = Gwdb.open_base bname in
   let fix = ref 0 in
-  let nb_fam = nb_of_families base in
-  let nb_ind = nb_of_persons base in
+  let nb_fam = Driver.nb_of_families base in
+  let nb_ind = Driver.nb_of_persons base in
   if fast then (
-    load_strings_array base;
-    load_persons_array base);
+    Driver.load_strings_array base;
+    Driver.load_persons_array base);
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
   if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
@@ -133,11 +177,11 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if fast then (
-    clear_strings_array base;
-    clear_persons_array base);
+    Driver.clear_strings_array base;
+    Driver.clear_persons_array base);
   if not !dry_run then (
     if !fix <> 0 then (
-      Gwdb.commit_patches base;
+      Driver.commit_patches base;
       if v1 then (
         Printf.printf "%n changes commited\n" !fix;
         flush stdout))
@@ -147,14 +191,14 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     if v1 then (
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
-    Gwdb.sync base;
+    Driver.sync base;
     if v1 then (
-      Printf.printf "Done";
+      Printf.printf "Done\n";
       flush stdout))
 
 (**/**)
 
-let bname = ref ""
+let bname = ref None
 let verbosity = ref 2
 let fast = ref false
 let f_parents = ref false
@@ -169,58 +213,90 @@ let invalid_utf8 = ref false
 let key = ref false
 let index = ref false
 let dry_run = ref false
+let dump = ref false
+let ofile = ref ""
+let bases_dir = ref (Dirs.path Secure.default_base_dir)
 
 let speclist =
   [
+    ("-bd", Arg.String (fun s -> bases_dir := s), " Bases folder");
     ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
-    ("-families-parents", Arg.Set f_parents, " missing doc");
-    ("-families-children", Arg.Set f_children, " missing doc");
-    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
-    ("-persons-parents", Arg.Set p_parents, " missing doc");
-    ("-persons-families", Arg.Set p_families, " missing doc");
-    ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
-    ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
-    ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
-    ("-person-key", Arg.Set key, " missing doc");
+    ("-families-parents", Arg.Set f_parents, " fix families’ parents links");
+    ("-families-children", Arg.Set f_children, " fix families’ children links");
+    ( "-persons-NBDS",
+      Arg.Set p_NBDS,
+      " fix persons' birth, baptism, death and burial events" );
+    ("-persons-parents", Arg.Set p_parents, " fix persons’ parents links");
+    ("-persons-families", Arg.Set p_families, " fix persons’ families links");
+    ( "-pevents-witnesses",
+      Arg.Set pevents_witnesses,
+      " fix witnesses of personal events" );
+    ( "-fevents-witnesses",
+      Arg.Set fevents_witnesses,
+      " fix witnesses of family events" );
+    ( "-marriage-divorce",
+      Arg.Set marriage_divorce,
+      " fix marriage and divorce events" );
+    ("-person-key", Arg.Set key, " fix duplicate person keys");
+    ("-dump", Arg.Set dump, " dump list of persons");
+    ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enabled by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+    ("-invalid-utf8", Arg.Set invalid_utf8, " fix invalid UTF-8 sequences");
   ]
-  |> List.sort compare |> Arg.align
+  |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
+  |> Arg.align
 
-let anonfun i = bname := i
+let anonfun i = bname := Some i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir (Filename.dirname !bname);
-  if !bname = "" then (
-    Arg.usage speclist usage;
-    exit 2);
-  Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
-  @@ fun () ->
-  if
-    !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
-    || !key || !index
-  then ()
-  else (
-    f_parents := true;
-    f_children := true;
-    p_parents := true;
-    p_families := true;
-    pevents_witnesses := true;
-    fevents_witnesses := true;
-    marriage_divorce := true;
-    p_NBDS := true;
-    invalid_utf8 := true;
-    key := true);
-  check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
-    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key !bname
+  Secure.set_base_dir !bases_dir;
+  match !bname with
+  | None ->
+      Arg.usage speclist usage;
+      exit 2
+  | Some bname ->
+      let bpath = Filename.concat !bases_dir bname in
+      let lock_file = Mutil.lock_file bpath in
+      let on_exn exn bt =
+        Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+        exit 2
+      in
+      Driver.with_database bpath @@ fun base ->
+      let nb_fam = Driver.nb_of_families base in
+      let nb_ind = Driver.nb_of_persons base in
+      let nb_real_ind = Driver.nb_of_real_persons base in
+      nb_ind_init := nb_ind;
+      Printf.eprintf "GwFixbase for base %s\n" bpath;
+      Printf.eprintf "Initial state: %d persons, %d real persons, %d families\n"
+        nb_ind nb_real_ind nb_fam;
+
+      Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
+      if
+        !f_parents || !f_children || !p_parents || !p_families
+        || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
+        || !p_NBDS || !invalid_utf8 || !key || !index
+      then ()
+      else (
+        f_parents := true;
+        f_children := true;
+        p_parents := true;
+        p_families := true;
+        pevents_witnesses := true;
+        fevents_witnesses := true;
+        marriage_divorce := true;
+        p_NBDS := true;
+        invalid_utf8 := true;
+        key := true);
+      check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
+        ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+        ~marriage_divorce ~invalid_utf8 ~key;
+      if !dump then dump_persons bpath !ofile
 
 let _ = main ()

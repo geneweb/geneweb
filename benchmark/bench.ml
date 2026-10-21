@@ -1,4 +1,12 @@
-open Geneweb
+module Driver = Geneweb_db.Driver
+module Sosa = Geneweb_sosa
+module Place = Geneweb.Place
+module Util = Geneweb.Util
+module Config = Geneweb.Config
+module UpdateData = Geneweb.UpdateData
+module Perso = Geneweb.Perso
+module BirthDeath = Geneweb.BirthDeath
+module Check = Geneweb.Check
 
 let style = ref Benchmark.Auto
 
@@ -47,9 +55,6 @@ let bench () =
       bench "Mutil.contains"
         (Mutil.contains "foobarbaz")
         [ "foo"; "bar"; "baz"; "foobarbaz!" ];
-      bench "Mutil.start_with"
-        (Mutil.start_with "foobarbaz" 0)
-        [ "foo"; "bar"; ""; "foobarbaz" ];
       bench "Mutil.start_with_wildcard"
         (Mutil.start_with_wildcard "foobarbaz" 0)
         [ "foo"; "bar"; ""; "foobarbaz" ];
@@ -92,10 +97,11 @@ let bench () =
                 in
                 for day = 1 to len do
                   let d =
-                    { Def.day; month; year; delta = 0; prec = Def.Sure }
+                    { Adef.day; month; year; delta = 0; prec = Adef.Sure }
                   in
                   (Sys.opaque_identity ignore)
-                    (Calendar.julian_of_sdn Def.Sure @@ Calendar.sdn_of_julian d)
+                    (Calendar.julian_of_sdn Adef.Sure
+                    @@ Calendar.sdn_of_julian d)
                 done
               done
           done)
@@ -107,10 +113,9 @@ let bench () =
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
         Secure.set_base_dir (Filename.dirname bname);
-        let base = Gwdb.open_base bname in
+        Driver.with_database bname @@ fun base ->
         List.iter (fun load -> load base) load;
         let r = bench ?t name (fn base) args in
-        Gwdb.close_base base;
         r
       in
       bench_w_base "UpdateData.get_all_data"
@@ -146,14 +151,14 @@ let bench () =
              };
            ]
       :: bench_w_base
-           ~load:[ Gwdb.load_persons_array ]
+           ~load:[ Geneweb_db.Driver.load_persons_array ]
            "Util.authorized_age"
            (fun base conf ->
-             Gwdb.Collection.iter
+             Geneweb_db.Collection.iter
                (Sys.opaque_identity (fun p ->
                     Sys.opaque_identity ignore
                     @@ Util.authorized_age conf base p))
-               (Gwdb.persons base))
+               (Geneweb_db.Driver.persons base))
            [
              { conf with wizard = true };
              { conf with wizard = false; friend = false };
@@ -167,17 +172,20 @@ let bench () =
            [ conf ]
       :: bench_w_base "Perso.first_possible_duplication" ~t:10
            (fun base _conf ->
-             Gwdb.Collection.fold
+             Geneweb_db.Collection.fold
                (fun acc p ->
-                 Perso.first_possible_duplication base (Gwdb.get_iper p) ([], [])
+                 Perso.first_possible_duplication base
+                   (Geneweb_db.Driver.get_iper p)
+                   ([], [])
                  :: acc)
-               [] (Gwdb.persons base))
+               []
+               (Geneweb_db.Driver.persons base))
            [ conf ]
       :: bench_w_base "BirthDeath.select_person" ~t:10
            (fun base get ->
              (Sys.opaque_identity BirthDeath.select_person) conf base get true
              |> Sys.opaque_identity ignore)
-           [ (fun p -> Date.od_of_cdate (Gwdb.get_birth p)) ]
+           [ (fun p -> Date.od_of_cdate (Geneweb_db.Driver.get_birth p)) ]
       :: suite
   | _ -> suite
 

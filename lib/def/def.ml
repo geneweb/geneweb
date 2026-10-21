@@ -1,58 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Http response status *)
-type httpStatus =
-  | OK (* 200 *)
-  | Moved_Temporarily (* 302 *)
-  | Bad_Request (* 400 *)
-  | Unauthorized (* 401 *)
-  | Forbidden (* 403 *)
-  | Not_Found (* 404 *)
-  | Conflict (* 409 *)
-  | Internal_Server_Error (* 500 *)
-  | Service_Unavailable (* 503 *)
-
-exception HttpExn of httpStatus * string
+exception HttpExn of Geneweb_http.Code.status * string
 
 (* TODO OCaml 4.12 : use Either *)
 
 (** Type that represents 2 possible choices *)
 type ('a, 'b) choice = Left of 'a | Right of 'b
-
-type cdate = Adef.cdate
-(** Alias to [Adef.cdate] *)
-
-(** Alias to [Adef.date] *)
-type date = Adef.date =
-  | Dgreg of dmy * calendar
-  (* textual form of the date *)
-  | Dtext of string
-
-(** Alias to [Adef.calendar] *)
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-
-and dmy = Adef.dmy = {
-  day : int;
-  month : int;
-  year : int;
-  prec : precision;
-  delta : int;
-}
-(** Alias to [Adef.dmy] *)
-
-and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-(** Alias to [Adef.dmy2] *)
-
-(** Alias to [Adef.precision] *)
-and precision = Adef.precision =
-  | Sure
-  | About
-  | Maybe
-  | Before
-  | After
-  | OrYear of dmy2
-  (* inteval *)
-  | YearInt of dmy2
 
 (** Relation kind between couple in the family *)
 type relation_kind =
@@ -67,44 +20,52 @@ type relation_kind =
   | MarriageLicense
   | Pacs
   | Residence
+[@@deriving show { with_path = false }]
 
 (** Divorce status *)
 type divorce =
   | NotDivorced
-  | Divorced of cdate
+  | Divorced of Adef.cdate
   | Separated_old
   | NotSeparated
-  | Separated of cdate
+  | Separated of Adef.cdate
+[@@deriving show { with_path = false }]
 
 (** Death reason *)
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
+[@@deriving show { with_path = false }]
 
 (** Death status *)
 type death =
   | NotDead
-  | Death of death_reason * cdate
+  | Death of death_reason * Adef.cdate
   | DeadYoung
   | DeadDontKnowWhen
   | DontKnowIfDead
   | OfCourseDead
+[@@deriving show { with_path = false }]
 
 (** Burial information *)
-type burial = UnknownBurial | Buried of cdate | Cremated of cdate
+type burial = UnknownBurial | Buried of Adef.cdate | Cremated of Adef.cdate
+[@@deriving show { with_path = false }]
 
 (** Rights for access to the personal data *)
 type access = IfTitles | Public | SemiPublic | Private
+[@@deriving show { with_path = false }]
 
 (** Title name *)
 type 'string gen_title_name = Tmain | Tname of 'string | Tnone
+[@@deriving show { with_path = false }]
 
 type 'string gen_title = {
   t_name : 'string gen_title_name;
   t_ident : 'string;
   t_place : 'string;
-  t_date_start : cdate;
-  t_date_end : cdate;
+  t_date_start : Adef.cdate;
+  t_date_end : Adef.cdate;
   t_nth : int;
 }
+[@@deriving show { with_path = false }]
 (** Type that represents information about nobility title of a person *)
 
 (** Witness kind for an event *)
@@ -117,6 +78,7 @@ type witness_kind =
   | Witness_Attending
   | Witness_Mentioned
   | Witness_Other
+[@@deriving show { with_path = false }]
 
 (** Personal event name. *)
 type 'string gen_pers_event_name =
@@ -171,16 +133,18 @@ type 'string gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_pers_event = {
   epers_name : 'string gen_pers_event_name;
-  epers_date : cdate;
+  epers_date : Adef.cdate;
   epers_place : 'string;
   epers_reason : 'string;
   epers_note : 'string;
   epers_src : 'string;
   epers_witnesses : ('person * witness_kind) array;
 }
+[@@deriving show { with_path = false }]
 (** Personal event information *)
 
 (** Event name pertaining a family. *)
@@ -198,16 +162,18 @@ type 'string gen_fam_event_name =
   | Efam_PACS
   | Efam_Residence
   | Efam_Name of 'string
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_fam_event = {
   efam_name : 'string gen_fam_event_name;
-  efam_date : cdate;
+  efam_date : Adef.cdate;
   efam_place : 'string;
   efam_reason : 'string;
   efam_note : 'string;
   efam_src : 'string;
   efam_witnesses : ('person * witness_kind) array;
 }
+[@@deriving show { with_path = false }]
 (** Event information pertaining a family. *)
 
 (** Relation type with parent (if not native) *)
@@ -217,6 +183,7 @@ type relation_type =
   | CandidateParent
   | GodParent
   | FosterParent
+[@@deriving show { with_path = false }]
 
 type ('person, 'string) gen_relation = {
   r_type : relation_type;
@@ -224,10 +191,11 @@ type ('person, 'string) gen_relation = {
   r_moth : 'person option;
   r_sources : 'string;
 }
+[@@deriving show { with_path = false }]
 (** Relation information with parents (if not native) *)
 
 (** Sex of person *)
-type sex = Male | Female | Neuter
+type sex = Male | Female | Neuter [@@deriving show { with_path = false }]
 
 type place = {
   other : string;
@@ -239,6 +207,7 @@ type place = {
   region : string;
   country : string;
 }
+[@@deriving show { with_path = false }]
 (** Place information *)
 
 type ('iper, 'person, 'string) gen_person = {
@@ -260,11 +229,11 @@ type ('iper, 'person, 'string) gen_person = {
   occupation : 'string;
   sex : sex;
   access : access;
-  birth : cdate;
+  birth : Adef.cdate;
   birth_place : 'string;
   birth_note : 'string;
   birth_src : 'string;
-  baptism : cdate;
+  baptism : Adef.cdate;
   baptism_place : 'string;
   baptism_note : 'string;
   baptism_src : 'string;
@@ -281,20 +250,24 @@ type ('iper, 'person, 'string) gen_person = {
   psources : 'string;
   key_index : 'iper;
 }
+[@@deriving show { with_path = false }]
 (** Polymorphic type describing information about person. *)
 
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
-(** Person's ascendants (family where he is a children) with its consangunity rate
-    (equal to relationship betwen his parents). *)
+[@@deriving show { with_path = false }]
+(** Person's ascendants (family where he is a children) with its consangunity
+    rate (equal to relationship betwen his parents). *)
 
 (* Person's families to which he belongs as parent (union of families) *)
 type 'family gen_union = { family : 'family array }
+[@@deriving show { with_path = false }]
 
 type 'person gen_descend = { children : 'person array }
+[@@deriving show { with_path = false }]
 (** Children of the family *)
 
 type ('person, 'ifam, 'string) gen_family = {
-  marriage : cdate;
+  marriage : Adef.cdate;
   marriage_place : 'string;
   marriage_note : 'string;
   marriage_src : 'string;
@@ -307,10 +280,8 @@ type ('person, 'ifam, 'string) gen_family = {
   fsources : 'string;
   fam_index : 'ifam;
 }
+[@@deriving show { with_path = false }]
 (** Polymorphic type describing information about family. *)
-
-type 'person gen_couple = 'person Adef.gen_couple
-(** Alias to [Adef.gen_couple] *)
 
 (** Database errors describing bad specification of the person *)
 type 'person error =
@@ -318,12 +289,13 @@ type 'person error =
   | OwnAncestor of 'person  (** Person is his own ancestor *)
   | BadSexOfMarriedPerson of 'person
 
-(** Database warnings attached to the specification of the person, family, relation, etc. *)
+(** Database warnings attached to the specification of the person, family,
+    relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | BigAgeBetweenSpouses of
       'person
       * 'person
-      * dmy (* Age differece between couples is greater then 50 years *)
+      * Adef.dmy (* Age differece between couples is greater then 50 years *)
   | BirthAfterDeath of 'person  (** Person is born after his death *)
   | IncoherentSex of 'person * int * int  (** Incoherent sex of person *)
   | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
@@ -337,9 +309,11 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
       (** Children aren't ordered *)
   | CloseChildren of 'family * 'person * 'person
-      (** Age difference between two child is less then 7 month (except for twins) *)
-  | DeadOld of 'person * dmy
-      (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
+      (** Age difference between two child is less then 7 month (except for
+          twins) *)
+  | DeadOld of 'person * Adef.dmy
+      (** Dead old (at the age older then 109 after 1900 year and older then 100
+          before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
       (** Children is born in more then 1 year after his father's death *)
   | DistantChildren of 'family * 'person * 'person
@@ -359,26 +333,30 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Children is born after his mother's death *)
   | ParentBornAfterChild of 'person * 'person
       (** Parent is born after one of his children *)
-  | ParentTooOld of 'person * dmy * 'person
-      (** Person became a parent at age older then 55 years for mother and 70 for father *)
-  | ParentTooYoung of 'person * dmy * 'person
+  | ParentTooOld of 'person * Adef.dmy * 'person
+      (** Person became a parent at age older then 55 years for mother and 70
+          for father *)
+  | ParentTooYoung of 'person * Adef.dmy * 'person
       (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent
       (** Personal events haven't been ordered correctly *)
   | PossibleDuplicateFam of 'family * 'family
-      (** There is a possibility that two families are a duplicate of each other *)
+      (** There is a possibility that two families are a duplicate of each other
+      *)
   | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
-      (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+      (** There is a possibility that two families are a duplicate of each other
+          (Homonymous spouse) *)
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person
       (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
       (** Witness is born after personal event date *)
   | TitleDatesError of 'person * 'title
-      (** Title's start date is after end date or person is born after title dates *)
+      (** Title's start date is after end date or person is born after title
+          dates *)
   | UndefinedSex of 'person  (** Person has undefined sex (Neuter) *)
-  | YoungForMarriage of 'person * dmy * 'family
+  | YoungForMarriage of 'person * Adef.dmy * 'family
       (** Person is married before he was 12 years old *)
-  | OldForMarriage of 'person * dmy * 'family
+  | OldForMarriage of 'person * Adef.dmy * 'family
       (** Person is married after he was 100 years old *)
 
 (** Missing sources warning *)
@@ -410,6 +388,8 @@ type ('iper, 'person, 'family, 'string) base_changed =
       ('iper, 'person, 'string) gen_person
       * ('iper, 'person, 'string) gen_person
       * ('iper, 'person, 'string) gen_person
+      (** Kept person before the merge, deleted person, kept person after the
+          merge. *)
   | U_Send_image of ('iper, 'person, 'string) gen_person
   | U_Delete_image of ('iper, 'person, 'string) gen_person
   | U_Add_family of
@@ -454,7 +434,7 @@ module NLDB = struct
     | PgWizard of string
 
   type key = string * string * int
-  type ind = { lnTxt : string option; lnPos : int }
+  type ind = { lnTxt : string option; lnPos : int; lnFamMarker : int option }
   type ('a, 'b) t = (('a, 'b) page * (string list * (key * ind) list)) list
 
   let equal_key (fn1, sn1, oc1) (fn2, sn2, oc2) =

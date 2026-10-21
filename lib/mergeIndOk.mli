@@ -2,10 +2,10 @@
 
 val merge_carrousel :
   Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Gwdb.person ->
-  ( Gwdb.iper,
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
+  ( Geneweb_db.Driver.iper,
     string * string * int * Update.create * string,
     string )
   Def.gen_person ->
@@ -14,29 +14,32 @@ val merge_carrousel :
 
 val reconstitute :
   Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Gwdb.person ->
-  ( Gwdb.iper,
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Geneweb_db.Driver.person ->
+  ( Geneweb_db.Driver.iper,
     string * string * int * Update.create * string,
     string )
   Def.gen_person
 
 val effective_mod_merge :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.iper, Gwdb.iper, string) Def.gen_person ->
-  (Gwdb.iper, Gwdb.iper, string) Def.gen_person ->
-  (Gwdb.iper, Update.key, string) Def.gen_person ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) Def.gen_person ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.iper, string) Def.gen_person ->
+  (Geneweb_db.Driver.iper, Update.key, string) Def.gen_person ->
   (Config.config ->
-  Gwdb.base ->
+  Geneweb_db.Driver.base ->
   CheckItem.base_warning list ->
-  (Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
-  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.istr )
+  Def.gen_person ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   string ->
   string ->
   int ->
-  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   string ->
   string ->
   int ->

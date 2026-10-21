@@ -2,37 +2,37 @@
 #                                                      STAGE 1: Build Geneweb
 ###############################################################################
 
-FROM ocaml/opam:debian-12-ocaml-4.14 AS builder
+FROM ocaml/opam:debian-ocaml-4.14-nnp@sha256:6dd7a8b14d2d6dbdc5c0d7dcc5bb1bd1136d4b17abe12e9fece2464931bbf9f9 AS builder
 
 ENV OPAMYES=yes
 ENV OPAMJOBS=2
+ENV DUNE_PROFILE=release
 
 USER root
 # Install required system dependencies
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt install -yq --no-install-recommends \
-    m4=1.4.19-3 \
-    libgmp-dev=2:6.2.1+dfsg1-1.1 \
-    libpcre3-dev=2:8.39-15 \
-    libipc-system-simple-perl=1.30-2 \
-    xdot=1.2-3 \
-    zlib1g-dev=1:1.2.13.dfsg-1 \
-    pkg-config=1.8.1-1 \
+    && apt-get update \
+    && apt-get install -yq --no-install-recommends \
+    m4 libgmp-dev libpcre2-dev libipc-system-simple-perl xdot zlib1g-dev pkg-config brotli \
     && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
 
-# Initialize OPAM
+# Update local opam repository
 USER opam
+WORKDIR /home/opam/opam-repository
+RUN git fetch origin master && git checkout b69889513d1dfe730791f2fffabe24ca1d944b5f && opam update
+
+# Initialize OPAM
 WORKDIR /home/opam
 RUN opam init --disable-sandboxing --auto-setup --bare
 
 # Copy opam file for dependency resolution then install dependencies
 COPY --chown=opam:opam *.opam ./
-RUN eval "$(opam env)" && opam install . --deps-only && opam install ancient
+RUN opam install . --deps-only --with-test && opam install ancient
 
 # Clone repository and build Geneweb
 WORKDIR /home/opam/geneweb
 COPY --chown=opam:opam . .
-RUN eval "$(opam env)" && ocaml ./configure.ml --sosa-zarith && make distrib
+RUN opam exec -- make distrib
 
 ###############################################################################
 #                                       STAGE 2: Export build via blank image
@@ -45,7 +45,7 @@ COPY --from=builder /home/opam/geneweb/distribution /
 #                                              STAGE 3: Assemble Docker image
 ###############################################################################
 
-FROM debian:12-slim AS container
+FROM debian:13-slim AS container
 
 ENV GENEWEB_HOME=/usr/local/share/geneweb
 ENV GENEWEB_DATA_PATH=${GENEWEB_HOME}/share/data
@@ -55,16 +55,13 @@ ENV GWSETUP_IP=172.17.0.1
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-  && apt install -qy --no-install-recommends sudo openssl \
+  && apt install -qy --no-install-recommends openssl adduser netcat-openbsd \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && adduser --system --group --uid 1000 \
-     --home ${GENEWEB_HOME} --shell /bin/bash geneweb \
-  && usermod -aG sudo geneweb \
-  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+     --home ${GENEWEB_HOME} --shell /bin/bash geneweb
 
-# Add required directories and copy geneweb distribution
-USER geneweb
+# Do everything in the Geneweb home directory
 WORKDIR ${GENEWEB_HOME}
 
 # Create directory structure and configure
@@ -74,6 +71,15 @@ RUN mkdir -p bin etc log share/data share/dist \
 # Copy application files
 COPY --from=builder /home/opam/geneweb/distribution share/dist
 COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
+
+# Make script executable, ensure log files exists and update ownership
+RUN chmod +x bin/geneweb-launch.sh \
+  && touch log/gwsetup.log \
+  && touch log/gwd.log \
+  && chown -R geneweb:geneweb .
+
+# Switch to geneweb user
+USER geneweb
 
 # Configure container
 EXPOSE 2316-2317

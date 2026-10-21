@@ -24,6 +24,10 @@ open Config
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   [[image:filename.jpg]] inline image from the notes image directory
+   [[image:subdir:filename.jpg]] image in a subdirectory (use ':' as separator)
+   [[image:filename.jpg/alt text]] image with alt text
+   [[image:filename.jpg/alt text/200px]] image with alt text and CSS max-width
    empty line : new paragraph
    lines starting with space : displayed as they are (providing 1/ there
      are at least two 2/ there is empty lines before and after the group
@@ -35,14 +39,18 @@ open Config
 type wiki_info = {
   wi_mode : string;
   wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool * string * string;
+  wi_person_exists : string * string * int -> bool;
+  wi_mark_if_not_public : string * string * int -> bool;
   wi_always_show_link : bool;
 }
+(** wi_mark_if_not_public: if the person designated by fn * sn * oc is not
+    public display it in red. This function is used by Roglo to identify persons
+    that should be public and are not *)
 
 val syntax_links : config -> wiki_info -> string -> string
 
 val make_edit_button :
-  Config.config -> string -> ?cnt:int option -> unit -> string
+  Config.config -> ?mode:string -> string -> ?cnt:int option -> unit -> string
 
 val html_of_tlsw : config -> string -> string list
 (** Parses a whole TLSW text to a list of strings *)
@@ -52,22 +60,30 @@ val html_with_summary_of_tlsw :
 (** HTML displaying a table of content for a TLSW file *)
 
 val extract_sub_part : string -> int -> string list
-(** [extract_sub_part tlsw i]
-    Extracts the `i`th first TLSW sections of `tlsw` *)
-
-val split_title_and_text : string -> (string * string) list * string
-(**
-   The argument is expected to have the form "KEY=value\n"...
-   This function calculates each Key/value pair and puts it in a list;
-   except for the key TITLE, that is the second element of the returned tuple.
-   If there is no title defined, checks if the first line is not empty and does
-   not start with '=' nor contains '<' nor '\[', in which case it is choosen as a
-   first line. Otherwise, the title is the empty string.
+(** [extract_sub_part tlsw i] Extracts the `i`th first TLSW sections of `tlsw`
 *)
 
+val split_title_and_text : string -> (string * string) list * string
+(** The argument is expected to have the form "KEY=value\n"... This function
+    calculates each Key/value pair and puts it in a list; except for the key
+    TITLE, that is the second element of the returned tuple. If there is no
+    title defined, checks if the first line is not empty and does not start with
+    '=' nor contains '<' nor '\[', in which case it is choosen as a first line.
+    Otherwise, the title is the empty string. *)
+
 val print_sub_part :
-  config -> wiki_info -> bool -> string -> string -> int -> string list -> unit
-(** Prints an exctracted sub part *)
+  config ->
+  wiki_info ->
+  has_next:bool ->
+  bool ->
+  string ->
+  string ->
+  int ->
+  string list ->
+  unit
+(** [print_sub_part conf wi ~has_next can_edit edit_mode sub_fname cnt0 lines]
+    prints the extracted section [cnt0]. [has_next] enables the next-section
+    navigation button. *)
 
 val print_mod_view_page :
   config (* conf *) ->
@@ -79,8 +95,8 @@ val print_mod_view_page :
   (string * string) list (* env *) ->
   string (* s *) ->
   unit
-(** [print_mod_view_page conf can_edit mode fname title env s]
-    Prints an editable part *)
+(** [print_mod_view_page conf can_edit mode fname title env s] Prints an
+    editable part *)
 
 val print_mod_ok :
   config (* conf *) ->
@@ -97,14 +113,34 @@ val print_mod_ok :
   (* string_filter *)
   bool (* title_is_1st *) ->
   unit
-(** [print_mod_ok conf wi edit_mode fname read_string commit string_filter title_is_1st]
-    Commits the changes of a page *)
+(** [print_mod_ok conf wi edit_mode fname read_string commit string_filter
+     title_is_1st] Commits the changes of a page *)
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
 val notes_aliases : config -> (string * string) list
-(** Reads the notes alias file (conf.base_env.notes_alias_file or base_path/notes.alias).
-    File format is "KEY value\n...", returns the list of (KEY,value) *)
+(** Reads the notes alias file (conf.base_env.notes_alias_file or
+    base_path/notes.alias). File format is "KEY value\n...", returns the list of
+    (KEY,value) *)
 
 val map_notes : (string * string) list -> string -> string
 (** Given an alias list, finds the corresponding alias for a given string *)
+
+val do_mod_ok :
+  config ->
+  (string -> string option) ->
+  (* edit_mode *)
+  (string option -> string) ->
+  (* fname *)
+  (string -> (string * string) list * string) ->
+  (* read_string *)
+  (string -> string -> unit) ->
+  (* commit *)
+  string
+(** [do_mod_ok conf edit_mode fname read_string commit] performs the same digest
+    check, conflict detection and commit as {!print_mod_ok} but returns the
+    resolved [fname] without rendering any page. The caller is responsible for
+    the response (typically an HTTP redirect or a custom view). On digest
+    mismatch, malformed request, or filename conflict, the appropriate error
+    page is emitted and the function raises (the implementation of those error
+    helpers terminates the request flow). *)

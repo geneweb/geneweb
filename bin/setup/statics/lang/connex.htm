@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+  <title>[Connex]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top;
+ text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[Listing connected components]</h1>
+</div>
+<ul>
+<li>
+<form method="get" action="connex">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+[Select your database by clicking on the associated button][:]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:%P/%a">%a</a></td>
+</tr>|
+<tr align="left"><td>- [there is no database at present]
+</tr></td>}
+</table>
+<p>
+<li>
+[Select the options you want][:]
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="a" id="a" value="on">
+<label for="a" style="font-family: monospace">-a&nbsp;&nbsp;</label>
+[All connex components.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="s" id="s" value="on">
+<label for="s" style="font-family: monospace">-s&nbsp;&nbsp;</label>
+[Produce connected components statistics.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="d" style="font-family: monospace">-d&nbsp;&nbsp;
+<input type="input" name="d" id="d" size="2" maxlength="2"
+ style="padding-left:4px">
+</label>&nbsp;&nbsp;[Show detail for components of this size.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="i" style="font-family: monospace">-i&nbsp;&nbsp;
+<input type="input" name="i" id="i" size="20" maxlength="50"
+ style="padding-left:4px"></label>&nbsp;&nbsp;[Ignore this origin file.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="bf" id="bf" value="on">
+<label for="bf" style="font-family: monospace">-bf&nbsp;&nbsp;</label>
+[Group by origin file.]
+</td>
+</tr>
+</table>
+<p>
+[WARNING: The following three options result in irreversible deletions. x
+Having a backup archive is recommended.]
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="del" style="font-family: monospace">-del
+<input type="input" name="del" id="del" size="5" maxlength="2"
+ style="padding-left:4px"></label>&nbsp;&nbsp;
+[Prompt for deleting branches of size <= this value.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td>
+<label for="cnt" style="font-family: monospace">-cnt
+<input type="input" name="cnt" id="cnt" size="5" maxlength="4"
+ style="padding-left:4px"></label>&nbsp;&nbsp;
+[Delete up to n branches of size <= -del value.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="exact" id="exact" value="on">
+<label for="exact" style="font-family: monospace">-exact</label>&nbsp;&nbsp;
+[With -del, match size exactly instead of <=.]
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Output][:]
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="radio" name="o" value="" checked>
+[No redirection (results on terminal only).]
+</td>
+</tr>
+<tr align="left">
+<td><input type="radio" name="o" value="/notes_d/connex.txt">
+[Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).]
+</td>
+</tr>
+<tr align="left">
+<td><input type="radio" name="o" value="choice">
+<input type="input" name="ot" size="30" maxlength="80"
+ style="padding-left:4px">&nbsp;&nbsp;
+[Output results to this file.]
+</td>
+</tr>
+</table>
+<p>
+<li>
+[Then push this button][:]
+<input type="submit" value="OK">
+</ul>
+</form>
+</body>
+</html>

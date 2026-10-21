@@ -1,4 +1,5 @@
 open Alcotest
+module Sosa = Geneweb_sosa
 
 (* TODO Fmt *)
 let testable_sosa = testable Fmt.nop Sosa.eq

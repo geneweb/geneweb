@@ -1,12 +1,8 @@
-(lang dune 2.9)
+(lang dune 3.11)
+(using dune_site 0.1)
+(generate_opam_files true)
 
 (name geneweb)
-
-; ignore formatting of generated dune file
-(formatting
- (enabled_for ocaml))
-
-(generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
 (maintainers "Elie Canonici-Merle <elie.canonicimerle@geneanet.org>")
@@ -17,35 +13,101 @@
 (package
   (name geneweb)
   (synopsis "Genealogy library and software")
-  (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
+  (description "GeneWeb is an open source genealogy software written in OCaml. \
+    It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
+  (sites (share hd) (lib plugins))
   (depends
+    ocaml
+    geneweb-compat
+    geneweb-http
     (alcotest :with-test)
     benchmark
-    (calendars (= "1.0.0"))
-    (camlp5 (>= "8.00.01"))
+    (calendars (>= "2.0.0"))
     camlp-streams
-    camlzip
-    cppo
-    (fmt :with-test)
+    decompress
+    fmt
+    logs
+    logs-syslog
+    ptime
     jingoo
     markup
-    (ocaml (>= 4.08))
-    (ocamlformat (and :with-test (= "0.24.1")))
     ounit
     ppx_blob
     ppx_deriving
-    ppx_import
     stdlib-shims
-    syslog
-    (unidecode (= "0.2.0"))
+    (unidecode (>= "0.5.0"))
     uri
     uucp
     uunf
     uutf
     yojson
-    zarith
-    (utop :dev)
+    digestif
+    base64
+    pp_loc
+    dune-site
+    conf-brotli
+    crunch
+    (utop :with-dev-setup)
+    (ocamlformat (and :with-dev-setup (= "0.29.0")))
   )
-  (depopts ancient)
+  (depopts
+    (ancient (>= 0.10.0))
+    zarith
+  )
 )
+
+(package
+  (name geneweb-win32)
+  (synopsis "Geneweb library for Windows support")
+  (tags (geneweb windows))
+  (depends ocaml))
+
+(package
+  (name geneweb-compat)
+  (synopsis "Geneweb library for legacy support")
+  (tags (geneweb legacy))
+  (depends ocaml))
+
+(package
+  (name geneweb-http)
+  (synopsis "Geneweb library for HTTP support")
+  (depends
+    ocaml
+    camlp-streams
+    geneweb-compat
+    geneweb-win32
+    logs
+    fmt))
+
+(package
+  (name geneweb-rpc)
+  (synopsis "Geneweb library for RPC support")
+  (tags (geneweb rpc json))
+  (depends
+    ocaml
+    (geneweb (= :version))
+    (qcheck :with-test)
+    (qcheck-alcotest :with-test)
+    lwt
+    lwt_ppx
+    tls
+    (cmdliner (>= "2.0.0"))
+    logs
+    digestif
+    httpun
+    httpun-lwt-unix
+    httpun-ws
+    js_of_ocaml
+    js_of_ocaml-ppx
+    promise_jsoo
+    yojson
+    fmt))
+
+(package
+  (name geneweb-plugins)
+  (synopsis "Geneweb plugins")
+  (sites (share assets))
+  (depends
+    ocaml
+    (geneweb (= :version))))

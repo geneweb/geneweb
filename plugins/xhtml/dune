@@ -1,9 +1,11 @@
-(executable
- (name plugin_xhtml)
- (libraries geneweb geneweb.gwd_lib geneweb.wserver)
- (modes
-  (native plugin)))
+(library
+ (public_name geneweb-plugins.xhtml_impl)
+ (name xhtml_impl)
+ (libraries geneweb.register))
 
-(alias
- (name plugin)
- (deps plugin_xhtml.cmxs))
+(plugin
+ (package geneweb-plugins)
+ (name xhtml)
+ (libraries geneweb-plugins.xhtml_impl)
+ (site
+  (geneweb plugins)))

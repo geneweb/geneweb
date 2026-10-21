@@ -1,0 +1,13 @@
+  $ gwd --check --load-plugins cgl,forum
+  DEBUG GWD  Loading plugin cgl...
+  DEBUG GWD  Loading plugin forum...
+  DEBUG GWD  End of check mode.
+
+  $ gwd --check --load-all-plugins
+  DEBUG GWD  Loading all the plugins...
+  DEBUG GWD  End of check mode.
+
+  $ gwd --check --load-plugins foo
+  DEBUG GWD  Loading plugin foo...
+  ERROR GWD  Cannot load the plugin foo
+  [1]

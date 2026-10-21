@@ -1,24 +1,25 @@
-(* $Id: mergeFamOk.ml,v 5.19 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mergeFamOk.ml v 7.1 16/06/2026 18:10:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
 
 let cat_strings base is1 sep is2 =
-  let n1 = sou base is1 in
-  let n2 = sou base is2 in
+  let n1 = Driver.sou base is1 in
+  let n2 = Driver.sou base is2 in
   if n1 = "" then n2 else if n2 = "" then n1 else n1 ^ sep ^ n2
 
 let merge_strings base is1 sep is2 =
-  if eq_istr is1 is2 then sou base is1 else cat_strings base is1 sep is2
+  if Driver.Istr.equal is1 is2 then Driver.sou base is1
+  else cat_strings base is1 sep is2
 
 let sorp base ip =
-  let p = poi base ip in
-  ( sou base (get_first_name p),
-    sou base (get_surname p),
-    get_occ p,
+  let p = Driver.poi base ip in
+  ( Driver.sou base (Driver.get_first_name p),
+    Driver.sou base (Driver.get_surname p),
+    Driver.get_occ p,
     Update.Link,
     "" )
 
@@ -42,13 +43,11 @@ let merge_event_witnesses wit1 wit2 =
 
 (* ********************************************************************** *)
 
-(** [Description] : Essaye de merger le plus possible d'evenement famille
-                    a partir des deux listes d'evenements famille.
-    [Args] :
-      - l1   : fevents de fam1
-      - l2   : fevents de fam2
-    [Retour] : la fusion des fevents
-    [Rem] : Non exporté en clair hors de ce module.                       *)
+(** [Description] : Essaye de merger le plus possible d'evenement famille a
+    partir des deux listes d'evenements famille. [Args] :
+    - l1 : fevents de fam1
+    - l2 : fevents de fam2 [Retour] : la fusion des fevents [Rem] : Non exporté
+      en clair hors de ce module. *)
 let merge_events conf l1 l2 =
   let merge_strings s1 sep s2 =
     if s1 = s2 then s1
@@ -169,26 +168,38 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let fam =
     {
-      marriage = field "marriage" get_marriage (( = ) Date.cdate_None);
+      marriage = field "marriage" Driver.get_marriage (( = ) Date.cdate_None);
       marriage_place =
         field "marriage_place"
-          (fun f -> sou base (get_marriage_place f))
+          (fun f -> Driver.sou base (Driver.get_marriage_place f))
           (( = ) "");
       marriage_note =
-        merge_strings base (get_marriage_note fam1) "<br>\n"
-          (get_marriage_note fam2);
+        merge_strings base
+          (Driver.get_marriage_note fam1)
+          "<br>\n"
+          (Driver.get_marriage_note fam2);
       marriage_src =
-        merge_strings base (get_marriage_src fam1) ", " (get_marriage_src fam2);
-      witnesses = merge_witnesses base (get_witnesses fam1) (get_witnesses fam2);
-      relation = field "relation" get_relation (( = ) Married);
-      divorce = field "divorce" get_divorce (( = ) NotDivorced);
+        merge_strings base
+          (Driver.get_marriage_src fam1)
+          ", "
+          (Driver.get_marriage_src fam2);
+      witnesses =
+        merge_witnesses base
+          (Driver.get_witnesses fam1)
+          (Driver.get_witnesses fam2);
+      relation = field "relation" Driver.get_relation (( = ) Married);
+      divorce = field "divorce" Driver.get_divorce (( = ) NotDivorced);
       fevents =
         merge_possible_event
-          (Futil.map_fam_event (sorp base) (sou base))
-          get_fevents;
-      comment = merge_strings base (get_comment fam1) ", " (get_comment fam2);
-      origin_file = sou base (get_origin_file fam1);
-      fsources = merge_strings base (get_fsources fam1) ", " (get_fsources fam2);
+          (Futil.map_fam_event (sorp base) (Driver.sou base))
+          Driver.get_fevents;
+      comment =
+        merge_strings base (Driver.get_comment fam1) ", "
+          (Driver.get_comment fam2);
+      origin_file = Driver.sou base (Driver.get_origin_file fam1);
+      fsources =
+        merge_strings base (Driver.get_fsources fam1) ", "
+          (Driver.get_fsources fam2);
       fam_index = ifam1;
     }
   in
@@ -197,7 +208,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
       children =
         Array.map
           (UpdateFam.person_key base)
-          (Array.append (get_children fam1) (get_children fam2));
+          (Array.append (Driver.get_children fam1) (Driver.get_children fam2));
     }
   in
   (fam, des)
@@ -205,18 +216,19 @@ let reconstitute conf base ifam1 fam1 fam2 =
 let print_merge conf base =
   match (p_getenv conf.env "i", p_getenv conf.env "i2") with
   | Some f1, Some f2 ->
-      let ifam1 = ifam_of_string f1 in
-      let fam1 = foi base ifam1 in
-      let fam2 = foi base (ifam_of_string f2) in
+      let ifam1 = Driver.Ifam.of_string f1 in
+      let fam1 = Driver.foi base ifam1 in
+      let fam2 = Driver.foi base (Driver.Ifam.of_string f2) in
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
-        let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
-        Update.digest_family ini_sfam
+        let ini_sfam = UpdateFam.string_family_of base ifam1 in
+        let salt = Option.get conf.secret_salt in
+        Update.digest_family ~salt ini_sfam
       in
       let scpl =
-        Futil.map_couple_p conf.multi_parents
+        Adef.map_couple_p
           (UpdateFam.person_key base)
-          (gen_couple_of_family (foi base sfam.fam_index))
+          (Driver.gen_couple_of_family (Driver.foi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> Hutil.incorrect_request conf
@@ -234,8 +246,9 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getenv conf.env "i2" with
   | None -> Hutil.incorrect_request conf
   | Some i2 ->
-      let ifam2 = ifam_of_string i2 in
-      UpdateFamOk.effective_del conf base Gwdb.dummy_iper (foi base ifam2);
+      let ifam2 = Driver.Ifam.of_string i2 in
+      UpdateFamOk.effective_del conf base Driver.Iper.dummy
+        (Driver.foi base ifam2);
       let ifam, fam, cpl, des =
         UpdateFamOk.effective_mod conf base true sfam scpl sdes
       in
@@ -244,33 +257,18 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
           (scpl, sdes, None)
       in
       Util.commit_patches conf base;
-      let s =
-        let sl =
-          [ fam.comment; fam.fsources; fam.marriage_note; fam.marriage_src ]
-        in
-        let sl =
-          let rec loop l accu =
-            match l with
-            | [] -> accu
-            | evt :: l -> loop l (evt.efam_note :: evt.efam_src :: accu)
-          in
-          loop fam.fevents sl
-        in
-        String.concat " " (List.map (sou base) sl)
-      in
-      Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
-      (* TODO update_cache_linked_pages *)
+      Notes.update_notes_links_family conf base fam;
       let changed =
         let gen_p =
           let p =
             match p_getenv conf.env "ip" with
             | Some i ->
-                let ip = iper_of_string i in
-                if Adef.mother cpl = ip then poi base (Adef.mother cpl)
-                else poi base (Adef.father cpl)
-            | None -> poi base (Adef.father cpl)
+                let ip = Driver.Iper.of_string i in
+                if Adef.mother cpl = ip then Driver.poi base (Adef.mother cpl)
+                else Driver.poi base (Adef.father cpl)
+            | None -> Driver.poi base (Adef.father cpl)
           in
-          Util.string_gen_person base (gen_person_of_person p)
+          Util.string_gen_person base (Driver.gen_person_of_person p)
         in
         let n_f = Util.string_gen_family base fam in
         U_Merge_family (gen_p, o_f1, o_f2, n_f)
@@ -282,11 +280,11 @@ let print_mod_merge o_conf base =
   let get_gen_family i =
     match p_getenv o_conf.env i with
     | Some i ->
-        let fam = foi base (ifam_of_string i) in
-        Util.string_gen_family base (gen_family_of_family fam)
+        let fam = Driver.foi base (Driver.Ifam.of_string i) in
+        Util.string_gen_family base (Driver.gen_family_of_family fam)
     | None ->
-        let fam = foi base dummy_ifam in
-        Util.string_gen_family base (gen_family_of_family fam)
+        let fam = Driver.foi base Driver.Ifam.dummy in
+        Util.string_gen_family base (Driver.gen_family_of_family fam)
   in
   let o_f1 = get_gen_family "i" in
   let o_f2 = get_gen_family "i2" in

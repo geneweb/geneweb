@@ -1,8 +1,11 @@
 (** This module allows plugins to modify geneweb configuration.
 
-    This approch is preffered to Functors or library variants
-    for simple functions if it does not come with a performance cost.
-*)
+    This approch is preffered to Functors or library variants for simple
+    functions if it does not come with a performance cost. *)
+
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Code = Geneweb_http.Code
 
 let nb_errors = ref 0
 let errors_undef = ref []
@@ -12,300 +15,137 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
-let sock_dir = ref ""
 let bases = ref (Secure.base_dir ())
 
-type init_s = { status : bool; bname : string }
-
-let init_done : init_s ref = ref { status = false; bname = "" }
-
-(** allows testing of reorg config in classic mode *)
 let config_reorg bname =
+  let bname = Filename.remove_extension bname in
   String.concat Filename.dir_sep
     [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
 
-type syslog_level =
-  [ `LOG_ALERT
-  | `LOG_CRIT
-  | `LOG_DEBUG
-  | `LOG_EMERG
-  | `LOG_ERR
-  | `LOG_INFO
-  | `LOG_NOTICE
-  | `LOG_WARNING ]
+let config_legacy bname =
+  String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
 
+type my_fun_2 = string -> string
+type my_fun_3 = string -> string -> string
+
+(* Function references that will be set based on mode *)
+let config = ref config_legacy
+let cnt_d = ref (fun _ -> "")
+let adm_file = ref (fun _ -> "")
+let src_d = ref (fun _ -> "")
+let etc_d = ref (fun _ -> "")
+let config_d = ref (fun _ -> "")
+let lang_d = ref (fun _ _ -> "")
+let bpath = ref (fun _ -> "")
+let portraits_d = ref (fun _ -> "")
+let images_d = ref (fun _ -> "")
+let albums_d = ref (fun _ -> "")
+let clean_bname bname = Filename.remove_extension bname
+let path_concat parts = String.concat Filename.dir_sep parts
+let base_dir () = Secure.base_dir ()
+
+let cache_d bname =
+  path_concat [ base_dir (); clean_bname bname ^ ".gwb"; "caches" ]
+
+(* Module for reorg mode paths *)
 module Default = struct
-  (* Attention, ajuster is_reorg_base en conséquence *)
-  let config bname =
-    let bname = Filename.remove_extension bname in
-    config_reorg bname
+  let config bname = config_reorg bname
 
   let cnt_d bname =
-    let bname = Filename.remove_extension bname in
-    if !sock_dir = "" then
-      cnt_dir :=
-        if bname <> "" then
-          String.concat Filename.dir_sep
-            [ Secure.base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
-        else String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ]
-    else cnt_dir := !sock_dir;
+    let bname = clean_bname bname in
+    cnt_dir :=
+      if bname <> "" then
+        path_concat [ base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
+      else path_concat [ base_dir (); "cnt" ];
     !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
 
   let src_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "src" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "src" ]
 
   let etc_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwb"; "etc" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "etc" ]
 
   let config_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "config" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "config" ]
 
-  let lang_d bname lang =
-    let bname = Filename.remove_extension bname in
-    if lang = "" then
-      String.concat Filename.dir_sep
-        [ Secure.base_dir (); bname ^ ".gwb"; "etc"; "lang" ]
-    else
-      String.concat Filename.dir_sep
-        [ Secure.base_dir (); bname ^ ".gwb"; "etc"; "lang"; lang ]
+  let lang_d bname file =
+    let bname = clean_bname bname in
+    Filename.concat (path_concat [ base_dir (); bname ^ ".gwb"; "lang" ]) file
 
   let images_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "images" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "images" ]
+
+  let albums_d bname =
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); bname ^ ".gwb"; "documents"; "albums" ]
 
   let bpath bname =
-    let bname = Filename.remove_extension bname in
-    if bname = "" then Secure.base_dir ()
-    else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
+    let bname = clean_bname bname in
+    Filename.concat (base_dir ()) (bname ^ ".gwb")
 end
 
+(* Module for legacy mode paths *)
 module Legacy = struct
-  (* Attention, ajuster is_reorg_base en conséquence *)
-  let config bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
+  let config = config_legacy
 
-  let cnt_d _bname =
-    if !cnt_dir = "" then (
-      let str = String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ] in
-      cnt_dir := str;
-      str)
-    else !cnt_dir
+  let cnt_d bname =
+    let _ = bname in
+    cnt_dir := path_concat [ base_dir (); "cnt" ];
+    !cnt_dir
 
   let adm_file file = Filename.concat !cnt_dir file
 
   let portraits_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep [ Secure.base_dir (); "images"; bname ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "images"; bname ]
 
   let src_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep [ Secure.base_dir (); "src"; bname ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "src"; bname ]
 
   let etc_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep [ Secure.base_dir (); "etc"; bname ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "etc"; bname ]
 
-  let config_d _bname = Secure.base_dir ()
+  let config_d bname =
+    let _ = bname in
+    base_dir ()
 
-  let lang_d bname lang =
-    let bname = Filename.remove_extension bname in
-    if lang = "" then
-      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; bname ]
-    else
-      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; lang; bname ]
+  let lang_d bname file =
+    let bname = clean_bname bname in
+    Filename.concat (path_concat [ base_dir (); "lang"; bname ]) file
 
   let images_d bname =
-    let bname = Filename.remove_extension bname in
-    String.concat Filename.dir_sep
-      [ Secure.base_dir (); "src"; bname; "images" ]
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "src"; bname; "images" ]
+
+  let albums_d bname =
+    let bname = clean_bname bname in
+    path_concat [ base_dir (); "src"; bname; "albums" ]
 
   let bpath bname =
-    let bname = Filename.remove_extension bname in
-    if bname = "" then Secure.base_dir ()
-    else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
-
-  (** [output_error ?headers ?content conf code]
-      Send the http status [code], [headers] and
-      [content] if provided, or default content otherwise.
-  *)
-  let output_error =
-    let output_file conf fn =
-      let ic = open_in fn in
-      try
-        in_channel_length ic |> really_input_string ic
-        |> Output.print_sstring conf;
-        close_in ic
-      with _ -> ( try close_in ic with _ -> ())
-    in
-    fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
-      Output.status conf code;
-      List.iter (Output.header conf "%s") headers;
-      Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
-      match content with
-      | Some content -> Output.print_string conf content
-      | None -> (
-          let code =
-            match code with
-            | Def.Bad_Request -> "400"
-            | Unauthorized -> "401"
-            | Forbidden -> "403"
-            | Not_Found -> "404"
-            | Conflict -> "409"
-            | Internal_Server_Error -> "500"
-            | Service_Unavailable -> "503"
-            | OK | Moved_Temporarily -> assert false
-          in
-          let fname lang =
-            code ^ "-" ^ lang ^ ".html"
-            |> Filename.concat "etc" |> Mutil.search_asset_opt
-          in
-          match fname conf.lang with
-          | Some fn -> output_file conf fn
-          | None -> (
-              match fname "en" with
-              | Some fn -> output_file conf fn
-              | None -> Output.print_sstring conf ""))
-
-  (** Calcul les droits de visualisation d'une personne en
-      fonction de son age.
-      Renvoie (dans l'ordre des tests) :
-      - Vrai si : magicien ou ami ou la personne est public
-      - Vrai si : la personne est en si_titre, si elle a au moins un
-                  titre et que public_if_title = yes dans le fichier gwf
-      - Faux si : la personne n'est pas décédée et private_years > 0
-      - Vrai si : la personne est plus agée (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Faux si : la personne est plus jeune (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Vrai si : la personne est décédée depuis plus de privates_years
-      - Faux si : la personne est décédée depuis moins de privates_years
-      - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                  privée et public_if_no_date = yes
-      - Vrai si : la personne s'est mariée depuis plus de private_years
-      - Faux dans tous les autres cas *)
-  let p_auth conf base p =
-    conf.Config.wizard || conf.friend
-    || Gwdb.get_access p = Public
-    || conf.public_if_titles
-       && Gwdb.get_access p = IfTitles
-       && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-    ||
-    let death = Gwdb.get_death p in
-    if death = NotDead then conf.private_years < 1
-    else
-      let check_date d lim none =
-        match d with
-        | None -> none ()
-        | Some d ->
-            let a = Date.time_elapsed d conf.today in
-            if a.Def.year > lim then true
-            else if a.year < conf.private_years then false
-            else a.month > 0 || a.day > 0
-      in
-      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) conf.private_years
-      @@ fun () ->
-      check_date
-        (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
-        conf.private_years
-      @@ fun () ->
-      check_date
-        (Gwdb.get_death p |> Date.dmy_of_death)
-        conf.private_years_death
-      @@ fun () ->
-      (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
-      ||
-      let families = Gwdb.get_family p in
-      let len = Array.length families in
-      let rec loop i =
-        i < len
-        && check_date
-             (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
-            |> Date.cdate_to_dmy_opt)
-             conf.private_years_marriage
-             (fun () -> loop (i + 1))
-      in
-      loop 0
-
-  let syslog (level : syslog_level) msg =
-    let tm = Unix.(time () |> localtime) in
-    let level =
-      match level with
-      | `LOG_EMERG -> "EMERGENCY"
-      | `LOG_ALERT -> "ALERT"
-      | `LOG_CRIT -> "CRITICAL"
-      | `LOG_ERR -> "ERROR"
-      | `LOG_WARNING -> "WARNING"
-      | `LOG_NOTICE -> "NOTICE"
-      | `LOG_INFO -> "INFO"
-      | `LOG_DEBUG -> "DEBUG"
-    in
-    Printf.eprintf "[%s]: %s %s\n"
-      (Mutil.sprintf_date tm : Adef.safe_string :> string)
-      level msg
-
-  let wrap_output (conf : Config.config) (title : Adef.safe_string)
-      (content : unit -> unit) =
-    let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
-    Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
-    Output.print_string conf title;
-    Output.print_sstring conf {|</title>|};
-    Output.print_sstring conf
-      (if robot then {|<meta name="robots" content="index,follow">|}
-      else {|<meta name="robots" content="none">|});
-    Output.print_sstring conf {|<meta charset="|};
-    Output.print_sstring conf conf.charset;
-    Output.print_sstring conf {|">|};
-    Output.print_sstring conf
-      {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
-    Output.print_sstring conf {|</head>|};
-    Output.print_sstring conf "<body>";
-    content ();
-    Output.print_sstring conf {|</body></html>|}
+    let bname = clean_bname bname in
+    Filename.concat (base_dir ()) (bname ^ ".gwb")
 end
 
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
-
-let config = ref (Legacy.config : my_fun_2)
-let cnt_d = ref (Legacy.cnt_d : my_fun_2)
-let adm_file = ref (Legacy.adm_file : my_fun_2)
-let src_d = ref (Legacy.src_d : my_fun_2)
-let etc_d = ref (Legacy.etc_d : my_fun_2)
-let config_d = ref (Legacy.config_d : my_fun_2)
-let lang_d = ref (Legacy.lang_d : my_fun_3)
-let bpath = ref (Legacy.bpath : my_fun_2)
-let portraits_d = ref (Legacy.portraits_d : my_fun_2)
-let images_d = ref (Legacy.images_d : my_fun_2)
-
-(* attention; ne pas utiliser !config! *)
+(* Check if a base is in reorg format *)
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
-  Sys.file_exists
-    (String.concat Filename.dir_sep
-       [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ])
+  Sys.file_exists (config_reorg bname)
 
-let output_error = ref Legacy.output_error
-let p_auth = ref Legacy.p_auth
-let syslog = ref Legacy.syslog
-
-let init bname =
+(* Initialize path functions based on mode *)
+let init () =
   Secure.add_assets Filename.current_dir_name;
-
-  reorg := !reorg || is_reorg_base bname;
   if !reorg then (
     config := Default.config;
     cnt_d := Default.cnt_d;
@@ -316,7 +156,8 @@ let init bname =
     lang_d := Default.lang_d;
     bpath := Default.bpath;
     portraits_d := Default.portraits_d;
-    images_d := Default.images_d)
+    images_d := Default.images_d;
+    albums_d := Default.albums_d)
   else (
     config := Legacy.config;
     cnt_d := Legacy.cnt_d;
@@ -327,91 +168,409 @@ let init bname =
     lang_d := Legacy.lang_d;
     bpath := Legacy.bpath;
     portraits_d := Legacy.portraits_d;
-    images_d := Legacy.images_d)
+    images_d := Legacy.images_d;
+    albums_d := Legacy.albums_d)
 
-let init_etc bname =
-  if !init_done.status && bname = !init_done.bname then ()
-  else init_done := { status = true; bname };
-  if !reorg then (
-    (if not (Sys.file_exists (!bpath bname)) then
-     try
-       Unix.mkdir (!bpath bname) 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
+let set_reorg bname force =
+  let res = match force with Some b -> b | None -> is_reorg_base bname in
+  reorg := res;
+  init ()
 
-    (if not (Sys.file_exists (!etc_d bname)) then
-     try Unix.mkdir (!etc_d bname) 0o755
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
+let get_timestamp () =
+  let tm = Unix.localtime (Unix.time ()) in
+  Printf.sprintf "%04d%02d%02d-%02d%02d%02d" (1900 + tm.Unix.tm_year)
+    (1 + tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    tm.Unix.tm_sec
 
-    (if not (Sys.file_exists (!config_d bname)) then
-     try Unix.mkdir (!config_d bname) 0o755
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING
-         (Printf.sprintf "Failure when creating config_dir: %s"
-            (!config_d bname)));
+let create_default_gwf config_path =
+  let gwf_defaults =
+    [
+      "access_by_key=yes";
+      "disable_forum=yes";
+      "hide_private_names=no";
+      "use_restrict=no";
+      "show_consang=yes";
+      "display_sosa=yes";
+      "place_surname_link_to_ind=yes";
+      "max_anc_level=8";
+      "max_anc_tree=7";
+      "max_desc_level=12";
+      "max_desc_tree=4";
+      "max_cousins=2000";
+      "max_cousins_level=5";
+      "latest_event=20";
+      "template=*";
+      "long_date=no";
+      "counter=yes";
+      "full_siblings=yes";
+      "hide_advanced_request=no";
+      "p_mod=";
+    ]
+  in
+  let oc = open_out config_path in
+  List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf_defaults;
+  close_out oc
 
-    if not (Sys.file_exists (!cnt_d bname)) then
-      try Unix.mkdir (!cnt_d bname) 0o755
-      with Unix.Unix_error (_, _, _) ->
-        !syslog `LOG_WARNING
-          (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
-  else (
-    (if not (Sys.file_exists "etc") then
-     try
-       Unix.mkdir "etc" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
-
-    (if not (Sys.file_exists "lang") then
-     try
-       Unix.mkdir "lang" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
-
-    (if not (Sys.file_exists "cnt") then
-     try
-       Unix.mkdir "cnt" 0o755;
-       force := true
-     with Unix.Unix_error (_, _, _) ->
-       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
-
-    if not (Sys.file_exists (!etc_d bname)) then
-      try
-        Unix.mkdir (!etc_d bname) 0o755;
-        force := true
-      with Unix.Unix_error (_, _, _) ->
-        !syslog `LOG_WARNING
-          (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)))
-
-let test_reorg bname =
-  if !reorg || is_reorg_base bname then (
-    reorg := true;
-    init bname)
-
-let test_base bname =
-  let bdir = !bpath bname in
-  if Sys.file_exists (config_reorg bname) && !force then (
-    reorg := true;
-    init_done := { status = false; bname };
-    init bname);
-  Printf.eprintf "Mode: %s, for base %s\n"
-    (if !reorg then "reorg" else "classic")
-    (Filename.concat (!bpath "") (bname ^ ".gwb"));
+let check_base_exists bname =
+  let clean_bname = Filename.remove_extension bname in
+  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
   if (not !force) && Sys.file_exists bdir then (
-    Printf.eprintf
-      "The database \"%s\" already exists. Use option -f to overwrite it." bname;
-    flush stderr;
-    exit 2);
-  init_etc bname
+    Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
+      bname;
+    exit 2)
 
-(** [wrap_output conf title content]
-    Plugins defining a page content but not a complete UI
-    may want to wrap their page using [wrap_output].
-*)
-let wrap_output = ref Legacy.wrap_output
+let rec create_base_and_config bname =
+  let clean_bname = Filename.remove_extension bname in
+  let bdir = Filename.concat (Secure.base_dir ()) (clean_bname ^ ".gwb") in
+  let user_wants_reorg = !reorg in
+  if Sys.file_exists bdir then
+    migrate_gwf_bidirectional clean_bname user_wants_reorg;
+  Filesystem.create_dir bdir;
+  if
+    (not (Sys.file_exists (config_reorg clean_bname)))
+    && not (Sys.file_exists (config_legacy clean_bname))
+  then migrate_gwf_bidirectional clean_bname user_wants_reorg;
+  Printf.eprintf "\n";
+  reorg := user_wants_reorg;
+  init ();
+  bdir
+
+and migrate_gwf_bidirectional bname user_wants_reorg =
+  let bname = Filename.remove_extension bname in
+  let legacy_path = Filename.concat (Secure.base_dir ()) (bname ^ ".gwf") in
+  let reorg_path =
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
+  in
+  let legacy_exists = Sys.file_exists legacy_path in
+  let reorg_exists = Sys.file_exists reorg_path in
+  Printf.eprintf "Migration check for %s:\n" bname;
+  Printf.eprintf "  Classic .gwf exists: %b%s\n" legacy_exists
+    (if legacy_exists then " (" ^ Filename.basename legacy_path ^ ")" else "");
+  Printf.eprintf "  Reorg .gwf exists: %b%s\n" reorg_exists
+    (if reorg_exists then " (" ^ Filename.basename reorg_path ^ ")" else "");
+  match (user_wants_reorg, legacy_exists, reorg_exists) with
+  | true, true, false ->
+      (* Migration classic → reorg *)
+      Printf.eprintf "Migrating .gwf from classic to reorg mode:\n";
+      Filesystem.create_dir ~parent:true (Filename.dirname reorg_path);
+      let timestamp = get_timestamp () in
+      let backup_path = legacy_path ^ ".classic." ^ timestamp in
+      Filesystem.copy_file legacy_path backup_path;
+      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
+      Filesystem.copy_file legacy_path reorg_path;
+      Sys.remove legacy_path;
+      Printf.eprintf "  Configuration migrated: %s\n"
+        (Filename.basename reorg_path)
+  | false, false, true ->
+      (* Migration reorg → classic *)
+      Printf.eprintf "Migrating .gwf from reorg to classic mode:\n";
+      let timestamp = get_timestamp () in
+      let backup_path = reorg_path ^ ".reorg." ^ timestamp in
+      Filesystem.copy_file reorg_path backup_path;
+      Printf.eprintf "  Backup created: %s\n" (Filename.basename backup_path);
+      Filesystem.copy_file reorg_path legacy_path;
+      Sys.remove reorg_path;
+      Printf.eprintf "  Configuration migrated: %s\n"
+        (Filename.basename legacy_path)
+  | true, false, false ->
+      (* Créer nouveau .gwf en mode reorg *)
+      Filesystem.create_dir ~parent:true (Filename.dirname reorg_path);
+      Printf.eprintf "Creating default configuration: %s\n"
+        (Filename.basename reorg_path);
+      create_default_gwf reorg_path
+  | false, false, false ->
+      (* Créer nouveau .gwf en mode classic *)
+      Printf.eprintf "Creating default configuration: %s\n"
+        (Filename.basename legacy_path);
+      create_default_gwf legacy_path
+  | _, true, true ->
+      (* Conflit : .gwf existe dans les deux modes *)
+      let remove_path = if user_wants_reorg then legacy_path else reorg_path in
+      let remove_mode = if user_wants_reorg then "classic" else "reorg" in
+      let keep_mode = if user_wants_reorg then "reorg" else "classic" in
+      Printf.eprintf "Warning: .gwf exists in both modes, keeping %s mode\n"
+        keep_mode;
+      let timestamp = get_timestamp () in
+      let backup_path = remove_path ^ "." ^ remove_mode ^ "." ^ timestamp in
+      Filesystem.copy_file remove_path backup_path;
+      Printf.eprintf "Backup created: %s\n" (Filename.basename backup_path);
+      Sys.remove remove_path
+  | _ ->
+      (* .gwf existe déjà au bon endroit selon l'intention utilisateur *)
+      Printf.eprintf "Configuration kept\n";
+      ()
+
+(* Utility functions for error handling *)
+let output_error =
+  let output_file conf fn =
+    let ic = open_in fn in
+    try
+      in_channel_length ic |> really_input_string ic
+      |> Output.print_sstring conf;
+      close_in ic
+    with _ -> ( try close_in ic with _ -> ())
+  in
+  fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
+    Output.status conf code;
+    Output.header conf "Content-type: text/html; charset=utf-8";
+    Output.header conf "Connection: close";
+    List.iter (Output.header conf "%s") headers;
+    Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
+    (match content with
+    | Some content -> Output.print_string conf content
+    | None -> (
+        let code = Code.to_string code in
+        let fname lang =
+          code ^ "-" ^ lang ^ ".html"
+          |> Filename.concat "etc" |> Mutil.search_asset_opt
+        in
+        match fname conf.lang with
+        | Some fn -> output_file conf fn
+        | None -> (
+            match fname "en" with
+            | Some fn -> output_file conf fn
+            | None -> Output.print_sstring conf "")));
+    Output.flush conf
+
+let is_semi_public p = Driver.get_access p = Def.SemiPublic
+
+(* assumes fn+sn, fn sn, fn.occ+sn, fn.occ sn *)
+let split_key key =
+  let key = String.map (fun c -> if c = '+' then ' ' else c) key in
+  match String.index_opt key ' ' with
+  | None -> ("?", "", "?") (* FIXME could be (key, "", "?") or ("?", "", key) *)
+  | Some sep ->
+      let fn_oc = String.sub key 0 sep in
+      let sn = String.sub key (sep + 1) (String.length key - sep - 1) in
+      let fn, oc =
+        match String.rindex_opt fn_oc '.' with
+        | None -> (fn_oc, "")
+        | Some d ->
+            ( String.sub fn_oc 0 d,
+              String.sub fn_oc (d + 1) (String.length fn_oc - d - 1) )
+      in
+      (fn, oc, sn)
+
+let person_of_string_user_key base key =
+  let key = String.map (fun c -> if c = '+' then ' ' else c) key in
+  let fn, oc, sn = split_key key in
+  let occ = Option.value ~default:0 (int_of_string_opt oc) in
+  match Driver.person_of_key base fn sn occ with
+  | Some _ as ip -> ip
+  | None -> Gutil.person_of_string_dot_key base key
+
+(* Determine if person is related to the current user *)
+let ancestors _conf base max_generations family ip =
+  let rec loop gen acc ips =
+    if gen <= 0 then acc
+    else
+      let new_ancestors =
+        List.fold_left
+          (fun acc ip ->
+            match Driver.get_parents (Driver.poi base ip) with
+            | Some ifam ->
+                let fam = Driver.foi base ifam in
+                let father = Driver.get_father fam in
+                let mother = Driver.get_mother fam in
+                father :: mother :: acc
+            | None -> acc)
+          [] ips
+      in
+      loop (gen - 1) (new_ancestors @ acc) new_ancestors
+  in
+  loop max_generations family [ ip ]
+
+let descendants _conf base family ip =
+  let rec loop acc ips =
+    if ips = [] then acc
+    else
+      let new_descendants =
+        List.fold_left
+          (fun acc ip ->
+            let ifams = Driver.get_family (Driver.poi base ip) in
+            Array.fold_left
+              (fun acc ifam ->
+                Array.to_list (Driver.get_children (Driver.foi base ifam)) @ acc)
+              acc ifams)
+          [] ips
+      in
+      loop (new_descendants @ acc) new_descendants
+  in
+  loop family [ ip ]
+
+(* Nombre de générations d'ancêtres ; 2 si absent ou mal renseigné *)
+let semi_public_max conf =
+  match List.assoc_opt "is_semi_public_max" conf.Config.base_env with
+  | Some s -> Option.value ~default:2 (int_of_string_opt (String.trim s))
+  | None -> 2
+
+let compute_family conf base ip =
+  let family = ancestors conf base (semi_public_max conf + 1) [ ip ] ip in
+  let spouses =
+    Array.fold_left
+      (fun acc ifam ->
+        let f = Driver.foi base ifam in
+        let sp =
+          if ip = Driver.get_father f then Driver.get_mother f
+          else Driver.get_father f
+        in
+        let psp = Driver.poi base sp in
+        if
+          Driver.sou base (Driver.get_first_name psp) <> "?"
+          && Driver.sou base (Driver.get_surname psp) <> "?"
+        then sp :: acc
+        else acc)
+      []
+      (Driver.get_family (Driver.poi base ip))
+  in
+  descendants conf base (spouses @ family) ip |> List.sort_uniq compare
+
+(* Dernière famille chargée, sous forme d'ensemble, et dernier fichier
+   nettoyé : évite de relire ou de tester le fichier à chaque p_auth *)
+let family_memo : (string * (Driver.iper, unit) Hashtbl.t) option ref = ref None
+let family_cleaned : string option ref = ref None
+
+let family_set conf base fname ip =
+  match !family_memo with
+  | Some (f, set) when f = fname -> set
+  | _ ->
+      let l =
+        Mutil.read_or_create_value fname (fun () -> compute_family conf base ip)
+      in
+      let set = Hashtbl.create (max 16 (List.length l)) in
+      List.iter (fun i -> Hashtbl.replace set i ()) l;
+      family_memo := Some (fname, set);
+      family_cleaned := None;
+      set
+
+let drop_family fname =
+  if !family_cleaned <> Some fname then (
+    (match !family_memo with
+    | Some (f, _) when f = fname -> family_memo := None
+    | _ -> ());
+    (if Sys.file_exists fname then
+       try Sys.remove fname
+       with Sys_error _ -> Printf.eprintf "Error when removing %s\n" fname);
+    family_cleaned := Some fname)
+
+let is_related conf base p =
+  match conf.Config.user_iper with
+  | Some ip when conf.Config.userkey <> "" ->
+      let fname =
+        String.concat Filename.dir_sep
+          [
+            Secure.base_dir ();
+            conf.Config.bname ^ ".gwb";
+            "caches";
+            "family-" ^ conf.Config.userkey;
+          ]
+      in
+      if (List.assoc_opt "fmode" conf.Config.env :> string option) = Some "on"
+      then Hashtbl.mem (family_set conf base fname ip) (Driver.get_iper p)
+      else (
+        drop_family fname;
+        false)
+  | _ -> false
+
+let has_date base p =
+  Driver.get_birth p <> Date.cdate_None
+  || Driver.get_baptism p <> Date.cdate_None
+  || (match Driver.get_death p with
+    | Death (_, d) -> d <> Date.cdate_None
+    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
+        false)
+  || (match Driver.get_burial p with
+    | Buried cod -> Date.od_of_cdate cod <> None
+    | Cremated _ | UnknownBurial -> false)
+  ||
+  let families = Driver.get_family p in
+  Array.exists
+    (fun ifam -> Driver.foi base ifam |> Driver.get_marriage <> Date.cdate_None)
+    families
+
+type view = As_is | As_friend | As_visitor
+
+(* Authorization checks for person access *)
+
+let p_auth ?(view = As_is) conf base p =
+  let access = Driver.get_access p in
+  let not_private = access <> Def.Private in
+  let wizard, friend, myself =
+    let me = conf.Config.user_iper = Some (Driver.get_iper p) in
+    match view with
+    | As_is -> (conf.Config.wizard, conf.Config.friend, me)
+    | As_friend -> (false, conf.Config.friend || conf.Config.wizard, me)
+    | As_visitor -> (false, false, false)
+  in
+  wizard
+  || ((not conf.Config.semi_public) && friend)
+  || myself || access = Def.Public
+  || conf.Config.public_if_titles && access = Def.IfTitles
+     && Driver.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+  || friend && conf.Config.consent
+     && (is_semi_public p || is_related conf base p)
+     && not_private
+  || ((not (has_date base p)) && conf.Config.public_if_no_date && not_private)
+  ||
+  if conf.Config.private_years <= -1 then true
+  else
+    let check_date d lim none =
+      match d with
+      | None -> none ()
+      | Some d ->
+          let a = Date.time_elapsed d conf.today in
+          if a.Adef.year > lim then true
+          else if a.Adef.year = lim && (a.month > 0 || a.day > 0) then true
+          else none ()
+    in
+    check_date
+      (Driver.get_birth p |> Date.cdate_to_dmy_opt)
+      conf.Config.private_years
+    @@ fun () ->
+    check_date
+      (Driver.get_baptism p |> Date.cdate_to_dmy_opt)
+      conf.Config.private_years
+    @@ fun () ->
+    check_date
+      (Driver.get_death p |> Date.dmy_of_death)
+      conf.Config.private_years_death
+    @@ fun () ->
+    let families = Driver.get_family p in
+    let len = Array.length families in
+    let rec loop i =
+      i < len
+      && check_date
+           (Array.get families i |> Driver.foi base |> Driver.get_marriage
+          |> Date.cdate_to_dmy_opt)
+           conf.Config.private_years_marriage
+           (fun () -> loop (i + 1))
+    in
+    loop 0
+
+(** special p_auth case for fn and sn which are always visible for consenting
+    friends unless private *)
+let p_auth_sp conf base p =
+  conf.Config.friend && conf.Config.consent
+  && Driver.get_access p <> Def.Private
+  || p_auth conf base p
+
+(* Wrap content in a basic HTML page *)
+let wrap_output (conf : Config.config) (title : Adef.safe_string)
+    (content : unit -> unit) =
+  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
+  Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
+  Output.print_string conf title;
+  Output.print_sstring conf {|</title>|};
+  Output.print_sstring conf
+    (if robot then {|<meta name="robots" content="index,follow">|}
+     else {|<meta name="robots" content="none">|});
+  Output.print_sstring conf {|<meta charset="|};
+  Output.print_sstring conf conf.charset;
+  Output.print_sstring conf {|">|};
+  Output.print_sstring conf
+    {|<meta name="viewport" content="width=device-width, initial-scale=1">|};
+  Output.print_sstring conf {|</head>|};
+  Output.print_sstring conf "<body>";
+  content ();
+  Output.print_sstring conf {|</body></html>|}

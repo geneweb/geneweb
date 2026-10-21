@@ -11,38 +11,64 @@ homepage: "https://geneweb.org"
 doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
-  "dune" {>= "2.9"}
+  "dune" {>= "3.11"}
+  "ocaml"
+  "geneweb-compat"
+  "geneweb-http"
   "alcotest" {with-test}
   "benchmark"
-  "calendars" {= "1.0.0"}
-  "camlp5" {>= "8.00.01"}
+  "calendars" {>= "2.0.0"}
   "camlp-streams"
-  "camlzip"
-  "cppo"
-  "fmt" {with-test}
+  "decompress"
+  "fmt"
+  "logs"
+  "logs-syslog"
+  "ptime"
   "jingoo"
   "markup"
-  "ocaml" {>= "4.08"}
-  "ocamlformat" {with-test & = "0.24.1"}
   "ounit"
   "ppx_blob"
   "ppx_deriving"
-  "ppx_import"
   "stdlib-shims"
-  "syslog"
-  "unidecode" {= "0.2.0"}
+  "unidecode" {>= "0.5.0"}
   "uri"
   "uucp"
   "uunf"
   "uutf"
   "yojson"
-  "zarith"
-  "utop" {dev}
+  "digestif"
+  "base64"
+  "pp_loc"
+  "dune-site"
+  "conf-brotli"
+  "crunch"
+  "utop" {with-dev-setup}
+  "ocamlformat" {with-dev-setup & = "0.29.0"}
   "odoc" {with-doc}
 ]
-depopts: ["ancient"]
+depopts: [
+  "ancient" {>= "0.10.0"}
+  "zarith"
+]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
-  [ "ocaml" "./configure.ml" "--release" ]
-  [ make "build" ]
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "--promote-install-files=false"
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+  ["dune" "install" "-p" name "--create-install-files" name]
+  ["cmdliner" "install" "tool-support"
+              "--update-opam-install=%{_:name}%.install"
+              "_build/install/default/bin/gwd" {os-family != "windows"}
+              "_build/install/default/bin/gwd.exe:gwd" {os-family = "windows"}
+              "_build/cmdliner-install"]
 ]

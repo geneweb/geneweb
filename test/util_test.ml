@@ -3,7 +3,9 @@ open Geneweb
 
 let mutil_contains () =
   let str = "foo bar" in
+  let str2 = "/notes_d/albums/test-images-alb" in
   let test t b = (check bool) t b (Mutil.contains str t) in
+  let test2 t b = (check bool) t b (Mutil.contains str2 t) in
   test "foo" true;
   test "baz" false;
   test "foo_b" false;
@@ -11,20 +13,9 @@ let mutil_contains () =
   test "foo__b" false;
   test "bar__" false;
   test "r" true;
-  test "" true
-
-let mutil_start_with () =
-  check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" (-1) "foo");
-  check_raises "" (Invalid_argument "start_with") (fun () ->
-      ignore @@ Mutil.start_with "foo" 4 "foo");
-  (check bool) "Mutil.start_with \"foo\" 0 \"foo\"" true
-    (Mutil.start_with "foo" 0 "foo");
-  (check bool) "not (Mutil.start_with \"bar\" 0 \"foo\")" true
-    (not @@ Mutil.start_with "bar" 0 "foo");
-  (check bool) "Mutil.start_with \"\" 0 \"foo\"" true
-    (Mutil.start_with "" 0 "foo");
-  ()
+  test "" true;
+  test2 "albums/test-images-alb" true;
+  test2 "albums/test" true
 
 let mutil_arabian_romian _ =
   let test a r =
@@ -84,6 +75,15 @@ let mutil_string_of_int_sep _ =
   test "," "10,000" 10000;
   test "," "100,000" 100000;
   test "," "1,000,000" 1000000
+
+let mutil_epoch_of_date _ =
+  let e = 1760000000 in
+  let s = (Mutil.sprintf_date (Unix.localtime (float_of_int e)) :> string) in
+  (check (option int)) "Mutil.epoch_of_date" (Some e) (Mutil.epoch_of_date s);
+  (check (option int))
+    "Mutil.epoch_of_date invalid" None
+    (Mutil.epoch_of_date "1760000000");
+  ()
 
 let name_title _ =
   let test exp = List.iter (fun s -> (check string) "" exp (Name.title s)) in
@@ -154,6 +154,7 @@ let util_string_with_macros _ =
 
 let utf8_capitalize_fst _ =
   let test a r = (check string) a r (Utf8.capitalize_fst a) in
+  test "" "";
   test "abcdef" "Abcdef";
   test " ghiljl" " Ghiljl";
   test "<i>mnopqr1" "<i>Mnopqr1";
@@ -169,7 +170,6 @@ let util_escape_html _ =
       :> string)
 
 let datedisplay_string_of_date _ =
-  let open Def in
   let conf = Config.empty in
   let conf =
     {
@@ -184,7 +184,7 @@ let datedisplay_string_of_date _ =
     "ghjennaghju/ferraghju/marzu/aprile/maghju/ghjugnu/lugliu/aostu/sittembre/uttobre/nuvembre/dicembre";
   let test aaa cal (d, m, y) =
     let date =
-      Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
+      Adef.Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
     in
     let bbb :> string = DateDisplay.string_of_date conf date in
     (check string) "" aaa bbb
@@ -220,10 +220,10 @@ let v =
     ( "mutil",
       [
         test_case "Mutil.contains" `Quick mutil_contains;
-        test_case "Mutil.start_with" `Quick mutil_start_with;
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
-        test_case "Mutil.string_of_int_sep" `Quick mutil_compare_after_particle;
+        test_case "Mutil.string_of_int_sep" `Quick mutil_string_of_int_sep;
+        test_case "Mutil.epoch_of_date" `Quick mutil_epoch_of_date;
       ] );
     ("name", [ test_case "Name.title" `Quick name_title ]);
     ( "utf8",

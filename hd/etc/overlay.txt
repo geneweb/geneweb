@@ -1,0 +1,24 @@
+<div class="loading-overlay hidden">
+  <div class="text-center">
+    <div class="spinner-border text-light mb-3" role="status">
+      <span class="visually-hidden">Loading…</span>
+    </div>
+    <div class="h4">[*waiting overlay]0</div>
+    <p>[*waiting overlay]1</p>
+  </div>
+</div>
+<script>
+function showOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) {
+    overlay.classList.remove('hidden');
+  }
+}
+function hideOverlay() {
+  const overlay = document.querySelector('.loading-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
+}
+window.addEventListener('pageshow', hideOverlay);
+</script>

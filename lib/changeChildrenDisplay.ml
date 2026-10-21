@@ -2,26 +2,26 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open ChangeChildren
+module Driver = Geneweb_db.Driver
 
 let print_child_person conf base p =
-  let var = Adef.encoded ("c" ^ string_of_iper (get_iper p)) in
+  let var = Adef.encoded ("c" ^ Driver.Iper.to_string (Driver.get_iper p)) in
   let first_name =
     match p_getenv conf.env ((var :> string) ^ "_first_name") with
     | Some v -> v
-    | None -> p_first_name base p
+    | None -> Driver.p_first_name base p
   in
   let surname =
     match p_getenv conf.env ((var :> string) ^ "_surname") with
     | Some v -> v
-    | None -> p_surname base p
+    | None -> Driver.p_surname base p
   in
   let occ =
     match p_getint conf.env ((var :> string) ^ "_occ") with
     | Some i -> i
-    | None -> get_occ p
+    | None -> Driver.get_occ p
   in
   Output.print_sstring conf {|<table class="m1-2"><tbody><tr align="|};
   Output.print_sstring conf conf.left;
@@ -32,7 +32,7 @@ let print_child_person conf base p =
   transl_nth conf "first name/first names" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</label></td><td colspan="3">|};
-  Output.print_sstring conf {|<input name=\"|};
+  Output.print_sstring conf {|<input name="|};
   Output.print_string conf var;
   Output.print_sstring conf
     {|_first_name" class="form-control" size="23" maxlength="200" id="|};
@@ -51,10 +51,10 @@ let print_child_person conf base p =
   Output.print_string conf var;
   Output.print_sstring conf {|_occ" name="|};
   Output.print_string conf var;
-  Output.print_sstring conf {|occ" size="5" maxlength="8"|};
+  Output.print_sstring conf {|_occ" size="5" maxlength="8"|};
   Output.print_sstring conf
     (if occ = 0 then "" else {| value="|} ^ string_of_int occ ^ {|"|});
-  Output.print_sstring conf {|</td></tr><tr align="|};
+  Output.print_sstring conf {|></td></tr><tr align="|};
   Output.print_sstring conf conf.left;
   Output.print_sstring conf {|"><td>|};
   Output.print_sstring conf {|<label for="|};
@@ -77,8 +77,8 @@ let print_children conf base ipl =
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun ip ->
-      let p = poi base ip in
-      Output.print_sstring conf {|<li class="mt-3"><span class="ml-2">|};
+      let p = Driver.poi base ip in
+      Output.print_sstring conf {|<li class="mt-3"><span class="ms-2">|};
       Output.print_string conf
         (reference conf base p (gen_person_text conf base p));
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
@@ -89,28 +89,35 @@ let print_children conf base ipl =
   Output.print_sstring conf "</ul>"
 
 let print_change conf base p =
-  let title _ =
-    transl conf "change children's names"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+  let title h =
+    let t = Utf8.capitalize_fst (transl conf "change children's names") in
+    if h then Output.print_sstring conf t
+    else
+      let s = gen_person_text conf base p in
+      let r = reference conf base p s in
+      Output.print_sstring conf
+        (Util.transl_a_of_b conf t (r :> string) (s :> string));
+      Output.print_string conf (DateDisplay.short_dates_text conf base p)
   in
-  let children = children_of_p base p in
+  let children = Driver.children_of_p base p in
   let digest = digest_children base children in
-  Hutil.header conf title;
-  Output.print_sstring conf
-    (Format.sprintf {|<h2>%s %s</h2>
-<form method="post" action="%s">|}
-       (let s : Adef.safe_string = gen_person_text conf base p in
-        let r : Adef.safe_string = reference conf base p s in
-        Util.transl_a_of_b conf "" (r :> string) (s :> string))
-       (DateDisplay.short_dates_text conf base p :> string)
-       (conf.command :> string));
+  Hutil.header ~h1_class:"h2" conf title;
+  Output.printf conf {|<form method="post" action="%s">|}
+    (conf.command :> string);
   Util.hidden_env conf;
-  Util.hidden_input_s conf "ip" (string_of_iper (get_iper p));
+  Util.hidden_input_s conf "ip" (Driver.Iper.to_string (Driver.get_iper p));
   Util.hidden_input_s conf "digest" digest;
   Util.hidden_input_s conf "m" "CHG_CHN_OK";
+  Output.printf conf
+    {|<div class="d-flex flex-wrap align-items-center gap-2 my-3">
+  <label for="chn_all">%s</label>
+  <input class="form-control w-auto" id="chn_all" size="30" maxlength="200">
+  <button type="submit" class="btn btn-primary">OK</button>
+</div>|}
+    (Utf8.capitalize_fst (transl conf "change all children's surnames to"));
   print_children conf base children;
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg ml-5 mb-2">|};
+    {|<button type="submit" class="btn btn-primary btn-lg ms-5 mb-2">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></form>";
@@ -119,27 +126,27 @@ let print_change conf base p =
 let print conf base =
   match p_getenv conf.env "ip" with
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_change conf base p
   | _ -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
-  Output.print_sstring conf "<h4>";
+  Output.print_sstring conf "\n<h2 class=\"h4\">";
   transl_nth conf "child/children" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</h4><p><ul>";
+  Output.print_sstring conf "</h2>\n<ul>";
   Array.iter
     (fun ifam ->
-      let des = foi base ifam in
+      let des = Driver.foi base ifam in
       Array.iter
         (fun ip ->
-          let p = poi base ip in
+          let p = Driver.poi base ip in
           Output.print_sstring conf "<li>";
           gen_person_text conf base p
           |> reference conf base p |> Output.print_string conf;
           Output.print_string conf (DateDisplay.short_dates_text conf base p))
-        (get_children des))
-    (get_family u);
+        (Driver.get_children des))
+    (Driver.get_family u);
   Output.print_sstring conf "</ul>"
 
 let print_change_done conf base p =
@@ -155,7 +162,7 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let var = "c" ^ string_of_iper ip_var in
+  let var = "c" ^ Driver.Iper.to_string ip_var in
   Update.print_create_conflict conf base p var
 
 let error_person conf err =
@@ -175,8 +182,8 @@ let print_update_child conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_change_ok conf base p =
-  let ipl = children_of_p base p in
-  let parent_surname = p_surname base p in
+  let ipl = Driver.children_of_p base p in
+  let parent_surname = Driver.p_surname base p in
   let redisp = Option.is_some (p_getenv conf.env "return") in
   if redisp then print_update_child conf base
   else (
@@ -184,14 +191,14 @@ let print_change_ok conf base p =
     let changed =
       try change_children conf base parent_surname ipl with
       | ChangeChildrenConflict (p, p') ->
-          print_conflict conf base (get_iper p) p'
+          print_conflict conf base (Driver.get_iper p) p'
       | FirstNameMissing _ ->
           error_person conf (transl conf "first name missing")
     in
     Util.commit_patches conf base;
     let changed =
       U_Change_children_name
-        (Util.string_gen_person base (gen_person_of_person p), changed)
+        (Util.string_gen_person base (Driver.gen_person_of_person p), changed)
     in
     History.record conf base changed "cn";
     print_change_done conf base p)
@@ -200,6 +207,6 @@ let print_ok o_conf base =
   let conf = Update.update_conf o_conf in
   match p_getenv conf.env "ip" with
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_change_ok conf base p
   | _ -> Hutil.incorrect_request conf

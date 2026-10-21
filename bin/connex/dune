@@ -1,0 +1,5 @@
+(executable
+ (package geneweb)
+ (name connex)
+ (public_name connex)
+ (libraries unix str geneweb))

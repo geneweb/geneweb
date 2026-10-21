@@ -1,0 +1,31 @@
+(rule
+ (target version.ml)
+ (deps
+  (universe)
+  (:script ./generate_version.sh)
+  (:input ./version.txt))
+ (action
+  (with-stdout-to
+   %{target}
+   (bash "./%{script} %{input}"))))
+
+(library
+ (name geneweb)
+ (public_name geneweb)
+ (libraries
+  unix
+  str
+  stdlib-shims
+  camlp-streams
+  geneweb_core
+  geneweb_def
+  geneweb_db
+  geneweb_sosa
+  geneweb_util
+  geneweb_templ
+  yojson
+  markup
+  re
+  uucp
+  uri
+  digestif))

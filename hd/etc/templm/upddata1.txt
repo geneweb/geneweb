@@ -9,6 +9,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
   <script type="text/javascript">
   <!--
@@ -148,8 +149,9 @@
 %else;
   %apply;print_long()
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 
 </body>
 </html>

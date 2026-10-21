@@ -14,16 +14,16 @@
 %end;
 %define;ttl(ss,gg)
   %if;(ss=0)
-    %if;(gg=2)[a grandfather/a grandmother/a grandparent]0
-    %else;[father/mother]0%end;
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]0)
+    %else;([father/mother]0)%end;
   %else;
-    %if;(gg=2)[a grandfather/a grandmother/a grandparent]1
-    %else;[father/mother]1%end;
+    %if;(gg=2)([a grandfather/a grandmother/a grandparent]1)
+    %else;([father/mother]1)%end;
   %end;
 %end;
 %( vtbr will show 2 vertical bars if one grandparents’ couple is divorced or separated
    this allows the central column carrying the marriage period for those case not to widen the table %)
-%define;setvar(nnn,vvv)%set_var.nnn.vvv;%end;
+%( %define;setvar(nnn,vvv)%set_var.nnn.vvv;%end; already in perso_utils %)
 %define;fam_dates(xx)
   %if;(spouse.access=xx.father.access and family.date_s!="")
     %apply;setvar%with;mar_xx%and;%family.date_s;%end;
@@ -41,22 +41,29 @@
 %let;marriage_sep_check;%get_var.mar_father;%get_var.mar_mother;%in;
 %let;vtbr;%if;("-" in marriage_sep_check)2%else;1%end;%in;
 %define;ind(xx,gg)
-  %if;xx.has_image;
-    %if;(not cancel_links)<a href="%xx.image_url;" target="_blank">%end;
-    <img class="rounded" %xx.image_small_size; src="%xx.image_url;"
-      alt="[image/images]0" title="%xx; (%apply;ttl(xx.sex,gg))">
-    %if;(not cancel_links)</a>%end;
+  %if;(xx.has_image or xx.has_blason)
+    %if;xx.has_image;
+      %if;(not cancel_links)<a href="%xx.image_url;" target="_blank">%end;
+      <img class="rounded" %xx.image_small_size; src="%xx.image_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %elseif;xx.has_blason;
+      %if;(not cancel_links)<a href="%xx.blason_url;" target="_blank">%end;
+      <img class="rounded" %xx.blason_small_size; src="%xx.blason_url;"
+        alt="[image/images]0" title="%xx; %apply;ttl(xx.sex,gg)">
+      %if;(not cancel_links)</a>%end;
+    %end;
   %elseif;(b.default_image="yes")
     <img height="75" src="%images_prefix;img_unknown_%if;(xx.sex=1)wo%end;man.png" alt="[missing image]">
   %(%else;
-    <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted"
+    <span class="image_small_size rounded px-3 pt-1 pb-2 text-body-secondary"
       %if;(father.has_parents and mother.has_image)%father.image_small_size;
       %elseif;(mother.has_parents and father.has_image)%mother.image_small_size;%end;>?</span>%)
   %end;
   %apply;short_display_person_tree("xx")
 %end;
 %if;has_parents;
-  <table class="px-0 mx-auto text-center%if;(op_m=2) small%end;" style="line-height:0.9rem">
+  <table class="mt-2 mt-md-0 mx-auto px-0 text-center%if;(op_m=2) small%end;" style="line-height:0.9rem">
     <tr>%nn;
       %if;father.has_parents;
         <td colspan="4" class="align-bottom">%apply;ind("father.father",2)</td>
@@ -78,7 +85,7 @@
       %if;father.has_parents;
         <td></td>
         <td colspan="2">%apply;vt("father.father","","",vtbr)</td>
-        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+        <td colspan="3" class="small align-text-center text-center fst-italic col-1 px-1">%nn;
           %apply;display_date_marriage_parent("father")</td>
         <td colspan="2">%apply;vt("father.mother","","",vtbr)</td>
         <td></td>
@@ -87,7 +94,7 @@
       %if;mother.has_parents;
         <td></td>
         <td colspan="2">%apply;vt("mother.father","","",vtbr)</td>
-        <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
+        <td colspan="3" class="small align-text-center text-center fst-italic col-1 px-1">%nn;
           %apply;display_date_marriage_parent("mother")</td>
         <td colspan="2">%apply;vt("mother.mother","","",vtbr)</td>
         <td></td>
@@ -148,7 +155,7 @@
       <td colspan="3"></td>
       <td colspan="3">%apply;vt("father","","",1)</td>
       <td colspan="1"></td>
-      <td colspan="5" class="small align-text-center text-center font-italic col-1 px-0">%nn;
+      <td colspan="5" class="small align-text-center text-center fst-italic col-1 px-0">%nn;
         %apply;display_date_marriage_parent("self")%nn;
       </td>
       <td colspan="1"></td>

@@ -1,5 +1,6 @@
-<!-- $Id: modules/arbre_vertical.txt v7.1 04/03/2023 10:39:16 $ -->
+<!-- $Id: modules/arbre_vertical.txt v7.1 04/04/2026 06:50:37 $ -->
 %( Arbre ascendant vertical %)
+
 %define;a_tree_line()
   %if;(not is_first)
     <tr>
@@ -18,30 +19,39 @@
       %if;(not is_first)
         <td></td>
       %end;
-      <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0 fix_size">%nn;
+      <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0">%nn;
         %if;(cell.is_empty)%nn;
         %else;
-          %if;(e.im="" and cell.person.has_image)
-            %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
-            <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
-             alt="[image/images]0" title="[image/images]0">%nn;
+          %if;(e.im="" and (cell.person.has_image or cell.person.has_blason))
+            %if;(cell.person.has_image and cell.person.has_blason)
+              %if;not cancel_links;<a href="%cell.person.blason_url;">%end;
+              <img class="rounded mb-1" src="%cell.person.blason_url;" 
+                %cell.person.blason_extra_small_size; title="[blason]0">
+              %if;not cancel_links;</a>%end;
+            %end;
+            %if;not cancel_links;<a
+              href="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;">%end;
+            <img class="rounded mb-1"
+              src="%if;cell.person.has_image;%cell.person.image_url;%else;%cell.person.blason_url;%end;"%nn;
+              %if;cell.person.has_image;%cell.person.image_small_size;%else;%cell.person.blason_small_size;%end;%sp;%nn;
+              alt="[image/images]0 " title="[image/images]0">%nn;
             %if;not cancel_links;</a>%end;<br>
           %end;
           %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
              + also cell.person birth and death + his cell.family.marriage + cell.family.”parents” infos too
               we can’t do a single mark from bottom to mark upper cells because table %foreach;cell start at top rows %)
           %let;self_parent_dead;
-            %if;(birth_date!="" and birth_date.year<today.year-120)1%end;
+            %if;(birth_date.year!="" and birth_date.year<today.year-120)1%end;
             %if;has_parents;
-              %if;((father.birth_date!="" and father.birth_date.year<today.year-120)
-               or (mother.birth_date!="" and mother.birth_date.year<today.year-120))1%end;
+              %if;((father.birth_date.year!="" and father.birth_date.year<today.year-120)
+               or (mother.birth_date.year!="" and mother.birth_date.year<today.year-120))1%end;
               %if;father.has_parents;
-                %if;((father.father.birth_date!="" and father.father.birth_date.year<today.year-120)
-                 or (father.mother.birth_date!="" and father.mother.birth_date.year<today.year-120))1%end;
+                %if;((father.father.birth_date.year!="" and father.father.birth_date.year<today.year-120)
+                 or (father.mother.birth_date.year!="" and father.mother.birth_date.year<today.year-120))1%end;
                %end;
               %if;mother.has_parents;
-                %if;((mother.father.birth_date!="" and mother.father.birth_date.year<today.year-120)
-                 or (mother.mother.birth_date!="" and mother.mother.birth_date.year<today.year-120))1%end;
+                %if;((mother.father.birth_date.year!="" and mother.father.birth_date.year<today.year-120)
+                 or (mother.mother.birth_date.year!="" and mother.mother.birth_date.year<today.year-120))1%end;
                %end;
             %end;
           %in;
@@ -65,7 +75,7 @@
           %in;
           %apply;short_display_person_tree("cell.person")%nn;
           %if;(cell_person_dead!="" and cell.person!=self and cell.person!=self.mother and cell.person!=self.father)
-            <div class="text-danger" title="Please! Let me rest in peace!">†</div>
+            <div class="text-danger" title="[*falsely alive]">†</div>
           %end;
           %if;cell.person.has_nobility_titles;%cell.person.title;%end;
         %end;
@@ -85,7 +95,7 @@
               <span
             %end;
               %let;spouses_dead;%if;(not cell.family.mother.is_dead and not cell.family.father.is_dead and cell.family.marriage_date.year!="")%if;(today.year-cell.family.marriage_date.year>100)1%end;%end;%in;
-              class="small font-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
+              class="small fst-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
               title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or ("-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
                        %if;(cell.family.sep_date_s!="")
                          %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;
@@ -94,14 +104,23 @@
                          %if;(spouses_dead=1)&#10;&#10;Please let both spouses rest in peace!%end;
                        %end;%nn;
                      %end;
-                     %if;wizard;&#10;&#10;%nn;
+                     %if;(wizard and not cancel_links)
+                       &#10;&#10;%nn;
                        %if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0
                        %else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;
                      %end;">%nn;
             %if;(cell.family.marriage_date.year="")
               -%nn;
             %else;
-              %let;fw;%( first widow different cases %)
+              %let;fw;
+%( first widow: détermine qui est veuf/veuve en premier dans le couple
+     0 = mère veuve (père décédé en premier, même année possible)
+     1 = décédés la même année
+     2 = mère veuve (père décédé, date mère imprécise)
+     3 = père veuf (mère décédée en premier)
+     4 = père veuf (mère décédée, date père imprécise)
+     5 = mère veuve (père décédé, mère toujours vivante)
+     6 = père veuf (mère décédée, père toujours vivant) %)
                 %if;(cell.family.father.death_date.year!="" and cell.family.father.death_date.prec=""
                  and cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
                   %if;(cell.family.father.death_date.year-cell.family.mother.death_date.year=0)1%nn;
@@ -136,8 +155,8 @@
               %in;
               %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
                  %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
-                <span class="small" style="font-size:8px;">%cell.family.date_s;</span>%nn;
-                <span style="font-size:8px;" class="%nn;
+                <span class="small">%cell.family.date_s;</span>%nn;
+                <span class="%nn;
                   %if;(not cancel_links)small%sp;
                     %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
                     %elseif;(fw=5 or fw=6)
@@ -233,32 +252,27 @@
         %if;not cancel_links;</a>%end;
       </div>
     %end;
-    %if;(xx!=self)<div>|</div>%end;
+    %if;(xx!=self)<div class="py-0">|</div>%end;
   %end;%nl;
 %end;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
 %if;has_parents;
-  <table class="tree-vert mx-auto my-2">
-    %if;(e.t="T" and e.t1="m")
+  %if;(e.t="T" and e.t1="m")
+    <div class="row mx-auto mt-2">
       %include;modules/arbre_8gen
-    %elseif;(e.t="A" or e.t="C")
-      <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
-    %else;
-      %foreach;ancestor_tree_line(e_v+1)
-        %apply;a_tree_line()
-      %end;
-    %end;
-  </table>
+    </div>
+  %elseif;(e.t="A" or e.t="C")
+    <div class="text-center col-6 mt-2">
+      %apply;line("self",e_v+1)
+    </div>
+  %else;
+    <div class="d-flex mt-2 mx-3%if;(e_v<3) justify-content-center col-6%end;">
+      <table class="tree-vert">
+        %foreach;ancestor_tree_line(e_v+1)
+          %apply;a_tree_line()
+        %end;
+      </table>
+    </div>
+  %end;
 %end;
 %include;buttons_dag
-%(<script>
-window.addEventListener('load', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const e_v = urlParams.get('v');
-  const width = window.innerWidth;
-  var size = 2*width/(2^(e_v+1));
-  console.log(size);
-  alert(size);
-  $('.fix_size').css("max-width", size);
-})
-</script>%)

@@ -58,7 +58,6 @@ let cmap_utf_8 cmap s =
 
 (**/**)
 
-let lowercase s = cmap_utf_8 Uucp.Case.Map.to_lower s
 let uppercase s = cmap_utf_8 Uucp.Case.Map.to_upper s
 
 let skip_html_tags s =

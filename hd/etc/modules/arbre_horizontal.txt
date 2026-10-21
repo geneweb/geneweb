@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_horizontal.txt v7.1 30/12/2021 18:24:51 $ -->
+<!-- $Id: modules/arbre_horizontal.txt v7.1 04/04/2026 06:49:22 $ -->
 %( Arbre ascendant horizontal jusqu’à 6 générations %)
 
 %define;urlset(xx,yy)
@@ -228,11 +228,11 @@
   <div class="d-flex justify-content-between">
     <h2>[*preview family tree]</h2>
     %if;not cancel_links;
-      <div class="form-inline">
+      <div class="d-inline-flex align-items-center flex-wrap">
         <div class="btn-group mx-2">
           %for;i;1;7;
             <a href="%apply;url_set%with;vh%and;%i;%end;"
-              class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
+              class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled fw-bold%end;" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end;">%i;</a>
           %end;
@@ -241,27 +241,18 @@
           <a href="%if;(evar.sosa!="on")%url_set.sosa.on%else;%url_set.sosa%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
-               [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
-          >Sosa
-            <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+               [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2">Sosa
+            <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-body-secondary"></i>
           </a>
         </div>
-        <div class="input-group input-group-sm ">
-          <div class="input-group-prepend">
-            %if;(evartw>=6)
-              <a href="%apply;url_set%with;twidth%and;%expr(evartw-2);%end;"
-                class="btn btn-outline-secondary"
-                title="- 2 ([width])"
-              >&nbsp;-</a>
-            %end;
-          </div>
+        <div class="input-group input-group-sm">
+          %if;(evartw>=6)
+            <a href="%apply;url_set%with;twidth%and;%expr(evartw-2);%end;"
+              class="btn btn-outline-secondary" title="- 2 ([width])">&nbsp;-</a>
+          %end;
           <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled>
-          <div class="input-group-append">
-              <a href="%apply;url_set%with;twidth%and;%expr(evartw+2);%end;"
-                class="btn btn-outline-secondary"
-                title="+ 2 ([width])"
-              >&nbsp;+</a>
-          </div>
+            <a href="%apply;url_set%with;twidth%and;%expr(evartw+2);%end;"
+              class="btn btn-outline-secondary" title="+ 2 ([width])">&nbsp;+</a>
         </div>
       </div>
     %end;

@@ -1,11 +1,13 @@
+<!-- $Id: upd_js.txt v7.1 06/01/2026 02:00:03 $ -->
 %( Input datalists and function to populate all datalists %)
+%if;(is_upd_ind or is_upd_fam)
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
 %apply;dl("fnames")
 %apply;dl("snames")
 %apply;dl("places")
 %apply;dl("occupations")
 %apply;dl("sources")
-%if;("IND" in e.m)
+%if;is_upd_ind;
   %apply;dl("pub_names")
   %apply;dl("qualifiers")
   %apply;dl("aliases")
@@ -13,145 +15,269 @@
   %apply;dl("estates")
 %end;
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    addClearButtonToInputs();
-    inputToBook.addNavigation();
-    populateDatalists();
-});
+%if;is_upd_ind;
+function change_buri(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  const input = document.getElementById('e_name' + xcnt);
+  input.value = selector.value;
+}
 
-%( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
-$(document).ready(function() {
-  $("[id$=_selct]").on('change', function() {
-    var pre = '#' + this.id;
-    var all = pre + '_data, ' + pre + '_sex';
-    var mod = pre + '_mod';
-    var isLink = this.value === "link";
-    $(all).toggle(!isLink);
-    $(mod).toggle(isLink);
-  }).change();
-});
-
-<!--
-function changeCalendar(e,v,m,c) {
-  var mv = m;
-  switch (m) {
-  case "VD": mv = 1; break;
-  case "BR": mv = 2; break;
-  case "FM": mv = 3; break;
-  case "NI": mv = 4; break;
-  case "PL": mv = 5; break;
-  case "VT": mv = 6; break;
-  case "GE": mv = 7; break;
-  case "FL": mv = 8; break;
-  case "PR": mv = 9; break;
-  case "ME": mv = 10; break;
-  case "TH": mv = 11; break;
-  case "FT": mv = 12; break;
-  case "JC": mv = 13; break;
-  }
-  switch(c.options%[c.selectedIndex%].value) {
-  case 'G':
-  case 'J':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(month)]11</option>\
-</select>\
-';
-    break;
-  case 'F':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(french revolution month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(french revolution month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(french revolution month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(french revolution month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(french revolution month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(french revolution month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(french revolution month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(french revolution month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(french revolution month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(french revolution month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(french revolution month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(french revolution month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(french revolution month)]12</option>\
-</select>\
-';
-    break;
-  case 'H':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(hebrew month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(hebrew month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(hebrew month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(hebrew month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(hebrew month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(hebrew month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(hebrew month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(hebrew month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(hebrew month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(hebrew month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(hebrew month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(hebrew month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(hebrew month)]12</option>\
-</select>\
-';
-    break;
+function set_buri(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  if (selector.value === '') {
+    selector.value = '#buri';
+    change_buri(xcnt);
   }
 }
--->
+
+function change_death(xcnt) {
+  const selector = document.getElementById('death_select' + xcnt);
+  const input = document.getElementById('e_name' + xcnt);
+  input.value = (selector.value !== 'NotDead' && selector.value !== 'DontKnowIfDead') ? '#deat' : '';
+}
+
+function set_burial_focus(xcnt) {
+  const selector = document.getElementById('buri_select' + xcnt);
+  selector.value = '#buri';
+  change_buri(xcnt);
+}
+
+function set_death_focus(xcnt) {
+  const selector = document.getElementById('death_select' + xcnt);
+  selector.value = 'Death';
+  change_death(xcnt);
+}
+%end;
+
+/**
+ * Trie alphabétiquement les options par groupes numérotés.
+ * data-insert="N" sur le séparateur = point d'insertion du groupe N
+ * data-sort="N" sur les options = appartenance au groupe N
+ */
+function sortSelectOptions() {
+  document.querySelectorAll('select.sortable-select').forEach(select => {
+    select.querySelectorAll('option[data-insert]').forEach(insertPoint => {
+      const group = insertPoint.dataset.insert;
+      const sortables = Array.from(select.querySelectorAll(`option[data-sort="${group}"]`));
+      
+      if (sortables.length < 2) return;
+      
+      sortables.forEach(opt => opt.remove());
+      sortables.sort((a, b) => a.textContent.localeCompare(b.textContent, undefined, { sensitivity: 'base' }));
+      
+      const fragment = document.createDocumentFragment();
+      sortables.forEach(opt => fragment.appendChild(opt));
+      
+      if (insertPoint.nextSibling) {
+        select.insertBefore(fragment, insertPoint.nextSibling);
+      } else {
+        select.appendChild(fragment);
+      }
+    });
+  });
+}
+
+/** Gère l'affichage du champ d'événement personnalisé */
+function showEventLabel(type, defaultName, cnt) {
+  const selector = document.getElementById(type + '_select' + cnt);
+  const wrapper = document.getElementById(type + '_label_selector' + cnt);
+  const input = document.getElementById('e_name' + cnt);
+  if (!selector || !wrapper || !input) return;
+  const selectedOption = selector.options[selector.selectedIndex];
+  const isCustom = !!selectedOption && selectedOption.id === 'custom' + cnt;
+  const isDelete = !!selectedOption && selectedOption.id === 'delete' + cnt;
+  
+  if (isDelete) {
+    input.value = '';
+  } else if (isCustom) {
+    input.value = (defaultName && defaultName.charAt(0) !== '#') ? defaultName : '';
+  } else {
+    input.value = selector.value;
+  }
+
+  wrapper.classList.toggle('d-none', !isCustom);
+  if (isCustom && document.activeElement === selector) input.focus();
+}
+
+function show_pevent_label(xxname, xcnt) {
+  showEventLabel('pevent', xxname, xcnt);
+}
+
+function show_fevent_label(xxname, xcnt) {
+  showEventLabel('fevent', xxname, xcnt);
+}
+
+/** Affiche les champs d'événements personnalisés existants au chargement */
+function initCustomEvents() {
+  document.querySelectorAll('.other_evts').forEach(evt => {
+    const input = evt.querySelector('input');
+    evt.classList.toggle('d-none', !(input?.value && input.value.charAt(0) !== '#'));
+  });
+}
+
+/** Focus initial sur le premier champ pertinent */
+function initFormFocus() {
+  const form = document.getElementById('updfam') || document.getElementById('updind');
+  if (!form) return;
+  
+  let targetId = form.dataset.insert?.split('/')[0] || null;
+  
+  if (!targetId && form.id === 'updfam') {
+    const input = Array.from(form.querySelectorAll('input[type="text"]'))
+      .find(el => (el.id?.startsWith('e_place') || el.id?.endsWith('_fn')) && el.value === '');
+    targetId = input?.id;
+  }
+  
+  if (targetId) {
+    document.getElementById(targetId)?.focus();
+  }
+}
+
+/** Scrolls back, on a form redisplay, to the first insertion or swap point requested */
+function initInsertScroll(redisplay) {
+  const form = document.getElementById('updfam') || document.forms.upd;
+  if (!form) return;
+  const key = 'upd_insert_point';
+  try {
+    const name = sessionStorage.getItem(key);
+    sessionStorage.removeItem(key);
+    if (redisplay && name) form.elements.namedItem(name)?.scrollIntoView?.({ block: 'center' });
+  } catch (e) {}
+  form.addEventListener('submit', ev => {
+    const el = Array.from(form.elements).find(el => /^(e\d+_)?(ins|inv|add)_/.test(el.name)
+      && (el.checked || el === ev.submitter || (el.tagName === 'SELECT' && +el.value > 0)));
+    try {
+      if (el) sessionStorage.setItem(key, el.name);
+      else sessionStorage.removeItem(key);
+    } catch (e) {}
+  });
+}
+
+/** Toggle visibilité des champs create/link pour témoins/relations */
+function initSelectToggle() {
+  document.querySelectorAll('[id$="_selct"]').forEach(select => {
+    select.addEventListener('change', function() {
+      const pre = this.id;
+      const isLink = this.value === 'link';
+      
+      const dataEl = document.getElementById(pre + '_data');
+      const sexEl = document.getElementById(pre + '_sex');
+      const modEl = document.getElementById(pre + '_mod');
+      
+      if (dataEl) dataEl.style.display = isLink ? 'none' : '';
+      if (sexEl) sexEl.style.display = isLink ? 'none' : '';
+      if (modEl) modEl.style.display = isLink ? '' : 'none';
+    });
+    select.dispatchEvent(new Event('change'));
+  });
+}
+
+/** Gestion du scroll pour le banner */
+function updateBannerState() {
+  const banner = document.getElementById('banner');
+  if (banner) banner.classList.toggle('scrolled', window.scrollY > 35);
+}
+document.addEventListener('scroll', updateBannerState, { passive: true });
+document.addEventListener('DOMContentLoaded', updateBannerState);
+
+%( Month names per calendar select value; any other value, Julian included,
+   uses the Gregorian list, see changeCalendar. %)
+const CALENDAR_MONTHS = {
+  'G': %['-', `[(month)]0`, `[(month)]1`, `[(month)]2`, `[(month)]3`, `[(month)]4`, `[(month)]5`, `[(month)]6`, `[(month)]7`, `[(month)]8`, `[(month)]9`, `[(month)]10`, `[(month)]11`],
+  'F': %['-', `[(french revolution month)]0`, `[(french revolution month)]1`, `[(french revolution month)]2`, `[(french revolution month)]3`, `[(french revolution month)]4`, `[(french revolution month)]5`, `[(french revolution month)]6`, `[(french revolution month)]7`, `[(french revolution month)]8`, `[(french revolution month)]9`, `[(french revolution month)]10`, `[(french revolution month)]11`, `[(french revolution month)]12`],
+  'H': %['-', `[(hebrew month)]0`, `[(hebrew month)]1`, `[(hebrew month)]2`, `[(hebrew month)]3`, `[(hebrew month)]4`, `[(hebrew month)]5`, `[(hebrew month)]6`, `[(hebrew month)]7`, `[(hebrew month)]8`, `[(hebrew month)]9`, `[(hebrew month)]10`, `[(hebrew month)]11`, `[(hebrew month)]12`]
+};
+
+const FRENCH_MONTH_CODES = { VD:1, BR:2, FM:3, NI:4, PL:5, VT:6, GE:7, FL:8, PR:9, ME:10, TH:11, FT:12, JC:13 };
+
+function changeCalendar(e, v, m, c) {
+  const mv = FRENCH_MONTH_CODES[m] || m;
+  const calType = c.options[c.selectedIndex].value;
+  const months = CALENDAR_MONTHS[calType] || CALENDAR_MONTHS['G'];
+  
+  let options = '';
+  for (let i = 0; i < months.length; i++) {
+    const val = i === 0 ? '' : i;
+    options += '<option value="' + val + '"' + (mv == i ? ' selected' : '') + '>' + months[i] + '</option>';
+  }
+  
+  document.getElementById(e).innerHTML = 
+    '<select class="form-select form-control-inline ps-sm-1 pe-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ms-sm-2 ms-md-3%end;" name="' + v + '" style="display:inline-block;width:auto">' +
+    options + '</select>';
+}
+
+function initCalendarMonthSelects() {
+  document.querySelectorAll('select[id$="_cal"]').forEach(sel => {
+    if (sel.value === 'F' || sel.value === 'H') {
+      sel.dispatchEvent(new Event('change'));
+    }
+  });
+}
+%( Bootstrap, clearinput.js and autosize are loaded after this file by js.txt. %)
+document.addEventListener('DOMContentLoaded', () => {
+  addClearButtonToInputs();
+  sortSelectOptions();
+  initCustomEvents();
+  initSelectToggle();
+  initFormFocus();
+  initInsertScroll(%if;("_OK" in evar_m)true%else;false%end;);
+  initCalendarMonthSelects();
+  new bootstrap.ScrollSpy(document.body, { target: '#banner' });
+%if;is_upd_fam;
+  document.querySelectorAll('.transfer-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const notes = document.getElementById('notes_comments');
+      const target = document.querySelector('[data-marr]');
+      if (!notes || !target) return;
+      target.value = notes.value;
+      notes.value = '';
+      if (typeof autosize !== 'undefined') autosize.update(target);
+      btn.style.display = 'none';
+    });
+  });
+%end;
+});
 </script>
+%else;
+%( m=CHG_EVT %)
+<script>
+ (function() {
+  const list = document.getElementById('sort_list');
+  if (!list) return;
+
+  function updatePositions(li) {
+    // Re-numérote les .pos selon l'ordre DOM actuel
+    list.querySelectorAll(':scope > li').forEach((item, idx) => {
+      const pos = item.querySelector('.pos');
+      if (pos) pos.value = idx + 1;
+    });
+  }
+
+  function refreshArrows() {
+    const items = list.querySelectorAll(':scope > li');
+    items.forEach((li, idx) => {
+      const up = li.querySelector('.up');
+      const down = li.querySelector('.down');
+      if (up) up.style.visibility = (idx === 0) ? 'hidden' : 'visible';
+      if (down) down.style.visibility = (idx === items.length - 1) ? 'hidden' : 'visible';
+    });
+  }
+
+  list.addEventListener('click', function(e) {
+    const btn = e.target.closest('.up, .down');
+    if (!btn) return;
+    const li = btn.closest('li');
+    if (!li) return;
+    if (btn.classList.contains('up') && li.previousElementSibling) {
+      li.parentNode.insertBefore(li, li.previousElementSibling);
+    } else if (btn.classList.contains('down') && li.nextElementSibling) {
+      li.parentNode.insertBefore(li.nextElementSibling, li);
+    }
+    updatePositions();
+    refreshArrows();
+  });
+
+  refreshArrows();
+})();
+</script>
+%end;

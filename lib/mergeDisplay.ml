@@ -1,20 +1,45 @@
-(* $Id: merge.ml, v7-exp 2018-09-26 07:34:44 ddr Exp $ *)
+(* $Id: merge.ml, v7.1 04/03/2026 00:11:35 *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let print_someone conf base p =
-  Output.printf conf "%s%s %s" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-    (p_surname base p)
+  Output.printf conf "%s%s %s"
+    (Driver.p_first_name base p)
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
+    (Driver.p_surname base p)
+
+let print_person_info conf base p =
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_string conf (acces conf base p);
+  Output.print_sstring conf {|">|};
+  Output.print_string conf (escape_html (Driver.p_first_name base p));
+  if Driver.get_occ p <> 0 then (
+    Output.print_sstring conf ".";
+    Output.print_sstring conf (string_of_int (Driver.get_occ p)));
+  Output.print_sstring conf " ";
+  Output.print_string conf (escape_html (Driver.p_surname base p));
+  Output.print_sstring conf "</a>";
+  let dates = DateDisplay.short_dates_text conf base p in
+  if (dates :> string) <> "" then
+    Output.print_string conf (mod_ind_link conf p dates);
+  let cop = (child_of_parent conf base p :> string) in
+  if cop <> "" then (
+    Output.print_sstring conf ", ";
+    Output.print_sstring conf cop);
+  let hw = (husband_wife conf base p true :> string) in
+  if hw <> "" then Output.print_sstring conf hw
 
 let print conf base p =
   let list = Gutil.find_same_name base p in
   let list =
     List.fold_right
-      (fun p1 pl -> if get_iper p1 = get_iper p then pl else p1 :: pl)
+      (fun p1 pl ->
+        if Driver.get_iper p1 = Driver.get_iper p then pl else p1 :: pl)
       list []
   in
   let title _ =
@@ -22,72 +47,57 @@ let print conf base p =
       (Utf8.capitalize_fst (transl_decline conf "merge" ""))
   in
   Hutil.header conf title;
+  Output.print_sstring conf "<h2 class=\"h4\">\n";
+  print_person_info conf base p;
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl_decline conf "with" "");
+  Output.print_sstring conf (transl conf ":");
+  Output.print_sstring conf "\n</h2>\n";
   Output.print_sstring conf
-    (Format.sprintf
-       {|<h2>
-%s%s %s %s%s
-</h2>
-<form method="get" action="%s" class="mx-3 mb-3">|}
-       (p_first_name base p)
-       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-       (p_surname base p)
-       (transl_decline conf "with" "")
-       (transl conf ":")
+    (Format.sprintf {|<form method="get" action="%s" class="my-3">|}
        (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
-  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "i"
+    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+  let ph =
+    Format.sprintf "%s.%s %s"
+      (transl_nth conf "first name/first names" 0)
+      (transl conf "number")
+      (transl_nth conf "surname/surnames" 0)
+  in
   Output.print_sstring conf
-    "<span class=\"form-row align-items-center\"><span \
-     class=\"col-auto\"><span class=\"custom-control custom-radio\"><input \
-     type=\"radio\" class=\"custom-control-input\" name=\"select\" \
-     id=\"input\" value=\"input\" checked><label \
-     class=\"custom-control-label\"for=\"input\">";
+    {|<div class="form-check d-flex align-items-center gap-2 ms-3">|};
+  Output.print_sstring conf
+    {|<input class="form-check-input" type="radio" name="select" id="input" value="input" checked>|};
+  Output.print_sstring conf
+    {|<label class="form-check-label text-nowrap" for="input">|};
   Output.print_sstring conf (transl conf "any individual in the base");
-  Output.print_sstring conf
-    "</label></span></span><span class=\"col-auto\"><input type=\"text\" \
-     class=\"form-control\" name=\"n\" placeholder=\"";
-  Output.print_sstring conf (transl_nth conf "first name/first names" 0);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (transl conf "number");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "surname/surnames" 0);
-  Output.print_sstring conf "\" title=\"";
-  Output.print_sstring conf (transl_nth conf "first name/first names" 0);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (transl conf "number");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "surname/surnames" 0);
-  Output.print_sstring conf
-    "\" size=\"50\" id=\"inlineinput\" autofocus></span></span>";
+  Output.print_sstring conf {|</label>|};
+  Output.printf conf
+    {|<input type="text" class="form-control form-control-sm w-auto pnoc-input" name="n" id="inlineinput" placeholder="%s" title="%s" size="50" autofocus>|}
+    ph ph;
+  Output.print_sstring conf {|</div>|};
   if list <> [] then
     List.iter
       (fun p ->
-        Output.print_sstring conf "<div class=\"custom-control custom-radio\">";
+        Output.print_sstring conf {|<div class="form-check ms-3">|};
         Output.print_sstring conf
-          "<input type=\"radio\" class=\"custom-control-input\" \
-           name=\"select\" id=\"";
-        Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
-        Output.print_sstring conf "\" value=\"";
-        Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
-        Output.print_sstring conf "\">\n";
-        Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
-        Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
-        Output.print_sstring conf "\">";
-        let cop = (Util.child_of_parent conf base p :> string) in
-        let cop = if cop = "" then "" else ", " ^ cop in
-        let hbw = (Util.husband_wife conf base p true :> string) in
-        let hbw = if hbw = "" then "" else ", " ^ hbw in
-        Output.print_sstring conf
-          (Printf.sprintf "%s.%d %s%s%s"
-             (get_first_name p |> sou base)
-             (get_occ p)
-             (get_surname p |> sou base)
-             cop hbw);
-        Output.print_sstring conf "</label></div>")
+          {|<input type="radio" class="form-check-input" name="select" id="|};
+        Output.print_string conf
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        Output.print_sstring conf {|" value="|};
+        Output.print_string conf
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        Output.print_sstring conf {|"><label class="form-check-label" for="|};
+        Output.print_string conf
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        Output.print_sstring conf {|">|};
+        print_person_info conf base p;
+        Output.print_sstring conf {|</label></div>|})
       list;
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg mt-2">|};
+    {|<button type="submit" class="btn btn-primary btn-lg mt-3">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>\n";
@@ -97,16 +107,16 @@ let print_possible_continue_merging conf base =
   let open Adef in
   match (p_getenv conf.env "ini1", p_getenv conf.env "ini2") with
   | Some ini1, Some ini2 ->
-      let ini1 = iper_of_string ini1 in
-      let ini2 = iper_of_string ini2 in
-      let p1 = poi base ini1 in
-      let p2 = poi base ini2 in
+      let ini1 = Driver.Iper.of_string ini1 in
+      let ini2 = Driver.Iper.of_string ini2 in
+      let p1 = Driver.poi base ini1 in
+      let p2 = Driver.poi base ini2 in
       Output.print_sstring conf {|<p><a href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf {|m=MRG_IND&i=|};
-      Output.print_string conf (string_of_iper ini1 |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ini1 |> Mutil.encode);
       Output.print_sstring conf {|&i2=|};
-      Output.print_string conf (string_of_iper ini2 |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ini2 |> Mutil.encode);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl conf "continue merging"));
@@ -120,7 +130,7 @@ let print_possible_continue_merging conf base =
   | _ -> (
       match p_getenv conf.env "ip" with
       | Some ip ->
-          let ip = iper_of_string ip in
+          let ip = Driver.Iper.of_string ip in
           let s1 =
             match p_getenv conf.env "iexcl" with
             | Some "" | None -> Adef.encoded ""
@@ -132,12 +142,12 @@ let print_possible_continue_merging conf base =
             | Some s -> "&fexcl=" ^<^ Mutil.encode s
           in
           if s1 <^> Adef.encoded "" || s2 <^> Adef.encoded "" then (
-            let p = poi base ip in
+            let p = Driver.poi base ip in
             let s = gen_person_text conf base p in
             Output.print_sstring conf {|<p><a href="|};
             Output.print_string conf (commd conf);
             Output.print_sstring conf {|m=MRG_DUP&ip=|};
-            Output.print_string conf (string_of_iper ip |> Mutil.encode);
+            Output.print_string conf (Driver.Iper.to_string ip |> Mutil.encode);
             Output.print_string conf s1;
             Output.print_string conf s2;
             Output.print_sstring conf {|">|};

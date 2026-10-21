@@ -25,6 +25,10 @@ open Util
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   [[image:filename.jpg]] inline image from the notes image directory
+   [[image:subdir:filename.jpg]] image in a subdirectory (use ':' as separator)
+   [[image:filename.jpg/alt text]] image with alt text
+   [[image:filename.jpg/alt text/200px]] image with alt text and CSS max-width
    empty line : new paragraph
    lines starting with space : displayed as they are (providing 1/ there
      are at least two 2/ there is empty lines before and after the group
@@ -32,9 +36,6 @@ open Util
    __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
-
-module Buff2 = Buff.Make ()
-module Buff = Buff.Make ()
 
 let first_cnt = 1
 let tab lev s = String.make (2 * lev) ' ' ^ s
@@ -49,10 +50,11 @@ let section_level s len =
   loop 1 (len - 2) 4
 
 (* Creates an edit button with consistent styling *)
-let make_edit_button conf fnotes ?(cnt = None) () =
+let make_edit_button conf ?(mode = "") fnotes ?(cnt = None) () =
   let href =
-    Printf.sprintf "%sm=MOD_NOTES&f=%s%s"
+    Printf.sprintf "%sm=MOD_%s&f=%s%s"
       (commd conf :> string)
+      mode
       (Mutil.encode fnotes :> string)
       (match cnt with None -> "" | Some n -> "&v=" ^ string_of_int n)
   in
@@ -64,7 +66,7 @@ let make_edit_button conf fnotes ?(cnt = None) () =
           (Printf.sprintf (ftransl conf "modify note section %d") n)
   in
   Format.sprintf
-    {|<a href="%s" class="align-self-center ml-3 mb-1"
+    {|<a href="%s" class="align-self-center ms-3 mb-1"
   title="%s">(%s)</a>|}
     href title (transl conf "modify")
 
@@ -108,87 +110,204 @@ let str_start_with str i x =
   in
   loop i 0
 
-type wiki_info = {
-  wi_mode : string;
-  wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool * string * string;
-  wi_always_show_link : bool;
-}
-
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
 let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
-let syntax_links conf wi s =
+type wiki_info = {
+  wi_mode : string;
+  wi_file_path : string -> string;
+  wi_person_exists : string * string * int -> bool;
+  wi_mark_if_not_public : string * string * int -> bool;
+  wi_always_show_link : bool;
+}
+
+let find_first_char_from_list str i chars =
+  let len = String.length str in
+  let tbl : (char, unit) Hashtbl.t = Hashtbl.create 17 in
+  List.iter (fun c -> Hashtbl.replace tbl c ()) chars;
+  let rec find_index j =
+    if j >= len then None
+    else if Hashtbl.mem tbl str.[j] then Some j
+    else find_index (j + 1)
+  in
+  find_index i
+
+type quot_lev = Italic | Bold | BoldItalic | Zero
+
+let italic_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 2
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && (quot_lev = Zero || quot_lev = Italic)
+
+let bold_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 3
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && s.[i + 2] = '\''
+  && (quot_lev = Zero || quot_lev = Bold)
+
+let bold_italic_delimiter_at s i quot_lev =
+  let len = String.length s in
+  i <= len - 5
+  && s.[i] = '\''
+  && s.[i + 1] = '\''
+  && s.[i + 2] = '\''
+  && s.[i + 3] = '\''
+  && s.[i + 4] = '\''
+  && (quot_lev = Zero || quot_lev = BoldItalic)
+
+(* bold italic detects ''bold'', '''italic''' and '''''bold_italic'''''
+    and {highlight} sequences in a string, and replaces it with the
+    appropriate html code (<i>, <b>, ...) *)
+let bold_italic_syntax s =
+  let buff = Buffer.create 80 in
+  let chars = [ '{'; '%'; '\'' ] in
   let slen = String.length s in
-  let rec loop quot_lev pos i len =
-    let len, quot_lev =
-      if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
-        let len =
-          match quot_lev with
-          | 1 -> Buff.mstore len "</i>"
-          | 2 -> Buff.mstore len "</b>"
-          | 3 -> Buff.mstore len "</b></i>"
-          | _ -> len
-        in
-        (len, 0)
-      else (len, quot_lev)
-    in
-    if i = slen then Buff.get len
+  let rec loop quot_lev i =
+    (if i = slen || List.exists (str_start_with s i) [ "</li>"; "</p>" ] then
+       match quot_lev with
+       | Italic -> Buffer.add_string buff "</i>"
+       | Bold -> Buffer.add_string buff "</b>"
+       | BoldItalic -> Buffer.add_string buff "</b></i>"
+       | Zero -> ());
+    if i = slen then () (* % allows escaping [, {, ' *)
     else if
       s.[i] = '%'
       && i < slen - 1
-      && List.mem s.[i + 1] [ '['; ']'; '{'; '}'; '\'' ]
-    then loop quot_lev pos (i + 2) (Buff.store len s.[i + 1])
-    else if s.[i] = '%' && i < slen - 1 && s.[i + 1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len "")
-    else if s.[i] = '{' then
+      && (s.[i + 1] = '['
+         || s.[i + 1] = '{'
+         || s.[i + 1] = '}' (* is this needed?, then why not ']' ?*)
+         || s.[i + 1] = '\'')
+    then (
+      Buffer.add_char buff s.[i + 1];
+      loop quot_lev (i + 2) (* single % are kept *))
+    else if s.[i] = '%' then (
+      Buffer.add_char buff '%';
+      loop quot_lev (i + 1) (* highlight *))
+    else if s.[i] = '{' then (
+      let buff2 = Buffer.create 80 in
       let b, j =
-        let rec loop len j =
+        let rec loop j =
           if j = slen then ("", i + 1)
-          else if j < slen - 1 && s.[j] = '%' then
-            loop (Buff2.store len s.[j + 1]) (j + 2)
-          else if s.[j] = '}' then (Buff2.get len, j + 1)
-          else loop (Buff2.store len s.[j]) (j + 1)
+          else if j < slen - 1 && s.[j] = '%' then (
+            Buffer.add_char buff2 s.[j + 1];
+            loop (j + 2))
+          else if s.[j] = '}' then (Buffer.contents buff2, j + 1)
+          else (
+            Buffer.add_char buff2 s.[j];
+            loop (j + 1))
         in
-        loop 0 (i + 1)
+        loop (i + 1)
       in
-      let s =
-        if String.length b <> 0 then
+      let t =
+        if b <> "" then
           Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
         else ""
       in
-      loop quot_lev pos j (Buff.mstore len s)
-    else if
-      i <= slen - 5
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && s.[i + 3] = '\''
-      && s.[i + 4] = '\''
-      && (quot_lev = 0 || quot_lev = 3)
-    then
-      let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) pos (i + 5) (Buff.mstore len s)
-    else if
-      i <= slen - 3
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && s.[i + 2] = '\''
-      && (quot_lev = 0 || quot_lev = 2)
-    then
-      let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) pos (i + 3) (Buff.mstore len s)
-    else if
-      i <= slen - 2
-      && s.[i] = '\''
-      && s.[i + 1] = '\''
-      && (quot_lev = 0 || quot_lev = 1)
-    then
-      let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
+      Buffer.add_string buff t;
+      loop quot_lev j)
+    else if bold_italic_delimiter_at s i quot_lev then (
+      let t, ql =
+        if quot_lev = Zero then ("<b><i>", BoldItalic) else ("</i></b>", Zero)
+      in
+      Buffer.add_string buff t;
+      loop ql (i + 5))
+    else if bold_delimiter_at s i quot_lev then (
+      let t, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      Buffer.add_string buff t;
+      loop ql (i + 3))
+    else if italic_delimiter_at s i quot_lev then (
+      let t, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      Buffer.add_string buff t;
+      loop ql (i + 2))
+    else if s.[i] = '\'' then (
+      Buffer.add_char buff '\'';
+      loop quot_lev (i + 1))
     else
-      match NotesLinks.misc_notes_link s i with
+      let k = find_first_char_from_list s i chars in
+      match k with
+      | None -> Buffer.add_string buff (String.sub s i (String.length s - i))
+      | Some k ->
+          Buffer.add_string buff (String.sub s i (k - i));
+          loop quot_lev k
+  in
+  loop Zero 0;
+  Buffer.contents buff
+
+let syntax_links conf wi s =
+  let buff = Buffer.create 80 in
+  let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
+  let slen = String.length s in
+  let rec loop ?stop_at_brace quot_lev pos i =
+    let brace_stop =
+      match stop_at_brace with
+      | Some _ -> i < slen && s.[i] = '}'
+      | None -> false
+    in
+    (if
+       i = slen || brace_stop
+       || List.exists (str_start_with s i) [ "</li>"; "</p>" ]
+     then
+       match quot_lev with
+       | Italic -> Buffer.add_string buff "</i>"
+       | Bold -> Buffer.add_string buff "</b>"
+       | BoldItalic -> Buffer.add_string buff "</b></i>"
+       | Zero -> ());
+    if i = slen then (false, pos, i)
+    else if brace_stop then (true, pos, i + 1)
+    else if
+      s.[i] = '%'
+      && i < slen - 1
+      && (s.[i + 1] = '['
+         || s.[i + 1] = ']'
+         || s.[i + 1] = '{'
+         || s.[i + 1] = '}'
+         || s.[i + 1] = '\'')
+    then (
+      Buffer.add_char buff s.[i + 1];
+      loop ?stop_at_brace quot_lev pos (i + 2))
+    else if s.[i] = '%' then (
+      Buffer.add_char buff '%';
+      loop ?stop_at_brace quot_lev pos (i + 1))
+    else if s.[i] = '{' then (
+      let start_len = Buffer.length buff in
+      Buffer.add_char buff '{';
+      let closed, pos', j = loop ~stop_at_brace:() Zero pos (i + 1) in
+      if closed then (
+        let inner =
+          Buffer.sub buff (start_len + 1) (Buffer.length buff - start_len - 1)
+        in
+        Buffer.truncate buff start_len;
+        if inner <> "" then
+          Buffer.add_string buff
+            (Printf.sprintf "<span class=\"highlight\">%s</span>" inner));
+      loop ?stop_at_brace quot_lev pos' j)
+    else if bold_italic_delimiter_at s i quot_lev then (
+      let t, ql =
+        if quot_lev = Zero then ("<i><b>", BoldItalic) else ("</b></i>", Zero)
+      in
+      Buffer.add_string buff t;
+      loop ?stop_at_brace ql pos (i + 5))
+    else if bold_delimiter_at s i quot_lev then (
+      let t, ql = if quot_lev = Zero then ("<b>", Bold) else ("</b>", Zero) in
+      Buffer.add_string buff t;
+      loop ?stop_at_brace ql pos (i + 3))
+    else if italic_delimiter_at s i quot_lev then (
+      let t, ql = if quot_lev = Zero then ("<i>", Italic) else ("</i>", Zero) in
+      Buffer.add_string buff t;
+      loop ?stop_at_brace ql pos (i + 2))
+    else if s.[i] = '\'' then (
+      Buffer.add_char buff '\'';
+      loop ?stop_at_brace quot_lev pos (i + 1))
+    else
+      let link = NotesLinks.misc_notes_link s i in
+      let next_pos = if NotesLinks.advances_pos link then pos + 1 else pos in
+      match link with
       | NotesLinks.WLpage (j, fpath1, fname1, anchor, text) ->
+          let text = bold_italic_syntax text in
           let fpath, fname =
             let aliases = notes_aliases conf in
             let fname = map_notes aliases fname1 in
@@ -202,51 +321,94 @@ let syntax_links conf wi s =
           in
           let anchor = if anchor = "" then "" else "#" ^ encode anchor in
           let t =
-            Printf.sprintf {|<a href="%sm=%s&f=%s%s"%s>%s</a>|}
-              (commd conf : Adef.escaped_string :> string)
-              (encode wi.wi_mode) (encode fname) anchor c text
+            if cancel_links then text
+            else
+              Printf.sprintf {|<a href="%sm=%s&f=%s%s"%s>%s</a>|}
+                (commd conf : Adef.escaped_string :> string)
+                (encode wi.wi_mode) (encode fname) anchor c text
           in
-          loop quot_lev pos j (Buff.mstore len t)
-      | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
-          let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
+          Buffer.add_string buff t;
+          loop ?stop_at_brace quot_lev next_pos j
+      | NotesLinks.WLperson (j, (fn, sn, oc), name, _, _) ->
           let name =
-            match name with None -> fn0 ^ " " ^ sn0 | Some name -> name
+            if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
+            then Option.value ~default:"??" name
+            else Util.private_txt conf ""
+          in
+          let name = bold_italic_syntax name in
+          let color = " style=\"color:red\"" in
+          let color1 =
+            if wi.wi_mark_if_not_public (fn, sn, oc) then "style=\"color:red\""
+            else ""
           in
           let t =
-            if exists then
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                name
-            else if wi.wi_always_show_link then
-              let s = " style=\"color:red\"" in
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>"
+            if cancel_links || name = Util.private_txt conf "" then name
+            else if wi.wi_person_exists (fn, sn, oc) then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" %s>%s</a>"
                 pos
                 (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                s name
-            else
-              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color1 name
+            else if wi.wi_always_show_link then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
+                pos
                 (commd conf :> string)
-                (if conf.hide_names then "x x" else escape name)
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color name
+            else
+              Printf.sprintf "<a href=\"%s\" %s>%s</a>"
+                (commd conf :> string)
+                color
+                (if conf.hide_names then Util.private_txt conf "" else name)
           in
-          loop quot_lev (pos + 1) j (Buff.mstore len t)
+          Buffer.add_string buff t;
+          loop ?stop_at_brace quot_lev next_pos j
       | NotesLinks.WLwizard (j, wiz, name) ->
+          let name = bold_italic_syntax name in
           let t =
             let s = if name <> "" then name else wiz in
-            Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
-              (commd conf :> string)
-              (encode wiz) s
+            if cancel_links then s
+            else
+              Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
+                (commd conf :> string)
+                (encode wiz) s
           in
-          loop quot_lev (pos + 1) j (Buff.mstore len t)
-      | NotesLinks.WLnone (_j, _none_s) ->
-          loop quot_lev pos (i + 1) (Buff.store len s.[i])
+          Buffer.add_string buff t;
+          loop ?stop_at_brace quot_lev next_pos j
+      | NotesLinks.WLimage (j, (dirs, file), alt, width_opt) ->
+          (* Build the path for the ?s= parameter by joining dirs and file
+             with '/' (the ':' directory separator is already split by
+             check_file_name into the dirs list). *)
+          let path = String.concat "/" (dirs @ [ file ]) in
+          let src =
+            Printf.sprintf "%sm=IM&s=%s" (commd conf :> string) (encode path)
+          in
+          let style =
+            match width_opt with
+            | None -> ""
+            | Some w -> Printf.sprintf " style=\"max-width:%s\"" (escape w)
+          in
+          let t =
+            Printf.sprintf {|<img src="%s" alt="%s"%s class="notes-image">|} src
+              (escape alt) style
+          in
+          Buffer.add_string buff t;
+          loop ?stop_at_brace quot_lev next_pos j
+      | NotesLinks.WLnone (j, none_s) ->
+          Buffer.add_string buff none_s;
+          loop ?stop_at_brace quot_lev next_pos j
   in
-  loop 0 1 0 0
+  ignore (loop Zero 1 0);
+  Buffer.contents buff
 
 let toc_list = [ "__NOTOC__"; "__TOC__"; "__SHORT_TOC__" ]
+
+module Buff = Buff.Make ()
+(* TODO replace Buff by Buffer. Needs more understanding of the functions *)
 
 let lines_list_of_string s =
   let rec loop no_toc lines len i =
@@ -322,7 +484,7 @@ let remove_links s =
       let len, i =
         match NotesLinks.misc_notes_link s i with
         | NotesLinks.WLpage (j, _, _, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLperson (j, (fn, sn, _), name, text) ->
+        | NotesLinks.WLperson (j, (fn, sn, _), name, text, _) ->
             let text =
               match text with
               | None | Some "" -> Option.value ~default:(fn ^ " " ^ sn) name
@@ -330,6 +492,7 @@ let remove_links s =
             in
             (Buff.mstore len text, j)
         | NotesLinks.WLwizard (j, _, text) -> (Buff.mstore len text, j)
+        | NotesLinks.WLimage (j, _, alt, _) -> (Buff.mstore len alt, j)
         | NotesLinks.WLnone (j, none_s) -> (Buff.mstore len none_s, j)
       in
       loop len i
@@ -377,7 +540,7 @@ let summary_of_tlsw_lines conf short lines =
         {|<div id="summary">
   <div class="d-flex align-items-center">
     <h2>0 – %s</h2>
-    <a href="#" class="toc-toggle ml-2">(%s)</a>
+    <a href="#" class="toc-toggle ms-2">(%s)</a>
   </div>
 <div id="toc-content">|}
         (Utf8.capitalize_fst (message_txt conf 3))
@@ -387,8 +550,8 @@ let summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 
 let modify_link conf cnt _empty = function
-  | Some (_, _, sfn) when conf.wizard ->
-      make_edit_button conf sfn ~cnt:(Some cnt) ()
+  | Some (_, mode, sfn) when conf.wizard ->
+      make_edit_button conf ~mode sfn ~cnt:(Some cnt) ()
   | _ -> ""
 
 let rec tlsw_list tag1 tag2 lev list sl =
@@ -620,13 +783,14 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
             (* S: previous condition is a strange way to write `if v = 0` *)
           else
             let nlev = section_level s len in
-            if cnt = v (*  *) then loop (s :: lines) nlev (cnt + 1) sl
+            if cnt = v (* *) then loop (s :: lines) nlev (cnt + 1) sl
             else if cnt > v then
               if nlev > lev then loop (s :: lines) lev (cnt + 1) sl else lines
             else loop lines lev (cnt + 1) sl
-        else if (* This line is not a title *)
-                cnt <= v then
-          loop lines lev cnt sl (* Line is in an ignored section *)
+        else if
+          (* This line is not a title *)
+          cnt <= v
+        then loop lines lev cnt sl (* Line is in an ignored section *)
         else loop (s :: lines) lev cnt sl (* Keeping the line *)
     | [] -> lines
   in
@@ -634,7 +798,7 @@ let rev_extract_sub_part (s : string) (v : int) : string list =
 
 let extract_sub_part s v = List.rev (rev_extract_sub_part s v)
 
-let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
+let print_sub_part_links conf edit_mode sfn cnt0 has_next =
   Output.print_sstring conf "<div class=\"btn-group mb-3\">";
   if cnt0 >= first_cnt then (
     Output.print_sstring conf {|<a href="|};
@@ -649,6 +813,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_nth conf "modify all note" 1));
     Output.print_sstring conf "</a>");
+
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
   Output.print_sstring conf {|m=|};
@@ -659,7 +824,20 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "modify all note" 0));
   Output.print_sstring conf "</a>";
-  if not is_empty then (
+
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_sstring conf {|m=|};
+  Output.print_sstring conf
+    (if edit_mode = Mutil.encode "MOD_WIZNOTES" then "WIZNOTES" else "NOTES");
+  Output.print_string conf sfn;
+  Output.print_sstring conf {|" class="btn btn-sm btn-outline-primary">|};
+  Output.print_sstring conf {|<i class="fa fa-image fa-fw"></i> |};
+  Output.print_sstring conf
+    (transl_nth conf "visualize/show/hide/summary" 1 |> Utf8.capitalize_fst);
+  Output.print_sstring conf "</a>";
+
+  if has_next then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=";
@@ -692,13 +870,98 @@ let print_sub_part_text conf wi edit_opt cnt0 lines =
   in
   Output.print_string conf (Util.safe_html s)
 
-let print_sub_part conf wi can_edit edit_mode sub_fname cnt0 lines =
+let print_sub_part conf wi ~has_next can_edit edit_mode sub_fname cnt0 lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn =
     if sub_fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode sub_fname
   in
-  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 (lines = []);
+  print_sub_part_links conf (Mutil.encode edit_mode) sfn cnt0 has_next;
   print_sub_part_text conf wi edit_opt cnt0 lines
+
+let print_mod_view_header conf can_edit (mode : Adef.encoded_string)
+    (sfn : Adef.encoded_string) has_v v title =
+  let edit_btn =
+    if can_edit then
+      Format.sprintf
+        {|<a href="%sm=%s%s%s"
+    class="btn btn-sm btn-outline-primary align-self-center ms-3 mt-1">%s</a>|}
+        (commd conf :> string)
+        (mode :> string)
+        (if has_v then "&v=" ^ string_of_int v else "")
+        (sfn :> string)
+        (Utf8.capitalize_fst (message_txt conf 0))
+    else ""
+  in
+  Output.print_sstring conf {|<div class="d-flex me-2">
+  <h1>|};
+  title false;
+  Output.printf conf {|</h1>%s
+</div>|} edit_btn
+
+let print_mod_view_form_start conf can_edit mode fname has_v v s is_new_note =
+  Output.printf conf {|<form method="POST" action="%s">|} conf.command;
+  Util.hidden_env conf;
+  if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
+  if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
+  if fname <> "" && not is_new_note then
+    Util.hidden_input conf "f" (Mutil.encode fname);
+  if can_edit then
+    Util.hidden_input conf "digest" (Mutil.digest s |> Mutil.encode)
+
+let print_new_note_input conf =
+  let note_lbl = Utf8.capitalize_fst (transl_nth conf "note/notes" 0) in
+  let plh = Utf8.capitalize_fst (transl_nth conf "new note name" 0) in
+  Output.printf conf
+    {|<div class="row mb-3">
+  <label class="col-sm-2 col-form-label visually-hidden" for="new_f">%s</label>
+  <div class="col-sm-7">
+    <input type="text" class="form-control form-control-lg" placeholder="%s"
+      name="new_f" id="new_f" tabindex="4" autofocus required>
+  </div>
+</div>|}
+    note_lbl plh
+
+let print_mod_view_editor conf can_edit sub_part is_new_note =
+  let note_lbl = Utf8.capitalize_fst (transl_nth conf "note/notes" 0) in
+  Output.print_sstring conf
+    {|<div class="d-flex flex-column">
+  <div class="pt-1">|};
+  let env =
+    Templ.Env.empty
+    |> Templ.Env.add "name" (Templ.Vstring (Adef.encoded "notes"))
+  in
+  Templ.output_simple conf env "toolbar";
+  let submit_btn =
+    if can_edit then
+      let lbl = Utf8.capitalize_fst (transl_nth conf "validate/delete" 0) in
+      Format.sprintf
+        {|<button type="submit" tabindex="6" title="%s"
+    class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3">
+    <span class="fw-bold text-uppercase">%s</span>
+    <i class="fa fa-share fa-rotate-180 fa-fw ms-2" aria-hidden="true"></i>
+  </button>|}
+        lbl lbl
+    else ""
+  in
+  Output.printf conf
+    {|</div>
+  <div class="row editor-container">
+    <div class="d-flex flex-column col-9">
+      <textarea name="notes" id="notes_comments" rows="25" tabindex="5"
+        class="form-control insert-character-target%s"%s%s>%s</textarea>
+      %s
+    </div>
+    <div class="col mx-2 pl-0 pr-3 py-0">|}
+    (if is_new_note then " no-clear-button" else "")
+    (if can_edit then "" else {| readonly="readonly"|})
+    (if is_new_note then " placeholder=\"" ^ note_lbl ^ "\"" else "")
+    (Util.escape_html sub_part :> string)
+    submit_btn;
+  Templ.output_simple conf Templ.Env.empty "characters";
+  Output.print_sstring conf {|</div>
+  </div>
+</div>
+</form>|}
 
 let print_mod_view_page conf can_edit mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
@@ -709,62 +972,22 @@ let print_mod_view_page conf can_edit mode fname title env s =
   let sub_part =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
-  let is_empty = sub_part = "" in
+  let has_next = has_v && extract_sub_part s (v + 1) <> [] in
+  let is_new_note = Util.p_getenv conf.env "new" <> None in
   let sfn =
     if fname = "" then Adef.encoded "" else "&f=" ^<^ Mutil.encode fname
   in
   Hutil.header_without_title conf;
-  Output.print_sstring conf "<div class=\"d-flex mb-3\">";
-  Output.print_sstring conf "<h1 class=\"mb-0\">";
-  title false;
-  Output.print_sstring conf "</h1>";
-  if can_edit then (
-    Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=|};
-    Output.print_string conf mode;
-    if has_v then Output.printf conf "&v=%d" v;
-    Output.print_string conf sfn;
-    Output.print_sstring conf
-      {|" class="btn btn-sm btn-outline-primary align-self-center ml-3 mt-1">|};
-    Output.print_sstring conf (Utf8.capitalize_fst (message_txt conf 0));
-    Output.print_sstring conf "</a>");
-  Output.print_sstring conf "</div>";
+  Output.print_sstring conf {|<div class="mx-1">|};
+  print_mod_view_header conf
+    (can_edit && not is_new_note)
+    mode sfn has_v v title;
   if can_edit && has_v then
-    print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
-  Output.print_sstring conf {|<form method="POST" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
-  Util.hidden_env conf;
-  if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
-  if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
-  if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
-  if can_edit then
-    Util.hidden_input conf "digest" (Mutil.digest s |> Mutil.encode);
-  Output.print_sstring conf
-    {|<div class="d-flex flex-column"><div class="pt-1">|};
-  Util.include_template conf [ ("name", Adef.encoded "notes") ] "toolbar" ignore;
-  Output.print_sstring conf {|</div><div class="row editor-container">|};
-  Output.print_sstring conf
-    {|<div class="d-flex flex-column col-9"><textarea name="notes" id="notes_comments"
-  class="form-control insert-character-target"|};
-  Output.print_sstring conf
-    (if can_edit then ">" else " readonly=\"readonly\">");
-  Output.print_string conf (Util.escape_html sub_part);
-  Output.print_sstring conf "</textarea>";
-  if can_edit then (
-    Output.print_sstring conf
-      {|<button type="submit" class="btn btn-outline-primary btn-lg mx-auto py-3 px-5 my-3">|};
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-    Output.print_sstring conf "</button>");
-  Output.print_sstring conf "</div><div class=\"col mx-2 p-2\"";
-
-  Util.include_template conf
-    [ ("name", Adef.encoded "notes") ]
-    "characters" ignore;
-  Output.print_sstring conf "</div></div>";
-  Output.print_sstring conf "</div></form>";
+    print_sub_part_links conf (mode_pref ^^^ mode) sfn v has_next;
+  print_mod_view_form_start conf can_edit mode fname has_v v s is_new_note;
+  if is_new_note then print_new_note_input conf;
+  print_mod_view_editor conf can_edit sub_part is_new_note;
+  Output.print_sstring conf {|</div>|};
   Hutil.trailer conf
 
 let insert_sub_part s v sub_part =
@@ -850,38 +1073,51 @@ let split_title_and_text s =
 
 let print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (Util.transl conf "notes modified"))
+    match Util.p_getenv conf.env "new_f" with
+    | Some _ ->
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl_nth conf "new note name" 1))
+    | None ->
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (Util.transl conf "note modified"))
   in
   Hutil.header conf title;
-  Output.print_sstring conf {|<div style="text-align:center"> --- |};
-  title ();
-  Output.print_sstring conf {| --- </div>|};
-  let get_v = Util.p_getint conf.env "v" in
-  let v = match get_v with Some v -> v | None -> 0 in
-  let title, s =
-    if v = 0 && title_is_1st then
-      let env, s = split_title_and_text s in
-      ((try List.assoc "TITLE" env with Not_found -> ""), s)
-    else ("", s)
+  let v, lines, has_next =
+    match Util.p_getint conf.env "v" with
+    | Some v -> (v, extract_sub_part s v, extract_sub_part s (v + 1) <> [])
+    | None ->
+        let title, s =
+          if title_is_1st then
+            let env, s = split_title_and_text s in
+            ((try List.assoc "TITLE" env with Not_found -> ""), s)
+          else ("", s)
+        in
+        let lines, _ = lines_list_of_string s in
+        let lines =
+          if title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
+        in
+        (0, lines, false)
   in
-  let lines, _ = lines_list_of_string s in
-  let lines =
-    if v = 0 && title <> "" then ("<h1>" ^ title ^ "</h1>") :: lines else lines
-  in
-  print_sub_part conf wi conf.wizard edit_mode fname v lines;
+  print_sub_part conf wi ~has_next conf.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
-let print_mod_ok conf wi edit_mode fname read_string commit string_filter
-    title_is_1st =
+let do_mod_ok conf edit_mode fname read_string commit =
   let new_fname = Util.p_getenv conf.env "new_f" in
   let fname =
     match new_fname with
     | Some f -> fname (Some f)
     | None -> fname (Util.p_getenv conf.env "f")
   in
+  (match new_fname with
+  | Some _ when fname <> "" ->
+      let new_fn_path =
+        String.concat Filename.dir_sep
+          [ !GWPARAM.bpath conf.bname; "notes_d"; fname ^ ".txt" ]
+      in
+      if Sys.file_exists new_fn_path then Update.error_same_file conf
+  | _ -> ());
   match edit_mode fname with
-  | Some edit_mode ->
+  | Some _ ->
       let old_string =
         let e, s = read_string fname in
         List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
@@ -895,13 +1131,25 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
         match Util.p_getenv conf.env "digest" with Some s -> s | None -> ""
       in
       if digest <> Mutil.digest old_string then Update.error_digest conf
-      else
+      else begin
         let s =
           match Util.p_getint conf.env "v" with
           | Some v -> insert_sub_part old_string v sub_part
           | None -> sub_part
         in
-        if s <> old_string then commit fname s;
-        let sub_part = string_filter sub_part in
-        print_ok conf wi edit_mode fname title_is_1st sub_part
+        if s <> old_string then commit fname s
+      end;
+      fname
+  | None ->
+      Hutil.incorrect_request conf;
+      ""
+
+let print_mod_ok conf wi edit_mode fname read_string commit string_filter
+    title_is_1st =
+  let fname_resolved = do_mod_ok conf edit_mode fname read_string commit in
+  match edit_mode fname_resolved with
+  | Some em ->
+      let _, s = read_string fname_resolved in
+      let sub_part = string_filter s in
+      print_ok conf wi em fname_resolved title_is_1st sub_part
   | None -> Hutil.incorrect_request conf

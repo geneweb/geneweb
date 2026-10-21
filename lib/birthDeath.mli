@@ -1,44 +1,74 @@
+val get_k : Config.config -> int
+(** [get_k conf] returns the number of items to select: the [k] parameter, else
+    the [latest_event] base parameter, else 20. *)
+
 val select_person :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.person -> Def.date option) ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.person -> Adef.date option) ->
   bool ->
-  (Gwdb.person * Def.dmy * Def.calendar) list * int
-(** [select_person conf base get_date find_oldest] select 20 persons
-    from the base according to the one of their date (birth, death,
-    marriage, specific event, etc.) that could be get with [get_date].
-    Returns sorted by date persons that have the latest (if [find_oldest]
-    is false) or oldest (otherwise) date. Selection could be different depending
-    on environement [conf.env]. These variables affect the selection:
-      k - allows to modify default value (20) of selected persons
-      by,bm,bd - allows to set reference date (all dates after the reference
-                 one aren't selected)
-    Returns also the number of selected persons *)
+  (Geneweb_db.Driver.person * Adef.dmy * Adef.calendar) list * int
+(** [select_person conf base get_date find_oldest] select 20 persons from the
+    base according to the one of their date (birth, death, marriage, specific
+    event, etc.) that could be get with [get_date]. Returns sorted by date
+    persons that have the latest (if [find_oldest] is false) or oldest
+    (otherwise) date. Selection could be different depending on environement
+    [conf.env]. These variables affect the selection: k - allows to modify
+    default value (20) of selected persons by,bm,bd - allows to set reference
+    date (all dates after the reference one aren't selected) Returns also the
+    number of selected persons. Persons not allowed by [Util.authorized_age] are
+    skipped. *)
+
+val select_families :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  int array ->
+  (Geneweb_db.Driver.family -> (int * Adef.date) option) ->
+  bool ->
+  ((Geneweb_db.Driver.family * Adef.dmy * Adef.calendar) list * int) array
+(** [select_families conf base limits get_date find_oldest] fills several lists
+    of families in a single pass over the base. [get_date fam] returns the index
+    of the list for [fam] and its date; list [i] keeps at most [limits.(i)]
+    families. Each list is selected and sorted as by {!select_family}. *)
 
 val select_family :
   Config.config ->
-  Gwdb.base ->
-  (Gwdb.family -> Def.date option) ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.family -> Adef.date option) ->
   bool ->
-  (Gwdb.family * Def.dmy * Def.calendar) list * int
-(** Same as [select_person] but dealing with families *)
+  (Geneweb_db.Driver.family * Adef.dmy * Adef.calendar) list * int
+(** Same as [select_person] but dealing with families; a family is skipped
+    unless both parents are allowed by [Util.authorized_age]. *)
 
-val death_date : Gwdb.person -> Adef.date option
+val death_date : Geneweb_db.Driver.person -> Adef.date option
 (** Returns person's death date (if exists) *)
 
 val make_population_pyramid :
   nb_intervals:int ->
   interval:int ->
   limit:int ->
-  at_date:Def.dmy ->
-  Config.config ->
-  Gwdb.base ->
+  at_date:Adef.dmy ->
+  Geneweb_db.Driver.base ->
   int array * int array
-(** [make_population_pyramid nb_intervals interval interval at_date conf base]
-    Calculates population pyramid of all perons in the base. Population pyramid
-    consists of two separated arrays that regroups number of men's and women's born
-    in each time interval. One array has a size [nb_intervals + 1] and every element
-    is a number of persons born in the giving time interval that represents [interval] years.
-    Calculation starts at the date [at_date] and persons that are considered
-    in pyramid should be alive at this date. [limit] allows to limit persons
-    by age (those that has age greater then limit aren't taken into the account) *)
+(** [make_population_pyramid nb_intervals interval limit at_date base]
+    Calculates population pyramid of all persons in the base, regardless of
+    access rights (only counts are returned). Population pyramid consists of two
+    separated arrays that regroups number of men's and women's born in each time
+    interval. One array has a size [nb_intervals + 1] and every element is mber
+    of persons born in the giving time interval that represents [interval]
+    years. Calculation starts at the date [at_date] and persons that are
+    considered in pyramid should be alive at this date. [limit] allows to limit
+    persons by age (those that has age greater then limit aren't taken into the
+    account) *)
+
+val make_death_pyramid :
+  nb_intervals:int ->
+  interval:int ->
+  limit:int ->
+  from_year:int ->
+  to_year:int ->
+  Geneweb_db.Driver.base ->
+  int array * int array
+(** Counts deceased persons by age-at-death bucket. Only persons with both a
+    Gregorian birth date and a death date falling in [from_year..to_year] are
+    counted, regardless of access rights. *)

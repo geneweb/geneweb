@@ -1,0 +1,47 @@
+(generate_sites_module
+ (module sites)
+ (sites geneweb)
+ (plugins
+  (geneweb plugins)))
+
+(library
+ (public_name geneweb.register)
+ (name geneweb_register)
+ (modules registration)
+ (libraries geneweb geneweb_compat))
+
+(library
+ (public_name geneweb.gwd_lib)
+ (name gwd_lib)
+ (libraries
+  geneweb
+  geneweb.oidc
+  geneweb_http
+  geneweb_register
+  digestif
+  dune-site
+  dune-site.plugins
+  cmdliner)
+ (modules request sites cmd cmd_legacy robot gwd_oidc))
+
+(executable
+ (package geneweb)
+ (name gwd)
+ (public_name gwd)
+ (libraries
+  base64
+  dynlink
+  geneweb
+  geneweb.oidc
+  geneweb_http
+  geneweb_register
+  gwd_lib
+  logs
+  logs-syslog
+  logs-syslog.unix
+  fmt
+  fmt.tty
+  str
+  unix
+  uri)
+ (modules gwd))

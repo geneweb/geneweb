@@ -1,19 +1,16 @@
-ifneq ($(MAKECMDGOALS),ci)
-Makefile.config: configure.ml
-	@if [ -e "$@" ]; then \
-	  echo "configure file has changed. Please rerun ocaml ./configure.ml"; exit 1; \
-	else \
-	  echo "Please run ocaml ./configure.ml first"; exit 1; \
-	fi
-include Makefile.config
+.PHONY: info refresh-version fmt build build-geneweb build-geneweb-rpc gwd \
+        install uninstall distrib distrib-rpc doc opendoc test bench \
+        bench-marshal bench-tabulate clean ci ocp-indent help bundle \
+        dmg clean-bundle
 
-# Ensure that all the dune commands run with the profile choosen with the script
-# ./configure
-export DUNE_PROFILE := $(DUNE_PROFILE)
-
+# OS / extension detection
+ifeq ($(OS),Windows_NT)
+  OS_TYPE := Win
+  EXT := .exe
+else
+  OS_TYPE := $(shell uname -s)
+  EXT :=
 endif
-
--include Makefile.local
 
 # Variables for packagers.
 DISTRIB_DIR=distribution
@@ -23,124 +20,69 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
-
-ifeq ($(DUNE_PROFILE),dev)
-    CPPO_D+= -D DEBUG
-endif
-
-%/dune: %/dune.in Makefile.config
-	@printf "Generating $@…" \
-	&& cat $< \
-	| cppo -n $(CPPO_D) \
-	| sed \
-	-e 's/%%%CPPO_D%%%/$(CPPO_D)/g' \
-	-e 's/%%%SOSA_PKG%%%/$(SOSA_PKG)/g' \
-	-e 's/%%%GWDB_PKG%%%/$(GWDB_PKG)/g' \
-	-e 's/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g' \
-	-e 's/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g' \
-	-e 's/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g' \
-	-e 's/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g' \
-	> $@ \
-	&& printf " Done.\n"
-
 COMPIL_DATE := $(shell date +'%Y-%m-%d')
 COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
-COMMIT_TITLE := $(shell git log -1 --no-merges --pretty="%s" | sed "s/\"/\\\"/g")
-COMMIT_COMMENT:= $(shell git log -1 --no-merges --pretty="%b" | sed "s/\"/\\\"/g")
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
+COMMIT_TITLE := $(shell git log -1 --pretty="%s" | sed "s/\"/\\\"/g")
+COMMIT_COMMENT:= $(shell git log -1 --pretty="%b" | sed "s/\"/\\\"/g")
+BRANCH := $(shell git symbolic-ref --quiet --short HEAD || git branch -r --contains HEAD | head -n1 | tr -d ' ')
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
-OCAMLV := $(shell ocaml --version)
-
-lib/version.ml: lib/version.txt .git/HEAD .git/index
-	@cp lib/version.txt $@
-	@printf 'let branch = "$(BRANCH)"\n' >> $@
-	@printf 'let src = "$(SOURCE)"\n' >> $@
-	@printf 'let commit_id = "$(COMMIT_ID)"\n' >> $@
-	@printf 'let commit_date = "$(COMMIT_DATE)"\n' >> $@
-	@printf 'let compil_date = "$(COMPIL_DATE)"\n' >> $@
-	@printf 'Generating $@… Done.\n'
-.PHONY: build fmt gwd install
-
-# Patch/unpatch files for campl5 >= 8.03
-CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
-CAMLP5_MAJOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 1)
-CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
-
-patch_files:
-	@if [ '$(CAMLP5_VERSION)' != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
-	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
-	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
-	  perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 10$$2/' bin/ged2gwb/ged2gwb.ml; \
-	fi
-
-unpatch_files:
-	@if [ -f bin/ged2gwb/dune.in.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
-	  printf "Restoring original patched files… Done.\n"; \
-	  mv bin/ged2gwb/dune.in.bak bin/ged2gwb/dune.in; \
-	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
-	fi
-
-BUILD = dune build -p geneweb
-UNPATCH = $(MAKE) --no-print-directory unpatch_files
-
-unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
+VERSION := $(shell awk -F\" '/^let ver =/ {print $$2}' lib/version.txt)
+OCAMLV := $(shell ocamlopt --version)
 
 info:
-	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n'
+	@printf 'Building \033[1;1mGeneweb $(VERSION)\033[0m with OCaml $(OCAMLV).\n\n'
 	@printf 'Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. '
 	@printf 'Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n'
 	@printf '  \033[1;1m%s\033[0m\n' '$(subst ','\'',$(COMMIT_TITLE))'
 ifneq ($(COMMIT_COMMENT),)
-	@printf '\n$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
+	@printf '\n%s' '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
 endif
 	@printf '\n\033[1;1mGenerating configuration files\033[0m\n'
-.PHONY: patch_files unpatch_files info
 
-DUNE_IN_FILES := $(shell find lib bin test -name "dune.in")
-DUNE_FILES := $(patsubst %.in,%,$(DUNE_IN_FILES))
-
-generated: $(DUNE_FILES) lib/version.ml
-	@printf "Done.\n"
-
-fmt build gwd install uninstall: info patch_files generated
+fmt build build-geneweb gwd distrib install uninstall: info
 
 fmt: ## Format Ocaml code
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	$(call unpatch_after, dune build @fmt --auto-promote)
+	dune fmt
 
-# [BEGIN] Installation / Distribution section
+build:
+	dune build
 
-build: ## Build the geneweb package (libraries and binaries)
+build-geneweb: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@$(call unpatch_after, $(BUILD))
+	dune build @bin/all @lib/all
+	@printf "Done."
+
+build-geneweb-rpc: ## Build the geneweb-rpc package
+	@printf "\033[1;1mBuilding Geneweb RPC package\033[0m\n"
+	dune build @rpc/all
 	@printf "Done."
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	@$(call unpatch_after, dune build bin/gwd bin/gwc)
+	dune build @bin/gwd/all @bin/gwc/all
 	@printf "Done."
 
-install: ## Install geneweb using dune
-	$(call unpatch_after, dune build @install)
+install: ## Install geneweb into the current opam switch (needed for gwtolatex, which depends on the pinned geneweb library)
+	@printf "\n\033[1;1mInstalling geneweb into opam switch\033[0m\n"
+	dune build @install
 	dune install
-
-uninstall: ## Uninstall geneweb using dune
-	$(call unpatch_after, dune build @install)
-	dune uninstall
-
-distrib: info ## Build the project and copy what is necessary for distribution
-	@$(MAKE) --no-print-directory patch_files generated
-	@printf "\n\033[1;1mBuilding executables\n\033[0m"
-	@$(call unpatch_after, $(BUILD))
 	@printf "Done.\n"
-	@$(RM) -r $(DISTRIB_DIR)
+
+uninstall: ## Remove geneweb from the current opam switch
+	@printf "\n\033[1;1mUninstalling geneweb from opam switch\033[0m\n"
+	dune uninstall
+	@printf "Done.\n"
+
+distrib: ## Build the project and copy what is necessary for distribution
+	dune build --release @bin/all @lib/all
+	@printf "Done.\n"
+	@rm -rf $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
-	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
+	cp CHANGES.md $(DISTRIB_DIR)/CHANGES.txt
 	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
 	cp etc/README.txt $(DISTRIB_DIR)/.
 	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
@@ -150,17 +92,18 @@ ifeq ($(OS_TYPE),Win)
 	cp etc/Windows/gwsetup.bat $(DISTRIB_DIR)
 	cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt
 	cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt
+	cp -f etc/ROBOT.txt $(DISTRIB_DIR)/ROBOT.txt
 else ifeq ($(OS_TYPE),Darwin)
-	cp etc/gwd.sh $(DISTRIB_DIR)
-	cp etc/gwsetup.sh $(DISTRIB_DIR)
-	cp etc/macOS/geneweb.sh $(DISTRIB_DIR)
+	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.command
+	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.command
+	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.command
 else
 	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh
 	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh
+	cp etc/geneweb.sh $(DISTRIB_DIR)/geneweb.sh
 endif
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
-	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
 	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
@@ -172,18 +115,37 @@ endif
 	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
+	cp $(BUILD_DISTRIB_DIR)robot/robot.exe $(DISTRIB_DIR)/gw/robot$(EXT)
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
 	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp -R hd/* $(DISTRIB_DIR)/gw/
+	rm $(DISTRIB_DIR)/gw/dune
+	rm $(DISTRIB_DIR)/gw/etc/js/dune
+	rm $(DISTRIB_DIR)/gw/etc/js/dune.inc
+	for f in $(DISTRIB_DIR)/gw/etc/js/*.js ; do \
+	  [ -e "$$f" ] || continue ; \
+	  case "$$f" in *.min.js) continue ;; esac ; \
+	  if [ -f "$${f%.js}.min.js" ]; then rm -f "$$f" ; fi ; \
+	done
+	@printf "\n\033[1;1m└ Compressing large JS/CSS assets\033[0m\n"
+	@for f in $(DISTRIB_DIR)/gw/etc/js/*.min.js; do \
+	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
+	    printf "gzip -9 -k %s\n" "$$f"; \
+	    gzip -9 -k -f "$$f"; \
+	    printf "brotli %s\n" "$$f"; \
+	    brotli -f -q 11 "$$f"; \
+	  fi; \
+	done
+	@for f in $(DISTRIB_DIR)/gw/etc/css/*.css; do \
+	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 10000 ]; then \
+	    printf "gzip -9 -k %s\n" "$$f"; \
+	    gzip -9 -k -f "$$f"; \
+	    printf "brotli %s\n" "$$f"; \
+	    brotli -f -q 11 "$$f"; \
+	  fi; \
+	done
 	mkdir $(DISTRIB_DIR)/gw/setup
-	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
-	mkdir $(DISTRIB_DIR)/gw/setup/lang
-	cp bin/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/
-	cp bin/setup/setup.css $(DISTRIB_DIR)/gw/setup/
-	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
 	@printf "\n\033[1;1m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	@for P in $(shell ls plugins); do \
@@ -202,73 +164,90 @@ endif
 	  fi; \
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
-	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
-.PHONY: fmt install uninstall distrib
+	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n\n"
+
+distrib-rpc: distrib
+	dune build --release @rpc/all
+	@printf "\n\n\033[1;1m└ Copy RPC server executable to distribution\033[0m\n"
+	cp $(BUILD_DIR)/rpc/server/server.exe $(DISTRIB_DIR)/gw/rpc_server$(EXT)
+	@echo "Done."
 
 # [END] Installation / Distribution section
 
 doc: ## Documentation generation
-doc: | $(GENERATED_FILES_DEP)
+doc:
 	dune build @doc
-.PHONY: doc
 
 opendoc: doc
 	xdg-open $(ODOC_DIR)/index.html
-.PHONY: opendoc
 
 test: ## Run tests
-test: | $(GENERATED_FILES_DEP)
-	dune build @runtest
-.PHONY: test
+test:
+	@dune build @runtest
+
+ci: ## Run tests, skip known failures
+ci:
+	@GENEWEB_CI=on dune build @runtest
 
 bench: ## Run benchmarks
-bench: | $(GENERATED_FILES_DEP)
+bench:
 	dune build @runbench
-.PHONY: bench
 
 BENCH_FILE?=geneweb-bench.bin
 
 bench-marshal: ## Run benchmarks and record the result
-bench-marshal: | $(GENERATED_FILES_DEP)
+bench-marshal:
 ifdef BENCH_NAME
 	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
 else
 	 $(error BENCH_NAME variable is empty)
 endif
-.PHONY: bench-marshal
 
 bench-tabulate: ## Read BENCH_FILE and print a report
-bench-tabulate: | $(GENERATED_FILES_DEP)
+bench-tabulate:
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
-	@$(RM) $(BENCH_FILE)
-.PHONY: bench-tabulate
+	@rm -f $(BENCH_FILE)
 
 clean:
 	@echo -n "Cleaning…"
-	@$(RM) $(GENERATED_FILES_DEP)
-	@$(RM) -r $(DISTRIB_DIR)
-	@dune clean
+	@rm -rf $(DISTRIB_DIR)
+	@rm -rf _build
 	@echo " Done."
-.PHONY: clean
-
-ci: ## Run tests, skip known failures
-ci:
-ifdef SKIP_BUILD
-	@GENEWEB_CI=on dune runtest
-else
-	@ocaml ./configure.ml && $(MAKE) -s build && GENEWEB_CI=on dune runtest
-endif
-
-ocp-indent: ## Run ocp-indent (inplace edition)
-ocp-indent:
-	for f in `find lib bin -type f -regex .*[.]ml[i]?` ; do \
-		echo $$f ; \
-		ocp-indent -i $$f ; \
-	done
-.PHONY: ocp-indent
 
 .DEFAULT_GOAL := help
 help:
 	@clear;grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile | awk 'BEGIN {FS = ":.*?#\
 # "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /[33m/'
-.PHONY: help
+
+bundle: distrib ## Create macOS app bundle
+ifeq ($(OS_TYPE),Darwin)
+	@printf "\n\033[1;1m=== Creating macOS bundle ===\033[0m\n"
+	@if [ ! -f "create_bundle.sh" ]; then \
+		echo "❌ create_bundle.sh not found"; \
+		exit 1; \
+	fi
+	./create_bundle.sh
+	@printf "\n\033[1;1m✅ Bundle created: GeneWeb.app\033[0m\n"
+else
+	@echo "❌ Bundle creation is only supported on macOS"
+endif
+
+dmg: bundle ## Create macOS DMG installer
+ifeq ($(OS_TYPE),Darwin)
+	@printf "\n\033[1;1m=== Creating DMG installer ===\033[0m\n"
+	@if [ ! -f "create_dmg.sh" ]; then \
+		echo "❌ create_dmg.sh not found"; \
+		exit 1; \
+	fi
+	./create_dmg.sh
+	@printf "\n\033[1;1m✅ DMG created\033[0m\n"
+else
+	@echo "❌ DMG creation is only supported on macOS"
+endif
+
+clean-bundle: ## Remove generated bundle and DMG
+	@echo "Cleaning macOS artifacts…"
+	@rm -rf GeneWeb.app
+	@rm -f GeneWeb-*.dmg
+	@rm -f install_geneweb.sh
+	@echo "Done."

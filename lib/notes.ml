@@ -1,13 +1,18 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Gwdb
 open Util
 module StrSet = Mutil.StrSet
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+
+let src = Logs.Src.create ~doc:"Notes" "NOTS"
+
+module Log = (val Logs.src_log src : Logs.LOG)
 
 let file_path conf base fname =
   String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; base_notes_dir base; fname ^ ".txt" ]
+    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -16,7 +21,7 @@ let path_of_fnotes fnotes =
 
 let read_notes base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = base_notes_read base fnotes in
+  let s = Driver.base_notes_read base fnotes in
   Wiki.split_title_and_text s
 
 let merge_possible_aliases conf db =
@@ -61,7 +66,7 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let db = Gwdb.read_nldb base in
+  let db = Driver.read_nldb base in
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
@@ -71,8 +76,9 @@ let notes_links_db conf base eliminate_unlinked =
           match pg with
           | PgInd ip -> pget conf base ip |> authorized_age conf base
           | PgFam ifam ->
-              foi base ifam |> get_father |> pget conf base
-              |> authorized_age conf base
+              Driver.(
+                foi base ifam |> get_father |> pget conf base
+                |> authorized_age conf base)
           | PgNotes | PgMisc _ | PgWizard _ -> true
         in
         if record_it then
@@ -124,6 +130,16 @@ let notes_links_db conf base eliminate_unlinked =
       Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
+let image_url_from_path conf path =
+  if path = "" then ""
+  else
+    let prefix = (Util.commd conf :> string) in
+    let album = "albums/" in
+    if String.starts_with ~prefix:album path then
+      let n = String.length album in
+      prefix ^ "m=IMA&s=" ^ String.sub path n (String.length path - n)
+    else prefix ^ "m=DOC&s=" ^ path
+
 let json_extract_img conf s =
   let extract l =
     List.fold_left
@@ -150,175 +166,8 @@ let json_extract_img conf s =
   let json = try Yojson.Basic.from_string s with _ -> `Null in
   let _, img = match json with `Assoc l -> extract l | _ -> (None, None) in
   match img with
-  | Some img -> ((Util.commd conf :> string) ^ "m=DOC&s=" ^ img, img)
+  | Some img -> (image_url_from_path conf img, img)
   | None -> ("", "")
-
-let safe_gallery conf s =
-  let html s = Util.string_with_macros conf [] s in
-  let safe_map e =
-    match e with
-    | `Assoc l ->
-        `Assoc
-          (List.map
-             (function
-               | key, `String s when key = "alt" -> (key, `String (html s))
-               | e -> e)
-             l)
-    | _ -> `Assoc []
-  in
-  let safe_json l =
-    List.map
-      (function
-        | key, `String s when key = "title" -> (key, `String (html s))
-        | key, `String s when key = "desc" -> (key, `String (html s))
-        | "map", `List lmap -> ("map", `List (List.map safe_map lmap))
-        | "images", `List images_l ->
-            ( "images",
-              `List
-                (List.map
-                   (function
-                     | `Assoc img_l ->
-                         `Assoc
-                           (List.map
-                              (function
-                                | "map", `List lmap ->
-                                    ("map", `List (List.map safe_map lmap))
-                                | "img", `String s -> ("img", `String s)
-                                | e -> e)
-                              img_l)
-                     | e -> e)
-                   images_l) )
-        | e -> e)
-      l
-  in
-  let json = try Yojson.Basic.from_string s with _ -> `Assoc [] in
-  let json =
-    match json with `Assoc l -> `Assoc (safe_json l) | _ -> `Assoc []
-  in
-  Yojson.Basic.to_string json
-
-let update_notes_links_db base fnotes s =
-  let slen = String.length s in
-  let list_nt, list_ind =
-    let rec loop list_nt list_ind pos i =
-      if i = slen then (list_nt, list_ind)
-      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
-      else
-        match NotesLinks.misc_notes_link s i with
-        | NotesLinks.WLpage (j, _, lfname, _, _) ->
-            let list_nt =
-              if List.mem lfname list_nt then list_nt else lfname :: list_nt
-            in
-            loop list_nt list_ind pos j
-        | NotesLinks.WLperson (j, key, _, txt) ->
-            let list_ind =
-              let link = { Def.NLDB.lnTxt = txt; Def.NLDB.lnPos = pos } in
-              (key, link) :: list_ind
-            in
-            loop list_nt list_ind (pos + 1) j
-        | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
-    in
-    loop [] [] 1 0
-  in
-  NotesLinks.update_db base fnotes (list_nt, list_ind)
-
-let update_notes_links_person base (p : _ Def.gen_person) =
-  let s =
-    let sl =
-      [
-        p.notes;
-        p.occupation;
-        p.birth_note;
-        p.birth_src;
-        p.baptism_note;
-        p.baptism_src;
-        p.death_note;
-        p.death_src;
-        p.burial_note;
-        p.burial_src;
-        p.psources;
-      ]
-    in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
-      in
-      loop p.pevents sl
-    in
-    String.concat " " (List.map (sou base) sl)
-  in
-  update_notes_links_db base (Def.NLDB.PgInd p.Def.key_index) s
-
-let update_notes_links_family base (f : _ Def.gen_family) =
-  let s =
-    let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
-    let sl =
-      let rec loop l accu =
-        match l with
-        | [] -> accu
-        | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
-      in
-      loop f.fevents sl
-    in
-    String.concat " " (List.map (sou base) sl)
-  in
-  update_notes_links_db base (Def.NLDB.PgFam f.Def.fam_index) s
-
-let commit_notes conf base fnotes s =
-  let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
-  let fname = path_of_fnotes fnotes in
-  let fpath =
-    String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; base_notes_dir base; fname ]
-  in
-  File.create_dir ~parent:true (Filename.dirname fpath);
-  (try Gwdb.commit_notes base fname s
-   with Sys_error m ->
-     Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
-  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db base pg s
-
-let commit_wiznotes conf base fnotes s =
-  let pg = Def.NLDB.PgWizard fnotes in
-  let fname = path_of_fnotes fnotes in
-  let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
-      [ base_wiznotes_dir base; fname ]
-  in
-  File.create_dir ~parent:true (Filename.dirname fpath);
-  Gwdb.commit_wiznotes base fname s;
-  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db base pg s
-
-(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
-(* TODO adjust replacement to news capital variants *)
-let replace olds news str =
-  let olds_l = Name.lower olds in
-  let olds_u1 = Utf8.capitalize_fst olds_l in
-  let olds_u2 = Utf8.uppercase olds_l in
-  let regexp =
-    Str.regexp (olds ^ "\\|" ^ olds_l ^ "\\|" ^ olds_u1 ^ "\\|" ^ olds_u2)
-  in
-  Str.global_replace regexp news str
-
-(*
-TITLE=Test imap
-TYPE=gallery
-{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
- "map":
- [{"shape":"rect","coords":"104,100.7,145,152.7",
-   "fn":"henri",
-   "sn":"gouraud",
-   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
-   "oc":"0",
-   "alt":"Henri Gouraud",
-   "group":"1"},{...}],
- "groups":[]}
-*)
 
 let extract_pnoc json =
   let fn =
@@ -345,41 +194,399 @@ let extract_pnoc json =
   in
   (fn, sn, oc)
 
+let mark_pnocs_validity base s =
+  let mark_one e =
+    match e with
+    | `Assoc l ->
+        let t =
+          try match List.assoc "t" l with `String s -> s | _ -> ""
+          with Not_found -> ""
+        in
+        if t = "" || t = "p" then
+          let fn, sn, oc = extract_pnoc (`Assoc l) in
+          if fn = "" || sn = "" then `Assoc l
+          else
+            let ok =
+              Driver.person_of_key base (Name.lower fn) (Name.lower sn) oc
+              <> None
+            in
+            `Assoc (l @ [ ("valid", `Bool ok) ])
+        else `Assoc l
+    | other -> other
+  in
+  let walk_image_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (List.map mark_one lmap))
+        | other -> other)
+      l
+  in
+  let walk_top_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (List.map mark_one lmap))
+        | "images", `List imgs ->
+            ( "images",
+              `List
+                (List.map
+                   (function
+                     | `Assoc img_l -> `Assoc (walk_image_fields img_l)
+                     | other -> other)
+                   imgs) )
+        | other -> other)
+      l
+  in
+  let json = try Yojson.Basic.from_string s with _ -> `Assoc [] in
+  let json =
+    match json with `Assoc l -> `Assoc (walk_top_fields l) | _ -> `Assoc []
+  in
+  Yojson.Basic.to_string json
+
+let safe_gallery conf base s =
+  let html s =
+    let s =
+      let wi =
+        {
+          Wiki.wi_mode = "NOTES";
+          Wiki.wi_file_path = file_path conf base;
+          Wiki.wi_person_exists = person_exists conf base;
+          Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
+          Wiki.wi_always_show_link = conf.wizard || conf.friend;
+        }
+      in
+      Wiki.syntax_links conf wi s
+    in
+    Util.string_with_macros conf [] s
+  in
+  let safe_map e =
+    match e with
+    | `Assoc l ->
+        `Assoc
+          (List.map
+             (function
+               | key, `String s when key = "alt" -> (key, `String (html s))
+               | e -> e)
+             l)
+    | _ -> `Assoc []
+  in
+  let safe_json l =
+    List.map
+      (function
+        | key, `String s when key = "title" -> (key, `String (html s))
+        | key, `String s when key = "chronicle" -> (key, `String (html s))
+        | key, `String s when key = "desc" -> (key, `String (html s))
+        | "map", `List lmap -> ("map", `List (List.map safe_map lmap))
+        | "images", `List images_l ->
+            ( "images",
+              `List
+                (List.map
+                   (function
+                     | `Assoc img_l ->
+                         `Assoc
+                           (List.map
+                              (function
+                                | "map", `List lmap ->
+                                    ("map", `List (List.map safe_map lmap))
+                                | "img", `String s -> ("img", `String s)
+                                | "desc", `String s -> ("desc", `String (html s))
+                                | e -> e)
+                              img_l)
+                     | e -> e)
+                   images_l) )
+        | e -> e)
+      l
+  in
+  let json = try Yojson.Basic.from_string s with _ -> `Assoc [] in
+  let json =
+    match json with `Assoc l -> `Assoc (safe_json l) | _ -> `Assoc []
+  in
+  Yojson.Basic.to_string json
+
+type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
+
+let cache_linked_pages_name = "cache_linked_pages"
+
+let get_linked_pages_fname conf =
+  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
+
+let read_cache_linked_pages conf =
+  let fname = get_linked_pages_fname conf in
+  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
+  | Some ic ->
+      Fun.protect
+        ~finally:(fun () -> close_in_noerr ic)
+        (fun () -> Some (input_value ic : cache_linked_pages_t))
+  | None ->
+      Log.warn (fun k -> k "%s not found: run update_nldb" fname);
+      None
+
+let save_cache_linked_pages bdir (ht : cache_linked_pages_t) =
+  let fname = Filename.concat bdir cache_linked_pages_name in
+  let tmp = fname ^ ".tmp" in
+  let oc = open_out_bin tmp in
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () ->
+      output_value oc ht;
+      close_out oc);
+  Sys.rename tmp fname
+
+let write_cache_linked_pages conf ht =
+  try save_cache_linked_pages (!GWPARAM.bpath conf.bname) ht
+  with Sys_error e ->
+    Log.warn (fun k -> k "%s not updated: %s" cache_linked_pages_name e)
+
+let adjust_cache_linked_pages conf ~removed ~added =
+  if removed <> [] || added <> [] then
+    match read_cache_linked_pages conf with
+    | None -> ()
+    | Some ht ->
+        List.iter
+          (fun key ->
+            match Hashtbl.find_opt ht key with
+            | Some 1 -> Hashtbl.remove ht key
+            | Some n -> Hashtbl.replace ht key (n - 1)
+            | None -> ())
+          removed;
+        List.iter
+          (fun key ->
+            let n = try Hashtbl.find ht key with Not_found -> 0 in
+            Hashtbl.replace ht key (n + 1))
+          added;
+        write_cache_linked_pages conf ht
+
+let links_of_text s =
+  NotesLinks.fold_links
+    (fun ~pos link (list_nt, list_ind) ->
+      match link with
+      | NotesLinks.WLpage (_, _, lfname, _, _) ->
+          let list_nt =
+            if List.mem lfname list_nt then list_nt else lfname :: list_nt
+          in
+          (list_nt, list_ind)
+      | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
+          let link =
+            {
+              Def.NLDB.lnTxt = txt;
+              Def.NLDB.lnPos = pos;
+              Def.NLDB.lnFamMarker = fam_marker;
+            }
+          in
+          (list_nt, (key, link) :: list_ind)
+      | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
+          (list_nt, list_ind))
+    ([], []) s
+
+let update_notes_links_db conf base fnotes s =
+  let list_nt, list_ind = links_of_text s in
+  let keys l = List.sort_uniq compare (List.map fst l) in
+  let old_keys =
+    match NotesLinks.update_db base fnotes (list_nt, list_ind) with
+    | Some (_, old_ind) -> keys old_ind
+    | None -> []
+  in
+  let new_keys = keys list_ind in
+  adjust_cache_linked_pages conf
+    ~removed:(List.filter (fun k -> not (List.mem k new_keys)) old_keys)
+    ~added:(List.filter (fun k -> not (List.mem k old_keys)) new_keys)
+
+let notes_bearing_text_of_person base (p : _ Def.gen_person) =
+  let sl =
+    [
+      p.notes;
+      p.occupation;
+      p.birth_note;
+      p.birth_src;
+      p.baptism_note;
+      p.baptism_src;
+      p.death_note;
+      p.death_src;
+      p.burial_note;
+      p.burial_src;
+      p.psources;
+    ]
+  in
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
+    in
+    loop p.pevents sl
+  in
+  String.concat " " (List.map (Driver.sou base) sl)
+
+let notes_bearing_text_of_family base (f : _ Def.gen_family) =
+  let sl = [ f.marriage_note; f.marriage_src; f.comment; f.fsources ] in
+  let sl =
+    let rec loop l accu =
+      match l with
+      | [] -> accu
+      | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
+    in
+    loop f.fevents sl
+  in
+  String.concat " " (List.map (Driver.sou base) sl)
+
+let has_links s = Mutil.contains s "[["
+
+let update_notes_links_person ?old_text conf base (p : _ Def.gen_person) =
+  let s = notes_bearing_text_of_person base p in
+  match old_text with
+  | Some t when links_of_text t = links_of_text s -> ()
+  | Some _ | None ->
+      update_notes_links_db conf base (Def.NLDB.PgInd p.Def.key_index) s
+
+let update_notes_links_family ?old_text conf base (f : _ Def.gen_family) =
+  let s = notes_bearing_text_of_family base f in
+  match old_text with
+  | Some t when links_of_text t = links_of_text s -> ()
+  | Some _ | None ->
+      update_notes_links_db conf base (Def.NLDB.PgFam f.Def.fam_index) s
+
+let commit_notes conf base fnotes s =
+  let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
+  let fname = path_of_fnotes fnotes in
+  let fpath =
+    String.concat Filename.dir_sep
+      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
+  in
+  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
+  (try Driver.commit_notes base fname s
+   with Sys_error m ->
+     Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
+  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
+  update_notes_links_db conf base pg s
+
+let commit_wiznotes conf base fnotes s =
+  let pg = Def.NLDB.PgWizard fnotes in
+  let fname = path_of_fnotes fnotes in
+  let fpath =
+    List.fold_left Filename.concat
+      (Util.bpath (conf.bname ^ ".gwb"))
+      [ Driver.base_wiznotes_dir base; fname ]
+  in
+  Filesystem.create_dir ~parent:true (Filename.dirname fpath);
+  Driver.commit_wiznotes base fname s;
+  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
+  update_notes_links_db conf base pg s
+
+(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
+(* TODO adjust replacement to news capital variants *)
+let replace olds news str =
+  let olds_l = Name.lower olds in
+  let olds_u1 = Utf8.capitalize_fst olds_l in
+  let olds_u2 = Utf8.uppercase olds_l in
+  (* Names are data: match and substitute them literally. *)
+  let alts = List.map Str.quote [ olds; olds_l; olds_u1; olds_u2 ] in
+  let regexp = Str.regexp (String.concat "\\|" alts) in
+  Str.global_substitute regexp (fun _ -> news) str
+
+(*
+TITLE=Test imap
+TYPE=gallery
+{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
+ "map":
+ [{"shape":"rect","coords":"104,100.7,145,152.7",
+   "fn":"henri",
+   "sn":"gouraud",
+   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
+   "oc":"0",
+   "alt":"Henri Gouraud",
+   "group":"1"},{...}],
+ "groups":[]}
+*)
+
 let _print_key label (fn, sn, oc) =
   Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn
 
 let lower_key (fn, sn, oc) = (Name.lower fn, Name.lower sn, oc)
 
-let replace_person person_json (new_fn, new_sn, new_oc) =
+let json_gallery_items_for_key conf s key =
+  let json = try Yojson.Basic.from_string s with _ -> `Null in
+  let lkey = lower_key key in
+  let has_key ml =
+    let l = match ml with `List l -> l | _ -> [] in
+    List.exists
+      (fun e -> Def.NLDB.equal_key (lower_key (extract_pnoc e)) lkey)
+      l
+  in
+  let url f = image_url_from_path conf f in
+  let str k l =
+    try match List.assoc k l with `String v -> v | _ -> ""
+    with Not_found -> ""
+  in
+  let process images =
+    let _, r =
+      List.fold_left
+        (fun (i, acc) img ->
+          let i = i + 1 in
+          match img with
+          | `Assoc il
+            when has_key (try List.assoc "map" il with Not_found -> `Null) ->
+              let f = str "img" il in
+              (i, (i, url f, f, str "desc" il) :: acc)
+          | _ -> (i, acc))
+        (0, []) images
+    in
+    List.rev r
+  in
+  match json with
+  | `Assoc l -> (
+      match List.assoc_opt "images" l with
+      | Some (`List imgs) -> process imgs
+      | _ -> process [ `Assoc l ])
+  | _ -> []
+
+let replace_person person_json (old_fn, old_sn, _old_oc) (new_fn, new_sn, new_oc)
+    =
+  let old_name = Name.lower (old_fn ^ " " ^ old_sn) in
   `Assoc
     (List.map
        (function
          | "fn", _ -> ("fn", `String new_fn)
          | "sn", _ -> ("sn", `String new_sn)
          | "oc", _ -> ("oc", `String (string_of_int new_oc))
-         | key, value -> (key, value) (* Preserve any other fields *))
+         | "alt", `String s when String.equal (Name.lower s) old_name ->
+             ("alt", `String (new_fn ^ " " ^ new_sn))
+         | key, value -> (key, value))
        (Yojson.Basic.Util.to_assoc person_json))
 
 (* Processes the map to replace target person
    with new values if the condition is met *)
 let update_map json oldk newk =
-  let map_data =
-    json |> Yojson.Basic.Util.member "map" |> Yojson.Basic.Util.to_list
-  in
-  let updated_map =
+  let update_map_list lmap =
     List.map
       (fun person_json ->
         let current_person = extract_pnoc person_json |> lower_key in
-        if current_person = lower_key oldk then replace_person person_json newk
+        if current_person = lower_key oldk then
+          replace_person person_json oldk newk
         else person_json)
-      map_data
+      lmap
   in
-  `Assoc
-    (List.map
-       (function
-         | "map", _ -> ("map", `List updated_map)
-         | field -> field (* Preserve all other top-level fields *))
-       (Yojson.Basic.Util.to_assoc json))
+  let update_fields l =
+    List.map
+      (function
+        | "map", `List lmap -> ("map", `List (update_map_list lmap))
+        | "images", `List imgs ->
+            ( "images",
+              `List
+                (List.map
+                   (function
+                     | `Assoc il ->
+                         `Assoc
+                           (List.map
+                              (function
+                                | "map", `List lmap ->
+                                    ("map", `List (update_map_list lmap))
+                                | e -> e)
+                              il)
+                     | e -> e)
+                   imgs) )
+        | field -> field)
+      l
+  in
+  `Assoc (update_fields (Yojson.Basic.Util.to_assoc json))
 
 let update_gallery s oldk newk =
   (* assumes the json part starts at the first { *)
@@ -400,17 +607,22 @@ let update_gallery s oldk newk =
 
 let rewrite_key s oldk newk _file =
   let s =
-    if Mutil.contains s "TYPE=gallery" then update_gallery s oldk newk else s
+    if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
+      update_gallery s oldk newk
+    else s
   in
   let slen = String.length s in
   let rec rebuild rs i =
     if i >= slen then rs
     else
       match NotesLinks.misc_notes_link s i with
-      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLnone (j, _) ->
+      | WLpage (j, _, _, _, _)
+      | WLwizard (j, _, _)
+      | WLimage (j, _, _, _)
+      | WLnone (j, _) ->
           let ss = String.sub s i (j - i) in
           rebuild (rs ^ ss) j
-      | WLperson (j, k, name, text) ->
+      | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
             let ofn, osn, _ooc = oldk in
@@ -419,13 +631,19 @@ let rewrite_key s oldk newk _file =
               | Some str -> Some (replace ofn fn str |> replace osn sn)
               | None -> None
             in
+            let fam_suffix =
+              match fam_marker with
+              | Some n -> "#" ^ string_of_int n
+              | None -> ""
+            in
             let ss =
-              Printf.sprintf "[[%s/%s/%d/%s%s]]" fn sn oc
+              Printf.sprintf "[[%s/%s/%d/%s%s]]%s" fn sn oc
                 (Option.fold
                    ~none:(Printf.sprintf "%s %s" fn sn)
                    ~some:(fun txt -> txt)
                    name)
                 (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
+                fam_suffix
             in
             rebuild (rs ^ ss) j
           else
@@ -435,14 +653,16 @@ let rewrite_key s oldk newk _file =
   rebuild "" 0
 
 let replace_ind_key_in_str base is oldk newk p =
-  let s = sou base is in
+  let s = Driver.sou base is in
   let design = Gutil.designation base p in
   let s' = rewrite_key s oldk newk design in
-  Gwdb.insert_string base s'
+  Driver.insert_string base s'
 
-let update_ind_key_pgind base p oldk newk =
-  let oldp = Gwdb.gen_person_of_person @@ poi base p in
-  let replace is = replace_ind_key_in_str base is oldk newk (poi base p) in
+let update_ind_key_pgind conf base p oldk newk =
+  let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
+  let replace is =
+    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
+  in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
   let birth_note = replace oldp.birth_note in
@@ -481,14 +701,14 @@ let update_ind_key_pgind base p oldk newk =
       pevents;
     }
   in
-  Gwdb.patch_person base p newp;
-  update_notes_links_person base newp
+  Driver.patch_person base p newp;
+  update_notes_links_person conf base newp
 
-let update_ind_key_pgfam base f oldk newk =
-  let oldf = Gwdb.gen_family_of_family @@ foi base f in
-  let cpl = foi base f in
-  let fath = poi base (get_father cpl) in
-  let moth = poi base (get_mother cpl) in
+let update_ind_key_pgfam conf base f oldk newk =
+  let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
+  let cpl = Driver.foi base f in
+  let fath = Driver.poi base (Driver.get_father cpl) in
+  let moth = Driver.poi base (Driver.get_mother cpl) in
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
@@ -510,18 +730,18 @@ let update_ind_key_pgfam base f oldk newk =
   let newf =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
-  Gwdb.patch_family base f newf;
-  update_notes_links_family base newf
+  Driver.patch_family base f newf;
+  update_notes_links_family conf base newf
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
-  let oldn = base_notes_read base fname in
+  let oldn = Driver.base_notes_read base fname in
   let newn = rewrite_key oldn oldk newk f in
   commit_notes conf base f newn
 
 let update_ind_key_pgwiz conf base f oldk newk =
   let fname = path_of_fnotes f in
-  let oldn = base_wiznotes_read base fname in
+  let oldn = Driver.base_wiznotes_read base fname in
   let newn = rewrite_key oldn oldk newk f in
   commit_wiznotes conf base f newn
 
@@ -529,8 +749,8 @@ let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
   List.iter
     (function
-      | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
-      | PgFam f -> update_ind_key_pgfam base f oldk newk
+      | Def.NLDB.PgInd p -> update_ind_key_pgind conf base p oldk newk
+      | PgFam f -> update_ind_key_pgfam conf base f oldk newk
       | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
       | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
       | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
@@ -544,6 +764,7 @@ let wiki_aux pp conf base env str =
       Wiki.wi_mode = "NOTES";
       Wiki.wi_file_path = file_path conf base;
       Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
@@ -555,46 +776,57 @@ let source conf base str =
 let note conf base env str = wiki_aux (fun x -> x) conf base env str
 
 let person_note conf base p str =
-  let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
+  let env =
+    [
+      ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
+      ('k', fun () -> Image.default_image_filename "portraits" base p);
+    ]
+  in
   note conf base env str
-
-let source_note conf base p str =
-  let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
-  wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
 
 let source_note_with_env conf base env str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
+
+let wiki_of_source conf base ~always_show_link p s =
+  let wi =
+    {
+      Wiki.wi_mode = "NOTES";
+      Wiki.wi_file_path = file_path conf base;
+      Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_mark_if_not_public = Util.mark_if_not_public conf base;
+      Wiki.wi_always_show_link = always_show_link;
+    }
+  in
+  let env =
+    [
+      ( 'i',
+        fun () ->
+          Geneweb_db.Driver.Iper.to_string (Geneweb_db.Driver.get_iper p) );
+      ('k', fun () -> Image.default_image_filename "portraits" base p);
+    ]
+  in
+  Util.string_with_macros conf env (Wiki.syntax_links conf wi s)
 
 let fold_linked_pages conf base db key type_filter transform =
   List.fold_left
     (fun acc (pg, (_, il)) ->
       let record_it =
         match (pg, type_filter) with
-        | Def.NLDB.PgMisc n, Some typ ->
+        | Def.NLDB.PgMisc n, Some typ -> (
             let nenv = read_notes base n |> fst in
-            let gallery =
-              try List.assoc "TYPE" nenv = typ with Not_found -> false
-            in
-            gallery
+            try
+              let t = List.assoc "TYPE" nenv in
+              t = typ || (t = "album" && typ = "gallery")
+            with Not_found -> false)
         | Def.NLDB.PgInd ip, None -> (
             authorized_age conf base (pget conf base ip)
-            &&
-            match type_filter with
-            | Some "gallery" | Some "album" -> false
-            | _ -> true)
+            && match type_filter with Some "gallery" -> false | _ -> true)
         | Def.NLDB.PgFam ifam, None -> (
             authorized_age conf base
-              (pget conf base (get_father @@ foi base ifam))
-            &&
-            match type_filter with
-            | Some "gallery" | Some "album" -> false
-            | _ -> true)
+              (pget conf base (Driver.get_father @@ Driver.foi base ifam))
+            && match type_filter with Some "gallery" -> false | _ -> true)
         | _, _ -> (
-            true
-            &&
-            match type_filter with
-            | Some "gallery" | Some "album" -> false
-            | _ -> true)
+            match type_filter with Some "gallery" -> false | _ -> true)
       in
       if record_it then
         List.fold_left
@@ -605,65 +837,124 @@ let fold_linked_pages conf base db key type_filter transform =
     [] db
   |> List.sort_uniq compare
 
-let links_to_cache_entries conf base db key =
-  fold_linked_pages conf base db key None (fun _pg k ind acc -> (k, ind) :: acc)
-
 let links_to_ind conf base db key typ =
   fold_linked_pages conf base db key typ (fun pg _k _ind acc -> pg :: acc)
 
-type mode = Delete | Rename | Merge
-type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
-
-let cache_linked_pages_name = "cache_linked_pages"
-
-let get_linked_pages_fname conf =
-  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
-
-let read_cache_linked_pages conf =
-  let fname = get_linked_pages_fname conf in
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-  | Some ic ->
-      let ht : cache_linked_pages_t = input_value ic in
-      close_in ic;
-      ht
-  | None ->
-      Printf.eprintf "%s not exist. Run update_nldb\n" fname;
-      let ht : cache_linked_pages_t = Hashtbl.create 10 in
-      ht
-
-(* sync with update_nldb.ml if this changes *)
-let write_cache_linked_pages conf cache_linked_pages =
-  let fname = get_linked_pages_fname conf in
-  let oc = open_out_bin fname in
-  output_value oc cache_linked_pages;
-  close_out oc
-
-let update_cache_linked_pages conf mode old_key new_key nbr =
-  let ht = read_cache_linked_pages conf in
-  match mode with
-  | Delete -> Hashtbl.remove ht old_key
-  | Merge -> (
-      let entry = try Some (Hashtbl.find ht old_key) with Not_found -> None in
-      match entry with
-      | Some _ -> Hashtbl.remove ht old_key
-      | None ->
-          ();
-          Hashtbl.add ht new_key nbr)
-  | Rename ->
-      (let entry =
-         try Some (Hashtbl.find ht old_key) with Not_found -> None
-       in
-       match entry with
-       | Some _ ->
-           Hashtbl.remove ht old_key;
-           Hashtbl.add ht new_key nbr
-       | None -> ());
-      write_cache_linked_pages conf ht
+let on_person_saved conf base ~old_key ?old_text
+    ~(pgl : unit -> (Driver.iper, Driver.ifam) Def.NLDB.page list) p =
+  (* Must run first: if p links to itself, update_ind_key re-indexes the
+     rewritten notes. *)
+  update_notes_links_person ?old_text conf base p;
+  if old_key <> Util.make_key base p then
+    update_ind_key conf base (pgl ()) old_key
+      (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
 
 let linked_pages_nbr conf base ip =
-  let key = Util.make_key base (Gwdb.gen_person_of_person (poi base ip)) in
-  let ht = read_cache_linked_pages conf in
-  let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
-  match entry with Some nbr -> nbr | None -> 0
+  let key =
+    Util.make_key base (Driver.gen_person_of_person (Driver.poi base ip))
+  in
+  match read_cache_linked_pages conf with
+  | None -> 0
+  | Some ht -> ( try Hashtbl.find ht key with Not_found -> 0)
 
-let has_linked_pages conf base ip = linked_pages_nbr conf base ip <> 0
+let linked_page_text_family conf base ifam s (str : Adef.safe_string)
+    (pg, (_, il)) : Adef.safe_string =
+  match pg with
+  | Def.NLDB.PgMisc pg -> (
+      let fam = Driver.foi base ifam in
+      let father_key =
+        let p = Driver.poi base (Driver.get_father fam) in
+        let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+        let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+        (fn, sn, Driver.get_occ p)
+      in
+      let mother_key =
+        let p = Driver.poi base (Driver.get_mother fam) in
+        let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+        let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+        (fn, sn, Driver.get_occ p)
+      in
+      let dominated_by_marker =
+        let markers =
+          List.filter_map (fun (_, ind) -> ind.Def.NLDB.lnFamMarker) il
+        in
+        List.sort_uniq compare markers
+      in
+      let matching_marker =
+        List.find_opt
+          (fun marker ->
+            let dominated_keys =
+              List.filter_map
+                (fun (key, ind) ->
+                  if ind.Def.NLDB.lnFamMarker = Some marker then Some key
+                  else None)
+                il
+            in
+            List.mem father_key dominated_keys
+            && List.mem mother_key dominated_keys)
+          dominated_by_marker
+      in
+      match matching_marker with
+      | None -> str
+      | Some marker -> (
+          try
+            let nenv, _ = read_notes base pg in
+            let v = List.assoc s nenv in
+            if v = "" then raise Not_found;
+            let persons_with_marker =
+              List.filter
+                (fun (_, ind) -> ind.Def.NLDB.lnFamMarker = Some marker)
+                il
+            in
+            let father_annot =
+              List.find_map
+                (fun (key, ind) ->
+                  if key = father_key then ind.Def.NLDB.lnTxt else None)
+                persons_with_marker
+            in
+            let mother_annot =
+              List.find_map
+                (fun (key, ind) ->
+                  if key = mother_key then ind.Def.NLDB.lnTxt else None)
+                persons_with_marker
+            in
+            let annot_suffix =
+              match (father_annot, mother_annot) with
+              | Some fa, Some ma when fa <> "" && ma <> "" ->
+                  Printf.sprintf " (%s/%s)" fa ma
+              | Some fa, _ when fa <> "" -> Printf.sprintf " (%s)" fa
+              | _, Some ma when ma <> "" -> Printf.sprintf " (%s)" ma
+              | _ -> ""
+            in
+            let lnPos =
+              match persons_with_marker with
+              | (_, ind) :: _ -> ind.Def.NLDB.lnPos
+              | [] -> 0
+            in
+            let a, b, c =
+              try
+                let i = String.index v '{' in
+                let j = String.index v '}' in
+                ( String.sub v 0 i,
+                  String.sub v (i + 1) (j - i - 1),
+                  String.sub v (j + 1) (String.length v - j - 1) )
+              with Not_found -> ("", v, "")
+            in
+            let str1 =
+              Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s%s" a
+                (Util.commd conf :> string)
+                (Mutil.encode pg :> string)
+                lnPos b c annot_suffix
+              |> Util.safe_html
+            in
+            if (str :> string) = "" then str1
+            else if Util.start_with (str1 :> string) 0 "<li>" then
+              Adef.safe ((str :> string) ^ (str1 :> string))
+            else Adef.safe ((str :> string) ^ ", " ^ (str1 :> string))
+          with Not_found -> str))
+  | _ -> str
+
+let get_linked_page_family conf base ifam s =
+  let db = Driver.read_nldb base in
+  let db = merge_possible_aliases conf db in
+  List.fold_left (linked_page_text_family conf base ifam s) (Adef.safe "") db

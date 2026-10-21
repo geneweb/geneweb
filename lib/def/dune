@@ -1,4 +1,7 @@
 (library
  (name geneweb_def)
  (public_name geneweb.def)
+ (libraries re geneweb_http)
+ (preprocess
+  (pps ppx_deriving.show))
  (wrapped false))

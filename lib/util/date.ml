@@ -8,13 +8,20 @@ type cdate = Adef.cdate =
   | Cfrench of int
   | Chebrew of int
   | Ctext of string
-  | Cdate of date
+  | Cdate of Adef.date
   | Cnone
 
-(* compress concrete date if it's possible *)
+(* Compress concrete date into integer if simple precision.
+   Encoding: (((prec_code * 32 + day) * 13 + month) * 2500 + year)
+   - prec_code: 0=Sure, 1=About, 2=Maybe, 3=Before, 4=After
+   - day ∈ [0,31], month ∈ [0,12], year ∈ ]0,2500[
+   - Limitations: year must be in ]0,2500[, delta must be 0,
+     OrYear/YearInt cannot be compressed
+   - Note: month can be 13 for some calendars but compression uses
+     mod 13 so max storable is 12 *)
 let compress d =
   let simple =
-    match d.prec with
+    match d.Adef.prec with
     | Sure | About | Maybe | Before | After ->
         d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500 && d.delta = 0
     | OrYear _ | YearInt _ -> false
@@ -38,16 +45,16 @@ let uncompress x =
   let day, x = (x mod 32, x / 32) in
   let prec =
     match x with
-    | 1 -> About
+    | 1 -> Adef.About
     | 2 -> Maybe
     | 3 -> Before
     | 4 -> After
     | _ -> Sure
   in
-  { day; month; year; prec; delta = 0 }
+  { Adef.day; month; year; prec; delta = 0 }
 
 let date_of_cdate = function
-  | Cgregorian i -> Dgreg (uncompress i, Dgregorian)
+  | Cgregorian i -> Adef.Dgreg (uncompress i, Dgregorian)
   | Cjulian i -> Dgreg (uncompress i, Djulian)
   | Cfrench i -> Dgreg (uncompress i, Dfrench)
   | Chebrew i -> Dgreg (uncompress i, Dhebrew)
@@ -55,36 +62,32 @@ let date_of_cdate = function
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
 
-let cdate_of_date d =
-  match d with
-  | Dgreg (g, cal) -> (
+let cdate_of_date = function
+  | Adef.Dtext t -> Ctext t
+  | Dgreg (g, cal) as d -> (
       match compress g with
+      | None -> Cdate d
       | Some i -> (
           match cal with
           | Dgregorian -> Cgregorian i
           | Djulian -> Cjulian i
           | Dfrench -> Cfrench i
-          | Dhebrew -> Chebrew i)
-      | None -> Cdate d)
-  | Dtext t -> Ctext t
+          | Dhebrew -> Chebrew i))
 
 let cdate_of_od = function Some d -> cdate_of_date d | None -> Cnone
-
-let od_of_cdate od =
-  match od with Cnone -> None | _ -> Some (date_of_cdate od)
-
+let od_of_cdate = function Cnone -> None | cd -> Some (date_of_cdate cd)
 let cdate_None = cdate_of_od None
 
 let dmy_of_dmy2 dmy2 =
   {
-    day = dmy2.day2;
+    Adef.day = dmy2.Adef.day2;
     month = dmy2.month2;
     year = dmy2.year2;
     prec = Sure;
     delta = dmy2.delta2;
   }
 
-let leap_year a = if a mod 100 = 0 then a / 100 mod 4 = 0 else a mod 4 = 0
+let leap_year a = (a mod 4 = 0 && a mod 100 <> 0) || a mod 400 = 0
 
 let nb_days_in_month m a =
   if m = 2 && leap_year a then 29
@@ -92,52 +95,52 @@ let nb_days_in_month m a =
     [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |].(m - 1)
   else 0
 
-(* TODO use SDN instead *)
+(* TODO: Consider using SDN (Serial Day Number) for calendar-neutral
+   calculations once Calendars library is updated. Current implementation
+   works only for Gregorian calendar and partial dates. *)
 let time_elapsed d1 d2 =
   let prec =
-    match (d1.prec, d2.prec) with
-    | Sure, Sure -> Sure
+    match (d1.Adef.prec, d2.Adef.prec) with
+    | Adef.Sure, Sure -> Adef.Sure
     | (Maybe | Sure | About), (Maybe | Sure | About) -> Maybe
     | (About | Maybe | Sure | Before), (After | Sure | Maybe | About) -> After
     | (About | Maybe | Sure | After), (Before | Sure | Maybe | About) -> Before
     | _ -> Maybe
   in
-  match d1 with
-  | { day = 0; month = 0; year = a1; _ } ->
-      { day = 0; month = 0; year = d2.year - a1; prec; delta = 0 }
-  | { day = 0; month = m1; year = a1; _ } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2; _ } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 })
-  | { day = j1; month = m1; year = a1; _ } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2; _ } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2; _ } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { day = j2; month = m2; year = a2; _ } ->
-          let day, r =
-            if j1 <= j2 then (j2 - j1, 0)
-            else (j2 - j1 + nb_days_in_month m1 a1, 1)
-          in
-          let month, r =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let year = a2 - a1 - r in
-          { day; month; year; prec; delta = 0 })
+  let compute_month_diff m1 m2 =
+    if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1)
+  in
+  let compute_day_diff j1 j2 m1 a1 =
+    if j1 <= j2 then (j2 - j1, 0) else (j2 - j1 + nb_days_in_month m1 a1, 1)
+  in
+  match (d1, d2) with
+  | { day = 0; month = 0; year = a1; _ }, { year = a2; _ } ->
+      { Adef.day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = 0; month = _; year = a1; _ }, { day = 0; month = 0; year = a2; _ }
+    ->
+      { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = 0; month = m1; year = a1; _ }, { day = 0; month = m2; year = a2; _ }
+    ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | { day = 0; month = m1; year = a1; _ }, { month = m2; year = a2; _ } ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | { day = _; month = _; year = a1; _ }, { day = 0; month = 0; year = a2; _ }
+    ->
+      { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
+  | { day = _; month = m1; year = a1; _ }, { day = 0; month = m2; year = a2; _ }
+    ->
+      let month, r = compute_month_diff m1 m2 in
+      { day = 0; month; year = a2 - a1 - r; prec; delta = 0 }
+  | ( { day = j1; month = m1; year = a1; _ },
+      { day = j2; month = m2; year = a2; _ } ) ->
+      let day, r1 = compute_day_diff j1 j2 m1 a1 in
+      let month, r2 = compute_month_diff (m1 + r1) m2 in
+      { day; month; year = a2 - a1 - r2; prec; delta = 0 }
 
 let time_elapsed_opt d1 d2 =
-  match (d1.prec, d2.prec) with
+  match (d1.Adef.prec, d2.Adef.prec) with
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
@@ -145,17 +148,17 @@ let time_elapsed_opt d1 d2 =
 (* use strict = false to compare date as if they are points on a timeline.
    use strict = true to compare date by taking precision in account. This makes some dates not comparable, do not use to sort a list *)
 let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
-  match compare dmy1.year dmy2.year with
+  match compare dmy1.Adef.year dmy2.Adef.year with
   | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
   | x -> eval_strict strict dmy1 dmy2 x
 
 and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* compare a known month|day with a unknown one (0) *)
-  let compare_with_unknown_value ~strict ~unkonwn ~known =
-    match unkonwn.prec with
-    | After -> Some 1
+  let compare_with_unknown_value ~strict ~unknown =
+    match unknown.Adef.prec with
+    | Adef.After -> Some 1
     | Before -> Some (-1)
-    | _other -> if strict then None else compare_prec false unkonwn known
+    | _other -> if strict then None else Some (-1)
   in
   (* if we are comparing months the next comparison to do is on days
       else if we are comparing days it is compare_prec *)
@@ -166,11 +169,10 @@ and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* 0 means month|day is unknow*)
   match (x, y) with
   | 0, 0 -> compare_prec strict dmy1 dmy2
-  | 0, _ -> compare_with_unknown_value ~strict ~unkonwn:dmy1 ~known:dmy2
+  | 0, _ -> compare_with_unknown_value ~strict ~unknown:dmy1
   | _, 0 ->
       (* swap dmy1 and dmy2 *)
-      Option.map Int.neg
-      @@ compare_with_unknown_value ~strict ~unkonwn:dmy2 ~known:dmy1
+      Option.map Int.neg @@ compare_with_unknown_value ~strict ~unknown:dmy2
   | m1, m2 -> (
       match Int.compare m1 m2 with
       | 0 -> next_comparison strict dmy1 dmy2
@@ -194,24 +196,173 @@ and eval_strict strict dmy1 dmy2 x =
     | x -> Some x
   else Some x
 
-exception Not_comparable
-
-let compare_dmy ?(strict = false) dmy1 dmy2 =
-  match compare_dmy_opt ~strict dmy1 dmy2 with
-  | None -> raise Not_comparable
+let compare_dmy dmy1 dmy2 =
+  match compare_dmy_opt ~strict:false dmy1 dmy2 with
+  | None -> assert false
   | Some x -> x
 
-let compare_date ?(strict = false) d1 d2 =
+let compare_dmy_period d1 d2 =
+  let trunc d =
+    if d1.Adef.month = 0 || d2.Adef.month = 0 then
+      { d with Adef.month = 0; day = 0 }
+    else if d1.day = 0 || d2.day = 0 then { d with Adef.day = 0 }
+    else d
+  in
+  compare_dmy (trunc d1) (trunc d2)
+
+let compare_dmy_strict dmy1 dmy2 = compare_dmy_opt ~strict:true dmy1 dmy2
+
+let compare_date d1 d2 =
   match (d1, d2) with
-  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy ~strict dmy1 dmy2
-  | Dgreg (_, _), Dtext _ -> if strict then raise Not_comparable else 1
-  | Dtext _, Dgreg (_, _) -> if strict then raise Not_comparable else -1
-  | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
+  | Adef.Dgreg (dmy1, _), Adef.Dgreg (dmy2, _) -> compare_dmy dmy1 dmy2
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
+  | Dtext _, Dtext _ -> 0
+
+let compare_date_period d1 d2 =
+  match (d1, d2) with
+  | Adef.Dgreg (dmy1, _), Adef.Dgreg (dmy2, _) -> compare_dmy_period dmy1 dmy2
+  | _ -> compare_date d1 d2
+
+let compare_date_strict d1 d2 =
+  match (d1, d2) with
+  | Adef.Dgreg (dmy1, _), Adef.Dgreg (dmy2, _) -> compare_dmy_strict dmy1 dmy2
+  | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
 
 let cdate_to_dmy_opt cdate =
+  match od_of_cdate cdate with Some (Dgreg (d, _)) -> Some d | _ -> None
+
+let max_month_of = function
+  | Adef.Dgregorian | Djulian -> 12
+  | Dfrench | Dhebrew -> 13
+
+let partial_date_upper_bound ~from ~day ~month ~year =
+  match (day, month) with
+  | 0, 0 | _, 0 -> (1, 1, year + 1)
+  | 0, month ->
+      if month = max_month_of from then (1, 1, year + 1)
+      else (1, month + 1, year)
+  | day, month -> (day, month, year)
+
+let to_sdn ~from ?(lower = true) d =
+  let { Adef.day; month; year; delta; _ } = d in
+  let day, month, year =
+    if lower then (max 1 day, max 1 month, year)
+    else partial_date_upper_bound ~from ~day ~month ~year
+  in
+  let dmy = { d with day; month; year } in
+  let base_sdn =
+    match from with
+    | Dgregorian -> Calendar.sdn_of_gregorian dmy
+    | Djulian -> Calendar.sdn_of_julian dmy
+    | Dfrench -> Calendar.sdn_of_french dmy
+    | Dhebrew -> Calendar.sdn_of_hebrew dmy
+  in
+  base_sdn + delta
+
+let gregorian_of_sdn ~prec sdn = Calendar.gregorian_of_sdn prec sdn
+let julian_of_sdn ~prec sdn = Calendar.julian_of_sdn prec sdn
+let french_of_sdn ~prec sdn = Calendar.french_of_sdn prec sdn
+let hebrew_of_sdn ~prec sdn = Calendar.hebrew_of_sdn prec sdn
+
+let approx_gregorian ~from d =
+  if from = Adef.Dgregorian then d
+  else if d.Adef.day > 0 && d.month > 0 then d
+  else
+    let sdn_lo = to_sdn ~from ~lower:true d in
+    let sdn_hi = to_sdn ~from ~lower:false d - 1 in
+    let sdn = sdn_lo + ((sdn_hi - sdn_lo) / 2) in
+    let g = Calendar.gregorian_of_sdn d.prec sdn in
+    {
+      g with
+      day = (if d.day = 0 then 0 else g.day);
+      month = (if d.month = 0 then 0 else g.month);
+    }
+
+let cdate_to_gregorian_dmy_opt cdate =
   match od_of_cdate cdate with
-  | Some (Dgreg (d, _)) -> Some d
-  | Some (Dtext _) | None -> None
+  | Some (Dgreg (d, cal)) -> Some (approx_gregorian ~from:cal d)
+  | _ -> None
+
+let convert ~from ~to_ dmy =
+  if from = to_ then dmy
+  else
+    let via_gregorian d =
+      let g =
+        match from with
+        | Adef.Dgregorian -> d
+        | Djulian -> Calendar.gregorian_of_julian d
+        | Dfrench -> Calendar.gregorian_of_french d
+        | Dhebrew -> Calendar.gregorian_of_hebrew d
+      in
+      match to_ with
+      | Adef.Dgregorian -> g
+      | Djulian -> Calendar.julian_of_gregorian g
+      | Dfrench -> Calendar.french_of_gregorian g
+      | Dhebrew -> Calendar.hebrew_of_gregorian g
+    in
+    let convert_dmy2 d2 =
+      Calendar.dmy2_of_dmy (via_gregorian (Calendar.dmy_of_dmy2 d2))
+    in
+    let prec =
+      match dmy.Adef.prec with
+      | Adef.OrYear d2 -> Adef.OrYear (convert_dmy2 d2)
+      | YearInt d2 -> YearInt (convert_dmy2 d2)
+      | p -> p
+    in
+    { (via_gregorian dmy) with prec }
+
+let days_between ~from d1 d2 =
+  if d1.Adef.day = 0 || d1.month = 0 || d2.Adef.day = 0 || d2.month = 0 then
+    None
+  else
+    let sdn1 = to_sdn ~from d1 in
+    let sdn2 = to_sdn ~from d2 in
+    if sdn2 >= sdn1 then Some (sdn2 - sdn1) else None
+
+let time_elapsed_cal ~from d1 d2 =
+  if from = Adef.Dgregorian then time_elapsed d1 d2
+  else
+    let d1 = convert ~from ~to_:Dgregorian d1 in
+    let d2 = convert ~from ~to_:Dgregorian d2 in
+    time_elapsed d1 d2
+
+type age = {
+  nb_year : int;
+  nb_month : int;
+  nb_day : int;
+  prec : Adef.precision;
+}
+
+let age_of_dmy d =
+  { nb_year = d.Adef.year; nb_month = d.month; nb_day = d.day; prec = d.prec }
+
+let age_between ~from d1 d2 =
+  let valid =
+    if d1.Adef.day > 0 && d1.month > 0 && d2.Adef.day > 0 && d2.month > 0 then
+      let sdn1 = to_sdn ~from d1 in
+      let sdn2 = to_sdn ~from d2 in
+      sdn2 >= sdn1
+    else
+      d2.year > d1.year
+      || d2.year = d1.year
+         && (d1.month = 0 || d2.month = 0 || d2.month > d1.month
+            || d2.month = d1.month
+               && (d1.day = 0 || d2.day = 0 || d2.day >= d1.day))
+  in
+  if not valid then None else Some (age_of_dmy (time_elapsed_cal ~from d1 d2))
+
+type relative_pos = Before of age | After of age | Same
+
+let age_is_zero a = a.nb_year = 0 && a.nb_month = 0 && a.nb_day = 0
+
+let relative_age ~from ~ref d =
+  match age_between ~from ref d with
+  | Some age -> Some (if age_is_zero age then Same else After age)
+  | None -> (
+      match age_between ~from d ref with
+      | Some age -> Some (Before age)
+      | None -> None)
 
 let cdate_of_death = function
   | Death (_, cd) -> Some cd

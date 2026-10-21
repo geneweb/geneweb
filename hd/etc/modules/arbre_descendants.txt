@@ -1,11 +1,9 @@
-<!-- $Id: modules/arbre_descendants.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/arbre_descendants.txt v7.1 01/03/2025 19:03:50 $ -->
 %define;display_person(xxx)
-  <div class="list-group-item px-0 mx-0 border-0">
+  <div class="px-0 mx-0 border-0">
   %if;(not cancel_links)
     <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
-             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;"
-      class="big_anchor list-group-item-action" title="[*navigation]">
-    </a>
+             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;" title="[*navigation]"></a>
   %end;
   %if;(xxx.has_sosa)%apply;display_sosa("xxx")<br>%end;
   %if;(cancel_links or xxx.is_restricted)
@@ -27,7 +25,7 @@
       href="%prefix;m=MOD_IND;i=%xxx.index;"
       title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
   %end;
-    <span class="font-italic">%nn;
+    <span class="fst-italic">%nn;
       %if;(xxx.dates!="")%xxx.dates;%nn;
       %elseif;(wizard and not cancel_links)-%nn;
       %elseif;(cancel_links)<br>
@@ -43,7 +41,7 @@
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
           target="_blank" title="[*image/images]0 %xxx;">%nn;
       %end;
-        <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
+        <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ms-0 pe-0" %nn;
           src="%xxx.image_url;" alt="[image/images]0">%nn;
       %if;not cancel_links;</a>%end;
     %elseif;(bvar.default_image="yes")
@@ -52,13 +50,13 @@
           class="normal_anchor" target="_blank" %nn;
           title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
       %end;
-      <img class="small_image align-self-center rounded ml-0" style="height:70%%"
+      <img class="small_image align-self-center rounded ms-0" style="height:70%%"
         src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
         alt="[missing image]">
       %if;(wizard and not cancel_links)</a>%end;
     %else;
       <span class="small_image noimage rounded display-4 text-center%nn;
-        text-muted ml-0 h-100">%bvar.default_image_no;</span>
+        text-body-secondary ms-0 h-100">%bvar.default_image_no;</span>
     %end;
   %end;
   </div>
@@ -253,7 +251,7 @@ Person:            Child1     Child2          Child3
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
 %let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
 %let;baseindex;%index;%in;
-<h1 id="a">[*descendants tree]</h1>
+<h3 id="a">[*descendants tree]</h3>
 %include;buttons_dag
 %reset_count;
 %let;evarv;%expr(e_v+1)%in;

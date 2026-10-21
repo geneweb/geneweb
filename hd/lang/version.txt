@@ -259,6 +259,7 @@ sv: Du kan välja ett annat språk bland de följande:
   <p><strong><font color=red>[
 co: I diritti di i streghi sò attimpati avà per mantenimentu.
 en: Wizard rights are now suspended for maintenance.
+es: Los derechos de los magos están actualmente suspendidos por mantenimiento.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 oc: Los drreches dels fachilhièrs son suspenduts per ara per mantenença.
 ]</font></strong>

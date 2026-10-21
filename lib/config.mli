@@ -1,6 +1,3 @@
-open Def
-open Gwdb
-
 (** Authentication scheme data type *)
 type auth_scheme_kind =
   | NoAuth
@@ -36,7 +33,7 @@ and digest_auth_scheme = {
 (** Digest authentication scheme inside {i Autorization} HTTP header *)
 
 type output_conf = {
-  status : Def.httpStatus -> unit;
+  status : Geneweb_http.Code.status -> unit;
   header : string -> unit;
   body : string -> unit;
   flush : unit -> unit;
@@ -56,24 +53,30 @@ type config = {
   debug : bool;
   query_start : float;
   friend : bool;
+  oidc : bool;  (** the current session was established through OIDC (SSO) *)
+  semi_public : bool;
   just_friend_wizard : bool;
   user : string;
   username : string;
   userkey : string;
+  consent : bool;
+  user_iper : Geneweb_db.Driver.iper option;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
   highlight : string;
   lang : string;
   vowels : string list;
+  base_lang : string;
+      (** Base reference language: [default_lang] of the .gwf, else the
+          [--default-lang] server option. Independent of the browser. *)
   default_lang : string;
   browser_lang : string;
-  default_sosa_ref : iper * Gwdb.person option;
-  multi_parents : bool;
+  default_sosa_ref : Geneweb_db.Driver.iper * Geneweb_db.Driver.person option;
   authorized_wizards_notes : bool;
   public_if_titles : bool;
   public_if_no_date : bool;
-  mutable setup_link : bool;
+  setup_link : bool;
   access_by_key : bool;
   private_years : int;
   private_years_death : int;
@@ -94,22 +97,20 @@ type config = {
   denied_titles : string list Lazy.t;
   request : string list;
   lexicon : (string, string) Hashtbl.t;
-  mutable charset : string;
+  charset : string;
   is_rtl : bool;
   left : string;
   right : string;
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : dmy;
+  today : Adef.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float;
   mutable output_conf : output_conf;
   (* HTTP printer *)
-  (* prefix for image urls:
-     the value of argument -images_url if specified, otherwise
-     command ^ "?m=IM&v=" in CGI mode
+  (* prefix for image urls: the value of -images_prefix in CGI mode,
      "images" otherwise *)
   gw_prefix : string;
   images_prefix : string;
@@ -118,11 +119,16 @@ type config = {
   etc_prefix : string;
       (* in CGI mode, provides location of etc files to Apache for direct loading *)
   cgi : bool;
-  forced_plugins : string list;
-  plugins : string list;
+  allowed_plugins : string list;
+  secret_salt : string option;
+      (** Secret salt generated at the server startup. The salt is used in
+          form's digests to enhance security. *)
+  predictable_mode : bool;
+      (** Determine if we are in predictable mode. In this mode, output must not
+          depend on random state. *)
 }
 (** Geneweb configuration data type *)
 
 val empty : config
-(** A dummy {!type:config} value, with uninitialized fields.
-    Used for testing purpose *)
+(** A dummy {!type:config} value, with uninitialized fields. Used for testing
+    purpose *)

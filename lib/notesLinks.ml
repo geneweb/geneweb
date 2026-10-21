@@ -1,6 +1,8 @@
 open Def.NLDB
+module Driver = Geneweb_db.Driver
 
 let char_dir_sep = ':'
+let dir_sep = ":"
 
 let check_file_name s =
   let rec loop path ibeg i =
@@ -24,8 +26,9 @@ let check_file_name s =
 
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string option * string option
+  | WLperson of int * key * string option * string option * int option
   | WLwizard of int * string * string
+  | WLimage of int * (string list * string) * string * string option
   | WLnone of int * string
 
 (* search in a note (s) wiki references
@@ -37,7 +40,9 @@ let misc_notes_link s i =
     (* assume no link up to [j] and find next link position *)
     if j < slen then
       match s.[j] with
-      | '%' -> wlnone (j + 2)
+      | '%' -> WLnone (j, cut j)
+      | '\'' -> WLnone (j, cut j)
+      | '{' | '}' -> WLnone (j, cut j)
       | '[' ->
           if j > i && j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
           else wlnone (j + 1)
@@ -111,6 +116,34 @@ let misc_notes_link s i =
             | None -> (b, "")
           in
           WLwizard (j, wiz, name)
+        else if spe = Some "image" then
+          (* Syntax: [[image:path/alt/width]]
+             where path uses ':' as directory separator (same as notes pages).
+             Fields are separated by '/': path, optional alt text, optional width. *)
+          let img_path, rest =
+            match String.index_opt b '/' with
+            | Some i ->
+                ( String.sub b 0 i,
+                  Some (String.sub b (i + 1) (String.length b - i - 1)) )
+            | None -> (b, None)
+          in
+          match check_file_name img_path with
+          | None -> wlnone j
+          | Some fpath ->
+              let alt, width_opt =
+                match rest with
+                | None -> ("", None)
+                | Some r -> (
+                    match String.index_opt r '/' with
+                    | None -> (r, None)
+                    | Some k ->
+                        ( String.sub r 0 k,
+                          let w =
+                            String.sub r (k + 1) (String.length r - k - 1)
+                          in
+                          if w = "" then None else Some w ))
+              in
+              WLimage (j, fpath, alt, width_opt)
         else
           try
             let k = 0 in
@@ -132,21 +165,68 @@ let misc_notes_link s i =
                 in
                 let oc1 = try int_of_string name with Failure _ -> -1 in
                 let oc = try int_of_string oc with Failure _ -> 0 in
-                if oc1 = -1 then (fn, sn, oc, Some name) else (fn, sn, oc1, None)
+                if oc1 = -1 then (fn, sn, oc, Some name)
+                else (fn, sn, oc1, Some (fn ^ " " ^ sn))
               with Not_found ->
                 let sn = String.sub b k (String.length b - k) in
                 (fn, sn, 0, Some (fn ^ " " ^ sn))
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in
-            WLperson (j, (fn, sn, oc), name, text)
+            let j, fam_marker =
+              if j < slen && (s.[j] = '#' || s.[j] = '&') then
+                let rec parse_int acc k =
+                  if k < slen && s.[k] >= '0' && s.[k] <= '9' then
+                    parse_int
+                      ((acc * 10) + Char.code s.[k] - Char.code '0')
+                      (k + 1)
+                  else (k, acc)
+                in
+                let k, acc = parse_int 0 (j + 1) in
+                if acc > 0 then (k, Some acc) else (j, None)
+              else (j, None)
+            in
+            WLperson (j, (fn, sn, oc), name, text, fam_marker)
           with Not_found -> wlnone j
       else wlnone j
   else wlnone (i + 1)
+
+let end_pos link =
+  match link with
+  | WLpage (j, _, _, _, _)
+  | WLperson (j, _, _, _, _)
+  | WLwizard (j, _, _)
+  | WLimage (j, _, _, _)
+  | WLnone (j, _) ->
+      j
+
+let advances_pos link =
+  match link with
+  | WLperson _ | WLwizard _ -> true
+  | WLpage _ | WLimage _ | WLnone _ -> false
+
+let fold_links f acc s =
+  let slen = String.length s in
+  let is_escapable c = c = '[' || c = ']' || c = '{' || c = '}' || c = '\'' in
+  let rec loop acc pos i =
+    if i >= slen then acc
+    else if i + 1 < slen && s.[i] = '%' && is_escapable s.[i + 1] then
+      loop acc pos (i + 2)
+    else if s.[i] = '%' then loop acc pos (i + 1)
+    else
+      let link = misc_notes_link s i in
+      let acc = f ~pos link acc in
+      let pos = if advances_pos link then pos + 1 else pos in
+      loop acc pos (end_pos link)
+  in
+  loop acc 1 0
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db
 
 let update_db base who list =
-  Gwdb.write_nldb base @@ add_in_db (Gwdb.read_nldb base) who list
+  let db = Driver.read_nldb base in
+  let old_entry = List.assoc_opt who db in
+  Driver.write_nldb base (add_in_db db who list);
+  old_entry

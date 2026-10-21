@@ -19,6 +19,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
   <script type="text/javascript">
     <!--
@@ -155,8 +156,9 @@
   %if;not cancel_links;
     %include;tools
     %apply;tools_anclist()
-    %base_trailer;
+    %include;trl
     %include;copyr
+    %query_time;
   %end;
 %end;
 </body>

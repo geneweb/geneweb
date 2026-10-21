@@ -1,6 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Adef
 open Def
 
 external identity : 'a -> 'a = "%identity"
@@ -9,6 +8,9 @@ let map_cdate fd d =
   match Date.od_of_cdate d with
   | Some d -> Date.cdate_of_date (fd d)
   | None -> d
+(* Note: when the cdate encodes "no date" (od_of_cdate returns None),
+     fd is not called and the original value is returned unchanged.
+     This is intentional: there is no date for fd to transform. *)
 
 let map_title_strings ?(fd = identity) f t =
   let t_name =
@@ -95,8 +97,8 @@ let map_fam_event ?(fd = identity) fp fs e =
 let map_relation_ps fp fs r =
   {
     r_type = r.r_type;
-    r_fath = (match r.r_fath with Some x -> Some (fp x) | None -> None);
-    r_moth = (match r.r_moth with Some x -> Some (fp x) | None -> None);
+    r_fath = Option.map fp r.r_fath;
+    r_moth = Option.map fp r.r_moth;
     r_sources = fs r.r_sources;
   }
 
@@ -179,12 +181,6 @@ let map_family_ps ?(fd = identity) fp ff fs fam =
     fsources = fs fam.fsources;
     fam_index = ff fam.fam_index;
   }
-
-let parent multi parent =
-  if not multi then Adef.parent parent else Adef.multi_parent parent
-
-let map_couple_p multi_parents fp cpl =
-  parent multi_parents (Array.map fp (parent_array cpl))
 
 let map_descend_p fp des = { children = Array.map fp des.children }
 
@@ -276,8 +272,12 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
           s_list father_titles_places
     in
     let list = Mutil.list_rev_map_append sou aliases list in
+    let list = Mutil.list_rev_map_append sou first_names_aliases list in
+    let list = Mutil.list_rev_map_append sou surnames_aliases list in
     list
 
+(* Like List.for_all2 eq l1 l2 but returns false instead of raising
+   Invalid_argument when the lists have different lengths. *)
 let rec eq_lists eq l1 l2 =
   match (l1, l2) with
   | x1 :: l1, x2 :: l2 -> eq x1 x2 && eq_lists eq l1 l2

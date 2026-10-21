@@ -1,5 +1,7 @@
 open Def
-open Gwdb
+module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 (* Optimisation de find_sosa_aux :                                           *)
 (* - ajout d'un cache pour conserver les descendants du sosa que l'on calcul *)
@@ -8,19 +10,19 @@ open Gwdb
 
 (* Type pour ne pas créer à chaque fois un tableau tstab et mark *)
 type sosa_t = {
-  tstab : (Gwdb.iper, int) Gwdb.Marker.t;
-  mark : (Gwdb.iper, bool) Gwdb.Marker.t;
-  mutable last_zil : (Gwdb.iper * Sosa.t) list;
-  sosa_ht : (Gwdb.iper, (Sosa.t * Gwdb.person) option) Hashtbl.t;
+  tstab : (Driver.iper, int) Collection.Marker.t;
+  mark : (Driver.iper, bool) Collection.Marker.t;
+  mutable last_zil : (Driver.iper * Sosa.t) list;
+  sosa_ht : (Driver.iper, (Sosa.t * Driver.person) option) Hashtbl.t;
 }
 
 let init_sosa_t conf base sosa_ref =
   try
     let tstab = Util.create_topological_sort conf base in
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let last_zil = [ (get_iper sosa_ref, Sosa.one) ] in
+    let mark = Driver.iper_marker (Driver.ipers base) false in
+    let last_zil = [ (Driver.get_iper sosa_ref, Sosa.one) ] in
     let sosa_ht = Hashtbl.create 5003 in
-    Hashtbl.add sosa_ht (get_iper sosa_ref) (Some (Sosa.one, sosa_ref));
+    Hashtbl.add sosa_ht (Driver.get_iper sosa_ref) (Some (Sosa.one, sosa_ref));
     Some { tstab; mark; last_zil; sosa_ht }
   with Consang.TopologicalSortError _ -> None
 
@@ -36,27 +38,27 @@ let find_sosa_aux conf base a p t_sosa =
     | [] -> Def.Left []
     | (ip, z) :: zil ->
         let _ = cache := (ip, z) :: !cache in
-        if ip = get_iper a then Right z
-        else if Gwdb.Marker.get t_sosa.mark ip then gene_find zil
+        if ip = Driver.get_iper a then Right z
+        else if Collection.Marker.get t_sosa.mark ip then gene_find zil
         else (
-          Gwdb.Marker.set t_sosa.mark ip true;
+          Collection.Marker.set t_sosa.mark ip true;
           if
-            Gwdb.Marker.get t_sosa.tstab (get_iper a)
-            <= Gwdb.Marker.get t_sosa.tstab ip
+            Collection.Marker.get t_sosa.tstab (Driver.get_iper a)
+            <= Collection.Marker.get t_sosa.tstab ip
           then
             let _ = has_ignore := true in
             gene_find zil
           else
             let asc = Util.pget conf base ip in
-            match get_parents asc with
+            match Driver.get_parents asc with
             | Some ifam -> (
-                let cpl = foi base ifam in
+                let cpl = Driver.foi base ifam in
                 let z = Sosa.twice z in
                 match gene_find zil with
                 | Left zil ->
                     Left
-                      ((get_father cpl, z)
-                      :: (get_mother cpl, Sosa.inc z 1)
+                      ((Driver.get_father cpl, z)
+                      :: (Driver.get_mother cpl, Sosa.inc z 1)
                       :: zil)
                 | Right z -> Right z)
             | None -> gene_find zil)
@@ -70,7 +72,9 @@ let find_sosa_aux conf base a p t_sosa =
     with
     | Left [] ->
         let _ =
-          List.iter (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false) !cache
+          List.iter
+            (fun (ip, _) -> Collection.Marker.set t_sosa.mark ip false)
+            !cache
         in
         None
     | Left zil ->
@@ -85,7 +89,9 @@ let find_sosa_aux conf base a p t_sosa =
         find zil
     | Right z ->
         let _ =
-          List.iter (fun (ip, _) -> Gwdb.Marker.set t_sosa.mark ip false) !cache
+          List.iter
+            (fun (ip, _) -> Collection.Marker.set t_sosa.mark ip false)
+            !cache
         in
         Some (z, p)
   in
@@ -94,11 +100,11 @@ let find_sosa_aux conf base a p t_sosa =
 let find_sosa conf base a sosa_ref t_sosa =
   match sosa_ref with
   | Some p ->
-      if get_iper a = get_iper p then Some (Sosa.one, p)
+      if Driver.get_iper a = Driver.get_iper p then Some (Sosa.one, p)
       else
-        let u = Util.pget conf base (get_iper a) in
+        let u = Util.pget conf base (Driver.get_iper a) in
         if Util.has_children base u then
-          try Hashtbl.find t_sosa.sosa_ht (get_iper a)
+          try Hashtbl.find t_sosa.sosa_ht (Driver.get_iper a)
           with Not_found -> find_sosa_aux conf base a p t_sosa
         else None
   | None -> None
@@ -111,27 +117,26 @@ let sosa_ht = Hashtbl.create 5003
 
 (* ************************************************************************ *)
 
-(** [Description] : Construit à partir d'une personne la base, la
-      liste de tous ses ancêtres directs et la stocke dans une hashtbl. La
-      clé de la table est l'iper de la personne et on lui associe son numéro
-      de sosa. Les sosa multiples ne sont représentés qu'une seule fois par
-      leur plus petit numéro sosa.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Construit à partir d'une personne la base, la liste de tous
+    ses ancêtres directs et la stocke dans une hashtbl. La clé de la table est
+    l'iper de la personne et on lui associe son numéro de sosa. Les sosa
+    multiples ne sont représentés qu'une seule fois par leur plus petit numéro
+    sosa. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let build_sosa_tree_ht conf base person =
-  let () = load_ascends_array base in
-  let () = load_couples_array base in
-  let nb_persons = nb_of_persons base in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  Driver.load_ascends_array base;
+  Driver.load_couples_array base;
+  let nb_persons = Driver.nb_of_persons base in
+  let mark =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
   (* Tableau qui va stocker au fur et à mesure les ancêtres de person. *)
   (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
   (* commence à l'indice 1 !                                            *)
-  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, dummy_iper) in
-  let () = Array.set sosa_accu 1 (Sosa.one, get_iper person) in
+  let sosa_accu = Array.make (nb_persons + 1) (Sosa.zero, Driver.Iper.dummy) in
+  Array.set sosa_accu 1 (Sosa.one, Driver.get_iper person);
   let rec loop i len =
     if i > nb_persons then ()
     else
@@ -143,21 +148,22 @@ let build_sosa_tree_ht conf base person =
         Hashtbl.add sosa_ht ip sosa_num;
         let asc = Util.pget conf base ip in
         (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
-        match get_parents asc with
+        match Driver.get_parents asc with
         | Some ifam ->
-            let cpl = foi base ifam in
+            let cpl = Driver.foi base ifam in
             let z = Sosa.twice sosa_num in
             let len =
-              if not @@ Gwdb.Marker.get mark (get_father cpl) then (
-                Array.set sosa_accu (len + 1) (z, get_father cpl);
-                Gwdb.Marker.set mark (get_father cpl) true;
+              if not @@ Collection.Marker.get mark (Driver.get_father cpl) then (
+                Array.set sosa_accu (len + 1) (z, Driver.get_father cpl);
+                Collection.Marker.set mark (Driver.get_father cpl) true;
                 len + 1)
               else len
             in
             let len =
-              if not @@ Gwdb.Marker.get mark (get_mother cpl) then (
-                Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
-                Gwdb.Marker.set mark (get_mother cpl) true;
+              if not @@ Collection.Marker.get mark (Driver.get_mother cpl) then (
+                Array.set sosa_accu (len + 1)
+                  (Sosa.inc z 1, Driver.get_mother cpl);
+                Collection.Marker.set mark (Driver.get_mother cpl) true;
                 len + 1)
               else len
             in
@@ -171,14 +177,11 @@ let build_sosa_tree_ht conf base person =
 
 (* ************************************************************************ *)
 
-(** [Description] : Fait appel à la construction de la
-      liste de tous les ancêtres directs de la souche de l'arbre
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Fait appel à la construction de la liste de tous les
+    ancêtres directs de la souche de l'arbre [Args] :
+    - conf : configuration de la base
+    - base : base de donnée [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let build_sosa_ht conf base =
   match Util.find_sosa_ref conf base with
   | Some sosa_ref -> build_sosa_tree_ht conf base sosa_ref
@@ -189,11 +192,9 @@ let build_sosa_ht conf base =
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche le sosa suivant
-    [Args] :
-      - s    : sosa
-    [Retour] :
-      - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant      *)
+(** [Description] : Recherche le sosa suivant [Args] :
+    - s : sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant *)
 let next_sosa s =
   (* La clé de la table est l'iper de la personne et on lui associe son numéro
      de sosa. On inverse pour trier sur les sosa *)
@@ -203,10 +204,12 @@ let next_sosa s =
   in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, dummy_iper)
+    | [] -> (Sosa.zero, Driver.Iper.dummy)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          match tl with [] -> (Sosa.zero, dummy_iper) | tl :: _tll -> tl
+          match tl with
+          | [] -> (Sosa.zero, Driver.Iper.dummy)
+          | tl :: _tll -> tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
@@ -220,10 +223,12 @@ let prev_sosa s =
   let sosa_list = List.rev sosa_list in
   let rec find_n x lst =
     match lst with
-    | [] -> (Sosa.zero, dummy_iper)
+    | [] -> (Sosa.zero, Driver.Iper.dummy)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          match tl with [] -> (Sosa.zero, dummy_iper) | tl :: _tll -> tl
+          match tl with
+          | [] -> (Sosa.zero, Driver.Iper.dummy)
+          | tl :: _tll -> tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
@@ -234,32 +239,28 @@ let prev_sosa s =
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche si la personne passée en argument a un
-                    numéro de sosa.
-    [Args] :
-      - p    : personne dont on cherche si elle a un numéro sosa
-    [Retour] :
-      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
-                sosa, ou retourne son numéro de sosa sinon
-    [Rem] : Exporté en clair hors de ce module.                         *)
+(** [Description] : Recherche si la personne passée en argument a un numéro de
+    sosa. [Args] :
+    - p : personne dont on cherche si elle a un numéro sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de sosa, ou
+      retourne son numéro de sosa sinon [Rem] : Exporté en clair hors de ce
+      module. *)
 let get_sosa_person p =
-  try Hashtbl.find sosa_ht (get_iper p) with Not_found -> Sosa.zero
+  try Hashtbl.find sosa_ht (Driver.get_iper p) with Not_found -> Sosa.zero
 
 (* ******************************************************************** *)
 (*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
 
 (* ******************************************************************** *)
 
-(** [Description] : Recherche si la personne passée en argument a un
-                    numéro de sosa.
-    [Args] :
+(** [Description] : Recherche si la personne passée en argument a un numéro de
+    sosa. [Args] :
     - conf : configuration de la base
     - base : base de donnée
-    - p    : personne dont on cherche si elle a un numéro sosa
-      [Retour] :
-    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
-                sosa, ou retourne son numéro de sosa sinon
-      [Rem] : Exporté en clair hors de ce module.                         *)
+    - p : personne dont on cherche si elle a un numéro sosa [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de sosa, ou
+      retourne son numéro de sosa sinon [Rem] : Exporté en clair hors de ce
+      module. *)
 let get_single_sosa conf base p =
   match Util.find_sosa_ref conf base with
   | None -> Sosa.zero
@@ -277,56 +278,51 @@ let get_single_sosa conf base p =
 (* ************************************************************************ *)
 
 (** [Description] : Affiche le picto sosa ainsi que le lien de calcul de
-      relation entre la personne et le sosa 1 (si l'option cancel_link
-      n'est pas activée).
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : la personne que l'on veut afficher
-      - link : ce booléen permet d'afficher ou non le lien sur le picto
-               sosa. Il n'est pas nécessaire de mettre le lien si on a
-               déjà affiché cette personne.
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
+    relation entre la personne et le sosa 1 (si l'option cancel_link n'est pas
+    activée). [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p : la personne que l'on veut afficher
+    - link : ce booléen permet d'afficher ou non le lien sur le picto sosa. Il
+      n'est pas nécessaire de mettre le lien si on a déjà affiché cette
+      personne. [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_sosa conf base p link =
   let sosa_num = get_sosa_person p in
   if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
     | Some r ->
         (if not link then ()
-        else
-          let sosa_link =
-            let i1 = string_of_iper (get_iper p) in
-            let i2 = string_of_iper (get_iper r) in
-            let b2 = Sosa.to_string sosa_num in
-            "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
-          in
-          Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (Util.commd conf);
-          Output.print_string conf (sosa_link |> Adef.safe);
-          Output.print_sstring conf {|"> |});
+         else
+           let sosa_link =
+             let i1 = Driver.Iper.to_string (Driver.get_iper p) in
+             let i2 = Driver.Iper.to_string (Driver.get_iper r) in
+             let b2 = Sosa.to_string sosa_num in
+             "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
+           in
+           Output.print_sstring conf {|<a href="|};
+           Output.print_string conf (Util.commd conf);
+           Output.print_string conf (sosa_link |> Adef.safe);
+           Output.print_sstring conf {|"> |});
         let title =
           if Util.is_hide_names conf r && not (Util.authorized_age conf base r)
           then ""
           else
             let direct_ancestor =
-              Name.strip_c (p_first_name base r) '"'
+              Name.strip_c (Driver.p_first_name base r) '"'
               ^ " "
-              ^ Name.strip_c (p_surname base r) '"'
+              ^ Name.strip_c (Driver.p_surname base r) '"'
             in
             Printf.sprintf
               (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))
               direct_ancestor
-            ^ Printf.sprintf ", Sosa: %s"
+            ^ Printf.sprintf " (%s %s)" (Util.transl conf "Sosa")
                 (Sosa.to_string_sep
                    (Util.transl conf "(thousand separator)")
                    sosa_num)
         in
-        Output.print_sstring conf {|<img class="mb-1" src="|};
-        Output.print_sstring conf (Util.images_prefix conf);
-        Output.print_sstring conf {|/sosa.png" alt="sosa" title="|};
-        Output.print_string conf (title |> Adef.safe);
-        Output.print_sstring conf {|"> |};
+        Output.printf conf
+          {|<i class="far fa-circle-dot text-success" title="%s"></i>|}
+          (title |> Adef.safe :> string);
         if not link then () else Output.print_sstring conf "</a> "
     | None -> ()

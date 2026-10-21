@@ -1,7 +1,13 @@
-<!-- page_test v1 %version 24/12/2023 00:58:22 -->
+<!-- conf.txt, v7.1 11/09/2026 01:38:20 -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
+  <title>[*geneweb parameters]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
 %include.css
 </head>
 <body>
@@ -18,7 +24,7 @@
 %end;
 <h1 class="mt-1 mx-3">%nn;
   [*geneweb parameters]%nn;
-  <i class="fa fa-hat-wizard fa-xs text-success ml-2"
+  <i class="fa fa-hat-wizard fa-xs text-success ms-2"
      title="[*wizard/wizards/friend/friends/exterior]1"
      aria-hidden="true" alt="green [*wizard/wizards/friend/friends/exterior]1 icon"></i>%nn;
 </h1>
@@ -34,20 +40,20 @@
   <h2>[*user and language variables]</h2>
   <div>%nn;
     User[:] %user.ident;<br>
-    username[:] %user.name;<br>
-    userkey[:] %user.key;<br>
-    lang: %lang.full; (%lang;)<br>
-    lang fallback: %lang_fallback;<br>
-    default_lang: %default_lang;<br>
-    browser_lang: %browser_lang;<br>
+    Username[:] %user.name;<br>
+    Status[:] %if;wizard;Wizard%elseif;friend;Friend%else;Visitor%end;<br>
+    Userkey[:] %user.key;<br>
+    Lang: %apply;language_name(lang) (%lang;)<br>
+    Lang fallback: %lang_fallback;<br>
+    Lang priority: URL lang (%e.lang;) &gt; browser_lang (%browser_lang;) &gt; base_lang (%base_lang;)<br>
   </div>
 </section>
 
 <section id="gwd-arguments" class="mt-3 mx-3">
 <h2>[*launch arguments of Gwd server]</h2>
  <div>%gwd.arglist;</div>
-  <p>
-  Mode: %if;(cgi)CGI%else;Server%end;<br>
+  <br>
+  Mode: <b>%if;cgi;CGI%else;Server%end;</b><br>
   prefix: %prefix;<br>
   etc_prefix: %etc_prefix;<br>
   images_prefix: %images_prefix;<br>
@@ -56,15 +62,17 @@
 <section id="bvar-list" class="mt-3 mx-3">
   <h2>[*configuration parameters]</h2>
   <div>
-     Mode: <b>%if;reorg;Reorg%else;Classic%end;</b>[:]%sp;
-    <tt>%if;reorg;%base.name;.gwb%/etc%/%base.name;%else;%base.name;%end;.gwf</tt><br>
+    <b>Gwf</b>[:] %if;reorg;%base.name;.gwb%/etc%/%base.name;.gwf (<b>Reorg</b>)
+    %else;%base.name;.gwf (<b>Classic</b>)%end;<br>
+    <br>
     %bvar.list;
   </div>
 </section>
 
-%base_trailer;
+%include;trl
 %include;copyr
 %include;js
+%query_time;
 </div>
 </body>
 </html>

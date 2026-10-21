@@ -2,9 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open BirthDeath
+module Driver = Geneweb_db.Driver
 
 let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
@@ -27,7 +27,9 @@ let list_aux_1 conf d cal last_month_txt was_future =
 
 let print_birth conf base =
   let list, len =
-    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
+    select_person conf base
+      (fun p -> Date.od_of_cdate (Driver.get_birth p))
+      false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -50,7 +52,7 @@ let print_birth conf base =
            Output.print_sstring conf "</em>.")
          else (
            Output.print_sstring conf
-             (transl_nth conf "born" (index_of_sex (get_sex p)));
+             (transl_nth conf "born" (index_of_sex (Driver.get_sex p)));
            Output.print_sstring conf " <em>";
            Output.print_string conf
              (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -76,6 +78,14 @@ let print_death conf base =
     let _, ages_sum, ages_nb =
       List.fold_left
         (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
+          let is_friend =
+            if
+              (try List.assoc "roglo" conf.base_env = "yes"
+               with Not_found -> false)
+              && Driver.get_access p = SemiPublic
+            then {|<i class="fa fa-person fa-fw text-warning"></i> |}
+            else ""
+          in
           let month_txt = month_txt conf d cal in
           if month_txt <> last_month_txt then (
             if (last_month_txt :> string) <> "" then
@@ -84,20 +94,20 @@ let print_death conf base =
             Output.print_string conf month_txt;
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
-            let sure d = d.prec = Sure in
-            match Date.cdate_to_dmy_opt (get_birth p) with
+            let sure d = d.Adef.prec = Sure in
+            match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
                   let a = Date.time_elapsed d1 d in
                   let ages_sum =
-                    match get_sex p with
+                    match Driver.get_sex p with
                     | Male -> (fst ages_sum + a.year, snd ages_sum)
                     | Female -> (fst ages_sum, snd ages_sum + a.year)
                     | Neuter -> ages_sum
                   in
                   let ages_nb =
-                    match get_sex p with
+                    match Driver.get_sex p with
                     | Male -> (fst ages_nb + 1, snd ages_nb)
                     | Female -> (fst ages_nb, snd ages_nb + 1)
                     | Neuter -> ages_nb
@@ -105,11 +115,11 @@ let print_death conf base =
                   (Some a, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
           in
-          Output.print_sstring conf "<li><b>";
+          Output.print_sstring conf (Printf.sprintf "<li>%s<b>" is_friend);
           Output.print_string conf (referenced_person_text conf base p);
           Output.print_sstring conf "</b>, ";
           Output.print_sstring conf
-            (transl_nth conf "died" (index_of_sex (get_sex p)));
+            (transl_nth conf "died" (index_of_sex (Driver.get_sex p)));
           Output.print_sstring conf " <em>";
           Output.print_string conf
             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
@@ -140,8 +150,7 @@ let print_death conf base =
     in
     aux 0 (fst ages_nb) (fst ages_sum);
     aux 1 (snd ages_nb) (snd ages_sum);
-    Output.print_sstring conf
-      {|<br><div align="center"><hr width="50%"></div><br>|};
+    Output.print_sstring conf {|<hr class="w-50 my-3">|};
     let aux name def =
       string_of_int
       @@
@@ -149,53 +158,55 @@ let print_death conf base =
       | Some s -> int_of_string s
       | None -> def
     in
-    let by = aux "by" conf.today.year in
-    let bm = aux "bm" conf.today.month in
-    let bd = aux "bd" conf.today.day in
-    Output.print_sstring conf {|<form method="get" action="|};
-    Output.print_sstring conf conf.command;
-    Output.print_sstring conf {|"><p>|};
+    let by =
+      aux "by" (if conf.predictable_mode then 1971 else conf.today.year)
+    in
+    let bm = aux "bm" (if conf.predictable_mode then 1 else conf.today.month) in
+    let bd = aux "bd" (if conf.predictable_mode then 1 else conf.today.day) in
+    Output.printf conf
+      {|<form method="get" action="%s">
+    <div class="d-flex align-items-center gap-2 mt-2">|}
+      conf.command;
     Util.hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "LD");
-    Output.print_sstring conf
-    @@ Printf.sprintf
-         (fcapitale (ftransl conf "the latest %t deaths"))
-         (fun _ ->
-           {|<input name="k" value="|} ^ string_of_int len
-           ^ {|" size="4" maxlength="4">|});
-    Output.print_sstring conf "\n... (";
-    Output.print_sstring conf (transl conf "before");
-    Output.print_sstring conf "...\n";
-    let aux name value size =
-      Output.print_sstring conf {|<input name="|};
-      Output.print_sstring conf name;
-      Output.print_sstring conf {|" value="|};
-      Output.print_sstring conf value;
-      Output.print_sstring conf {|" size="|};
-      Output.print_sstring conf size;
-      Output.print_sstring conf {|" maxlength="|};
-      Output.print_sstring conf size;
-      Output.print_sstring conf {|">|}
+    let label_k =
+      Printf.sprintf
+        (fcapitale (ftransl conf "the latest %t deaths"))
+        (fun () -> string_of_int len)
     in
-    aux "by" by "4";
-    aux "bm" bm "2";
-    aux "bd" bd "2";
-    Output.print_sstring conf ")";
-    Output.print_sstring conf
-      {|<button type="submit" class="btn btn-primary btn-lg">|};
+    Output.printf conf
+      {|<label for="ld_k">%s</label>
+<input type="number" id="ld_k" name="k" value="%d"
+  class="form-control" style="width:10ch" step="1" min="1">|}
+      label_k len;
+    (* TODO: reorder YYYYMMDD inputs function of chosen langage *)
+    Output.printf conf
+      {|<label for="ld_by">%s</label>
+    <input type="number" id="ld_by" name="by" value="%s"
+      class="form-control" style="width:10ch">
+    <input type="number" id="ld_bm" name="bm" value="%s"
+      class="form-control" style="width:8ch" min="1" max="12">
+    <input type="number" id="ld_bd" name="bd" value="%s"
+      class="form-control" style="width:8ch" min="1" max="31">|}
+      (transl conf "before") by bm bd;
+    Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
     transl_nth conf "validate/delete" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf "</button></p></form>");
+    Output.print_sstring conf {|</button></div></form>|});
   Hutil.trailer conf
 
 let print_oldest_alive conf base =
   let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
   let get_oldest_alive p =
-    match get_death p with
-    | NotDead -> Date.od_of_cdate (get_birth p)
+    match Driver.get_death p with
+    | NotDead -> (
+        match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
+        | Some d -> Some (Adef.Dgreg (d, Dgregorian))
+        | None -> None)
     | DontKnowIfDead when limit > 0 -> (
-        match Date.od_of_cdate (get_birth p) with
-        | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
+        match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
+        | Some d when conf.today.year - d.year <= limit ->
+            Some (Adef.Dgreg (d, Dgregorian))
         | Some _ | None -> None)
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
@@ -215,12 +226,12 @@ let print_oldest_alive conf base =
       Output.print_string conf (referenced_person_text conf base p);
       Output.print_sstring conf "</b>, ";
       Output.print_sstring conf
-        (transl_nth conf "born" (index_of_sex (get_sex p)));
+        (transl_nth conf "born" (index_of_sex (Driver.get_sex p)));
       Output.print_sstring conf " <em>";
       Output.print_string conf
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
-      if get_death p = NotDead && d.prec = Sure then (
+      if Driver.get_death p = NotDead && d.prec = Sure then (
         let a = Date.time_elapsed d conf.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
@@ -232,14 +243,16 @@ let print_oldest_alive conf base =
 
 let print_longest_lived conf base =
   let get_longest p =
-    if Util.authorized_age conf base p then
-      match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
-      | Some bd, Death (_, cd) -> (
-          match Date.cdate_to_dmy_opt cd with
-          | None -> None
-          | Some dd -> Some (Dgreg (Date.time_elapsed bd dd, Dgregorian)))
-      | _ -> None
-    else None
+    match
+      (Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p), Driver.get_death p)
+    with
+    | Some bd, Death (_, cd) -> (
+        match Date.cdate_to_gregorian_dmy_opt cd with
+        | None -> None
+        | Some dd ->
+            let te = Date.time_elapsed bd dd in
+            if te.year >= 0 then Some (Adef.Dgreg (te, Dgregorian)) else None)
+    | _ -> None
   in
   let list, len = select_person conf base get_longest false in
   let title _ =
@@ -255,7 +268,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int d.year);
+      Output.print_sstring conf (string_of_int d.Adef.year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";
@@ -265,89 +278,160 @@ let print_longest_lived conf base =
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
+let print_union_list ?(mt = false) conf base list =
+  Output.print_sstring conf (if mt then {|<ul class="mt-3">|} else "<ul>");
+  let last_month_txt, _ =
+    List.fold_left
+      (fun (last_month_txt, was_future) (fam, d, cal) ->
+        let month_txt, future =
+          list_aux_1 conf d cal last_month_txt was_future
+        in
+        Output.print_sstring conf "<li><b>";
+        Output.print_string conf
+          (referenced_person_text conf base
+             (pget conf base (Driver.get_father fam)));
+        Output.print_sstring conf "</b> ";
+        Output.print_sstring conf (transl_nth conf "and" 0);
+        Output.print_sstring conf " <b>";
+        Output.print_string conf
+          (referenced_person_text conf base
+             (pget conf base (Driver.get_mother fam)));
+        Output.print_sstring conf "</b>, ";
+        if future then (
+          Output.print_sstring conf "<em>";
+          Output.print_string conf
+            (DateDisplay.string_of_date conf (Dgreg (d, cal)));
+          Output.print_sstring conf "</em>")
+        else (
+          (match Driver.get_relation fam with
+          | NotMarried | NoSexesCheckNotMarried ->
+              Output.print_sstring conf
+              @@ transl_nth conf "relation/relations" 0
+          | Married | NoSexesCheckMarried ->
+              Output.print_sstring conf @@ transl conf "married"
+          | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
+          | MarriageBann | MarriageContract | MarriageLicense | Pacs | Residence
+          | NoMention ->
+              ());
+          Output.print_sstring conf " <em>";
+          Output.print_string conf
+            (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
+          Output.print_sstring conf "</em>.");
+        Output.print_sstring conf "</li>";
+        (month_txt, future))
+      (Adef.safe "", false)
+      list
+  in
+  if (last_month_txt :> string) <> "" then
+    Output.print_sstring conf "</ul></li>";
+  Output.print_sstring conf "</ul>"
+
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
-  Output.print_sstring conf "<ul>\n";
-  ignore
-  @@ List.fold_left
-       (fun (last_month_txt, was_future) (fam, d, cal) ->
-         let month_txt, future =
-           list_aux_1 conf d cal last_month_txt was_future
-         in
-         Output.print_sstring conf "<li><b>";
-         Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_father fam)));
-         Output.print_sstring conf "</b> ";
-         Output.print_sstring conf (transl_nth conf "and" 0);
-         Output.print_sstring conf " <b>";
-         Output.print_string conf
-           (referenced_person_text conf base (pget conf base (get_mother fam)));
-         Output.print_sstring conf "</b>, ";
-         if future then (
-           Output.print_sstring conf "<em>";
-           Output.print_string conf
-             (DateDisplay.string_of_date conf (Dgreg (d, cal)));
-           Output.print_sstring conf "</em>")
-         else (
-           (match get_relation fam with
-           | NotMarried | NoSexesCheckNotMarried ->
-               Output.print_sstring conf
-               @@ transl_nth conf "relation/relations" 0
-           | Married | NoSexesCheckMarried ->
-               Output.print_sstring conf @@ transl conf "married"
-           | Engaged -> Output.print_sstring conf @@ transl conf "engaged"
-           | MarriageBann | MarriageContract | MarriageLicense | Pacs
-           | Residence | NoMention ->
-               ());
-           Output.print_sstring conf " <em>";
-           Output.print_string conf
-             (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
-           Output.print_sstring conf "</em>.");
-         Output.print_sstring conf "</li>";
-         (month_txt, future))
-       (Adef.safe "", false)
-       list;
-  Output.print_sstring conf "</ul></li>";
+  print_union_list conf base list;
   Hutil.trailer conf
 
 let print_marriage conf base =
   let list, len =
     select_family conf base
       (fun fam ->
-        let rel = get_relation fam in
-        if rel = Married || rel = NoSexesCheckMarried then
-          Date.od_of_cdate (get_marriage fam)
-        else None)
+        match Driver.get_relation fam with
+        | Married | NoSexesCheckMarried | Engaged ->
+            Date.od_of_cdate (Driver.get_marriage fam)
+        | NotMarried | NoSexesCheckNotMarried | NoMention | MarriageBann
+        | MarriageContract | MarriageLicense | Pacs | Residence ->
+            None)
       false
   in
   let title _ =
-    Printf.sprintf (fcapitale (ftransl conf "the latest %d marriages")) len
+    Printf.sprintf
+      (fcapitale (ftransl conf "the latest %d marriages and engagements"))
+      len
     |> Output.print_sstring conf
   in
   print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
-  let list, len =
-    select_family conf base
+  let max_union_age = 90 in
+  let max_suspects = 1000 in
+  let k = get_k conf in
+  let perhaps_alive p =
+    match Driver.get_death p with
+    | NotDead -> true
+    | DontKnowIfDead ->
+        Update.infer_death_from_cdate conf (Driver.get_birth p) = DontKnowIfDead
+    | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> false
+  in
+  let still_together fam =
+    let ifam = Driver.get_ifam fam in
+    let current ip =
+      let p = pget conf base ip in
+      let fams = Driver.get_family p in
+      let n = Array.length fams in
+      n > 0 && Driver.Ifam.equal fams.(n - 1) ifam && perhaps_alive p
+    in
+    (match Driver.get_divorce fam with
+      | NotDivorced | NotSeparated -> true
+      | Divorced _ | Separated_old | Separated _ -> false)
+    && current (Driver.get_father fam)
+    && current (Driver.get_mother fam)
+  in
+  let lists =
+    select_families conf base
+      [| max_suspects + 1; k; max_suspects + 1; k |]
       (fun fam ->
-        if get_relation fam = Engaged then
-          let husb = pget conf base (get_father fam) in
-          let wife = pget conf base (get_mother fam) in
-          match (get_death husb, get_death wife) with
-          | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-              Date.od_of_cdate (get_marriage fam)
-          | _ -> None
-        else None)
+        let bucket =
+          match Driver.get_relation fam with
+          | Engaged -> Some 0
+          | Married | NoSexesCheckMarried -> Some 2
+          | NotMarried | NoSexesCheckNotMarried | NoMention | MarriageBann
+          | MarriageContract | MarriageLicense | Pacs | Residence ->
+              None
+        in
+        let marr = Driver.get_marriage fam in
+        match (bucket, Date.od_of_cdate marr) with
+        | Some b, Some d when still_together fam ->
+            if
+              Update.infer_death_from_cdate conf ~max_age:max_union_age marr
+              = OfCourseDead
+            then Some (b, d)
+            else Some (b + 1, d)
+        | (Some _ | None), _ -> None)
       true
   in
-  let title _ =
-    Printf.sprintf
-      (fcapitale
-         (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
-      len
+  let title fmt len _ =
+    Printf.sprintf (fcapitale (ftransl conf fmt)) len
     |> Output.print_sstring conf
   in
-  print_marr_or_eng conf base title list
+  let print_section fmt (suspects, n_suspects) (list, n) =
+    Output.print_sstring conf {|<h1 class="h2 mt-3">|};
+    title fmt n false;
+    Output.print_sstring conf "</h1>";
+    if n_suspects > 0 then (
+      Output.printf conf
+        {|<details class="ms-3 my-3 p-2 border"><summary class="text-body-secondary">%s <span class="badge text-bg-secondary">%s</span></summary>|}
+        (Printf.sprintf
+           (fcapitale
+              (ftransl conf
+                 "couples united more than %d years ago, with no recorded death"))
+           max_union_age)
+        (if n_suspects > max_suspects then string_of_int max_suspects ^ "+"
+         else string_of_int n_suspects);
+      print_union_list ~mt:true conf base
+        (List.filteri (fun i _ -> i < max_suspects) suspects);
+      Output.print_sstring conf "</details>");
+    print_union_list conf base list
+  in
+  Hutil.header_without_title conf
+    ~title:
+      (title "the %d oldest couples perhaps still alive"
+         (snd lists.(1) + snd lists.(3)));
+  if snd lists.(0) > 0 || snd lists.(1) > 0 then
+    print_section "the %d oldest couples perhaps still alive and engaged"
+      lists.(0) lists.(1);
+  print_section "the %d oldest couples perhaps still alive and married"
+    lists.(2) lists.(3);
+  Hutil.trailer conf
 
 let old_print_statistics conf =
   let title _ =
@@ -374,8 +458,8 @@ let old_print_statistics conf =
     aux "LB" "the latest %d births";
     aux "LD" "the latest %d deaths";
     (* FIXME *)
-    aux "LM" "the latest %d marriages";
-    aux "OE" "the %d oldest couples perhaps still alive and engaged";
+    aux "LM" "the latest %d marriages and engagements";
+    aux "OE" "the %d oldest couples perhaps still alive";
     aux "OA" "the %d oldest perhaps still alive");
   aux "LL" "the %d who lived the longest";
   Output.print_sstring conf "</ul>\n";
@@ -391,66 +475,27 @@ let set_vother x = Vother x
 let print_statistics conf =
   if p_getenv conf.env "old" = Some "on" then old_print_statistics conf
   else
-    Hutil.interp conf "stats"
-      {
-        Templ.eval_var = (fun _ -> raise Not_found);
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = (fun _ -> raise Not_found);
-      }
-      [] ()
+    let ifun =
+      Templ.
+        {
+          eval_var = (fun _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach = (fun _ -> raise Not_found);
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () "stats"
 
-let print_population_pyramid conf base =
-  let interval =
-    match p_getint conf.env "int" with Some i -> max 1 i | None -> 5
-  in
-  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
-  let at_date =
-    match p_getint conf.env "y" with
-    | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
-    | None -> conf.today
-  in
-  let nb_intervals = 150 / interval in
-  let men, wom =
-    make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base
-  in
-  let at_year = at_date.year in
-  let string_of_nb n =
-    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
-  in
-  let title _ =
-    transl conf "population pyramid"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf " (";
-    Output.print_sstring conf (string_of_int at_year);
-    Output.print_sstring conf ")"
-  in
-  let print_image doit sex iname =
-    Output.print_sstring conf "<td>";
-    if doit then (
-      Output.print_sstring conf {|<img src="|};
-      Output.print_sstring conf (Util.images_prefix conf);
-      Output.print_sstring conf "/";
-      Output.print_string conf iname;
-      Output.print_sstring conf {|" alt="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
-      Output.print_sstring conf {|" title="|};
-      Output.print_sstring conf (transl_nth conf "M/F" sex);
-      Output.print_sstring conf {|">|})
-    else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf "</td>"
-  in
-  Hutil.header conf title;
+let print_pyramid_table conf ~men ~wom ~nb_intervals ~interval ~row_label_side =
+  let sep = transl conf "(thousand separator)" in
+  let nbstr n = Mutil.string_of_int_sep sep n in
   let max_hum =
-    let max_men = Array.fold_left max 0 men in
-    let max_wom = Array.fold_left max 0 wom in
-    max 1 (max max_men max_wom)
+    max 1 (max (Array.fold_left max 0 men) (Array.fold_left max 0 wom))
   in
-  let max_size = 70 in
-  let band_size n = ((2 * max_size * n) + max_hum) / (2 * max_hum) in
-  let first_interv =
+  let band n = max 1 (((140 * n) + max_hum) / (2 * max_hum)) * 3 in
+  let first =
     let rec loop i =
       if i <= 0 then 0
       else if men.(i) > 0 || wom.(i) > 0 then i
@@ -458,89 +503,168 @@ let print_population_pyramid conf base =
     in
     loop nb_intervals
   in
-  Output.print_sstring conf "<div>\n";
-  Output.print_sstring conf {|<table id="table_pop_pyr" border="|};
-  Output.print_sstring conf (string_of_int conf.border);
-  Output.print_sstring conf
-    {|" cellspacing="0" cellpadding="0" style="margin:auto">|};
-  for i = first_interv downto 0 do
-    let nb_men = men.(i) in
-    let nb_wom = wom.(i) in
-    Output.print_sstring conf "<tr><td class=\"pyramid_year\">";
-    Output.print_sstring conf (string_of_int @@ (at_year - (i * interval)));
-    Output.print_sstring conf "</td><td>&nbsp;</td>";
-    print_image (i = 0) 0 (Adef.safe "male.png");
-    Output.print_sstring conf "<td>&nbsp;</td><td align=\"right\">\n";
-    Output.printf conf
-      {|<table cellspacing="0" cellpadding="0"><tr><td class="pyramid_nb">|};
-    if nb_men <> 0 then Output.print_sstring conf (string_of_int nb_men);
-    Output.print_sstring conf "&nbsp;</td><td>";
-    let aux_img nb img =
-      if nb <> 0 then (
-        let n = max 1 (band_size nb) in
-        Output.print_sstring conf {|<img src="|};
-        Output.print_string conf img;
-        Output.print_sstring conf {|" width="|};
-        Output.print_sstring conf (string_of_int @@ (n * 3));
-        Output.print_sstring conf {|" height="22">|})
+  let compact = interval < 3 in
+  let h = if compact then max 8 (interval * 8) else 24 in
+  let pfx = Util.images_prefix conf in
+  let bar nb file =
+    if nb = 0 then ""
+    else
+      Printf.sprintf {|<img src="%s/%s" width="%d" height="%d">|} pfx file
+        (band nb) h
+  in
+  let nb_html nb =
+    if nb = 0 then "" else Printf.sprintf {|<i>%s</i>|} (nbstr nb)
+  in
+  let side_html i =
+    match row_label_side with
+    | Some f ->
+        Printf.sprintf {|<td class="text-body-secondary px-2">%s</td>|} (f i)
+    | None -> ""
+  in
+  let cls = if compact then " pyr-compact" else "" in
+  Output.printf conf {|<div><table id="table_pop_pyr" class="%s">|} cls;
+  for i = first downto 0 do
+    let nm = men.(i) and nw = wom.(i) in
+    let center =
+      if i = nb_intervals then "&nbsp;" else string_of_int ((i + 1) * interval)
     in
-    aux_img nb_men
-      (Adef.encoded (Filename.concat (Util.images_prefix conf) "pyr_male.png"));
-    Output.print_sstring conf
-      {|</td></tr></table></td><td align="center" class="pyramid_center">|};
-    if i = nb_intervals then Output.print_sstring conf "&nbsp;"
-    else Output.print_sstring conf (string_of_int @@ ((i + 1) * interval));
-    Output.print_sstring conf
-      {|</td><td align="left"><table cellspacing="0" cellpadding="0"><tr><td>|};
-    aux_img nb_wom
-      (Adef.encoded
-         (Filename.concat (Util.images_prefix conf) "pyr_female.png"));
-    Output.print_sstring conf {|</td><td class="pyramid_nb">&nbsp;|};
-    if nb_wom <> 0 then Output.print_sstring conf (string_of_int nb_wom);
-    Output.print_sstring conf "</td></tr></table></td><td>&nbsp;</td>\n";
-    print_image (i = 0) 1 (Adef.safe "female.png");
-    Output.print_sstring conf {|<td>&nbsp;</td><td class="pyramid_year">|};
-    Output.print_sstring conf (string_of_int @@ (at_year - (i * interval)));
-    Output.print_sstring conf "</td></tr>"
+    Output.printf conf
+      {|<tr>%s
+    <td class="text-end">%s %s</td>
+    <td class="text-center px-1">%s</td>
+    <td>%s %s</td>
+  %s</tr>|}
+      (side_html i) (nb_html nm) (bar nm "pyr_male.png") center
+      (bar nw "pyr_female.png") (nb_html nw) (side_html i)
   done;
-  Output.print_sstring conf "</table>";
-  Output.print_sstring conf "</div><p>";
-  let sum_men = Array.fold_left ( + ) 0 men in
-  let sum_wom = Array.fold_left ( + ) 0 wom in
-  transl conf "number of living persons"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf (transl conf ":");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
-  Output.print_sstring conf {|.</p><form method="get" action="|};
-  Output.print_string conf (commd conf);
-  Output.print_sstring conf {|"><div class="form-inline">|};
-  hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
-  Output.print_sstring conf {|<label for="yr">|};
-  transl_nth conf "year/month/day" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</label>";
-  Output.print_sstring conf {|<input type="number" id="yr" name="y" value="|};
-  Output.print_sstring conf (string_of_int at_year);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1">
- <label for="int" class="ml-3">|};
-  transl conf "interval" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf
-    {|</label><input type="number" id="int" name="int" value="|};
-  Output.print_sstring conf (string_of_int interval);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1" min="0" max="130">
-<label for="lim" class="ml-3">|};
-  transl conf "limit" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf
-    {|</label><input type="number" id="lim" name="lim" value="|};
-  Output.print_sstring conf (string_of_int limit);
-  Output.print_sstring conf
-    {|" class="form-control col-1 ml-2" step="1" min="0" max="|};
-  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
-  Output.print_sstring conf
-    {|"><button type="submit" class="btn btn-primary ml-3">OK</button>
-    </div></form>|};
-  Hutil.trailer conf
+  Output.print_sstring conf {|</table>
+</div>|}
+
+let print_pyramid_totals conf ~string_of_nb ~label_key ~sum_men ~sum_wom =
+  Output.printf conf
+    {|<div class="mt-3">%s%s %s (%s &#9794; + %s &#9792;).</div>|}
+    (Utf8.capitalize_fst (transl conf label_key))
+    (transl conf ":")
+    (string_of_nb (sum_men + sum_wom))
+    (string_of_nb sum_men) (string_of_nb sum_wom)
+
+let print_pyramid_form_tail conf ~interval ~limit =
+  Output.printf conf
+    {|<label for="int" class="ms-3">%s</label>
+<input type="number" id="int" name="int"
+       value="%d" class="form-control" style="width:8ch"
+       step="1" min="1" max="130">
+<label for="lim" class="ms-3">%s</label>
+<input type="number" id="lim" name="lim"
+       value="%d" class="form-control" style="width:8ch"
+       step="1" min="0">
+<button type="submit" class="btn btn-primary ms-3">OK</button>|}
+    (Utf8.capitalize_fst (transl conf "interval"))
+    interval
+    (Utf8.capitalize_fst (transl conf "limit"))
+    limit
+
+let print_population_pyramid conf base =
+  let death_mode = p_getenv conf.env "t" = Some "D" in
+  let interval =
+    match p_getint conf.env "int" with Some i -> max 1 i | None -> 5
+  in
+  let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
+  let nb_intervals = 150 / interval in
+  let string_of_nb n =
+    Mutil.string_of_int_sep (transl conf "(thousand separator)") n
+  in
+  let commd_s = (commd conf :> string) in
+  let open_form hidden_extra =
+    Output.printf conf
+      {|<form method="get" class="mt-2" action="%s">
+  <div class="d-flex align-items-center flex-wrap gap-2">|}
+      commd_s;
+    hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
+    Output.print_sstring conf hidden_extra
+  in
+  if death_mode then (
+    let from_year =
+      match p_getint conf.env "from" with
+      | Some y -> y
+      | None -> conf.today.year
+    in
+    let to_year =
+      match p_getint conf.env "to" with Some y -> y | None -> from_year
+    in
+    let men, wom =
+      make_death_pyramid ~nb_intervals ~interval ~limit ~from_year ~to_year base
+    in
+    let range =
+      if to_year <> from_year then Printf.sprintf "%d-%d" from_year to_year
+      else string_of_int from_year
+    in
+    let title _ =
+      Output.printf conf
+        {|<a href="%sm=POP_PYR" title="%s"
+  class="btn btn-secondary btn-sm mb-1 me-3">&#176;</a>%s (%s)|}
+        commd_s
+        (Utf8.capitalize_fst (transl conf "pon pyramid"))
+        (Utf8.capitalize_fst (transl conf "death pyramid"))
+        range
+    in
+    Hutil.header conf title;
+    print_pyramid_table conf ~men ~wom ~nb_intervals ~interval
+      ~row_label_side:None;
+    let sum_men = Array.fold_left ( + ) 0 men in
+    let sum_wom = Array.fold_left ( + ) 0 wom in
+    print_pyramid_totals conf ~string_of_nb
+      ~label_key:"number of deceased persons" ~sum_men ~sum_wom;
+    open_form {|<input type="hidden" name="t" value="D">|};
+    Output.printf conf
+      {|<label for="from">%s</label>
+<input type="number" id="from" name="from" value="%d"
+  class="form-control" style="width:10ch" step="1">
+<label for="to">… %s</label>
+<input type="number" id="to" name="to" value="%d"
+  class="form-control" style="width:10ch" step="1">|}
+      (transl_nth conf "from/to (date year)" 0 |> Utf8.capitalize_fst)
+      from_year
+      (transl_nth conf "from/to (date year)" 1)
+      to_year;
+    print_pyramid_form_tail conf ~interval ~limit;
+    Output.print_sstring conf {|</div></form>|};
+    Hutil.trailer conf)
+  else
+    let at_date =
+      match p_getint conf.env "y" with
+      | Some i ->
+          { Adef.year = i; month = 31; day = 12; prec = Sure; delta = 0 }
+      | None -> conf.today
+    in
+    let men, wom =
+      make_population_pyramid ~nb_intervals ~interval ~limit ~at_date base
+    in
+    let at_year = at_date.year in
+    let title _ =
+      Output.printf conf
+        {|<a href="%sm=POP_PYR&t=D&from=1900&to=%d" title="%s"
+  class="btn btn-secondary btn-sm mb-1 me-3">&dagger;</a>%s (%d)|}
+        commd_s conf.today.year
+        (Utf8.capitalize_fst (transl conf "death pyramid"))
+        (Utf8.capitalize_fst (transl conf "population pyramid"))
+        at_year
+    in
+    Hutil.header conf title;
+    print_pyramid_table conf ~men ~wom ~nb_intervals ~interval
+      ~row_label_side:(Some (fun i -> string_of_int (at_year - (i * interval))));
+    let sum_men = Array.fold_left ( + ) 0 men in
+    let sum_wom = Array.fold_left ( + ) 0 wom in
+    print_pyramid_totals conf ~string_of_nb
+      ~label_key:"number of living persons" ~sum_men ~sum_wom;
+    open_form "";
+    Output.printf conf
+      {|<label for="yr">%s</label>
+<input type="number" id="yr" name="y" value="%d"
+  class="form-control" style="width:9ch" step="1">|}
+      (transl_nth conf "year/month/day" 0 |> Utf8.capitalize_fst)
+      at_year;
+    print_pyramid_form_tail conf ~interval ~limit;
+    Output.print_sstring conf {|</div></form>|};
+    Hutil.trailer conf

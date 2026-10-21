@@ -2,12 +2,15 @@
 
 open Config
 open Def
-open Gwdb
-open TemplAst
 open Util
 open HistoryDiff
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let escape_html s = (Util.escape_html s :> Adef.safe_string)
+
+let date_epoch_str (s : Adef.safe_string) =
+  Option.fold ~none:"" ~some:string_of_int (Mutil.epoch_of_date (s :> string))
 
 let print_clean conf =
   match p_getenv conf.env "f" with
@@ -54,12 +57,10 @@ let print_clean conf =
 
 (* ************************************************************************ *)
 
-(** [Description] : Ré-écrit le fichier historique lié à une personne en
-      ayant supprimé les entrées non désirées.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Néant
-    [Rem] : Exporté en clair hors de ce module.                             *)
+(** [Description] : Ré-écrit le fichier historique lié à une personne en ayant
+    supprimé les entrées non désirées. [Args] :
+    - conf : configuration de la base [Retour] : Néant [Rem] : Exporté en clair
+      hors de ce module. *)
 let print_clean_ok conf =
   let rec clean_history i history new_history =
     match history with
@@ -81,27 +82,27 @@ let print_clean_ok conf =
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
       (if new_history = [] then Mutil.rm fname
-      else
-        let ext_flags =
-          [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
-        in
-        match
-          try Some (Secure.open_out_gen ext_flags 0o644 fname)
-          with Sys_error _ -> None
-        with
-        | Some oc ->
-            List.iter (fun v -> output_value oc (v : gen_record)) new_history;
-            close_out oc
-        | None -> ());
+       else
+         let ext_flags =
+           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
+         in
+         match
+           try Some (Secure.open_out_gen ext_flags 0o644 fname)
+           with Sys_error _ -> None
+         with
+         | Some oc ->
+             List.iter (fun v -> output_value oc (v : gen_record)) new_history;
+             close_out oc
+         | None -> ());
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
 (**/**) (* Template *)
 
 let person_of_gen_p_key base gen_p =
-  match person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
-  | Some ip -> poi base ip
-  | None -> Gwdb.empty_person base Gwdb.dummy_iper
+  match Driver.person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
+  | Some ip -> Driver.poi base ip
+  | None -> Driver.empty_person base Driver.Iper.dummy
 
 (* N'est pas forcément très précis. En effet, on enregistre que     *)
 (* les ipers. Or lors d'un nettoyage de la base, il se peut que     *)
@@ -179,7 +180,7 @@ let string_of_related conf base ip related : Adef.safe_string =
       let p = person_of_iper conf base ip in
       if (p :> string) = "" then acc
       else
-        let c = try pget conf base ic with _ -> Gwdb.empty_person base ic in
+        let c = try pget conf base ic with _ -> Driver.empty_person base ic in
         let rel =
           let rec loop rp =
             match rp with
@@ -190,7 +191,7 @@ let string_of_related conf base ip related : Adef.safe_string =
                     Util.rchild_type_text conf r.r_type 2
                 | _ -> loop l)
           in
-          loop (get_rparents c)
+          loop (Driver.get_rparents c)
         in
         (Utf8.capitalize_fst (rel : Adef.safe_string :> string)
         ^<^ transl conf ":" ^<^ p)
@@ -268,7 +269,11 @@ let string_of_event_witness conf base witnesses =
   Array.fold_right
     (fun (ip, wk) accu ->
       let witn = person_of_iper conf base ip in
-      let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
+      let kind =
+        Util.string_of_witness_kind conf
+          (Driver.get_sex @@ Driver.poi base ip)
+          wk
+      in
       if (witn :> string) = "" then (kind ^^^ transl conf ":" ^<^ witn) :: accu
       else accu)
     witnesses []
@@ -401,20 +406,17 @@ let string_of_efam_name conf efam_name =
 (* ************************************************************************ *)
 
 (** [Description] : Converti un tableau de char en string, avec les parties
-      modifiées encadrées par des balises <span>.
-    [Args] :
-      - arr : tableau à convertir
-      - diff_arr : tableau des différences
-    [Retour] :
-      - string
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+    modifiées encadrées par des balises <span>. [Args] :
+    - arr : tableau à convertir
+    - diff_arr : tableau des différences [Retour] :
+    - string [Rem] : Non exporté en clair hors de ce module. *)
 let highlight_diff arr diff_arr =
   let rec loop i s =
     if i >= Array.length arr then s
     else if diff_arr.(i) then (
       let j = ref i in
       let accu = ref s in
-      accu := !accu ^ "<span class=\"mark\">";
+      accu := !accu ^ "<span class=\"hl\">";
       while !j < Array.length diff_arr && diff_arr.(!j) do
         accu := !accu ^ Printf.sprintf "%c" arr.(!j);
         incr j
@@ -430,13 +432,10 @@ let highlight_diff arr diff_arr =
 
 (* ************************************************************************ *)
 
-(** [Description] : Converti une string en tableau de char afin de pouvoir
-      faire un diff.
-    [Args] :
-      - s : string à convertir
-    [Retour] :
-      - char array
-    [Rem] : Non exporté en clair hors de ce module.                         *)
+(** [Description] : Converti une string en tableau de char afin de pouvoir faire
+    un diff. [Args] :
+    - s : string à convertir [Retour] :
+    - char array [Rem] : Non exporté en clair hors de ce module. *)
 let array_of_string s =
   let s = (s :> string) in
   let len = String.length s in
@@ -453,9 +452,9 @@ let diff_string (before : Adef.safe_string) (after : Adef.safe_string) :
     Adef.safe_string * Adef.safe_string =
   if before = after then (before, after)
   else if (before :> string) = "" then
-    (before, "<span class=\"mark\">" ^<^ after ^>^ "</span>")
+    (before, "<span class=\"hl\">" ^<^ after ^>^ "</span>")
   else if (after :> string) = "" then
-    ("<span class=\"mark\">" ^<^ before ^>^ "</span>", after)
+    ("<span class=\"hl\">" ^<^ before ^>^ "</span>", after)
   else
     let aa = array_of_string (after :> string) in
     let bb = array_of_string (before :> string) in
@@ -466,38 +465,41 @@ let diff_string (before : Adef.safe_string) (after : Adef.safe_string) :
 
 type 'a env =
   | Vfam of
-      (iper, ifam, string) gen_family option
-      * (iper, ifam, string) gen_family option
+      (Driver.iper, Driver.ifam, string) gen_family option
+      * (Driver.iper, Driver.ifam, string) gen_family option
       * bool
-  | Vchild of iper array option * iper array option
+  | Vchild of Driver.iper array option * Driver.iper array option
   | Vfevent of
-      (iper, string) gen_fam_event option
-      * (iper, string) gen_fam_event option
+      (Driver.iper, string) gen_fam_event option
+      * (Driver.iper, string) gen_fam_event option
       * bool
   | Vpevent of
-      (iper, string) gen_pers_event option
-      * (iper, string) gen_pers_event option
+      (Driver.iper, string) gen_pers_event option
+      * (Driver.iper, string) gen_pers_event option
   | Vint of int
   | Vstring of string
   | Vother of 'a
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
-let str_val x = VVstring x
-let safe_val (x : Adef.safe_string) = VVstring (x :> string)
+let str_val x = Templ.VVstring x
+let safe_val (x : Adef.safe_string) = Templ.VVstring (x :> string)
 
 let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl
   with Not_found -> eval_compound_var conf base env (bef, aft, p_auth) sl
 
 and eval_simple_var conf base env (bef, aft, p_auth) :
-    string list -> 'a expr_val = function
+    string list -> 'a Templ.expr_val = function
+  | [ "permalink" ] ->
+      Templ.VVstring
+        (Permalink.script conf (Permalink.query conf base) :> string)
   | [ s ] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
   | _ -> raise Not_found
 
-and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b expr_val =
+and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b Templ.expr_val =
   let loop = function
     | [ s ] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
     | [ "evar"; s ] -> (
@@ -512,15 +514,17 @@ and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b expr_val =
   loop sl
 
 and eval_gen_record conf base env (bef, aft, p_auth) :
-    string list -> 'a expr_val * 'b expr_val = function
+    string list -> 'a Templ.expr_val * 'b Templ.expr_val = function
   | [ "date" ] -> (safe_val bef.date, safe_val aft.date)
+  | [ "date_epoch" ] ->
+      (str_val (date_epoch_str bef.date), str_val (date_epoch_str aft.date))
   | [ "wizard" ] ->
       (safe_val bef.HistoryDiff.wizard, safe_val aft.HistoryDiff.wizard)
   | [ s ] -> eval_str_gen_record conf base env (bef, aft, p_auth) s
   | _ -> raise Not_found
 
 and eval_str_gen_record conf base env (bef, aft, p_auth) :
-    string -> 'a expr_val * 'b expr_val =
+    string -> 'a Templ.expr_val * 'b Templ.expr_val =
   let diff_string a b =
     let a, b = diff_string a b in
     (safe_val a, safe_val b)
@@ -737,13 +741,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_simple_str_var conf base env (bef, aft, p_auth) : string -> 'a expr_val
-    = function
+and eval_simple_str_var conf base env (bef, aft, p_auth) :
+    string -> 'a Templ.expr_val = function
   | "acces" ->
       person_of_gen_p_key base aft.gen_p
       |> acces conf base
-      |> (safe_val :> Adef.escaped_string -> 'a expr_val)
+      |> (safe_val :> Adef.escaped_string -> 'a Templ.expr_val)
   | "date" -> eval_string_env "date" env
+  | "date_epoch" -> eval_string_env "date_epoch" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
   | "nb_families" ->
@@ -782,10 +787,12 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_f, aft_f) with
       | [], [] -> ()
       | [], gen_f :: l ->
-          let fam = foi base gen_f.fam_index in
+          let fam = Driver.foi base gen_f.fam_index in
           let isp = Gutil.spouse aft.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
-          let m_auth = authorized_age conf base (poi base isp) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp) && p_auth
+          in
           let vfam = Vfam (None, Some gen_f, m_auth) in
           let vchild, c =
             match (bef_c, aft_c) with
@@ -793,17 +800,21 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [])
           in
           let env =
-            ("fam", vfam) :: ("spouse_bef", Vstring "")
-            :: ("spouse_aft", Vstring (sp :> string))
-            :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring "")
+              |> add "spouse_aft" (Vstring (sp :> string))
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop [] bef_c l c
       | gen_f :: l, [] ->
-          let fam = foi base gen_f.fam_index in
+          let fam = Driver.foi base gen_f.fam_index in
           let isp = Gutil.spouse aft.gen_p.key_index fam in
           let sp = person_of_iper conf base isp in
-          let m_auth = authorized_age conf base (poi base isp) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp) && p_auth
+          in
           let vfam = Vfam (Some gen_f, None, m_auth) in
           let vchild, c =
             match (bef_c, aft_c) with
@@ -811,19 +822,23 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [])
           in
           let env =
-            ("fam", vfam)
-            :: ("spouse_bef", Vstring (sp :> string))
-            :: ("spouse_aft", Vstring "") :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring (sp :> string))
+              |> add "spouse_aft" (Vstring "")
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop l c [] aft_c
       | gen_f1 :: l1, gen_f2 :: l2 ->
-          let fam = foi base gen_f2.fam_index in
+          let fam = Driver.foi base gen_f2.fam_index in
           let isp1 = Gutil.spouse bef.gen_p.key_index fam in
           let isp2 = Gutil.spouse aft.gen_p.key_index fam in
           let sp1 = person_of_iper conf base isp1 in
           let sp2 = person_of_iper conf base isp2 in
-          let m_auth = authorized_age conf base (poi base isp2) && p_auth in
+          let m_auth =
+            authorized_age conf base (Driver.poi base isp2) && p_auth
+          in
           let vfam = Vfam (Some gen_f1, Some gen_f2, m_auth) in
           let vchild, c1, c2 =
             match (bef_c, aft_c) with
@@ -832,10 +847,11 @@ let print_foreach conf base print_ast _eval_expr =
             | _ -> (* pas normal*) (Vchild (None, None), [], [])
           in
           let env =
-            ("fam", vfam)
-            :: ("spouse_bef", Vstring (sp1 :> string))
-            :: ("spouse_aft", Vstring (sp2 :> string))
-            :: ("child", vchild) :: env
+            Templ.Env.(
+              env |> add "fam" vfam
+              |> add "spouse_bef" (Vstring (sp1 :> string))
+              |> add "spouse_aft" (Vstring (sp2 :> string))
+              |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
           loop l1 c1 l2 c2
@@ -846,16 +862,22 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_fevents, aft_fevents) with
       | [], [] -> ()
       | [], aft_evt :: l ->
-          let env = ("fevent", Vfevent (None, Some aft_evt, m_auth)) :: env in
+          let env =
+            Templ.Env.add "fevent" (Vfevent (None, Some aft_evt, m_auth)) env
+          in
           List.iter (print_ast env xx) al;
           loop m_auth [] l
       | bef_evt :: l, [] ->
-          let env = ("fevent", Vfevent (Some bef_evt, None, m_auth)) :: env in
+          let env =
+            Templ.Env.add "fevent" (Vfevent (Some bef_evt, None, m_auth)) env
+          in
           List.iter (print_ast env xx) al;
           loop m_auth l []
       | bef_evt :: l1, aft_evt :: l2 ->
           let env =
-            ("fevent", Vfevent (Some bef_evt, Some aft_evt, m_auth)) :: env
+            Templ.Env.add "fevent"
+              (Vfevent (Some bef_evt, Some aft_evt, m_auth))
+              env
           in
           List.iter (print_ast env xx) al;
           loop m_auth l1 l2
@@ -874,15 +896,17 @@ let print_foreach conf base print_ast _eval_expr =
       match (bef_pevents, aft_pevents) with
       | [], [] -> ()
       | [], aft_evt :: l ->
-          let env = ("pevent", Vpevent (None, Some aft_evt)) :: env in
+          let env = Templ.Env.add "pevent" (Vpevent (None, Some aft_evt)) env in
           List.iter (print_ast env xx) al;
           loop [] l
       | bef_evt :: l, [] ->
-          let env = ("pevent", Vpevent (Some bef_evt, None)) :: env in
+          let env = Templ.Env.add "pevent" (Vpevent (Some bef_evt, None)) env in
           List.iter (print_ast env xx) al;
           loop l []
       | bef_evt :: l1, aft_evt :: l2 ->
-          let env = ("pevent", Vpevent (Some bef_evt, Some aft_evt)) :: env in
+          let env =
+            Templ.Env.add "pevent" (Vpevent (Some bef_evt, Some aft_evt)) env
+          in
           List.iter (print_ast env xx) al;
           loop l1 l2
     in
@@ -896,12 +920,14 @@ let print_foreach conf base print_ast _eval_expr =
           | [] -> ()
           | gr :: l ->
               let env =
-                ("line", Vint i)
-                :: ("date", Vstring (gr.date : Adef.safe_string :> string))
-                :: ( "wizard",
-                     Vstring
-                       (gr.HistoryDiff.wizard : Adef.safe_string :> string) )
-                :: env
+                Templ.Env.empty
+                |> Templ.Env.add "line" (Vint i)
+                |> Templ.Env.add "date"
+                     (Vstring (gr.date : Adef.safe_string :> string))
+                |> Templ.Env.add "date_epoch" (Vstring (date_epoch_str gr.date))
+                |> Templ.Env.add "wizard"
+                     (Vstring
+                        (gr.HistoryDiff.wizard : Adef.safe_string :> string))
               in
               List.iter (print_ast env xx) al;
               loop (i + 1) l
@@ -912,7 +938,9 @@ let print_foreach conf base print_ast _eval_expr =
   print_foreach
 
 let eval_predefined_apply conf _env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "transl_date", [ date_txt ] -> (
       (* date_tpl = "0000-00-00 00:00:00" *)
@@ -921,7 +949,8 @@ let eval_predefined_apply conf _env f vl =
         let month = int_of_string (String.sub date_txt 5 2) in
         let day = int_of_string (String.sub date_txt 8 2) in
         let date =
-          Dgreg ({ day; month; year; prec = Sure; delta = 0 }, Dgregorian)
+          Adef.Dgreg
+            ({ Adef.day; month; year; prec = Sure; delta = 0 }, Dgregorian)
         in
         let time = String.sub date_txt 11 8 in
         DateDisplay.string_of_date conf date ^>^ ", " ^ time
@@ -952,20 +981,24 @@ let print conf base =
           let p = person_of_gen_p_key base after.gen_p in
           let p_auth = authorized_age conf base p in
           let env =
-            [ ("history_file", Vstring file); ("history_len", Vint len) ]
+            Templ.Env.empty
+            |> Templ.Env.add "history_file" (Vstring file)
+            |> Templ.Env.add "history_len" (Vint len)
           in
           let eval_predefined_apply _env f vl =
             (eval_predefined_apply conf _env f vl :> string)
           in
-          Hutil.interp conf "updhist_diff"
-            {
-              Templ.eval_var = eval_var conf base;
-              Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-              Templ.eval_predefined_apply;
-              Templ.get_vother;
-              Templ.set_vother;
-              Templ.print_foreach = print_foreach conf base;
-            }
-            env (before, after, p_auth)
+          let ifun =
+            Templ.
+              {
+                eval_var = eval_var conf base;
+                eval_transl = (fun _ -> Templ.eval_transl conf);
+                eval_predefined_apply;
+                get_vother;
+                set_vother;
+                print_foreach = print_foreach conf base;
+              }
+          in
+          Templ.output conf ifun env (before, after, p_auth) "updhist_diff"
       | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")
   | _ -> Hutil.incorrect_request conf ~comment:"bad t parameter"

@@ -25,6 +25,7 @@
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 
@@ -118,8 +119,9 @@
   %include;tools
 
   %apply;tools_ancsosa()
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </body>
 </html>

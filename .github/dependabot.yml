@@ -4,11 +4,9 @@ updates:
     directory: "docker/"
     schedule:
       interval: "daily"
-  - package-ecosystem: "gitsubmodule"
-    directory: "/"
-    schedule:
-      interval: "daily"
   - package-ecosystem: "github-actions"
-    directory: ".github/workflows/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "daily"

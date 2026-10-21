@@ -2,50 +2,249 @@
 
 open Config
 open Def
-open Gwdb
-open TemplAst
 open Util
+
+let src = Logs.Src.create ~doc:"Perso" "PERS"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+module Sosa = Geneweb_sosa
+module Loc = Geneweb_templ.Loc
+module Collection = Geneweb_db.Collection
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Iper = Driver.Iper
+
+let elapsed_age d1 d2 =
+  let a = Date.time_elapsed d1 d2 in
+  if a.Adef.prec = Sure && (d1.Adef.day = 0 || d2.Adef.day = 0) then
+    { a with prec = About }
+  else a
+
+let person_living_age conf p p_auth =
+  match
+    ( p_auth,
+      Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+      Driver.get_death p )
+  with
+  | true, Some d, NotDead -> Some (elapsed_age d conf.today)
+  | _ -> None
+
+let format_age conf age =
+  let y = age.Adef.year in
+  let m = age.month in
+  let d = age.day in
+  let prec_str =
+    match age.prec with
+    | Sure -> ""
+    | About | Maybe -> "~"
+    | Before -> "<"
+    | After -> ">"
+    | OrYear _ | YearInt _ -> ""
+  in
+  let parts =
+    List.fold_left
+      (fun acc (value, idx, plural_key) ->
+        if value > 0 then
+          acc
+          @ [
+              (string_of_int value ^ " "
+              ^
+              if value = 1 then transl_nth conf "year/month/day" idx
+              else transl conf plural_key);
+            ]
+        else acc)
+      []
+      [ (y, 0, "years old"); (m, 1, "months old"); (d, 2, "days old") ]
+  in
+  let formatted = String.concat ", " parts in
+  let result =
+    if prec_str = "" then formatted else prec_str ^ " " ^ formatted
+  in
+  Adef.safe result
+
+let eval_age_field_var conf ?(before_birth = false) age = function
+  | [ "years" ] -> Templ.VVstring (string_of_int age.Adef.year)
+  | [ "months" ] -> Templ.VVstring (string_of_int age.month)
+  | [ "days" ] -> Templ.VVstring (string_of_int age.day)
+  | [ "short" ] ->
+      let y = age.year in
+      let m = age.month in
+      let d = age.day in
+      let sign = if before_birth then "−" else "" in
+      let s =
+        if y > 0 then
+          sign ^ string_of_int y ^ " "
+          ^
+          if y = 1 then transl_nth conf "year/month/day" 0
+          else transl conf "years old"
+        else if m > 0 then
+          sign ^ string_of_int m ^ " "
+          ^
+          if m = 1 then transl_nth conf "year/month/day" 1
+          else transl conf "months old"
+        else
+          sign ^ string_of_int d ^ " "
+          ^
+          if d = 1 then transl_nth conf "year/month/day" 2
+          else transl conf "days old"
+      in
+      Templ.VVstring s
+  | [ "sign" ] -> Templ.VVstring (if before_birth then "−" else "")
+  | [ "before_birth" ] -> Templ.VVbool before_birth
+  | [ "prec" ] -> (
+      match age.prec with
+      | Sure -> Templ.VVstring ""
+      | About | Maybe -> Templ.VVstring "~"
+      | Before -> Templ.VVstring "<"
+      | After -> Templ.VVstring ">"
+      | OrYear _ | YearInt _ -> Templ.VVstring "")
+  | [] -> raise Not_found
+  | _ -> raise Not_found
+
+let compare_dmy d1 d2 =
+  match compare d1.Adef.year d2.Adef.year with
+  | 0 -> (
+      match compare d1.Adef.month d2.Adef.month with
+      | 0 -> compare d1.Adef.day d2.Adef.day
+      | c -> c)
+  | c -> c
+
+let eval_marriage_age conf p fam sl =
+  match
+    ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+      Date.cdate_to_gregorian_dmy_opt (Driver.get_marriage fam) )
+  with
+  | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
+      Some ({ prec = Sure | About | Maybe; _ } as d2) ) -> (
+      let age = Date.time_elapsed d1 d2 in
+      match sl with
+      | [] -> Templ.VVstring (format_age conf age :> string)
+      | _ -> eval_age_field_var conf age sl)
+  | _ -> Templ.VVstring ""
+
+let compute_age_at_event conf p_auth birth_opt event_date_opt sl =
+  match (p_auth, birth_opt, event_date_opt) with
+  | true, Some birth_dmy, Some event_dmy -> (
+      let before_birth = compare_dmy event_dmy birth_dmy < 0 in
+      let age =
+        if before_birth then Date.time_elapsed event_dmy birth_dmy
+        else Date.time_elapsed birth_dmy event_dmy
+      in
+      match sl with
+      | [ _ ] ->
+          let s = (format_age conf age :> string) in
+          Templ.VVstring (if before_birth then "−" ^ s else s)
+      | _ :: rest -> eval_age_field_var conf ~before_birth age rest
+      | [] -> assert false)
+  | _ -> Templ.VVstring ""
+
+let eval_death_age conf p p_auth sl =
+  if p_auth then
+    match Gutil.get_birth_death_date p with
+    | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+        Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
+        _ )
+      when d1 <> d2 -> (
+        let d1 = Date.approx_gregorian ~from:c1 d1 in
+        let d2 = Date.approx_gregorian ~from:c2 d2 in
+        let age = elapsed_age d1 d2 in
+        match sl with
+        | [] -> Templ.VVstring (format_age conf age :> string)
+        | _ -> eval_age_field_var conf age sl)
+    | _ -> Templ.VVstring ""
+  else Templ.VVstring ""
+
+let eval_age_at_parent_event conf base p p_auth get_parent get_target_date sl =
+  match Driver.get_parents p with
+  | Some ifam ->
+      let parent = pget conf base (get_parent (Driver.foi base ifam)) in
+      let target = get_target_date parent in
+      compute_age_at_event conf p_auth
+        (Date.cdate_to_dmy_opt (Driver.get_birth p))
+        target sl
+  | None -> Templ.VVstring ""
+
+let p_birth p = Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p)
+
+let death_date_opt p =
+  match Date.date_of_death (Driver.get_death p) with
+  | Some (Dgreg (dmy, cal)) -> Some (Date.approx_gregorian ~from:cal dmy)
+  | _ -> None
+
+let eval_age_at_child_event conf base self child get_target_date sl =
+  let self_auth = authorized_age conf base self in
+  let target = get_target_date child in
+  compute_age_at_event conf self_auth
+    (Date.cdate_to_dmy_opt (Driver.get_birth self))
+    target sl
+
+let child_marriage base child =
+  let fams = Driver.get_family child in
+  if Array.length fams = 0 then None
+  else Date.cdate_to_dmy_opt (Driver.get_marriage (Driver.foi base fams.(0)))
+
+let get_cousins_sparse =
+  let cache = ref None in
+  fun conf base p ->
+    match !cache with
+    | Some (cached_ip, sparse) when cached_ip = Driver.get_iper p -> sparse
+    | _ ->
+        let sparse = Cousins.init_cousins_cnt conf base p in
+        cache := Some (Driver.get_iper p, sparse);
+        sparse
+
+let get_asc_cnt =
+  let cache = ref None in
+  fun conf base p ->
+    match !cache with
+    | Some (cached_ip, arr) when cached_ip = Driver.get_iper p -> arr
+    | _ ->
+        let arr = Cousins.init_asc_cnt conf base p in
+        cache := Some (Driver.get_iper p, arr);
+        arr
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
-let string_of_marriage_text conf base fam =
-  let marriage = Date.od_of_cdate (get_marriage fam) in
-  let marriage_place = sou base (get_marriage_place fam) in
-  let s =
-    match marriage with
-    | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d
-    | None -> Adef.safe ""
-  in
-  match marriage_place with
-  | "" -> s
-  | _ ->
-      s ^^^ ", "
-      ^<^ Util.safe_html (string_with_macros conf [] marriage_place)
-      ^>^ ","
+let hide_person conf base p =
+  (not (Util.authorized_age conf base p)) || Util.is_hide_names conf p
 
 let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
   let escape_html = if not safe then Util.escape_html else Adef.escaped in
+  let first = nth <= 0 in
+  let ordinal =
+    if first then Adef.safe ""
+    else
+      let nth_str =
+        if nth >= 100 then string_of_int nth else transl_nth conf "nth" nth
+      in
+      safe_html (nth_str ^ " ")
+  in
   let place, places_tl =
     match places with
-    | [] -> (Gwdb.empty_string, [])
+    | [] -> (Driver.Istr.empty, [])
     | place :: places_tl -> (place, places_tl)
   in
-  let acc = safe_html (sou base title ^ " " ^ sou base place) in
+  let place_str = Driver.sou base place in
+  let title_str = Driver.sou base title in
+  let acc =
+    safe_html
+      (if place_str = "" then title_str else title_str ^ " " ^ place_str)
+  in
   let href place s =
     if link then
       let href =
         "m=TT&sm=S&t="
-        ^<^ Mutil.encode (sou base title)
+        ^<^ Mutil.encode (Driver.sou base title)
         ^^^ "&p="
-        ^<^ Mutil.encode (sou base place)
+        ^<^ Mutil.encode (Driver.sou base place)
       in
       geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
     else s
   in
-  let acc = href place acc in
+  let acc = ordinal ^^^ href place acc in
   let rec loop acc places =
     let acc =
       match places with
@@ -55,51 +254,40 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     in
     match places with
     | place :: places ->
-        let acc = acc ^^^ href place (safe_html (sou base place)) in
+        let acc = acc ^^^ href place (safe_html (Driver.sou base place)) in
         loop acc places
     | _ -> acc
   in
   let acc = loop acc places_tl in
   let paren =
-    match (nth, dates, name) with
-    | n, _, _ when n > 0 -> true
-    | _, _, Tname _ -> true
-    | _, (Some _, _) :: _, _ -> authorized_age conf base p
+    match (name, dates) with
+    | Tname _, _ -> true
+    | _, (Some _, _) :: _ -> authorized_age conf base p
     | _ -> false
   in
   let acc = if paren then acc ^>^ " (" else acc in
-  let first = nth <= 0 in
-  let acc =
-    if first then acc
-    else
-      acc
-      ^>^ if nth >= 100 then string_of_int nth else transl_nth conf "nth" nth
-  in
   let acc, first =
     match name with
     | Tname n ->
-        let acc = if not first then acc ^>^ " ," else acc in
-        (acc ^^^ (sou base n |> escape_html :> Adef.safe_string), false)
-    | _ -> (acc, first)
+        (acc ^^^ (Driver.sou base n |> escape_html :> Adef.safe_string), false)
+    | _ -> (acc, true)
   in
   let acc =
     if authorized_age conf base p && dates <> [ (None, None) ] then
       fst
       @@ List.fold_left
            (fun (acc, first) (date_start, date_end) ->
-             let acc = if not first then acc ^>^ ", " else acc in
+             let acc =
+               if (not first) && name <> Tmain && name <> Tnone then
+                 acc ^>^ ", "
+               else acc
+             in
              let acc =
                match date_start with
                | Some d -> acc ^^^ DateDisplay.string_of_date conf d
                | None -> acc
              in
-             let acc =
-               match date_end with
-               | Some (Dgreg (d, _)) ->
-                   if d.month <> 0 then acc ^>^ " - " else acc ^>^ "-"
-               | Some (Dtext _) -> acc ^>^ " - "
-               | _ -> acc
-             in
+             let acc = match date_end with Some _ -> acc ^>^ "–" | _ -> acc in
              let acc =
                match date_end with
                | Some d -> acc ^^^ DateDisplay.string_of_date conf d
@@ -112,7 +300,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
   if paren then acc ^>^ ")" else acc
 
 let name_equiv n1 n2 =
-  Futil.eq_title_names eq_istr n1 n2
+  Futil.eq_title_names Driver.Istr.equal n1 n2
   || (n1 = Tmain && n2 = Tnone)
   || (n1 = Tnone && n2 = Tmain)
 
@@ -125,7 +313,8 @@ let nobility_titles_list conf base p =
         match l with
         | (nth, name, title, place, dates) :: rl
           when (not conf.is_rtl) && nth = t.t_nth && name_equiv name t.t_name
-               && eq_istr title t.t_ident && eq_istr place t.t_place ->
+               && Driver.Istr.equal title t.t_ident
+               && Driver.Istr.equal place t.t_place ->
             (nth, name, title, place, (t_date_start, t_date_end) :: dates) :: rl
         | _ ->
             ( t.t_nth,
@@ -141,7 +330,8 @@ let nobility_titles_list conf base p =
       match l with
       | (nth, name, title, places, dates) :: rl
         when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
-             && eq_istr title t_ident && dates = t_dates ->
+             && Driver.Istr.equal title t_ident
+             && dates = t_dates ->
           (nth, name, title, t_place :: places, dates) :: rl
       | _ -> (t_nth, t_name, t_ident, [ t_place ], t_dates) :: l)
     titles []
@@ -151,152 +341,19 @@ let nobility_titles_list conf base p =
 
 (* ********************************************************************** *)
 
-(** [Description] : Indique si l'individu a été modifiée.
-    [Args] :
-      - conf   : configuration de la base
-      - base   : arbre
-      - p      : person
-      - p_auth : indique si l'utilisateur est authentifié
-    [Retour] : Vrai si la personne a été modifiée, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
+(** [Description] : Indique si l'individu a été modifiée. [Args] :
+    - conf : configuration de la base
+    - base : arbre
+    - p : person
+    - p_auth : indique si l'utilisateur est authentifié [Retour] : Vrai si la
+      personne a été modifiée, Faux sinon. [Rem] : Exporté en clair hors de ce
+      module. *)
 let has_history conf base p p_auth =
-  let fn = sou base (get_first_name p) in
-  let sn = sou base (get_surname p) in
-  let occ = get_occ p in
+  let fn = Driver.sou base (Driver.get_first_name p) in
+  let sn = Driver.sou base (Driver.get_surname p) in
+  let occ = Driver.get_occ p in
   let person_file = HistoryDiff.history_file fn sn occ in
   p_auth && Sys.file_exists (HistoryDiff.history_path conf person_file)
-
-(* ************************************************************************ *)
-(*  [Fonc] get_death_text : config -> person -> bool -> string      *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Retourne une description de la mort de la personne
-    [Args] :
-    - conf : configuration de la base
-    - p    : la personne que l'on veut afficher
-    - p_auth : authentifié ou non
-      [Retour] :
-    - string
-      [Rem] : Exporté en clair hors de ce module.                             *)
-let get_death_text conf p p_auth =
-  let died =
-    if p_auth then
-      let is = index_of_sex (get_sex p) in
-      match get_death p with
-      | Death (dr, _) -> (
-          match dr with
-          | Unspecified -> transl_nth conf "died" is |> Adef.safe
-          | Murdered -> transl_nth conf "murdered" is |> Adef.safe
-          | Killed -> transl_nth conf "killed (in action)" is |> Adef.safe
-          | Executed ->
-              transl_nth conf "executed (legally killed)" is |> Adef.safe
-          | Disappeared -> transl_nth conf "disappeared" is |> Adef.safe)
-      | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
-      | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
-      | NotDead | DontKnowIfDead | OfCourseDead -> "" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_death_date =
-    match (p_auth, get_death p) with
-    | true, Death (_, d) -> (
-        let d = Date.date_of_cdate d in
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  died ^^^ " " ^<^ on_death_date
-
-let get_baptism_text conf p p_auth =
-  let baptized =
-    if p_auth then
-      get_sex p |> index_of_sex |> transl_nth conf "baptized" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_baptism_date =
-    match (p_auth, Date.od_of_cdate (get_baptism p)) with
-    | true, Some d -> (
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  baptized ^^^ " " ^<^ on_baptism_date
-
-let get_birth_text conf p p_auth =
-  let born =
-    if p_auth then
-      get_sex p |> index_of_sex |> transl_nth conf "born" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_birth_date =
-    match (p_auth, Date.od_of_cdate (get_birth p)) with
-    | true, Some d -> (
-        match List.assoc_opt "long_date" conf.base_env with
-        | Some "yes" ->
-            DateDisplay.string_of_ondate ~link:false conf d
-            ^>^ DateDisplay.get_wday conf d
-        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-    | _ -> "" |> Adef.safe
-  in
-  born ^^^ " " ^<^ on_birth_date
-
-let get_marriage_date_text conf fam p_auth =
-  match (p_auth, Date.od_of_cdate (get_marriage fam)) with
-  | true, Some d -> (
-      match List.assoc_opt "long_date" conf.base_env with
-      | Some "yes" ->
-          DateDisplay.string_of_ondate ~link:false conf d
-          ^>^ DateDisplay.get_wday conf d
-      | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-  | _ -> "" |> Adef.safe
-
-let get_burial_text conf p p_auth =
-  let buried =
-    if p_auth then
-      get_sex p |> index_of_sex |> transl_nth conf "buried" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_burial_date =
-    match get_burial p with
-    | Buried cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
-        | true, Some d -> (
-            match List.assoc_opt "long_date" conf.base_env with
-            | Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-        | _ -> "" |> Adef.safe)
-    | UnknownBurial | Cremated _ -> "" |> Adef.safe
-  in
-  buried ^^^ " " ^<^ on_burial_date
-
-let get_cremation_text conf p p_auth =
-  let cremated =
-    if p_auth then
-      get_sex p |> index_of_sex |> transl_nth conf "cremated" |> Adef.safe
-    else "" |> Adef.safe
-  in
-  let on_cremation_date =
-    match get_burial p with
-    | Cremated cod -> (
-        match (p_auth, Date.od_of_cdate cod) with
-        | true, Some d -> (
-            match List.assoc_opt "long_date" conf.base_env with
-            | Some "yes" ->
-                DateDisplay.string_of_ondate ~link:false conf d
-                ^>^ DateDisplay.get_wday conf d
-            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d)
-        | _ -> "" |> Adef.safe)
-    | UnknownBurial | Buried _ -> "" |> Adef.safe
-  in
-  cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
   match List.assoc_opt "max_desc_level" conf.base_env with
@@ -315,18 +372,19 @@ let get_descendants_at_level base p lev2 =
         Array.iter
           (fun ifam ->
             if lev < n then
-              let children = get_children (foi base ifam) in
+              let children = Driver.get_children (Driver.foi base ifam) in
               Array.iter
-                (fun ch -> loop (lev + 1) (get_family (poi base ch)))
+                (fun ch ->
+                  loop (lev + 1) (Driver.get_family (Driver.poi base ch)))
                 children
             else Hashtbl.replace ifam_ht ifam ())
           fam
       in
-      loop 1 (get_family p);
+      loop 1 (Driver.get_family p);
       (* build the list of descendants from the families *)
       Hashtbl.fold
         (fun ifam () acc ->
-          let childrens = get_children (foi base ifam) in
+          let childrens = Driver.get_children (Driver.foi base ifam) in
           Array.fold_left (fun acc ch -> ch :: acc) acc childrens)
         ifam_ht []
 
@@ -339,36 +397,40 @@ let make_desc_level_table conf base max_level p =
   in
   (* the table 'levt' may be not necessary, since I added 'flevt'; kept
      because '%max_desc_level;' is still used... *)
-  let levt = Gwdb.iper_marker (Gwdb.ipers base) infinite in
-  let flevt = Gwdb.ifam_marker (Gwdb.ifams base) infinite in
+  let levt =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) infinite
+  in
+  let flevt =
+    Geneweb_db.Driver.ifam_marker (Geneweb_db.Driver.ifams base) infinite
+  in
   let get = pget conf base in
-  let ini_ip = get_iper p in
+  let ini_ip = Driver.get_iper p in
   let rec fill lev = function
     | [] -> ()
     | ipl ->
         let new_ipl =
           List.fold_left
             (fun ipl ip ->
-              if Gwdb.Marker.get levt ip <= lev then ipl
+              if Collection.Marker.get levt ip <= lev then ipl
               else if lev <= max_level then (
-                Gwdb.Marker.set levt ip lev;
+                Collection.Marker.set levt ip lev;
                 let down =
                   if ip = ini_ip then true
                   else
                     match line with
-                    | Male -> get_sex (pget conf base ip) <> Female
-                    | Female -> get_sex (pget conf base ip) <> Male
+                    | Male -> Driver.get_sex (pget conf base ip) <> Female
+                    | Female -> Driver.get_sex (pget conf base ip) <> Male
                     | Neuter -> true
                 in
                 if down then
                   Array.fold_left
                     (fun ipl ifam ->
-                      if not (Gwdb.Marker.get flevt ifam <= lev) then
-                        Gwdb.Marker.set flevt ifam lev;
-                      let ipa = get_children (foi base ifam) in
+                      if not (Collection.Marker.get flevt ifam <= lev) then
+                        Collection.Marker.set flevt ifam lev;
+                      let ipa = Driver.get_children (Driver.foi base ifam) in
                       Array.fold_left (fun ipl ip -> ip :: ipl) ipl ipa)
                     ipl
-                    (get_family (get ip))
+                    (Driver.get_family (get ip))
                 else ipl)
               else ipl)
             [] ipl
@@ -380,11 +442,12 @@ let make_desc_level_table conf base max_level p =
 
 let desc_level_max base desc_level_table_l =
   let levt, _ = Lazy.force desc_level_table_l in
-  Gwdb.Collection.fold
+  Collection.fold
     (fun acc i ->
-      let lev = Gwdb.Marker.get levt i in
+      let lev = Collection.Marker.get levt i in
       if lev != infinite && acc < lev then lev else acc)
-    0 (Gwdb.ipers base)
+    0
+    (Geneweb_db.Driver.ipers base)
 
 let max_descendant_level base desc_level_table_l =
   desc_level_max base desc_level_table_l
@@ -392,10 +455,10 @@ let max_descendant_level base desc_level_table_l =
 (* ancestors by list *)
 
 type generation_person =
-  | GP_person of Sosa.t * iper * ifam option
-  | GP_same of Sosa.t * Sosa.t * iper
+  | GP_person of Sosa.t * Driver.iper * Driver.ifam option
+  | GP_same of Sosa.t * Sosa.t * Driver.iper
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
-  | GP_missing of Sosa.t * iper
+  | GP_missing of Sosa.t * Driver.iper
 
 let next_generation conf base mark gpl =
   let gpl =
@@ -406,11 +469,11 @@ let next_generation conf base mark gpl =
             let n_fath = Sosa.twice n in
             let n_moth = Sosa.inc n_fath 1 in
             let a = pget conf base ip in
-            match get_parents a with
+            match Driver.get_parents a with
             | Some ifam ->
-                let cpl = foi base ifam in
-                GP_person (n_fath, get_father cpl, Some ifam)
-                :: GP_person (n_moth, get_mother cpl, Some ifam)
+                let cpl = Driver.foi base ifam in
+                GP_person (n_fath, Driver.get_father cpl, Some ifam)
+                :: GP_person (n_moth, Driver.get_mother cpl, Some ifam)
                 :: gpl
             | None -> GP_missing (n, ip) :: gpl)
         | GP_interv None -> gp :: gpl
@@ -430,9 +493,9 @@ let next_generation conf base mark gpl =
       (fun gpl gp ->
         match gp with
         | GP_person (n, ip, _) ->
-            let m = Gwdb.Marker.get mark ip in
+            let m = Collection.Marker.get mark ip in
             if Sosa.eq m Sosa.zero then (
-              Gwdb.Marker.set mark ip n;
+              Collection.Marker.set mark ip n;
               gp :: gpl)
             else GP_same (n, m, ip) :: gpl
         | GP_same _ | GP_interv _ | GP_missing _ -> gp :: gpl)
@@ -490,9 +553,9 @@ let get_link all_gp ip =
 let parent_sosa conf base ip all_gp n parent =
   if sosa_is_present all_gp n then Sosa.to_string n
   else
-    match get_parents (pget conf base ip) with
+    match Driver.get_parents (pget conf base ip) with
     | Some ifam -> (
-        match get_link all_gp (parent (foi base ifam)) with
+        match get_link all_gp (parent (Driver.foi base ifam)) with
         | Some (GP_person (n, _, _)) -> Sosa.to_string n
         | _ -> "")
     | None -> ""
@@ -504,7 +567,9 @@ let will_print = function
 
 let get_all_generations conf base p =
   let max_level = match p_getint conf.env "v" with Some v -> v | None -> 0 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
+  let mark =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
+  in
   let rec get_generations level gpll gpl =
     let gpll = gpl :: gpll in
     if level < max_level then
@@ -514,7 +579,9 @@ let get_all_generations conf base p =
       else gpll
     else gpll
   in
-  let gpll = get_generations 0 [] [ GP_person (Sosa.one, get_iper p, None) ] in
+  let gpll =
+    get_generations 0 [] [ GP_person (Sosa.one, Driver.get_iper p, None) ]
+  in
   let gpll = List.rev gpll in
   List.flatten gpll
 
@@ -540,7 +607,10 @@ let get_all_generations conf base p =
 *)
 
 type pos = Left | Right | Center | Alone
-type cell = Cell of person * ifam option * pos * bool * int * string | Empty
+
+type cell =
+  | Cell of Driver.person * Driver.ifam option * pos * bool * int * string
+  | Empty
 
 let rec enrich lst1 lst2 =
   match (lst1, lst2) with
@@ -580,16 +650,16 @@ let tree_generation_list conf base gv p =
       (fun po l ->
         match po with
         | Empty -> Empty :: l
-        | Cell (p, _, _, _, _, base_prefix) -> (
-            match get_parents p with
+        | Cell (p, _, _, _, _, _base_prefix) -> (
+            match Driver.get_parents p with
             | Some ifam -> (
-                let cpl = foi base ifam in
+                let cpl = Driver.foi base ifam in
                 let fath =
-                  let p = pget conf base (get_father cpl) in
+                  let p = pget conf base (Driver.get_father cpl) in
                   if not @@ is_empty_name p then Some p else None
                 in
                 let moth =
-                  let p = pget conf base (get_mother cpl) in
+                  let p = pget conf base (Driver.get_mother cpl) in
                   if not @@ is_empty_name p then Some p else None
                 in
                 let fo = Some ifam in
@@ -607,25 +677,7 @@ let tree_generation_list conf base gv p =
                 | Some f, None -> Cell (f, fo, Alone, true, 1, base_prefix) :: l
                 | None, Some m -> Cell (m, fo, Alone, true, 1, base_prefix) :: l
                 | None, None -> Empty :: l)
-            | None -> (
-                match
-                  !GWPARAM_ITL.tree_generation_list conf base base_prefix p
-                with
-                | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2)
-                  ->
-                    if mf then
-                      Cell (moth, Some if2, Left, true, 1, base_prefix1)
-                      :: Cell (fath, Some if1, Right, true, 1, base_prefix2)
-                      :: l
-                    else
-                      Cell (fath, Some if1, Left, true, 1, base_prefix1)
-                      :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
-                      :: l
-                | Some (fath, ifam, base_prefix), None ->
-                    Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: l
-                | None, Some (moth, ifam, base_prefix) ->
-                    Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: l
-                | None, None -> Empty :: l)))
+            | None -> Empty :: l))
       pol []
   in
   let gen =
@@ -641,8 +693,8 @@ let tree_generation_list conf base gv p =
 let get_date_place conf base auth_for_all_anc p =
   if auth_for_all_anc || authorized_age conf base p then
     let d1 =
-      match Date.od_of_cdate (get_birth p) with
-      | None -> Date.od_of_cdate (get_baptism p)
+      match Date.od_of_cdate (Driver.get_birth p) with
+      | None -> Date.od_of_cdate (Driver.get_baptism p)
       | x -> x
     in
     let d1 =
@@ -651,15 +703,15 @@ let get_date_place conf base auth_for_all_anc p =
         Array.fold_left
           (fun d ifam ->
             if d <> None then d
-            else Date.od_of_cdate (get_marriage (foi base ifam)))
-          d1 (get_family p)
+            else Date.od_of_cdate (Driver.get_marriage (Driver.foi base ifam)))
+          d1 (Driver.get_family p)
     in
     let d2 =
-      match get_death p with
+      match Driver.get_death p with
       | Death (_, cd) -> Some (Date.date_of_cdate cd)
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
         -> (
-          match get_burial p with
+          match Driver.get_burial p with
           | Buried cod | Cremated cod -> Date.od_of_cdate cod
           | UnknownBurial -> None)
     in
@@ -674,25 +726,39 @@ let get_date_place conf base auth_for_all_anc p =
     in
     let pl =
       let pl = "" in
-      let pl = if pl <> "" then pl else sou base (get_birth_place p) in
-      let pl = if pl <> "" then pl else sou base (get_baptism_place p) in
-      let pl = if pl <> "" then pl else sou base (get_death_place p) in
-      let pl = if pl <> "" then pl else sou base (get_burial_place p) in
+      let pl =
+        if pl <> "" then pl else Driver.sou base (Driver.get_birth_place p)
+      in
+      let pl =
+        if pl <> "" then pl else Driver.sou base (Driver.get_baptism_place p)
+      in
+      let pl =
+        if pl <> "" then pl else Driver.sou base (Driver.get_death_place p)
+      in
+      let pl =
+        if pl <> "" then pl else Driver.sou base (Driver.get_burial_place p)
+      in
       if pl <> "" then pl
       else
         Array.fold_left
           (fun pl ifam ->
             if pl <> "" then pl
-            else sou base (get_marriage_place (foi base ifam)))
-          pl (get_family p)
+            else
+              Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam)))
+          pl (Driver.get_family p)
     in
     ((d1, d2, pl), auth_for_all_anc)
   else ((None, None, ""), false)
 
 (* duplications proposed for merging *)
 
-type dup = DupFam of ifam * ifam | DupInd of iper * iper | NoDup
-type excl_dup = (iper * iper) list * (ifam * ifam) list
+type dup =
+  | DupFam of Driver.ifam * Driver.ifam
+  | DupInd of Driver.iper * Driver.iper
+  | NoDup
+
+type excl_dup =
+  (Driver.iper * Driver.iper) list * (Driver.ifam * Driver.ifam) list
 
 let gen_excluded_possible_duplications conf s i_of_string =
   match p_getenv conf.env s with
@@ -720,8 +786,8 @@ let gen_excluded_possible_duplications conf s i_of_string =
   | None -> []
 
 let excluded_possible_duplications conf =
-  ( gen_excluded_possible_duplications conf "iexcl" iper_of_string,
-    gen_excluded_possible_duplications conf "fexcl" ifam_of_string )
+  ( gen_excluded_possible_duplications conf "iexcl" Driver.Iper.of_string,
+    gen_excluded_possible_duplications conf "fexcl" Driver.Ifam.of_string )
 
 let first_possible_duplication_children iexcl len child eq =
   let rec loop i =
@@ -732,10 +798,10 @@ let first_possible_duplication_children iexcl len child eq =
         if j = len then loop (i + 1)
         else
           let c2 = child j in
-          let ic1 = get_iper c1 in
-          let ic2 = get_iper c2 in
+          let ic1 = Driver.get_iper c1 in
+          let ic2 = Driver.get_iper c2 in
           if List.mem (ic1, ic2) iexcl then loop' (j + 1)
-          else if eq (get_first_name c1) (get_first_name c2) then
+          else if eq (Driver.get_first_name c1) (Driver.get_first_name c2) then
             DupInd (ic1, ic2)
           else loop' (j + 1)
       in
@@ -750,20 +816,20 @@ let first_possible_duplication base ip (iexcl, fexcl) =
       match List.assoc_opt i !cache with
       | Some s -> s
       | None ->
-          let s = Name.lower @@ sou base i in
+          let s = Name.lower @@ Driver.sou base i in
           cache := (i, s) :: !cache;
           s
   in
   let eq i1 i2 = str i1 = str i2 in
-  let p = poi base ip in
-  match get_family p with
+  let p = Driver.poi base ip in
+  match Driver.get_family p with
   | [||] -> NoDup
   | [| ifam |] ->
-      let children = get_children @@ foi base ifam in
+      let children = Driver.get_children @@ Driver.foi base ifam in
       let len = Array.length children in
       if len < 2 then NoDup
       else
-        let child i = poi base @@ Array.unsafe_get children i in
+        let child i = Driver.poi base @@ Array.unsafe_get children i in
         first_possible_duplication_children iexcl len child eq
   | ifams ->
       let len = Array.length ifams in
@@ -773,7 +839,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
         match Array.unsafe_get fams i with
         | Some f -> f
         | None ->
-            let f = foi base @@ Array.unsafe_get ifams i in
+            let f = Driver.foi base @@ Array.unsafe_get ifams i in
             Array.unsafe_set fams i (Some f);
             f
       in
@@ -781,7 +847,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
         match Array.unsafe_get spouses i with
         | Some sp -> sp
         | None ->
-            let sp = poi base @@ Gutil.spouse ip @@ fam i in
+            let sp = Driver.poi base @@ Gutil.spouse ip @@ fam i in
             Array.unsafe_set spouses i (Some sp);
             sp
       in
@@ -794,19 +860,19 @@ let first_possible_duplication base ip (iexcl, fexcl) =
               if j = len then loop (i + 1)
               else
                 let sp2 = spouse j in
-                if get_iper sp1 = get_iper sp2 then
+                if Driver.get_iper sp1 = Driver.get_iper sp2 then
                   let ifam1 = Array.unsafe_get ifams i in
                   let ifam2 = Array.unsafe_get ifams j in
                   if not (List.mem (ifam2, ifam2) fexcl) then
                     DupFam (ifam1, ifam2)
                   else loop' (j + 1)
                 else
-                  let isp1 = get_iper sp1 in
-                  let isp2 = get_iper sp2 in
+                  let isp1 = Driver.get_iper sp1 in
+                  let isp2 = Driver.get_iper sp2 in
                   if List.mem (isp1, isp2) iexcl then loop' (j + 1)
                   else if
-                    eq (get_first_name sp1) (get_first_name sp2)
-                    && eq (get_surname sp1) (get_surname sp2)
+                    eq (Driver.get_first_name sp1) (Driver.get_first_name sp2)
+                    && eq (Driver.get_surname sp1) (Driver.get_surname sp2)
                   then DupInd (isp1, isp2)
                   else loop' (j + 1)
             in
@@ -818,7 +884,7 @@ let first_possible_duplication base ip (iexcl, fexcl) =
       else
         let ichildren =
           Array.fold_left Array.append [||]
-          @@ Array.init len (fun i -> get_children @@ fam i)
+          @@ Array.init len (fun i -> Driver.get_children @@ fam i)
         in
         let len = Array.length ichildren in
         let children = Array.make len None in
@@ -826,14 +892,14 @@ let first_possible_duplication base ip (iexcl, fexcl) =
           match Array.unsafe_get children i with
           | Some c -> c
           | None ->
-              let c = poi base @@ Array.unsafe_get ichildren i in
+              let c = Driver.poi base @@ Array.unsafe_get ichildren i in
               Array.unsafe_set children i (Some c);
               c
         in
         first_possible_duplication_children iexcl len child eq
 
 let has_possible_duplications conf base p =
-  let ip = get_iper p in
+  let ip = Driver.get_iper p in
   let excl = excluded_possible_duplications conf in
   first_possible_duplication base ip excl <> NoDup
 
@@ -841,11 +907,12 @@ let merge_date_place conf base surn ((d1, d2, pl), auth) p =
   let (pd1, pd2, ppl), auth = get_date_place conf base auth p in
   let nd1 =
     if pd1 <> None then pd1
-    else if eq_istr (get_surname p) surn then if pd2 <> None then pd2 else d1
+    else if Driver.Istr.equal (Driver.get_surname p) surn then
+      if pd2 <> None then pd2 else d1
     else None
   in
   let nd2 =
-    if eq_istr (get_surname p) surn then
+    if Driver.Istr.equal (Driver.get_surname p) surn then
       if d2 <> None then d2
       else if d1 <> None then d1
       else if pd1 <> None then pd2
@@ -855,7 +922,9 @@ let merge_date_place conf base surn ((d1, d2, pl), auth) p =
     else d1
   in
   let pl =
-    if ppl <> "" then ppl else if eq_istr (get_surname p) surn then pl else ""
+    if ppl <> "" then ppl
+    else if Driver.Istr.equal (Driver.get_surname p) surn then pl
+    else ""
   in
   ((nd1, nd2, pl), auth)
 
@@ -867,7 +936,7 @@ let build_surnames_list conf base v p =
       | Some v when v <> "" -> int_of_string v
       | _ -> 5
     in
-    Gwdb.iper_marker (Gwdb.ipers base) n
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) n
   in
   let auth = conf.wizard || conf.friend in
   let add_surname sosa p surn dp =
@@ -881,36 +950,38 @@ let build_surnames_list conf base v p =
     r := (fst !r, sosa :: snd !r)
   in
   let rec loop lev sosa p surn dp =
-    if Gwdb.Marker.get mark (get_iper p) = 0 then ()
+    if Collection.Marker.get mark (Driver.get_iper p) = 0 then ()
     else if lev > v then
+      (* TODO verify equation and see if hide_person should be used *)
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_surname sosa p surn dp
     else (
-      Gwdb.Marker.set mark (get_iper p) (Gwdb.Marker.get mark (get_iper p) - 1);
-      match get_parents p with
+      Collection.Marker.set mark (Driver.get_iper p)
+        (Collection.Marker.get mark (Driver.get_iper p) - 1);
+      match Driver.get_parents p with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let fath = pget conf base (get_father cpl) in
-          let moth = pget conf base (get_mother cpl) in
+          let cpl = Driver.foi base ifam in
+          let fath = pget conf base (Driver.get_father cpl) in
+          let moth = pget conf base (Driver.get_mother cpl) in
           if
-            (not (eq_istr surn (get_surname fath)))
-            && not (eq_istr surn (get_surname moth))
+            (not (Driver.Istr.equal surn (Driver.get_surname fath)))
+            && not (Driver.Istr.equal surn (Driver.get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
           (if not (is_hidden fath) then
-           let dp1 = merge_date_place conf base surn dp fath in
-           loop (lev + 1) sosa fath (get_surname fath) dp1);
+             let dp1 = merge_date_place conf base surn dp fath in
+             loop (lev + 1) sosa fath (Driver.get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
           if not (is_hidden moth) then
             let dp2 = merge_date_place conf base surn dp moth in
-            loop (lev + 1) sosa moth (get_surname moth) dp2
+            loop (lev + 1) sosa moth (Driver.get_surname moth) dp2
       | None -> add_surname sosa p surn dp)
   in
-  loop 1 Sosa.one p (get_surname p) (get_date_place conf base auth p);
+  loop 1 Sosa.one p (Driver.get_surname p) (get_date_place conf base auth p);
   let list = ref [] in
   Hashtbl.iter
     (fun i dp ->
-      let surn = sou base i in
+      let surn = Driver.sou base i in
       if surn <> "?" then list := (surn, !dp) :: !list)
     ht;
   (* TODO don't query db in sort *)
@@ -936,25 +1007,25 @@ let build_surnames_list conf base v p =
 (* ************************************************************************* *)
 
 (** [Description] : Construit la liste éclair des ascendants de p jusqu'à la
-                    génération v.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - v    : le nombre de génération
-      - p    : person
-    [Retour] : (surname * place * date begin * date end * person * list iper)
-    [Rem] : Exporté en clair hors de ce module.                              *)
+    génération v. [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - v : le nombre de génération
+    - p : person [Retour] : (surname * place * date begin * date end * person *
+      list iper) [Rem] : Exporté en clair hors de ce module. *)
 let build_list_eclair conf base v p =
   let ht = Hashtbl.create 701 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let mark =
+    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+  in
   (* Fonction d'ajout dans la Hashtbl. A la clé (surname, place) on associe *)
   (* la personne (pour l'interprétation dans le template), la possible date *)
   (* de début, la possible date de fin, la liste des personnes/évènements.  *)
   (* Astuce: le nombre d'élément de la liste correspond au nombre             *)
   (* d'évènements et le nombre d'iper unique correspond au nombre d'individu. *)
   let add_surname p surn pl d =
-    if not (is_empty_string pl) then
-      let pl = Util.string_of_place conf (sou base pl) in
+    if not (Driver.Istr.is_empty pl) then
+      let pl = Util.string_of_place conf (Driver.sou base pl) in
       let r =
         try Hashtbl.find ht (surn, pl)
         with Not_found ->
@@ -981,55 +1052,61 @@ let build_list_eclair conf base v p =
                 | None -> de)
             | None -> d
           in
-          (pp, db, de, get_iper p :: l))
+          (pp, db, de, Driver.get_iper p :: l))
           p !r
   in
   (* Fonction d'ajout de tous les évènements d'une personne (birth, bapt...). *)
   let add_person p surn =
-    if Gwdb.Marker.get mark (get_iper p) then ()
+    if Collection.Marker.get mark (Driver.get_iper p) then ()
     else (
-      Gwdb.Marker.set mark (get_iper p) true;
-      add_surname p surn (get_birth_place p) (Date.od_of_cdate (get_birth p));
-      add_surname p surn (get_baptism_place p)
-        (Date.od_of_cdate (get_baptism p));
+      Collection.Marker.set mark (Driver.get_iper p) true;
+      add_surname p surn (Driver.get_birth_place p)
+        (Date.od_of_cdate (Driver.get_birth p));
+      add_surname p surn
+        (Driver.get_baptism_place p)
+        (Date.od_of_cdate (Driver.get_baptism p));
       let death =
-        match get_death p with
+        match Driver.get_death p with
         | Death (_, cd) -> Some (Date.date_of_cdate cd)
         | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
           ->
             None
       in
-      add_surname p surn (get_death_place p) death;
+      add_surname p surn (Driver.get_death_place p) death;
       let burial =
-        match get_burial p with
+        match Driver.get_burial p with
         | Buried cod | Cremated cod -> Date.od_of_cdate cod
         | UnknownBurial -> None
       in
-      add_surname p surn (get_burial_place p) burial;
+      add_surname p surn (Driver.get_burial_place p) burial;
       Array.iter
         (fun ifam ->
-          let fam = foi base ifam in
-          add_surname p surn (get_marriage_place fam)
-            (Date.od_of_cdate (get_marriage fam)))
-        (get_family p))
+          let fam = Driver.foi base ifam in
+          add_surname p surn
+            (Driver.get_marriage_place fam)
+            (Date.od_of_cdate (Driver.get_marriage fam)))
+        (Driver.get_family p))
   in
 
   (* TODO do we have a get_ascendants function? *)
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
   let rec loop lev p =
-    let surn = get_surname p in
-    if lev > v then
+    let surn = Driver.get_surname p in
+    if lev >= v then
+      (* TODO verify equation and see if hide_person should be used *)
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_person p surn
-    else add_person p surn;
-    match get_parents p with
-    | None -> ()
-    | Some ifam ->
-        let cpl = foi base ifam in
-        let fath = pget conf base (get_father cpl) in
-        let moth = pget conf base (get_mother cpl) in
-        if not (is_hidden fath) then loop (lev + 1) fath;
-        if not (is_hidden moth) then loop (lev + 1) moth
+    else begin
+      add_person p surn;
+      match Driver.get_parents p with
+      | None -> ()
+      | Some ifam ->
+          let cpl = Driver.foi base ifam in
+          let fath = pget conf base (Driver.get_father cpl) in
+          let moth = pget conf base (Driver.get_mother cpl) in
+          if not (is_hidden fath) then loop (lev + 1) fath;
+          if not (is_hidden moth) then loop (lev + 1) moth
+    end
   in
   (* Construction de la Hashtbl. *)
   loop 1 p;
@@ -1039,7 +1116,7 @@ let build_list_eclair conf base v p =
   let l = ref [] in
   Hashtbl.iter
     (fun (istr, place) ht_val ->
-      let surn = sou base istr in
+      let surn = Driver.sou base istr in
       if surn <> "?" then
         let p, db, de, pl = (fun x -> x) !ht_val in
         l := (surn, place, db, de, p, pl) :: !l)
@@ -1078,7 +1155,7 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
             let v =
               let v = List.assoc s nenv in
               if v = "" then raise Not_found
-              else Util.nth_field v (Util.index_of_sex (get_sex p))
+              else Util.nth_field v (Util.index_of_sex (Driver.get_sex p))
             in
             match text.Def.NLDB.lnTxt with
             | Some "" -> str
@@ -1104,23 +1181,22 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                       let a = String.sub v 0 i in
                       let b = String.sub v (i + 1) (j - i - 1) in
                       let c = String.sub v (j + 1) (String.length v - j - 1) in
-                      ( a |> Util.safe_html,
-                        b |> Util.safe_html,
-                        c |> Util.safe_html )
-                    with Not_found ->
-                      (Adef.safe "", Util.safe_html v, Adef.safe "")
+                      (a, b, c)
+                    with Not_found -> ("", v, "")
                   in
-                  (a : Adef.safe_string)
-                  ^^^ {|<a href="|}
-                  ^<^ (commd conf ^^^ {|m=NOTES&f=|}
-                       ^<^ (Mutil.encode pg :> Adef.escaped_string)
-                       ^>^ {|#p_|}
-                       ^ string_of_int text.Def.NLDB.lnPos
-                        : Adef.escaped_string
-                        :> Adef.safe_string)
-                  ^^^ {|">|} ^<^ b ^^^ {|</a>|} ^<^ c
+                  Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
+                    (commd conf :> string)
+                    (Mutil.encode pg :> string)
+                    text.Def.NLDB.lnPos b c
+                  |> Util.safe_html
                 in
-                if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
+                (* see FIXME above: if str1 starts with <li> then no ", " *)
+                (* is <li> is within str1, we are toast *)
+                (* template: no punctuation at the end of linked_page.XXX *)
+                if (str :> string) = "" then str1
+                else if Util.start_with (str1 :> string) 0 "<li>" then
+                  str ^>^ (str1 :> string)
+                else str ^^^ ", " ^<^ str1
           with Not_found -> str)
         l str
   | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes | Def.NLDB.PgWizard _
@@ -1160,15 +1236,21 @@ end)
 *)
 type ancestor_surname_info =
   | Branch of
-      (string * date option * date option * string * person * Sosa.t list * loc)
+      (string
+      * Adef.date option
+      * Adef.date option
+      * string
+      * Driver.person
+      * Sosa.t list
+      * Loc.t)
   | Eclair of
       (string
       * Adef.safe_string
-      * date option
-      * date option
-      * person
-      * iper list
-      * loc)
+      * Adef.date option
+      * Adef.date option
+      * Driver.person
+      * Driver.iper list
+      * Loc.t)
 
 (*
 TODO, this is not consistant with Def
@@ -1183,10 +1265,10 @@ type 'string gen_title = {
 *)
 type title_item =
   int
-  * istr gen_title_name
-  * istr
-  * istr list
-  * (date option * date option) list
+  * Driver.istr gen_title_name
+  * Driver.istr
+  * Driver.istr list
+  * (Adef.date option * Adef.date option) list
 
 type path_mode = Paths_cnt_raw | Paths_cnt | Paths
 
@@ -1197,40 +1279,54 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam list list * iper list * int) * int list) list ref
+  | Vcousl of
+      (Driver.iper
+      * (Driver.ifam list list * Driver.iper list * int)
+      * int list)
+      list
+      ref
   | Vcous_level of int ref * int ref
-  | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
-  | Vdmark of (iper, bool) Marker.t ref
+  | Vdesclevtab of
+      ((Driver.iper, int) Collection.Marker.t
+      * (Driver.ifam, int) Collection.Marker.t)
+      lazy_t
+  | Vdmark of (Driver.iper, bool) Collection.Marker.t ref
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
-  | Vind of person
-  | Vfam of ifam * family * (iper * iper * iper) * bool
-  | Vrel of relation * person option
+  | Vind of Driver.person
+  | Vfam of
+      Driver.ifam
+      * Driver.family
+      * (Driver.iper * Driver.iper * Driver.iper)
+      * bool
+  | Vrel of Driver.relation * Driver.person option
   | Vbool of bool
   | Vint of int
   | Vgpl of generation_person list
-  | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
+  | Vnldb of (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.t
   | Vstring of string
-  | Vsosa_ref of person option
-  | Vsosa of (iper * (Sosa.t * person) option) list ref
+  | Vsosa_ref of Driver.person option
+  | Vsosa of (Driver.iper * (Sosa.t * Driver.person) option) list ref
   | Vt_sosa of SosaCache.sosa_t option
-  | Vtitle of person * title_item
+  | Vtitle of Driver.person * title_item
   | Vvars of (string * string) list ref
-  | Vevent of person * istr Event.event_item
+  | Vevent of Driver.person * Driver.istr Event.event_item
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
 
-(** [has_witness_for_event event_name events] is [true] iff there is an event with name [event_name] in [events] and this event had witnesses. It do not check for permissions *)
+(** [has_witness_for_event event_name events] is [true] iff there is an event
+    with name [event_name] in [events] and this event had witnesses. It do not
+    check for permissions *)
 let has_witness_for_event conf base p event_name =
   List.exists
-    (fun ((name, _, _, _, _, wl, _) : istr Event.event_item) ->
+    (fun ((name, _, _, _, _, wl, _) : Driver.istr Event.event_item) ->
       name = event_name && Array.length wl > 0)
     (Event.events conf base p)
 
 let get_env v env =
-  try match List.assoc v env with Vlazy l -> Lazy.force l | x -> x
+  try match Templ.Env.find v env with Vlazy l -> Lazy.force l | x -> x
   with Not_found -> Vnone
 
 let get_vother = function Vother x -> Some x | _ -> None
@@ -1244,19 +1340,18 @@ let extract_var sini s =
 
 let template_file = ref "perso.txt"
 
-let warning_use_has_parents_before_parent (fname, bp, ep) var r =
-  Printf.sprintf
-    "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
-    fname bp ep var
-  |> !GWPARAM.syslog `LOG_WARNING;
+let warning_use_has_parents_before_parent loc var r =
+  Log.warn (fun k ->
+      k "%a: since v5.00, must test \"has_parents\" before using \"%s\"\n"
+        Loc.pp loc var);
   r
 
-let bool_val x = VVbool x
-let str_val x = VVstring x
-let null_val = VVstring ""
+let bool_val x = Templ.VVbool x
+let str_val x = Templ.VVstring x
+let null_val = Templ.VVstring ""
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
-  VVstring ((x :> Adef.safe_string) :> string)
+  Templ.VVstring ((x :> Adef.safe_string) :> string)
 
 let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
   if p_auth then
@@ -1268,12 +1363,25 @@ let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
     | None -> ""
   else ""
 
+let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
+  if p_auth then
+    match Image.get_blason_with_size conf base p false with
+    | Some (_, Some (w, h)) ->
+        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
+        Format.sprintf " width=\"%d\" height=\"%d\"" w h
+    | Some (_, None) | None -> Format.sprintf " height=\"%d\"" max_h
+  else ""
+
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
 let string_of_image_medium_size = gen_string_of_img_sz 160 120
 let string_of_image_small_size = gen_string_of_img_sz 100 75
+let string_of_blason_size = gen_string_of_fimg_sz max_im_wid max_im_wid
+let string_of_blason_medium_size = gen_string_of_fimg_sz 160 120
+let string_of_blason_small_size = gen_string_of_fimg_sz 100 75
+let string_of_blason_extra_small_size = gen_string_of_fimg_sz 50 37
 
 let get_sosa conf base env r p =
-  try List.assoc (get_iper p) !r
+  try List.assoc (Driver.get_iper p) !r
   with Not_found ->
     let s =
       match get_env "sosa_ref" env with
@@ -1283,31 +1391,8 @@ let get_sosa conf base env r p =
           | _ -> None)
       | _ -> None
     in
-    r := (get_iper p, s) :: !r;
+    r := (Driver.get_iper p, s) :: !r;
     s
-
-(* ************************************************************************** *)
-(*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
-
-(* ************************************************************************** *)
-
-(** [Description] : Permet de récupérer un lien de la chronique familiale.
-    [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-      - s    : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH")
-    [Retour] : string : "<a href="xxx">description du lien</a>"
-    [Rem] : Exporté en clair hors de ce module.                               *)
-let get_linked_page conf base p s =
-  let db = Gwdb.read_nldb base in
-  let db = Notes.merge_possible_aliases conf db in
-  let key =
-    let fn = Name.lower (sou base (get_first_name p)) in
-    let sn = Name.lower (sou base (get_surname p)) in
-    (fn, sn, get_occ p)
-  in
-  List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -1315,9 +1400,9 @@ let make_ep conf base ip =
   (p, p_auth)
 
 let make_efam conf base ip ifam =
-  let fam = foi base ifam in
-  let ifath = get_father fam in
-  let imoth = get_mother fam in
+  let fam = Driver.foi base ifam in
+  let ifath = Driver.get_father fam in
+  let imoth = Driver.get_mother fam in
   let ispouse = if ip = ifath then imoth else ifath in
   let cpl = (ifath, imoth, ispouse) in
   let m_auth =
@@ -1329,17 +1414,35 @@ let make_efam conf base ip ifam =
 let mode_local env =
   match get_env "fam_link" env with Vfam _ -> false | _ -> true
 
-let get_note_source conf base ?p auth no_note note_source =
-  safe_val
-  @@
+(* for family Driver.sources, p is not provided *)
+let get_note_or_source conf base
+    ?(p = Driver.empty_person base Driver.Iper.dummy) auth no_note
+    note_or_source =
+  let note_or_source = Driver.sou base note_or_source in
   if auth && not no_note then
+    (* TODO investigate the use of i in env *)
+    (* in notes, %i becomes index. Other use ??  *)
     let env =
-      match p with
-      | None -> []
-      | Some p -> [ ('i', fun () -> Image.default_portrait_filename base p) ]
+      [
+        ('i', fun () -> Driver.Iper.to_string (Driver.get_iper p));
+        ('k', fun () -> Image.default_image_filename "portraits" base p);
+      ]
     in
-    Notes.source_note_with_env conf base env (sou base note_source)
-  else Adef.safe ""
+    let lines = Wiki.html_of_tlsw conf note_or_source in
+    let lines =
+      (* remove enclosing <p> .. </p> if any *)
+      if List.compare_length_with lines 2 > 0 then
+        match lines with
+        | "<p>" :: remain ->
+            if List.hd (List.rev remain) = "</p>" then
+              List.rev (List.tl (List.rev remain))
+            else lines
+        | _ -> lines
+      else lines
+    in
+    Notes.source_note_with_env conf base env (String.concat "\n" lines)
+    |> safe_val
+  else null_val
 
 let date_aux conf p_auth date =
   match (p_auth, Date.od_of_cdate date) with
@@ -1351,7 +1454,7 @@ let date_aux conf p_auth date =
   | _ -> null_val
 
 let get_marriage_witnesses fam =
-  let fevents = Gwdb.get_fevents fam in
+  let fevents = Driver.get_fevents fam in
   let witnesses = List.map (fun marriage -> marriage.efam_witnesses) fevents in
   witnesses |> Array.concat
 
@@ -1368,17 +1471,29 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
       | Vdesclevtab t ->
           let m = fst (Lazy.force t) in
           let cnt =
-            Gwdb.Collection.fold
+            Collection.fold
               (fun cnt ip ->
                 if all_levels then
-                  if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
-                else if Gwdb.Marker.get m ip = i then cnt + 1
+                  if Collection.Marker.get m ip <= i then cnt + 1 else cnt
+                else if Collection.Marker.get m ip = i then cnt + 1
                 else cnt)
-              0 (Gwdb.ipers base)
+              0
+              (Geneweb_db.Driver.ipers base)
           in
-          VVstring (eval_int conf (if all_levels then cnt - 1 else cnt) sl)
+          Templ.VVstring
+            (eval_int conf (if all_levels then cnt - 1 else cnt) sl)
       | _ -> raise Not_found)
   | _ -> raise Not_found
+
+let undo_parentheses s =
+  Str.global_replace (Str.regexp " ?(\\([^)]*\\))") ", \\1" s
+
+let place_norm conf base p p_auth get =
+  if p_auth then
+    Driver.sou base (get p)
+    |> Place.normalize_place (Place.places_inverted conf)
+    |> str_val
+  else null_val
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
@@ -1400,15 +1515,15 @@ and eval_simple_bool_var conf base env =
         | _ -> raise Not_found)
   in
   let check_relation test =
-    fam_check_aux (fun fam -> test @@ get_relation fam)
+    fam_check_aux (fun fam -> test @@ Driver.get_relation fam)
   in
   function
   | "are_divorced" ->
       fam_check_aux (fun fam ->
-          match get_divorce fam with Divorced _ -> true | _ -> false)
+          match Driver.get_divorce fam with Divorced _ -> true | _ -> false)
   | "are_separated" ->
       fam_check_aux (fun fam ->
-          match get_separation fam with
+          match Driver.get_separation fam with
           | Separated _ | Separated_old -> true
           | _ -> false)
   | "are_engaged" -> check_relation (( = ) Engaged)
@@ -1430,24 +1545,27 @@ and eval_simple_bool_var conf base env =
   | "has_comment" | "has_fnotes" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
-          m_auth && (not conf.no_note) && sou base (get_comment fam) <> ""
+          m_auth && (not conf.no_note)
+          && Driver.sou base (Driver.get_comment fam) <> ""
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, _, _, _) -> false
           | _ -> raise Not_found))
   | "has_fsources" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) -> m_auth && sou base (get_fsources fam) <> ""
+      | Vfam (_, fam, _, m_auth) ->
+          m_auth && Driver.sou base (Driver.get_fsources fam) <> ""
       | _ -> false)
   | "has_marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          m_auth && (not conf.no_note) && sou base (get_marriage_note fam) <> ""
+          m_auth && (not conf.no_note)
+          && Driver.sou base (Driver.get_marriage_note fam) <> ""
       | _ -> raise Not_found)
   | "has_marriage_source" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          m_auth && sou base (get_marriage_src fam) <> ""
+          m_auth && Driver.sou base (Driver.get_marriage_src fam) <> ""
       | _ -> raise Not_found)
   | "has_relation_her" -> (
       match get_env "rel" env with
@@ -1460,7 +1578,7 @@ and eval_simple_bool_var conf base env =
   | "has_witnesses" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
-          m_auth && Array.length (get_witnesses fam) > 0
+          m_auth && Array.length (Driver.get_witnesses fam) > 0
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, _, _, _) -> false
@@ -1471,21 +1589,22 @@ and eval_simple_bool_var conf base env =
       match get_env "last" env with Vbool x -> x | _ -> raise Not_found)
   | "is_no_mention" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) when mode_local env -> get_relation fam = NoMention
+      | Vfam (_, fam, _, _) when mode_local env ->
+          Driver.get_relation fam = NoMention
       | _ -> (
           match get_env "fam_link" env with
-          | Vfam (_, fam, _, _) -> get_relation fam = NoMention
+          | Vfam (_, fam, _, _) -> Driver.get_relation fam = NoMention
           | _ -> raise Not_found))
   | "is_no_sexes_check" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, _) when mode_local env ->
-          get_relation fam = NoSexesCheckNotMarried
-          || get_relation fam = NoSexesCheckMarried
+          Driver.get_relation fam = NoSexesCheckNotMarried
+          || Driver.get_relation fam = NoSexesCheckMarried
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, _) ->
-              get_relation fam = NoSexesCheckNotMarried
-              || get_relation fam = NoSexesCheckMarried
+              Driver.get_relation fam = NoSexesCheckNotMarried
+              || Driver.get_relation fam = NoSexesCheckMarried
           | _ -> raise Not_found))
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
@@ -1508,7 +1627,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "comment" | "fnotes" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_comment fam |> get_note_source conf base m_auth conf.no_note
+          Driver.get_comment fam
+          |> get_note_or_source conf base m_auth conf.no_note
       | _ -> raise Not_found)
   | "count" -> (
       match get_env "count" env with
@@ -1533,7 +1653,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
-          match get_divorce fam with
+          match Driver.get_divorce fam with
           | Divorced d -> (
               let d = Date.od_of_cdate d in
               match d with
@@ -1544,7 +1664,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) -> (
-              match get_divorce fam with
+              match Driver.get_divorce fam with
               | Divorced d -> (
                   let d = Date.od_of_cdate d in
                   match d with
@@ -1557,7 +1677,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "separation_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
-          match get_separation fam with
+          match Driver.get_separation fam with
           | Separated d -> (
               let d = Date.od_of_cdate d in
               match d with
@@ -1568,7 +1688,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) -> (
-              match get_separation fam with
+              match Driver.get_separation fam with
               | Separated d -> (
                   let d = Date.od_of_cdate d in
                   match d with
@@ -1581,7 +1701,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "on_divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
-          match get_divorce fam with
+          match Driver.get_divorce fam with
           | Divorced d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
@@ -1590,7 +1710,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) -> (
-              match get_divorce fam with
+              match Driver.get_divorce fam with
               | Divorced d -> (
                   match date_aux conf m_auth d with
                   | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
@@ -1600,7 +1720,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "on_separation_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
-          match get_separation fam with
+          match Driver.get_separation fam with
           | Separated d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
@@ -1609,7 +1729,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) -> (
-              match get_separation fam with
+              match Driver.get_separation fam with
               | Separated d -> (
                   match date_aux conf m_auth d with
                   | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
@@ -1619,7 +1739,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "slash_divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match get_divorce fam with
+          match Driver.get_divorce fam with
           | Divorced d -> (
               let d = Date.od_of_cdate d in
               match d with
@@ -1631,7 +1751,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "slash_separation_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match get_separation fam with
+          match Driver.get_separation fam with
           | Separated d -> (
               let d = Date.od_of_cdate d in
               match d with
@@ -1681,7 +1801,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "fsources" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, _) ->
-          get_fsources fam |> sou base |> Util.safe_html |> safe_val
+          Driver.get_fsources fam |> Driver.sou base |> Util.safe_html
+          |> safe_val
       | _ -> null_val)
   | "url_in_env" -> (
       match get_env "url" env with Vstring x -> str_val x | _ -> str_val "")
@@ -1710,7 +1831,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
           null_val
       | _ -> null_val)
   (* carrousel *)
-  | "idigest" -> Image.default_portrait_filename base p |> str_val
+  | "idigest" -> Image.default_image_filename "portraits" base p |> str_val
   | "img_cnt" -> (
       match get_env "img_cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
@@ -1721,15 +1842,15 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> null_val)
   | "carrousel_img_raw" -> (
       match get_env "carrousel_img" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_note" -> (
       match get_env "carrousel_note" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   | "carrousel_src" -> (
       match get_env "carrousel_src" env with
-      | Vstring s -> str_val s
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> null_val)
   (* end carrousel *)
   | "lazy_force" -> (
@@ -1769,43 +1890,48 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
           if m_auth then
-            get_marriage_place fam |> sou base |> Util.string_of_place conf
-            |> safe_val
+            Driver.get_marriage_place fam
+            |> Driver.sou base |> Util.string_of_place conf |> safe_val
           else null_val
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) ->
               if m_auth then
-                get_marriage_place fam |> sou base |> Util.string_of_place conf
-                |> safe_val
+                Driver.get_marriage_place fam
+                |> Driver.sou base |> Util.string_of_place conf |> safe_val
               else null_val
           | _ -> raise Not_found))
   | "marriage_place_raw" -> (
+      let aux fam =
+        Driver.sou base (Driver.get_marriage_place fam) |> str_val
+      in
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
-          if m_auth then
-            get_marriage_place fam |> sou base
-            |> Util.raw_string_of_place conf
-            |> str_val
-          else null_val
+          if m_auth then aux fam else null_val
       | _ -> (
           match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              if m_auth then
-                get_marriage_place fam |> sou base
-                |> Util.raw_string_of_place conf
-                |> str_val
-              else null_val
+          | Vfam (_, fam, _, m_auth) -> if m_auth then aux fam else null_val
           | _ -> raise Not_found))
   | "marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_marriage_note fam |> get_note_source conf base m_auth conf.no_note
+          Driver.get_marriage_note fam
+          |> get_note_or_source conf base m_auth conf.no_note
       | _ -> raise Not_found)
   | "marriage_source" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_marriage_src fam |> get_note_source conf base m_auth false
+          Driver.get_marriage_src fam
+          |> get_note_or_source conf base m_auth false
+      | _ -> raise Not_found)
+  | "marriage_source_raw" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) ->
+          if m_auth then
+            safe_val
+              (Util.escape_html (Driver.sou base (Driver.get_marriage_src fam))
+                :> Adef.safe_string)
+          else null_val
       | _ -> raise Not_found)
   | "max_anc_level" -> (
       match get_env "max_anc_level" env with
@@ -1864,15 +1990,16 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "on_marriage_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
-          date_aux conf m_auth (get_marriage fam)
+          date_aux conf m_auth (Driver.get_marriage fam)
       | _ -> (
           match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> date_aux conf m_auth (get_marriage fam)
+          | Vfam (_, fam, _, m_auth) ->
+              date_aux conf m_auth (Driver.get_marriage fam)
           | _ -> raise Not_found))
   | "slash_marriage_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match (m_auth, Date.od_of_cdate (get_marriage fam)) with
+          match (m_auth, Date.od_of_cdate (Driver.get_marriage fam)) with
           | true, Some s -> DateDisplay.string_slash_of_date conf s |> safe_val
           | _ -> null_val)
       | _ -> raise Not_found)
@@ -1880,7 +2007,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       if conf.wizard then
         match get_env "fam" env with
         | Vfam (_, fam, _, _) ->
-            get_origin_file fam |> sou base |> Util.escape_html |> safe_val
+            Driver.get_origin_file fam |> Driver.sou base |> Util.escape_html
+            |> safe_val
         | _ -> null_val
       else raise Not_found
   | "qualifier" -> (
@@ -1890,7 +2018,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "related_type" -> (
       match get_env "rel" env with
       | Vrel (r, Some c) ->
-          rchild_type_text conf r.r_type (index_of_sex (get_sex c)) |> safe_val
+          rchild_type_text conf r.r_type (index_of_sex (Driver.get_sex c))
+          |> safe_val
       | _ -> raise Not_found)
   | "relation_type" -> (
       match get_env "rel" env with
@@ -1936,10 +2065,19 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "desc_level_table" env with
       | Vdesclevtab levt ->
           let _, flevt = Lazy.force levt in
-          Gwdb.Collection.iter
-            (fun i -> Gwdb.Marker.set flevt i (Gwdb.Marker.get flevt_save i))
-            (Gwdb.ifams base);
+          Collection.iter
+            (fun i ->
+              Collection.Marker.set flevt i (Collection.Marker.get flevt_save i))
+            (Geneweb_db.Driver.ifams base);
           null_val
+      | _ -> raise Not_found)
+  | "source_field" -> (
+      match get_env "src_field" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
+  | "source_ifam" -> (
+      match get_env "src_ifam" env with
+      | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | "source_type" -> (
       match get_env "src_typ" env with
@@ -1976,6 +2114,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
   | "anc_paths_at_level" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths true loc sl
+  | [ "anc_stats_json" ] ->
+      VVstring (AncStatsDisplay.compute_json conf base (fst ep))
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
@@ -1999,14 +2139,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | [ "plugin"; plugin ] ->
-      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
+  | [ "plugin"; plugin ] -> VVbool (List.mem plugin conf.allowed_plugins)
   | "base" :: "nb_persons" :: sl ->
-      VVstring (eval_int conf (nb_of_persons base) sl)
+      VVstring (eval_int conf (Driver.nb_of_persons base) sl)
   | "base" :: "nb_families" :: sl ->
-      VVstring (eval_int conf (nb_of_families base) sl)
+      VVstring (eval_int conf (Driver.nb_of_families base) sl)
   | "base" :: "real_nb_persons" :: sl ->
-      VVstring (eval_int conf (Gwdb.nb_of_real_persons base) sl)
+      VVstring (eval_int conf (Driver.nb_of_real_persons base) sl)
   | "cell" :: sl -> (
       match get_env "cell" env with
       | Vcell cell -> eval_cell_field_var conf base env cell loc sl
@@ -2017,18 +2156,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "child_link" env with
-          | Vind p ->
-              let ep = (p, true) in
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring b -> b
-                | _ -> conf.command
-              in
-              let conf = { conf with command = baseprefix } in
-              eval_person_field_var conf base env ep loc sl
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "cousin" :: sl -> (
       match get_env "cousin" env with
       | Vind p when mode_local env ->
@@ -2036,13 +2164,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | "enclosing" :: sl ->
-      let rec loop = function
-        | ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
-        | _ :: env -> loop env
-        | [] -> raise Not_found
-      in
-      loop env
   | "event_witness_relation" :: sl -> (
       match get_env "event_witness_relation" env with
       | Vevent (p, e) ->
@@ -2076,37 +2197,23 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
               eval_family_field_var conf base env (i, f, c, m) loc sl
           | _ -> raise Not_found))
   | "father" :: sl -> (
-      match get_parents a with
+      match Driver.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_father cpl) in
+          let cpl = Driver.foi base ifam in
+          let ep = make_ep conf base (Driver.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match !GWPARAM_ITL.get_father conf base conf.command (get_iper a) with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
   | "item" :: sl -> (
       match get_env "item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
       | _ -> raise Not_found)
   | "mother" :: sl -> (
-      match get_parents a with
+      match Driver.get_parents a with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_mother cpl) in
+          let cpl = Driver.foi base ifam in
+          let ep = make_ep conf base (Driver.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match !GWPARAM_ITL.get_mother conf base conf.command (get_iper a) with
-          | Some (ep, base_prefix) ->
-              let conf = { conf with command = base_prefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | "next_item" :: sl -> (
       match get_env "item" env with
       | Vslistlm (_ :: ell) -> eval_item_field_var ell sl
@@ -2142,20 +2249,31 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
-      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | Some p -> VVstring (Driver.Iper.to_string (Driver.get_iper p))
       | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
   (* person_index.e -> ei=, ep=, en=, eoc= *)
-  | [ "person_index"; x ] -> (
+  (* same code in dagDisplay.ml, but with slight differences *)
+  | "person_index" :: x :: sl -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
       in
       let s = if x = "x" then "" else x in
       match find_person conf base s with
-      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> VVstring "")
+      | Some p ->
+          let auth = authorized_age conf base p in
+          let ep = (p, auth) in
+          eval_person_field_var conf base env ep loc sl
+      | None -> (
+          match p_getenv conf.env s with
+          | Some s when Option.is_some (int_of_string_opt s) ->
+              let p = Driver.poi base (Driver.Iper.of_string s) in
+              let auth = authorized_age conf base p in
+              let ep = (p, auth) in
+              eval_person_field_var conf base env ep loc sl
+          | _ -> VVstring ""))
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
@@ -2167,72 +2285,94 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | [ "prefix_new_ix"; ip ] ->
       let p =
-        poi base (try iper_of_string ip with Failure _ -> raise Not_found)
+        Driver.poi base
+          (try Driver.Iper.of_string ip with Failure _ -> raise Not_found)
       in
       str_val
         ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
         ^ "pz="
-        ^ sou base (get_first_name p)
+        ^ Driver.sou base (Driver.get_first_name p)
         ^ "&nz="
-        ^ sou base (get_surname p)
-        ^ (if get_occ p <> 0 then "&ocz=" ^ string_of_int (get_occ p) else "")
+        ^ Driver.sou base (Driver.get_surname p)
+        ^ (if Driver.get_occ p <> 0 then
+             "&ocz=" ^ string_of_int (Driver.get_occ p)
+           else "")
         ^ "&")
   | "pvar" :: v :: sl -> (
-      match find_person_in_env conf base v with
-      | Some p ->
-          let ep = make_ep conf base (get_iper p) in
-          eval_person_field_var conf base env ep loc sl
-      | None -> raise Not_found)
-  | "qvar" :: v :: sl ->
-      (* %qvar.index_v.surname;
-         direct access to a person whose index value is v
+      (* %pvar.v.surname;
+         direct access to a person defined as iv or pv, nv, ocv in the url
+         get highest index in a list of iN or pN
+         test for existence of person iv or pv, nv, ocv
       *)
-      let v1 = iper_of_string v in
-      let v0 = int_of_string v in
-      if v0 >= 0 && v0 < nb_of_persons base then
-        let ep = make_ep conf base v1 in
-        if is_hidden (fst ep) then raise Not_found
-        else eval_person_field_var conf base env ep loc sl
-      else raise Not_found
-  | "p_of_index" :: v :: sl ->
+      match v with
+      | "highest" ->
+          let max_index =
+            List.fold_left
+              (fun acc (key, _) ->
+                if String.length key >= 2 then
+                  let prefix = String.get key 0 in
+                  if prefix = 'p' || prefix = 'i' then
+                    try
+                      let num =
+                        int_of_string (String.sub key 1 (String.length key - 1))
+                      in
+                      max acc num
+                    with _ -> acc
+                  else acc
+                else acc)
+              0 conf.env
+          in
+          VVstring (string_of_int max_index)
+      | _ -> (
+          match find_person_in_env conf base v with
+          | Some p ->
+              let ep = make_ep conf base (Driver.get_iper p) in
+              eval_person_field_var conf base env ep loc sl
+          | None -> (
+              match sl with [ "exist" ] -> VVbool false | _ -> raise Not_found))
+      )
+  | "p_of_index" :: v :: sl -> (
       (* %p_of_index.index_v.surname;
          direct access to a person whose index value is v
       *)
-      let i = int_of_string v in
-      if i >= 0 && i < Gwdb.nb_of_persons base then
-        let ip = iper_of_string v in
-        let ep = make_ep conf base ip in
-        if is_hidden (fst ep) then str_val ""
-        else eval_person_field_var conf base env ep loc sl
-      else raise Not_found
-  | "f_of_index" :: v :: sl ->
+      match int_of_string_opt v with
+      | Some i when i >= 0 && i < Driver.nb_of_persons base ->
+          let ip = Driver.Iper.of_string v in
+          let ep = make_ep conf base ip in
+          if is_hidden (fst ep) then str_val ""
+          else eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found)
+  | "f_of_index" :: v :: sl -> (
       (* %f_of_index.index_v.marriage_date;
          direct access to a family whose index value is v
       *)
-      let i = int_of_string v in
-      if i >= 0 && i < Gwdb.nb_of_families base then
-        let ifam = ifam_of_string v in
-        let f, c, a = make_efam conf base (get_iper a) ifam in
-        eval_family_field_var conf base env (ifam, f, c, a) loc sl
-      else raise Not_found
+      match int_of_string_opt v with
+      | Some i when i >= 0 && i < Driver.nb_of_families base ->
+          let ifam = Driver.Ifam.of_string v in
+          let f, c, a = make_efam conf base (Driver.get_iper a) ifam in
+          eval_family_field_var conf base env (ifam, f, c, a) loc sl
+      | _ -> raise Not_found)
   | [ "set_count"; n; v ] -> (
       match n with
       | "1" | "2" | "3" -> (
           match get_env ("count" ^ n) env with
-          | Vcnt c ->
-              c := int_of_string v;
-              VVstring ""
+          | Vcnt c -> (
+              match int_of_string_opt v with
+              | Some i ->
+                  c := i;
+                  VVstring ""
+              | _ -> raise Not_found)
           | _ -> raise Not_found)
       | _ -> raise Not_found)
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
@@ -2244,11 +2384,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
           (if not (List.mem name !GWPARAM.set_vars) then
-           let name =
-             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
-             else name
-           in
-           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+             let name =
+               if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+               else name
+             in
+             GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   | "svar" :: i :: sl -> (
@@ -2264,25 +2404,28 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
         | Some p -> p
         | None -> if j = 0 then raise Not_found else find_base_p (j - 1)
       in
-      let p0 = find_base_p (int_of_string i) in
-      (* find sosa identified by si= of that person *)
-      match p_getint conf.env ("s" ^ i) with
-      | Some s -> (
-          let s0 = Sosa.of_int s in
-          let ip0 = get_iper p0 in
-          match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
-          | Some (p :: _) ->
-              let p_auth = authorized_age conf base p in
-              eval_person_field_var conf base env (p, p_auth) loc sl
-          | _ -> raise Not_found)
-      | None -> raise Not_found)
+      match int_of_string_opt i with
+      | Some v -> (
+          let p0 = find_base_p v in
+          (* find sosa identified by si= of that person *)
+          match p_getint conf.env ("s" ^ i) with
+          | Some s -> (
+              let s0 = Sosa.of_int s in
+              let ip0 = Driver.get_iper p0 in
+              match Util.branch_of_sosa conf base s0 (pget conf base ip0) with
+              | Some (p :: _) ->
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl
+              | _ -> raise Not_found)
+          | None -> raise Not_found)
+      | _ -> raise Not_found)
   | "sosa_anc" :: s :: sl -> (
       (* %sosa_anc.sosa.first_name;
          direct access to a person whose sosa relative to sosa_ref is s
       *)
       match get_env "sosa_ref" env with
       | Vsosa_ref (Some p) -> (
-          let ip = get_iper p in
+          let ip = Driver.get_iper p in
           let s0 = Sosa.of_string s in
           match Util.branch_of_sosa conf base s0 (pget conf base ip) with
           | Some (p :: _) ->
@@ -2303,7 +2446,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "rel" env with
       | Vrel ({ r_type = rt; _ }, Some p) ->
           eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_iper p, false)
+            (index_of_sex (Driver.get_sex p), rt, Driver.get_iper p, false)
             loc sl
       | _ -> raise Not_found)
   | "relation_her" :: sl -> (
@@ -2317,32 +2460,25 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           eval_relation_field_var conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
+  | "blason_owner" :: sl -> (
+      match Image.get_blason_owner conf base a with
+      | Some fa_iper ->
+          let ep = make_ep conf base fa_iper in
+          eval_person_field_var conf base env ep loc sl
+      | None -> null_val)
   | "sosa_ref" :: sl -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref (Some p) ->
-          let ep = make_ep conf base (get_iper p) in
+          let ep = make_ep conf base (Driver.get_iper p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
-      | Vfam (_, _, (_, _, ip), _) when mode_local env ->
-          let ep = make_ep conf base ip in
+      | Vfam (_, _, (_, _, ip), m_auth) ->
+          let spouse = pget conf base ip in
+          let ep = (spouse, m_auth && authorized_age conf base spouse) in
           eval_person_field_var conf base env ep loc sl
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, (_, _, ip), _) -> (
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.command
-              in
-              match !GWPARAM_ITL.get_person conf base baseprefix ip with
-              | Some (ep, baseprefix) ->
-                  let conf = { conf with command = baseprefix } in
-                  let env = ("p_link", Vbool true) :: env in
-                  eval_person_field_var conf base env ep loc sl
-              | None -> raise Not_found)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "witness" :: sl -> (
       match get_env "witness" env with
       | Vind p ->
@@ -2361,28 +2497,22 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
-          match path_mode with
-          | Paths_cnt_raw -> (
-              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
-              match list1 with
-              | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
-              | None -> raise Not_found)
-          | Paths_cnt -> (
-              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
-              match list1 with
-              | Some list1 ->
+          let asc_cnt = get_asc_cnt conf base p in
+          let mode = if at_to then `At_level lev else `Up_to lev in
+          match Cousins.anc_cnt_aux ~asc_cnt conf base mode p with
+          | None -> raise Not_found
+          | Some list1 -> (
+              match path_mode with
+              | Paths_cnt_raw -> VVstring (eval_int conf (List.length list1) sl)
+              | Paths_cnt ->
                   VVstring
                     (eval_int conf
                        (List.length (Cousins.cousins_fold list1))
                        sl)
-              | None -> raise Not_found)
-          | Paths -> (
-              let l = Cousins.anc_cnt_aux conf base lev at_to p in
-              match l with
-              | Some l -> (
+              | Paths -> (
                   match get_env "cousins" env with
                   | Vcousl cl ->
-                      cl := Cousins.cousins_fold l;
+                      cl := Cousins.cousins_fold list1;
                       let l1, l2 = l1_l2 in
                       (match get_env "v1_v2" env with
                       | Vcous_level (v1, v2) ->
@@ -2390,8 +2520,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                           v2 := l2
                       | _ -> ());
                       VVstring ""
-                  | _ -> raise Not_found)
-              | None -> raise Not_found))
+                  | _ -> raise Not_found)))
       | _ -> raise Not_found)
 
 and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
@@ -2399,45 +2528,37 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
+          let mode = if at_to then `At_level lev else `Up_to lev in
+          let result = Cousins.desc_cnt_aux conf base mode p in
           match path_mode with
           | Paths_cnt_raw -> (
-              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
-              match list1 with
+              match result with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
-              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
-              match list1 with
+              match result with
               | Some l ->
                   VVstring
                     (eval_int conf (List.length (Cousins.cousins_fold l)) sl)
               | None -> raise Not_found)
           | Paths -> (
-              let l = Cousins.desc_cnt_aux conf base lev at_to p in
-              match l with
-              | Some l -> (
-                  match get_env "cousins" env with
-                  | Vcousl cl ->
-                      cl := Cousins.cousins_fold l;
-                      let l1, l2 = l1_l2 in
-                      (match get_env "v1_v2" env with
-                      | Vcous_level (v1, v2) ->
-                          v1 := l1;
-                          v2 := l2
-                      | _ -> ());
-                      VVstring ""
-                  | _ -> VVstring "")
-              | None -> (
-                  match get_env "cousins" env with
-                  | Vcousl cl ->
-                      cl := [];
-                      (match get_env "v1_v2" env with
-                      | Vcous_level (v1, v2) ->
-                          v1 := 0;
-                          v2 := 0
-                      | _ -> ());
-                      VVstring ""
-                  | _ -> VVstring "")))
+              let cl_val, l1, l2 =
+                match result with
+                | Some l ->
+                    let l1, l2 = l1_l2 in
+                    (Cousins.cousins_fold l, l1, l2)
+                | None -> ([], 0, 0)
+              in
+              match get_env "cousins" env with
+              | Vcousl cl ->
+                  cl := cl_val;
+                  (match get_env "v1_v2" env with
+                  | Vcous_level (v1, v2) ->
+                      v1 := l1;
+                      v2 := l2
+                  | _ -> ());
+                  VVstring ""
+              | _ -> VVstring ""))
       | _ -> raise Not_found)
 
 and eval_item_field_var ell = function
@@ -2467,18 +2588,20 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
   | [ "nth" ] -> VVstring (string_of_int nth)
   | [ "name" ] -> (
       match name with
-      | Tname n -> VVstring (sou base n |> escape_html :> string)
+      | Tname n -> VVstring (Driver.sou base n |> escape_html :> string)
       | _ -> VVstring "")
-  | [ "title" ] -> VVstring (sou base title |> escape_html :> string)
+  | [ "title" ] -> VVstring (Driver.sou base title |> escape_html :> string)
   | [ "places" ] ->
       let places =
-        List.map (fun pl -> (sou base pl |> escape_html :> string)) places
+        List.map
+          (fun pl -> (Driver.sou base pl |> escape_html :> string))
+          places
       in
       VVstring (String.concat ", " places)
   | [ "dates" ] ->
       let date_opt_to_string d =
         match d with
-        | Some (Dgreg (dmy, _)) ->
+        | Some (Adef.Dgreg (dmy, _)) ->
             Some (DateDisplay.string_of_dmy conf dmy :> string)
         | Some (Dtext d) -> Some (d |> escape_html :> string)
         | None -> None
@@ -2487,9 +2610,9 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
         List.map
           (fun (d1, d2) ->
             match (date_opt_to_string d1, date_opt_to_string d2) with
-            | Some s1, Some s2 -> Format.sprintf "%s - %s" s1 s2
-            | Some s1, None -> Format.sprintf "%s -" s1
-            | None, Some s2 -> Format.sprintf "- %s" s2
+            | Some s1, Some s2 -> Format.sprintf "%s–%s" s1 s2
+            | Some s1, None -> Format.sprintf "%s" s1
+            | None, Some s2 -> Format.sprintf "–%s" s2
             | None, None -> "")
           dates
       in
@@ -2498,7 +2621,7 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       match dates with
       | [ (d, _) ] -> (
           match d with
-          | Some (Dgreg (dmy, _)) ->
+          | Some (Adef.Dgreg (dmy, _)) ->
               VVstring (DateDisplay.string_of_dmy conf dmy :> string)
           | Some (Dtext d) -> VVstring (d |> escape_html :> string)
           | None -> null_val)
@@ -2507,7 +2630,7 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       match dates with
       | [ (_, d) ] -> (
           match d with
-          | Some (Dgreg (dmy, _)) ->
+          | Some (Adef.Dgreg (dmy, _)) ->
               VVstring (DateDisplay.string_of_dmy conf dmy :> string)
           | Some (Dtext d) -> VVstring (d |> escape_html :> string)
           | None -> null_val)
@@ -2530,16 +2653,10 @@ and eval_cell_field_var conf base env cell loc = function
       | Cell (_, _, _, _, s, _) -> VVstring (string_of_int s))
   | "family" :: sl -> (
       match cell with
-      | Cell (p, Some ifam, _, _, _, base_prefix) -> (
-          if conf.bname = base_prefix then
-            let f, c, a = make_efam conf base (get_iper p) ifam in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
-          else
-            let conf = { conf with command = base_prefix } in
-            match !GWPARAM_ITL.get_family conf base base_prefix p ifam with
-            | Some (f, c, a) ->
-                eval_family_field_var conf base env (ifam, f, c, a) loc sl
-            | None -> assert false)
+      | Cell (p, Some ifam, _, _, _, base_prefix) ->
+          assert (conf.bname = base_prefix);
+          let f, c, a = make_efam conf base (Driver.get_iper p) ifam in
+          eval_family_field_var conf base env (ifam, f, c, a) loc sl
       | _ -> VVstring "")
   | [ "is_center" ] -> (
       match cell with
@@ -2563,7 +2680,7 @@ and eval_cell_field_var conf base env cell loc = function
       match cell with
       | Cell (p, _, _, _, _, base_prefix) ->
           if conf.bname = base_prefix then
-            let ep = make_ep conf base (get_iper p) in
+            let ep = make_ep conf base (Driver.get_iper p) in
             eval_person_field_var conf base env ep loc sl
           else
             let conf = { conf with command = base_prefix } in
@@ -2576,9 +2693,9 @@ and eval_ancestor_field_var conf base env gp loc = function
   | "family" :: sl -> (
       match gp with
       | GP_person (_, ip, Some ifam) ->
-          let f = foi base ifam in
-          let ifath = get_father f in
-          let imoth = get_mother f in
+          let f = Driver.foi base ifam in
+          let ifath = Driver.get_father f in
+          let imoth = Driver.get_mother f in
           let ispouse = if ip = ifath then imoth else ifath in
           let c = (ifath, imoth, ispouse) in
           let m_auth =
@@ -2590,20 +2707,22 @@ and eval_ancestor_field_var conf base env gp loc = function
   | "father" :: sl -> (
       match gp with
       | GP_person (_, ip, _) -> (
-          match (get_parents (pget conf base ip), get_env "all_gp" env) with
+          match
+            (Driver.get_parents (pget conf base ip), get_env "all_gp" env)
+          with
           | Some ifam, Vallgp all_gp -> (
-              let cpl = foi base ifam in
-              match get_link all_gp (get_father cpl) with
+              let cpl = Driver.foi base ifam in
+              match get_link all_gp (Driver.get_father cpl) with
               | Some gp -> eval_ancestor_field_var conf base env gp loc sl
               | None ->
-                  let ep = make_ep conf base (get_father cpl) in
+                  let ep = make_ep conf base (Driver.get_father cpl) in
                   eval_person_field_var conf base env ep loc sl)
           | _, _ -> raise Not_found)
       | GP_same (_, _, ip) -> (
-          match get_parents (pget conf base ip) with
+          match Driver.get_parents (pget conf base ip) with
           | Some ifam ->
-              let cpl = foi base ifam in
-              let ep = make_ep conf base (get_father cpl) in
+              let cpl = Driver.foi base ifam in
+              let ep = make_ep conf base (Driver.get_father cpl) in
               eval_person_field_var conf base env ep loc sl
           | _ -> raise Not_found)
       | _ -> raise Not_found)
@@ -2611,7 +2730,7 @@ and eval_ancestor_field_var conf base env gp loc = function
       match (gp, get_env "all_gp" env) with
       | (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
           let n = Sosa.twice n in
-          VVstring (parent_sosa conf base ip all_gp n get_father)
+          VVstring (parent_sosa conf base ip all_gp n Driver.get_father)
       | _ -> null_val)
   | "interval" :: sl -> (
       let to_string x = eval_sosa conf x sl in
@@ -2631,7 +2750,7 @@ and eval_ancestor_field_var conf base env gp loc = function
       match (gp, get_env "all_gp" env) with
       | (GP_person (n, ip, _) | GP_same (n, _, ip)), Vallgp all_gp ->
           let n = Sosa.inc (Sosa.twice n) 1 in
-          VVstring (parent_sosa conf base ip all_gp n get_mother)
+          VVstring (parent_sosa conf base ip all_gp n Driver.get_mother)
       | _ -> null_val)
   | "same" :: sl -> (
       match gp with
@@ -2645,7 +2764,7 @@ and eval_ancestor_field_var conf base env gp loc = function
   | "spouse" :: sl -> (
       match gp with
       | GP_person (_, ip, Some ifam) ->
-          let ip = Gutil.spouse ip (foi base ifam) in
+          let ip = Gutil.spouse ip (Driver.foi base ifam) in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | GP_person _ | GP_interv _ | GP_missing _ | GP_same _ -> raise Not_found)
@@ -2687,7 +2806,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
                :> Adef.safe_string)
             ^^^ (str : Adef.encoded_string :> Adef.safe_string))
       | sl ->
-          let ep = make_ep conf base (get_iper p) in
+          let ep = make_ep conf base (Driver.get_iper p) in
           eval_person_field_var conf base env ep loc sl)
   | Eclair (_, place, db, de, p, persl, loc) -> (
       function
@@ -2701,11 +2820,11 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           | None -> null_val)
       | [ "nb_events" ] -> VVstring (string_of_int (List.length persl))
       | [ "nb_ind" ] ->
-          IperSet.elements (List.fold_right IperSet.add persl IperSet.empty)
+          Iper.Set.elements (List.fold_right Iper.Set.add persl Iper.Set.empty)
           |> List.length |> string_of_int |> str_val
       | [ "place" ] -> safe_val place
       | sl ->
-          let ep = make_ep conf base (get_iper p) in
+          let ep = make_ep conf base (Driver.get_iper p) in
           eval_person_field_var conf base env ep loc sl)
 
 and eval_sosa conf n = function
@@ -2723,7 +2842,86 @@ and eval_int conf n = function
   | [] -> Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
-and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
+and eval_place_field conf pl = function
+  | [ "sub" ] -> Place.only_suburb pl |> str_val
+  | [ "main" ] -> Place.without_suburb pl |> str_val
+  | _ -> Util.string_of_place conf pl |> safe_val
+
+and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
+  function
+  | [ "access_status" ] -> VVstring (Util.access_status p)
+  | [ "age" ] -> (
+      match person_living_age conf p p_auth with
+      | Some elapsed -> VVstring (format_age conf elapsed :> string)
+      | None -> null_val)
+  | "age" :: sl -> (
+      match person_living_age conf p p_auth with
+      | Some elapsed -> eval_age_field_var conf elapsed sl
+      | None -> null_val)
+  | [ "marriage_age" ] -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when m_auth && p_auth ->
+          eval_marriage_age conf p fam []
+      | _ -> null_val)
+  | "marriage_age" :: sl -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when m_auth && p_auth ->
+          eval_marriage_age conf p fam sl
+      | _ -> null_val)
+  | [ "death_age" ] -> eval_death_age conf p p_auth []
+  | "death_age" :: sl -> eval_death_age conf p p_auth sl
+  | ([ "age_at_father_birth" ] | "age_at_father_birth" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_father p_birth sl
+  | ([ "age_at_father_death" ] | "age_at_father_death" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_father
+        death_date_opt sl
+  | ([ "age_at_mother_birth" ] | "age_at_mother_birth" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_mother p_birth sl
+  | ([ "age_at_mother_death" ] | "age_at_mother_death" :: _) as sl ->
+      eval_age_at_parent_event conf base p p_auth Driver.get_mother
+        death_date_opt sl
+  | ([ "age_at_parent_marriage" ] | "age_at_parent_marriage" :: _) as sl -> (
+      match Driver.get_parents p with
+      | Some ifam ->
+          let fam = Driver.foi base ifam in
+          let target = Date.cdate_to_dmy_opt (Driver.get_marriage fam) in
+          compute_age_at_event conf p_auth
+            (Date.cdate_to_dmy_opt (Driver.get_birth p))
+            target sl
+      | None -> Templ.VVstring "")
+  | ([ "age_at_spouse_death" ] | "age_at_spouse_death" :: _) as sl -> (
+      match get_env "fam" env with
+      | Vfam (_, _, (_, _, ispouse), m_auth) ->
+          let spouse = pget conf base ispouse in
+          let target = death_date_opt spouse in
+          compute_age_at_event conf (p_auth && m_auth)
+            (Date.cdate_to_dmy_opt (Driver.get_birth p))
+            target sl
+      | _ -> null_val)
+  | ([ "age_at_child_birth" ] | "age_at_child_birth" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child p_birth sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_child_death" ] | "age_at_child_death" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child death_date_opt sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_child_marriage" ] | "age_at_child_marriage" :: _) as sl -> (
+      match (get_env "p" env, get_env "child" env) with
+      | Vind self, Vind child ->
+          eval_age_at_child_event conf base self child (child_marriage base) sl
+      | _ -> Templ.VVstring "")
+  | ([ "age_at_related_baptism" ] | "age_at_related_baptism" :: _) as sl -> (
+      match (get_env "p" env, get_env "rel" env) with
+      | Vind self, Vrel (_, Some related) ->
+          let self_auth = authorized_age conf base self in
+          let target = Date.cdate_to_dmy_opt (Driver.get_baptism related) in
+          compute_age_at_event conf self_auth
+            (Date.cdate_to_dmy_opt (Driver.get_birth self))
+            target sl
+      | _ -> Templ.VVstring "")
   | "anc1" :: sl -> (
       match get_env "anc1" env with
       | Vind pa ->
@@ -2747,45 +2945,59 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Vint i -> str_val (string_of_int i)
       | _ -> raise Not_found)
   | "baptism_date" :: sl -> (
-      match Date.od_of_cdate (get_baptism p) with
+      match Date.od_of_cdate (Driver.get_baptism p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
+  | "baptism_place" :: sl ->
+      let pl = Driver.get_baptism_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "birth_date" :: sl -> (
-      match Date.od_of_cdate (get_birth p) with
+      match Date.od_of_cdate (Driver.get_birth p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
+  | "birth_place" :: sl ->
+      let pl = Driver.get_birth_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "burial_date" :: sl -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Buried cod when p_auth -> (
           match Date.od_of_cdate cod with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
+  | "burial_place" :: sl ->
+      let pl = Driver.get_burial_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | [ "cnt" ] -> (
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cous_paths_min_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p true l1 l2 with
-      | Some min -> VVstring (string_of_int min)
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p `Min l1 l2 with
+      | Some y -> VVstring (string_of_int y)
       | None -> raise Not_found)
   | [ "cous_paths_max_date"; l1; l2 ] -> (
-      match Cousins.min_max_date conf base p false l1 l2 with
-      | Some max -> VVstring (string_of_int max)
+      let sparse = get_cousins_sparse conf base p in
+      match Cousins.min_max_date sparse conf base p `Max l1 l2 with
+      | Some y -> VVstring (string_of_int y)
       | None -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> VVstring (string_of_int (List.length l))
       | None -> VVstring "-1")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           VVstring (string_of_int (List.length (Cousins.cousins_fold l)))
       | None -> VVstring "-1")
   | [ "cous_paths"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l -> (
           match get_env "cousins" env with
@@ -2797,17 +3009,21 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | [ "cous_implx_cnt"; l1; l2 ] -> (
       match p_getenv conf.env "c_implex" with
       | Some "on" | Some "1" ->
-          let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
+          let sparse = get_cousins_sparse conf base p in
+          let cnt = Cousins.cousins_implex_cnt sparse conf base l1 l2 p in
           VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cousins"; "max_a" ] ->
-      let max_a, _ = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let max_a, _ = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let _, max_d = Cousins.max_l1_l2 conf base p in
+      let sparse = get_cousins_sparse conf base p in
+      let _, max_d = Cousins.max_l1_l2 sparse conf base p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
+      let sparse = get_cousins_sparse conf base p in
+      let l = Cousins.cousins_l1_l2_aux sparse conf base l1 l2 p in
       match l with
       | Some l ->
           let l =
@@ -2816,82 +3032,96 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           VVstring (string_of_int (List.length l))
       | None -> VVstring "-1")
   | "cremated_date" :: sl -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Cremated cod when p_auth -> (
           match Date.od_of_cdate cod with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
+  | "cremated_place" :: sl ->
+      let pl = Driver.get_burial_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
   | "death_date" :: sl -> (
-      match get_death p with
+      match Driver.get_death p with
       | Death (_, cd) when p_auth ->
           eval_date_field_var conf (Date.date_of_cdate cd) sl
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
       | OfCourseDead ->
           null_val)
+  | "death_place" :: sl ->
+      let pl = Driver.get_death_place p |> Driver.sou base in
+      if p_auth then eval_place_field conf pl sl else null_val
+  | [ "exist" ] -> VVbool true
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
       | _ -> raise Not_found)
   | "father" :: sl -> (
-      match get_parents p with
+      match Driver.get_parents p with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_father cpl) in
+          let cpl = Driver.foi base ifam in
+          let ep = make_ep conf base (Driver.get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match !GWPARAM_ITL.get_father conf base conf.command (get_iper p) with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "father" null_val)
-      )
-  | [ "has_linked_page"; s ] -> (
-      match get_env "nldb" env with
-      | Vnldb db ->
-          let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
-          in
-          let r =
-            List.exists
-              (fun (pg, (_, il)) ->
-                match pg with
-                | Def.NLDB.PgMisc pg ->
-                    if List.mem_assoc key il then
-                      let nenv, _ = Notes.read_notes base pg in
-                      List.mem_assoc s nenv
-                    else false
-                | _ -> false)
-              db
-          in
-          VVbool r
-      | _ -> raise Not_found)
+      | None -> warning_use_has_parents_before_parent loc "father" null_val)
+  | [ "has_linked_page"; s ] ->
+      if p_auth then
+        match get_env "nldb" env with
+        | Vnldb db ->
+            let key =
+              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              (fn, sn, Driver.get_occ p)
+            in
+            let r =
+              List.exists
+                (fun (pg, (_, il)) ->
+                  match pg with
+                  | Def.NLDB.PgMisc pg ->
+                      if List.mem_assoc key il then
+                        let nenv, _ = Notes.read_notes base pg in
+                        List.mem_assoc s nenv
+                      else false
+                  | _ -> false)
+                db
+            in
+            VVbool r
+        | _ -> raise Not_found
+      else VVbool false
+  | [ "has_linked_page_family"; s ] -> (
+      match get_env "fam" env with
+      | Vfam (ifam, _, _, m_auth) ->
+          if m_auth then
+            let v = Notes.get_linked_page_family conf base ifam s in
+            VVbool ((v :> string) <> "")
+          else VVbool false
+      | _ -> VVbool false)
   (* TODO exclude TYPE gallery and album ?? *)
   (* TODO fold link_to_ind and Notes.link_to_ind !! *)
-  | [ "has_linked_pages" ] -> (
-      match get_env "nldb" env with
-      | Vnldb db ->
-          let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
-          in
-          VVbool (Notes.links_to_ind conf base db key None <> [])
-      | _ -> raise Not_found)
+  | [ "has_linked_pages" ] ->
+      if p_auth then
+        match get_env "nldb" env with
+        | Vnldb db ->
+            let key =
+              let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+              let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+              (fn, sn, Driver.get_occ p)
+            in
+            VVbool (Notes.links_to_ind conf base db key None <> [])
+        | _ -> raise Not_found
+      else VVbool false
   | [ "has_linked_pages_2" ] ->
-      VVbool (Notes.linked_pages_nbr conf base (get_iper p) > 0)
+      VVbool (p_auth && Notes.linked_pages_nbr conf base (Driver.get_iper p) > 0)
   | [ "linked_pages_nbr" ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
           let r =
             if p_auth then
               let key =
-                let fn = Name.lower (sou base (get_first_name p)) in
-                let sn = Name.lower (sou base (get_surname p)) in
-                (fn, sn, get_occ p)
+                let fn =
+                  Name.lower (Driver.sou base (Driver.get_first_name p))
+                in
+                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                (fn, sn, Driver.get_occ p)
               in
               string_of_int
                 (List.length (Notes.links_to_ind conf base db key None))
@@ -2900,16 +3130,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           str_val r
       | _ -> str_val "0")
   | [ "linked_pages_nbr_2" ] ->
-      VVstring (string_of_int (Notes.linked_pages_nbr conf base (get_iper p)))
+      VVstring
+        (string_of_int (Notes.linked_pages_nbr conf base (Driver.get_iper p)))
   | [ "nb_linked_pages_type"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
           let n =
             if p_auth then
               let key =
-                let fn = Name.lower (sou base (get_first_name p)) in
-                let sn = Name.lower (sou base (get_surname p)) in
-                (fn, sn, get_occ p)
+                let fn =
+                  Name.lower (Driver.sou base (Driver.get_first_name p))
+                in
+                let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+                (fn, sn, Driver.get_occ p)
               in
               List.length (Notes.links_to_ind conf base db key (Some s))
             else 0
@@ -2917,23 +3150,12 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           VVstring (string_of_int n)
       | _ -> raise Not_found)
   | [ "has_sosa" ] -> (
-      match get_env "p_link" env with
-      | Vbool _ -> VVbool false
-      | _ -> (
-          match get_env "sosa" env with
-          | Vsosa r -> VVbool (get_sosa conf base env r p <> None)
-          | _ -> VVbool false))
-  | [ "init_cache"; nb_asc; from_gen_desc; nb_desc ] -> (
-      try
-        let nb_asc = int_of_string nb_asc in
-        let from_gen_desc = int_of_string from_gen_desc in
-        let nb_desc = int_of_string nb_desc in
-        let () =
-          !GWPARAM_ITL.init_cache conf base (get_iper p) nb_asc from_gen_desc
-            nb_desc
-        in
-        null_val
-      with _ -> raise Not_found)
+      match get_env "sosa" env with
+      | Vsosa r -> VVbool (get_sosa conf base env r p <> None)
+      | _ -> VVbool false)
+  | [ "is_visible" ] -> VVbool p_auth
+  | [ "is_public" ] -> VVbool (Driver.get_access p = Public)
+  | [ "is_semi_public" ] -> VVbool (GWPARAM.is_semi_public p)
   | [ "lev_cnt" ] -> (
       match get_env "lev_cnt" env with
       | Vint i -> str_val (string_of_int i)
@@ -2942,34 +3164,38 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "nldb" env with
       | Vnldb db ->
           let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
+            let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+            let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+            (fn, sn, Driver.get_occ p)
           in
           List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
           |> safe_val
       | _ -> raise Not_found)
+  | [ "linked_page_family"; s ] -> (
+      match get_env "fam" env with
+      | Vfam (ifam, _, _, _) ->
+          VVstring (Notes.get_linked_page_family conf base ifam s :> string)
+      | _ -> VVstring "")
   | "marriage_date" :: sl -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, true) -> (
-          match Date.od_of_cdate (get_marriage fam) with
+          match Date.od_of_cdate (Driver.get_marriage fam) with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | _ -> null_val)
+  | "marriage_place" :: sl -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, true) ->
+          let pl = Driver.get_marriage_place fam |> Driver.sou base in
+          if p_auth then eval_place_field conf pl sl else null_val
+      | _ -> null_val)
   | "mother" :: sl -> (
-      match get_parents p with
+      match Driver.get_parents p with
       | Some ifam ->
-          let cpl = foi base ifam in
-          let ep = make_ep conf base (get_mother cpl) in
+          let cpl = Driver.foi base ifam in
+          let ep = make_ep conf base (Driver.get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None -> (
-          match !GWPARAM_ITL.get_mother conf base conf.command (get_iper p) with
-          | Some (ep, baseprefix) ->
-              let conf = { conf with command = baseprefix } in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+      | None -> warning_use_has_parents_before_parent loc "mother" null_val)
   | [ "nbr" ] -> (
       match get_env "nbr" env with
       | Vint nbr -> VVstring (string_of_int nbr)
@@ -2977,10 +3203,26 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "nobility_title" :: sl -> (
       match Util.main_title conf base p with
       | Some t when p_auth ->
-          let id = sou base t.t_ident in
-          let pl = sou base t.t_place in
+          let id = Driver.sou base t.t_ident in
+          let pl = Driver.sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
       | Some _ | None -> null_val)
+  | [ "parent_marriage_date" ] -> (
+      match Driver.get_parents p with
+      | Some ifam when p_auth -> (
+          let fam = Driver.foi base ifam in
+          match Date.od_of_cdate (Driver.get_marriage fam) with
+          | Some d -> VVstring (DateDisplay.string_of_date conf d :> string)
+          | None -> Templ.VVstring "")
+      | _ -> Templ.VVstring "")
+  | "parent_marriage_date" :: sl -> (
+      match Driver.get_parents p with
+      | Some ifam when p_auth -> (
+          let fam = Driver.foi base ifam in
+          match Date.od_of_cdate (Driver.get_marriage fam) with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> Templ.VVstring "")
+      | _ -> Templ.VVstring "")
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl -> (
       match get_env "sosa" env with
@@ -2998,7 +3240,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               | so, ip ->
                   if so = Sosa.zero then null_val
                   else
-                    let p = poi base ip in
+                    let p = Driver.poi base ip in
                     let p_auth = authorized_age conf base p in
                     eval_person_field_var conf base env (p, p_auth) loc sl)
           | None -> null_val)
@@ -3012,7 +3254,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               | so, ip ->
                   if Sosa.eq so Sosa.zero then null_val
                   else
-                    let p = poi base ip in
+                    let p = Driver.poi base ip in
                     let p_auth = authorized_age conf base p in
                     eval_person_field_var conf base env (p, p_auth) loc sl)
           | None -> null_val)
@@ -3020,8 +3262,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | "spouse" :: sl -> (
       match get_env "fam" env with
       | Vfam (ifam, _, _, _) ->
-          let cpl = foi base ifam in
-          let ip = Gutil.spouse (get_iper p) cpl in
+          let cpl = Driver.foi base ifam in
+          let ip = Gutil.spouse (Driver.get_iper p) cpl in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
@@ -3052,10 +3294,13 @@ and eval_date_field_var conf d = function
               else VVstring (string_of_int dmy2.day2)
           | _ -> null_val)
       | _ -> null_val)
-  | [ "julian_day" ] -> (
+  | [ "julian_day" ] | [ "sdn" ] -> (
       match d with
-      | Dgreg (dmy, _) ->
-          VVstring (string_of_int (Calendar.sdn_of_gregorian dmy))
+      | Dgreg (dmy, cal) ->
+          let from =
+            if dmy.day > 0 && dmy.month > 0 then Adef.Dgregorian else cal
+          in
+          VVstring (string_of_int (Date.to_sdn ~from dmy))
       | _ -> null_val)
   | [ "month" ] -> (
       match d with
@@ -3094,7 +3339,7 @@ and eval_date_field_var conf d = function
 and _eval_place_field_var conf place = function
   | [] ->
       (* Compatibility before eval_place_field_var *)
-      VVstring place
+      Templ.VVstring place
   | [ "other" ] -> (
       match place_of_string conf place with
       | Some p -> VVstring p.other
@@ -3138,17 +3383,17 @@ and eval_nobility_title_field_var (id, pl) = function
 and eval_bool_event_field base (p, p_auth) (_, date, place, note, src, w, isp) =
   function
   | "has_date" -> p_auth && date <> Date.cdate_None
-  | "has_place" -> p_auth && sou base place <> ""
-  | "has_note" -> p_auth && sou base note <> ""
-  | "has_src" -> p_auth && sou base src <> ""
+  | "has_place" -> p_auth && Driver.sou base place <> ""
+  | "has_note" -> p_auth && Driver.sou base note <> ""
+  | "has_src" -> p_auth && Driver.sou base src <> ""
   | "has_witnesses" -> p_auth && Array.length w > 0
   | "has_spouse" -> p_auth && isp <> None
   | "computable_age" ->
       if p_auth then
-        match Date.cdate_to_dmy_opt (get_birth p) with
+        match Date.cdate_to_dmy_opt (Driver.get_birth p) with
         | Some d -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | None -> (
-            match Date.cdate_to_dmy_opt (get_baptism p) with
+            match Date.cdate_to_dmy_opt (Driver.get_baptism p) with
             | Some d -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
             | None -> false)
       else false
@@ -3159,8 +3404,8 @@ and eval_str_event_field conf base (p, p_auth)
   | "age" ->
       if p_auth then
         let birth_date, approx =
-          match Date.cdate_to_dmy_opt (get_birth p) with
-          | None -> (Date.cdate_to_dmy_opt (get_baptism p), true)
+          match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+          | None -> (Date.cdate_to_dmy_opt (Driver.get_baptism p), true)
           | x -> (x, false)
         in
         match (birth_date, Date.cdate_to_dmy_opt date) with
@@ -3172,7 +3417,7 @@ and eval_str_event_field conf base (p, p_auth)
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            safe_val (s ^<^ DateDisplay.string_of_age conf a)
+            safe_val (s ^<^ format_age conf a)
         | _ -> null_val
       else null_val
   | "name" -> (
@@ -3191,22 +3436,47 @@ and eval_str_event_field conf base (p, p_auth)
         | None -> null_val)
   | "on_date" -> date_aux conf p_auth date
   | "place" ->
-      if p_auth then sou base place |> Util.string_of_place conf |> safe_val
+      if p_auth then
+        Driver.sou base place |> Util.string_of_place conf |> safe_val
       else null_val
-  | "note" -> note |> get_note_source conf base ~p p_auth conf.no_note
-  | "src" -> src |> get_note_source conf base ~p p_auth false
+  | "note" -> note |> get_note_or_source conf base ~p p_auth conf.no_note
+  | "src" -> src |> get_note_or_source conf base ~p p_auth false
   | _ -> raise Not_found
 
 and eval_event_field_var conf base env (p, p_auth)
-    (name, date, place, note, src, w, isp) loc = function
+    (name, date, place, note, src, w, isp) (loc : Loc.t) = function
   | "date" :: sl -> (
       match (p_auth, Date.od_of_cdate date) with
       | true, Some d -> eval_date_field_var conf d sl
       | _ -> null_val)
+  | [ "age" ] -> (
+      if not p_auth then null_val
+      else
+        let birth_date =
+          match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+          | None -> Date.cdate_to_dmy_opt (Driver.get_baptism p)
+          | x -> x
+        in
+        match (birth_date, Date.cdate_to_dmy_opt date) with
+        | Some d1, Some d2 when d1 <> d2 ->
+            VVstring (format_age conf (Date.time_elapsed d1 d2) :> string)
+        | _ -> null_val)
+  | "age" :: sl -> (
+      if not p_auth then null_val
+      else
+        let birth_date =
+          match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+          | None -> Date.cdate_to_dmy_opt (Driver.get_baptism p)
+          | x -> x
+        in
+        match (birth_date, Date.cdate_to_dmy_opt date) with
+        | Some d1, Some d2 when d1 <> d2 ->
+            eval_age_field_var conf (Date.time_elapsed d1 d2) sl
+        | _ -> null_val)
   | "spouse" :: sl -> (
       match isp with
       | Some isp ->
-          let sp = poi base isp in
+          let sp = Driver.poi base isp in
           let ep = (sp, authorized_age conf base sp) in
           eval_person_field_var conf base env ep loc sl
       | None -> null_val)
@@ -3233,12 +3503,13 @@ and eval_event_witness_relation_var conf base env (p, e) loc = function
 
 and eval_bool_person_field conf base env (p, p_auth) = function
   | "access_by_key" ->
-      Util.accessible_by_key conf base p (p_first_name base p)
-        (p_surname base p)
+      Util.accessible_by_key conf base p
+        (Driver.p_first_name base p)
+        (Driver.p_surname base p)
   | "birthday" -> (
-      match (p_auth, Date.cdate_to_dmy_opt (get_birth p)) with
+      match (p_auth, Date.cdate_to_dmy_opt (Driver.get_birth p)) with
       | true, Some d ->
-          if d.prec = Sure && get_death p = NotDead then
+          if d.prec = Sure && Driver.get_death p = NotDead then
             d.day = conf.today.day && d.month = conf.today.month
             && d.year < conf.today.year
             || (not (Date.leap_year conf.today.year))
@@ -3249,18 +3520,24 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "wedding_birthday" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match (get_relation fam, get_divorce fam, get_separation fam) with
+          match
+            ( Driver.get_relation fam,
+              Driver.get_divorce fam,
+              Driver.get_separation fam )
+          with
           | (Married | NoSexesCheckMarried), NotDivorced, NotSeparated -> (
-              match (m_auth, Date.cdate_to_dmy_opt (get_marriage fam)) with
+              match
+                (m_auth, Date.cdate_to_dmy_opt (Driver.get_marriage fam))
+              with
               | true, Some d ->
-                  let father = pget conf base (get_father fam) in
-                  let mother = pget conf base (get_mother fam) in
+                  let father = pget conf base (Driver.get_father fam) in
+                  let mother = pget conf base (Driver.get_mother fam) in
                   if
                     d.prec = Sure
                     && authorized_age conf base father
-                    && get_death father = NotDead
+                    && Driver.get_death father = NotDead
                     && authorized_age conf base mother
-                    && get_death mother = NotDead
+                    && Driver.get_death mother = NotDead
                   then
                     d.day = conf.today.day && d.month = conf.today.month
                     && d.year < conf.today.year
@@ -3273,17 +3550,21 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | _ -> false)
   | "computable_age" ->
       if p_auth then
-        match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+        match
+          (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+        with
         | Some d, NotDead -> not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ -> false
       else false
   | "computable_death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
             _ )
           when d1 <> d2 ->
+            let d1 = Date.approx_gregorian ~from:c1 d1 in
+            let d2 = Date.approx_gregorian ~from:c2 d2 in
             let a = Date.time_elapsed d1 d2 in
             a.year > 0
             || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
@@ -3294,8 +3575,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              ( Date.cdate_to_dmy_opt (get_birth p),
-                Date.cdate_to_dmy_opt (get_marriage fam) )
+              ( Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p),
+                Date.cdate_to_gregorian_dmy_opt (Driver.get_marriage fam) )
             with
             | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
                 Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
@@ -3316,84 +3597,83 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth
       && (snd (Util.get_approx_death_date_place conf base p) :> string) <> ""
   | "has_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
-      else get_aliases p <> []
-  | "has_baptism_date" -> p_auth && get_baptism p <> Date.cdate_None
-  | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
-  | "has_baptism_source" -> p_auth && sou base (get_baptism_src p) <> ""
+      if hide_person conf base p then false else Driver.get_aliases p <> []
+  | "has_baptism_date" -> p_auth && Driver.get_baptism p <> Date.cdate_None
+  | "has_baptism_place" ->
+      p_auth && Driver.sou base (Driver.get_baptism_place p) <> ""
+  | "has_baptism_source" ->
+      p_auth && Driver.sou base (Driver.get_baptism_src p) <> ""
   | "has_baptism_note" ->
-      p_auth && (not conf.no_note) && sou base (get_baptism_note p) <> ""
+      p_auth && (not conf.no_note)
+      && Driver.sou base (Driver.get_baptism_note p) <> ""
   | "has_baptism_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Baptism)
-  | "has_birth_date" -> p_auth && get_birth p <> Date.cdate_None
-  | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
-  | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
+  | "has_birth_date" -> p_auth && Driver.get_birth p <> Date.cdate_None
+  | "has_birth_place" ->
+      p_auth && Driver.sou base (Driver.get_birth_place p) <> ""
+  | "has_birth_source" ->
+      p_auth && Driver.sou base (Driver.get_birth_src p) <> ""
   | "has_birth_note" ->
-      p_auth && (not conf.no_note) && sou base (get_birth_note p) <> ""
+      p_auth && (not conf.no_note)
+      && Driver.sou base (Driver.get_birth_note p) <> ""
   | "has_birth_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Birth)
   | "has_burial_date" ->
       if p_auth then
-        match get_burial p with
+        match Driver.get_burial p with
         | Buried cod -> Date.od_of_cdate cod <> None
         | Cremated _ | UnknownBurial -> false
       else false
-  | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
-  | "has_burial_source" -> p_auth && sou base (get_burial_src p) <> ""
+  | "has_burial_place" ->
+      p_auth && Driver.sou base (Driver.get_burial_place p) <> ""
+  | "has_burial_source" ->
+      p_auth && Driver.sou base (Driver.get_burial_src p) <> ""
   | "has_burial_note" ->
-      p_auth && (not conf.no_note) && sou base (get_burial_note p) <> ""
+      p_auth && (not conf.no_note)
+      && Driver.sou base (Driver.get_burial_note p) <> ""
   | "has_burial_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Burial)
   | "has_children" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) ->
-          if Array.length (get_children fam) > 0 then true
-          else !GWPARAM_ITL.has_children conf base p fam
-      | _ -> (
+      | Vfam (_, fam, _, _) -> Array.length (Driver.get_children fam) > 0
+      | _ ->
           Array.exists
-            (fun ifam -> [||] <> get_children (foi base ifam))
-            (get_family p)
-          ||
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, (ifath, imoth, _), _) ->
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf with command = baseprefix }
-                | _ -> conf
-              in
-              []
-              <> !GWPARAM_ITL.get_children_of_parents
-                   base conf.command ifam ifath imoth
-          | _ -> false))
+            (fun ifam -> [||] <> Driver.get_children (Driver.foi base ifam))
+            (Driver.get_family p))
   | "has_consanguinity" ->
       p_auth
-      && get_consang p != Adef.fix (-1)
-      && get_consang p >= Adef.fix_of_float 0.0001
+      && Driver.get_consang p != Adef.fix (-1)
+      && Driver.get_consang p >= Adef.fix_of_float 0.0001
   | "has_cremation_date" ->
       if p_auth then
-        match get_burial p with
+        match Driver.get_burial p with
         | Cremated cod -> Date.od_of_cdate cod <> None
         | Buried _ | UnknownBurial -> false
       else false
-  | "has_cremation_place" -> p_auth && sou base (get_burial_place p) <> ""
+  | "has_cremation_place" ->
+      p_auth && Driver.sou base (Driver.get_burial_place p) <> ""
   | "has_cremation_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Cremation)
+  | "has_date" -> GWPARAM.p_auth conf base p
   | "has_death_date" -> (
-      match get_death p with
+      match Driver.get_death p with
       | Death (_, _) -> p_auth
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
         ->
           false)
-  | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
-  | "has_death_source" -> p_auth && sou base (get_death_src p) <> ""
+  | "has_death_place" ->
+      p_auth && Driver.sou base (Driver.get_death_place p) <> ""
+  | "has_death_source" ->
+      p_auth && Driver.sou base (Driver.get_death_src p) <> ""
   | "has_death_note" ->
-      p_auth && (not conf.no_note) && sou base (get_death_note p) <> ""
+      p_auth && (not conf.no_note)
+      && Driver.sou base (Driver.get_death_note p) <> ""
   | "has_death_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Death)
   | "has_event" ->
       if p_auth then
         let events = Event.events conf base p in
-        let nb_fam = Array.length (get_family p) in
+        let nb_fam = Array.length (Driver.get_family p) in
         match List.assoc_opt "has_events" conf.base_env with
         | Some "never" -> false
         | Some "always" ->
@@ -3406,7 +3686,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               match events with
               | [] -> false
               | (name, _, p, n, s, wl, _) :: events -> (
-                  let p, n, s = (sou base p, sou base n, sou base s) in
+                  let p, n, s =
+                    (Driver.sou base p, Driver.sou base n, Driver.sou base s)
+                  in
                   match name with
                   | Event.Pevent pname -> (
                       match pname with
@@ -3453,52 +3735,56 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             in
             loop events 0 0 0 0 0
       else false
-  | "has_families" ->
-      Array.length (get_family p) > 0
-      || !GWPARAM_ITL.has_family_correspondance conf.command (get_iper p)
+  | "has_families" -> Array.length (Driver.get_family p) > 0
   | "has_first_names_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
-      else get_first_names_aliases p <> []
+      if hide_person conf base p then false
+      else Driver.get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
+  (* Beware: lots of confusion between image and portrait *)
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
+  | "has_blason" -> Image.has_blason conf base p false
+  | "has_blason_self" -> Image.has_blason conf base p true
+  | "has_blason_stop" -> Image.has_blason_stop conf base p
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
+  | "has_c_image_url" -> (
+      match get_env "carrousel_img" env with
+      | Vstring s -> Image.is_url s
+      | _ -> false)
   | "has_old_image_url" | "has_old_portrait_url" -> (
-      match Image.get_old_portrait conf base p with
+      match Image.get_old_portrait_or_blason conf base "portraits" p with
       | Some (`Url _url) -> true
       | _ -> false)
   (* carrousel *)
-  | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
-  | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
-      Image.get_old_portrait conf base p |> Option.is_some
+      Image.get_old_portrait_or_blason conf base "portraits" p |> Option.is_some
+  | "has_old_blason" ->
+      Image.get_old_portrait_or_blason conf base "blasons" p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
-      p_auth && (not conf.no_note) && sou base (get_notes p) <> ""
-  | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
-  | "has_parents" ->
-      get_parents p <> None
-      ||
-      let conf =
-        match get_env "baseprefix" env with
-        | Vstring baseprefix -> { conf with command = baseprefix }
-        | _ -> conf
+      p_auth && (not conf.no_note) && Driver.sou base (Driver.get_notes p) <> ""
+  | "has_wiznotes" ->
+      let wfile =
+        String.concat Filename.dir_sep
+          [ !GWPARAM.bpath conf.bname; "wiznotes"; conf.user ^ ".txt" ]
       in
-      !GWPARAM_ITL.has_parents_link conf.command (get_iper p)
+      conf.wizard && Sys.file_exists wfile
+  | "has_occupation" ->
+      p_auth && Driver.sou base (Driver.get_occupation p) <> ""
+  | "has_parents" -> Driver.get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
-      if is_hide_names conf p && not p_auth then false
-      else sou base (get_psources p) <> ""
+      if hide_person conf base p then false
+      else Driver.sou base (Driver.get_psources p) <> ""
   | "has_public_name" ->
-      if (not p_auth) && is_hide_names conf p then false
-      else sou base (get_public_name p) <> ""
+      if hide_person conf base p then false
+      else Driver.sou base (Driver.get_public_name p) <> ""
   | "has_qualifiers" ->
-      if (not p_auth) && is_hide_names conf p then false
-      else get_qualifiers p <> []
+      if hide_person conf base p then false else Driver.get_qualifiers p <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
@@ -3506,87 +3792,98 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             (fun l ip ->
               let rp = pget conf base ip in
               if is_hidden rp then l else ip :: l)
-            [] (get_related p)
+            [] (Driver.get_related p)
         in
-        get_rparents p <> [] || related <> []
-      else p_auth && (get_rparents p <> [] || get_related p <> [])
+        Driver.get_rparents p <> [] || related <> []
+      else p_auth && (Driver.get_rparents p <> [] || Driver.get_related p <> [])
+  | "has_secondary_pevents" ->
+      List.exists
+        (fun e ->
+          match e.epers_name with
+          | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+          | Epers_Cremation ->
+              false
+          | _ -> true)
+        (Driver.get_pevents p)
   | "has_siblings" -> (
-      match get_parents p with
-      | Some ifam -> Array.length (get_children (foi base ifam)) > 1
-      | None ->
-          let conf =
-            match get_env "baseprefix" env with
-            | Vstring baseprefix -> { conf with command = baseprefix }
-            | _ -> conf
-          in
-          !GWPARAM_ITL.has_siblings conf.command (get_iper p))
+      match Driver.get_parents p with
+      | Some ifam ->
+          Array.length (Driver.get_children (Driver.foi base ifam)) > 1
+      | None -> false)
   | "has_sources" ->
       p_auth
-      && (sou base (get_psources p) <> ""
-         || sou base (get_birth_src p) <> ""
-         || sou base (get_baptism_src p) <> ""
-         || sou base (get_death_src p) <> ""
-         || sou base (get_burial_src p) <> ""
+      && (Driver.sou base (Driver.get_psources p) <> ""
+         || Driver.sou base (Driver.get_birth_src p) <> ""
+         || Driver.sou base (Driver.get_baptism_src p) <> ""
+         || Driver.sou base (Driver.get_death_src p) <> ""
+         || Driver.sou base (Driver.get_burial_src p) <> ""
          || Array.exists
               (fun ifam ->
-                let fam = foi base ifam in
-                let isp = Gutil.spouse (get_iper p) fam in
-                let sp = poi base isp in
+                let fam = Driver.foi base ifam in
+                let isp = Gutil.spouse (Driver.get_iper p) fam in
+                let sp = Driver.poi base isp in
                 (* On sait que p_auth vaut vrai. *)
                 let m_auth = authorized_age conf base sp in
                 m_auth
-                && (sou base (get_marriage_src fam) <> ""
-                   || sou base (get_fsources fam) <> ""))
-              (get_family p))
+                && (Driver.sou base (Driver.get_marriage_src fam) <> ""
+                   || Driver.sou base (Driver.get_fsources fam) <> ""))
+              (Driver.get_family p))
   | "has_surnames_aliases" ->
-      if (not p_auth) && is_hide_names conf p then false
-      else get_surnames_aliases p <> []
+      if hide_person conf base p then false
+      else Driver.get_surnames_aliases p <> []
   | "is_buried" -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Buried _ -> p_auth
       | Cremated _ | UnknownBurial -> false)
   | "is_cremated" -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Cremated _ -> p_auth
       | Buried _ | UnknownBurial -> false)
   | "is_dead" -> (
-      match get_death p with
+      match Driver.get_death p with
       | Death _ | DeadYoung | DeadDontKnowWhen -> p_auth
       | NotDead | DontKnowIfDead | OfCourseDead -> false)
   | "is_certainly_dead" -> (
-      match get_death p with
+      match Driver.get_death p with
       | OfCourseDead -> p_auth
       (* TODOWHY : why not: | Death _ | DeadYoung -> true *)
       | Death _ | DeadYoung | DeadDontKnowWhen | NotDead | DontKnowIfDead ->
           false)
   | "is_descendant" -> (
       match get_env "desc_mark" env with
-      | Vdmark r -> Gwdb.Marker.get !r (get_iper p)
+      | Vdmark r -> Collection.Marker.get !r (Driver.get_iper p)
       | _ -> raise Not_found)
-  | "is_female" -> get_sex p = Female
+  | "is_female" -> Driver.get_sex p = Female
   | "is_invisible" ->
+      (* test visibility for visitors *)
       let conf = { conf with wizard = false; friend = false } in
       not (authorized_age conf base p)
-  | "is_male" -> get_sex p = Male
-  | "is_private" -> get_access p = Private
+  | "is_visible" -> authorized_age conf base p
+  | "is_male" -> Driver.get_sex p = Male
+  | "is_private" -> Driver.get_access p = Private
   | "is_public" -> Util.is_public conf base p
+  | "has_titles" -> Driver.get_titles p <> []
+  | "is_semi_public" -> GWPARAM.is_semi_public p
+  | "is_related" -> GWPARAM.is_related conf base p
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "access" -> acces conf base p |> safe_val
   | "age" -> (
-      match (p_auth, Date.cdate_to_dmy_opt (get_birth p), get_death p) with
-      | true, Some d, NotDead ->
-          Date.time_elapsed d conf.today
-          |> DateDisplay.string_of_age conf
-          |> safe_val
-      | _ -> null_val)
+      match person_living_age conf p p_auth with
+      | Some elapsed -> DateDisplay.string_of_age conf elapsed |> safe_val
+      | None -> null_val)
+  | "age_days" -> (
+      if not p_auth then null_val
+      else
+        match age_days conf base p with
+        | Some n -> VVstring (string_of_int n)
+        | None -> null_val)
   | "alias" -> (
-      match get_aliases p with
-      | nn :: _ ->
-          if (not p_auth) && is_hide_names conf p then null_val
-          else sou base nn |> Util.escape_html |> safe_val
+      match Driver.get_aliases p with
+      | nn :: _ when p_auth ->
+          Driver.sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "approx_birth_place" ->
       if p_auth then
@@ -3604,58 +3901,86 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "birth_place" ->
       if p_auth then
-        get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val
+        Driver.get_birth_place p |> Driver.sou base |> Util.string_of_place conf
+        |> safe_val
       else null_val
   | "birth_place_raw" ->
-      if p_auth then sou base (get_birth_place p) |> str_val else null_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_birth_place p))
+            :> Adef.safe_string)
+      else null_val
+  | "birth_place_norm" -> place_norm conf base p p_auth Driver.get_birth_place
   | "birth_note" ->
-      get_birth_note p |> get_note_source conf base ~p p_auth conf.no_note
+      Driver.get_birth_note p
+      |> get_note_or_source conf base ~p p_auth conf.no_note
   | "birth_source" ->
-      get_birth_src p |> get_note_source conf base ~p p_auth false
+      Driver.get_birth_src p |> get_note_or_source conf base ~p p_auth false
   | "baptism_place" ->
       if p_auth then
-        get_baptism_place p |> sou base |> Util.string_of_place conf |> safe_val
+        Driver.get_baptism_place p |> Driver.sou base
+        |> Util.string_of_place conf |> safe_val
       else null_val
   | "baptism_place_raw" ->
-      if p_auth then sou base (get_baptism_place p) |> str_val else null_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_baptism_place p))
+            :> Adef.safe_string)
+      else null_val
+  | "baptism_place_norm" ->
+      place_norm conf base p p_auth Driver.get_baptism_place
   | "baptism_note" ->
-      get_baptism_note p |> get_note_source conf base ~p p_auth conf.no_note
+      Driver.get_baptism_note p
+      |> get_note_or_source conf base ~p p_auth conf.no_note
   | "baptism_source" ->
-      get_baptism_src p |> get_note_source conf base ~p p_auth false
+      Driver.get_baptism_src p |> get_note_or_source conf base ~p p_auth false
   | "burial_place" ->
       if p_auth then
-        get_burial_place p |> sou base |> Util.string_of_place conf |> safe_val
+        Driver.get_burial_place p |> Driver.sou base
+        |> Util.string_of_place conf |> safe_val
       else null_val
   | "burial_place_raw" ->
-      if p_auth then sou base (get_burial_place p) |> str_val else null_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_burial_place p))
+            :> Adef.safe_string)
+      else null_val
+  | "burial_place_norm" -> place_norm conf base p p_auth Driver.get_burial_place
   | "burial_note" ->
-      get_burial_note p |> get_note_source conf base ~p p_auth conf.no_note
+      Driver.get_burial_note p
+      |> get_note_or_source conf base ~p p_auth conf.no_note
   | "burial_source" ->
-      get_burial_src p |> get_note_source conf base ~p p_auth false
+      Driver.get_burial_src p |> get_note_or_source conf base ~p p_auth false
   | "child_name" ->
       let force_surname =
-        match get_parents p with
+        match Driver.get_parents p with
         | None -> false
         | Some ifam ->
-            foi base ifam |> get_father |> pget conf base |> p_surname base
-            |> ( <> ) (p_surname base p)
+            Driver.foi base ifam |> Driver.get_father |> pget conf base
+            |> Driver.p_surname base
+            |> ( <> ) (Driver.p_surname base p)
       in
-      if (not p_auth) && is_hide_names conf p then str_val "x x"
+      if hide_person conf base p then str_val (Util.private_txt conf "")
       else if force_surname then gen_person_text conf base p |> safe_val
-      else gen_person_text ~sn:false ~chk:false conf base p |> safe_val
+      else gen_person_text ~sn:false conf base p |> safe_val
   | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf
-          (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0))
+          (round_2_dec (Adef.float_of_fix (Driver.get_consang p) *. 100.0))
         ^ " %"
         |> str_val
       else null_val
   | "cremation_place" ->
       if p_auth then
-        get_burial_place p |> sou base |> Util.string_of_place conf |> safe_val
+        Driver.get_burial_place p |> Driver.sou base
+        |> Util.string_of_place conf |> safe_val
       else null_val
   | "cremation_place_raw" ->
-      if p_auth then sou base (get_burial_place p) |> str_val else null_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_burial_place p))
+            :> Adef.safe_string)
+      else null_val
   | "dates" ->
       if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
       else null_val
@@ -3665,10 +3990,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
-        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), _)),
-            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), _)),
+        | ( Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d1), c1)),
+            Some (Dgreg (({ prec = Sure | About | Maybe; _ } as d2), c2)),
             approx )
           when d1 <> d2 ->
+            let d1 = Date.approx_gregorian ~from:c1 d1 in
+            let d2 = Date.approx_gregorian ~from:c2 d2 in
             let a = Date.time_elapsed d1 d2 in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
@@ -3679,51 +4006,77 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "death_place" ->
       if p_auth then
-        get_death_place p |> sou base |> Util.string_of_place conf |> safe_val
+        Driver.get_death_place p |> Driver.sou base |> Util.string_of_place conf
+        |> safe_val
       else null_val
   | "death_place_raw" ->
-      if p_auth then sou base (get_death_place p) |> str_val else null_val
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_death_place p))
+            :> Adef.safe_string)
+      else null_val
+  | "death_place_norm" -> place_norm conf base p p_auth Driver.get_death_place
   | "death_note" ->
-      get_death_note p |> get_note_source conf base ~p p_auth conf.no_note
+      Driver.get_death_note p
+      |> get_note_or_source conf base ~p p_auth conf.no_note
   | "death_source" ->
-      get_death_src p |> get_note_source conf base ~p p_auth false
+      Driver.get_death_src p |> get_note_or_source conf base ~p p_auth false
   | "died" -> string_of_died conf p p_auth |> safe_val
   | "father_age_at_birth" ->
-      string_of_parent_age conf base ep get_father |> safe_val
+      string_of_parent_age conf base ep Driver.get_father |> safe_val
   | "first_name" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else p_first_name base p |> Util.escape_html |> safe_val
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_first_name base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf "p")
   | "first_name_key" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
+      if hide_person conf base p then null_val
+      else Driver.p_first_name base p |> Name.lower |> Mutil.encode |> safe_val
   | "first_name_key_val" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_first_name base p |> Name.lower |> str_val
+      if hide_person conf base p then null_val
+      else Driver.p_first_name base p |> Name.lower |> str_val
   | "first_name_key_strip" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else Name.strip_c (p_first_name base p) '"' |> str_val
+      if hide_person conf base p then null_val
+      else Name.strip_c (Driver.p_first_name base p) '"' |> str_val
   | "history_file" ->
       if not p_auth then null_val
       else
-        let fn = sou base (get_first_name p) in
-        let sn = sou base (get_surname p) in
-        let occ = get_occ p in
+        let fn = Driver.sou base (Driver.get_first_name p) in
+        let sn = Driver.sou base (Driver.get_surname p) in
+        let occ = Driver.get_occ p in
         HistoryDiff.history_file fn sn occ |> str_val
-  | "image" -> (
+  | "image" | "portrait" -> (
       match Image.get_portrait conf base p with
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
-  | "image_size" -> string_of_image_size conf base ep |> str_val
-  | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
-  | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
-  | "image_url" -> string_of_image_url conf base ep false |> safe_val
-  | "index" -> (
-      match get_env "p_link" env with
-      | Vbool _ -> null_val
-      | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
-  (* carrousel functions *)
-  | "carrousel" -> Image.default_portrait_filename base p |> str_val
+  | "old_image" | "old_portrait" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "image_html_url" | "portrait_html_url" ->
+      string_of_image_url conf base ep true false |> safe_val
+  | "image_size" | "portrait_size" ->
+      string_of_image_size conf base ep |> str_val
+  | "blason_size" -> string_of_blason_size conf base ep |> str_val
+  | "image_medium_size" | "portrait_medium_size" ->
+      string_of_image_medium_size conf base ep |> str_val
+  | "blason_medium_size" -> string_of_blason_medium_size conf base ep |> str_val
+  | "image_small_size" | "portrait_small_size" ->
+      string_of_image_small_size conf base ep |> str_val
+  | "blason_small_size" -> string_of_blason_small_size conf base ep |> str_val
+  | "blason_extra_small_size" ->
+      string_of_blason_extra_small_size conf base ep |> str_val
+  | "image_url" | "portrait_url" ->
+      string_of_image_url conf base ep false false |> safe_val
+  | "old_image_url" | "old_portrait_url" ->
+      string_of_image_url conf base ep false true |> safe_val
+  | "blason_url" -> string_of_blason_url conf base ep false false |> safe_val
+  | "old_blason_url" -> string_of_blason_url conf base ep false true |> safe_val
+  | "index" ->
+      Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode |> safe_val
+  | "carrousel" -> Image.default_image_filename "portraits" base p |> str_val
+  | "blason_carrousel" ->
+      Image.default_image_filename "blasons" base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -3738,51 +4091,66 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "carrousel_img_src" env with
       | Vstring source -> str_val source
       | _ -> raise Not_found)
-  | "portrait" -> (
-      (* TODO what do we want here? can we remove this? *)
-      match Image.get_portrait conf base p with
-      | Some (`Path s) -> str_val s
-      | Some (`Url u) -> str_val u
+  | "blason" -> (
+      match Image.get_blason conf base p false with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_name" -> (
-      match Image.get_portrait conf base p with
-      | Some (`Path s) -> str_val (Filename.basename s)
-      | Some (`Url u) -> str_val u (* ?? *)
+  | "old_blason" -> (
+      match Image.get_old_blason conf base p false with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_saved" -> (
-      match Image.get_old_portrait conf base p with
-      | Some (`Path s) -> str_val s
-      | Some (`Url u) -> str_val u
+  | "blason_self" -> (
+      match Image.get_blason conf base p true with
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
-  | "portrait_saved_name" -> (
-      match Image.get_old_portrait conf base p with
-      | Some (`Path s) -> str_val (Filename.basename s)
-      | Some (`Url u) -> str_val u (* ?? *)
-      | None -> null_val)
-  | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
+  | "portrait_name" -> str_val (Image.get_portrait_name conf base p)
+  | "blason_name" -> str_val (Image.get_blason_name conf base p)
+  | "old_portrait_name" -> str_val (Image.get_old_portrait_name conf base p)
+  | "old_blason_name" -> str_val (Image.get_old_blason_name conf base p)
+  | "blason_stop_name" ->
+      str_val (Image.default_image_filename "blasons" base p ^ ".stop")
+  | "X" -> str_val Filename.dir_sep
+  | "ext" -> (
+      match p_getenv conf.env "file_name" with
+      | Some f -> str_val (Filename.extension f)
+      | None -> str_val "no_ext")
+  (* end carrousel functions *)
   | "key" ->
-      if is_hide_names conf p && not p_auth then null_val
+      if hide_person conf base p then null_val
       else
         Format.sprintf "%s.%d %s"
-          (p_first_name base p |> Name.lower)
-          (get_occ p)
-          (p_surname base p |> Name.lower)
+          (Driver.p_first_name base p |> Name.lower)
+          (Driver.get_occ p)
+          (Driver.p_surname base p |> Name.lower)
+        |> str_val
+  | "keydir" ->
+      if is_hide_names conf p && not p_auth then null_val
+      else
+        Format.sprintf "%s.%d.%s"
+          (Driver.p_first_name base p |> Name.lower)
+          (Driver.get_occ p)
+          (Driver.p_surname base p |> Name.lower)
         |> str_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
-          let tab = Gwdb.iper_marker (Gwdb.ipers base) false in
+          let tab =
+            Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+          in
           let rec mark_descendants len p =
-            let i = get_iper p in
-            if Gwdb.Marker.get tab i then ()
+            let i = Driver.get_iper p in
+            if Collection.Marker.get tab i then ()
             else (
-              Gwdb.Marker.set tab i true;
+              Collection.Marker.set tab i true;
               let u = p in
-              for i = 0 to Array.length (get_family u) - 1 do
-                let des = foi base (get_family u).(i) in
-                for i = 0 to Array.length (get_children des) - 1 do
+              for i = 0 to Array.length (Driver.get_family u) - 1 do
+                let des = Driver.foi base (Driver.get_family u).(i) in
+                for i = 0 to Array.length (Driver.get_children des) - 1 do
                   mark_descendants (len + 1)
-                    (pget conf base (get_children des).(i))
+                    (pget conf base (Driver.get_children des).(i))
                 done
               done)
           in
@@ -3790,19 +4158,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           r := tab;
           null_val
       | _ -> raise Not_found)
-  | "marriage_age" -> (
+  | "marriage_age_years" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              ( Date.cdate_to_dmy_opt (get_birth p),
-                Date.cdate_to_dmy_opt (get_marriage fam) )
+              ( Date.cdate_to_dmy_opt (Driver.get_birth p),
+                Date.cdate_to_dmy_opt (Driver.get_marriage fam) )
             with
             | ( Some ({ prec = Sure | About | Maybe; _ } as d1),
                 Some ({ prec = Sure | About | Maybe; _ } as d2) ) ->
-                Date.time_elapsed d1 d2
-                |> DateDisplay.string_of_age conf
-                |> safe_val
+                (Date.time_elapsed d1 d2).year |> string_of_int |> str_val
             | _ -> null_val
           else null_val
       | _ -> raise Not_found)
@@ -3811,22 +4177,43 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         (fun acc ifam ->
           acc
           ^ (if acc = "" then "" else "|")
-          ^ sou base (get_marriage_place (foi base ifam)))
+          ^ Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam)))
         ""
-        (Array.to_list (get_family p))
+        (Array.to_list (Driver.get_family p))
+      |> str_val
+  | "marriage_places_raw" ->
+      List.fold_left
+        (fun acc ifam ->
+          acc
+          ^ (if acc = "" then "" else "|")
+          ^ Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam))
+          |> undo_parentheses)
+        ""
+        (Array.to_list (Driver.get_family p))
+      |> str_val
+  | "marriage_places_norm" ->
+      List.fold_left
+        (fun acc ifam ->
+          let pl =
+            Driver.sou base (Driver.get_marriage_place (Driver.foi base ifam))
+            |> Place.normalize_place (Place.places_inverted conf)
+          in
+          acc ^ (if acc = "" then "" else "|") ^ pl)
+        ""
+        (Array.to_list (Driver.get_family p))
       |> str_val
   | "mother_age_at_birth" ->
-      string_of_parent_age conf base ep get_mother |> safe_val
+      string_of_parent_age conf base ep Driver.get_mother |> safe_val
   | "misc_names" ->
       if p_auth then
         let l =
           Util.nobtit conf base
-          |> Gwdb.person_misc_names base p
+          |> Geneweb_db.Driver.person_misc_names base p
           |> List.map Util.escape_html
         in
         let l =
-          let first_name = p_first_name base p in
-          let surname = p_surname base p in
+          let first_name = Driver.p_first_name base p in
+          let surname = Driver.p_surname base p in
           if first_name <> "?" && surname <> "?" then
             (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html) :: l
           else l
@@ -3843,53 +4230,49 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "nb_children_total" ->
       Array.fold_left
-        (fun n ifam -> n + Array.length (get_children (foi base ifam)))
-        0 (get_family p)
+        (fun n ifam ->
+          n + Array.length (Driver.get_children (Driver.foi base ifam)))
+        0 (Driver.get_family p)
       |> string_of_int |> str_val
   | "nb_children" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, _) ->
-          get_children fam |> Array.length |> string_of_int |> str_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (ifam, _, _, _) ->
-              let baseprefix =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> baseprefix
-                | _ -> conf.command
-              in
-              string_of_int (!GWPARAM_ITL.nb_children baseprefix ifam)
-              |> str_val
-          | _ ->
-              Array.fold_left
-                (fun n ifam -> n + Array.length (get_children (foi base ifam)))
-                0 (get_family p)
-              |> string_of_int |> str_val))
-  | "nb_families" -> (
-      match get_env "p_link" env with
-      | Vbool _ ->
-          get_iper p
-          |> !GWPARAM_ITL.nb_families conf.command
-          |> string_of_int |> str_val
-      | _ -> get_family p |> Array.length |> string_of_int |> str_val)
+          Driver.get_children fam |> Array.length |> string_of_int |> str_val
+      | _ ->
+          Array.fold_left
+            (fun n ifam ->
+              n + Array.length (Driver.get_children (Driver.foi base ifam)))
+            0 (Driver.get_family p)
+          |> string_of_int |> str_val)
+  | "nb_families" ->
+      Driver.get_family p |> Array.length |> string_of_int |> str_val
+  | "nb_pevents" ->
+      Driver.get_pevents p |> List.length |> string_of_int |> str_val
   | "notes" | "pnotes" ->
-      get_notes p |> get_note_source conf base ~p p_auth conf.no_note
+      Driver.get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else get_occ p |> string_of_int |> str_val
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.get_occ p |> string_of_int |> str_val
+      else null_val
   | "occupation" ->
-      get_occupation p |> get_note_source conf base ~p p_auth false
-  | "on_baptism_date" -> date_aux conf p_auth (get_baptism p)
+      Driver.get_occupation p |> get_note_or_source conf base ~p p_auth false
+  | "occupation_raw" ->
+      if p_auth then
+        safe_val
+          (Util.escape_html (Driver.sou base (Driver.get_occupation p))
+            :> Adef.safe_string)
+      else null_val
+  | "on_baptism_date" -> date_aux conf p_auth (Driver.get_baptism p)
   | "slash_baptism_date" ->
       if p_auth then
-        match Date.od_of_cdate (get_baptism p) with
+        match Date.od_of_cdate (Driver.get_baptism p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
         | None -> null_val
       else null_val
-  | "on_birth_date" -> date_aux conf p_auth (get_birth p)
+  | "on_birth_date" -> date_aux conf p_auth (Driver.get_birth p)
   | "slash_birth_date" ->
       if p_auth then
-        match Date.od_of_cdate (get_birth p) with
+        match Date.od_of_cdate (Driver.get_birth p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
         | None -> null_val
       else null_val
@@ -3900,13 +4283,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         | None -> null_val
       else null_val
   | "on_burial_date" -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Buried cod -> date_aux conf p_auth cod
       | Cremated _ | UnknownBurial -> raise Not_found)
-  | "psources" -> get_psources p |> get_note_source conf base ~p p_auth false
+  | "psources" ->
+      Driver.get_psources p |> get_note_or_source conf base ~p p_auth false
   | "slash_burial_date" ->
       if p_auth then
-        match get_burial p with
+        match Driver.get_burial p with
         | Buried cod -> (
             match Date.od_of_cdate cod with
             | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
@@ -3914,24 +4298,24 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         | Cremated _ | UnknownBurial -> raise Not_found
       else null_val
   | "on_cremation_date" -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Cremated cod -> date_aux conf p_auth cod
       | Buried _ | UnknownBurial -> raise Not_found)
   | "slash_cremation_date" -> (
-      match get_burial p with
+      match Driver.get_burial p with
       | Cremated cod -> (
           match (p_auth, Date.od_of_cdate cod) with
           | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
           | _ -> null_val)
       | _ -> raise Not_found)
   | "on_death_date" -> (
-      match get_death p with
+      match Driver.get_death p with
       | Death (_, d) -> date_aux conf p_auth d
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
         ->
           raise Not_found)
   | "slash_death_date" -> (
-      match (p_auth, get_death p) with
+      match (p_auth, Driver.get_death p) with
       | true, Death (_, d) ->
           Date.date_of_cdate d
           |> DateDisplay.string_slash_of_date conf
@@ -3941,35 +4325,40 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match (p_auth, fst (Util.get_approx_death_date_place conf base p)) with
       | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
       | _ -> null_val)
+  | "permalink" ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | "prev_fam_father" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (ifath, _, _), _) ->
-          string_of_iper ifath |> Mutil.encode |> safe_val
+          Driver.Iper.to_string ifath |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_index" -> (
       match get_env "prev_fam" env with
-      | Vfam (ifam, _, _, _) -> string_of_ifam ifam |> Mutil.encode |> safe_val
+      | Vfam (ifam, _, _, _) ->
+          Driver.Ifam.to_string ifam |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "prev_fam_mother" -> (
       match get_env "prev_fam" env with
       | Vfam (_, _, (_, imoth, _), _) ->
-          string_of_iper imoth |> Mutil.encode |> safe_val
+          Driver.Iper.to_string imoth |> Mutil.encode |> safe_val
       | _ -> raise Not_found)
   | "public_name" ->
-      if (not p_auth) && is_hide_names conf p then null_val
-      else get_public_name p |> sou base |> Util.escape_html |> safe_val
+      if p_auth then
+        Driver.get_public_name p |> Driver.sou base |> Util.escape_html
+        |> safe_val
+      else null_val
   | "qualifier" -> (
-      match get_qualifiers p with
-      | nn :: _ when p_auth || not (is_hide_names conf p) ->
-          sou base nn |> Util.escape_html |> safe_val
+      match Driver.get_qualifiers p with
+      | nn :: _ when p_auth ->
+          Driver.sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "sex" ->
       (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
-      get_sex p |> index_of_sex |> string_of_int |> str_val
+      Driver.get_sex p |> index_of_sex |> string_of_int |> str_val
   | "sosa_in_list" -> (
       match get_env "all_gp" env with
       | Vallgp all_gp -> (
-          match get_link all_gp (get_iper p) with
+          match get_link all_gp (Driver.get_iper p) with
           | Some (GP_person (s, _, _)) -> str_val (Sosa.to_string s)
           | Some _ | None -> null_val)
       | _ -> raise Not_found)
@@ -3979,40 +4368,58 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           match get_sosa conf base env x p with
           | Some (n, q) ->
               Printf.sprintf "m=RL&i1=%s&i2=%s&b1=1&b2=%s"
-                (string_of_iper (get_iper p))
-                (string_of_iper (get_iper q))
+                (Driver.Iper.to_string (Driver.get_iper p))
+                (Driver.Iper.to_string (Driver.get_iper q))
                 (Sosa.to_string n)
               |> str_val
           | None -> null_val)
-      | _ -> raise Not_found)
+      | _ -> null_val (* silent fail *))
   | "source" -> (
       match get_env "src" env with
-      | Vstring s -> safe_val (Notes.source_note conf base p s)
+      | Vstring s ->
+          let always_show_link =
+            conf.wizard
+            || (conf.friend && conf.consent && GWPARAM.is_semi_public p)
+          in
+          Notes.wiki_of_source conf base ~always_show_link p s |> str_val
+      | _ -> null_val)
+  | "source_raw" -> (
+      match get_env "src" env with
+      | Vstring s -> safe_val (Util.escape_html s :> Adef.safe_string)
       | _ -> raise Not_found)
   | "surname" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else p_surname base p |> Util.escape_html |> safe_val
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_surname base p |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf "n")
   | "surname_begin" ->
-      if (not p_auth) && is_hide_names conf p then null_val
-      else
-        p_surname base p |> surname_particle base |> Util.escape_html
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_surname base p |> surname_particle base |> Util.escape_html
         |> safe_val
+      else null_val
   | "surname_end" ->
-      if (not p_auth) && is_hide_names conf p then str_val "x"
-      else
-        p_surname base p
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_surname base p
         |> surname_without_particle base
         |> Util.escape_html |> safe_val
+      else str_val (Util.private_txt conf "n")
   | "surname_key" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_surname base p |> Name.lower |> Mutil.encode |> safe_val
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_surname base p |> Name.lower |> Mutil.encode |> safe_val
+      else null_val
   | "surname_key_val" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else p_surname base p |> Name.lower |> str_val
+      if GWPARAM.p_auth_sp conf base p then
+        Driver.p_surname base p |> Name.lower |> str_val
+      else null_val
   | "surname_key_strip" ->
-      if is_hide_names conf p && not p_auth then null_val
-      else Name.strip_c (p_surname base p) '"' |> str_val
-  | "title" -> person_title conf base p |> safe_val
+      if GWPARAM.p_auth_sp conf base p then
+        Name.strip_c (Driver.p_surname base p) '"' |> str_val
+      else null_val
+  | "title" -> if p_auth then person_title conf base p |> safe_val else null_val
+  | "p_auth" -> GWPARAM.p_auth conf base p |> bool_val
+  | "test_p_auth" ->
+      Printf.eprintf "Test_p_auth\n";
+      GWPARAM.p_auth ~view:GWPARAM.As_friend conf base p |> bool_val
+  | "p_auth_sp" -> GWPARAM.p_auth_sp conf base p |> bool_val
   | _ -> raise Not_found
 
 and eval_witness_relation_var conf base env
@@ -4034,23 +4441,26 @@ and eval_family_field_var conf base env
   | [ "date_s" ] | [ "dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base true fam :> string)
-  | "father" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base ifath in
-          eval_person_field_var conf base env ep loc sl)
+  | "father" :: sl ->
+      let ep = make_ep conf base ifath in
+      eval_person_field_var conf base env ep loc sl
+  | "divorce_date" :: sl -> (
+      match Driver.get_divorce fam with
+      | Divorced cd when m_auth -> (
+          match Date.od_of_cdate cd with
+          | Some d -> eval_date_field_var conf d sl
+          | None -> null_val)
+      | _ -> null_val)
   | "marriage_date" :: sl -> (
-      match Date.od_of_cdate (get_marriage fam) with
+      match Date.od_of_cdate (Driver.get_marriage fam) with
       | Some d when m_auth -> eval_date_field_var conf d sl
       | Some _ | None -> null_val)
-  | "mother" :: sl -> (
-      match get_env "f_link" env with
-      | Vbool _ -> raise Not_found
-      | _ ->
-          let ep = make_ep conf base imoth in
-          eval_person_field_var conf base env ep loc sl)
+  | "mother" :: sl ->
+      let ep = make_ep conf base imoth in
+      eval_person_field_var conf base env ep loc sl
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
+  | [ "nb_fevents" ] ->
+      VVstring (string_of_int (List.length (Driver.get_fevents fam)))
   | [ "sep_date_s" ] | [ "sep_dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base false fam :> string)
@@ -4096,14 +4506,14 @@ and eval_str_family_field env (ifam, _, _, _) = function
       match get_env "desc_level_table" env with
       | Vdesclevtab levt ->
           let _, flevt = Lazy.force levt in
-          string_of_int (Gwdb.Marker.get flevt ifam)
+          string_of_int (Collection.Marker.get flevt ifam)
       | _ -> raise Not_found)
-  | "index" -> string_of_ifam ifam
+  | "index" -> Driver.Ifam.to_string ifam
   | "set_infinite_desc_level" -> (
       match get_env "desc_level_table" env with
       | Vdesclevtab levt ->
           let _, flevt = Lazy.force levt in
-          Gwdb.Marker.set flevt ifam infinite;
+          Collection.Marker.set flevt ifam infinite;
           ""
       | _ -> raise Not_found)
   | _ -> raise Not_found
@@ -4113,15 +4523,15 @@ and simple_person_text conf base p p_auth : Adef.safe_string =
     match main_title conf base p with
     | Some t -> titled_person_text conf base p t
     | None -> gen_person_text conf base p
-  else if is_hide_names conf p then Adef.safe "x x"
+  else if is_hide_names conf p then Adef.safe (Util.private_txt conf "")
   else gen_person_text conf base p
 
 and string_of_died conf p p_auth =
   Adef.safe
   @@
   if p_auth then
-    let is = index_of_sex (get_sex p) in
-    match get_death p with
+    let is = index_of_sex (Driver.get_sex p) in
+    match Driver.get_death p with
     | Death (dr, _) -> (
         match dr with
         | Unspecified -> transl_nth conf "died" is
@@ -4134,13 +4544,18 @@ and string_of_died conf p p_auth =
     | NotDead | DontKnowIfDead | OfCourseDead -> ""
   else ""
 
-and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
+and string_of_image_url conf base (p, p_auth) html saved : Adef.escaped_string =
   if p_auth then
-    match Image.get_portrait conf base p with
+    match
+      if saved then Image.get_old_portrait conf base p
+      else Image.get_portrait conf base p
+    with
+    | Some (`Path fname) when Filename.extension fname = ".url" ->
+        Adef.escaped (Image.read_url_file fname)
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
-        let k = Image.default_portrait_filename base p in
+        let k = Image.default_image_filename "portraits" base p in
         Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")
@@ -4152,15 +4567,43 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
     | None -> Adef.escaped ""
   else Adef.escaped ""
 
+and string_of_blason_url conf base (p, p_auth) html saved : Adef.escaped_string
+    =
+  if p_auth then
+    match Image.get_blason_aux conf base p false saved with
+    | Some (`Path fname) when Filename.extension fname = ".url" -> (
+        match Some (Secure.open_in fname) with
+        | Some ic -> Adef.escaped (input_line ic)
+        | None -> Adef.escaped "")
+    | Some (`Path fname) ->
+        (* p is not the blason owner *)
+        let s = Unix.stat fname in
+        let k = Filename.basename fname |> Filename.chop_extension in
+        (* k is first_name.occ.surname.blason *)
+        let parts = String.split_on_char '.' k in
+        let access =
+          Format.sprintf "p=%s&n=%s&oc=%s" (List.nth parts 0) (List.nth parts 2)
+            (List.nth parts 1)
+        in
+        Format.sprintf "%sm=FIM%s&d=%d&%s&k=/%s"
+          (commd conf :> string)
+          (if html then "H" else "")
+          (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+          access k
+        |> Adef.escaped
+    | Some (`Url url) -> Adef.escaped url (* FIXME *)
+    | None -> Adef.escaped ""
+  else Adef.escaped "xz"
+
 and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
-  match get_parents p with
+  match Driver.get_parents p with
   | Some ifam ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       let pp = pget conf base (parent cpl) in
       if p_auth && authorized_age conf base pp then
         match
-          ( Date.cdate_to_dmy_opt (get_birth pp),
-            Date.cdate_to_dmy_opt (get_birth p) )
+          ( Date.cdate_to_dmy_opt (Driver.get_birth pp),
+            Date.cdate_to_dmy_opt (Driver.get_birth p) )
         with
         | Some d1, Some d2 ->
             Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
@@ -4181,51 +4624,46 @@ let eval_transl conf base env upp s c =
         | "n" -> (
             (* select nth value *)
             (* replaced by %apply;nth([...],sex) or "s" below *)
-            match get_env "count" env with Vcnt i -> !i | _ -> 0)
+            match get_env "count" env with
+            | Vcnt i -> if !i > 1 then 1 else 0
+            | _ -> 0)
         | "s" -> (
             (* male/female/neuter *)
             match get_env "child" env with
-            | Vind p -> index_of_sex (get_sex p)
+            | Vind p -> index_of_sex (Driver.get_sex p)
             | _ -> (
                 match get_env "p" env with
-                | Vind p -> index_of_sex (get_sex p)
-                | _ ->
-                    Printf.sprintf "Sex of unknown person"
-                    |> !GWPARAM.syslog `LOG_WARNING;
-                    assert false))
+                | Vind p -> index_of_sex (Driver.get_sex p)
+                | _ -> Fmt.failwith "Sex of unknown person"))
         | "w" -> (
             (* witness/witnesses *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
-                if Array.length (get_witnesses fam) <= 1 then 0 else 1
+                if Array.length (Driver.get_witnesses fam) > 1 then 1 else 0
             | _ -> 0)
         | "f" -> (
             (* family/families *)
             match get_env "p" env with
-            | Vind p -> if Array.length (get_family p) <= 1 then 0 else 1
-            | _ ->
-                Printf.sprintf "families of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
-                assert false)
+            | Vind p -> if Array.length (Driver.get_family p) > 1 then 1 else 0
+            | _ -> Fmt.failwith "Families of unknown person")
         | "c" -> (
             (* child/children *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
-                if Array.length (get_children fam) <= 1 then 0 else 1
+                if Array.length (Driver.get_children fam) > 1 then 1 else 0
             | _ -> (
                 match get_env "p" env with
                 | Vind p ->
                     let n =
                       Array.fold_left
                         (fun n ifam ->
-                          n + Array.length (get_children (foi base ifam)))
-                        0 (get_family p)
+                          n
+                          + Array.length
+                              (Driver.get_children (Driver.foi base ifam)))
+                        0 (Driver.get_family p)
                     in
-                    if n <= 1 then 0 else 1
-                | _ ->
-                    Printf.sprintf "Children of unknown person"
-                    |> !GWPARAM.syslog `LOG_WARNING;
-                    assert false))
+                    if n > 0 then 1 else 0
+                | _ -> Fmt.failwith "Children of unknown person"))
         | "e" -> (
             (* singular/plural for events *)
             match get_env "p" env with
@@ -4234,10 +4672,7 @@ let eval_transl conf base env upp s c =
                 | [] -> 0
                 | [ _e ] -> 0
                 | _ -> 1)
-            | _ ->
-                Printf.sprintf "Events of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
-                assert false)
+            | _ -> Fmt.failwith "Events of unknown person")
         | "t" -> (
             (* singular/plural  titles *)
             match get_env "p" env with
@@ -4246,10 +4681,7 @@ let eval_transl conf base env upp s c =
                 | [] -> 0
                 | [ _t ] -> 0
                 | _ -> 1)
-            | _ ->
-                Printf.sprintf "Titles of unknown person"
-                |> !GWPARAM.syslog `LOG_WARNING;
-                assert false)
+            | _ -> Fmt.failwith "Titles of unknown person")
         | _ -> assert false
       in
       let r = Templ.eval_transl_lexicon conf upp s (string_of_int n) in
@@ -4271,14 +4703,18 @@ let print_foreach conf base print_ast eval_expr =
   in
 
   let print_foreach_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first a ->
-          let env = ("alias", Vstring (sou base a)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "alias" (Vstring (Driver.sou base a))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
-        (get_aliases p)
+        (Driver.get_aliases p)
+    else ()
   in
 
   let print_foreach_ascendant env al ep =
@@ -4292,9 +4728,11 @@ let print_foreach conf base print_ast eval_expr =
               | GP_missing (_, _) -> ()
               | GP_person _ | GP_same _ | GP_interv _ ->
                   let env =
-                    ("ancestor", Vanc gp) :: ("first", Vbool first)
-                    :: ("last", Vbool (gl = []))
-                    :: ("mode", Vstring "Vgpl") :: env
+                    Templ.Env.(
+                      env |> add "ancestor" (Vanc gp)
+                      |> add "first" (Vbool first)
+                      |> add "last" (Vbool (gl = []))
+                      |> add "mode" (Vstring "Vgpl"))
                   in
                   List.iter (print_ast env ep) al);
               loop false gl
@@ -4314,29 +4752,30 @@ let print_foreach conf base print_ast eval_expr =
                let ianc_env =
                  match iancl with
                  | ianc1 :: ianc2 :: _ ->
-                     [
-                       ("anc1", Vind (pget conf base ianc1));
-                       ("anc2", Vind (pget conf base ianc2));
-                     ]
+                     Templ.Env.(
+                       env
+                       |> add "anc1" (Vind (pget conf base ianc1))
+                       |> add "anc2" (Vind (pget conf base ianc2)))
                  | ianc1 :: _ ->
-                     [
-                       ("anc1", Vind (pget conf base ianc1));
-                       ("anc2", Vind (poi base Gwdb.dummy_iper));
-                     ]
+                     Templ.Env.(
+                       env
+                       |> add "anc1" (Vind (pget conf base ianc1))
+                       |> add "anc2" (Vind (Driver.poi base Driver.Iper.dummy)))
                  | _ ->
-                     [
-                       ("anc1", Vind (poi base Gwdb.dummy_iper));
-                       ("anc2", Vind (poi base Gwdb.dummy_iper));
-                     ]
+                     Templ.Env.(
+                       env
+                       |> add "anc1" (Vind (Driver.poi base Driver.Iper.dummy))
+                       |> add "anc2" (Vind (Driver.poi base Driver.Iper.dummy)))
                in
                let env =
-                 ("path_end", Vind (poi base ip))
-                 :: ("anc_level", Vint lev) :: ("lev_cnt", Vint lev_cnt)
-                 :: ("first", Vbool first) :: ("cnt", Vint cnt)
-                 :: ("nbr", Vint nbr)
-                 :: ("last", Vbool (l = []))
-                 :: env
-                 @ ianc_env
+                 Templ.Env.(
+                   ianc_env
+                   |> add "path_end" (Vind (Driver.poi base ip))
+                   |> add "anc_level" (Vint lev)
+                   |> add "lev_cnt" (Vint lev_cnt)
+                   |> add "first" (Vbool first) |> add "cnt" (Vint cnt)
+                   |> add "nbr" (Vint nbr)
+                   |> add "last" (Vbool (l = [])))
                in
                List.iter (print_ast env ep) al);
               loop false (cnt + 1) l
@@ -4352,7 +4791,9 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ( match get_env "max_anc_level" env with Vint n -> n | _ -> 0)
       | _ -> raise Not_found
     in
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
+    let mark =
+      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
+    in
     let rec loop gpl i n =
       let prev_n = n in
       if i > max_level then ()
@@ -4366,34 +4807,42 @@ let print_foreach conf base print_ast eval_expr =
             n gpl
         in
         let env =
-          ("gpl", Vgpl gpl) :: ("level", Vint i)
-          :: ("nbr_a", Vint (n - 1))
-          :: ("nbr_a_l", Vint (n - prev_n))
-          :: env
+          Templ.Env.(
+            env |> add "gpl" (Vgpl gpl) |> add "level" (Vint i)
+            |> add "nbr_a" (Vint (n - 1))
+            |> add "nbr_a_l" (Vint (n - prev_n)))
         in
         List.iter (print_ast env ep) al;
         let gpl = next_generation conf base mark gpl in
         loop gpl (succ i) n
     in
-    loop [ GP_person (Sosa.one, get_iper p, None) ] 0 0
+    let first_family =
+      let families = Driver.get_family p in
+      if Array.length families > 0 then Some families.(0) else None
+    in
+    loop [ GP_person (Sosa.one, Driver.get_iper p, first_family) ] 0 0
   in
 
   let print_foreach_ascendant_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level = match get_env max_lev env with Vint n -> n | _ -> 0 in
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
+    let mark =
+      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
+    in
     let rec loop gpl i =
       if i > max_level then ()
       else
-        let env = ("gpl", Vgpl gpl) :: ("level", Vint i) :: env in
+        let env =
+          Templ.Env.(env |> add "gpl" (Vgpl gpl) |> add "level" (Vint i))
+        in
         List.iter (print_ast env ep) al;
-        Gwdb.Collection.iter
-          (fun i -> Gwdb.Marker.set mark i Sosa.zero)
-          (Gwdb.ipers base);
+        Collection.iter
+          (fun i -> Collection.Marker.set mark i Sosa.zero)
+          (Geneweb_db.Driver.ipers base);
         let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
     in
-    loop [ GP_person (Sosa.one, get_iper p, None) ] 0
+    loop [ GP_person (Sosa.one, Driver.get_iper p, None) ] 0
   in
 
   let print_foreach_anc_surn env el al loc ((p, _) as ep) =
@@ -4412,7 +4861,9 @@ let print_foreach conf base print_ast eval_expr =
           (fun (a, b, c, d, e, f) ->
             let b = (b : Adef.escaped_string :> Adef.safe_string) in
             let env =
-              ("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env
+              Templ.Env.add "ancestor"
+                (Vanc_surn (Eclair (a, b, c, d, e, f, loc)))
+                env
             in
             List.iter (print_ast env ep) al)
           l
@@ -4421,7 +4872,9 @@ let print_foreach conf base print_ast eval_expr =
         List.iter
           (fun (a, (((b, c, d), e), f)) ->
             let env =
-              ("ancestor", Vanc_surn (Branch (a, b, c, d, e, f, loc))) :: env
+              Templ.Env.add "ancestor"
+                (Vanc_surn (Branch (a, b, c, d, e, f, loc)))
+                env
             in
             List.iter (print_ast env ep) al)
           l
@@ -4432,7 +4885,7 @@ let print_foreach conf base print_ast eval_expr =
     let p, max_level =
       match el with
       | [ [ e1 ]; [ e2 ] ] ->
-          let ip = iper_of_string @@ eval_expr env ep e1 in
+          let ip = Driver.Iper.of_string @@ eval_expr env ep e1 in
           let max_level = eval_int_expr env ep e2 in
           (pget conf base ip, max_level)
       | [ [ e ] ] -> (p, eval_int_expr env ep e)
@@ -4444,9 +4897,9 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop first = function
       | g :: gl ->
           let env =
-            ("celll", Vcelll g) :: ("first", Vbool first)
-            :: ("last", Vbool (gl = []))
-            :: env
+            Templ.Env.(
+              env |> add "celll" (Vcelll g) |> add "first" (Vbool first)
+              |> add "last" (Vbool (gl = [])))
           in
           List.iter (print_ast env ep) al;
           loop false gl
@@ -4462,83 +4915,50 @@ let print_foreach conf base print_ast eval_expr =
     in
     Mutil.list_iter_first
       (fun first cell ->
-        let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
+        let env =
+          Templ.Env.(
+            env |> add "cell" (Vcell cell) |> add "first" (Vbool first))
+        in
         List.iter (print_ast env ep) al)
       celll
   in
-  let print_foreach_child env al ep = function
-    | Vfam (ifam, fam, (ifath, imoth, isp), _) -> (
-        match get_env "f_link" env with
-        | Vbool _ ->
-            let baseprefix =
-              match get_env "baseprefix" env with
-              | Vstring baseprefix -> baseprefix
-              | _ -> conf.command
+  let print_foreach_child env al = function
+    | Vfam (_, fam, _, _) ->
+        let auth =
+          Array.for_all
+            (fun ip -> authorized_age conf base (pget conf base ip))
+            (Driver.get_children fam)
+        in
+        let env = Templ.Env.add "auth" (Vbool auth) env in
+        let n =
+          let p =
+            match get_env "p" env with Vind p -> p | _ -> assert false
+          in
+          let rec loop i =
+            if i = Array.length (Driver.get_children fam) then -2
+            else if (Driver.get_children fam).(i) = Driver.get_iper p then i
+            else loop (i + 1)
+          in
+          loop 0
+        in
+        Array.iteri
+          (fun i ip ->
+            let p = pget conf base ip in
+            let env =
+              Templ.Env.(
+                env |> add "child" (Vind p) |> add "child_cnt" (Vint (i + 1)))
             in
-            let children =
-              !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth
+            let env =
+              if i = n - 1 && not (is_hidden p) then
+                Templ.Env.add "pos" (Vstring "prev") env
+              else if i = n then Templ.Env.add "pos" (Vstring "self") env
+              else if i = n + 1 && not (is_hidden p) then
+                Templ.Env.add "pos" (Vstring "next") env
+              else env
             in
-            List.iter
-              (fun (((p, _) as ep), baseprefix) ->
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("child_link", Vind p) :: env in
-                let env = ("baseprefix", Vstring baseprefix) :: env in
-                let env = ("p_link", Vbool true) :: env in
-                List.iter (print_ast env ep) al)
-              children
-        | _ ->
-            let auth =
-              Array.for_all
-                (fun ip -> authorized_age conf base (pget conf base ip))
-                (get_children fam)
-            in
-            let env = ("auth", Vbool auth) :: env in
-            let n =
-              let p =
-                match get_env "p" env with Vind p -> p | _ -> assert false
-              in
-              let rec loop i =
-                if i = Array.length (get_children fam) then -2
-                else if (get_children fam).(i) = get_iper p then i
-                else loop (i + 1)
-              in
-              loop 0
-            in
-            Array.iteri
-              (fun i ip ->
-                let p = pget conf base ip in
-                let env =
-                  ("#loop", Vint 0) :: ("child", Vind p)
-                  :: ("child_cnt", Vint (i + 1))
-                  :: env
-                in
-                let env =
-                  if i = n - 1 && not (is_hidden p) then
-                    ("pos", Vstring "prev") :: env
-                  else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (is_hidden p) then
-                    ("pos", Vstring "next") :: env
-                  else env
-                in
-                let ep = (p, authorized_age conf base p) in
-                List.iter (print_ast env ep) al)
-              (get_children fam);
-
-            List.iter
-              (fun (_, _, children) ->
-                List.iter
-                  (fun ((p, _), baseprefix, can_merge) ->
-                    if not can_merge then
-                      let env =
-                        ("#loop", Vint 0) :: ("child_link", Vind p)
-                        :: ("baseprefix", Vstring baseprefix)
-                        :: ("p_link", Vbool true) :: env
-                      in
-                      let ep = (p, true) in
-                      List.iter (print_ast env ep) al)
-                  children)
-              (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
-        )
+            let ep = (p, authorized_age conf base p) in
+            List.iter (print_ast env ep) al)
+          (Driver.get_children fam)
     | _ -> ()
   in
   let print_foreach_descendant env al (p, _) count_paths =
@@ -4546,14 +4966,14 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "level" env with
       | Vint lev -> lev
       | _ ->
-          !GWPARAM.syslog `LOG_WARNING "Missing level info";
+          Log.warn (fun k -> k "Missing level info");
           0
     in
     let ip_l =
       match get_env "cousins" env with
       | Vcousl cl -> !cl
       | _ ->
-          !GWPARAM.syslog `LOG_WARNING "Empty cousins list";
+          Log.warn (fun k -> k "Empty cousins list");
           []
     in
     let ip_l =
@@ -4564,13 +4984,14 @@ let print_foreach conf base print_ast eval_expr =
       match ip_l with
       | [] -> ()
       | ip :: ip_l ->
-          let ep = (poi base ip, true) in
+          let ep = (Driver.poi base ip, true) in
           let env =
-            ("descendant", Vind (poi base ip))
-            :: ("nbr", Vint i)
-            :: ("first", Vbool (i = 0))
-            :: ("last", Vbool (ip_l = []))
-            :: env
+            Templ.Env.(
+              env
+              |> add "descendant" (Vind (Driver.poi base ip))
+              |> add "nbr" (Vint i)
+              |> add "first" (Vbool (i = 0))
+              |> add "last" (Vbool (ip_l = [])))
           in
           List.iter (print_ast env ep) al;
           loop (succ i) ip_l
@@ -4584,7 +5005,7 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop i =
       if i > max_level then ()
       else
-        let env = ("level", Vint i) :: env in
+        let env = Templ.Env.add "level" (Vint i) env in
         List.iter (print_ast env ep) al;
         loop (succ i)
     in
@@ -4593,8 +5014,10 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_event env al ((p, _) as ep) =
     Mutil.list_iter_first
       (fun first evt ->
-        let env = ("event", Vevent (p, evt)) :: env in
-        let env = ("first", Vbool first) :: env in
+        let env =
+          Templ.Env.(
+            env |> add "event" (Vevent (p, evt)) |> add "first" (Vbool first))
+        in
         List.iter (print_ast env ep) al)
       (Event.sorted_events conf base p)
   in
@@ -4615,9 +5038,10 @@ let print_foreach conf base print_ast eval_expr =
             (fun i (ip, _) ->
               let p = pget conf base ip in
               let env =
-                (epers_event_witness_string, Vind p)
-                :: ("first", Vbool (i = 0))
-                :: env
+                Templ.Env.(
+                  env
+                  |> add epers_event_witness_string (Vind p)
+                  |> add "first" (Vbool (i = 0)))
               in
               List.iter (print_ast env ep) al)
             wl
@@ -4631,21 +5055,24 @@ let print_foreach conf base print_ast eval_expr =
           Array.iteri
             (fun i (ip, wk) ->
               let p = pget conf base ip in
-              let wk_s = Util.string_of_witness_kind conf (get_sex p) wk in
+              let wk_s =
+                Util.string_of_witness_kind conf (Driver.get_sex p) wk
+              in
               let wk_r = Util.string_of_witness_kind_raw wk in
               let env =
-                ("event_witness", Vind p)
-                :: ("witness_kind", Vstring (wk_r :> string))
-                :: ("event_witness_kind", Vstring (wk_s :> string))
-                :: ("first", Vbool (i = 0))
-                :: env
+                Templ.Env.(
+                  env
+                  |> add "event_witness" (Vind p)
+                  |> add "witness_kind" (Vstring (wk_r :> string))
+                  |> add "event_witness_kind" (Vstring (wk_s :> string))
+                  |> add "first" (Vbool (i = 0)))
               in
               List.iter (print_ast env ep) al)
             witnesses
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
-    let related = List.sort_uniq compare (get_related p) in
+    let related = List.sort_uniq compare (Driver.get_related p) in
     let events_witnesses =
       let l = ref [] in
       (let rec make_list = function
@@ -4653,13 +5080,14 @@ let print_foreach conf base print_ast eval_expr =
              let c = pget conf base ic in
              List.iter
                (fun ((name, _, _, _, _, wl, _) as evt) ->
-                 match Util.array_mem_witn conf base (get_iper p) wl with
+                 match Util.array_mem_witn conf base (Driver.get_iper p) wl with
                  | None -> ()
                  | Some wk -> (
                      match name with
                      | Event.Pevent _ -> l := (c, wk, evt) :: !l
                      | Event.Fevent _ ->
-                         if get_sex c = Male then l := (c, wk, evt) :: !l))
+                         if Driver.get_sex c = Male then l := (c, wk, evt) :: !l
+                     ))
                (Event.sorted_events conf base c);
              make_list icl
          | [] -> ()
@@ -4677,11 +5105,12 @@ let print_foreach conf base print_ast eval_expr =
     List.iter
       (fun (p, wk, evt) ->
         if p_auth then
-          let env = ("event_witness_relation", Vevent (p, evt)) :: env in
           let env =
-            ( "event_witness_relation_kind",
-              Vstring (wk : Adef.safe_string :> string) )
-            :: env
+            Templ.Env.(
+              env
+              |> add "event_witness_relation" (Vevent (p, evt))
+              |> add "event_witness_relation_kind"
+                   (Vstring (wk : Adef.safe_string :> string)))
           in
           List.iter (print_ast env ep) al)
       events_witnesses
@@ -4695,12 +5124,14 @@ let print_foreach conf base print_ast eval_expr =
               (* TODO if witness_kind = Witness, we might want wk = "" *)
               let wk_s =
                 if witness_kind = Witness && wk = Witness then ""
-                else (Util.string_of_witness_kind conf (get_sex p) wk :> string)
+                else
+                  (Util.string_of_witness_kind conf (Driver.get_sex p) wk
+                    :> string)
               in
               let env =
-                ("witness", Vind p) :: ("first", Vbool first)
-                :: ("witness_kind", Vstring wk_s)
-                :: env
+                Templ.Env.(
+                  env |> add "witness" (Vind p) |> add "first" (Vbool first)
+                  |> add "witness_kind" (Vstring wk_s))
               in
               if witness_kind = Witness || witness_kind = wk then (
                 List.iter (print_ast env ep) al;
@@ -4715,19 +5146,19 @@ let print_foreach conf base print_ast eval_expr =
 
   let print_foreach_witness_relation env al ((p, _) as ep) =
     let l =
-      let related = List.sort_uniq compare (get_related p) in
+      let related = List.sort_uniq compare (Driver.get_related p) in
       let l = ref [] in
       List.iter
         (fun ic ->
           let c = pget conf base ic in
           (* TODO WHY: only on Male? probably bugged on same sex or neuter couples *)
-          if get_sex c = Male then
+          if Driver.get_sex c = Male then
             Array.iter
               (fun ifam ->
-                let fam = foi base ifam in
-                if Array.mem (get_iper p) (get_witnesses fam) then
+                let fam = Driver.foi base ifam in
+                if Array.mem (Driver.get_iper p) (Driver.get_witnesses fam) then
                   l := (ifam, fam) :: !l)
-              (get_family (pget conf base ic)))
+              (Driver.get_family (pget conf base ic)))
         related;
       !l
     in
@@ -4735,8 +5166,8 @@ let print_foreach conf base print_ast eval_expr =
       List.sort
         (fun (_, fam1) (_, fam2) ->
           match
-            ( Date.od_of_cdate (get_marriage fam1),
-              Date.od_of_cdate (get_marriage fam2) )
+            ( Date.od_of_cdate (Driver.get_marriage fam1),
+              Date.od_of_cdate (Driver.get_marriage fam2) )
           with
           | Some d1, Some d2 -> Date.compare_date d1 d2
           | _ -> 0)
@@ -4744,108 +5175,63 @@ let print_foreach conf base print_ast eval_expr =
     in
     List.iter
       (fun (ifam, fam) ->
-        let ifath = get_father fam in
-        let imoth = get_mother fam in
+        let ifath = Driver.get_father fam in
+        let imoth = Driver.get_mother fam in
         let cpl = (ifath, imoth, imoth) in
         let m_auth =
           authorized_age conf base (pget conf base ifath)
           && authorized_age conf base (pget conf base imoth)
         in
         if m_auth then
-          let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
+          let env = Templ.Env.add "fam" (Vfam (ifam, fam, cpl, true)) env in
           List.iter (print_ast env ep) al)
       l
   in
 
   let print_foreach_family env al ini_ep (p, _) =
-    match get_env "p_link" env with
-    | Vbool _ ->
-        let conf =
-          match get_env "baseprefix" env with
-          | Vstring baseprefix -> { conf with command = baseprefix }
-          | _ -> conf
-        in
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
-            let cpl = (ifath, imoth, get_iper spouse) in
-            let vfam = Vfam (ifam, fam, cpl, true) in
-            let env = ("#loop", Vint 0) :: env in
-            let env = ("fam_link", vfam) :: env in
-            let env = ("f_link", Vbool true) :: env in
-            let env = ("is_link", Vbool true) :: env in
-            let env = ("baseprefix", Vstring baseprefix) :: env in
-            let env = ("family_cnt", Vint (i + 1)) :: env in
-            let env =
-              match prev with
-              | Some vfam -> ("prev_fam", vfam) :: env
-              | None -> env
-            in
-            List.iter (print_ast env ini_ep) al;
-            (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
-    | _ ->
-        (if Array.length (get_family p) > 0 then
-         let rec loop prev i =
-           if i = Array.length (get_family p) then ()
-           else
-             let ifam = (get_family p).(i) in
-             let fam = foi base ifam in
-             let ifath = get_father fam in
-             let imoth = get_mother fam in
-             let ispouse = Gutil.spouse (get_iper p) fam in
-             let cpl = (ifath, imoth, ispouse) in
-             let m_auth =
-               authorized_age conf base (pget conf base ifath)
-               && authorized_age conf base (pget conf base imoth)
-             in
-             let vfam = Vfam (ifam, fam, cpl, m_auth) in
-             let env = ("#loop", Vint 0) :: env in
-             let env = ("fam", vfam) :: env in
-             let env = ("family_cnt", Vint (i + 1)) :: env in
-             let env =
-               match prev with
-               | Some vfam -> ("prev_fam", vfam) :: env
-               | None -> env
-             in
-             List.iter (print_ast env ini_ep) al;
-             loop (Some vfam) (i + 1)
-         in
-         loop None 0);
-        List.fold_left
-          (fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
-            if can_merge then (None, i)
-            else
-              let cpl = (ifath, imoth, get_iper sp) in
-              let vfam = Vfam (ifam, fam, cpl, true) in
-              let env = ("#loop", Vint 0) :: env in
-              let env = ("fam_link", vfam) :: env in
-              let env = ("f_link", Vbool true) :: env in
-              let env = ("is_link", Vbool true) :: env in
-              let env = ("baseprefix", Vstring baseprefix) :: env in
-              let env = ("family_cnt", Vint (i + 1)) :: env in
-              let env =
-                match prev with
-                | Some vfam -> ("prev_fam", vfam) :: env
-                | None -> env
-              in
-              List.iter (print_ast env ini_ep) al;
-              (Some vfam, i + 1))
-          (None, 0)
-          (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
+    if Array.length (Driver.get_family p) > 0 then
+      let rec loop prev i =
+        if i = Array.length (Driver.get_family p) then ()
+        else
+          let ifam = (Driver.get_family p).(i) in
+          let fam = Driver.foi base ifam in
+          let ifath = Driver.get_father fam in
+          let imoth = Driver.get_mother fam in
+          let ispouse = Gutil.spouse (Driver.get_iper p) fam in
+          let cpl = (ifath, imoth, ispouse) in
+          let m_auth =
+            authorized_age conf base (pget conf base ifath)
+            && authorized_age conf base (pget conf base imoth)
+          in
+
+          let vfam = Vfam (ifam, fam, cpl, m_auth) in
+          let env =
+            Templ.Env.(env |> add "fam" vfam |> add "family_cnt" (Vint (i + 1)))
+          in
+          let env =
+            match prev with
+            | Some vfam -> Templ.Env.add "prev_fam" vfam env
+            | None -> env
+          in
+          List.iter (print_ast env ini_ep) al;
+          loop (Some vfam) (i + 1)
+      in
+      loop None 0
   in
 
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first s ->
-          let env = ("first_name_alias", Vstring (sou base s)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "first_name_alias" (Vstring (Driver.sou base s))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
-        (get_first_names_aliases p)
+        (Driver.get_first_names_aliases p)
+    else ()
   in
 
   let print_foreach_cousin_path env el al ((p, _) as ep) in_or_less =
@@ -4883,15 +5269,16 @@ let print_foreach conf base print_ast eval_expr =
       (level, l1, l2)
     in
     let level, l1, l2 = get_level_info conf env el ep in
+    let sparse = get_cousins_sparse conf base p in
     let l =
-      Cousins.cousins_l1_l2_aux conf base (string_of_int l1) (string_of_int l2)
-        p
+      Cousins.cousins_l1_l2_aux sparse conf base (string_of_int l1)
+        (string_of_int l2) p
     in
     match l with
     | Some l ->
         print_foreach_path_aux conf base in_or_less level env al ep
           (Cousins.cousins_fold l)
-    | None -> !GWPARAM.syslog `LOG_WARNING "Empty cousins list"
+    | None -> Log.warn (fun k -> k "Empty cousins list")
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =
@@ -4901,7 +5288,7 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop i =
       if i > max_level then ()
       else
-        let env = ("level", Vint i) :: env in
+        let env = Templ.Env.add "level" (Vint i) env in
         List.iter (print_ast env ep) al;
         loop (succ i)
     in
@@ -4913,70 +5300,94 @@ let print_foreach conf base print_ast eval_expr =
       let titles = nobility_titles_list conf base p in
       Mutil.list_iter_first
         (fun first x ->
-          let env = ("nobility_title", Vtitle (p, x)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "nobility_title" (Vtitle (p, x))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
         titles
   in
+
   let print_foreach_nob_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
       Mutil.list_iter_first
         (fun first x ->
-          let env = ("nob_title", Vtitle (p, x)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "nob_title" (Vtitle (p, x))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
         titles
   in
+
   let print_foreach_parent env al ((a, _) as ep) =
-    match get_parents a with
+    match Driver.get_parents a with
     | Some ifam ->
-        let cpl = foi base ifam in
-        Array.iter
-          (fun iper ->
+        let parents = Driver.get_parent_array (Driver.foi base ifam) in
+        let len = Array.length parents in
+        Array.iteri
+          (fun i iper ->
             let p = pget conf base iper in
-            let env = ("parent", Vind p) :: env in
+            let env =
+              Templ.Env.(
+                env |> add "parent" (Vind p) |> add "last" (Vbool (i = len - 1)))
+            in
             List.iter (print_ast env ep) al)
-          (get_parent_array cpl)
+          parents
     | None -> ()
   in
+
   let print_foreach_qualifier env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first nn ->
-          let env = ("qualifier", Vstring (sou base nn)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "qualifier" (Vstring (Driver.sou base nn))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
-        (get_qualifiers p)
+        (Driver.get_qualifiers p)
+    else ()
   in
+
   let print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
       Mutil.list_iter_first
         (fun first r ->
-          let env = ("rel", Vrel (r, None)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env |> add "rel" (Vrel (r, None)) |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
-        (get_rparents p)
+        (Driver.get_rparents p)
   in
+
   let print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let l =
-        let l = List.sort_uniq compare (get_related p) in
+        let l = List.sort_uniq compare (Driver.get_related p) in
         List.fold_left
           (fun l ic ->
             let c = pget conf base ic in
             let rec loop l = function
               | r :: rl -> (
                   match r.r_fath with
-                  | Some ip when ip = get_iper p -> loop ((c, r) :: l) rl
+                  | Some ip when ip = Driver.get_iper p -> loop ((c, r) :: l) rl
                   | Some _ | None -> (
                       match r.r_moth with
-                      | Some ip when ip = get_iper p -> loop ((c, r) :: l) rl
+                      | Some ip when ip = Driver.get_iper p ->
+                          loop ((c, r) :: l) rl
                       | Some _ | None -> loop l rl))
               | [] -> l
             in
-            loop l (get_rparents c))
+            loop l (Driver.get_rparents c))
           [] l
       in
       let l =
@@ -4984,13 +5395,13 @@ let print_foreach conf base print_ast eval_expr =
         List.sort
           (fun (c1, _) (c2, _) ->
             let d1 =
-              match Date.od_of_cdate (get_baptism c1) with
-              | None -> Date.od_of_cdate (get_birth c1)
+              match Date.od_of_cdate (Driver.get_baptism c1) with
+              | None -> Date.od_of_cdate (Driver.get_birth c1)
               | x -> x
             in
             let d2 =
-              match Date.od_of_cdate (get_baptism c2) with
-              | None -> Date.od_of_cdate (get_birth c2)
+              match Date.od_of_cdate (Driver.get_baptism c2) with
+              | None -> Date.od_of_cdate (Driver.get_birth c2)
               | x -> x
             in
             match (d1, d2) with
@@ -5000,10 +5411,11 @@ let print_foreach conf base print_ast eval_expr =
       in
       List.iter
         (fun (c, r) ->
-          let env = ("rel", Vrel (r, Some c)) :: env in
+          let env = Templ.Env.add "rel" (Vrel (r, Some c)) env in
           List.iter (print_ast env ep) al)
         l
   in
+
   let print_foreach_sorted_list_item env al ep listname =
     let l =
       match get_env listname env with
@@ -5014,21 +5426,25 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
       | _ :: sll as gsll ->
           let item = Vslistlm gsll in
-          let env = ("item", item) :: ("prev_item", prev_item) :: env in
+          let env =
+            Templ.Env.(env |> add "item" item |> add "prev_item" prev_item)
+          in
           List.iter (print_ast env ep) al;
           loop item sll
     in
     loop (Vslistlm []) l
   in
+
   let print_foreach_source env al ((p, p_auth) as ep) =
-    let rec insert_loop typ src = function
-      | (typ1, src1) :: srcl ->
-          if src = src1 then (typ1 ^ ", " ^ typ, src1) :: srcl
-          else (typ1, src1) :: insert_loop typ src srcl
-      | [] -> [ (typ, src) ]
+    let rec insert_loop typ fld ifo src = function
+      | (typ1, _, _, src1) :: srcl when src = src1 ->
+          (typ1 ^ ", " ^ typ, "", "", src1) :: srcl
+      | e :: srcl -> e :: insert_loop typ fld ifo src srcl
+      | [] -> [ (typ, fld, ifo, src) ]
     in
-    let insert typ src srcl =
-      if src = "" then srcl else insert_loop (Util.translate_eval typ) src srcl
+    let insert typ fld ifo src srcl =
+      if src = "" then srcl
+      else insert_loop (Util.translate_eval typ) fld ifo src srcl
     in
     let srcl =
       if p_auth then
@@ -5036,64 +5452,80 @@ let print_foreach conf base print_ast eval_expr =
         let srcl =
           insert
             (transl_nth conf "person/persons" 0)
-            (sou base (get_psources p))
+            "psources" ""
+            (Driver.sou base (Driver.get_psources p))
             srcl
         in
         let srcl =
-          insert (transl_nth conf "birth" 0) (sou base (get_birth_src p)) srcl
+          insert
+            (transl_nth conf "birth" 0)
+            "birth_src" ""
+            (Driver.sou base (Driver.get_birth_src p))
+            srcl
         in
         let srcl =
           insert
             (transl_nth conf "baptism" 0)
-            (sou base (get_baptism_src p))
+            "baptism_src" ""
+            (Driver.sou base (Driver.get_baptism_src p))
             srcl
         in
         let srcl, _ =
           Array.fold_left
             (fun (srcl, i) ifam ->
-              let fam = foi base ifam in
-              let isp = Gutil.spouse (get_iper p) fam in
-              let sp = poi base isp in
-              (* On sait que p_auth vaut vrai. *)
+              let fam = Driver.foi base ifam in
+              let isp = Gutil.spouse (Driver.get_iper p) fam in
+              let sp = Driver.poi base isp in
               let m_auth = authorized_age conf base sp in
               if m_auth then
                 let lab =
-                  if Array.length (get_family p) = 1 then ""
+                  if Array.length (Driver.get_family p) = 1 then ""
                   else " " ^ string_of_int i
                 in
+                let ifs = Driver.Ifam.to_string ifam in
                 let srcl =
                   let src_typ = transl_nth conf "marriage/marriages" 0 in
-                  insert (src_typ ^ lab) (sou base (get_marriage_src fam)) srcl
+                  insert (src_typ ^ lab) "marriage_src" ifs
+                    (Driver.sou base (Driver.get_marriage_src fam))
+                    srcl
                 in
                 let src_typ = transl_nth conf "family/families" 0 in
-                ( insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl,
+                ( insert (src_typ ^ lab) "fsources" ifs
+                    (Driver.sou base (Driver.get_fsources fam))
+                    srcl,
                   i + 1 )
               else (srcl, i + 1))
-            (srcl, 1) (get_family p)
+            (srcl, 1) (Driver.get_family p)
         in
         let srcl =
-          insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
+          insert
+            (transl_nth conf "death" 0)
+            "death_src" ""
+            (Driver.sou base (Driver.get_death_src p))
+            srcl
         in
         let buri_crem_lex =
-          match get_burial p with
-          | Cremated _cdate -> "cremation"
-          | Buried _cdate -> "burial"
-          | UnknownBurial -> "burial" (* TODOWHY what should we print here *)
+          match Driver.get_burial p with
+          | Cremated _ -> "cremation"
+          | Buried _ | UnknownBurial -> "burial"
         in
         insert
           (transl_nth conf buri_crem_lex 0)
-          (sou base (get_burial_src p))
+          "burial_src" ""
+          (Driver.sou base (Driver.get_burial_src p))
           srcl
       else []
     in
-    (* Affiche les sources et met à jour les variables "first" et "last". *)
     let rec loop first = function
-      | (src_typ, src) :: srcl ->
+      | (src_typ, fld, ifs, src) :: srcl ->
           let env =
-            ("first", Vbool first)
-            :: ("last", Vbool (srcl = []))
-            :: ("src_typ", Vstring src_typ)
-            :: ("src", Vstring src) :: env
+            Templ.Env.(
+              env |> add "first" (Vbool first)
+              |> add "last" (Vbool (srcl = []))
+              |> add "src_typ" (Vstring src_typ)
+              |> add "src_field" (Vstring fld)
+              |> add "src_ifam" (Vstring ifs)
+              |> add "src" (Vstring src))
           in
           List.iter (print_ast env ep) al;
           loop false srcl
@@ -5101,16 +5533,22 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true srcl
   in
+
   let print_foreach_surname_alias env al ((p, p_auth) as ep) =
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if p_auth then
       Mutil.list_iter_first
         (fun first s ->
-          let env = ("surname_alias", Vstring (sou base s)) :: env in
-          let env = ("first", Vbool first) :: env in
+          let env =
+            Templ.Env.(
+              env
+              |> add "surname_alias" (Vstring (Driver.sou base s))
+              |> add "first" (Vbool first))
+          in
           List.iter (print_ast env ep) al)
-        (get_surnames_aliases p)
+        (Driver.get_surnames_aliases p)
+    else ()
   in
+
   (* carrousel *)
   let print_foreach_img_in_carrousel env al ((p, _p_auth) as ep) old =
     let l =
@@ -5124,18 +5562,21 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
       | (name, url, src, note) :: l ->
           let env =
-            ("carrousel_img", Vstring (Filename.basename name))
-            :: ("carrousel_img_src", Vstring src)
-            :: ("carrousel_img_note", Vstring note)
-            :: ("first", Vbool first)
-            :: ("last", Vbool (l = []))
-            :: ("url", Vstring url) :: ("img_cnt", Vint cnt) :: env
+            Templ.Env.(
+              env
+              |> add "carrousel_img" (Vstring (Filename.basename name))
+              |> add "carrousel_img_src" (Vstring src)
+              |> add "carrousel_img_note" (Vstring note)
+              |> add "first" (Vbool first)
+              |> add "last" (Vbool (l = []))
+              |> add "url" (Vstring url) |> add "img_cnt" (Vint cnt))
           in
           List.iter (print_ast env ep) al;
           loop false (cnt + 1) l
     in
     loop true 1 l
   in
+
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
     | "ancestor" | "ascendant" -> print_foreach_ascendant env al ep
@@ -5146,7 +5587,7 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
-    | "child" -> print_foreach_child env al ep efam
+    | "child" -> print_foreach_child env al efam
     | "path" | "cous_path" -> print_foreach_cousin_path env el al ep false
     | "path_at_level" | "cous_path_at_level" ->
         print_foreach_cousin_path env el al ep true
@@ -5199,6 +5640,7 @@ let print_foreach conf base print_ast eval_expr =
     | "witness_relation" -> print_foreach_witness_relation env al ep
     | _ -> raise Not_found
   in
+
   let print_foreach env ini_ep loc s sl ell al =
     let rec loop env ((a, _) as ep) efam = function
       | [ s ] -> print_simple_foreach env ell al ini_ep ep efam loc s
@@ -5227,83 +5669,44 @@ let print_foreach conf base print_ast eval_expr =
               let auth = authorized_age conf base p in
               let ep = (p, auth) in
               loop env ep efam sl
-          | _ -> (
-              match get_env "child_link" env with
-              | Vind p ->
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let auth = authorized_age conf base p in
-                  let ep = (p, auth) in
-                  loop env ep efam sl
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | "father" :: sl -> (
-          match get_parents a with
+          match Driver.get_parents a with
           | Some ifam ->
-              let cpl = foi base ifam in
-              let ((_, p_auth) as ep) = make_ep conf base (get_father cpl) in
-              let ifath = get_father cpl in
-              let cpl = (ifath, get_mother cpl, ifath) in
+              let cpl = Driver.foi base ifam in
+              let ((_, p_auth) as ep) =
+                make_ep conf base (Driver.get_father cpl)
+              in
+              let ifath = Driver.get_father cpl in
+              let cpl = (ifath, Driver.get_mother cpl, ifath) in
               let m_auth =
                 p_auth && authorized_age conf base (pget conf base ifath)
               in
-              let efam = Vfam (ifam, foi base ifam, cpl, m_auth) in
+              let efam = Vfam (ifam, Driver.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              let conf =
-                match get_env "baseprefix" env with
-                | Vstring baseprefix -> { conf with command = baseprefix }
-                | _ -> conf
-              in
-              match !GWPARAM_ITL.get_father' conf base (get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let env = ("baseprefix", Vstring baseprefix) :: env in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "father" ()))
+          | None -> warning_use_has_parents_before_parent loc "father" ())
       | "mother" :: sl -> (
-          match get_parents a with
+          match Driver.get_parents a with
           | Some ifam ->
-              let cpl = foi base ifam in
-              let ((_, p_auth) as ep) = make_ep conf base (get_mother cpl) in
-              let ifath = get_father cpl in
-              let cpl = (ifath, get_mother cpl, ifath) in
+              let cpl = Driver.foi base ifam in
+              let ((_, p_auth) as ep) =
+                make_ep conf base (Driver.get_mother cpl)
+              in
+              let ifath = Driver.get_father cpl in
+              let cpl = (ifath, Driver.get_mother cpl, ifath) in
               let m_auth =
                 p_auth && authorized_age conf base (pget conf base ifath)
               in
-              let efam = Vfam (ifam, foi base ifam, cpl, m_auth) in
+              let efam = Vfam (ifam, Driver.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
-          | None -> (
-              match !GWPARAM_ITL.get_mother' conf base (get_iper a) with
-              | Some (baseprefix, ep, ifam, fam, cpl) ->
-                  let efam = Vfam (ifam, fam, cpl, true) in
-                  let env = ("p_link", Vbool true) :: env in
-                  let env = ("f_link", Vbool true) :: env in
-                  let env = ("baseprefix", Vstring baseprefix) :: env in
-                  loop env ep efam sl
-              | None -> warning_use_has_parents_before_parent loc "mother" ()))
+          | None -> warning_use_has_parents_before_parent loc "mother" ())
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl -> (
           match efam with
           | Vfam (_, _, (_, _, ip), _) ->
               let ep = make_ep conf base ip in
               loop env ep efam sl
-          | _ -> (
-              match get_env "fam_link" env with
-              | Vfam (_, _, (_, _, ip), _) -> (
-                  let baseprefix =
-                    match get_env "baseprefix" env with
-                    | Vstring baseprefix -> baseprefix
-                    | _ -> conf.command
-                  in
-                  match !GWPARAM_ITL.get_person conf base baseprefix ip with
-                  | Some (ep, baseprefix) ->
-                      let env = ("p_link", Vbool true) :: env in
-                      let env = ("baseprefix", Vstring baseprefix) :: env in
-                      loop env ep efam sl
-                  | None -> raise Not_found)
-              | _ -> raise Not_found))
+          | _ -> raise Not_found)
       | _ -> raise Not_found
     in
     let efam =
@@ -5316,7 +5719,9 @@ let print_foreach conf base print_ast eval_expr =
   print_foreach
 
 let eval_predefined_apply conf env f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map (function Templ.VVstring s -> s | _ -> raise Not_found) vl
+  in
   match (f, vl) with
   | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
   | "a_of_b2", [ s1; s2; s3 ] ->
@@ -5387,9 +5792,7 @@ let eval_predefined_apply conf env f vl =
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
-  let emal =
-    match p_getint conf.env "v" with Some i -> i | None -> Cousins.mal
-  in
+  let emal = match p_getint conf.env "v" with Some i -> i | None -> 0 in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
     if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
@@ -5398,95 +5801,107 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | Some p -> SosaCache.init_sosa_t conf base p
       | None -> None
     in
+    let computed_mal = ref None in
+    let get_mal () =
+      match !computed_mal with
+      | Some v -> v
+      | None ->
+          let v = Cousins.max_ancestor_level conf base (Driver.get_iper p) 0 in
+          computed_mal := Some v;
+          v
+    in
+    let computed_mdl = ref None in
+    let get_mdl () =
+      match !computed_mdl with
+      | Some v -> v
+      | None ->
+          let v =
+            Cousins.max_descendant_level conf base (Driver.get_iper p) 0
+          in
+          computed_mdl := Some v;
+          v
+    in
     let desc_level_table_l =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
     let desc_level_table_m =
-      let dlt () = make_desc_level_table conf base Cousins.mdl p in
+      let dlt () = make_desc_level_table conf base (get_mdl ()) p in
       Lazy.from_fun dlt
     in
     let desc_level_table_l_save =
-      let dlt () = make_desc_level_table conf base emal p in
+      let dlt () =
+        let limit = if emal > 0 then emal else get_mdl () in
+        make_desc_level_table conf base limit p
+      in
       Lazy.from_fun dlt
     in
-    let mal () =
-      Vint (Cousins.max_ancestor_level conf base (get_iper p) (emal + 1))
-    in
-    (* Static max ancestor level *)
+    let mal () = Vint (get_mal ()) in
     let smal () =
-      Vint (Cousins.max_ancestor_level conf base (get_iper p) Cousins.mal)
+      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) 0)
     in
-    (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
           Vint
-            (Cousins.max_ancestor_level conf base (get_iper sosa_ref)
-               Cousins.mal)
+            (Cousins.max_ancestor_level conf base (Driver.get_iper sosa_ref) 0)
       | None -> Vint 0
     in
     let mcl () = Vint (Cousins.max_cousin_level conf) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en
-       compte les liens inter-arbres (limité à 10 générations car
-       problématique en terme de perf). *)
-    let mdl () =
-      Vint
-        (max
-           (max_descendant_level base desc_level_table_l)
-           (!GWPARAM_ITL.max_descendant_level conf base (get_iper p) 10))
-    in
-    (* Static max descendant level *)
+    let mdl () = Vint (max_descendant_level base desc_level_table_l) in
     let smdl () = Vint (max_descendant_level base desc_level_table_m) in
     let nldb () =
-      let db = Gwdb.read_nldb base in
+      let db = Driver.read_nldb base in
       let db = Notes.merge_possible_aliases conf db in
       Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
-    [
-      ("p", Vind p);
-      ("p_auth", Vbool (authorized_age conf base p));
-      ("count", Vcnt (ref 0));
-      ("count1", Vcnt (ref 0));
-      ("count2", Vcnt (ref 0));
-      ("count3", Vcnt (ref 0));
-      ("vars", Vvars (ref []));
-      ("cousins", Vcousl (ref []));
-      ("v1_v2", Vcous_level (ref 0, ref 0));
-      ("list", Vslist (ref SortedList.empty));
-      ("listb", Vslist (ref SortedList.empty));
-      ("listc", Vslist (ref SortedList.empty));
-      ("listd", Vslist (ref SortedList.empty));
-      ("liste", Vslist (ref SortedList.empty));
-      ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
-      ("lazy_print", Vlazyp (ref None));
-      ("sosa", Vsosa (ref []));
-      ("sosa_ref", Vsosa_ref sosa_ref);
-      ("t_sosa", Vt_sosa t_sosa);
-      ("max_anc_level", Vlazy (Lazy.from_fun mal));
-      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
-      ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));
-      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
-      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
-      ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
-      ("desc_level_table", Vdesclevtab desc_level_table_l);
-      ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
-      ("nldb", Vlazy (Lazy.from_fun nldb));
-      ("all_gp", Vlazy (Lazy.from_fun all_gp));
-    ]
+    Templ.Env.empty |> Templ.Env.add "p" (Vind p)
+    |> Templ.Env.add "p_auth" (Vbool (authorized_age conf base p))
+    |> Templ.Env.add "count" (Vcnt (ref 0))
+    |> Templ.Env.add "count1" (Vcnt (ref 0))
+    |> Templ.Env.add "count2" (Vcnt (ref 0))
+    |> Templ.Env.add "count3" (Vcnt (ref 0))
+    |> Templ.Env.add "vars" (Vvars (ref []))
+    |> Templ.Env.add "cousins" (Vcousl (ref []))
+    |> Templ.Env.add "v1_v2" (Vcous_level (ref 0, ref 0))
+    |> Templ.Env.add "list" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listb" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listc" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "listd" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "liste" (Vslist (ref SortedList.empty))
+    |> Templ.Env.add "desc_mark"
+         (Vdmark (ref @@ Collection.Marker.dummy Driver.Iper.dummy false))
+    |> Templ.Env.add "lazy_print" (Vlazyp (ref None))
+    |> Templ.Env.add "sosa" (Vsosa (ref []))
+    |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref)
+    |> Templ.Env.add "t_sosa" (Vt_sosa t_sosa)
+    |> Templ.Env.add "max_anc_level" (Vlazy (Lazy.from_fun mal))
+    |> Templ.Env.add "static_max_anc_level" (Vlazy (Lazy.from_fun smal))
+    |> Templ.Env.add "sosa_ref_max_anc_level" (Vlazy (Lazy.from_fun srmal))
+    |> Templ.Env.add "max_cous_level" (Vlazy (Lazy.from_fun mcl))
+    |> Templ.Env.add "max_desc_level" (Vlazy (Lazy.from_fun mdl))
+    |> Templ.Env.add "static_max_desc_level" (Vlazy (Lazy.from_fun smdl))
+    |> Templ.Env.add "desc_level_table" (Vdesclevtab desc_level_table_l)
+    |> Templ.Env.add "desc_level_table_save"
+         (Vdesclevtab desc_level_table_l_save)
+    |> Templ.Env.add "nldb" (Vlazy (Lazy.from_fun nldb))
+    |> Templ.Env.add "all_gp" (Vlazy (Lazy.from_fun all_gp))
   in
-  if no_headers then
-    Hutil.interp_no_header conf templ_fname
-      {
-        Templ.eval_var = eval_var conf base;
-        Templ.eval_transl = eval_transl conf base;
-        Templ.eval_predefined_apply = eval_predefined_apply conf;
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = print_foreach conf base;
-      }
-      env ep
+  let ifun =
+    {
+      Templ.eval_var = eval_var conf base;
+      Templ.eval_transl = eval_transl conf base;
+      Templ.eval_predefined_apply = eval_predefined_apply conf;
+      Templ.get_vother;
+      Templ.set_vother;
+      Templ.print_foreach = print_foreach conf base;
+    }
+  in
+  if no_headers then Templ.output conf ifun env ep templ_fname
   else if menu then
     let size =
       match Util.open_etc_file conf templ_fname with
@@ -5498,36 +5913,297 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | None -> 0
     in
     if size = 0 then Hutil.header conf title
-    else
-      Hutil.interp_no_header conf templ_fname
-        {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = eval_transl conf base;
-          Templ.eval_predefined_apply = eval_predefined_apply conf;
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach = print_foreach conf base;
-        }
-        env ep
-  else
-    Hutil.interp conf templ_fname
-      {
-        Templ.eval_var = eval_var conf base;
-        Templ.eval_transl = eval_transl conf base;
-        Templ.eval_predefined_apply = eval_predefined_apply conf;
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = print_foreach conf base;
-      }
-      env ep
+    else Templ.output conf ifun env ep templ_fname
+  else Templ.output conf ifun env ep templ_fname
 
 let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
 let interp_templ_with_menu = gen_interp_templ true
 
-let interp_notempl_with_menu title templ_fname conf base p =
-  (* On envoie le header car on n'est pas dans un template (exple: merge). *)
-  Hutil.header_with_title conf title;
-  gen_interp_templ true title templ_fname conf base p
+let print_isolated conf base =
+  Driver.load_ascends_array base;
+  Driver.load_unions_array base;
+  let rtypes =
+    [|
+      Def.GodParent;
+      Def.Adoption;
+      Def.Recognition;
+      Def.FosterParent;
+      Def.CandidateParent;
+    |]
+  in
+  let rtype_keys =
+    [|
+      "godfather/godmother/godparents";
+      "adoptive father/adoptive mother/adoptive parents";
+      "recognizing father/recognizing mother/recognizing parents";
+      "foster father/foster mother/foster parents";
+      "candidate father/candidate mother/candidate parents";
+    |]
+  in
+  let wkinds =
+    [|
+      Def.Witness;
+      Def.Witness_GodParent;
+      Def.Witness_Informant;
+      Def.Witness_Attending;
+      Def.Witness_Mentioned;
+      Def.Witness_CivilOfficer;
+      Def.Witness_ReligiousOfficer;
+      Def.Witness_Other;
+    |]
+  in
+  let wkind_keys =
+    [|
+      "witness/witness/witnesses";
+      "godfather/godmother/godparents";
+      "informant/informant/informant";
+      "present/present/present";
+      "mentioned/mentioned/mentioned";
+      "civil registrar/civil registrar/civil registrar";
+      "parrish registrar/parrish registrar/parrish registrar";
+      "other/other/other";
+    |]
+  in
+  let idx_of arr v =
+    let rec aux i =
+      if i >= Array.length arr then 0 else if arr.(i) = v then i else aux (i + 1)
+    in
+    aux 0
+  in
+  let label keys i = transl_nth conf keys.(i) 2 in
+  let candidates =
+    Geneweb_db.Collection.fold
+      (fun acc iper ->
+        let p = Driver.poi base iper in
+        if Driver.get_parents p = None && Array.length (Driver.get_family p) = 0
+        then iper :: acc
+        else acc)
+      [] (Driver.ipers base)
+  in
+  let truly = ref [] in
+  let by_rel = Array.make 5 [] in
+  let n_rel = ref 0 in
+  let by_wit = Array.make 8 [] in
+  let n_wit = ref 0 in
+  let find_wit_kind_in iper rp =
+    let from_pevt =
+      List.find_map
+        (fun evt ->
+          Mutil.array_find_map
+            (fun (wip, wk) -> if wip = iper then Some wk else None)
+            evt.Def.epers_witnesses)
+        (Driver.get_pevents rp)
+    in
+    match from_pevt with
+    | Some _ -> from_pevt
+    | None ->
+        Mutil.array_find_map
+          (fun ifam ->
+            List.find_map
+              (fun evt ->
+                Mutil.array_find_map
+                  (fun (wip, wk) -> if wip = iper then Some wk else None)
+                  evt.Def.efam_witnesses)
+              (Driver.get_fevents (Driver.foi base ifam)))
+          (Driver.get_family rp)
+  in
+  let classify_related p =
+    let iper = Driver.get_iper p in
+    List.find_map
+      (fun ip ->
+        let rp = Driver.poi base ip in
+        match
+          List.find_map
+            (fun r ->
+              if r.Def.r_fath = Some iper || r.Def.r_moth = Some iper then
+                Some (`Rel (idx_of rtypes r.Def.r_type))
+              else None)
+            (Driver.get_rparents rp)
+        with
+        | Some _ as v -> v
+        | None ->
+            Option.map
+              (fun wk -> `Wit (idx_of wkinds wk))
+              (find_wit_kind_in iper rp))
+      (Driver.get_related p)
+  in
+  List.iter
+    (fun iper ->
+      let p = Driver.poi base iper in
+      if
+        Driver.sou base (Driver.get_first_name p) = "?"
+        && Driver.sou base (Driver.get_surname p) = "?"
+      then ()
+      else
+        let rp = Driver.get_rparents p in
+        let rl = Driver.get_related p in
+        if rp = [] && rl = [] then truly := p :: !truly
+        else if rp <> [] then (
+          incr n_rel;
+          let i = idx_of rtypes (List.hd rp).Def.r_type in
+          by_rel.(i) <- p :: by_rel.(i))
+        else
+          match classify_related p with
+          | Some (`Rel i) ->
+              incr n_rel;
+              by_rel.(i) <- p :: by_rel.(i)
+          | Some (`Wit i) ->
+              incr n_wit;
+              by_wit.(i) <- p :: by_wit.(i)
+          | None ->
+              incr n_wit;
+              by_wit.(0) <- p :: by_wit.(0))
+    candidates;
+  let cmp p1 p2 =
+    let sn p = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    let fn p = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+    match String.compare (sn p1) (sn p2) with
+    | 0 -> String.compare (fn p1) (fn p2)
+    | c -> c
+  in
+  let truly = List.sort cmp !truly in
+  Array.iteri (fun i l -> by_rel.(i) <- List.sort cmp l) by_rel;
+  Array.iteri (fun i l -> by_wit.(i) <- List.sort cmp l) by_wit;
+  let n1 = List.length truly in
+  let n2 = !n_rel in
+  let n3 = !n_wit in
+  let tot = n1 + n2 + n3 in
+  let iso =
+    "isolated persons/totally isolated/linked by relation/witness to an event"
+  in
+  let title _ =
+    Output.printf conf "%s (%d)"
+      (Utf8.capitalize_fst (transl_nth conf iso 0))
+      tot
+  in
+  let find_all_wit_kinds iper =
+    List.concat_map
+      (fun ip ->
+        let rp = Driver.poi base ip in
+        List.filter_map
+          (fun (_, _, _, _, _, wl, _) ->
+            Mutil.array_find_map
+              (fun (wip, wk) -> if wip = iper then Some wk else None)
+              wl)
+          (Event.sorted_events conf base rp))
+      (Driver.get_related (Driver.poi base iper))
+    |> List.sort_uniq compare
+  in
+  Hutil.header conf title;
+  let print_person_li p =
+    Output.print_sstring conf "<li>";
+    Output.print_string conf (referenced_person_text conf base p);
+    Output.print_string conf (DateDisplay.short_dates_text conf base p)
+  in
+  let print_list list =
+    Output.print_sstring conf "<ul>\n";
+    List.iter
+      (fun p ->
+        print_person_li p;
+        Output.print_sstring conf "</li>\n")
+      list;
+    Output.print_sstring conf "</ul>\n"
+  in
+  let print_wit_list cur_idx list =
+    let cur_wk = wkinds.(cur_idx) in
+    Output.print_sstring conf "<ul>\n";
+    List.iter
+      (fun p ->
+        print_person_li p;
+        let others =
+          List.filter
+            (fun wk -> wk <> cur_wk)
+            (find_all_wit_kinds (Driver.get_iper p))
+        in
+        (if others <> [] then
+           let s =
+             String.concat ", "
+               (List.map
+                  (fun wk ->
+                    (Util.string_of_witness_kind conf (Driver.get_sex p) wk
+                      :> string))
+                  others)
+           in
+           Output.printf conf " <em>(%s)</em>" s);
+        Output.print_sstring conf "</li>\n")
+      list;
+    Output.print_sstring conf "</ul>\n"
+  in
+  let up =
+    " <a href=\"#isolated-top\" class=\"small text-body-secondary ms-2\">^</a>"
+  in
+  let print_sub plist id lbl list =
+    if list <> [] then (
+      Output.printf conf "<h4 class=\"ms-3\" id=\"%s\">%s (%d)%s</h4>\n" id
+        (Utf8.capitalize_fst lbl) (List.length list) up;
+      plist list)
+  in
+  let print_h3 id lbl n =
+    Output.printf conf "<h3 id=\"%s\">%s (%d)%s</h3>\n" id
+      (Utf8.capitalize_fst lbl) n up
+  in
+  Output.print_sstring conf "<div id=\"isolated-top\" class=\"mb-3\">\n";
+  let toc = Buffer.create 256 in
+  let add_toc_raw id lbl n =
+    Buffer.add_string toc
+      (Printf.sprintf "<a href=\"#%s\">%s&nbsp;(%d)</a>" id
+         (Utf8.capitalize_fst lbl) n)
+  in
+  let add_sub_toc prefix keys arr =
+    let first = ref true in
+    Array.iteri
+      (fun i list ->
+        if list <> [] then (
+          if !first then (
+            Buffer.add_string toc (transl conf ":");
+            Buffer.add_string toc " ";
+            first := false)
+          else Buffer.add_string toc " &middot; ";
+          Buffer.add_string toc
+            (Printf.sprintf "<a href=\"#%s-%d\">%s&nbsp;(%d)</a>" prefix i
+               (Utf8.capitalize_fst (label keys i))
+               (List.length list))))
+      arr
+  in
+  if n1 > 0 then add_toc_raw "sec-truly" (transl_nth conf iso 1) n1;
+  if n2 > 0 then (
+    if Buffer.length toc > 0 then Buffer.add_string toc "<br>\n";
+    add_toc_raw "sec-rel" (transl_nth conf iso 2) n2;
+    add_sub_toc "sec-rel" rtype_keys by_rel);
+  if n3 > 0 then (
+    if Buffer.length toc > 0 then Buffer.add_string toc "<br>\n";
+    add_toc_raw "sec-wit" (transl_nth conf iso 3) n3;
+    add_sub_toc "sec-wit" wkind_keys by_wit);
+  Output.print_sstring conf (Buffer.contents toc);
+  Output.print_sstring conf "</div>\n";
+  if n1 > 0 then (
+    print_h3 "sec-truly" (transl_nth conf iso 1) n1;
+    if conf.wizard then (
+      Output.print_sstring conf "<div class=\"text-danger mb-1\">";
+      Output.print_sstring conf
+        (Utf8.capitalize_fst
+           (transl conf
+              "caution: these persons are lost when exporting with gwu without \
+               the -isolated option"));
+      Output.print_sstring conf "</div>\n");
+    print_list truly);
+  if n2 > 0 then (
+    print_h3 "sec-rel" (transl_nth conf iso 2) n2;
+    Array.iteri
+      (fun i list ->
+        print_sub print_list
+          (Printf.sprintf "sec-rel-%d" i)
+          (label rtype_keys i) list)
+      by_rel);
+  if n3 > 0 then (
+    print_h3 "sec-wit" (transl_nth conf iso 3) n3;
+    Array.iteri
+      (fun i list ->
+        print_sub (print_wit_list i)
+          (Printf.sprintf "sec-wit-%d" i)
+          (label wkind_keys i) list)
+      by_wit);
+  Hutil.trailer conf
 
 (* Main *)
 
@@ -5536,8 +6212,9 @@ let print ?no_headers conf base p =
     if conf.wizard || conf.friend then None
     else
       let src =
-        match get_parents p with
-        | Some ifam -> sou base (get_origin_file (foi base ifam))
+        match Driver.get_parents p with
+        | Some ifam ->
+            Driver.sou base (Driver.get_origin_file (Driver.foi base ifam))
         | None -> ""
       in
       try Some (src, List.assoc ("passwd_" ^ src) conf.base_env)
@@ -5548,37 +6225,3 @@ let print ?no_headers conf base p =
     when is_that_user_and_password conf.auth_scheme "" passwd = false ->
       Util.unauthorized conf src
   | Some _ | None -> interp_templ ?no_headers "perso" conf base p
-
-let print_what_links conf base p =
-  if authorized_age conf base p then (
-    let key =
-      let fn = Name.lower (sou base (get_first_name p)) in
-      let sn = Name.lower (sou base (get_surname p)) in
-      (fn, sn, get_occ p)
-    in
-    let db = Gwdb.read_nldb base in
-    let db = Notes.merge_possible_aliases conf db in
-    let pgl = Notes.links_to_ind conf base db key None in
-    let title h =
-      let lnkd_typ =
-        match p_getenv conf.env "type" with
-        | Some "gallery" -> "linked images"
-        | Some "album" -> "linked images"
-        | _ -> "linked pages"
-      in
-      transl conf lnkd_typ |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      Util.transl conf ":" |> Output.print_sstring conf;
-      Output.print_sstring conf " ";
-      if h then Output.print_string conf (simple_person_text conf base p true)
-      else (
-        Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (commd conf);
-        Output.print_string conf (acces conf base p);
-        Output.print_sstring conf {|">|};
-        Output.print_string conf (simple_person_text conf base p true);
-        Output.print_sstring conf {|</a>|})
-    in
-    Hutil.header conf title;
-    NotesDisplay.print_linked_list conf base pgl;
-    Hutil.trailer conf)
-  else Hutil.incorrect_request conf

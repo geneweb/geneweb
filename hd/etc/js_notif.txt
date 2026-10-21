@@ -1,0 +1,40 @@
+<!-- Notification inline script for index/js.txt -->
+var notifLabels={
+  danger:'[*NOTIF error/warning/success/info]0',
+  warning:'[*NOTIF error/warning/success/info]1',
+  success:'[*NOTIF error/warning/success/info]2',
+  info:'[*NOTIF error/warning/success/info]3'
+};
+var notifIcons={
+  danger:'fa-circle-xmark',
+  warning:'fa-triangle-exclamation',
+  success:'fa-circle-check',
+  info:'fa-circle-info'
+};
+(function(){
+  var items=%[%];
+  try{items=JSON.parse(document.currentScript.dataset.notif)||items;}catch(e){}
+  %if;(e.nomod="1")
+    items.push({level:'info',title:'[*no modification]',
+      message:'[NOTIF no modification]',autohide:true});
+    var u=new URL(location.href);
+    u.searchParams.delete('nomod');
+    history.replaceState(null,'',u);
+  %end;
+  if(!items.length)return;
+  var c=document.createElement('div');
+  c.className='notif-ctr';
+  document.body.appendChild(c);
+  items.forEach(function(x){
+    var ti=x.title||notifLabels[x.level],
+        ic=notifIcons[x.level]||'fa-circle-info',
+        h='<div class="toast show border-'+x.level+'" role="alert">'+
+          '<div class="toast-header bg-'+x.level+' text-white">'+
+          '<i class="fa '+ic+' me-2"></i><strong class="me-auto">'+ti+'</strong>'+
+          '<button type="button" class="btn-close ms-2" aria-label="Close" onclick="this.closest(\'.toast\').remove()">'+
+          '</button></div>'+
+          '<div class="toast-body">'+x.message+'</div></div>';
+    c.insertAdjacentHTML('beforeend',h);
+    if(x.autohide){var t=c.lastElementChild;setTimeout(function(){t.remove();},6000);}
+  });
+})();

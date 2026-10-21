@@ -1,88 +1,103 @@
+<!-- $Id: updhist.txt v7.1 15/10/2026 06:15:29 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 24/6/2024 05:24:40 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
-%include;css
+  %permalink;
+  %include;css
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %include;hed
 %message_to_wizard;
 <div class="container">
 %include;home
-<h1>[*history of updates]</h1>
+<h1>[*history of updates]%if;(e.wiz!="") — [wizard/wizards/friend/friends/exterior]0 %e.wiz;%end;</h1>
 %define;search_form()
-  %if;(wizard or friend)
-    <form class="form-inline mb-2" method="get" action="%action;">
-      %hidden;
-      <input type="hidden" name="m" value="HIST_SEARCH">
-      %if;(e.m="HIST_SEARCH" and found)
-        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
-      %end;
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
-          name="s" size="30" maxlength="40" value="%e.s.ns;">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
-        </div>
-      </div>
-      <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
-      <input type="number" class="form-control" id="rows" title="[*number of rows]"
-         name="k" value="%kk;" min="0" max="150" step="10">
-      <div class="custom-control custom-checkbox ml-3">
-        <input type="checkbox" class="custom-control-input" name="c" value="on" id="case"
-          %if;("main"!="true" and e.c="on") checked%end;>
-        <label class="custom-control-label" for="case">[*search/case sensitive]1</label>
-      </div>
-    </form>
-  %end;
+  <form class="d-flex flex-wrap align-items-center gap-3 mb-2" method="get" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="HIST">
+    %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
+    <label for="rows" class="col-form-label text-nowrap mb-0">[*number of rows]</label>
+    <input type="number" class="form-control w-auto" id="rows" title="[*number of rows]"
+      name="k" value="%kk;" min="10" max="150" step="10">
+    <div class="input-group w-auto">
+      <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
+        name="s" maxlength="60" value="%e.s.ns;" aria-label="[*search/case sensitive]0">
+      <button type="submit" class="btn btn-primary" title="[*search/case sensitive]0">OK</button>
+    </div>
+    <div class="form-check text-nowrap">
+      <input type="checkbox" class="form-check-input" name="c" value="on" id="case"%if;(e.c="on") checked%end;>
+      <label class="form-check-label" for="case">[*search/case sensitive]1</label>
+    </div>
+    %if;(e.s!="" or e.wiz!="")
+      <a class="btn btn-outline-secondary" href="%prefix;m=HIST&k=%kk;">%nn;
+        <i class="fa fa-xmark text-danger me-2" aria-hidden="true"></i>[*clear filters]</a>
+    %end;
+  </form>
 %end;
 
 %let;kk;%if;(e.k="")3%else;%e.k%end;%in;
-%let;wiz;%if;(e.wiz!="" and e.n="")%e.wiz;%end;%in;
+%let;pg;%if;(e.pg="")1%else;%e.pg;%end;%in;
 %define;table()
   <table class="table table-sm table-hover px-1">
-    <thead class="thead-default">
+    <caption class="visually-hidden">[*history of updates]</caption>
+    <thead class="table-light">
       <tr>
         <th>[*date/dates]0</th>
+        <th class="text-center">
+          <i class="fa fa-person fa-fw text-dark" title="[*access]0" aria-hidden="true"></i>
+          <span class="visually-hidden">[access]0</span></th>
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
-        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-clock-rotate-left fa-fw text-dark" title="[*history]"></i></th>%end;
+        %if;(bvar.history_diff="yes")<th class="text-center">
+          <i class="fa fa-clock-rotate-left fa-fw text-dark"
+            title="[*history]" aria-hidden="true"></i>
+            <span class="visually-hidden">[history]</span></th>%end;
       </tr>
     </thead>
-    %foreach;history_line(kk, e.pos, wiz)
+    %foreach;history_line(kk, e.pos, e.wiz)
       <tr>
-        <td>%time;</td>
-        <td>
-          %if;(first_name!="")
-            <!--%first_name;/%occ;/%surname;-->
-            <a href="%prefix;%person.access;">%person;</a>, %person.title;
-            %person.dates;
-            %if;(b.show_invisible="on" and wizard and person.is_invisible)
-              <img src="%images_prefix;restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
-            %end;
-          %elseif;is_note;
-            - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
-            %if;(note.part!="");v=%note.part;%end;">
-            <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
-            </i></a>
-            %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
-              </span>%nn;
-            %end;
+        <td><span class="gw-hist-time" data-epoch="%time_epoch;">%time;</span></td>
+        <td class="text-center">
+        %if;is_person;
+          %if;(person.is_private)
+            <i class="fa fa-person fa-fw text-danger"></i>%nn;
+          %elseif;(person.is_semi_public)
+            <i class="fa fa-person fa-fw text-warning"></i>%nn;
+          %elseif;(person.is_public or b.public_if_titles="yes" and person.has_titles)
+            <i class="fa fa-person fa-fw text-success"></i>%nn;
           %else;
-            %key;
+            <i class="fa fa-person fa-fw text-body-secondary"></i>%nn;
           %end;
+        %end;
+        </td>
+        <td>
+        %if;(first_name!="")
+          <a href="%prefix;%person.access;">%person;</a>%nn;
+          %if;wizard;<a href="%prefix;m=MOD_IND&i=%person.index;">%end;%person.dates;%nn;
+          %if;wizard;</a>%end; %person.title;
+        %elseif;is_note;
+          - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
+          %if;(note.part!="");v=%note.part;%end;">
+          <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
+          </i></a>
+          %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
+            </span>%nn;
+          %end;
+        %else;
+          %key;
+        %end;
         </td>
         <td>
           %if;(user!="")
             <i>
-              %if;(wiz="")
+              %if;(e.wiz="")
                 <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
               %else;
                 %user;
@@ -96,7 +111,7 @@
             %if;(first_name!="" and person.has_history)
               <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-clock-rotate-left fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
-                <span class="sr-only">[history]</span></a>
+                <span class="visually-hidden">[history]</span></a>
             %else;
               &nbsp;
             %end;
@@ -117,7 +132,7 @@
   %elseif;(uu = "cb")[copy portrait to blason]0%nn;
   %elseif;(uu = "cd")[copy image to blason]0%nn;
   %elseif;(uu = "cn")[change children's names]%nn;
-  %elseif;(uu = "db")[delete::coat of arms]0%nn;
+  %elseif;(uu = "db")[delete::blason/blasons]0%nn;
   %elseif;(uu = "dc")[delete::image/images]0 [from carrousel]%nn;
   %elseif;(uu = "df")[delete::family/families]0%nn;
   %elseif;(uu = "dp")[delete::person/persons]0%nn;
@@ -125,6 +140,7 @@
   %elseif;(uu = "d?")[delete::unknown]0%nn;
   %elseif;(uu = "ff")[merge::family/families]1%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
+  %elseif;(uu = "fa")[modify::first name alias]0%nn;
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
   %elseif;(uu = "if")[invert::family/families]1%nn;
   %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
@@ -138,58 +154,55 @@
   %elseif;(uu = "mt")[modify::title/titles]0%nn;
   %elseif;(uu = "mu")[modify::public name]0%nn;
   %elseif;(uu = "mx")[modify::qualifier/qualifiers]0%nn;
-  %elseif;(uu = "rb")[restore::coat of arms]0%nn;
+  %elseif;(uu = "rb")[restore::blason/blasons]0%nn;
   %elseif;(uu = "rc")[restore::carrousel image]%nn;
   %elseif;(uu = "rp")[restore::portrait]%nn;
   %elseif;(uu = "sp")[send::portrait]%nn;
-  %elseif;(uu = "sb")[send::coat of arms]%nn;
+  %elseif;(uu = "sb")[send::blason/blasons]0%nn;
   %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "sf")[send::image/images]0 [to carrousel]%nn;
+  %elseif;(uu = "sf" or uu = "sx")[send::image/images]0 [to carrousel]%nn;
   %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
+  %elseif;(uu = "sa")[modify::surname alias]0%nn;
   %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "sx")[send::unknown]0%nn;
   %elseif;(uu = "s?")[send::unknown]0%nn;
   %else;%apply;interp(uu) %nn;
   %end;
 %end;
 
 %define;nav()
-  %if;(pos!="")
-   <form class="form-inline" method="get" action="%action;">
-     %hidden;
-     <input type="hidden" name="m" value="HIST">
-     <input type="hidden" name="k" value="%e.k;">
-     <input type="hidden" name="pos" value="%pos;">
-     <div class="input-group">
-       <button type="submit" class="btn btn-outline-primary ml-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
-       %if;(wiz!="")
-         <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
-       %end;
-     </div>
-   </form>
+  <div class="d-flex gap-2 mb-2">
+  %if;(e.pos!="")
+    <button type="button" class="btn btn-outline-primary" id="hist-back" title="[*previous]">%nn;
+      <i class="fa fa-backward fa-fw" aria-hidden="true"></i></button>
   %end;
-%end;
-
-%if;(not cancel_links and (e.m!="HIST_SEARCH" or not found))
-  <div class="d-flex justify-content-between mt-2 px-1">
-    <div class="order-1">%apply;search_form()</div>
-    <div class="d-none order-3">%apply;table()</div>
-    <div class="order-2">%apply;nav()</div>
+  %if;(e.pos!="" or pos>0)<span class="align-self-center">%pg;</span>%end;
+  %if;(pos>0)
+    <form method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="HIST">
+      <input type="hidden" name="k" value="%kk;">
+      <input type="hidden" name="pos" value="%pos;">
+      <input type="hidden" name="pg" value="%expr(pg+1)">
+      %if;(e.s!="")<input type="hidden" name="s" value="%e.s.ns;">%end;
+      %if;(e.c="on")<input type="hidden" name="c" value="on">%end;
+      %if;(e.wiz!="")<input type="hidden" name="wiz" value="%e.wiz;">%end;
+      <button type="submit" class="btn btn-outline-primary" title="[*next]"><i class="fa fa-forward fa-fw" aria-hidden="true"></i></button>
+    </form>
+  %end;
   </div>
 %end;
-%apply;table()
 
-%if;(e.m="HIST_SEARCH" and found)
-  <div class="d-flex justify-content-between px-1">
-    %apply;search_form()
-    %apply;nav()
-  </div>
-%end;
+<div class="d-flex flex-wrap align-items-start column-gap-3">
+  %if;not cancel_links;<div class="order-1">%apply;search_form()</div>%end;
+  <div class="order-3 w-100">%apply;table()</div>
+  %if;not cancel_links;<div class="order-2 ms-auto">%apply;nav()</div>%end;
+</div>
 
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 %include;js
+%query_time;
 </body>
 </html>

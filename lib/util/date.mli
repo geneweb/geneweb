@@ -1,31 +1,35 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-
 val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
 val nb_days_in_month : int -> int -> int
-(** Returns number of days for the given month and year for
-    gregorian calendar. Takes into account leap years. *)
+(** Returns number of days for the given month and year in the Gregorian
+    calendar. Takes leap years into account. Returns [0] for [month = 0]
+    (partial dates) or invalid months (> 12). Note: Calendars with 13 months
+    (Hebrew embolismic, French complementary) are not supported by this
+    function. *)
 
-val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
-(** [time_elapsed start stop]
-    Compute the time elapsed between [start] and [stop].
-    If [stop] is prior to [start], resulting [dmy]'s field
-    are negative (but correct).
-    Resulting [prec] can be:
+val time_elapsed : Adef.dmy -> Adef.dmy -> Adef.dmy
+(** [time_elapsed start stop] Compute the time elapsed between [start] and
+    [stop]. If [stop] is prior to [start], resulting [dmy]'s field are negative
+    (but correct). Resulting [prec] can be:
     - [Sure] for exact duration
     - [Before] for "less than" duration
     - [After] for "more than" duration
-    - [Maybe] for other cases
-    Used to compare only gregorian calendar's dates.
- *)
+    - [Maybe] for other cases Used to compare only gregorian calendar's dates.
 
-val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
-(** Same as [time_elapsed], but will return [None]
-    if computation is not possible
-    (e.g. time_elapsed_opt /1839 /1859). *)
+    Handles partial dates: [day=0] means unknown day, [month=0] means unknown
+    month. Result precision degrades appropriately:
+    - [/1850] to [12/07/1900] returns [0/7/50] (50 years, 7 months)
+    - [/1850] to [/1900] returns [0/0/50] (50 years)
+
+    Note: The result is a [dmy] structure used to represent duration, not an
+    actual date. *)
+
+val time_elapsed_opt : Adef.dmy -> Adef.dmy -> Adef.dmy option
+(** Same as [time_elapsed], but will return [None] if computation is not
+    possible (e.g. time_elapsed_opt /1839 /1859). *)
 
 (* TODO add date_of_burial/event?  *)
 val dmy_of_death : Def.death -> Adef.dmy option
@@ -33,56 +37,129 @@ val dmy_of_death : Def.death -> Adef.dmy option
 val date_of_death : Def.death -> Adef.date option
 (** Returns date of death if present. *)
 
-val dmy_of_dmy2 : dmy2 -> dmy
-(** [dmy_of_dmy2 dmy2]
-    Convert a [dmy2] to [dmy] using [Sure] as precision. *)
+val dmy_of_dmy2 : Adef.dmy2 -> Adef.dmy
+(** [dmy_of_dmy2 dmy2] Convert a [dmy2] to [dmy] using [Sure] as precision. *)
 
-exception Not_comparable
-(** [Not_comparable] is raised by [compare_dmy] and [compare_date] when
-    [strict] mode is used and precision of dates are incompatibles to
-    have a reliable result (e.g. is [compare_dmy 2019 07/2019]) or when
-    one of the date in [compare_date] is [Dtext]. *)
+val compare_dmy : Adef.dmy -> Adef.dmy -> int
+(** [compare_dmy d1 d2] Compare two dates as points on a timeline. Return a
+    negative integer if [d1] is prior to [d2], [0] if [d1] is equal to [d2], and
+    a positive integer if [d2] is prior to [d1]. Date precision is handled
+    permissively: dates with uncertain precision ([About], [Maybe]) are
+    comparable with precise dates. An unknown month or day precedes any known
+    value, unless its precision is [After]. This function always returns a
+    result and can be used for sorting. *)
 
-val compare_dmy : ?strict:bool -> dmy -> dmy -> int
-(** [compare_dmy ?strict d1 d2]
-    Return a negative integer if [d1] is prior to [d2],
-    [0] if [d1] is equal to [d2],
-    and a positive integer if [d2] is prior to [d1].
-    [strict] parameter enable or disable strict mode, and
-    is false by default (see [Not_comparable])
-*)
+val compare_dmy_period : Adef.dmy -> Adef.dmy -> int
+(** [compare_dmy_period d1 d2] Compare [d1] and [d2] at their common precision:
+    a month or day unknown in either date is ignored in both, so a partial date
+    equals any date of its period ([1900] equals [15/06/1900]). Intended for
+    range filters and for sorts that must keep the stored order when dates are
+    not comparable at full precision. Not transitive: unsuitable for display
+    sorts or priority queues. *)
 
-val compare_dmy_opt : ?strict:bool -> dmy -> dmy -> int option
-(** [compare_dmy_opt ?strict d1 d2]
-    Same as [compare_dmy], but do not raise an exception
-*)
+val compare_dmy_strict : Adef.dmy -> Adef.dmy -> int option
+(** [compare_dmy_strict d1 d2] Compare two dates with strict precision handling.
+    Return [None] if dates cannot be reliably compared due to incompatible
+    precision (e.g. comparing [2019] with [07/2019], or [Before 1850] with
+    [After 1840]). Return [Some x] with the same semantics as [compare_dmy] when
+    comparison is meaningful. Do not use for sorting lists as it may return
+    [None]. *)
 
-val compare_date : ?strict:bool -> date -> date -> int
-(** [compare_date d1 d2]
-    If both [d1] and [d2] are [Dgreg] date, uses [compare_dmy]
-    to compare them.
-    [Dtext] dates are always considered prior to any [Dgreg] date,
-    and equal to any other [Dtext] date.
-    [strict] parameter enable or disable strict mode, and
-    is false by default (see [Not_comparable])
-*)
+val compare_date : Adef.date -> Adef.date -> int
+(** [compare_date d1 d2] Compare two dates using [compare_dmy] if both are
+    [Dgreg] dates. [Dtext] dates are always considered prior to any [Dgreg]
+    date, and equal to any other [Dtext] date. Always returns a result and can
+    be used for sorting. *)
 
-val cdate_None : cdate
+val compare_date_period : Adef.date -> Adef.date -> int
+(** [compare_date_period d1 d2] Same as [compare_date], using
+    [compare_dmy_period] for [Dgreg] dates. *)
+
+val compare_date_strict : Adef.date -> Adef.date -> int option
+(** [compare_date_strict d1 d2] Strict comparison of dates. Return [None] if
+    dates are not reliably comparable (different types, or incompatible
+    precision for [Dgreg] dates). Return [Some x] with same semantics as
+    [compare_date] otherwise. Do not use for sorting lists. *)
+
+val cdate_None : Adef.cdate
 (** Absent compressed date *)
 
-val date_of_cdate : cdate -> date
-(** Convert [cdate] to [date]; fail if [cdate] is [Cnone]  *)
+val date_of_cdate : Adef.cdate -> Adef.date
+(** Convert [cdate] to [date]; fail if [cdate] is [Cnone] *)
 
-val od_of_cdate : cdate -> date option
+val od_of_cdate : Adef.cdate -> Adef.date option
 (** Optional date from [cdate] *)
 
-val cdate_to_dmy_opt : cdate -> dmy option
+val cdate_to_dmy_opt : Adef.cdate -> Adef.dmy option
 (** [cdate_to_dmy_opt d] is [Some dmy] iff [d] resolve to [Dgreg (dmy,_)] *)
 
-val cdate_of_date : date -> cdate
+val cdate_of_date : Adef.date -> Adef.cdate
 (** Convert [date] to [cdate] *)
 
-val cdate_of_od : date option -> cdate
+val cdate_of_od : Adef.date option -> Adef.cdate
 (** Optional date to [cdate] *)
 
 (* TODO date_to_dmy? *)
+
+val to_sdn : from:Adef.calendar -> ?lower:bool -> Adef.dmy -> int
+(** Convert [dmy] in calendar [from] to SDN (Serial Day Number). For partial
+    dates (day=0 or month=0), returns lower bound by default. Set [lower:false]
+    for upper bound. Includes [delta] in result. *)
+
+val convert : from:Adef.calendar -> to_:Adef.calendar -> Adef.dmy -> Adef.dmy
+(** Convert [dmy] between calendars via Gregorian pivot. Partial dates pass
+    through unchanged (no valid SDN representation). Preserves [prec] including
+    OrYear/YearInt variants. *)
+
+val gregorian_of_sdn : prec:Adef.precision -> int -> Adef.dmy
+(** Convert SDN to Gregorian [dmy] with given precision. *)
+
+val julian_of_sdn : prec:Adef.precision -> int -> Adef.dmy
+(** Convert SDN to Julian [dmy] with given precision. *)
+
+val french_of_sdn : prec:Adef.precision -> int -> Adef.dmy
+(** Convert SDN to French Republican [dmy] with given precision. *)
+
+val hebrew_of_sdn : prec:Adef.precision -> int -> Adef.dmy
+(** Convert SDN to Hebrew [dmy] with given precision. *)
+
+val approx_gregorian : from:Adef.calendar -> Adef.dmy -> Adef.dmy
+(** [approx_gregorian ~from d] ensures [d] contains meaningful Gregorian values.
+    For complete non-Gregorian dates, returns [d] unchanged (already converted
+    at import). For partial non-Gregorian dates (day=0 or month=0), converts via
+    SDN midpoint of the period preserving partial fields. *)
+
+val cdate_to_gregorian_dmy_opt : Adef.cdate -> Adef.dmy option
+(** Like [cdate_to_dmy_opt] but ensures the returned [dmy] contains Gregorian
+    values even for partial non-Gregorian dates. *)
+
+val days_between : from:Adef.calendar -> Adef.dmy -> Adef.dmy -> int option
+(** Total days between two complete dates. Returns [None] if either date is
+    partial (day=0 or month=0) or if d2 < d1. *)
+
+val time_elapsed_cal : from:Adef.calendar -> Adef.dmy -> Adef.dmy -> Adef.dmy
+(** Like [time_elapsed] but converts dates to Gregorian first if needed. Allows
+    computing intervals between dates in any calendar. *)
+
+type age = {
+  nb_year : int;
+  nb_month : int;
+  nb_day : int;
+  prec : Adef.precision;
+}
+(** Age/interval result with named fields. *)
+
+val age_between : from:Adef.calendar -> Adef.dmy -> Adef.dmy -> age option
+(** Compute age between two dates. Returns [None] if d2 < d1. Uses SDN for
+    validation on complete dates. *)
+
+type relative_pos =
+  | Before of age
+  | After of age
+  | Same  (** Position of target relative to reference date. *)
+
+val relative_age :
+  from:Adef.calendar -> ref:Adef.dmy -> Adef.dmy -> relative_pos option
+(** Position and distance of date relative to reference. [Before age] means date
+    is [age] before ref. [After age] means date is [age] after ref. Returns
+    [None] if comparison impossible (incompatible partial dates). *)

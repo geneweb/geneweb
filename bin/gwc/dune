@@ -1,0 +1,15 @@
+(generate_sites_module
+ (module sites)
+ (sites geneweb))
+
+(library
+ (name gwcomp)
+ (libraries geneweb)
+ (modules gwcomp))
+
+(executable
+ (package geneweb)
+ (name gwc)
+ (public_name gwc)
+ (libraries unix gwcomp dune-site)
+ (modules gwc db1link sites))

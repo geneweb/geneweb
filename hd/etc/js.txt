@@ -1,26 +1,22 @@
-<!-- $Id: js.txt v7.1 10/01/2025 04:15:45 $ -->
+<!-- $Id: js.txt v7.1 03/10/2026 01:19:36 $ -->
+%if;not cancel_links;
+%( Edit pages: is_upd_ind and is_upd_fam are set by the person and family
+   form printers, so a *_OK result page is not taken for a form; notes
+   editors, see bin/gwd/request.ml. %)
+%let;upd_form;%if;(is_upd_ind or is_upd_fam)1%end;%in;
+%let;upd_notes;%if;(e.m="MOD_NOTES" or e.m="MOD_NOTES_OK" or e.m="MOD_WIZNOTES" or e.m="MOD_WIZNOTES_OK")1%end;%in;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
-            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
-                       sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
-                       sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
+                       sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
+                       sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha256-GRJrh0oydT1CwS36bBeJK/2TggpaUQC6GzTaTQdZm0k=
-                       sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct
-                       sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
-      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
-              integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
-                         sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
-                         sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ=="
-              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdn.jsdelivr.net/npm/maximize-select2-height@1.0/maximize-select2-height.min.js"
-              integrity="sha256-rOpd4voNU/iOOklhdb2rhwe4OaXfo7vIO3f7Tc8xe0o=
-                         sha384-/Pca3vtmH/c7JiUJVMPvoo2SCkKgnjpJyBqTvCPmkDGYhFzSeIBZp/UJ7PZY7/+G
-                         sha512-NHHjSaRwEJ7OOPdQlvxa0gYbL9Np67IYbl+yJ3jDCTUxCCGKhCNlX77eacvuKmf4RszZBA8Elh71V26SKmElWA=="
+    %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
+      <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/js/tom-select.complete.min.js"
+              integrity="sha256-/xuwMq7lcOSlC8tEFkJsHCEM/2U2rqAn3Fhp+pCz0qY=
+                         sha384-A/OhuVi7Pu3OK0LZqDw5rUUVpqZdcqxIyZTjfjxT0v8Y3VsdpFvQChtHCOSobZTL
+                         sha512-iYRFjWzVbUrSMW1pEM3z1uQlMBLr66Up/W6q/IFWb7PR1pvTz22ntvG5rQUSxH99kUsaafhb6qPbSm3j6AQvrQ=="
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
@@ -30,392 +26,361 @@
                           sha512-Bb1WXpqE5T4DNZzNLvoK3ABggd1ycVuM5kKvKamvvjc0bD7/9AAWJx1J4lra90R9qGFRH6zbQEFuUk253WNmBw=="
                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
+    %if;(e.m="STATS")
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+              integrity="sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo=
+                         sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ
+                         sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
   %else;
-    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
-    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
-    %if;((e.m="A" and e.t="") or "NOTES" in e.m)
-      <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
-      <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
+    %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
+      <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.6.0"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
-      <script src="%etc_prefix;js/regex.js?version=4.4.0"></script>
+      <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
+    %end;
+    %if;(e.m="STATS")
+      <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;
-  %if;(e.m="A" and e.t="T" and e.t1="CT")
-    <script src="%etc_prefix;js/jquery.line.js"></script>
+  %( autocomplete.js serves the welcome page and form fields: from the RPC
+     server with rpc_datalist=1 (self-configured by the data-* attributes),
+     from the .gz files otherwise (initialised by populateDatalists' block). %)
+  %if;(is_welcome or upd_form=1)
+    %let;rpc_addr;%if;(b.rpc_server_url!="")%b.rpc_server_url;%else;127.0.0.1%end;%in;
+    <script>
+    window.AC_TRANSLATIONS = {
+      labels: {
+        prefix: "[starts with/contains/approximate]0",
+        internal: "[starts with/contains/approximate]1",
+        fuzzy: "[starts with/contains/approximate]2"
+      },
+      hints: {
+        navigate: "[navigate/scroll/columns/select/close]0",
+        page: "[navigate/scroll/columns/select/close]1",
+        columns: "[navigate/scroll/columns/select/close]2",
+        select: "[navigate/scroll/columns/select/close]3",
+        close: "[navigate/scroll/columns/select/close]4"
+      },
+      result: "[result/results]0",
+      results: "[result/results]1"
+    };
+    </script>
+    <script src="%etc_prefix;js/autocomplete.min.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.min.js%end;"
+      %if;(b.rpc_datalist=1)data-rpc="%if;("/" in rpc_addr)%rpc_addr;%elseif;(":" in rpc_addr)%rpc_addr;/search%else;%rpc_addr;:8080/search%end;"
+      data-base="%base.name;" data-debug="%if;(b.rpc_debug="yes")1%end;"%end;></script>
   %end;
+  %if;(e.m="A" and e.t="T" and (e.t1="m" or e.t1="CT"))
+    <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
+  %end;
+  %if;(e.m="CHK_DATA")
+    <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
+  %end;
+  %if;(e.m="RM")
+    <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
+  %end;
+  %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
+  %if;(upd_form=1 or e.m="MOD_GALLERY" or e.m="UNKNOWN")
+   <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;" data-clear-title="[*clear input]"></script>
+  %end;
+  %if;(e.m="UNKNOWN")
+   <script>document.addEventListener('DOMContentLoaded', addClearButtonToInputs);</script>
+  %end;
+%end;
+%if;(e.v="updRLM" or e.m="MRG" or upd_form=1)
+<script>
+window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
+</script>
+<script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
+%end;
+%if;(e.m="C" and e.t="")
+<script src="%etc_prefix;js/cousins.min.js?hash=%apply;hash%with;%etc_prefix;js/cousins.min.js%end;"></script>
+%end;
+%if;(e.m="CHK_DATA")
+<script>
+  function showOverlay() {
+    document.querySelector('.loading-overlay')?.classList.remove('hidden');
+  }
+  function hideOverlay() {
+    document.querySelector('.loading-overlay')?.classList.add('hidden');
+  }
+  window.addEventListener('pageshow', hideOverlay);
+</script>
+%end;
+%if;(e.m="CHG_CHN")
+<script>
+{
+  const all = document.getElementById('chn_all');
+  all?.form.addEventListener('submit', () => {
+    const v = all.value.trim();
+    if (v) all.form.querySelectorAll('input[name$=_surname]').forEach(i => { i.value = v; });
+  });
+}
+</script>
+%end;
+%if;(e.m="HIST" and e.pos!="")
+<script>
+document.getElementById('hist-back')?.addEventListener('click', () => history.back());
+</script>
 %end;
 %if;(not is_welcome and e.m!="MOD_DATA")
   %if;wizard;
     %if;(e.m="MOD_DATA_OK" and e.data!="")
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*modification successful]" ||
-            htmlTitle == "[*no modification]") {
-          document.getElementById("reference").focus();
+        if (htmlTitle == `[*modification successful]` ||
+            htmlTitle == `[*no modification]`) {
+          document.getElementById("reference")?.focus();
         }
       </script>
     %end;
     %if;(e.m="MOD_IND_OK" or e.m="MOD_FAM_OK"
-       or e.m="ADD_FAM_OK" or e.m="DEL_FAM_OK"
-       or e.m="SND_IMAGE_OK" or e.m="DEL_IMAGE_OK"
+       or e.m="ADD_FAM_OK" or e.m="ADD_PAR_OK"
+       or e.m="DEL_FAM_OK" or e.m="CHG_CHN_OK"
        or e.m="CHG_EVT_IND_ORD_OK" or e.m="CHG_EVT_FAM_ORD_OK"
-       or e.m="CHG_CHN_OK"
+       or e.m="DEL_IMAGE_OK" or e.m="SND_IMAGE_OK"
        or (e.m="MOD_DATA_OK" and e.data=""))
       <script>
         var htmlTitle = document.title;
-        if (htmlTitle == "[*person modified]" ||
-            htmlTitle == "[*person added]"    ||
-            htmlTitle == "[*image received]"  ||
-            htmlTitle == "[*image deleted]"   ||
-            htmlTitle == "[*modification successful]") {
-            document.getElementById("i%e.i;").focus();
+        if (htmlTitle == `[*person modified]` ||
+            htmlTitle == `[*person added]`    ||
+            htmlTitle == `[*image received]`  ||
+            htmlTitle == `[*image deleted]`   ||
+            htmlTitle == `[*modification successful]`) {
+            document.getElementById("i%e.i;")?.focus();
         }
-        else if (htmlTitle == "[*family modified]" ||
-                 htmlTitle == "[*family added]"    ||
-                 htmlTitle == "[*family deleted]"  ||
-                 htmlTitle == "[*children's names changed]") {
-            document.getElementById("i%e.ip;").focus();
+        else if (htmlTitle == `[*family modified]` ||
+                 htmlTitle == `[*family added]`    ||
+                 htmlTitle == `[*family deleted]`  ||
+                 htmlTitle == `[*children's names changed]`) {
+            document.getElementById("i%e.ip;")?.focus();
         }
       </script>
     %end;
-    %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
-    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
-      <script>$('body').scrollspy({ target: '#banner' })</script>
-    %end;
   %end;
 %end;
-%if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
-    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES"
-    or (e.m="MOD_DATA" and (e.data="src" or e.data="occu")))
+%if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or "SND_IMAGE_C" in e.m
+    or upd_notes=1 or e.m="MOD_GALLERY" or (e.m="MOD_DATA" and (e.data="src" or e.data="occu" or e.data="place")))
   %if;(b.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"
-      integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"
+            integrity="sha256-VCHx3GCDnd156mCM5EM9bJTj7mhMrrwg2tAab9B1vQs=
+                       sha384-Q9KD03bmEL9H3t9KOxcdN2YplobIplv9iv7srJG5fI9U22Pw0uvKgHwtI32TTG3U
+                       sha512-OjjaC+tijryqhyPqy7jWSPCRj7fcosu1zreTX1k+OWSwu6uSqLLQ2kxaqL9UpR7xFaPsCwhMf1bQABw2rCxMbg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   %else;
-     <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
+     <script src="%etc_prefix;js/autosize.min.js?version=6.0.1"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
-%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+%if;((e.m="A" or e.m="D") and e.t="")
 <script>
-  $(document).ready(function() {
-    $('.transfer-btn').click(function() {
-      var commentContent = $('#notes_comments').val();
-      var mariageEvent = $('[data-marr]').attr('id');
-      $('#' + mariageEvent).val(commentContent);
-      $('#notes_comments').val('');
-      autosize.update($('#' + mariageEvent));
-      $(this).hide();
+function initBsValidation() {
+  document.querySelectorAll('.needs-validation').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
     });
   });
+}
+document.addEventListener('DOMContentLoaded', initBsValidation);
 </script>
 %end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
-<script%if;(e.templ!="") type="text/javascript"%end;>
- <!--
-   $("#btnshowfilter").on("click", function() {
-    var nbinput = $('input.filter:text:disabled').length;
-    if (nbinput == 5) {
-      $('#input1').prop('disabled', false);
-      $('#filterbysurname').removeClass("d-none");
-      $('#total').addClass("text-muted");
-      $('#input1').focus(); }
-    else {
-      $('.filter').prop('disabled', true);
-      $('#filterbysurname').addClass("d-none");
-      $('#total').removeClass("text-muted"); }
-  });
-  $("#btnplus").on("click", function() {
-    var len = $('.filter:text:not(:disabled)').length + 1;
-    $('#input'+len).removeClass("d-none").prop('disabled', false).focus();
-    if (len == 5) { $("#btnplus").addClass("disabled").attr('tabindex', '-1'); }
-  });
-  $("#btnclear").on("click", function() {
-    $('.extrafilter').val('').addClass("d-none").prop('disabled', true);
-    $('#input1').val('').focus();
-    $('#btnplus').removeClass('disabled').removeAttr('tabindex');
-    $('*[data-surname]').removeClass("d-none");
-  });
-  $('.filter').on("input", function(e) {
-    var input1 = $("#input1").val();
-    var input2 = $("#input2").val();
-    var input3 = $("#input3").val();
-    var input4 = $("#input4").val();
-    var input5 = $("#input5").val();
-    if (input1 == "") { var input1 = "_"; }
-    $('[data-surname]').addClass("d-none");
-    $('[data-surname*="' + input1 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input2 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input3 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input4 + '"]').removeClass("d-none");
-    $('[data-surname*="' + input5 + '"]').removeClass("d-none");
-  });
-  function implex(xx) {
-    $('[class^="sosa_"]').css("background-color","");
-    $('.sosa_'+xx).add('.sosa_implex_'+xx).css("background-color","#CCFFFF");
-  }
-  function implexdesc(xx) {
-    $('a[data-index]').css("background-color","");
-    $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
-  }
-  -->
-</script>
-%end;
-%( Functions for character.txt %)
-%if;("ADD" in e.m or "MOD" in e.m)
 <script>
-  // Attach a click event listener to each anchor element within the character's list container
-  function setupCharacterInsertion() {
-    document.querySelectorAll('.ch a').forEach(function (element) {
-      element.addEventListener('click', function (event) {
-        event.preventDefault();
-        var textarea = document.querySelector('.insert-character-target');
-        insertCharacter(textarea, this.innerText);
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterbysurname');
+    const btnShow = document.getElementById('btnshowfilter');
+    const btnPlus = document.getElementById('btnplus');
+    const btnClear = document.getElementById('btnclear');
+    const totalEl = document.getElementById('total');
+    const filters = document.querySelectorAll('input.filter');
+    const extraFilters = document.querySelectorAll('input.extrafilter');
+
+    if (!btnShow || !filterForm) return;
+
+    btnShow.addEventListener('click', function() {
+      const allDisabled = Array.from(filters)
+        .every(function(el) { return el.disabled; });
+      if (allDisabled) {
+        const input1 = document.getElementById('input1');
+        input1.disabled = false;
+        filterForm.classList.remove('d-none');
+        if (totalEl) totalEl.classList.add('text-body-secondary');
+        input1.focus();
+      } else {
+        filters.forEach(function(el) { el.disabled = true; });
+        filterForm.classList.add('d-none');
+        if (totalEl) totalEl.classList.remove('text-body-secondary');
+      }
+    });
+
+    if (btnPlus) {
+      btnPlus.addEventListener('click', function() {
+        const activeCount = Array.from(filters)
+          .filter(function(el) { return !el.disabled; }).length;
+        const next = document.getElementById('input' + (activeCount + 1));
+        if (!next) return;
+        next.classList.remove('d-none');
+        next.disabled = false;
+        next.focus();
+        if (activeCount + 1 === 4) {
+          btnPlus.classList.add('disabled');
+          btnPlus.setAttribute('tabindex', '-1');
+        }
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', function() {
+        extraFilters.forEach(function(el) {
+          el.value = '';
+          el.classList.add('d-none');
+          el.disabled = true;
+        });
+        const input1 = document.getElementById('input1');
+        input1.value = '';
+        input1.focus();
+        btnPlus.classList.remove('disabled');
+        btnPlus.removeAttribute('tabindex');
+        document.querySelectorAll('[data-surname]')
+          .forEach(function(el) { el.classList.remove('d-none'); });
+      });
+    }
+
+    const surnames = document.querySelectorAll('[data-surname]');
+    filters.forEach(function(input) {
+      input.addEventListener('input', function() {
+        const vals = %['input1', 'input2', 'input3', 'input4'%]
+          .map(function(id) { return document.getElementById(id).value; });
+        if (vals%[0%] === '') vals%[0%] = '_';
+        surnames.forEach(function(el) {
+          const sn = el.dataset.surname;
+          el.classList.toggle('d-none',
+            !vals.some(function(v) { return v !== '' && sn.includes(v); }));
+        });
       });
     });
+  });
+
+  function implex(xx) {
+    document.querySelectorAll('[class^="sosa_"]').forEach(function(el) {
+      el.style.backgroundColor = '';
+    });
+    document.querySelectorAll('.sosa_' + xx + ', .sosa_implex_' + xx)
+      .forEach(function(el) { el.style.backgroundColor = '#CCFFFF'; });
   }
 
-  // Function to insert a character at the current cursor position in a textarea
-  function insertCharacter(t, v) {
-    var startPos = t.selectionStart;
-    var endPos = t.selectionEnd;
-    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
-    t.selectionStart = startPos + v.length;
-    t.selectionEnd = t.selectionStart;
-    t.focus();
+  function implexdesc(xx) {
+    document.querySelectorAll('a[data-index]').forEach(function(a) {
+      a.style.backgroundColor = '';
+    });
+    document.querySelectorAll('a[data-index="' + xx + '"]')
+      .forEach(function(a) { a.style.backgroundColor = '#CCFFFF'; });
   }
+</script>
+%end;
+%( Toolbar (toolbar.txt) and special characters (characters.txt) of the editors. %)
+%if;(upd_form=1 or upd_notes=1)
+<script>
 function insertTags(tagOpen, tagClose, sampleText) {
-  const textarea = document.querySelector('textarea#notes_comments');
-  if (!textarea) return false;
-
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const scrollTop = textarea.scrollTop;
-
-  let selectedText = textarea.value.substring(start, end);
-  if (!selectedText) selectedText = sampleText;
-
-  // Remove trailing space if exists
-  if (selectedText.endsWith(' ')) {
-    selectedText = selectedText.slice(0, -1);
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + ' ' + after;
-  } else {
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    textarea.value = before + tagOpen + selectedText + tagClose + after;
-  }
-
-  // Restore scroll position
-  textarea.scrollTop = scrollTop;
-
-  // Set selection
+  const ta = document.querySelector('textarea#notes_comments');
+  if (!ta) return false;
+  const { selectionStart: start, selectionEnd: end, scrollTop } = ta;
+  let sel = ta.value.substring(start, end) || sampleText;
+  %( Keep a trailing space of the selection outside the closing tag. %)
+  const trail = sel.endsWith(' ') ? ' ' : '';
+  if (trail) sel = sel.slice(0, -1);
+  ta.setRangeText(tagOpen + sel + tagClose + trail, start, end);
+  ta.scrollTop = scrollTop;
+  const pos = start + tagOpen.length;
   if (start === end) {
-    // No text was selected
-    const cursorPos = start + tagOpen.length;
-    textarea.setSelectionRange(cursorPos, cursorPos + sampleText.length);
+    ta.setSelectionRange(pos, pos + sampleText.length);
   } else {
-    // Text was selected
-    const newCursorPos = start + tagOpen.length + selectedText.length + tagClose.length;
-    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    const after = pos + sel.length + tagClose.length;
+    ta.setSelectionRange(after, after);
   }
-
-  textarea.focus();
+  ta.focus();
   return false;
 }
-// Toolbar sticky behavior
-function setupToolbarSticky() {
-  const toolbar = document.querySelector('.toolbar-wrapper');
-  if (!toolbar) return;
-
-  let lastScroll = window.scrollY;
-
-  function handleScroll() {
-    const currentScroll = window.scrollY;
-    if (currentScroll > 0) {
-      toolbar.classList.add('is-sticky');
-    } else {
-      toolbar.classList.remove('is-sticky');
-    }
-    lastScroll = currentScroll;
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('notes-wide');
+  const ta = document.getElementById('notes_comments');
+  if (!btn || !ta) return;
+  const col = ta.parentElement;
+  const side = ta.closest('.row').lastElementChild;
+  const fit = () => {
+    if (btn.getAttribute('aria-pressed') !== 'true') return;
+    const gap = 2 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    ta.style.width = (document.documentElement.clientWidth - 2 * gap) + 'px';
+    ta.style.marginLeft = '0';
+    ta.style.marginLeft = (gap - ta.getBoundingClientRect().left) + 'px';
+  };
+  btn.addEventListener('click', () => {
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', on);
+    btn.classList.toggle('text-danger', on);
+    col.classList.toggle('col-9', !on);
+    side.classList.toggle('d-none', on);
+    ta.classList.toggle('ms-2', !on);
+    if (on) fit();
+    else ta.style.width = ta.style.marginLeft = '';
+  });
+  window.addEventListener('resize', fit);
+});
+%if;(e.templ="")
+document.addEventListener('click', function(event) {
+  const a = event.target.closest('.ch a');
+  if (!a) return;
+  event.preventDefault();
+  const t = document.querySelector('.insert-character-target');
+  if (!t) return;
+  t.setRangeText(a.textContent, t.selectionStart, t.selectionEnd, 'end');
+  t.focus();
+});
+%end;
 </script>
 %end;
 %( Popover functions for anc/destables %)
 %if;((e.m="A" and e.t="Z") or (e.m="D" and (e.t="H" or e.t="I")))
 <script>
-$('[data-toggle="popover"]').popover({
-  html: true,
-  trigger: "focus",
-  delay: { hide: 250 }
-})
-$('.popover-dismiss').popover({
-  trigger: 'focus'
-})
-$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+  new bootstrap.Popover(el, {
+    html: true,
+    trigger: 'focus',
+    delay: { hide: 250 },
+    allowList: {
+      ...bootstrap.Tooltip.Default.allowList,
+      dl: [],
+      dt: [],
+      dd: []
+    }
+  });
+});
+%( BS5 moves title= to data-bs-original-title on popovers; restore it as a native hover tooltip. %)
+document.querySelectorAll('[data-bs-toggle="popover"][data-bs-original-title]').forEach(el => {
+  const helpText = el.getAttribute('data-bs-original-title');
+  if (helpText) {
+    el.addEventListener('mouseenter', () => el.setAttribute('title', helpText));
+    el.addEventListener('mouseleave', () => el.removeAttribute('title'));
+  }
+});
 </script>
 %end;
-%( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
-%if;(not is_welcome)
+%( Ctrl+click on an input with data-book opens its MOD_DATA book. %)
+%if;(wizard and (is_welcome or upd_form=1 or e.m="MOD_GALLERY"))
 <script>
-// Enhanced clear button management for dynamic input fields
-// Add clear buttons (X) to input fields and handle DataTable updates
-// Generic clear button functionality for form inputs
-
-function addClearButtonToInputs() {
-    // Utility function to create and setup clear button
-    function createClearButton(element) {
-        const clearButton = document.createElement('i');
-        clearButton.className = 'fas fa-xmark clear-button-icon';
-        clearButton.title = '[*clear input]';
-
-        clearButton.style.cssText = `
-            position: absolute;
-            right: 10px;
-            top: ${element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%'};
-            transform: ${element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)'};
-            cursor: pointer;
-            color: #667fc9;
-            font-size: 1em;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
-            pointer-events: auto;
-        `;
-        return clearButton;
-    }
-
-    // Initialize or update a single input
-    function initializeInput(element) {
-        // Skip if already initialized
-        if (element.dataset.clearInitialized) {
-            const existingButton = element.parentNode.querySelector('.clear-button-icon');
-            if (existingButton) {
-                existingButton.style.opacity = element.value ? '1' : '0';
-            }
-            return;
-        }
-
-        // Mark as initialized
-        element.dataset.clearInitialized = 'true';
-
-        // Create wrapper if needed
-        let wrapper = element.parentNode;
-        if (!wrapper.classList.contains('clear-button-wrapper')) {
-            wrapper = document.createElement('div');
-            wrapper.className = 'clear-button-wrapper';
-            wrapper.style.cssText = 'position:relative;display:inline-block;width:100%';
-            element.parentNode.insertBefore(wrapper, element);
-            wrapper.appendChild(element);
-        }
-
-        // Add padding for the clear button
-        element.style.paddingRight = '24px';
-
-        // Create and append clear button
-        const clearButton = createClearButton(element);
-        wrapper.appendChild(clearButton);
-
-        // Update clear button visibility
-        const updateVisibility = () => {
-            requestAnimationFrame(() => {
-                clearButton.style.opacity = element.value ? '1' : '0';
-            });
-        };
-
-        // Event listeners
-        element.addEventListener('input', updateVisibility);
-        element.addEventListener('change', updateVisibility);
-        element.addEventListener('focus', updateVisibility);
-
-        // Hover effects
-        clearButton.addEventListener('mouseenter', () => clearButton.style.color = '#335599');
-        clearButton.addEventListener('mouseleave', () => clearButton.style.color = '#667fc9');
-
-        // Handle clear button click
-        clearButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Clear the input
-            element.value = '';
-            element.focus();
-            updateVisibility();
-
-            // Trigger events
-            const inputEvent = new CustomEvent('clearButton', {
-                bubbles: true,
-                detail: { element }
-            });
-            element.dispatchEvent(inputEvent);
-            element.dispatchEvent(new Event('input', { bubbles: true }));
-            element.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
-        // Initial visibility state
-        updateVisibility();
-    }
-
-    // Process all matching inputs
-    function processInputs() {
-        const selector = `
-            input[type="text"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            input[type="search"]:not(.no-clear-button):not([readonly]):not([disabled]),
-            textarea:not(.no-clear-button):not([readonly]):not([disabled]),
-            .clear-button:not([readonly]):not([disabled])
-        `;
-
-        requestAnimationFrame(() => {
-            document.querySelectorAll(selector).forEach(initializeInput);
-        });
-    }
-
-    // Initial processing
-    processInputs();
-
-    // Monitor DOM changes
-    const observer = new MutationObserver((mutations) => {
-        let shouldProcess = false;
-        mutations.forEach(mutation => {
-            if (mutation.addedNodes.length ||
-                mutation.type === 'attributes' &&
-                (mutation.attributeName === 'type' || mutation.attributeName === 'class')) {
-                shouldProcess = true;
-            }
-        });
-        if (shouldProcess) {
-            processInputs();
-        }
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['type', 'class']
-    });
-}
-</script>
-%end;
-<script>
-%if;(wizard and (is_welcome or "MOD_" in e.m))
-// Manages enhanced input field behaviors (navigation, interaction)
 const inputToBook = {
   addNavigation: function() {
-    // Use event delegation for dynamically added inputs
-    $(document).on('mousedown', 'input[data-book]', function(event) {
-      if (event.ctrlKey && event.button === 0) {
+    document.addEventListener('mousedown', function(event) {
+      const input = event.target.closest('input[data-book]');
+      if (input && event.ctrlKey && event.button === 0) {
         event.preventDefault();
-        inputToBook.openBook(this.value, $(this).data('book'));
+        inputToBook.openBook(input.value, input.dataset.book);
       }
     });
   },
@@ -425,12 +390,13 @@ const inputToBook = {
 
     let preVal = value;
     if (book === "place") {
-      const place = value.split(/\]\s+[-��]\s+/);
+      const place = value.split(/\]\s+[-–—]\s+/);
       preVal = place.length > 1 ? place[1] : value;
     }
 
     preVal = preVal.substring(0, Math.min(preVal.length, 12))
-                   .split(/[, ]+/)[0];
+                   .split(/[, ]+/)[0]
+                   .substring(0, Math.floor(value.length / 2));
 
     const encVal = encodeURIComponent(value);
     const encPreVal = encodeURIComponent(preVal);
@@ -439,48 +405,63 @@ const inputToBook = {
     window.open(url, '_blank');
   }
 };
+%( notes_upd_gallery.js calls addNavigation() itself. %)
+%if;(e.m!="MOD_GALLERY")inputToBook.addNavigation();%end;
+</script>
 %end;
-%if;is_welcome;
-// Controls unified search functionality with a shared submit button
-// Handles both main person search and optional title search forms
+%( Each block below runs its setup on DOMContentLoaded; their order is the
+   order of the listeners: clearinput before the floating placeholders,
+   tooltips after the modules that create elements. %)
+%if;(e.templ="")
+%if;(is_welcome and b.propose_titles!="no")
+<script>
+%( Shared submit button for the person and title search forms. %)
 function initializeWelcomeSearchFunctionality() {
-  const searchForms = {
-    main: document.getElementById('main-search'),
-    title: document.getElementById('title-search')
-  };
+  const mainForm = document.getElementById('main-search');
+  const titleForm = document.getElementById('title-search');
   const searchBtn = document.getElementById('global-search');
+  if (!searchBtn) return;
+
+  const defaultText = `[*search/case sensitive]0`;
 
   function hasInput(form) {
     return form && Array.from(form.querySelectorAll('input[type="search"]'))
                       .some(input => input.value.trim() !== '');
   }
 
-  function getTooltip() {
-    if (hasInput(searchForms.main)) {
-      return '[*search/case sensitive]0 [person/persons]0';
-    }
-    if (searchForms.title && hasInput(searchForms.title)) {
-      return '[*search/case sensitive]0 [title/titles]0/[estate]0';
-    }
-    return '';
+  function closeAlertsAndCleanURL() {
+    document.querySelectorAll('.alert').forEach(el => {
+      bootstrap.Alert.getOrCreateInstance(el).close();
+    });
+    const url = new URL(window.location.href);
+    const bParam = url.searchParams.get('b');
+    url.search = '';
+    if (bParam !== null) url.searchParams.set('b', bParam);
+    window.history.replaceState({}, '', url);
   }
 
-  $(searchBtn).tooltip({
-    title: getTooltip,
-    trigger: 'hover'
-  });
+  function updateTooltip() {
+    const instance = bootstrap.Tooltip.getInstance(searchBtn);
+    if (!instance) return;
+    let text = defaultText;
+    if (hasInput(mainForm)) text = `[*search/case sensitive]0 [person/persons]0`;
+    else if (titleForm && hasInput(titleForm)) text = `[*search/case sensitive]0 [title/titles]0/[estate]0`;
+    instance.setContent({ '.tooltip-inner': text });
+    if (text !== defaultText) {
+      instance.show();
+    } else {
+      instance.hide();
+    }
+  }
 
-  Object.values(searchForms).forEach(form => {
+  [mainForm, titleForm].forEach(form => {
     if (!form) return;
-    
     form.querySelectorAll('input[type="search"]').forEach(input => {
       input.addEventListener('input', () => {
-        $(searchBtn).tooltip('hide')
-                   .attr('data-original-title', getTooltip())
-                   .tooltip('show');
+        if (hasInput(form)) closeAlertsAndCleanURL();
+        updateTooltip();
       });
     });
-
     form.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -490,42 +471,286 @@ function initializeWelcomeSearchFunctionality() {
   });
 
   searchBtn.addEventListener('click', () => {
-    if (hasInput(searchForms.main)) {
-      searchForms.main.submit();
-    }
-    else if (searchForms.title && hasInput(searchForms.title)) {
-      searchForms.title.submit();
-    }
+    if (hasInput(mainForm)) mainForm.submit();
+    else if (titleForm && hasInput(titleForm)) titleForm.submit();
   });
 }
+document.addEventListener('DOMContentLoaded', initializeWelcomeSearchFunctionality);
+</script>
 %end;
-%if;(not is_welcome and e.m!="MOD_DATA")
+%if;(roglo and is_welcome)
+<script>
+function moveWelcomeLangSelect() {
+  const sel = document.getElementById('dropdownMenu1');
+  const group = sel ? sel.closest('.btn-group') : null;
+  const loginBox = document.getElementById('gw-login');
+  if (!group || !loginBox) return;
+  group.classList.remove('dropup');
+  group.classList.add('dropdown');
+  loginBox.appendChild(group);
+}
+document.addEventListener('DOMContentLoaded', moveWelcomeLangSelect);
+</script>
+%end;
+%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
+    or b.datalist_titles=1 or b.datalist_estates=1))
+  or (e.m="MOD_GALLERY" and (b.datalist_fnames=1 or b.datalist_snames=1))
+  or (upd_form=1 and (b.datalist_fnames=1
+    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
+    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
+    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
+<script>
+%if;(e.m="MOD_GALLERY")
+const DatalistManager = {
+  handleDataTableInput: function(input, listId) {
+    const dataList = document.getElementById(listId);
+    if (!dataList) return;
+    const { selectionStart: selStart, selectionEnd: selEnd, value } = input;
+    const lc = value.toLowerCase();
+    if (!Array.from(dataList.options).some(o => o.value.toLowerCase() === lc)) return;
+    const rowIndex = table.row(input.closest('tr')).index();
+    const cellIndex = input.closest('td').cellIndex;
+    requestAnimationFrame(() => {
+      const el = table.row(rowIndex).node()?.cells%[cellIndex%]?.querySelector('input');
+      if (!el) return;
+      if (el.value !== value) el.value = value;
+      el.focus();
+      el.setSelectionRange(selStart, selEnd);
+    });
+  }
+};
+%end;
+%( Type → hash of its .gz file, which versions its URL as for the other
+   assets: gwd lets browsers keep these files a year. %)
+%define;gz(xx)%if;(b.datalist_xx=1)xx: '%apply;hash%with;%base.name;/cache/%base.name;_xx.cache.gz%end;',%end;%end;
+const HASHES = {
+  %apply;gz("snames")
+  %apply;gz("fnames")
+  %if;(upd_form=1)
+    %apply;gz("places")
+    %apply;gz("occupations")
+    %apply;gz("sources")
+  %end;
+  %if;(is_welcome or is_upd_ind)
+    %apply;gz("titles")
+    %apply;gz("estates")
+  %end;
+  %if;is_upd_ind;
+    %apply;gz("pub_names")
+    %apply;gz("qualifiers")
+    %apply;gz("aliases")
+  %end;
+};
+const DATALISTS = Object.keys(HASHES);
+%if;cgi;
+const DATALIST_DIR = `/${location.pathname.split('/')%[1%] || ''}/bases/etc/%base.name;/cache/`;
+%else;
+const DATALIST_DIR = '%base.name;/cache/';
+%end;
+function fetchDatalist(index) {
+  return fetch(DATALIST_DIR + index + '.cache.gz?hash=' + HASHES%[index.replace('%base.name;_', '')%])
+    .then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text();
+    })
+    .then(text => text.split('\n').map(l => l.trim().replace('<option>', '')).filter(Boolean));
+}
+function populateDatalists() {
+  DATALISTS.forEach(t => {
+    const dl = document.getElementById('datalist_' + t);
+    if (!dl) return;
+    fetchDatalist('%base.name;_' + t)
+      .then(values => {
+        const frag = document.createDocumentFragment();
+        values.forEach(v => frag.appendChild(new Option('', v)));
+        dl.replaceChildren(frag);
+      })
+      .catch(err => console.error(`datalist_${t}:`, err));
+  });
+}
+%( The gallery calls populateDatalists() itself. Elsewhere autocomplete.js
+   serves the fields from the .gz files of DATALISTS: directly, or once the
+   RPC server is, or becomes, unavailable. %)
+%if;(e.m!="MOD_GALLERY")
+document.addEventListener('DOMContentLoaded', () => {
+  const ac = window.GenewebAutocomplete;
+  if (!ac) return populateDatalists();
+  const local = () => DATALISTS.length && ac.init({
+    base: '%base.name;',
+    inputSelector: DATALISTS.map(t => `input%[list="datalist_${t}"%]`).join(),
+    load: fetchDatalist
+  });
+  %if;(b.rpc_datalist=1)
+    ac.onUnavailable(() => { ac.destroy(); local(); });
+  %else;
+    local();
+  %end;
+});
+%end;
+</script>
+%end;
+%if;(not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+%define;language(x)
+  %apply;nth%with;
+    af/ar/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/%nn;
+    it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
+    %and;x%end;
+%end;
+%( Hydrate the language selector skeleton emitted by copyr.txt. Names come
+   from the !languages lexicon entry, translated server-side for the
+   current lang. %)
+<script>
+(() => {
+  const menu = document.getElementById('language-menu');
+  if (!menu) return;
+  const names = {%nn;
+    %for;i;0;32;%let;l1;%apply;language(i)%in;%nn;
+      %if;(i>0),%end;'%l1;':`%apply;language_name(l1)`%nn;
+    %end;
+  };
+  const def = '%default_lang;';
+  const base = '%base_lang;';
+  %( TODO file= is stripped to flush any image-upload param carried over a
+     lang switch; legacy hack inherited from the lang_file pattern in
+     copyr.txt, should move to the request handler. %)
+  const hrefFor = t => {
+    const u = new URL(window.location.href);
+    u.searchParams.delete('file');
+    if (t === def) u.searchParams.delete('lang');
+    else u.searchParams.set('lang', t);
+    return u.pathname + u.search + u.hash;
+  };
+  const frag = document.createDocumentFragment();
+  for (const l of Object.keys(names)) {
+    const cur = l === '%lang;';
+    const a = document.createElement('a');
+    a.className = 'dropdown-item' + (l === base ? ' bg-warning' : '')
+      + (cur ? ' disabled' : '');
+    a.id = 'lang_' + l;
+    if (cur) a.setAttribute('aria-current', 'true');
+    else a.href = hrefFor(l);
+    const code = document.createElement('code');
+    code.textContent = (l === 'pt-br' ? l : l + '\u00a0\u00a0\u00a0') + ' ';
+    a.appendChild(code);
+    const n = names%[l%];
+    a.appendChild(document.createTextNode(
+      n.charAt(0).toUpperCase() + n.slice(1)));
+    frag.appendChild(a);
+  }
+  menu.appendChild(frag);
+})();
+</script>
+%end;
+%if;(wizard and not is_welcome and e.m="")
+<script>
+%( updateField const + lazy-loading %)
+const UPD = {
+  prefix: "%prefix;",
+  iper: "%index;",
+  error: `[*error]`,
+  editField: `[*edit this field]`
+};
+(function () {
+  const slot = document.getElementById('upd-wand-sources');
+  const wand = document.querySelector('.upd-wand');
+  if (slot && wand && !slot.querySelector('.upd-wand')) {
+    slot.appendChild(wand.cloneNode(true));
+  }
+})();
+(function () {
+  let loaded = false;
+  document.addEventListener('click', ev => {
+    if (!ev.target.closest('.upd-wand')) return;
+    ev.preventDefault();
+    if (loaded) { if (window.InplaceEdit) InplaceEdit.toggle(); return; }
+    loaded = true;
+    const s = document.createElement('script');
+    s.src = "%etc_prefix;js/updateField.min.js?hash=%apply;hash%with;%etc_prefix;js/updateField.min.js%end;";
+    s.onload = () => { InplaceEdit.init(); InplaceEdit.toggle(); };
+    document.head.appendChild(s);
+  });
+})();
+</script>
+%end;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    if (!bootstrap.Tooltip.getInstance(el)) {
+      new bootstrap.Tooltip(el, {
+        trigger: el.dataset.bsTrigger || 'hover',
+        delay: { show: 200, hide: 50 },
+        container: 'body'
+      });
+    }
+  });
+});
+</script>
+%if;(e.notif!="" or e.nomod="1")
+<script data-notif="%e.notif;">
+%include;js_notif
+</script>
+%end;
+%if;(e.m="" and e.other_names="on")
+<script>
+(function(){
+  var u=new URL(location.href);
+  u.searchParams.delete('other_names');
+  u.searchParams.delete('pn');
+  history.replaceState(null,'',u);
+})();
+</script>
+%end;
+%if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
+<script>
 function initializeLazyModules() {
-  $('#load_once_p_mod').one('click', () => $.getScript('js/p_mod.js'));
-  $('#load_once_copylink').one('click', () => $.getScript('js/copylink.js'));
-  $('#load_once_rlm_builder').one('click', () => $.getScript('js/rlm_builder.js'));
+  function loadScriptOnce(buttonId, scriptUrl) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.addEventListener('click', function handler() {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.head.appendChild(script);
+      btn.removeEventListener('click', handler);
+    });
+  }
+  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
 }
+document.addEventListener('DOMContentLoaded', initializeLazyModules);
+</script>
 %end;
-%if;(e.templ="" and not is_welcome)
-// Focus on found autofocus input in opening BS modal
-function setupModalAutofocus() {
-  $('.modal').on('shown.bs.modal', function() {
-    $(this).find('[autofocus]').focus();
-  });
-}
+%if;(not is_welcome)
+<script>
+%( Focus the autofocus element of an opening BS modal. %)
+document.addEventListener('shown.bs.modal', function(event) {
+  event.target.querySelector('[autofocus]')?.focus();
+});
+</script>
 %end;
-%if;(e.m!="MOD_DATA")
-// Floating placeholders for all textual inputs
+%if;(e.m!="MOD_DATA" and not ((e.m="D" and e.t="D")
+       or (e.m="A" and e.t="H") or "HIST" in e.m))
+<script>
+%( Floating placeholders for textual inputs. %)
 function setupFloatingPlaceholders() {
-  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="search"][placeholder]');
-  
+  const inputs = document.querySelectorAll('input[type="text"][placeholder], input[type="number"][placeholder], input[type="search"][placeholder], textarea[placeholder]');
+
   inputs.forEach(input => {
-    const hadFocus = document.activeElement === input;
-    
-    const wrapper = document.createElement('div');
-    wrapper.className = 'input-wrapper';
-    input.parentNode.insertBefore(wrapper, input);
-    wrapper.appendChild(input);
+    %( Skip placeholders made of non-breaking spaces only. %)
+    if (input.placeholder.trim() === '') return;
+
+    let wrapper = input.parentNode;
+    if (wrapper.classList.contains('clear-button-wrapper')) {
+      %( Reuse the positioned wrapper added by clearinput; keep the
+         .input-wrapper CSS hooks so layout rules still match. %)
+      wrapper.classList.add('input-wrapper');
+    } else if (!wrapper.classList.contains('input-wrapper')) {
+      const hadFocus = document.activeElement === input;
+      wrapper = document.createElement('div');
+      wrapper.className = 'input-wrapper';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      if (hadFocus) requestAnimationFrame(() => input.focus());
+    }
 
     const placeholder = document.createElement('span');
     placeholder.className = 'floating-placeholder';
@@ -535,240 +760,107 @@ function setupFloatingPlaceholders() {
     input.addEventListener('focus', () => placeholder.classList.add('active'));
     input.addEventListener('blur', () => placeholder.classList.remove('active'));
 
-    if (hadFocus || input.hasAttribute('autofocus')) {
-      requestAnimationFrame(() => {
-        input.focus();
-        placeholder.classList.add('active');
-      });
+    if (input === document.activeElement || input.hasAttribute('autofocus')) {
+      placeholder.classList.add('active');
     }
   });
 }
+document.addEventListener('DOMContentLoaded', setupFloatingPlaceholders);
+</script>
 %end;
 %if;(e.m="NOTES" or e.m="WIZNOTES")
-// TOC toggle for NOTES and WIZNOTES
+<script>
 function setupTocToggle() {
-  const toggleTocText = function() {
-    return $('#toc-content').is(':hidden')
-      ? '([visualize/show/hide/summary]1)'
-      : '([visualize/show/hide/summary]2)';
-  };
-  $('.toc-toggle').on('click', function() {
-    $('#toc-content').toggle();
-    $('.toc-toggle').text(toggleTocText());
+  const tocContent = document.getElementById('toc-content');
+  if (!tocContent) return;
+  function toggleTocText() {
+    return tocContent.hidden
+      ? `([visualize/show/hide/summary]1)`
+      : `([visualize/show/hide/summary]2)`;
+  }
+  document.querySelectorAll('.toc-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+      tocContent.hidden = !tocContent.hidden;
+      document.querySelectorAll('.toc-toggle').forEach(b => {
+        b.textContent = toggleTocText();
+      });
+    });
   });
 }
+document.addEventListener('DOMContentLoaded', setupTocToggle);
+</script>
 %end;
-%( Place the cursor at the end an autofocused input %)
-%if;("MOD" in e.m)
+%( Place the cursor at the end of a prefilled autofocused field in the editors. %)
+%if;(upd_form=1 or upd_notes=1 or e.m="MOD_DATA" or e.m="MOD_DATA_OK")
+<script>
 function setupAutofocusInput() {
-  const focusableElement = document.querySelector('input[autofocus]:not([id="n"]), textarea[autofocus]');
-  if (focusableElement) {
-    focusableElement.focus();
-    if (focusableElement.setSelectionRange) {
-      focusableElement.setSelectionRange(focusableElement.value.length, focusableElement.value.length);
-    } else if (focusableElement.value) {
-      focusableElement.value = focusableElement.value;
-    }
-  }
+  const el = document.querySelector('input[autofocus]:not(#n), textarea[autofocus]');
+  if (!el) return;
+  el.focus();
+  el.setSelectionRange(el.value.length, el.value.length);
 }
-%end;
-%if;((is_welcome and (b.datalist_fnames=1 or b.datalist_snames=1
-    or b.datalist_titles=1 or b.datalist_estates=1))
-  or (e.m="MOD_NOTES" and (b.datalist_fnames=1 or b.datalist_snames=1))
-  or ("IND" in e.m or "FAM" in e.m and e.m!="MOD_NOTES" and (b.datalist_fnames=1
-    or b.datalist_snames=1 or b.datalist_occupations=1 or b.datalist_sources=1
-    or b.datalist_places=1 or b.datalist_aliases=1 or b.datalist_estates=1
-    or b.datalist_titles=1 or b.datalist_pub_names=1 or b.datalist_qualifiers=1)))
-// Manages datalist population and updates
-// Simple datalist manager with special handling for DataTables inputs
-const DatalistManager = {
-  // Main populate function for regular form datalists
-  populateDatalist: function(datalistId, cacheFile) {
-    const dataList = document.getElementById(datalistId);
-    if (!dataList) return;
-
-    fetch(cacheFile)
-      .then(response => {
-        const reader = response.body
-          .pipeThrough(new DecompressionStream('gzip'))
-          .getReader();
-        return new ReadableStream({
-          start(controller) {
-            return pump();
-            function pump() {
-              return reader.read().then(({done, value}) => {
-                if (done) {
-                  controller.close();
-                  return;
-                }
-                controller.enqueue(value);
-                return pump();
-              });
-            }
-          }
-        });
-      })
-      .then(stream => new Response(stream))
-      .then(response => response.text())
-      .then(text => {
-        const fragment = document.createDocumentFragment();
-        text.split("\n")
-            .filter(line => line.trim())
-            .forEach(option => {
-              const opt = document.createElement("option");
-              opt.value = option.trim().replace("<option>", "");
-              fragment.appendChild(opt);
-            });
-        dataList.textContent = '';
-        dataList.appendChild(fragment);
-      })
-      .catch(error => console.error(`Error loading ${cacheFile}:`, error));
-  },
-  %if;(e.m="MOD_NOTES")
-  // Special handling for DataTables inputs
-  handleDataTableInput: function(input, listId) {
-    if (!input || !listId) return;
-
-    const dataList = document.getElementById(listId);
-    if (!dataList) return;
-
-    // Store current cursor position and selection
-    const selStart = input.selectionStart;
-    const selEnd = input.selectionEnd;
-    const currentValue = input.value;
-
-    // Let browser handle datalist matching
-    const option = Array.from(dataList.options).find(opt =>
-      opt.value.toLowerCase() === currentValue.toLowerCase()
-    );
-
-    if (option) {
-      // Get row and cell info before any updates
-      const $row = $(input).closest('tr');
-      const $cell = $(input).closest('td');
-      const rowIndex = table.row($row).index();
-      const cellIndex = $cell.index();
-
-      // Preserve case the user typed
-      const finalValue = currentValue;
-
-      // Use requestAnimationFrame to handle focus after redraw
-      requestAnimationFrame(() => {
-        const $newRow = $(table.row(rowIndex).node());
-        const $newCell = $newRow.find(`td:eq(${cellIndex})`);
-        const $newInput = $newCell.find('input');
-
-        if ($newInput.length) {
-          if ($newInput.val() !== finalValue) {
-            $newInput.val(finalValue);
-          }
-          $newInput.focus();
-          // Only select if user had selected the whole content
-          if (selStart === 0 && selEnd === currentValue.length) {
-            $newInput[0].setSelectionRange(0, finalValue.length);
-          } else {
-            $newInput[0].setSelectionRange(selStart, selEnd);
-          }
-        }
-      });
-    } else {
-      // If no match, just maintain cursor position
-      requestAnimationFrame(() => {
-        input.setSelectionRange(selStart, selEnd);
-      });
-    }
-  }
-%end;
-};
-
-function constructCachePath() {
-  const baseName = "%base.name;";
-  %if;cgi;
-    const pathname = window.location.pathname;
-    const segments = pathname.split('/');
-    const prefix = segments[1] || '';
-    return `/${prefix}/bases/etc/${baseName}/cache/${baseName}`;
-  %else;
-    return `${baseName}/cache/${baseName}`;
-  %end;
-}
-
-function populateDatalists() {
-  const path = constructCachePath();
-  const datalists = %[
-  %if;(is_welcome or e.m="MOD_NOTES" or "IND" in e.m or "FAM" in e.m)
-    %if;(b.datalist_snames=1)  { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
-    %if;(b.datalist_fnames=1)  { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
-    %if;("IND" in e.m or "FAM" in e.m)
-      %if;(b.datalist_places=1)  { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
-      %if;(b.datalist_occupations=1)  { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
-      %if;(b.datalist_sources=1)  { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
-    %end;
-  %end;
-  %if;(is_welcome or "IND" in e.m)
-    %if;is_welcome;
-      %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
-      %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
-    %else;
-      %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
-      %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
-      %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
-    %end;
-  %end;
-  %];
-
-  datalists.forEach(list => DatalistManager.populateDatalist(list.id, list.file));
-}
+document.addEventListener('DOMContentLoaded', setupAutofocusInput);
+</script>
 %end;
 
-const initTooltips = () => {
-  const tooltipElements = document.querySelectorAll('[data-toggle="tooltip"]');
-  if (tooltipElements.length > 0) {
-    $(tooltipElements).tooltip({
-      trigger: 'hover',
-      delay: { show: 200, hide: 50 },
-      html: true
-    });
-  }
-};
-
-function safeInitialize(fn) {
-  try {
-    fn();
-  } catch (error) {
-    console.error('Initialization error:', error);
-  }
-}
-%( Initialize on DOM Content Loaded %)
+%if;(e.m="MOD_DATA")
+<script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
+%end;
+%if;(e.m="RM")
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-%if;is_welcome;
-  initTooltips();
-  initializeWelcomeSearchFunctionality();
-  %if;wizard;
-    inputToBook.addNavigation();
-  %end;
-  %if;(b.datalist_fnames=1 or b.datalist_snames=1)
-    populateDatalists();
-  %end;
-%end;
-%if;(not is_welcome and e.m!="MOD_DATA")
-  initializeLazyModules();
-%end;
-%if;(e.templ="" and not is_welcome)
-  setupModalAutofocus();
-%end;
-%if;(e.m!="MOD_DATA")
-  setupFloatingPlaceholders();
-%end;
-%if;("ADD" in e.m or "MOD" in e.m)
-  setupToolbarSticky();
-  setupCharacterInsertion();
-%end;
-%if;(e.m="NOTES" or e.m="WIZNOTES")
-  setupTocToggle();
-%end;
-%if;("MOD" in e.m)
-  setupAutofocusInput();
-%end;
+  if (typeof RelationMatrix !== 'undefined') RelationMatrix.init();
 });
 </script>
+%end;
+%if;(e.m="C" and e.t="")
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Cousins !== 'undefined' && Cousins.init) Cousins.init();
+});
+</script>
+%end;
+%( History pages (m=HIST, m=HIST_DIFF): update times are recorded in the
+   server's timezone and rendered as Unix epochs in data-epoch attributes;
+   redisplay them in the browser's timezone. %)
+%if;(e.m="HIST" or e.m="HIST_DIFF")
+<script>
+  document.querySelectorAll('.gw-hist-time').forEach((el) => {
+    const epoch = parseInt(el.dataset.epoch, 10);
+    if (isNaN(epoch)) return;
+    const d = new Date(epoch * 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    el.textContent = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} `
+      + `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  });
+</script>
+%end;
+%end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
+%end;%( closing initial “not cancel_links”, not indented either %)
+%( b.reduce_place=yes %)
+%if;(e.m="" and not is_welcome and b.reduce_place="yes")
+<script>
+function reducePlaces() {
+  const seen = [];
+  document.querySelectorAll('[data-updfield$="_place"]').forEach(el => {
+    const a = el.querySelector('abbr');
+    const full = (a ? a.title : el.textContent).trim();
+    const raw = (el.dataset.updraw || '').trim();
+    const sub = raw.startsWith('%[') && /\%]\s(?:–|—|-)\s/.test(raw);
+    const sep = sub ? full.search(/\s(?:–|—|-)\s/) : -1;
+    const i = full.indexOf(',', sep < 0 ? 0 : sep);
+    if (i > 0 &&
+        seen.some(s => full.endsWith(s) && full.length - s.length <= i)) {
+      const abbr = document.createElement('abbr');
+      abbr.title = full;
+      abbr.textContent = full.slice(0, i);
+      el.replaceChildren(abbr);
+    } else if (a) {
+      el.textContent = full;
+    }
+    seen.push(full);
+  });
+}
+reducePlaces();
+</script>
+%end;

@@ -61,6 +61,10 @@
 %foreach;event_witness_relation;%incr_count;%end;
 %let;rel_nbr;%count;%in;
 
+%define;witness_at(xxx,yyy)
+  [*witness at %s of:::xxx:yyy]
+%end;
+
 %if;(op_m=1 and has_relations)
   %reset_count;
   %foreach;relation;%if;(has_relation_him or has_relation_her)%incr_count;%end;%end;
@@ -68,20 +72,20 @@
   %foreach;event_witness_relation;%incr_count;%end;
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h2>[*relation/relations]1%nn;
+  <h2 class="h3">[*relation/relations]1%nn;
     %if;(cnt>0)
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
-          <img class="ml-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree">%nn;
+          <img class="ms-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree">%nn;
         </a>%nn;
       %end;
     %end;
   </h2>
-  <ul  class="pl-4">
+  <ul class="ps-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        <ul  class="pl-4">
+        <ul class="ps-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
           </li>
@@ -105,12 +109,24 @@
       %apply;short_display_person("related")
     </li>
   %end;
+  %foreach;event_witness_relation;
+    %apply;li_SDC("event_witness_relation.person")
+      %let;str;%event_witness_relation.event.name;
+      %if;(event_witness_relation.event.date.year!="") [in (year)] %event_witness_relation.event.date.year;%end;%in;
+      %apply;witness_at(event_witness_relation_kind,str)
+      %apply;short_display_person("event_witness_relation.person")
+      %if;(event_witness_relation.event.spouse!="")
+      %sp;[and]
+      %apply;short_display_person("event_witness_relation.event.spouse")
+      %end;.
+    </li>
+  %end;
   </ul>
 
 %( relation_complete includes witness of his events and witness at other's events %)
 %elseif;(op_m=2 and rel_nbr>0)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h2 id="relations" >[*relation/relations]1
+  <h2  class="h3" id="relations" >[*relation/relations]1
   %if;(not cancel_links)
     <a %apply;relations_tree(l_ref)>
     <img src="%images_prefix;gui_create.png" height="20" alt="Tree">
@@ -139,7 +155,7 @@
   %if;(count>0)
     <h3>[*relations of] %self;</h3>
   %end;
-  <ul  class="pl-4">
+  <ul class="ps-4">
   %foreach;relation;
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
@@ -208,7 +224,7 @@
   %if;(count>0)
     <h3>[*witnesses to events of] %self;</h3>
   %end;
-  <ul  class="pl-4">
+  <ul class="ps-4">
     %foreach;event;%sp;
       %reset_count;
       %foreach;event_witness;
@@ -238,7 +254,7 @@
   %if;(count>0)
     <h3>%apply;str(self,sex)</h3>
   %end;
-  <ul  class="pl-4">
+  <ul class="ps-4">
     %foreach;event_witness_relation;
       %apply;li_SDC("event_witness_relation.person")
         %apply;capitalize(event_witness_relation.event.name)%sp;

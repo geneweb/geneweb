@@ -1,40 +1,35 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist_diff.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- $Id: updhist_diff.txt v7.1 11/04/2026 03:47:24 $ -->
   <title>[*revision history]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
+  %permalink;
   %include;css
 </head>
 <body%body_prop;>
 %include;hed
 %include;home
 <div class="container">
-<script><!--
-
-function update_new () {
-  var input_new = $('input[type=radio][name=new]:checked').val(),
-      input_old = $('input[type=radio][name=old]:checked').val();
-  if (input_new >= input_old){
-    var tmp = parseInt(input_new) + 1;
-    $('input[type=radio][name=old][value='+input_old+']').prop('checked', false);
-    $('input[type=radio][name=old][value='+tmp+']').prop('checked', true);
+<script>
+function updateRadios(changed) {
+  const newEl = document.querySelector('input[name=new]:checked');
+  const oldEl = document.querySelector('input[name=old]:checked');
+  if (!newEl || !oldEl) return;
+  const newVal = parseInt(newEl.value, 10);
+  const oldVal = parseInt(oldEl.value, 10);
+  if (changed === 'new' && newVal >= oldVal) {
+    const target = document.querySelector(`input[name=old][value="${newVal + 1}"]`);
+    if (target) target.checked = true;
+  } else if (changed === 'old' && oldVal <= newVal) {
+    const target = document.querySelector(`input[name=new][value="${oldVal - 1}"]`);
+    if (target) target.checked = true;
   }
 }
-
-function update_old () {
-  var input_new = $('input[type=radio][name=new]:checked').val(),
-      input_old = $('input[type=radio][name=old]:checked').val();
-  if (input_old <= input_new){
-    var tmp = parseInt(input_old) - 1;
-    $('input[type=radio][name=new][value='+input_new+']').prop('checked', false);
-    $('input[type=radio][name=new][value='+tmp+']').prop('checked', true);
-  }
-}
---></script>
+</script>
 
 <h1 class="text-center">
   <a href="%prefix;%acces;">%person;</a>%nn;
@@ -69,11 +64,11 @@ function update_old () {
         <tr>
           <td %if;(line % 2 != 0) class="odd" %end;>
             <div class="form-inline">
-              <input type="radio" class="form-control" name="old" value="%line;" onclick="update_old()" %if;(line = 0)style="visibility: hidden"%elseif;(line = 1)checked%end;%/>
-              <input type="radio" class="form-control ml-2" name="new" value="%line;" onclick="update_new()" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
+              <input type="radio" class="form-check-input" name="old" value="%line;" onclick="updateRadios('old')" %if;(line = 0)style="visibility: hidden"%elseif;(line = 1)checked%end;%/>
+              <input type="radio" class="form-check-input ms-2" name="new" value="%line;" onclick="updateRadios('new')" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
             </div>
           </td>
-          <td %if;(line % 2 != 0) class="odd" %end;>%apply;transl_date%with;%date;%end;</td>
+          <td %if;(line % 2 != 0) class="odd" %end;><span class="gw-hist-time" data-epoch="%date_epoch;">%apply;transl_date%with;%date;%end;</span></td>
           <td %if;(line % 2 != 0) class="odd" %end;>%wizard;</td>
         </tr>
       %end;
@@ -132,14 +127,14 @@ function update_old () {
   %end;
   %if;(before.first_names_aliases!=after.first_names_aliases)
     <tr>
-      <th scope="row" class="table-success text-nowrap">[*first name alias]</th>
+      <th scope="row" class="table-success text-nowrap">[*first name alias]0</th>
       <td class="odd">%before.first_names_aliases;</td>
       <td class="odd">%after.first_names_aliases;</td>
     </tr>
   %end;
   %if;(before.surnames_aliases!=after.surnames_aliases)
     <tr>
-      <th scope="row" class="table-success text-nowrap">[*surname alias]</th>
+      <th scope="row" class="table-success text-nowrap">[*surname alias]0</th>
       <td class="odd">%before.surnames_aliases;</td>
       <td class="odd">%after.surnames_aliases;</td>
     </tr>
@@ -288,7 +283,7 @@ function update_old () {
     %end;
     %if;(before.children!=after.children)
       <tr>
-        <th scope="row" class="table-success text-nowrap">[*child/children]1</td>
+        <th scope="row" class="table-success text-nowrap">[*child/children]1</th>
         <td class="odd">%before.children;</td>
         <td class="odd">%after.children;</td>
       </tr>
@@ -299,20 +294,20 @@ function update_old () {
 
 %define;print_diff()
   <div class="text-center">
-    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%evar.old;&old=%expr(evar.old+1)" title="[*previous/next diff]0"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |
+    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%evar.old;&old=%expr(evar.old+1)" title="[*previous/next diff]0"><i class="fa fa-arrow-left me-1"></i>[previous/next diff]0</a> |
     <a href="%prefix;m=%evar.m;&t=SUM&f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a>
-    | %if;(evar.new!=0)<a href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%expr(evar.new-1)&old=%evar.new;" title="[*previous/next diff]1"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end;
+    | %if;(evar.new!=0)<a href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%expr(evar.new-1)&old=%evar.new;" title="[*previous/next diff]1">[previous/next diff]1<i class="fa fa-arrow-right ms-1"></i></a>%elseif;(evar.new=0)[last diff]%end;
   </div>
   <table class="table mb-0 mt-3">
     <colgroup>
-      <col style="width:8%%;border-right-style:inset">
-      <col style="width:46%%;border-right-style:inset">
+      <col class="border-end" style="width:8%%">
+      <col class="border-end" style="width:46%%">
       <col style="width:46%%">
     </colgroup>
     <tr>
       <th scope="row" class="table-success text-nowrap">[*revision of]</th>
-      <td><b>%apply;transl_date%with;%before.date;%end;</b></td>
-      <td><b>%apply;transl_date%with;%after.date;%end;</b></td>
+      <td><b><span class="gw-hist-time" data-epoch="%before.date_epoch;">%apply;transl_date%with;%before.date;%end;</span></b></td>
+      <td><b><span class="gw-hist-time" data-epoch="%after.date_epoch;">%apply;transl_date%with;%after.date;%end;</span></b></td>
     </tr>
     <tr>
       <th scope="row" class="table-success text-nowrap"> [*wizard/wizards/friend/friends/exterior]0</th>
@@ -322,8 +317,8 @@ function update_old () {
   </table>
   <table class="table mb-0">
      <colgroup>
-      <col style="width:8%%;;border-right-style:inset">
-      <col style="width:46%%;border-right-style:inset">
+      <col class="border-end" style="width:8%%">
+      <col class="border-end" style="width:46%%">
       <col style="width:46%%">
     </colgroup>
     <tr>
@@ -351,10 +346,11 @@ function update_old () {
 %else;
   %apply;print_diff()
 %end;
-%base_trailer;
+%include;trl
 %include;copyr
 
 </div>
 %include;js
+%query_time;
 </body>
 </html>

@@ -24,7 +24,7 @@
 %let;laL;title="[add::parents] (L)" accesskey="L"%in;
 %let;laP;title="[modify::person/persons]0 (P)" accesskey="P"%in;
 %let;laR;title="[relationship computing] (R)" accesskey="R"%in;
-%let;laU;title="[update] (U)" accesskey="U"%in;
+%let;laU;title="[update::] (U)" accesskey="U"%in;
 %let;laS;title="(S)" accesskey="S"%in;
 %let;lcS;<code>(S)</code>%in; %( Sosa reference %)
 %let;laY;title="[tree] (Y)" accesskey="Y"%in;
@@ -63,7 +63,7 @@
           <a id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;>[add::parents]</a>%nn;
         %end;
         <a id="snd_image" href="%prefix;m=SND_IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
-        <a href="%prefix;m=MRG;i=%index;">[merge]0 (oc=%occ;)</a>%nn;
+        <a href="%prefix;m=MRG;i=%index;">[merge::]0 (oc=%occ;)</a>%nn;
         <a href="%prefix;%access;&i=%index;&m=DEL_IND;">[delete::person/persons]0</a>%nn;
       </span>
     </span>

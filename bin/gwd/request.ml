@@ -3,790 +3,886 @@
 open Geneweb
 open Config
 open Def
-open Gwdb
 open Util
+module Sosa = Geneweb_sosa
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Registration = Geneweb_register.Registration
+module Server = Geneweb_http.Server
+module Code = Geneweb_http.Code
+module Connection = Geneweb_http.Connection
 
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
-    true
-  else if
-    List.exists (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
-  then
-    true
-  else false
+type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 
-let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl) pl
-    []
+let this_request_updates_database conf =
+  match p_getenv conf.env "m" with
+  | Some
+      ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
+      | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
+      | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
+      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE"
+      | "UNKNOWN_OK" ) ->
+      true
+  | _ -> false
 
-let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
-  match sosa_ref, sosa_nb with
-  | Some p, Some n ->
-    if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base n p with
-        Some (p :: _) -> [p], true
-      | _ -> [], false
-    else [], false
-  | _ ->
-    let acc = SearchName.search_by_key conf base an in
-    if acc <> [] then acc, false
-    else
-      ( SearchName.search_key_aux begin fun conf base acc an ->
-            let spl = select_std_eq conf base acc an in
-            if spl = [] then
-              if acc = [] then SearchName.search_by_name conf base an
-              else acc
-            else spl
-          end conf base an
-      , false )
+let request_issue ?(level = `Warning) ~key _conn conf base =
+  let title = Util.transl conf ("NOTIF_TT " ^ key) in
+  let comment = Util.transl conf ("NOTIF " ^ key) in
+  (match level with
+  | `Error -> Notif.error ~title comment
+  | `Warning -> Notif.warning ~title comment
+  | `Info -> Notif.info ~title comment);
+  let conf = Notif.inject_pending conf in
+  SrcfileDisplay.print_welcome conf base
 
-let relation_print conf base p =
-  let p1 =
-    match p_getenv conf.senv "ei" with
-    | Some i ->
-      conf.senv <- [] ;
-      let i = iper_of_string i in
-      if Gwdb.iper_exists base i
-      then Some (pget conf base i)
-      else None
-    | None ->
-      match find_person_in_env conf base "1" with
-      | Some p1 ->
-        conf.senv <- [];
-        Some p1
-      | None -> None
-  in
-  RelationDisplay.print conf base p p1
-
-let specify conf base n pl =
-  let title _ = Output.printf conf "%s : %s" n (transl conf "specify") in
-  let n = Name.crush_lower n in
-  let ptll =
-    List.map
-      (fun p ->
-         let tl = ref [] in
-         let add_tl t =
-           tl :=
-             let rec add_rec =
-               function
-                 t1 :: tl1 ->
-                 if eq_istr t1.t_ident t.t_ident &&
-                    eq_istr t1.t_place t.t_place
-                 then
-                   t1 :: tl1
-                 else t1 :: add_rec tl1
-               | [] -> [t]
-             in
-             add_rec !tl
-         in
-         let compare_and_add t pn =
-           let pn = sou base pn in
-           if Name.crush_lower pn = n then add_tl t
-           else
-             match get_qualifiers p with
-               nn :: _ ->
-               let nn = sou base nn in
-               if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t
-             | _ -> ()
-         in
-         List.iter
-           (fun t ->
-              match t.t_name, get_public_name p with
-                Tname s, _ -> compare_and_add t s
-              | _, pn when sou base pn <> "" -> compare_and_add t pn
-              | _ -> ())
-           (nobtit conf base p);
-         p, !tl)
-      pl
-  in
-
-  Hutil.header conf title;
-  (* Si on est dans un calcul de parenté, on affiche *)
-  (* l'aide sur la sélection d'un individu.          *)
-  Util.print_tips_relationship conf;
-  Output.print_sstring conf "<ul>\n";
-  (* Construction de la table des sosa de la base *)
-  let () = SosaCache.build_sosa_ht conf base in
-  List.iter
-    (fun (p, _tl) ->
-       Output.print_sstring conf "<li>\n";
-       SosaCache.print_sosa conf base p true;
-       Update.print_person_parents_and_spouses conf base p;
-       Output.print_sstring conf "</li>\n"
-    ) ptll;
-  Output.print_sstring conf "</ul>\n";
-  Hutil.trailer conf
-
-let incorrect_request ?(comment = "") conf =
-  Hutil.incorrect_request ~comment:comment conf
-
-let person_selected conf base p =
+let person_selected conn conf base p =
   match p_getenv conf.senv "em" with
-    Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
-  | None -> record_visited conf (get_iper p); Perso.print conf base p
-
-let person_selected_with_redirect conf base p =
-  match p_getenv conf.senv "em" with
-  | Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf ~comment:"Incorrect em= value"
+  | Some "R" ->
+      let p1 = find_person_in_env_pref conf base "e" in
+      RelationDisplay.print conf base p p1
+  | Some _ -> request_issue conn conf base ~key:"incorrect em value"
   | None ->
-    Wserver.http_redirect_temporarily
-      (commd conf ^^^ Util.acces conf base p :> string)
-
-let updmenu_print = Perso.interp_templ "updmenu"
-
-let very_unknown conf _ =
-  match p_getenv conf.env "n", p_getenv conf.env "p" with
-  | Some sname, Some fname ->
-    let title _ =
-      transl conf "not found"
-      |> Utf8.capitalize_fst
-      |> Output.print_sstring conf ;
-      Output.print_sstring conf (transl conf ":") ;
-      Output.print_sstring conf {| "|} ;
-      Output.print_string conf (Util.escape_html fname) ;
-      Output.print_sstring conf {| |} ;
-      Output.print_string conf (Util.escape_html sname) ;
-      Output.print_sstring conf {|"|} ;
-    in
-    Output.status conf Def.Not_Found;
-    Hutil.header ~error:true conf title;
-    Hutil.trailer conf
-  | _ ->
-    match p_getenv conf.env "i" with
-    | Some i ->
-      let title _ =
-        Output.print_sstring conf "<kbd>" ;
-        Output.print_string conf (Util.escape_html i) ;
-        Output.print_sstring conf "</kbd>" ;
-        Output.print_sstring conf (transl conf ":") ;
-        Output.print_sstring conf " " ;
-        transl conf "not found"
-        |> Utf8.capitalize_fst
-        |> Output.print_sstring conf ;
+      record_visited conf (Driver.get_iper p);
+      let conf =
+        match (p_getenv conf.env "other_names", p_getenv conf.env "pn") with
+        | Some "on", Some pn when pn <> "" -> Some.other_names_notif conf pn
+        | _ -> conf
       in
-      Output.status conf Def.Not_Found;
-      Hutil.header ~error:true conf title;
-      Hutil.trailer conf
-    | None -> Hutil.incorrect_request conf ~comment:"Missing p=, n= and i="
+      Perso.print conf base p
 
-(* Print Not found page *)
+let person_selected_with_redirect conn conf base p =
+  match p_getenv conf.senv "em" with
+  | Some "R" | None ->
+      Connection.http_redirect_temporarily conn
+        (commd conf ^^^ Util.acces conf base p :> string)
+  | Some _ -> request_issue conn conf base ~key:"incorrect em value"
+
+(* Print “Not found” page *)
 let unknown conf n =
   let title _ =
-    transl conf "not found"
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf ;
-    Output.print_sstring conf (transl conf ":") ;
-    Output.print_sstring conf {| "|} ;
-    Output.print_string conf (Util.escape_html n) ;
-    Output.print_sstring conf {|"|} ;
+    transl conf "not found" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf {| "|};
+    Output.print_string conf (Util.escape_html n);
+    Output.print_sstring conf {|"|}
   in
-  Output.status conf Def.Not_Found;
+  Output.status conf Code.Not_Found;
   Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
-let make_henv conf base =
+let redirect_or_specify conn =
+  PersonLookup.redirect_or_specify ~not_found:unknown
+    ~redirect_to_person:(person_selected_with_redirect conn)
+
+let make_henv _conn conf base =
+  (* Collect henv extensions in reverse, prepend to conf.henv at the end. *)
+  let extras = ref [] in
+  let add_extra k v = extras := (k, v) :: !extras in
+  let add_param param =
+    match Util.p_getenv conf.env param with
+    | Some s -> add_extra param (Mutil.encode s)
+    | None -> ()
+  in
   let conf =
     match Util.find_sosa_ref conf base with
     | Some p ->
-      let x =
-        let first_name = p_first_name base p in
-        let surname = p_surname base p in
-        if Util.accessible_by_key conf base p first_name surname then
-          [ "pz", Name.lower first_name |> Mutil.encode
-          ; "nz", Name.lower surname |> Mutil.encode
-          ; "ocz", get_occ p |> string_of_int |> Mutil.encode
-          ]
-        else [ "iz", get_iper p |> string_of_iper |> Mutil.encode ]
-      in
-      { conf with henv = conf.henv @ x }
+        let first_name = Driver.p_first_name base p in
+        let surname = Driver.p_surname base p in
+        if Util.accessible_by_key conf base p first_name surname then (
+          add_extra "pz" (Name.lower first_name |> Mutil.encode);
+          add_extra "nz" (Name.lower surname |> Mutil.encode);
+          add_extra "ocz" (Driver.get_occ p |> string_of_int |> Mutil.encode))
+        else
+          add_extra "iz"
+            (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+        conf
     | None -> conf
   in
+  (match p_getenv conf.env "dsrc" with
+  | Some "" | None -> ()
+  | Some s -> add_extra "dsrc" (Mutil.encode s));
+  (match p_getenv conf.env "templ" with
+  | None -> ()
+  | Some s -> add_extra "templ" (Mutil.encode s));
+  (match Util.p_getenv conf.env "escache" with
+  | Some _ -> add_extra "escache" (escache_value base)
+  | None -> ());
+  if Util.p_getenv conf.env "manitou" = Some "off" then
+    add_extra "manitou" (Adef.encoded "off");
+  if Util.p_getenv conf.env "fmode" = Some "on" then
+    add_extra "fmode" (Adef.encoded "on");
   let conf =
-    match p_getenv conf.env "dsrc" with
-    | Some "" | None -> conf
-    | Some s -> { conf with henv = conf.henv @ ["dsrc", Mutil.encode s] }
+    if conf.userkey = "" then conf
+    else
+      match GWPARAM.person_of_string_user_key base conf.userkey with
+      | Some ip ->
+          {
+            conf with
+            consent =
+              conf.semi_public
+              && Driver.get_access (Driver.poi base ip) = SemiPublic;
+            user_iper = Some ip;
+          }
+      | None -> conf
   in
-  let conf =
-    match p_getenv conf.env "templ" with
-    | None -> conf
-    | Some s -> { conf with henv = conf.henv @ ["templ", Mutil.encode s] }
-  in
-  let conf =
-    match Util.p_getenv conf.env "escache" with
-    | Some _ -> { conf with henv = conf.henv @ ["escache", escache_value base] }
-    | None -> conf
-  in
-  let conf =
-    if Util.p_getenv conf.env "manitou" = Some "off"
-    then { conf with henv = conf.henv @ ["manitou", Adef.encoded "off"] }
-    else conf
-  in
-  let aux param conf =
-    match Util.p_getenv conf.env param with
-    | Some s -> { conf with henv = conf.henv @ [param, Mutil.encode s] }
-    | None -> conf
-  in
-  aux "alwsurn" conf
-  |> aux "pure_xhtml"
-  |> aux "size"
-  |> aux "p_mod"
-  |> aux "wide"
+  add_param "alwsurn";
+  add_param "pure_xhtml";
+  add_param "size";
+  add_param "p_mod";
+  add_param "wide";
+  { conf with henv = conf.henv @ List.rev !extras }
 
 let special_vars =
-  [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
-    "iz"; "long"; "manitou"; "nz"; "ocz";
-    "p_mod"; "pure_xhtml"; "pz"; "size"; "templ"; "wide" ]
+  [
+    "alwsurn";
+    "cgl";
+    "dsrc";
+    "em";
+    "ei";
+    "ep";
+    "en";
+    "eoc";
+    "escache";
+    "et";
+    "iz";
+    "long";
+    "manitou";
+    "nz";
+    "ocz";
+    "fmode";
+    "p_mod";
+    "pure_xhtml";
+    "pz";
+    "size";
+    "templ";
+    "wide";
+  ]
 
-let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) env
+let only_special_env env =
+  List.for_all (fun (x, _) -> List.mem x special_vars) env
 
-let make_senv conf base =
+let make_senv conn conf base =
   let set_senv conf vm vi =
-    let aux k v conf =
-      if p_getenv conf.env k = Some v
-      then { conf with senv = conf.senv @ [ k, Mutil.encode v ] }
-      else conf
+    (* Accumulate senv extensions in reverse, prepend to base senv at the end.
+       The base senv starts with [("em", vm); ("ei", vi)] and extras are
+       appended in declaration order. *)
+    let extras = ref [] in
+    let add_extra k v = extras := (k, v) :: !extras in
+    let add_if_eq k v =
+      if p_getenv conf.env k = Some v then add_extra k (Mutil.encode v)
     in
-    let conf =
-      { conf with senv = ["em", vm; "ei", vi] }
-      |> aux "long" "on"
-    in
-    let conf =
-      match p_getenv conf.env "et" with
-      | Some x -> { conf with senv = conf.senv @ ["et", Mutil.encode x] }
-      | _ -> conf
-    in
-    let conf = aux "cgl" "on" conf in
-    let conf =
-      match p_getenv conf.env "bd" with
-      | None | Some ("0" | "") -> conf
-      | Some x -> { conf with senv = conf.senv @ ["bd", Mutil.encode x] }
-    in
-    match p_getenv conf.env "color" with
-    | Some x -> { conf with senv = conf.senv @ ["color", Mutil.encode x] }
-    | _ -> conf
+    add_if_eq "long" "on";
+    (match p_getenv conf.env "et" with
+    | Some x -> add_extra "et" (Mutil.encode x)
+    | _ -> ());
+    add_if_eq "cgl" "on";
+    (match p_getenv conf.env "bd" with
+    | None | Some ("0" | "") -> ()
+    | Some x -> add_extra "bd" (Mutil.encode x));
+    (match p_getenv conf.env "color" with
+    | Some x -> add_extra "color" (Mutil.encode x)
+    | _ -> ());
+    { conf with senv = ("em", vm) :: ("ei", vi) :: List.rev !extras }
   in
   let get x = Util.p_getenv conf.env x in
-  match get "em", get "ei", get "ep", get "en", get "eoc" with
-  | Some vm, Some vi, _, _, _ -> set_senv conf (Mutil.encode vm) (Mutil.encode vi)
+  match (get "em", get "ei", get "ep", get "en", get "eoc") with
+  | Some vm, Some vi, _, _, _ ->
+      set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | Some vm, None, Some vp, Some vn, voco ->
-    let voc =
-      match voco with
-      | Some voc -> (try int_of_string voc with Failure _ -> 0)
-      | None -> 0
-    in
-    let ip =
-      match person_of_key base vp vn voc with
-      | Some ip -> ip
-      | None -> Hutil.incorrect_request conf
-          ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration"; raise Exit
-    in
-    let vi = string_of_iper ip in
-    set_senv conf (Mutil.encode vm) (Mutil.encode vi)
+      let voc =
+        match voco with
+        | Some voc -> ( try int_of_string voc with Failure _ -> 0)
+        | None -> 0
+      in
+      let ip =
+        match Driver.person_of_key base vp vn voc with
+        | Some ip -> ip
+        | None ->
+            request_issue conn conf base ~key:"incorrect person env";
+            Driver.Iper.dummy
+      in
+      let vi = Driver.Iper.to_string ip in
+      set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
-let propose_base conf =
-  let title _ = Output.print_sstring conf "Base" in
-  Hutil.header conf title;
-  Output.print_sstring conf {|<ul><li><form method="GET" action="|} ;
-  Output.print_sstring conf conf.indep_command ;
-  Output.print_sstring conf {|">|} ;
-  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |} ;
-  Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst
-  |> Output.print_sstring conf ;
-  Output.print_sstring conf "</button></li></ul>";
-  Hutil.trailer conf
+let try_plugin conn conf base_name meth =
+  Registration.try_handlers ~meth (fun ~name handler ->
+      List.mem name conf.allowed_plugins && handler conn conf base_name)
 
-let try_plugin list conf base_name m =
-  let fn =
-    if List.mem "*" list
-    then (fun ( _, fn) -> fn conf base_name)
-    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name)
-  in
-  List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
-
-let w_lock ~onerror fn conf (base_name : string option) =
+let w_lock ~onerror fn conn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
+  (* FIXME: we lost the backtrace because onerror does not handle it. *)
   Lock.control
-    (Mutil.lock_file bfile) true
-    ~onerror:(fun () -> onerror conf base_name)
-    (fun () -> fn conf base_name)
+    ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
+    ~wait:true ~lock_file:(Mutil.lock_file bfile)
+  @@ fun () -> fn conn conf base_name
 
-let w_base ~none fn conf (bfile : string option) =
+(* Module-level ref used as an init-once guard: the nldb format check
+   reads the on-disk index header once per gwd process lifetime to
+   avoid reissuing the warning notification on every request. The
+   guard is set before the check so that two simultaneous requests
+   don't both emit the notification. This is one of the few legacy
+   refs left in this file; do not add more. *)
+let nldb_check_done = ref false
+
+let check_nldb_format conf base =
+  if not !nldb_check_done then (
+    nldb_check_done := true;
+    match Driver.check_nldb_format base with
+    | `BadFormat ->
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT incompatible notes_links")
+          (Util.transl conf "NOTIF incompatible notes_links")
+    | `Ok | `NoFile -> ())
+
+let redirect_to_random_person conn conf base =
+  let n = Driver.nb_of_persons base in
+  let rec pick k =
+    let p =
+      Driver.poi base (Driver.Iper.of_string (string_of_int (Random.int n)))
+    in
+    if k = 0 || ((not (Util.is_empty_name p)) && Util.authorized_age conf base p)
+    then p
+    else pick (k - 1)
+  in
+  if n = 0 then SrcfileDisplay.print_welcome conf base
+  else (
+    Random.self_init ();
+    let p = pick 100 in
+    Connection.http_redirect_temporarily conn
+      (match p_getenv conf.env "m" with
+      | None | Some "" -> (commd conf ^^^ Util.acces conf base p :> string)
+      | Some _ ->
+          Util.url_set_aux conf
+            (commd conf :> string)
+            [ "i"; "p"; "n"; "oc"; "file"; "rnd" ]
+            [ Driver.Iper.to_string (Driver.get_iper p) ]))
+
+let w_base ~none fn conn conf (bfile : string option) =
   match bfile with
   | None -> none conf
   | Some bfile ->
-     let base = try Some (Gwdb.open_base bfile) with _ -> None in
-     match base with
-     | None -> none conf
-     | Some base ->
-        let conf = make_henv conf base in
-        let conf = make_senv conf base in
-        let conf = match Util.default_sosa_ref conf base with
-          | Some p -> { conf with default_sosa_ref = get_iper p, Some p;
-              nb_of_persons = Gwdb.nb_of_persons base;
-              nb_of_families = Gwdb.nb_of_families base}
-          | None -> { conf with
-              nb_of_persons = Gwdb.nb_of_persons base;
-              nb_of_families = Gwdb.nb_of_families base}
-        in
-        fn conf base
+      let bname = Filename.basename bfile |> Filename.chop_extension in
+      (* make sure the various folders (portraits, images, ...) are located properly *)
+      GWPARAM.set_reorg bname None;
+      Driver.with_database bfile (fun base ->
+          let conf = make_henv conn conf base in
+          let conf = make_senv conn conf base in
+          let conf =
+            match Util.default_sosa_ref conf base with
+            | Some p ->
+                {
+                  conf with
+                  default_sosa_ref = (Driver.get_iper p, Some p);
+                  nb_of_persons = Driver.nb_of_persons base;
+                  nb_of_families = Driver.nb_of_families base;
+                }
+            | None ->
+                {
+                  conf with
+                  nb_of_persons = Driver.nb_of_persons base;
+                  nb_of_families = Driver.nb_of_families base;
+                }
+          in
+          check_nldb_format conf base;
+          let conf = Notif.inject_pending conf in
+          fn conn conf base)
 
-let w_person ~none fn conf base =
+let w_person ~none fn conn conf base =
   match find_person_in_env conf base "" with
-  | Some p -> fn conf base p
-  | _ -> none conf base
+  | Some p -> fn conn conf base p
+  | _ -> none conn conf base
 
-let output_error ?headers ?content conf code =
-  !GWPARAM.output_error ?headers ?content conf code
-
-let w_wizard fn conf base =
-  if conf.wizard then
-    fn conf base
-  else if conf.just_friend_wizard then
-    output_error conf Def.Forbidden
+let w_wizard fn conn conf base =
+  if conf.wizard then fn conn conf base
+  else if conf.just_friend_wizard then GWPARAM.output_error conf Code.Forbidden
   else
     (* FIXME: send authentification headers *)
-    output_error conf Def.Unauthorized
+    GWPARAM.output_error conf Code.Unauthorized
 
+(* The closures w_lock, w_base, w_person, print_page and handle_no_bfile
+   are constructed once at module load time (treat_request being a value
+   binding, not a function definition) and shared across every request.
+   The actual per-request entry point is the [fun conf -> ...] at the
+   end of this binding. *)
 let treat_request =
-  let w_lock = w_lock ~onerror:(fun conf _ -> Update.error_locked conf) in
+  let w_lock = w_lock ~onerror:(fun _conn conf _ -> Update.error_locked conf) in
   let w_base =
     let none conf =
-      if conf.bname = "" then output_error conf Def.Bad_Request
-      else output_error conf Def.Not_Found
+      if conf.bname = "" then GWPARAM.output_error conf Code.Bad_Request
+      else (
+        Notif.error
+          ~title:(Util.transl conf "NOTIF_TT unknown base")
+          (Printf.sprintf
+             (Util.ftransl conf "NOTIF unknown base %s")
+             (Util.escape_html conf.bname :> string));
+        let conf = Notif.inject_pending conf in
+        try Templ.output_simple conf Templ.Env.empty "index"
+        with _ -> GWPARAM.output_error conf Code.Not_Found)
     in
     w_base ~none
   in
-  let w_person = w_person ~none:SrcfileDisplay.print_welcome in
-  fun conf ->
-  let bfile =
-    if conf.bname = "" then None
-    else (
-      let bfile = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb") in
-      if Sys.file_exists bfile
-      then Some bfile
-      else None)
+  let print_welcome _conn = SrcfileDisplay.print_welcome in
+  let w_person = w_person ~none:print_welcome in
+  let print_page conn conf l =
+    w_base
+      (if only_special_env conf.env then print_welcome
+       else
+         w_person @@ fun conn conf base p ->
+         match p_getenv conf.env "ptempl" with
+         | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
+             Perso.interp_templ t conf base p
+         | _ -> person_selected conn conf base p)
+      conn conf l
   in
-  let process () =
-  if conf.wizard
-  || conf.friend
-  || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
-  then begin
-#ifdef UNIX
-    begin match bfile with
-      | None -> ()
-      | Some bfile ->
-        let stat = Unix.stat bfile in
-        Unix.setgid stat.Unix.st_gid ;
-        Unix.setuid stat.Unix.st_uid ;
-    end ;
-#endif
-    let plugins =
-      match List.assoc_opt "plugins" conf.Config.base_env with
-      | None -> []
-      | Some list -> String.split_on_char ',' list |> List.map String.trim
+  let handle_no_bfile conn conf l =
+    if conf.bname = "" then
+      try Templ.output_simple conf Templ.Env.empty "index"
+      with _ -> SrcfileDisplay.propose_base conf
+    else print_page conn conf l
+  in
+  fun conn conf ->
+    let bfile =
+      if conf.bname = "" then None
+      else
+        let bfile =
+          Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
+        in
+        if Sys.file_exists bfile then Some bfile else None
     in
-    if List.mem "*" plugins then
-      List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
-    else
-      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile) !GwdPlugin.se ;
-    let m = Option.value ~default:"" (p_getenv conf.env "m") in
-    if not @@ try_plugin plugins conf bfile m
-    then begin
-        if List.assoc_opt "counter" conf.base_env <> Some "no" &&
-          m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
-        then begin
-          match
-            if only_special_env conf.env
-            then SrcfileDisplay.incr_welcome_counter conf
-            else SrcfileDisplay.incr_request_counter conf
-          with
-          | Some (welcome_cnt, request_cnt, start_date) ->
-            GwdLog.log begin fun oc ->
-              let thousand oc x = output_string oc @@ Mutil.string_of_int_sep ","  x in
-              Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
-                thousand (welcome_cnt + request_cnt) thousand welcome_cnt
-                start_date
-            end ;
-          | None -> ()
-        end ;
-        let incorrect_request ?(comment = "") conf _ =
-          incorrect_request ~comment:comment conf
-        in
-        let doc_aux conf base print =
-          match Util.p_getenv conf.env "s" with
-          | Some f ->
-                if Filename.check_suffix f ".txt" then
-                  let f = Filename.chop_suffix f ".txt" in
-                  SrcfileDisplay.print_source conf base f
-                else print conf f
-          | _ -> incorrect_request conf ~comment:"Missing s= for m=DOC" base
-        in
-        match m with
-        | "" ->
-          let base =
-            match bfile with
-            | None -> None
-            | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
+    let process () =
+      if
+        conf.wizard || conf.friend
+        || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
+      then (
+        if
+          List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
+          && this_request_updates_database conf
+        then
+          w_base
+            (fun conn conf base ->
+              request_issue conn conf base ~level:`Error
+                ~key:"wizards cant write")
+            conn conf bfile
+        else if p_getenv conf.env "rnd" = Some "1" then
+          w_base redirect_to_random_person conn conf bfile
+        else
+          let () =
+            Registration.call_hooks (fun ~name hook ->
+                if List.mem name conf.allowed_plugins then hook conn conf bfile)
           in
-          if base <> None then
-            w_base @@
-            if only_special_env conf.env then SrcfileDisplay.print_welcome
-            else w_person @@ fun conf base p ->
-              match p_getenv conf.env "ptempl" with
-              | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                Perso.interp_templ t conf base p
-              | _ -> person_selected conf base p
-          else if conf.bname = ""
-          then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
-          else
-            w_base begin
-              if only_special_env conf.env then SrcfileDisplay.print_welcome
-              else w_person @@ fun conf base p ->
-                match p_getenv conf.env "ptempl" with
-                | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
-                  Perso.interp_templ t conf base p
-                | _ -> person_selected conf base p
-            end
-        | "A" ->
-          AscendDisplay.print |> w_person |> w_base
-        | "ADD_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_add
-        | "ADD_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
-        | "ADD_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_add
-        | "ADD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
-        | "ADD_PAR" ->
-          w_wizard @@ w_base @@ UpdateFam.print_add_parents
-        | "ADD_PAR_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
-        | "ANM" ->
-          w_base @@ fun conf _ -> BirthdayDisplay.print_anniversaries conf
-        | "AN" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_birth conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_birth conf base
-          end
-        | "AD" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_dead conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_dead conf base
-          end
-        | "AM" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some x -> BirthdayDisplay.print_marriage conf base (int_of_string x)
-            | _ -> BirthdayDisplay.print_menu_marriage conf base
-          end
-        | "AS" ->
-          w_base @@ fun conf base ->
-            SrcfileDisplay.print conf base "advanced"
-        | "AS_OK" ->
-          w_base @@ AdvSearchOkDisplay.print
-        | "C" ->
-          w_base @@ w_person @@ CousinsDisplay.print
-        | "CHK_DATA" ->
-          w_base @@ CheckDataDisplay.print
-        | "CAL" -> w_base @@ Hutil.print_calendar
-        | "CHG_CHN" when conf.wizard ->
-          w_wizard @@ w_base @@ ChangeChildrenDisplay.print
-        | "CHG_CHN_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
-        | "CHG_EVT_IND_ORD" ->
-          w_wizard @@ w_base @@ UpdateInd.print_change_event_order
-        | "CHG_EVT_IND_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_change_event_order
-        | "CHG_EVT_FAM_ORD" ->
-          w_wizard @@ w_base @@ UpdateFam.print_change_event_order
-        | "CHG_EVT_FAM_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_event_order
-        | "CHG_FAM_ORD" ->
-          w_wizard @@ w_base @@ UpdateFam.print_change_order
-        | "CHG_FAM_ORD_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_order_ok
-        | "CONN_WIZ" ->
-          w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
-        | "D" ->
-          w_base @@ w_person @@ DescendDisplay.print
-        | "DAG" ->
-          w_base @@ DagDisplay.print
-        | "DEL_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_del
-        | "DEL_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
-        | "DEL_IMAGE" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
-        | "DEL_IMAGE_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
-        | "DEL_IMAGE_C_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
-        | "DEL_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_del
-        | "DEL_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
-        | "DOC" ->
-          w_base @@ fun conf base -> doc_aux conf base
-            ImageDisplay.print_source
-        | "DOCH" ->
-          w_base @@ fun conf base -> doc_aux conf base
-            (fun conf _base -> ImageDisplay.print_html conf)
-        | "F" ->
-          w_base @@ w_person @@ Perso.interp_templ "family"
-        | "H" ->
-          w_wizard @@ w_base @@ fun conf base ->
-            ( match p_getenv conf.env "v" with
-            | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base ~comment:"Missing v= for m=H")
-        | "HIST" ->
-          w_base @@ History.print
-        | "HIST_CLEAN" ->
-          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean conf
-        | "HIST_CLEAN_OK" ->
-          w_wizard @@ w_base @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
-        | "HIST_DIFF" ->
-          w_base @@ HistoryDiffDisplay.print
-        | "HIST_SEARCH" ->
-          w_base @@ History.print_search
-        | "IM_C" ->
-          w_base @@ ImageCarrousel.print_c ~saved:false
-        | "IM_C_S" ->
-          w_base @@ ImageCarrousel.print_c ~saved:true
-        | "IM" ->
-          w_base @@ ImageDisplay.print
-        | "IMH" ->
-          w_base @@ fun conf _ -> ImageDisplay.print_html conf
-        | "INV_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_inv
-        | "INV_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
-        | "KILL_ANC" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
-        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
-              (Gwdb.empty_person base Gwdb.dummy_iper) 
-        | "LB" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_birth
-        | "LD" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_death
-        | "LINKED" ->
-          w_base @@ w_person @@ Perso.print_what_links
-        | "LL" ->
-          w_base @@ BirthDeathDisplay.print_longest_lived
-        | "LM" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_marriage
-        | "MISC_NOTES" ->
-          w_base @@ NotesDisplay.print_misc_notes
-        | "MISC_NOTES_SEARCH" ->
-          w_base @@ NotesDisplay.print_misc_notes_search
-        | "MOD_DATA" ->
-          w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
-        | "MOD_DATA_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
-        | "MOD_FAM" ->
-          w_wizard @@ w_base @@ UpdateFam.print_mod
-        | "MOD_FAM_OK" when conf.wizard ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
-        | "MOD_IND" ->
-          w_wizard @@ w_base @@ UpdateInd.print_mod
-        | "MOD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
-        | "MOD_NOTES" ->
-          w_wizard @@ w_base @@ NotesDisplay.print_mod
-        | "MOD_NOTES_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
-        | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print_mod
-        | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
-          w_lock @@ w_base @@ WiznotesDisplay.print_mod_ok
-        | "MRG" ->
-          w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
-        | "MRG_DUP" ->
-          w_wizard @@ w_base @@ MergeDupDisplay.main_page
-        | "MRG_DUP_IND_Y_N" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_ind_y_n
-        | "MRG_DUP_FAM_Y_N" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_fam_y_n
-        | "MRG_FAM" ->
-          w_wizard @@ w_base @@ MergeFamDisplay.print
-        | "MRG_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_merge
-        | "MRG_MOD_FAM_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_mod_merge
-        | "MRG_IND" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
-        | "MRG_IND_OK" -> (* despite the _OK suffix, this one does not actually update databse *)
-          w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
-        | "MRG_MOD_IND_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
-        | "N" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.search_surname_print conf base Some.surname_not_found v
-            | _ -> AllnDisplay.print_surnames conf base
-          end
-        | "NG" -> w_base @@ begin fun conf base ->
-            (* Rétro-compatibilité <= 6.06 *)
-            let env =
-              match p_getenv conf.env "n" with
-                Some n ->
-                begin match p_getenv conf.env "t" with
-                    Some "P" -> ("fn", Mutil.encode n) :: conf.env
-                  | Some "N" -> ("sn", Mutil.encode n) :: conf.env
-                  | _ -> ("v", Mutil.encode n) :: conf.env
-                end
-              | None -> conf.env
+          let m = Option.value ~default:"" (p_getenv conf.env "m") in
+          if not @@ try_plugin conn conf bfile m then
+            ((if
+                List.assoc_opt "counter" conf.base_env <> Some "no"
+                && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
+                && m <> "IMA"
+              then
+                match
+                  if only_special_env conf.env then
+                    SrcfileDisplay.incr_welcome_counter conf
+                  else SrcfileDisplay.incr_request_counter conf
+                with
+                | _ -> ());
+             let doc_aux conf base print =
+               match Util.p_getenv conf.env "s" with
+               | Some f ->
+                   if Filename.check_suffix f ".txt" then
+                     let f = Filename.chop_suffix f ".txt" in
+                     SrcfileDisplay.print_source conf base f
+                   else print conf f
+               | _ -> request_issue conn conf base ~key:"missing doc param"
+             in
+             let w_base hdl = w_base (fun _conn -> hdl) conn in
+             let w_person hdl = w_person (fun _conn -> hdl) conn in
+             let w_lock hdl = w_lock (fun _conn -> hdl) conn in
+             let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
+             match m with
+             | "" -> (
+                 match bfile with
+                 | Some bfile -> (
+                     (* We attempt to load the database in order to detect issues. *)
+                     try
+                       Driver.with_database bfile ignore;
+                       print_page conn
+                     with _ -> handle_no_bfile conn)
+                 | None -> handle_no_bfile conn)
+             | "A" -> w_base @@ w_person @@ AscendDisplay.print
+             | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
+             | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
+             | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
+             | "ADD_PAR_OK" ->
+                 w_wizard @@ w_base @@ UpdateFamOk.print_add_parents
+             | "ANM" ->
+                 w_base @@ fun conf _ ->
+                 BirthdayDisplay.print_anniversaries conf
+             | "AN" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some x ->
+                     BirthdayDisplay.print_birth conf base (int_of_string x)
+                 | _ -> BirthdayDisplay.print_menu_birth conf base)
+             | "AD" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some x ->
+                     BirthdayDisplay.print_dead conf base (int_of_string x)
+                 | _ -> BirthdayDisplay.print_menu_dead conf base)
+             | "AM" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some x ->
+                     BirthdayDisplay.print_marriage conf base (int_of_string x)
+                 | _ -> BirthdayDisplay.print_menu_marriage conf base)
+             | "AS" ->
+                 w_base @@ fun conf base ->
+                 SrcfileDisplay.print conf base "advanced"
+             | "AS_OK" -> w_base @@ AdvSearchOkDisplay.print
+             | "BLASON_MOVE_TO_ANC" -> w_base @@ ImageCarrousel.print_main_c
+             | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
+             | "C" -> w_base @@ w_person @@ CousinsDisplay.print
+             | "CAL" -> w_base @@ CalendarDisplay.print_calendar
+             | "CHANGE_WIZ_VIS" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ WiznotesDisplay.change_wizard_visibility
+             | "CHG_CHN" when conf.wizard ->
+                 w_wizard @@ w_base @@ ChangeChildrenDisplay.print
+             | "CHG_CHN_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
+             | "CHG_EVT_IND_ORD" ->
+                 w_wizard @@ w_base @@ UpdateInd.print_change_event_order
+             | "CHG_EVT_IND_ORD_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ UpdateIndOk.print_change_event_order
+             | "CHG_EVT_FAM_ORD" ->
+                 w_wizard @@ w_base @@ UpdateFam.print_change_event_order
+             | "CHG_EVT_FAM_ORD_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ UpdateFamOk.print_change_event_order
+             | "CHG_FAM_ORD" ->
+                 w_wizard @@ w_base @@ UpdateFam.print_change_order
+             | "CHG_FAM_ORD_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ UpdateFamOk.print_change_order_ok
+             | "CHK_DATA" -> w_wizard @@ w_base @@ CheckDataDisplay.print
+             | "CHK_DATA_L" ->
+                 w_wizard @@ w_base
+                 @@ CheckDataDisplay.print_redirect_to_list conn
+             | "CHK_DATA_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ CheckDataDisplay.print_chk_ok
+             | "CONN_WIZ" ->
+                 w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
+             | "D" -> w_base @@ w_person @@ DescendDisplay.print
+             | "DAG" -> w_base @@ DagDisplay.print conn
+             | "DEL_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_del
+             | "DEL_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
+             | "DEL_IMAGE" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
+             | "DEL_IMAGE_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
+             | "DEL_IMAGE_C_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+             | "DEL_IND" -> w_wizard @@ w_base @@ UpdateInd.print_del
+             | "DEL_IND_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
+             | "DOC" ->
+                 w_base @@ fun conf base ->
+                 doc_aux conf base ImageDisplay.print_source
+             | "DOCH" ->
+                 w_base @@ fun conf base ->
+                 doc_aux conf base (fun conf _base ->
+                     ImageDisplay.print_html conf)
+             | "F" -> w_base @@ w_person @@ Perso.interp_templ "family"
+             | "FIM" -> w_base @@ ImageDisplay.print_blason
+             | "FOLDER_IMAGES" ->
+                 w_base @@ fun conf _base ->
+                 if conf.wizard then
+                   ImageDisplay.print_folder_images_json conf
+                     (Util.p_getenv conf.env "folder")
+                 else Hutil.incorrect_request conf
+             | "GALLERY" ->
+                 w_base (fun conf base ->
+                     match
+                       (p_getenv conf.env "ref", p_getenv conf.env "ajax")
+                     with
+                     | Some "on", _ ->
+                         let fnotes =
+                           match p_getenv conf.env "f" with
+                           | Some f ->
+                               if NotesLinks.check_file_name f <> None then f
+                               else ""
+                           | None -> ""
+                         in
+                         NotesDisplay.print_what_links conf base fnotes
+                     | _, Some "on" ->
+                         Output.header conf
+                           "Content-type: application/json; charset=utf-8";
+                         Output.header conf "Connection: close";
+                         NotesDisplay.print_gallery_json conf base
+                     | _ -> NotesDisplay.print_gallery conf base)
+             | "MOD_GALLERY" ->
+                 w_wizard
+                 @@ w_base (fun conf base ->
+                     match p_getenv conf.env "ajax" with
+                     | Some "on" ->
+                         Output.header conf
+                           "Content-type: application/json; charset=utf-8";
+                         NotesDisplay.print_mod_gallery_json conf base
+                     | _ -> NotesDisplay.print_mod_gallery conf base)
+             | "MOD_GALLERY_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ NotesDisplay.print_mod_gallery_ok conn
+             | "H" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some f -> SrcfileDisplay.print conf base f
+                 | None -> request_issue conn conf base ~key:"missing v param")
+             | "HIST" -> w_base @@ History.print
+             | "HIST_CLEAN" ->
+                 w_wizard @@ w_base
+                 @@ fun conf _ -> HistoryDiffDisplay.print_clean conf
+             | "HIST_CLEAN_OK" ->
+                 w_wizard @@ w_base
+                 @@ fun conf _ -> HistoryDiffDisplay.print_clean_ok conf
+             | "HIST_DIFF" -> w_base @@ HistoryDiffDisplay.print
+             | "IMA" ->
+                 w_base @@ fun conf _base -> ImageDisplay.print_album_image conf
+             | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false
+             | "IM_C_S" -> w_base @@ ImageCarrousel.print_c ~saved:true
+             | "IM" -> w_base @@ ImageDisplay.print
+             | "IMAGE_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
+             | "IMH" -> w_base @@ fun conf _ -> ImageDisplay.print_html conf
+             | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
+             | "INV_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
+             | "ISOLATED" ->
+                 w_base @@ fun conf base -> Perso.print_isolated conf base
+             | "KILL_ANC" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ MergeIndDisplay.print_kill_ancestors
+             | "L" ->
+                 w_base @@ fun conf base ->
+                 Perso.interp_templ "list" conf base
+                   (Driver.empty_person base Driver.Iper.dummy)
+             | "LB" -> w_base @@ BirthDeathDisplay.print_birth
+             | "LD" -> w_base @@ BirthDeathDisplay.print_death
+             | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
+             | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
+             | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
+             | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
+             | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
+             | "MISC_NOTES_SEARCH" ->
+                 w_base @@ NotesDisplay.print_misc_notes_search
+             | "MOD_DATA" -> w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
+             | "MOD_DATA_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
+             | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod
+             | "MOD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_mod
+             | "MOD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_mod
+             | "MOD_IND_OK" -> w_wizard @@ w_base @@ UpdateIndOk.print_mod
+             | "MOD_NOTES" -> w_wizard @@ w_base @@ NotesDisplay.print_mod
+             | "MOD_NOTES_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
+             | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
+                 w_base @@ WiznotesDisplay.print_mod
+             | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
+                 w_lock @@ w_base @@ WiznotesDisplay.print_mod_ok
+             | "MRG" -> w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
+             | "MRG_DUP" -> w_wizard @@ w_base @@ MergeDupDisplay.main_page
+             | "MRG_DUP_IND_Y_N" ->
+                 w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_ind_y_n
+             | "MRG_DUP_FAM_Y_N" ->
+                 w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_fam_y_n
+             | "MRG_FAM" -> w_wizard @@ w_base @@ MergeFamDisplay.print
+             | "MRG_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_merge
+             | "MRG_MOD_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_mod_merge
+             | "MRG_IND" ->
+                 w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
+             | "MRG_IND_OK" ->
+                 (* Despite the _OK suffix, this one does not actually update databse *)
+                 w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
+             | "MRG_MOD_IND_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ MergeIndOkDisplay.print_mod_merge
+             | "N" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some v ->
+                     let alias_cache = Some.AliasCache.create () in
+                     Some.search_surname_print conf base alias_cache
+                       Some.surname_not_found v
+                 | _ -> AllnDisplay.print_surnames conf base)
+             | "NG" -> (
+                 w_base @@ fun conf base ->
+                 (* Backward compatibility for <= 6.07 *)
+                 let env =
+                   match p_getenv conf.env "n" with
+                   | Some n -> (
+                       match p_getenv conf.env "t" with
+                       | Some "P" -> ("fn", Mutil.encode n) :: conf.env
+                       | Some "N" -> ("sn", Mutil.encode n) :: conf.env
+                       | _ -> ("v", Mutil.encode n) :: conf.env)
+                   | None -> conf.env
+                 in
+                 let conf = { conf with env } in
+                 match p_getenv conf.env "select" with
+                 | Some "input" | None -> (
+                     (* Read non-empty search input fields *)
+                     let real_input label =
+                       match p_getenv conf.env label with
+                       | Some s -> if s = "" then None else Some s
+                       | None -> None
+                     in
+                     match real_input "v" with
+                     | Some n -> redirect_or_specify conn conf base n
+                     | None -> (
+                         match (real_input "fn", real_input "sn") with
+                         | Some fn, Some sn ->
+                             redirect_or_specify conn conf base (fn ^ " " ^ sn)
+                         | Some fn, None ->
+                             let conf =
+                               {
+                                 conf with
+                                 env = ("p", Mutil.encode fn) :: conf.env;
+                               }
+                             in
+                             SearchName.print conn conf base Some.specify
+                         | None, Some sn ->
+                             let conf =
+                               {
+                                 conf with
+                                 env = ("sn", Mutil.encode sn) :: conf.env;
+                               }
+                             in
+                             let alias_cache = Some.AliasCache.create () in
+                             Some.search_surname_print conf base alias_cache
+                               unknown sn
+                         | None, None ->
+                             request_issue conn conf base
+                               ~key:"missing fn and sn for search"))
+                 | Some i ->
+                     let p = pget conf base (Driver.Iper.of_string i) in
+                     Connection.http_redirect_temporarily conn
+                       (Adef.(Util.commd conf ^^^ Util.acces conf base p)
+                         :> string))
+             | "NOTES" ->
+                 w_base (fun conf base ->
+                     match p_getenv conf.env "ref" with
+                     | Some "on" ->
+                         let fnotes =
+                           match p_getenv conf.env "f" with
+                           | Some f ->
+                               if NotesLinks.check_file_name f <> None then f
+                               else ""
+                           | None -> ""
+                         in
+                         NotesDisplay.print_what_links conf base fnotes
+                     | _ -> NotesDisplay.print conf base)
+             | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
+             | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
+             | "P" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some v ->
+                     (* m=P&v=fn is a legacy route now served by m=S&p=fn.
+                        Rebuild conf.env stripping the legacy keys (m, v, t)
+                        and reinjecting the canonical ones in a single
+                        traversal. *)
+                     let t_value =
+                       match p_getenv conf.env "t" with
+                       | Some t -> t
+                       | None -> ""
+                     in
+                     let env_clean =
+                       List.filter
+                         (fun (k, _) -> k <> "m" && k <> "v" && k <> "t")
+                         conf.env
+                     in
+                     let conf =
+                       {
+                         conf with
+                         env =
+                           ("m", Mutil.encode "S")
+                           :: ("p", Mutil.encode v)
+                           :: ("t", Mutil.encode t_value)
+                           :: env_clean;
+                       }
+                     in
+                     SearchName.print conn conf base Some.specify
+                 | None ->
+                     (* Alphabetic first-name index, sortable by F or A. *)
+                     AllnDisplay.print_first_names conf base)
+             | "PERSO" ->
+                 w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
+             | "PNOC_LOOKUP" ->
+                 w_base @@ fun conf base -> PersonPicker.lookup_print conf base
+             | "POP_PYR" -> w_base @@ BirthDeathDisplay.print_population_pyramid
+             | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
+             | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
+             | "R" -> (
+                 w_base @@ fun conf base ->
+                 let r_not_found conf q =
+                   let title = transl conf "not found" |> Utf8.capitalize_fst in
+                   Notif.warning ~title
+                     (Printf.sprintf "%s: \"%s\"" title
+                        (Util.escape_html q :> string));
+                   let conf = Notif.inject_pending conf in
+                   match find_person_in_env_pref conf base "e" with
+                   | Some p -> RelationDisplay.print conf base p None
+                   | None -> SrcfileDisplay.print_welcome conf base
+                 in
+                 let lookup =
+                   PersonLookup.redirect_or_specify ~not_found:r_not_found
+                     ~redirect_to_person:(person_selected_with_redirect conn)
+                 in
+                 match p_getenv conf.env "select" with
+                 | Some "input" -> (
+                     let c = SearchName.extract_name_components conf base in
+                     match p_getenv conf.env "v" with
+                     | Some n -> lookup conf base n
+                     | None -> (
+                         match (c.first_name, c.surname, c.person_name) with
+                         | Some fn, Some sn, _ ->
+                             lookup conf base (fn ^ " " ^ sn)
+                         | Some fn, None, _ -> lookup conf base fn
+                         | None, Some sn, _ -> lookup conf base sn
+                         | None, None, Some pn -> lookup conf base pn
+                         | None, None, None ->
+                             request_issue conn conf base
+                               ~key:"missing p and n for relation"))
+                 | Some i when Option.is_some (int_of_string_opt i) ->
+                     RelationDisplay.print conf base
+                       (pget conf base (Driver.Iper.of_string i))
+                       (find_person_in_env_pref conf base "e")
+                 | _ -> (
+                     (* All R-case logic must be in a single expression. *)
+                     let p1_new = find_person_in_env conf base "1" in
+                     let p2_new = find_person_in_env conf base "2" in
+                     match (p1_new, p2_new) with
+                     | Some p1, Some p2 ->
+                         RelationDisplay.print conf base p1 (Some p2)
+                     | _ -> (
+                         (* Fallback on legacy parameter format. *)
+                         let p1_old = find_person_in_env conf base "" in
+                         let p2_old = find_person_in_env conf base "1" in
+                         match (p1_old, p2_old) with
+                         | Some p1, Some p2 ->
+                             RelationDisplay.print conf base p1 (Some p2)
+                         | Some p1, None ->
+                             RelationDisplay.print conf base p1
+                               (find_person_in_env_pref conf base "e")
+                         | _ ->
+                             request_issue conn conf base
+                               ~key:"incorrect fallback for relation")))
+             | "REQUEST" ->
+                 w_wizard @@ fun _ _ ->
+                 Output.status conf Code.OK;
+                 Output.header conf "Content-type: text/plain";
+                 Output.header conf "Connection: close";
+                 List.iter
+                   (fun s ->
+                     Output.print_sstring conf s;
+                     Output.print_sstring conf "\n")
+                   conf.Config.request
+             | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
+             | "RL" -> w_base @@ RelationLink.print
+             | "RM" -> w_base @@ RelationMatrixDisplay.print conn
+             | "RLM" -> w_base @@ RelationDisplay.print_multi conn
+             | "S" | "SN" ->
+                 w_base @@ fun conf base ->
+                 SearchName.print conn conf base Some.specify
+             | "SND_IMAGE" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
+             | "SND_IMAGE_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok
+             | "SND_IMAGE_C" ->
+                 w_base @@ w_person @@ Perso.interp_templ "carrousel"
+             | "SND_IMAGE_C_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+             | "SRC" -> (
+                 w_base @@ fun conf base ->
+                 match p_getenv conf.env "v" with
+                 | Some f -> SrcfileDisplay.print_source conf base f
+                 | _ -> request_issue conn conf base ~key:"missing v param")
+             | "STAT" ->
+                 w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
+             | "STATS" -> w_base @@ Statistics.print
+             | "TP" -> (
+                 w_base @@ fun conf base ->
+                 match Util.p_getenv conf.env "v" with
+                 | Some f -> (
+                     match Util.find_person_in_env conf base "" with
+                     | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
+                     | _ ->
+                         Perso.interp_templ ("tp0_" ^ f) conf base
+                           (Driver.empty_person base Driver.Iper.dummy))
+                 | None -> request_issue conn conf base ~key:"missing v param")
+             | "TT" -> w_base @@ TitleDisplay.print
+             | "U" ->
+                 w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
+             | "UNKNOWN" -> w_wizard @@ w_base @@ UnknownPersons.print
+             | "UNKNOWN_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UnknownPersons.print_ok
+             | "UPD" -> w_wizard @@ w_lock @@ w_base @@ UpdateField.print
+             | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
+                 w_wizard @@ w_base @@ WiznotesDisplay.print_view
+             | "WIZNOTES" when conf.authorized_wizards_notes ->
+                 w_base @@ WiznotesDisplay.print
+             | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
+                 w_base @@ WiznotesDisplay.print_search
+             | _ ->
+                 w_base @@ fun conf base ->
+                 Notif.error
+                   ~title:
+                     (Utf8.capitalize
+                        (Util.transl conf "NOTIF_TT incorrect request"))
+                   (Printf.sprintf
+                      (Util.ftransl conf "NOTIF incorrect request %s")
+                      (Util.escape_html m :> string));
+                 let conf = Notif.inject_pending conf in
+                 SrcfileDisplay.print_welcome conf base)
+              conf bfile)
+      else
+        let title _ =
+          Printf.sprintf "%s %s %s"
+            (transl conf "base" |> Utf8.capitalize_fst)
+            conf.bname
+            (transl conf "reserved to friends or wizards")
+          |> Output.print_sstring conf
+        in
+        Hutil.rheader conf title;
+        let base_name =
+          if conf.cgi then Printf.sprintf "b=%s&" conf.bname else ""
+        in
+        let user = transl_nth conf "user/password/cancel" 0 in
+        let passwd = transl_nth conf "user/password/cancel" 1 in
+        let referer =
+          match Util.extract_value '?' (get_referer conf :> string) with
+          | exception Not_found -> ""
+          | referer when referer <> "" -> "&" ^ referer
+          | _ -> ""
+        in
+        let oidc_login =
+          if Gwd_oidc.enabled conf.base_env then
+            let provider =
+              match List.assoc_opt "oidc_provider_name" conf.base_env with
+              | Some p when p <> "" -> p
+              | _ -> "SSO"
             in
-            let conf = {conf with env = env} in
-            (* Nouveau mode de recherche. *)
-            match p_getenv conf.env "select" with
-            | Some "input" | None ->
-              (* Récupère le contenu non vide de la recherche. *)
-              let real_input label =
-                match p_getenv conf.env label with
-                | Some s -> if s = "" then None else Some s
-                | None -> None
-              in
-              (* Recherche par clé, sosa, alias ... *)
-              let search n =
-                let (pl, sosa_acc) = find_all conf base n in
-                match pl with
-                | [] ->
-                  Some.search_surname_print conf base unknown n
-                | [p] ->
-                  if sosa_acc
-                  || Gutil.person_of_string_key base n <> None
-                  || person_is_std_key conf base p n
-                  then person_selected_with_redirect conf base p
-                  else specify conf base n pl
-                | pl -> specify conf base n pl
-              in
-              begin match real_input "v" with
-                | Some n -> search n
-                | None ->
-                  match real_input "fn", real_input "sn" with
-                    Some fn, Some sn -> search (fn ^ " " ^ sn)
-                  | Some fn, None ->
-                    Some.search_first_name_print conf base fn
-                  | None, Some sn ->
-                    Some.search_surname_print conf base unknown sn
-                  | None, None -> incorrect_request conf base
-                    ~comment:"Missing fn= and sn= for m=NG"
-              end
-            | Some i ->
-              relation_print conf base
-                (pget conf base (iper_of_string i))
-          end
-        | "NOTES" ->
-          w_base @@ NotesDisplay.print
-        | "OA" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_oldest_alive
-        | "OE" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_oldest_engagements
-        | "P" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.search_first_name_print conf base v
-            | None -> AllnDisplay.print_first_names conf base
-          end
-        | "PERSO" ->
-          w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
-
-        | "POP_PYR" when conf.wizard || conf.friend ->
-          w_base @@ BirthDeathDisplay.print_population_pyramid
-        | "PS" ->
-          w_base @@ PlaceDisplay.print_all_places_surnames
-        | "PPS" ->
-          w_base @@ Place.print_all_places_surnames
-        | "R" ->
-          w_base @@ w_person @@ relation_print
-        | "REFRESH" ->
-          w_base @@ w_person @@ Perso.interp_templ "carrousel"
-        | "REQUEST" ->
-          w_wizard @@ fun _ _ ->
-            Output.status conf Def.OK;
-            Output.header conf "Content-type: text";
-            List.iter begin fun s ->
-              Output.print_sstring conf s ;
-              Output.print_sstring conf "\n"
-            end conf.Config.request ;
-
-        | "RESET_IMAGE_C_OK" ->
-          w_base @@ ImageCarrousel.print_main_c
-
-        | "RL" ->
-          w_base @@ RelationLink.print
-        | "RLM" ->
-          w_base @@ RelationDisplay.print_multi
-        | "S" ->
-          w_base @@ fun conf base -> SearchName.print conf base specify unknown
-
-        | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print
-        | "SND_IMAGE_OK" ->
-           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok
-        | "SND_IMAGE_C" ->
-          w_base @@ w_person @@ Perso.interp_templ "carrousel"
-        | "SND_IMAGE_C_OK" ->
-          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
-
-        | "SRC" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some f -> SrcfileDisplay.print_source conf base f
-            | _ -> incorrect_request conf base ~comment:"Missing v= for m=SRC"
-          end
-        | "STAT" ->
-          w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
-        | "CHANGE_WIZ_VIS" ->
-          w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
-        | "TP" ->
-          w_base @@ fun conf base ->
-            begin match Util.p_getenv conf.env "v" with
-            | Some f ->
-              begin match Util.find_person_in_env conf base "" with
-              | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
-              | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
-                       (Gwdb.empty_person base Gwdb.dummy_iper)
-              end
-            | None -> incorrect_request conf base ~comment:"Missing v= for m=TP"
-            end
-        | "TT" ->
-          w_base @@ TitleDisplay.print
-        | "U" ->
-          w_wizard @@ w_base @@ w_person @@ updmenu_print
-        | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
-          w_wizard @@ w_base @@ WiznotesDisplay.print_view
-        | "WIZNOTES" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print
-        | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
-          w_base @@ WiznotesDisplay.print_search
-        | _ ->
-            w_base @@ fun conf base ->
-            let str = Format.sprintf "m=%s is not available here" m in
-            incorrect_request conf base ~comment:str
-      end conf bfile ;
-  end else begin
-    let title _ =
-      Printf.sprintf "%s %s %s"
-      (transl conf "base" |> Utf8.capitalize_fst)
-      conf.bname
-      (transl conf "reserved to friends or wizards")
-      |> Output.print_sstring conf
-    in
-    Hutil.rheader conf title ;
-    let base_name =
-      if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
-    in
-    let user = transl_nth conf "user/password/cancel" 0 in
-    let passwd = transl_nth conf "user/password/cancel" 1 in
-    let body =
-      if conf.cgi then
-        Printf.sprintf {|
+            Printf.sprintf {|<li><a href="%s?%sm=OIDC_LOGIN">%s</a></li>|}
+              (conf.command :> string)
+              base_name
+              (Utf8.capitalize_fst
+                 (Printf.sprintf (Util.ftransl conf "connect with %s") provider))
+          else ""
+        in
+        let body =
+          if conf.cgi then
+            Printf.sprintf
+              {|
             <input type="text" class="form-control" name="w"
               title="%s/%s %s" placeholder="%s:%s"
               aria-label="password input"
@@ -795,44 +891,51 @@ let treat_request =
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">OK</button>
             </div>|}
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
-            passwd user passwd user passwd
-      else
-        Printf.sprintf {|
+              (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+              (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+              passwd user passwd user passwd
+          else
+            Printf.sprintf
+              {|
             <div>
               <ul>
-              <li>%s%s <a href="%s?%sw=f"> %s</a></li>
-              <li>%s%s <a href="%s?%sw=w"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=f%s"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=w%s"> %s</a></li>
+              %s
               </ul>
             </div> |}
-            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
-            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
-    in
-    Output.print_sstring conf 
-      (Printf.sprintf {|
+              (transl conf "access" |> Utf8.capitalize_fst)
+              (transl conf ":")
+              (conf.command :> string)
+              base_name referer
+              (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+              (transl conf "access" |> Utf8.capitalize_fst)
+              (transl conf ":")
+              (conf.command :> string)
+              base_name referer
+              (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+              oidc_login
+        in
+        Output.print_sstring conf
+          (Printf.sprintf
+             {|
         <form class="form-inline" method="post" action="%s">
           <div class="input-group mt-1">
             <input type="hidden" name="b" value="%s">
             %s
           </div>
         </form>
-      |} (conf.command :> string) (conf.bname) body
-      );
-    Hutil.trailer conf
-  end
-  in
-  if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
-  else process ()
+      |}
+             (conf.command :> string)
+             conf.bname body);
+        Hutil.trailer conf
+    in
+    if conf.debug then
+      Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
+    else process ()
 
-let treat_request conf =
-  GWPARAM.init conf.bname ;
-  (* TODO verify if we need init_etc here *)
-  let conf = { conf with
-    base_env = Util.read_base_env conf.bname conf.gw_prefix conf.debug }
-  in
-  try treat_request conf with Update.ModErr _ -> Output.flush conf
+let treat_request conn conf =
+  GWPARAM.nb_errors := 0;
+  GWPARAM.errors_undef := [];
+  GWPARAM.errors_other := [];
+  try treat_request conn conf with Update.ModErr _ -> Output.flush conf

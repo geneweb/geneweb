@@ -3,10 +3,15 @@
 
 open Config
 
+let src = Logs.Src.create ~doc:"ImageDisplay" "IMG "
+
+module Log = (val Logs.src_log src : Logs.LOG)
+module Driver = Geneweb_db.Driver
+module Code = Geneweb_http.Code
+
 let print_placeholder_gendered_portrait conf p size =
-  let open Gwdb in
   let image, alt =
-    match get_sex p with
+    match Driver.get_sex p with
     | Male -> ("male.png", "M")
     | Female -> ("female.png", "F")
     | Neuter -> ("sexunknown.png", "?")
@@ -20,52 +25,50 @@ let print_placeholder_gendered_portrait conf p size =
 (* ************************************************************************** *)
 
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
-                    image, pdf ou html sur le flux HTTP sortant de Wserver.
-    [Args] :
-      - ct : le content_type MIME du fichier, par exemple "image/png",
-             "image/jpeg" ou "application/pdf"
-      - len : la taille en octet du fichier
-      - fname : le nom du fichier
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+    image, pdf ou html sur le flux HTTP sortant de Wserver. [Args] :
+    - ct : le content_type MIME du fichier, par exemple "image/png",
+      "image/jpeg" ou "application/pdf"
+    - len : la taille en octet du fichier
+    - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
+      dehors de ce module. *)
 let content conf ct len fname =
-  Output.status conf Def.OK;
+  Output.status conf Code.OK;
   Output.header conf "Content-type: %s" ct;
   Output.header conf "Content-length: %d" len;
   Output.header conf "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
   (* TODO: Utiliser un cache public pour les images non personelles. *)
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
+  Output.header conf "Connection: close";
   Output.flush conf
+
+let allowed_extensions =
+  [
+    (".png", "image/png");
+    (".jpg", "image/jpeg");
+    (".jpeg", "image/jpeg");
+    (".pjpeg", "image/jpeg");
+    (".gif", "image/gif");
+    (".pdf", "application/pdf");
+    (".htm", "text/html");
+    (".html", "text/html");
+  ]
+
+let error fmt = Format.kasprintf (fun s -> Error s) fmt
 
 let print_image_file conf fname =
   let res =
     List.find_opt
       (fun (suff, _ctype) ->
-        if
-          Filename.check_suffix fname suff
-          || Filename.check_suffix fname (String.uppercase_ascii suff)
-        then true
-        else false)
-      [
-        (".png", "image/png");
-        (".jpg", "image/jpeg");
-        (".jpeg", "image/jpeg");
-        (".pjpeg", "image/jpeg");
-        (".gif", "image/gif");
-        (".pdf", "application/pdf");
-        (".htm", "text/html");
-        (".html", "text/html");
-      ]
+        Filename.check_suffix fname suff
+        || Filename.check_suffix fname (String.uppercase_ascii suff))
+      allowed_extensions
   in
   match res with
-  | None ->
-      Error
-        (Format.sprintf "Could not find mime type from extension for file: %s"
-           fname)
+  | None -> error "cannot find MIME type from extension of file %s" fname
   | Some (_suff, ctype) -> (
       try
-        let ic = Secure.open_in_bin fname in
+        Secure.with_open_in_bin fname @@ fun ic ->
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
         content conf ctype len fname;
@@ -78,32 +81,104 @@ let print_image_file conf fname =
             loop (len - olen)
         in
         loop len;
-        close_in ic;
         Ok ()
-      with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
-          (Format.sprintf "Error printing image file content for %s : %s" fname
-             e);
-        Error e)
+      with Sys_error e -> error "cannot print image file %s: %s" fname e)
+
+let safe_folder f =
+  f <> ""
+  && (not (Mutil.contains f ".."))
+  && (not (String.contains f '/'))
+  && not (String.contains f '\\')
+
+let print_folder_images_json conf folder =
+  let files =
+    match folder with
+    | Some f when safe_folder f -> (
+        let dir = Filename.concat (!GWPARAM.albums_d conf.bname) f in
+        let collect entry acc =
+          match entry with
+          | Filesystem.File path ->
+              let ext = String.lowercase_ascii (Filename.extension path) in
+              if Array.mem ext Image.ext_list_1 then
+                String.concat "/" [ "albums"; f; Filename.basename path ] :: acc
+              else acc
+          | Filesystem.Dir _ | Filesystem.Exn _ -> acc
+        in
+        try Filesystem.walk_folder collect dir [] |> List.sort String.compare
+        with _ -> [])
+    | _ -> []
+  in
+  let json =
+    Yojson.Basic.to_string (`List (List.map (fun s -> `String s) files))
+  in
+  Output.status conf Code.OK;
+  Output.header conf "Content-type: application/json; charset=utf-8";
+  Output.header conf "Connection: close";
+  Output.print_sstring conf json;
+  Output.flush conf
+
+let print_album_image conf =
+  match Util.p_getenv conf.env "s" with
+  | Some f when f <> "" ->
+      let fname =
+        if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
+      in
+      if Mutil.contains fname ".." || String.contains fname '\\' then
+        Hutil.incorrect_request conf
+      else
+        let fname = Filename.concat (!GWPARAM.albums_d conf.bname) fname in
+        if conf.wizard || conf.friend || Image.is_not_private_img conf fname
+        then
+          Result.fold ~ok:ignore
+            ~error:(fun _ -> Hutil.incorrect_request conf)
+            (print_image_file conf fname)
+        else Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
-(*  [Fonc] print_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(*  [Fonc] print_portrait : Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit *)
 (* ************************************************************************** *)
 
-(** [Description] : Affiche l'image d'une personne en réponse HTTP.
-    [Args] :
-      - conf : configuration de la requête
-      - base : base de donnée sélectionnée
-      - p : personne dans la base dont il faut afficher l'image
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(** [Description] : Affiche l'image d'une personne en réponse HTTP. [Args] :
+    - conf : configuration de la requête
+    - base : base de donnée sélectionnée
+    - p : personne dans la base dont il faut afficher l'image [Retour] : aucun
+      [Rem] : Ne pas utiliser en dehors de ce module. *)
 let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->
       Result.fold ~ok:ignore
-        ~error:(fun _ ->
+        ~error:(fun e ->
+          Log.err (fun k -> k "%s" e);
           Hutil.incorrect_request conf
             ~comment:"print_image_file failed (portrait)")
+        (print_image_file conf path)
+  | Some (`Url url) ->
+      Util.html conf;
+      Output.print_sstring conf "<head><title>";
+      Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
+      Output.print_sstring conf "</title></head><body>";
+      Output.print_sstring conf (Printf.sprintf {|<img src=%s>|} url);
+      Output.print_sstring conf "</body></html>"
+  | None -> Hutil.incorrect_request conf
+
+(* ********************************************************************************* *)
+(*  [Fonc] print_blason : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(* ********************************************************************************* *)
+
+(** [Description] : Affiche l'image de la famille d'une personne en réponse
+    HTTP. [Args] :
+    - conf : configuration de la requête
+    - base : base de donnée sélectionnée
+    - p : personne dans la base dont il faut afficher l'image de la famille
+      [Retour] : aucun [Rem] : Ne pas utiliser en dehors de ce module. *)
+let print_blason_aux conf base p =
+  match Image.get_blason conf base p false with
+  | Some (`Path path) ->
+      Result.fold ~ok:ignore
+        ~error:(fun e ->
+          Log.err (fun k -> k "%s" e);
+          Hutil.incorrect_request conf)
         (print_image_file conf path)
   | Some (`Url url) ->
       Util.html conf;
@@ -119,7 +194,9 @@ let print_source conf f =
   let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
   if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
     Result.fold ~ok:ignore
-      ~error:(fun _ -> Hutil.incorrect_request conf)
+      ~error:(fun e ->
+        Log.err (fun k -> k "%s" e);
+        Hutil.incorrect_request conf)
       (print_image_file conf fname)
   else Hutil.incorrect_request conf
 
@@ -129,6 +206,14 @@ let print conf base =
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_portrait conf base p
+      | None -> Hutil.incorrect_request conf)
+
+let print_blason conf base =
+  match Util.p_getenv conf.env "s" with
+  | Some f -> print_source conf f
+  | None -> (
+      match Util.find_person_in_env conf base "" with
+      | Some p -> print_blason_aux conf base p
       | None -> Hutil.incorrect_request conf)
 
 let print_html conf =

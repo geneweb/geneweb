@@ -1,0 +1,5 @@
+(executable
+ (package geneweb)
+ (name gwfixbase)
+ (public_name gwfixbase)
+ (libraries unix str geneweb))

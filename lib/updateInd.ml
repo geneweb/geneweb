@@ -2,20 +2,19 @@
 
 open Config
 open Def
-open Gwdb
-open TemplAst
 open Util
+module Driver = Geneweb_db.Driver
 
 let string_person_of base p =
   let fp ip =
-    let p = poi base ip in
-    ( sou base (get_first_name p),
-      sou base (get_surname p),
-      get_occ p,
+    let p = Driver.poi base ip in
+    ( Driver.sou base (Driver.get_first_name p),
+      Driver.sou base (Driver.get_surname p),
+      Driver.get_occ p,
       Update.Link,
       "" )
   in
-  Futil.map_person_ps fp (sou base) (gen_person_of_person p)
+  Futil.map_person_ps fp (Driver.sou base) (Driver.gen_person_of_person p)
 
 (* Interpretation of template file 'updind.txt' *)
 
@@ -27,7 +26,7 @@ type 'a env =
   | Vbool of bool
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_env v env = try Templ.Env.find v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let bool_val = Update_util.bool_val
@@ -118,8 +117,8 @@ and eval_simple_var conf base env p = function
       match get_env "cnt" env with
       | Vint i -> (
           try
-            let p = poi base p.key_index in
-            let e = List.nth (get_pevents p) (i - 1) in
+            let p = Driver.poi base p.key_index in
+            let e = List.nth (Driver.get_pevents p) (i - 1) in
             let name =
               Util.string_of_pevent_name conf base e.epers_name
               |> Adef.safe_fn Utf8.capitalize_fst
@@ -129,7 +128,9 @@ and eval_simple_var conf base env p = function
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place = Util.string_of_place conf (sou base e.epers_place) in
+            let place =
+              Util.string_of_place conf (Driver.sou base e.epers_place)
+            in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)
@@ -141,6 +142,7 @@ and eval_simple_var conf base env p = function
   | [ "first_name_alias" ] -> eval_string_env "first_name_alias" env
   | [ "has_aliases" ] -> bool_val (p.aliases <> [])
   | [ "has_birth_date" ] -> bool_val (Date.od_of_cdate p.birth <> None)
+  | [ "has_image" ] | [ "has_portrait" ] -> bool_val ((p.image :> string) <> "")
   | [ "has_pevent_birth" ] ->
       let rec loop pevents =
         match pevents with
@@ -212,7 +214,7 @@ and eval_simple_var conf base env p = function
   | [ "has_surnames_aliases" ] -> bool_val (p.surnames_aliases <> [])
   | [ "has_titles" ] -> bool_val (p.titles <> [])
   | [ "image" ] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
-  | [ "index" ] -> str_val (string_of_iper p.key_index)
+  | [ "index" ] -> str_val (Driver.Iper.to_string p.key_index)
   | [ "is_female" ] -> bool_val (p.sex = Female)
   | [ "is_male" ] -> bool_val (p.sex = Male)
   | [ "is_first" ] -> (
@@ -221,6 +223,12 @@ and eval_simple_var conf base env p = function
       | _ -> raise Not_found)
   | [ "is_last" ] -> (
       match get_env "last" env with
+      | Vbool x -> bool_val x
+      | _ -> raise Not_found)
+  | [ "is_public" ] -> VVbool (p.access = Public)
+  | [ "is_semi_public" ] -> VVbool (p.access = SemiPublic)
+  | [ "is_upd_ind" ] -> (
+      match get_env "is_upd_ind" env with
       | Vbool x -> bool_val x
       | _ -> raise Not_found)
   | [ "nb_pevents" ] -> str_val (string_of_int (List.length p.pevents))
@@ -242,6 +250,8 @@ and eval_simple_var conf base env p = function
   | [ "of_course_dead" ] -> bool_val (p.death = OfCourseDead)
   | [ "public_name" ] ->
       safe_val (Util.escape_html p.public_name :> Adef.safe_string)
+  | [ "permalink" ] ->
+      VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "qualifier" ] -> eval_string_env "qualifier" env
   | "relation" :: sl ->
       let r =
@@ -487,13 +497,14 @@ and eval_person_var base (fn, sn, oc, create, _) = function
   | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "index" ] -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> str_val (string_of_iper ip)
-      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> str_val (Driver.Iper.to_string ip)
+      | _ -> str_val (Driver.Iper.to_string Driver.Iper.dummy))
   | [ "sex" ] ->
       let sex =
-        match person_of_key base fn sn oc with
-        | Some ip -> get_sex (poi base ip) |> index_of_sex |> string_of_int
+        match Driver.person_of_key base fn sn oc with
+        | Some ip ->
+            Driver.get_sex (Driver.poi base ip) |> index_of_sex |> string_of_int
         | _ -> Neuter |> index_of_sex |> string_of_int
       in
       str_val sex
@@ -509,23 +520,12 @@ and eval_is_relation_type rt = function
   | _ -> bool_val false
 
 and eval_special_var conf base = function
-  | [ "include_perso_header" ] -> (
-      (* TODO merge with mainstream includes ?? *)
+  | [ "include_menubar" ] -> (
       match p_getenv conf.env "i" with
       | Some i ->
-          let has_base_loop =
-            try
-              let _ = Util.create_topological_sort conf base in
-              false
-            with Consang.TopologicalSortError _ -> true
-          in
-          if has_base_loop then VVstring ""
-          else
-            let p = poi base (iper_of_string i) in
-            Perso.interp_templ_with_menu
-              (fun _ -> ())
-              "perso_header" conf base p;
-            VVstring ""
+          let p = Driver.poi base (Driver.Iper.of_string i) in
+          Perso.interp_templ ~no_headers:true "menubar" conf base p;
+          VVstring ""
       | None -> VVstring "")
   | _ -> raise Not_found
 
@@ -559,8 +559,9 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt nn ->
-             let env = (lab, Vstring nn) :: env in
-             let env = ("cnt", Vint cnt) :: env in
+             let env =
+               Templ.Env.(env |> add lab (Vstring nn) |> add "cnt" (Vint cnt))
+             in
              List.iter (print_ast env p) al;
              cnt + 1)
            0 list
@@ -571,7 +572,7 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             let env = ("cnt", Vint cnt) :: env in
+             let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
            1 list
@@ -582,7 +583,7 @@ let print_foreach print_ast _eval_expr =
       ignore
       @@ List.fold_left
            (fun cnt _ ->
-             let env = ("cnt", Vint cnt) :: env in
+             let env = Templ.Env.add "cnt" (Vint cnt) env in
              List.iter (print_ast env p) al;
              cnt + 1)
            1 list
@@ -592,9 +593,9 @@ let print_foreach print_ast _eval_expr =
     let rec loop first cnt = function
       | _ :: l ->
           let env =
-            ("cnt", Vint cnt) :: ("first", Vbool first)
-            :: ("last", Vbool (l = []))
-            :: env
+            Templ.Env.(
+              env |> add "cnt" (Vint cnt) |> add "first" (Vbool first)
+              |> add "last" (Vbool (l = [])))
           in
           List.iter (print_ast env p) al;
           loop false (cnt + 1) l
@@ -604,20 +605,21 @@ let print_foreach print_ast _eval_expr =
   and print_foreach_witness env p al list =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
-        | Some e ->
+        match List.nth list (i - 1) with
+        | exception Failure _ -> ()
+        | e ->
             let last = Array.length e.epers_witnesses - 1 in
             Array.iteri
               (fun i _ ->
                 let env =
-                  ("wcnt", Vint (i + 1))
-                  :: ("first", Vbool (i = 0))
-                  :: ("last", Vbool (i = last))
-                  :: env
+                  Templ.Env.(
+                    env
+                    |> add "wcnt" (Vint (i + 1))
+                    |> add "first" (Vbool (i = 0))
+                    |> add "last" (Vbool (i = last)))
                 in
                 List.iter (print_ast env p) al)
-              e.epers_witnesses
-        | None -> ())
+              e.epers_witnesses)
     | _ -> ()
   in
   print_foreach
@@ -629,21 +631,23 @@ let print_update_ind conf base p digest =
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
       let env =
-        [
-          ("digest", Vstring digest);
-          ("next_pevent", Vcnt (ref (List.length p.pevents + 1)));
-        ]
+        Templ.Env.empty
+        |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "next_pevent" (Vcnt (ref (List.length p.pevents + 1)))
+        |> Templ.Env.add "is_upd_ind" (Vbool true)
       in
-      Hutil.interp conf "updind"
-        {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
-        }
-        env p
+      let ifun =
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+      in
+      Templ.output conf ifun env p "updind"
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base p =
@@ -652,9 +656,9 @@ let print_del1 conf base p =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_decline conf "delete" s));
     Output.print_sstring conf " ";
-    Output.print_string conf (Util.escape_html (p_first_name base p));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
-    Output.print_string conf (Util.escape_html (p_surname base p))
+    Output.print_string conf (Util.escape_html (Driver.p_first_name base p));
+    Output.print_sstring conf (Format.sprintf ".%d " (Driver.get_occ p));
+    Output.print_string conf (Util.escape_html (Driver.p_surname base p))
   in
   Hutil.header conf title;
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
@@ -663,86 +667,48 @@ let print_del1 conf base p =
   Output.print_sstring conf
     "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper (get_iper p));
+    (Driver.Iper.to_string (Driver.get_iper p));
   Output.print_sstring conf
-    "<button type=\"submit\" class=\"btn btn-primary btn-lg\">\n";
+    "<button type=\"submit\" class=\"btn btn-danger btn-lg m-3\">\n";
   Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 1));
   Output.print_sstring conf "</button>\n";
   Output.print_sstring conf "</p>\n";
   Output.print_sstring conf "</form>\n";
   Hutil.trailer conf
 
-let print_add conf base =
-  let p =
-    {
-      first_name = "";
-      surname = "";
-      occ = 0;
-      image = "";
-      first_names_aliases = [];
-      surnames_aliases = [];
-      public_name = "";
-      qualifiers = [];
-      aliases = [];
-      titles = [];
-      rparents = [];
-      related = [];
-      occupation = "";
-      sex = Neuter;
-      access = IfTitles;
-      birth = Date.cdate_None;
-      birth_place = "";
-      birth_note = "";
-      birth_src = "";
-      baptism = Date.cdate_None;
-      baptism_place = "";
-      baptism_note = "";
-      baptism_src = "";
-      death = DontKnowIfDead;
-      death_place = "";
-      death_note = "";
-      death_src = "";
-      burial = UnknownBurial;
-      burial_place = "";
-      burial_note = "";
-      burial_src = "";
-      pevents = [];
-      notes = "";
-      psources = "";
-      key_index = dummy_iper;
-    }
-  in
-  print_update_ind conf base p ""
-
 let print_mod conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       let sp = string_person_of base p in
-      let digest = Update.digest_person sp in
+      let salt = Option.get conf.secret_salt in
+      let digest = Update.digest_person ~salt sp in
       print_update_ind conf base sp digest
 
 let print_del conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = poi base (iper_of_string i) in
+      let p = Driver.poi base (Driver.Iper.of_string i) in
       print_del1 conf base p
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some i ->
-      let p = string_person_of base (poi base (iper_of_string i)) in
-      Hutil.interp conf "updindevt"
-        {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach;
-        }
-        [] p
+      let p =
+        string_person_of base (Driver.poi base (Driver.Iper.of_string i))
+      in
+      Templ.output conf
+        Templ.
+          {
+            eval_var = eval_var conf base;
+            eval_transl = (fun _ -> Templ.eval_transl conf);
+            eval_predefined_apply = (fun _ -> raise Not_found);
+            get_vother;
+            set_vother;
+            print_foreach;
+          }
+        Templ.Env.empty p "updindevt"

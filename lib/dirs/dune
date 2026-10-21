@@ -1,0 +1,20 @@
+(executable
+ (name generate_flags)
+ (modules generate_flags))
+
+(rule
+ (with-stdout-to
+  flags.dune
+  (run ./generate_flags.exe %{ocaml-config:os_type})))
+
+(library
+ (package geneweb)
+ (name geneweb_dirs)
+ (modules geneweb_dirs var xdg)
+ (c_library_flags
+  (:standard
+   (:include flags.dune)))
+ (foreign_stubs
+  (language c)
+  (names windows_stubs))
+ (libraries fmt))

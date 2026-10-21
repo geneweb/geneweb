@@ -1,0 +1,16 @@
+root = true
+
+[*]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[Makefile]
+indent_style = tab
+
+[*.t]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[test/templ/*.html]
+trim_trailing_whitespace = false
+insert_final_newline = false

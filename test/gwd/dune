@@ -1,0 +1,26 @@
+(cram
+ (package geneweb-plugins)
+ (applies_to plugins)
+ (deps
+  (package geneweb-plugins)
+  %{bin:gwd}
+  (glob_files_rec ../../plugins/**)))
+
+(cram
+ (package geneweb)
+ (applies_to help log ancient windows)
+ (deps %{bin:gwd}))
+
+(cram
+ (package geneweb)
+ (applies_to windows)
+ (enabled_if
+  (= %{os_type} Win32)))
+
+(cram
+ (package geneweb)
+ (applies_to ancient)
+ (enabled_if
+  (and
+   (<> %{os_type} Win32)
+   (= %{env:GENEWEB_CI=} "on"))))

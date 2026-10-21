@@ -4,11 +4,86 @@ open Config
 open Util
 open Notes
 
+let src = Logs.Src.create ~doc:"NotesDisplay" "NOTE"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
+module Server = Geneweb_http.Server
+module Connection = Geneweb_http.Connection
+
+(* [deprecated] TYPE=album is accepted on read for backward compatibility
+   with notes, all new notes always write TYPE=gallery. *)
+let norm_type = function "album" -> "gallery" | t -> t
+
+let is_ancestor conf base anc =
+  let restrict_for_spouses =
+    try List.assoc "restrict_for_spouses" conf.base_env = "yes"
+    with Not_found -> false
+  in
+  let max =
+    match List.assoc_opt "restrict_note_max" conf.base_env with
+    | Some s -> ( try 2 lsl int_of_string s with Failure _ -> 32)
+    | None -> 32
+  in
+  let test_ancestor p1 p2 =
+    let ip1 = Driver.get_iper p1 in
+    let ip2 = Driver.get_iper p2 in
+    ip1 = ip2
+    || try Gutil.is_ancestor ~max base p1 p2 with Gutil.Same_person -> true
+  in
+  let bad_format n =
+    Log.warn (fun k -> k "bad pnoc format in RESTRICT (%d) (%s).\n" n anc)
+  in
+  if String.length anc <= 4 then (
+    bad_format 1;
+    false)
+  else
+    let anc = String.sub anc 2 (String.length anc - 4) in
+    let parts = String.split_on_char '/' anc in
+    if List.length parts <> 3 then (
+      bad_format 2;
+      false)
+    else
+      let fn = List.nth parts 0 |> Name.lower in
+      let sn = List.nth parts 1 |> Name.lower in
+      let oc =
+        try int_of_string (List.nth parts 2)
+        with Failure _ ->
+          bad_format 3;
+          0
+      in
+      match (Driver.person_of_key base fn sn oc, conf.user_iper) with
+      | Some anc_ip, Some user_ip ->
+          test_ancestor (Driver.poi base anc_ip) (Driver.poi base user_ip)
+          || restrict_for_spouses
+             &&
+             let families = Driver.get_family (Driver.poi base user_ip) in
+             Array.exists
+               (fun fam ->
+                 let fam = Driver.foi base fam in
+                 let fath_ip = Driver.get_father fam in
+                 let moth_ip = Driver.get_mother fam in
+                 let spouse_ip =
+                   if user_ip = fath_ip then moth_ip else fath_ip
+                 in
+                 test_ancestor (Driver.poi base anc_ip)
+                   (Driver.poi base spouse_ip))
+               families
+      | _ -> false
+
+let rec is_restricted conf base anc_l =
+  match anc_l with
+  | [] -> true
+  | anc :: l ->
+      if is_ancestor conf base anc then false else is_restricted conf base l
+
 let print_search_form conf from_note =
-  Output.print_sstring conf "<div class=\"form-group mt-3\">\n";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Output.printf conf
+    {|<div class="mt-3">
+<form class="d-flex align-items-center gap-2" method="get" action="%s">|}
+    conf.command;
   hidden_env conf;
-  Output.print_sstring conf "<div class=\"form-check form-check-inline\">";
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
   (match from_note with
@@ -17,20 +92,21 @@ let print_search_form conf from_note =
       Output.print_string conf (Util.escape_html n);
       Output.print_sstring conf {|">|}
   | None -> ());
-  Output.print_sstring conf {|<input type="text" name="s" size="40"|};
-  Output.print_sstring conf {| class="form-control col-8" value="|};
+  Output.print_sstring conf
+    {|<input type="text" name="s" size="40" class="form-control w-auto" value="|};
   (match p_getenv conf.env "s" with
   | Some s -> Output.print_string conf (Util.escape_html s)
   | None -> ());
   Output.print_sstring conf "\">";
-  Output.print_sstring conf "<input type=\"checkbox\" name=\"c\" value=\"on\"";
-  Output.printf conf " class=\"form-check-input ml-2\" id=\"case\"%s>"
+  Output.print_sstring conf {|<div class="form-check form-check-inline mb-0">|};
+  Output.printf conf
+    {|<input type="checkbox" name="c" value="on" class="form-check-input" id="case"%s>|}
     (match p_getenv conf.env "c" with
     | Some "on" -> " checked"
     | Some _ | None -> "");
-  Output.print_sstring conf "<label class=\"form-check-label\" for=\"case\">";
-  Output.printf conf "%s" (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</label></div>\n";
+  Output.printf conf {|<label class="form-check-label" for="case">%s</label>|}
+    (transl_nth conf "search/case sensitive" 1);
+  Output.print_sstring conf "</div>";
   Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -51,9 +127,27 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
     else ""
   in
   let modbtn =
-    if conf.wizard then Wiki.make_edit_button conf fnotes () else ""
+    if conf.wizard then Wiki.make_edit_button conf ~mode:"NOTES" fnotes ()
+    else ""
   in
-  Output.printf conf {|<div class="d-flex mb-3">%s%s</div>|} title_html modbtn;
+  let db = notes_links_db conf base false in
+  let pgl =
+    match List.assoc_opt fnotes db with Some _ -> true | None -> false
+  in
+  let from_where =
+    if pgl then
+      Format.sprintf
+        {|
+ <a href="%sm=NOTES&f=%s&ref=on"
+     class="align-self-center ms-3 mb-1"
+     title="%s">(<-)</a>|}
+        (commd conf :> string)
+        (fnotes :> string)
+        (transl conf "linked pages (pages) help" |> Utf8.capitalize_fst)
+    else ""
+  in
+  Output.printf conf {|<div class="d-flex mb-3">%s%s%s</div>|} title_html modbtn
+    from_where;
   let file_path = file_path conf base in
   let s = Util.string_with_macros conf [] s in
   let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
@@ -63,6 +157,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
         Wiki.wi_mode = "NOTES";
         Wiki.wi_file_path = file_path;
         Wiki.wi_person_exists = person_exists conf base;
+        Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
         Wiki.wi_always_show_link = conf.wizard || conf.friend;
       }
     in
@@ -73,39 +168,25 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   if ho <> None then print_search_form conf (Some fnotes);
   Hutil.trailer conf
 
-(* TODO: DO†WE†NEED†ME?
-   let what_links_page () =
-     if fnotes <> "" then (
-       Output.print_sstring conf {|<a href="|};
-       Output.print_string conf (commd conf);
-       Output.print_sstring conf {|m=NOTES&f=|};
-       Output.print_string conf (Mutil.encode fnotes);
-       Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-       Output.print_sstring conf (transl conf "linked pages");
-       Output.print_sstring conf ")</a>\n")
-   in*)
-
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Hutil.header_with_title conf (fun _ ->
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
-  if cnt0 = 0 && (title :> string) <> "" then (
-    Output.print_sstring conf "<br><br><h1>";
-    Output.print_string conf title;
-    Output.print_sstring conf "</h1>");
   let s = string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part s cnt0 in
+  let has_next = Wiki.extract_sub_part s (cnt0 + 1) <> [] in
   let mode = "NOTES" in
   let wi =
     {
       Wiki.wi_mode = mode;
       Wiki.wi_file_path = file_path conf base;
       Wiki.wi_person_exists = person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
-  Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
+  Wiki.print_sub_part conf wi ~has_next conf.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
 let fmt_fnote_title conf base fnotes =
@@ -117,7 +198,16 @@ let fmt_fnote_title conf base fnotes =
     if String.trim fnote_title = "" then no_title else fnote_title
   with Not_found -> no_title
 
-let linked_page_rows conf base pg =
+let person_query_suffix conf base = function
+  | None -> ""
+  | Some p -> "&" ^ (Util.acces conf base p :> string)
+
+let person_to_key base p =
+  let fn = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+  let sn = Name.lower (Driver.sou base (Driver.get_surname p)) in
+  (fn, sn, Driver.get_occ p)
+
+let linked_page_rows conf base ?person pg pgl =
   let typ = p_getenv conf.env "type" in
   match (pg, typ) with
   | Def.NLDB.PgInd ip, _ ->
@@ -130,19 +220,19 @@ let linked_page_rows conf base pg =
   <a href="%sm=MOD_IND&i=%s#notes" title="%s">
     <i class="fa fa-user"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_iper ip)
+             (Driver.Iper.to_string ip)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
         (Format.sprintf {|
 <td>%s%s</td>
-<td><i>%s</i></td>|}
+<td><i>%s</i></td><td></td>|}
            (Util.referenced_person_title_text conf base p :> string)
            (DateDisplay.short_dates_text conf base p :> string)
            (Utf8.capitalize_fst (transl conf "individual notes")))
   | Def.NLDB.PgFam ifam, _ ->
-      let fam = Gwdb.foi base ifam in
-      let fath = pget conf base (Gwdb.get_father fam) in
-      let moth = pget conf base (Gwdb.get_mother fam) in
+      let fam = Driver.foi base ifam in
+      let fath = pget conf base (Driver.get_father fam) in
+      let moth = pget conf base (Driver.get_mother fam) in
       if conf.wizard then
         Output.print_sstring conf
           (Format.sprintf
@@ -151,8 +241,8 @@ let linked_page_rows conf base pg =
   <a href="%sm=MOD_FAM&i=%s&ip=%s#events" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_ifam ifam)
-             (Gwdb.get_iper fath |> Gwdb.string_of_iper)
+             (Driver.Ifam.to_string ifam)
+             (Driver.get_iper fath |> Driver.Iper.to_string)
              (Utf8.capitalize_fst (transl conf "modify"))
              (transl_nth conf "event/events" 0)
              (transl_nth conf "family/families" 0));
@@ -160,7 +250,7 @@ let linked_page_rows conf base pg =
         (Format.sprintf
            {|
 <td>%s%s<br>& %s%s</td>
-<td class="align-middle"><i>%s %s</i></td>|}
+<td class="align-middle"><i>%s %s</i></td><td></td>|}
            (Util.referenced_person_title_text conf base fath :> string)
            (DateDisplay.short_dates_text conf base fath :> string)
            (Util.referenced_person_title_text conf base moth :> string)
@@ -174,20 +264,30 @@ let linked_page_rows conf base pg =
           (Format.sprintf
              {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES" title="%s">
-    <i class="far fa-file-lines"></i></a></td>|}
+  <a href="%sm=MOD_NOTES" title="%s"><i class="far fa-file-lines"></i></a>
+</td>|}
              (commd conf :> string)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
-        (Format.sprintf {|
+        (Format.sprintf
+           {|
 <td><a href="%sm=NOTES">%s</a></td>
-<td>%s</td>|}
+<td>%s</td><td></td>|}
            (commd conf :> string)
            (Utf8.capitalize (transl conf "base notes"))
            (Util.safe_html fnote_title :> string))
   | Def.NLDB.PgMisc fnotes, typ ->
       let nenv, _ = read_notes base fnotes in
-      let n_type = try List.assoc "TYPE" nenv with Not_found -> "" in
+      let n_type =
+        try norm_type (List.assoc "TYPE" nenv) with Not_found -> ""
+      in
+      let kq =
+        if n_type = "gallery" then person_query_suffix conf base person else ""
+      in
+      let view_route = if n_type = "gallery" then "GALLERY" else "NOTES" in
+      let mod_route =
+        if n_type = "gallery" then "MOD_GALLERY" else "MOD_NOTES"
+      in
       if match typ with Some t when t = "" -> t = n_type | _ -> true then (
         let fnote_title = fmt_fnote_title conf base fnotes in
         if conf.wizard then
@@ -195,27 +295,36 @@ let linked_page_rows conf base pg =
             (Format.sprintf
                {|
 <td class="text-center">
-  <a href="%sm=MOD_NOTES&f=%s" title="%s">
-    <i class="%s"></i></a></td>|}
+  <a href="%sm=%s&f=%s%s" title="%s"><i class="%s"></i></a>
+</td>|}
                (commd conf :> string)
-               (Util.uri_encode fnotes)
+               mod_route (Util.uri_encode fnotes) kq
                (Utf8.capitalize_fst
                   (transl conf
                      (if n_type = "gallery" then "modify gallery"
-                     else if n_type = "album" then "modify album"
-                     else "modify note")))
-               (if n_type = "gallery" || n_type = "album" then
-                "far fa-image fa-fw"
-               else "far fa-file-lines fa-fw"));
+                      else "modify note")))
+               (if n_type = "gallery" then "far fa-image fa-fw"
+                else "far fa-file-lines fa-fw"));
         Output.print_sstring conf
           (Format.sprintf
              {|
-<td><a href="%sm=NOTES&f=%s">%s</a></td>
-<td>%s</td>|}
+<td><a href="%sm=%s&f=%s%s">%s</a></td>
+<td>%s</td>%s|}
              (commd conf :> string)
-             (Util.uri_encode fnotes)
+             view_route (Util.uri_encode fnotes) kq
              (fnotes :> string)
-             (Util.safe_html fnote_title :> string)))
+             (Util.safe_html fnote_title :> string)
+             (if pgl || n_type = "gallery" then
+                Format.sprintf
+                  {|
+<td><a href="%sm=%s&f=%s&ref=on"
+       title="%s"><-</a></td>|}
+                  (commd conf :> string)
+                  view_route
+                  (fnotes :> string)
+                  (Utf8.capitalize_fst
+                     (transl conf "linked pages (pages) help"))
+              else "<td></td>")))
   | Def.NLDB.PgWizard wizname, _ ->
       if conf.wizard then
         Output.print_sstring conf
@@ -232,55 +341,169 @@ let linked_page_rows conf base pg =
         (Format.sprintf
            {|
 <td><a href="%sm=WIZNOTES&f=%s">%s</a></td>
-<td><i>%s</i></td>|}
+<td><i>%s</i></td><td></td>|}
            (commd conf :> string)
            (Util.uri_encode wizname)
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
-let create_gallery_item conf fnotes nenv s =
-  let img_url, img_name = Notes.json_extract_img conf s
-  and title = try List.assoc "TITLE" nenv with Not_found -> "" in
+let create_gallery_item_idx conf base person fnotes title
+    (img_idx, img_url, _img_name, desc) =
+  let max_len = 40 in
+  let caption =
+    match (title, desc) with
+    | "", "" -> fnotes
+    | t, "" -> t
+    | "", d -> d
+    | t, d ->
+        let s = t ^ " | " ^ d in
+        if String.length s > max_len then String.sub s 0 (max_len - 1) ^ "…"
+        else s
+  in
+  let img_param = Printf.sprintf "&img=%d" img_idx in
+  let kq = person_query_suffix conf base person in
   Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s"><img src="%s" \
-       title="%s | %s" alt="%s"></a>%s</div>|}
+    {|<div class="imap-gallery"><a href="%sm=GALLERY&f=%s%s%s"><img src="%s" title="%s" alt="%s"><div class="gallery-legend">%s</div></a></div>|}
     (commd conf :> string)
-    fnotes img_url fnotes img_name img_name title
+    (Util.uri_encode fnotes) kq img_param img_url fnotes fnotes caption
 
-let print_linked_list_gallery conf base pgl =
-  Wserver.printf "<div class=\"d-flex flex-wrap mt-3\">\n";
+let print_linked_list_gallery conf base ?person pgl =
+  Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
   List.iter
     (function
       | Def.NLDB.PgMisc fnotes ->
           let nenv, s = read_notes base fnotes in
-          let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-          if typ = "gallery" || typ = "album" then
-            Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
+          let typ =
+            try norm_type (List.assoc "TYPE" nenv) with Not_found -> ""
+          in
+          let restrict_l =
+            try List.assoc "RESTRICT" nenv with Not_found -> ""
+          in
+          let restrict_l =
+            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+          in
+          if
+            (restrict_l = [] || not (is_restricted conf base restrict_l))
+            && typ = "gallery"
+          then
+            let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+            let items =
+              match person with
+              | Some p ->
+                  Notes.json_gallery_items_for_key conf s (person_to_key base p)
+              | None -> []
+            in
+            let items =
+              if items <> [] then items
+              else
+                let u, n = Notes.json_extract_img conf s in
+                [ (1, u, n, "") ]
+            in
+            List.iter
+              (fun item ->
+                Output.print_sstring conf
+                  (create_gallery_item_idx conf base person fnotes title item))
+              items
       | _ -> ())
     pgl;
-  Wserver.printf "</div>\n"
+  Output.print_sstring conf "</div>\n"
 
-let print_linked_list_standard conf base pgl =
+let print_linked_list_standard conf base ?person pgl =
+  let db = notes_links_db conf base false in
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter
     (fun pg ->
-      Output.print_sstring conf "\n<tr>";
-      linked_page_rows conf base pg;
-      Output.print_sstring conf "</tr>\n")
+      match pg with
+      | Def.NLDB.PgMisc fnotes ->
+          let nenv, _ = read_notes base fnotes in
+          let restrict_l =
+            try List.assoc "RESTRICT" nenv with Not_found -> ""
+          in
+          let restrict_l =
+            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+          in
+          if restrict_l = [] || not (is_restricted conf base restrict_l) then (
+            Output.print_sstring conf "\n<tr>";
+            let pgl =
+              match List.assoc_opt fnotes db with
+              | Some _ -> true
+              | None -> false
+            in
+            linked_page_rows conf base ?person pg pgl;
+            Output.print_sstring conf "</tr>\n")
+      | _ ->
+          Output.print_sstring conf "\n<tr>";
+          linked_page_rows conf base ?person pg false;
+          Output.print_sstring conf "</tr>\n")
     pgl;
   Output.print_sstring conf "</table>"
 
-let print_linked_list conf base pgl =
+let print_linked_list conf base ?person pgl =
   match p_getenv conf.env "type" with
-  | Some "gallery" -> print_linked_list_gallery conf base pgl
-  | Some "album" -> print_linked_list_gallery conf base pgl
-  | _ -> print_linked_list_standard conf base pgl
+  | Some "gallery" -> print_linked_list_gallery conf base ?person pgl
+  | _ -> print_linked_list_standard conf base ?person pgl
+
+(* copied from perso.ml *)
+let simple_person_text conf base p p_auth : Adef.safe_string =
+  if p_auth then
+    match main_title conf base p with
+    | Some t -> titled_person_text conf base p t
+    | None -> gen_person_text conf base p
+  else if is_hide_names conf p then Adef.safe (Util.private_txt conf "")
+  else gen_person_text conf base p
+
+let print_what_links_p conf base p =
+  if authorized_age conf base p then (
+    let key = person_to_key base p in
+    let db = Driver.read_nldb base in
+    let db = Notes.merge_possible_aliases conf db in
+    let pgl = Notes.links_to_ind conf base db key None in
+    let title h =
+      let lnkd_typ, lnkd_typ_help =
+        match p_getenv conf.env "type" with
+        | Some "gallery" -> ("linked galleries", "linked galleries help")
+        | _ -> ("linked pages", "linked pages help")
+      in
+      let lnkd_typ_label = Util.transl conf lnkd_typ |> Utf8.capitalize_fst in
+      (* The page <title> only accepts plain text (see Hutil.header, which
+         calls [title true] there); the tooltip span is only valid in the
+         on-page <h1> (h = false). *)
+      (if h then lnkd_typ_label
+       else
+         Format.sprintf {|<span title="%s">%s</span>|}
+           (Util.transl conf lnkd_typ_help |> Utf8.capitalize_fst)
+           lnkd_typ_label)
+      |> Output.print_sstring conf;
+      Util.transl conf ":" |> Output.print_sstring conf;
+      Output.print_sstring conf " ";
+      if h then Output.print_string conf (simple_person_text conf base p true)
+      else (
+        Output.print_sstring conf {|<a href="|};
+        Output.print_string conf (commd conf);
+        Output.print_string conf (acces conf base p);
+        Output.print_sstring conf {|">|};
+        Output.print_string conf (simple_person_text conf base p true);
+        Output.print_sstring conf {|</a>|})
+    in
+    Hutil.header conf title;
+    print_linked_list conf base ~person:p pgl;
+    Hutil.trailer conf)
+  else Hutil.incorrect_request conf
 
 let print_what_links conf base fnotes =
   let title h =
-    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "linked pages"));
-    Output.print_sstring conf " ";
+    let label = Util.transl conf "linked pages" |> Utf8.capitalize_fst in
+    let colon = Util.transl conf ":" in
+    (* The page <title> only accepts plain text (see Hutil.header, which
+       calls [title true] there); the tooltip span is only valid in the
+       on-page <h1> (h = false). *)
+    (if h then Printf.sprintf "%s%s " label colon
+     else
+       Format.sprintf {|<span title="%s">%s%s </span>|}
+         (Util.transl conf "linked pages (pages) help" |> Utf8.capitalize_fst)
+         label colon)
+    |> Output.print_sstring conf;
     if h then (
       Output.print_sstring conf "[";
       Output.print_string conf (Util.escape_html fnotes);
@@ -299,90 +522,80 @@ let print_what_links conf base fnotes =
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 
+let read_notes_from_conf conf base =
+  let fnotes =
+    match p_getenv conf.env "f" with
+    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | None -> ""
+  in
+  read_notes base fnotes
+
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
     | Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
-  match p_getenv conf.env "ref" with
-  | Some "on" -> print_what_links conf base fnotes
-  | _ -> (
-      let nenv, s = read_notes base fnotes in
-      let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-      let templ, typ =
-        if typ = "" then (None, "")
-        else if typ = "album" || typ = "gallery" then
-          try (Util.open_etc_file conf "notes_gallery", typ)
-          with Not_found -> (None, "")
-        else (None, "")
-      in
-      match templ with
-      | Some (ic, _fname) -> (
-          match p_getenv conf.env "ajax" with
-          | Some "on" ->
-              let charset =
-                if conf.charset = "" then "utf-8" else conf.charset
-              in
-              Wserver.header
-                (Format.sprintf "Content-type: application/json; charset=%s"
-                   charset);
-              Wserver.printf "%s"
-                (match typ with
-                | "gallery" -> Notes.safe_gallery conf s
-                | "album" -> Notes.safe_gallery conf s
-                | _ -> s)
-          | _ -> Templ.copy_from_templ conf [] ic)
-      | None -> (
-          let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-          let title = Util.safe_html title in
-          match p_getint conf.env "v" with
-          | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-          | None -> print_whole_notes conf base fnotes title s None))
+  let nenv, s = read_notes base fnotes in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+  in
+  if restrict_l <> [] && is_restricted conf base restrict_l then
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+  else
+    let title = try List.assoc "TITLE" nenv with Not_found -> "" in
+    let title = Util.safe_html title in
+    match p_getint conf.env "v" with
+    | Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+    | None -> print_whole_notes conf base fnotes title s None
+
+let print_mod_gallery_json conf base =
+  let nenv, s = read_notes_from_conf conf base in
+  let s_digest =
+    List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
+  in
+  let digest = Mutil.digest s_digest in
+  let s = Notes.mark_pnocs_validity base s in
+  Output.printf conf "{\"digest\":\"%s\",\"r\":%s}" digest s
 
 let print_mod conf base =
+  let is_new_note = Util.p_getenv conf.env "new" <> None in
   let fnotes =
-    match p_getenv conf.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
-    | None -> ""
+    if is_new_note then ""
+    else
+      match p_getenv conf.env "f" with
+      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | None -> ""
   in
-  let nenv, s = read_notes base fnotes in
-  let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-  let templ =
-    if typ = "" then None
-    else if typ = "gallery" || typ = "album" then
-      Util.open_etc_file conf ("notes_upd_" ^ typ)
-    else None
+  let nenv, s = if is_new_note then ([], "") else read_notes base fnotes in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
   in
-  let title _ =
-    Output.printf conf "%s - %s%s"
-      (Utf8.capitalize_fst (transl conf "base notes"))
-      conf.bname
-      (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
-  in
-  match (templ, p_getenv conf.env "notmpl") with
-  | Some _, Some "on" ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-        nenv s
-  | Some (ic, _fname), _ -> (
-      match p_getenv conf.env "ajax" with
-      | Some "on" ->
-          let s_digest =
-            List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" nenv ^ s
-          in
-          let digest = Mutil.digest s_digest in
-          let charset = if conf.charset = "" then "utf-8" else conf.charset in
-          Wserver.header
-            (Format.sprintf "Content-type: application/json; charset=%s" charset);
-          Wserver.printf "{\"digest\":\"%s\",\"r\":%s}" digest s
-      | _ -> Templ.copy_from_templ conf [] ic)
-  | _ ->
-      Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title
-        nenv s
+  if restrict_l <> [] && is_restricted conf base restrict_l then
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+  else
+    let title _ =
+      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "base notes"));
+      if is_new_note then (
+        Output.print_sstring conf " — ";
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (transl_nth conf "new note name" 1)))
+      else if fnotes <> "" then (
+        Output.print_sstring conf " — ";
+        Output.print_sstring conf fnotes)
+    in
+    Wiki.print_mod_view_page conf true (Adef.encoded "NOTES") fnotes title nenv
+      s
 
 let print_mod_ok conf base =
   let fname = function
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | Some f ->
+        let f = Mutil.tr ' ' '_' f in
+        if NotesLinks.check_file_name f <> None then f else ""
     | None -> ""
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
@@ -396,6 +609,7 @@ let print_mod_ok conf base =
       Wiki.wi_mode = mode;
       Wiki.wi_file_path = file_path;
       Wiki.wi_person_exists = person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
@@ -440,23 +654,29 @@ let build_path_hierarchy d =
     | [] -> List.rev acc
     | part :: rest ->
         let new_current =
-          if current = "" then part
-          else current ^ String.make 1 NotesLinks.char_dir_sep ^ part
+          if current = "" then part else current ^ NotesLinks.dir_sep ^ part
         in
         build_paths ((new_current, part) :: acc) new_current rest
   in
   build_paths [] "" parts
 
+let can_see conf _f = conf.wizard || conf.friend
+
 (* Format directory entry with proper indentation level *)
-let format_folder_entry conf depth r path_to is_current is_path =
-  Format.sprintf {|<div class="my-1" style="margin-left: %.1fem;">%s</div>|}
-    (1.5 *. float_of_int depth)
-    (if is_current then
-     Format.sprintf
-       {|<span class="text-muted">
-             <i class="far fa-folder-open fa-fw mr-2"></i>%s
-          </span>|}
-       (Util.escape_html r :> string)
+let format_folder_entry conf depth r path_to is_current is_path view =
+  let view = view || can_see conf r in
+  let margin =
+    if depth = 0 then ""
+    else
+      Printf.sprintf " style=\"margin-left: %.1fem;\""
+        (1.5 *. float_of_int depth)
+  in
+  let content =
+    if is_current then
+      Format.sprintf
+        {|<span class="text-body-secondary">
+          <i class="far fa-folder-open fa-fw me-2"></i>%s</span>|}
+        (Util.escape_html r :> string)
     else
       let title_attr =
         let back_txt = Utf8.capitalize_fst (transl conf "back") in
@@ -467,42 +687,67 @@ let format_folder_entry conf depth r path_to is_current is_path =
               (Util.escape_html r :> string)
         else ""
       in
-      Format.sprintf
-        {|<a href="%sm=MISC_NOTES&d=%s"%s>
-             <i class="far fa-folder%s fa-fw mr-2"></i>%s
-          </a>|}
-        (commd conf :> string)
-        (Mutil.encode path_to :> string)
-        title_attr
-        (if is_path then "-open" else "")
-        (Util.escape_html r :> string))
+      if view then
+        Format.sprintf
+          {|<a href="%sm=MISC_NOTES&d=%s"%s>
+            <i class="far fa-folder-open fa-fw me-2"></i>%s</a>|}
+          (commd conf :> string)
+          (Mutil.encode path_to :> string)
+          title_attr
+          (Util.escape_html r :> string)
+      else
+        Format.sprintf {|<i class="far fa-folder-open fa-fw me-2"%s></i>%s|}
+          title_attr
+          (Util.escape_html r :> string)
+  in
+  Format.sprintf {|<div class="mt-1"%s>%s</div>|} margin content
 
 (* Format file entry with proper indentation level *)
-let format_file_entry conf depth d f n_type title =
+let format_file_entry conf depth d f n_type title view =
+  let view = view || can_see conf d in
   let icon = match n_type with "gallery" -> "image" | _ -> "file-lines" in
-  Format.sprintf
-    {|<div class="py-1" style="margin-left: %.1fem;">
-         <a href="%sm=NOTES&f=%s"><i class="far fa-%s fa-fw mr-2"></i>%s</a>
-         %s
-       </div>|}
-    (1.5 *. float_of_int depth)
-    (commd conf :> string)
-    (Mutil.encode (if d = "" then f else d ^ ":" ^ f) :> string)
-    icon
-    (Util.escape_html f :> string)
-    (if (title :> string) <> "" then
-     Format.sprintf {|<span class="text-muted ml-2">%s</span>|}
-       (title :> string)
-    else "")
+  let route = match n_type with "gallery" -> "GALLERY" | _ -> "NOTES" in
+  let color, mod_edit =
+    let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+    let f = notes_d ^ Filename.dir_sep ^ d ^ NotesLinks.dir_sep ^ f ^ ".txt" in
+    let f = Util.note_link_to_sys f in
+    if Sys.file_exists f then ("", "") else (" text-danger", "MOD_")
+  in
+  let margin =
+    if depth = 0 then ""
+    else
+      Printf.sprintf " style=\"margin-left: %.1fem;\""
+        (1.5 *. float_of_int depth)
+  in
+  if view then
+    Format.sprintf
+      {|<div class="mt-1"%s>
+         <a class="%s" href="%sm=%s%s&f=%s">
+           <i class="far fa-%s fa-fw me-2"></i>%s</a>%s</div>|}
+      margin color
+      (commd conf :> string)
+      mod_edit route
+      (Mutil.encode (if d = "" then f else d ^ ":" ^ f) :> string)
+      icon
+      (Util.escape_html f :> string)
+      (if (title :> string) <> "" then
+         Format.sprintf {|<span class="text-body-secondary ms-2">%s</span>|}
+           (title :> string)
+       else "")
+  else
+    Format.sprintf
+      {|<div class="mt-2"%s>
+         <i class="far fa-%s fa-fw me-2"></i>
+         <span class="text">%s</span></div>|}
+      margin icon
+      (Util.escape_html f :> string)
 
 (* Format back button *)
 let format_back_button conf d =
   Format.sprintf
     {|<div class="mb-3">
         <a href="%sm=MISC_NOTES%s" class="btn btn-outline-primary">
-          <i class="fa fa-arrow-left mr-2"></i>%s
-        </a>
-      </div>|}
+          <i class="fa fa-arrow-left me-2"></i>%s</a></div>|}
     (commd conf :> string)
     (match String.rindex_opt d NotesLinks.char_dir_sep with
     | Some i -> "&d=" ^ String.sub d 0 i
@@ -511,26 +756,90 @@ let format_back_button conf d =
 
 (* Format simple filename by removing parent directory *)
 let format_simple_filename d f =
-  let prefix = d ^ String.make 1 NotesLinks.char_dir_sep in
+  let prefix = d ^ NotesLinks.dir_sep in
   let prefix_len = String.length prefix in
   if String.length f > prefix_len && String.sub f 0 prefix_len = prefix then
     String.sub f prefix_len (String.length f - prefix_len)
   else f
 
+let check_note_access ~is_new conf base =
+  let fnotes =
+    if is_new then ""
+    else
+      match p_getenv conf.env "f" with
+      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | None -> ""
+  in
+  let nenv, _s = if is_new then ([], "") else read_notes base fnotes in
+  let restrict_l = try List.assoc "RESTRICT" nenv with Not_found -> "" in
+  let restrict_l =
+    if restrict_l = "" then [] else String.split_on_char ',' restrict_l
+  in
+  restrict_l = [] || not (is_restricted conf base restrict_l)
+
+let print_gallery conf base =
+  if check_note_access ~is_new:false conf base then
+    Templ.output_simple conf Templ.Env.empty "notes_gallery"
+  else
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+
+let print_mod_gallery_ok conn conf base =
+  let fname = function
+    | Some f ->
+        let f = Mutil.tr ' ' '_' f in
+        if NotesLinks.check_file_name f <> None then f else ""
+    | None -> ""
+  in
+  let edit_mode _ = if conf.wizard then Some "GALLERY" else None in
+  let read_string = read_notes base in
+  let commit = Notes.commit_notes conf base in
+  let fname_saved = Wiki.do_mod_ok conf edit_mode fname read_string commit in
+  let url =
+    Printf.sprintf "%sm=GALLERY&f=%s"
+      (commd conf :> string)
+      (Mutil.encode fname_saved :> string)
+  in
+  Connection.http_redirect_temporarily conn url
+
+let print_gallery_json conf base =
+  let _, s = read_notes_from_conf conf base in
+  let s = Notes.safe_gallery conf base (Notes.mark_pnocs_validity base s) in
+  Output.print_sstring conf s
+
+let print_mod_gallery conf base =
+  let is_new = Util.p_getenv conf.env "new" <> None in
+  if check_note_access ~is_new conf base then
+    Templ.output_simple conf Templ.Env.empty "notes_upd_gallery"
+  else
+    Output.print_sstring conf
+      (transl conf "note is restricted" |> Utf8.capitalize_fst)
+
 let print_misc_notes conf base =
   let d = match p_getenv conf.env "d" with Some d -> d | None -> "" in
+  let current_depth =
+    if d = "" then 0
+    else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
+  in
+  (* ATTENTION check this if "notes_d" changes (REORG) *)
+  let notes_d = Filename.concat (!GWPARAM.bpath conf.bname) "notes_d" in
+  let path_hierarchy d =
+    List.iteri
+      (fun i (path_to, dirname) ->
+        let parts = String.split_on_char NotesLinks.char_dir_sep d in
+        let is_current = i = List.length parts - 1 in
+        format_folder_entry conf (i + 1) dirname path_to is_current true true
+        |> Output.print_sstring conf)
+      (build_path_hierarchy d)
+  in
   Hutil.header conf (fun _ -> ());
-
-  Format.sprintf
-    {|<h1 class="mb-3"><i class="far fa-clipboard fa-sm mr-3"></i>%s</h1>|}
-    (if d <> "" then d
-    else
-      transl conf "miscellaneous notes"
-      |> Util.translate_eval |> Utf8.capitalize_fst)
-  |> Output.print_sstring conf;
-
+  Output.print_sstring conf
+    (Format.sprintf
+       {|<h1 class="mb-3" title="%s"><i class="far fa-clipboard fa-sm me-3"></i>%s</h1>|}
+       (transl conf "miscellaneous notes help" |> Utf8.capitalize_fst)
+       (if d <> "" then d
+        else transl conf "miscellaneous notes" |> Utf8.capitalize_fst));
   if d <> "" then format_back_button conf d |> Output.print_sstring conf;
-
   let db = notes_links_db conf base true in
   let db =
     List.fold_right
@@ -557,60 +866,99 @@ let print_misc_notes conf base =
       db []
   in
   let db = sort_entries db in
-
-  if db <> [] then (
-    Output.print_sstring conf {|<div class="px-1">|};
-
-    if d <> "" then
-      format_folder_entry conf 0 ".." "" false true |> Output.print_sstring conf;
-
-    if d <> "" then
-      List.iteri
-        (fun i (path_to, dirname) ->
-          let parts = String.split_on_char NotesLinks.char_dir_sep d in
-          let is_current = i = List.length parts - 1 in
-          format_folder_entry conf (i + 1) dirname path_to is_current true
-          |> Output.print_sstring conf)
-        (build_path_hierarchy d);
-
-    let current_depth =
-      if d = "" then 0
-      else List.length (String.split_on_char NotesLinks.char_dir_sep d) + 1
+  let one_folder r view =
+    let simple_d = if d = "" then r else d ^ NotesLinks.dir_sep ^ r in
+    format_folder_entry conf current_depth r simple_d false false view
+    |> Output.print_sstring conf
+  in
+  let one_file f view =
+    let envn, s = read_notes base f in
+    let txt =
+      let t = try List.assoc "TITLE" envn with Not_found -> "" in
+      if t <> "" then (Util.escape_html t :> string)
+      else if s = "" then ""
+      else
+        "<em>"
+        ^ (begin_text_without_html_tags 50 s |> Util.escape_html :> string)
+        ^ "</em>"
     in
-
-    List.iter
-      (function
-        | _, Some f ->
-            let txt =
-              let n, s = read_notes base f in
-              let t = try List.assoc "TITLE" n with Not_found -> "" in
-              if t <> "" then (Util.escape_html t :> string)
-              else if s = "" then ""
-              else
-                "<em>"
-                ^ (begin_text_without_html_tags 50 s |> Util.escape_html
-                    :> string)
-                ^ "</em>"
-            in
-            let n, _ = read_notes base f in
-            let n_type = try List.assoc "TYPE" n with Not_found -> "" in
-            let simple_f = format_simple_filename d f in
-            format_file_entry conf current_depth d simple_f n_type txt
-            |> Output.print_sstring conf
-        | r, None ->
-            format_folder_entry conf current_depth r
-              (if d = "" then r
-              else d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
-              false false
-            |> Output.print_sstring conf)
-      db;
+    let n_type = try List.assoc "TYPE" envn with Not_found -> "" in
+    let simple_f = format_simple_filename d f in
+    format_file_entry conf current_depth d simple_f n_type txt view
+    |> Output.print_sstring conf
+  in
+  let dirs_in_db, files_in_db =
+    List.partition
+      (fun f -> match f with _, None -> true | _, Some _f -> false)
+      db
+  in
+  let files_in_db =
+    List.fold_left
+      (fun acc e -> match e with _, Some f -> f :: acc | _ -> acc)
+      [] files_in_db
+    |> List.rev
+  in
+  let dirs_in_db =
+    List.fold_left
+      (fun acc e -> match e with d, None -> d :: acc | _ -> acc)
+      [] dirs_in_db
+    |> List.rev
+  in
+  if db <> [] then (
+    Output.print_sstring conf "<div>";
+    if d <> "" then (
+      format_folder_entry conf 0 ".." "" false true true
+      |> Output.print_sstring conf;
+      path_hierarchy d);
+    Output.print_sstring conf {|<div class="ms-2">|};
+    List.iter (fun d -> one_folder d true) dirs_in_db;
+    List.iter (fun f -> one_file f true) files_in_db;
     Output.print_sstring conf "</div>");
-
+  let d = Util.note_link_to_sys d in
+  let cur_dir = Filename.concat notes_d d in
+  let ls = Sys.readdir cur_dir |> Array.to_list in
+  let files, dirs =
+    List.fold_left
+      (fun (acc_f, acc_d) f ->
+        let stats = Unix.stat (Filename.concat cur_dir f) in
+        match stats.st_kind with
+        | S_DIR when f.[0] <> '.' ->
+            if List.mem f dirs_in_db then (acc_f, acc_d) else (acc_f, f :: acc_d)
+        | S_REG ->
+            if f.[String.length f - 1] <> '~' && f.[0] <> '.' then
+              let f =
+                if d = "" then Filename.remove_extension f
+                else d ^ NotesLinks.dir_sep ^ Filename.remove_extension f
+              in
+              if List.mem (Util.sys_to_note_link f) files_in_db then
+                (acc_f, acc_d)
+              else (f :: acc_f, acc_d)
+            else (acc_f, acc_d)
+        | _ -> (acc_f, acc_d))
+      ([], []) ls
+  in
+  if dirs <> [] || files <> [] then (
+    Output.print_sstring conf {|<div class="ms-2">|};
+    Output.print_sstring conf
+      (Format.sprintf
+         {|<h2 class="h3 mt-3 mb-1" title="%s">%s
+  <i class="far fa-circle-question fa-xs"></i></h2>|}
+         (transl conf "files not in db help" |> Utf8.capitalize_fst)
+         (transl conf "files not in db" |> Utf8.capitalize_fst));
+    if d <> "" then (
+      format_folder_entry conf 0 ".." "" false true true
+      |> Output.print_sstring conf;
+      path_hierarchy d);
+    List.iter (fun r -> one_folder r false) dirs;
+    Output.print_sstring conf "<p>";
+    List.iter
+      (fun f -> one_file (Filename.basename (Util.note_link_to_sys f)) false)
+      files;
+    Output.print_sstring conf {|</div>|});
   if d = "" then print_search_form conf None;
   Hutil.trailer conf
 
 (* searching *)
-
 let search_text conf base s =
   let s = if s = "" then " " else s in
   let case_sens = p_getenv conf.env "c" = Some "on" in

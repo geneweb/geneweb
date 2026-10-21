@@ -1,0 +1,42 @@
+name: Geneweb Ocaml Code Linter
+
+on:
+  push:
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
+  pull_request:
+    paths:
+      - '**/*.ml'
+      - '**/*.mli'
+      - '.ocamlformat'
+      - 'dune'
+      - 'dune-project'
+      - '**/*.opam'
+
+env:
+  OPAMYES: true
+
+jobs:
+  check_formatting:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Use OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+
+      - name: Install ocamlformat
+        run: opam install dune ocamlformat.0.29.0
+
+      - name: Check formatting with dune
+        id: format-check
+        run: opam exec -- dune build @fmt

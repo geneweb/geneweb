@@ -7,6 +7,7 @@
   <meta charset="utf-8">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 
@@ -247,7 +248,7 @@ zh: 网络家谱
             <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
             <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
             <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
-            <label><input type="checkbox" name="bp" value="on" %l_on1;%/>[baptism]</label>
+            <label><input type="checkbox" name="ba" value="on" %l_on1;%/>[baptism]</label>
             <label><input type="checkbox" name="bu" value="on" %l_on1;%/>[burial]</label>
             <input type="submit" value="Ok"%/>
           </form>
@@ -255,10 +256,11 @@ zh: 网络家谱
      </td></tr>
   </table>
 <br>
-%base_trailer;
+%include;trl
 %include;copyr
 </div>
 </div>
 %include;js
+%query_time;
 </body>
 </html>

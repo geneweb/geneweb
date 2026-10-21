@@ -2,32 +2,33 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 type update_error =
   | UERR of Adef.safe_string
-  | UERR_sex_married of person
-  | UERR_sex_incoherent of base * person
-  | UERR_sex_undefined of string * string * int
+  | UERR_sex_married of Driver.person
+  | UERR_sex_incoherent of Driver.base * Driver.person
   | UERR_unknow_person of string * string * int
-  | UERR_already_defined of base * person * string
-  | UERR_own_ancestor of base * person
+  | UERR_already_defined of Driver.base * Driver.person * string
+  | UERR_own_ancestor of Driver.base * Driver.person
   | UERR_digest
-  | UERR_bad_date of Def.dmy
+  | UERR_bad_date of Adef.dmy
   | UERR_missing_field of Adef.safe_string
-  | UERR_already_has_parents of base * person
+  | UERR_already_has_parents of Driver.base * Driver.person
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
+  | UERR_same_file
 
 exception ModErr of update_error
 
 type create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Adef.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Adef.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -50,7 +51,7 @@ let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =
 
 let infer_death_bb conf birth bapt =
   let infer_death_from_odate conf = function
-    | Some (Dgreg (d, _)) -> infer_death_from_dmy conf d
+    | Some (Adef.Dgreg (d, _)) -> infer_death_from_dmy conf d
     | Some (Dtext _) | None -> DontKnowIfDead
   in
   match infer_death_from_odate conf birth with
@@ -64,7 +65,7 @@ let infer_death_from_parents conf base fam =
     (* child is considered OfCourseDead if one parent is
        dead more than maximum_lifespan years ago *)
     let from_death =
-      match Date.dmy_of_death (get_death parent) with
+      match Date.dmy_of_death (Driver.get_death parent) with
       | Some dmy -> infer_death_from_dmy conf dmy
       | None -> DontKnowIfDead
     in
@@ -73,57 +74,73 @@ let infer_death_from_parents conf base fam =
       (* child is considered OfCourseDead if one parent was
          born more than maximum_lifespan + 25 years ago *)
       infer_death_from_cdate conf ~max_age:(maximum_lifespan + 25)
-        (get_birth parent)
+        (Driver.get_birth parent)
   in
-  let from_father = infer @@ poi base @@ get_father fam in
-  let from_mother = infer @@ poi base @@ get_mother fam in
-  let from_marriage = infer_death_from_cdate conf (get_marriage fam) in
+  let from_father = infer @@ Driver.poi base @@ Driver.get_father fam in
+  let from_mother = infer @@ Driver.poi base @@ Driver.get_mother fam in
+  let from_marriage = infer_death_from_cdate conf (Driver.get_marriage fam) in
   if
     Array.exists (( = ) OfCourseDead)
       [| from_father; from_mother; from_marriage |]
   then OfCourseDead
   else DontKnowIfDead
 
-let rec infer_death conf base p =
-  let death =
-    infer_death_bb conf
-      (Date.od_of_cdate (get_birth p))
-      (Date.od_of_cdate (get_baptism p))
-  in
-  if death <> DontKnowIfDead then death
-  else
-    let death =
-      let families = get_family p in
-      let len = Array.length families in
-      let rec loop_families i =
-        if i = len then DontKnowIfDead
-        else
-          let fam = foi base families.(i) in
-          match Date.cdate_to_dmy_opt (get_marriage fam) with
-          | Some d -> infer_death_from_dmy conf d
-          | None ->
-              let death =
-                let children = get_children fam in
-                let len = Array.length children in
-                let rec loop_children j =
-                  if j = len then DontKnowIfDead
-                  else
-                    let death = infer_death conf base (poi base children.(j)) in
-                    if death = OfCourseDead then OfCourseDead
-                    else loop_children (j + 1)
-                in
-                loop_children 0
-              in
-              if death = OfCourseDead then OfCourseDead
-              else loop_families (i + 1)
-      in
-      loop_families 0
-    in
-    if death <> DontKnowIfDead then death
+let infer_death conf base p =
+  let rec aux ~visited conf base p =
+    if Driver.Iper.Set.mem (Driver.get_iper p) visited then
+      (DontKnowIfDead, visited)
     else
-      match get_parents p with
-      | None -> DontKnowIfDead
-      | Some ifam -> infer_death_from_parents conf base (foi base ifam)
+      let visited = Driver.Iper.Set.add (Driver.get_iper p) visited in
+      let death =
+        infer_death_bb conf
+          (Date.od_of_cdate (Driver.get_birth p))
+          (Date.od_of_cdate (Driver.get_baptism p))
+      in
+      if death <> DontKnowIfDead then (death, visited)
+      else
+        let death, visited =
+          let families = Driver.get_family p in
+          let len = Array.length families in
+          let rec loop_families ~visited i =
+            if i = len then (DontKnowIfDead, visited)
+            else
+              let fam = Driver.foi base families.(i) in
+              match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
+              | Some d ->
+                  let death = infer_death_from_dmy conf d in
+                  if death <> DontKnowIfDead then (death, visited)
+                  else loop_families ~visited (i + 1)
+              | None ->
+                  let death, visited =
+                    let children = Driver.get_children fam in
+                    let len = Array.length children in
+                    let rec loop_children ~visited j =
+                      if j = len then (DontKnowIfDead, visited)
+                      else
+                        let death, visited =
+                          aux ~visited conf base (Driver.poi base children.(j))
+                        in
+                        if death = OfCourseDead then (OfCourseDead, visited)
+                        else loop_children ~visited (j + 1)
+                    in
+                    loop_children ~visited 0
+                  in
+                  if death = OfCourseDead then (OfCourseDead, visited)
+                  else loop_families ~visited (i + 1)
+          in
+          loop_families ~visited 0
+        in
+        let death =
+          if death <> DontKnowIfDead then death
+          else
+            match Driver.get_parents p with
+            | None -> DontKnowIfDead
+            | Some ifam ->
+                infer_death_from_parents conf base (Driver.foi base ifam)
+        in
+        (death, visited)
+  in
+  fst @@ aux ~visited:Driver.Iper.Set.empty conf base p
 
 (*let restrict_to_small_list el =
   let rec begin_list n rl el =
@@ -144,78 +161,209 @@ let rec infer_death conf base p =
   in
   begin_list 0 [] el*)
 
+let add_safe_string buf (s : Adef.safe_string) =
+  Buffer.add_string buf (s :> string)
+
+let add_escaped_string buf (s : Adef.escaped_string) =
+  Buffer.add_string buf (s :> string)
+
 (* ************************************************************************** *)
 (* [Fonc] print_person_parents_and_spouses :
             config -> base -> person -> unit *)
 
 (* ************************************************************************** *)
 
-(* ************************************************************************** *)
-
 (** [Description] : Print several information to distinguish homonyms. The
-      information includes name of the person, name of the parents,
-      name of the spouse.
-    [Args] :
-      - conf : configuration of the base
-      - base : base
-      - p    : person
-    [Retour] : unit
-    [Rem] : Not visible.                                                      *)
-let print_person_parents_and_spouses conf base p =
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
-  Output.print_string conf (acces conf base p);
-  Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html @@ p_first_name base p);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (string_of_int @@ get_occ p);
-  Output.print_sstring conf " ";
-  Output.print_string conf (escape_html @@ p_surname base p);
-  Output.print_sstring conf "</a>";
-  let pub_name = sou base (get_public_name p) in
-  if pub_name <> "" then
-    Output.print_sstring conf (Printf.sprintf " (%s)" pub_name);
-  Output.print_string conf (DateDisplay.short_dates_text conf base p);
-  let cop = Util.child_of_parent conf base p in
-  if String.length (cop :> string) > 0 then (
-    Output.print_sstring conf ", ";
-    Output.print_string conf cop);
-  let hbw = Util.husband_wife conf base p true in
-  if String.length (hbw :> string) > 0 then (
-    Output.print_sstring conf ", ";
-    Output.print_string conf hbw);
-  Output.print_sstring conf ". "
+    information includes name of the person, name of the parents, name of the
+    spouse. [Args] :
+    - conf : configuration of the base
+    - base : base
+    - p : person [Retour] : unit [Rem] : Not visible. *)
+let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
+    p =
+  if not (GWPARAM.p_auth conf base p) then ()
+  else
+    let buf = Buffer.create 256 in
+    Buffer.add_string buf "<a href=\"";
+    add_escaped_string buf (commd conf);
+    add_escaped_string buf (acces conf base p);
+    Buffer.add_string buf "\">";
+    let pub_name = Driver.sou base (Driver.get_public_name p) in
+    let first_name = (escape_html (Driver.p_first_name base p) :> string) in
+    let surname = (escape_html (Driver.p_surname base p) :> string) in
+    let name = if pub_name <> "" then (pub_name :> string) else first_name in
+    let name =
+      match List.assoc_opt "show_occ" conf.base_env with
+      | Some "yes" -> Printf.sprintf "%s.%d" name (Driver.get_occ p)
+      | _ -> name
+    in
+    Buffer.add_string buf name;
+    Buffer.add_char buf ' ';
+    Buffer.add_string buf surname;
+    Buffer.add_string buf "</a>";
+    (match snalias with
+    | Some sn_a ->
+        Buffer.add_string buf (" [" ^ (escape_html sn_a :> string) ^ "]")
+    | None -> ());
+    add_safe_string buf (DateDisplay.short_dates_text conf base p);
+    (match alias with
+    | Some alias ->
+        Printf.bprintf buf " %s %s" (Util.transl conf "alias")
+          (Util.escape_html alias :> string)
+    | None -> ());
+    if pub_name <> "" then (
+      Buffer.add_string buf " (";
+      Buffer.add_string buf first_name;
+      Buffer.add_string buf ")");
+    let cop = (Util.child_of_parent conf base p :> string) in
+    if cop <> "" then (
+      Buffer.add_string buf ", ";
+      Buffer.add_string buf cop);
+    let spouses_buf = Buffer.create 128 in
+    ignore (Util.husband_wife ~buf:spouses_buf conf base p true);
+    let spouses_text = Buffer.contents spouses_buf in
+    Buffer.add_string buf spouses_text;
+    Buffer.add_char buf '.';
+    Output.print_sstring conf (Buffer.contents buf)
+
+let form_dates_from_env conf =
+  let prec_str = function
+    | "about" -> "ca "
+    | "maybe" -> "?"
+    | "before" -> "<"
+    | "after" -> ">"
+    | _ -> ""
+  in
+  let get_year prefix =
+    match Util.p_getenv conf.env (prefix ^ "_yyyy") with
+    | Some y when y <> "" ->
+        let prec =
+          Util.p_getenv conf.env (prefix ^ "_prec") |> Option.value ~default:""
+        in
+        Some (prec_str prec ^ y)
+    | _ -> None
+  in
+  let find_event_year event_name =
+    let rec loop i =
+      if i > 20 then None
+      else
+        let idx = string_of_int i in
+        match Util.p_getenv conf.env ("e_name" ^ idx) with
+        | Some name when name = event_name -> (
+            match Util.p_getenv conf.env ("e_date" ^ idx ^ "_yyyy") with
+            | Some y when y <> "" ->
+                let prec =
+                  Util.p_getenv conf.env ("e_date" ^ idx ^ "_prec")
+                  |> Option.value ~default:""
+                in
+                Some (prec_str prec ^ y)
+            | _ -> None)
+        | Some _ -> loop (i + 1)
+        | None -> None
+    in
+    loop 1
+  in
+  let by =
+    match find_event_year "#birt" with
+    | Some y -> Some y
+    | None -> (
+        match find_event_year "#bapt" with
+        | Some y -> Some y
+        | None -> (
+            match get_year "birth" with
+            | Some y -> Some y
+            | None -> get_year "bapt"))
+  in
+  let dy =
+    match find_event_year "#deat" with
+    | Some y -> Some y
+    | None -> (
+        match find_event_year "#buri" with
+        | Some y -> Some y
+        | None -> (
+            match find_event_year "#crem" with
+            | Some y -> Some y
+            | None -> (
+                match get_year "death" with
+                | Some y -> Some y
+                | None -> get_year "burial")))
+  in
+  match (by, dy) with
+  | Some b, Some d -> " " ^ b ^ "–" ^ d
+  | Some b, None -> " " ^ b ^ "–"
+  | None, Some d -> " †" ^ d
+  | None, None -> ""
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
   | [ _ ] -> ()
   | pl ->
-      Output.print_sstring conf "<p>";
+      let occu_opt =
+        match List.assoc_opt "occu_in_homonyms" conf.base_env with
+        | Some "yes" -> Some None
+        | Some s -> (
+            match int_of_string_opt s with
+            | Some n when n > 0 -> Some (Some n)
+            | _ -> None)
+        | None -> None
+      in
+      let original_i = Util.p_getenv conf.env "i" in
+      Output.print_sstring conf "<p class=\"mt-2 mb-0\">";
       Output.print_sstring conf
       @@ Utf8.capitalize_fst (transl conf "persons having the same name");
       Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf "<ul>";
+      Output.print_sstring conf
+        {|<table class="table table-sm table-borderless my-1"><tbody>|};
       List.iter
         (fun p ->
-          Output.print_sstring conf "<li>";
+          let is_original =
+            match original_i with
+            | Some i -> Driver.Iper.to_string (Driver.get_iper p) = i
+            | None -> false
+          in
+          Output.print_sstring conf "<tr";
+          if is_original then
+            Output.print_sstring conf {| class="fst-italic text-info"|};
+          Output.print_sstring conf ">";
+          Output.print_sstring conf
+            {|<td class="text-end align-middle text-body-secondary p-0 pr-2" style="width:2em">|};
+          Output.print_sstring conf (string_of_int (Driver.get_occ p));
+          Output.print_sstring conf "</td>";
+          (match occu_opt with
+          | None -> ()
+          | Some max_len_opt ->
+              (match max_len_opt with
+              | Some n ->
+                  Output.printf conf
+                    {|<td class="text-body-secondary align-middle p-0 pr-1" style="width:%dem">|}
+                    ((n / 2) + 1)
+              | None ->
+                  Output.print_sstring conf
+                    {|<td class="text-body-secondary p-0 pr-1">|});
+              let occu = Driver.sou base (Driver.get_occupation p) in
+              (match max_len_opt with
+              | Some n when occu <> "" && String.length occu > n ->
+                  Output.print_string conf (escape_html (String.sub occu 0 n));
+                  Output.print_sstring conf "…"
+              | _ when occu <> "" -> Output.print_string conf (escape_html occu)
+              | _ -> ());
+              Output.print_sstring conf "</td>");
+          Output.print_sstring conf {|<td class="p-0">|};
           print_person_parents_and_spouses conf base p;
-          Output.print_sstring conf "</li>")
+          Output.print_sstring conf "</td></tr>")
         pl;
-      Output.print_sstring conf "</ul></p>"
+      Output.print_sstring conf "</tbody></table></p>"
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
 
 (* ************************************************************************* *)
 
-(** [Description] : Test si le label contient le mot 'note' pour savoir si
-      dans les évènement secondaires, il faut traiter la note comme un
-      textarea.
-    [Args] :
-      - lbl : le label
-    [Retour] :
-      - bool
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Test si le label contient le mot 'note' pour savoir si dans
+    les évènement secondaires, il faut traiter la note comme un textarea. [Args]
+    :
+    - lbl : le label [Retour] :
+    - bool [Rem] : Non exporté en clair hors de ce module. *)
 let is_label_note lbl =
   let rec loop i =
     if i = String.length lbl then false
@@ -265,9 +413,9 @@ let string_of_error conf =
     ^<^ Util.escape_html s
   in
   let fso_p base p =
-    let f = Gwdb.get_first_name p |> Gwdb.sou base |> Name.lower in
-    let s = Gwdb.get_surname p |> Gwdb.sou base |> Name.lower in
-    let o = get_occ p in
+    let f = Driver.get_first_name p |> Driver.sou base |> Name.lower in
+    let s = Driver.get_surname p |> Driver.sou base |> Name.lower in
+    let o = Driver.get_occ p in
     fso f s o
   in
   let strong s = ("<strong>" ^<^ s ^>^ "</strong>" :> Adef.safe_string) in
@@ -280,34 +428,44 @@ let string_of_error conf =
       (Utf8.capitalize_fst (fso_p base p :> string)
       ^ " "
       ^
-      if get_sex p = Female then transl conf "should be male"
+      if Driver.get_sex p = Female then transl conf "should be male"
       else transl conf "should be female")
-      |> Adef.safe
-  | UERR_sex_undefined (f, s, o) ->
-      Printf.sprintf
-        (fcapitale (ftransl conf "undefined sex for %t"))
-        (fun _ -> (fso f s o :> string))
       |> Adef.safe
   | UERR_unknow_person (f, s, o) ->
       Utf8.capitalize_fst (transl conf "unknown person")
       ^<^ transl conf ":" ^<^ " "
       ^<^ strong (fso f s o)
   | UERR_already_defined (base, p, var) ->
-      (Printf.sprintf
-         (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-         ("\"" ^ (fso_p base p :> string) ^ "\"")
-         (fun _ ->
-           Printf.sprintf "<a href=\"%s%s\">"
-             (commd conf : Adef.escaped_string :> string)
-             (acces conf base p : Adef.escaped_string :> string))
-         (fun _ -> "</a>")
-      ^
-      if var = "" then "."
-      else
-        "<span class=\"UERR_already_defined_var\">("
-        ^ (Util.escape_html var : Adef.escaped_string :> string)
-        ^ ")</span>.")
-      |> Adef.safe
+      let fn = Driver.p_first_name base p in
+      let sn = Driver.p_surname base p in
+      let occ = Driver.get_occ p in
+      let person_key =
+        if occ = 0 then fn ^ " " ^ sn
+        else fn ^ "." ^ string_of_int occ ^ " " ^ sn
+      in
+      let dates = (DateDisplay.short_dates_text conf base p :> string) in
+      let form_dates = form_dates_from_env conf in
+      let name_quoted = "\"" ^ (fso_p base p :> string) ^ form_dates ^ "\"" in
+      let person_link =
+        Printf.sprintf "<a href=\"%s%s\">%s</a>%s"
+          (commd conf :> string)
+          (acces conf base p :> string)
+          (escape_html person_key :> string)
+          dates
+      in
+      let base_msg =
+        Printf.sprintf
+          (fcapitale (ftransl conf "name %s already used by %s"))
+          name_quoted person_link
+      in
+      let msg =
+        if var = "" then base_msg ^ "."
+        else
+          base_msg ^ " <span class=\"UERR_already_defined_var\">("
+          ^ (Util.escape_html var :> string)
+          ^ ")</span>."
+      in
+      Adef.safe msg
   | UERR_own_ancestor (base, p) ->
       strong (fso_p base p)
       ^>^ " "
@@ -315,6 +473,9 @@ let string_of_error conf =
   | UERR_digest ->
       transl conf
         {|the base has changed; do "back", "reload", and refill the form|}
+      |> Utf8.capitalize_fst |> Adef.safe
+  | UERR_same_file ->
+      transl conf "this notes file already exists"
       |> Utf8.capitalize_fst |> Adef.safe
   | UERR_bad_date d ->
       (Utf8.capitalize_fst (transl conf "incorrect date")
@@ -366,43 +527,41 @@ let delete_topological_sort conf base =
   Mutil.rm tstab_file
 
 let print_someone conf base p =
-  Output.printf conf "%s%s %s" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-    (p_surname base p)
+  Output.printf conf "%s%s %s"
+    (Driver.p_first_name base p)
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
+    (Driver.p_surname base p)
 
 let print_first_name conf base p =
-  Output.print_string conf (Util.escape_html @@ p_first_name base p);
-  if get_occ p <> 0 then (
+  Output.print_string conf (Util.escape_html @@ Driver.p_first_name base p);
+  if Driver.get_occ p <> 0 then (
     Output.print_sstring conf ".";
-    Output.print_sstring conf @@ string_of_int (get_occ p))
+    Output.print_sstring conf @@ string_of_int (Driver.get_occ p))
 
 let someone_strong base p =
   "<strong>"
-  ^<^ escape_html (p_first_name base p)
-  ^^^ (if get_occ p = 0 then Adef.escaped ""
-      else Adef.escaped @@ "." ^ string_of_int (get_occ p))
+  ^<^ escape_html (Driver.p_first_name base p)
+  ^^^ (if Driver.get_occ p = 0 then Adef.escaped ""
+       else Adef.escaped @@ "." ^ string_of_int (Driver.get_occ p))
   ^^^ " "
-  ^<^ escape_html (p_surname base p)
+  ^<^ escape_html (Driver.p_surname base p)
   ^>^ "</strong>"
 
 let print_first_name_strong conf base p =
-  Output.printf conf "<strong>%s%s</strong>" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+  Output.printf conf "<strong>%s%s</strong>"
+    (Driver.p_first_name base p)
+    (if Driver.get_occ p = 0 then "" else "." ^ string_of_int (Driver.get_occ p))
 
 let print_error conf e = Output.print_string conf @@ string_of_error conf e
 
-let print_someone_ref_text conf base p =
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
-  Output.print_string conf (acces conf base p);
-  Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html @@ p_first_name base p);
-  if get_occ p <> 0 then (
-    Output.print_sstring conf ".";
-    Output.print_sstring conf (string_of_int (get_occ p)));
-  Output.print_sstring conf " ";
-  Output.print_string conf (escape_html @@ p_surname base p);
-  Output.print_sstring conf "</a>"
+let someone_ref_text conf base p =
+  let occ = Driver.get_occ p in
+  Printf.sprintf {|<a href="%s%s">%s%s %s</a>|}
+    (commd conf :> string)
+    (acces conf base p :> string)
+    (escape_html (Driver.p_first_name base p) :> string)
+    (if occ = 0 then "" else "." ^ string_of_int occ)
+    (escape_html (Driver.p_surname base p) :> string)
 
 let print_list_aux conf base title list printer =
   if list <> [] then (
@@ -439,42 +598,44 @@ let print_warning conf base = function
       Output.printf conf (ftransl conf "%t died before his/her birth") (fun _ ->
           (someone_strong_n_short_dates conf base p :> string))
   | ChangedOrderOfChildren (ifam, _, before, after) ->
-      let cpl = foi base ifam in
-      let fath = poi base (get_father cpl) in
-      let moth = poi base (get_mother cpl) in
+      let cpl = Driver.foi base ifam in
+      let fath = Driver.poi base (Driver.get_father cpl) in
+      let moth = Driver.poi base (Driver.get_mother cpl) in
       let print_list arr diff_arr =
         Array.iteri
           (fun i p ->
-            let p = poi base p in
+            let p = Driver.poi base p in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
             Output.print_sstring conf ">";
             Output.print_sstring conf "\n";
-            if eq_istr (get_surname p) (get_surname fath) then
-              print_first_name conf base p
+            if
+              Driver.Istr.equal (Driver.get_surname p) (Driver.get_surname fath)
+            then print_first_name conf base p
             else print_someone conf base p;
             Output.print_string conf (DateDisplay.short_dates_text conf base p);
             Output.print_sstring conf "\n";
             Output.print_sstring conf "</li>\n")
           arr
       in
+      let arg p = (someone_ref_text conf base p, Driver.p_first_name base p) in
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "changed order of children"));
-      Output.print_sstring conf "\n";
-      print_someone_ref_text conf base fath;
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (transl_nth conf "and" 0);
-      Output.print_sstring conf " ";
-      print_someone_ref_text conf base moth;
+        (Utf8.capitalize_fst
+           (transl_args conf "changed order of children of %1 and %2"
+              [ arg fath; arg moth ]));
       print_order_changed conf print_list before after
   | ChildrenNotInOrder (ifam, _, elder, x) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Output.printf conf
         (fcapitale
            (ftransl conf "the following children of %t and %t are not in order"))
-        (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
-        (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_father cpl))
+            :> string))
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_mother cpl))
+            :> string));
       Output.print_sstring conf ":\n<ul><li>";
       print_first_name_strong conf base elder;
       Output.print_string conf (DateDisplay.short_dates_text conf base elder);
@@ -486,9 +647,9 @@ let print_warning conf base = function
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
-            let fam = foi base ifam in
-            let sp = Gutil.spouse (get_iper p) fam in
-            let sp = poi base sp in
+            let fam = Driver.foi base ifam in
+            let sp = Gutil.spouse (Driver.get_iper p) fam in
+            let sp = Driver.poi base sp in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -542,13 +703,17 @@ let print_warning conf base = function
       let after = Array.of_list after in
       print_order_changed conf print_list before after
   | CloseChildren (ifam, c1, c2) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Output.printf conf
         (fcapitale
            (ftransl conf
               "the following children of %t and %t are born very close"))
-        (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
-        (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_father cpl))
+            :> string))
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_mother cpl))
+            :> string));
       Output.print_sstring conf ":\n<ul><li>";
       print_first_name_strong conf base c1;
       Output.print_string conf (DateDisplay.short_dates_text conf base c1);
@@ -557,13 +722,17 @@ let print_warning conf base = function
       Output.print_string conf (DateDisplay.short_dates_text conf base c2);
       Output.print_sstring conf "</li></ul>\n"
   | DistantChildren (ifam, p1, p2) ->
-      let cpl = foi base ifam in
+      let cpl = Driver.foi base ifam in
       Output.printf conf
         (fcapitale
            (ftransl conf
               "the following children of %t and %t are born very distant"))
-        (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
-        (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_father cpl))
+            :> string))
+        (fun _ ->
+          (someone_strong base (Driver.poi base (Driver.get_mother cpl))
+            :> string));
       Output.print_sstring conf ":<ul><li>";
       print_first_name_strong conf base p1;
       Output.print_string conf (DateDisplay.short_dates_text conf base p1);
@@ -575,7 +744,8 @@ let print_warning conf base = function
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
       Output.print_sstring conf
-        (transl_nth conf "died at an advanced age" @@ index_of_sex @@ get_sex p);
+        (transl_nth conf "died at an advanced age"
+        @@ index_of_sex @@ Driver.get_sex p);
       Output.print_sstring conf "(";
       Output.print_string conf (DateDisplay.string_of_age conf a);
       Output.print_sstring conf ")"
@@ -645,22 +815,25 @@ let print_warning conf base = function
       Output.print_string conf (DateDisplay.string_of_age conf a);
       Output.print_sstring conf ")"
   | PossibleDuplicateFam (f1, _) ->
-      let f = foi base f1 in
+      let f = Driver.foi base f1 in
       Output.printf conf
         (fcapitale (ftransl conf "%s and %s have several unions"))
-        (someone_strong base @@ poi base @@ get_father f :> string)
-        (someone_strong base @@ poi base @@ get_mother f :> string)
+        (someone_strong base @@ Driver.poi base @@ Driver.get_father f
+          :> string)
+        (someone_strong base @@ Driver.poi base @@ Driver.get_mother f
+          :> string)
   | PossibleDuplicateFamHomonymous (f1, _, p) ->
-      let f = foi base f1 in
-      let fath = get_father f in
-      let moth = get_mother f in
+      let f = Driver.foi base f1 in
+      let fath = Driver.get_father f in
+      let moth = Driver.get_mother f in
       let curr, hom =
-        if eq_iper fath (get_iper p) then (moth, fath) else (fath, moth)
+        if Driver.Iper.equal fath (Driver.get_iper p) then (moth, fath)
+        else (fath, moth)
       in
       Output.printf conf
         (fcapitale (ftransl conf "%s has unions with several persons named %s"))
-        (someone_strong base @@ poi base @@ curr :> string)
-        (someone_strong base @@ poi base @@ hom :> string)
+        (someone_strong base @@ Driver.poi base @@ curr :> string)
+        (someone_strong base @@ Driver.poi base @@ hom :> string)
   | PEventOrder (p, e1, e2) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t's %s before his/her %s"))
@@ -683,17 +856,17 @@ let print_warning conf base = function
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
         (fun _ ->
           ("<strong>"
-           ^<^ (safe_html @@ sou base t.t_ident)
+           ^<^ (safe_html @@ Driver.sou base t.t_ident)
            ^^^ " "
-           ^<^ (safe_html @@ sou base t.t_place)
+           ^<^ (safe_html @@ Driver.sou base t.t_place)
            ^^^ "</strong> <em>"
            ^<^ (match Date.od_of_cdate t.t_date_start with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^^^ "-"
            ^<^ (match Date.od_of_cdate t.t_date_end with
-               | Some d -> DateDisplay.string_of_date conf d
-               | None -> Adef.safe "")
+             | Some d -> DateDisplay.string_of_date conf d
+             | None -> Adef.safe "")
            ^>^ "</em>"
             :> string))
   | UndefinedSex p ->
@@ -723,14 +896,11 @@ let print_warnings conf base wl =
 
 (* ************************************************************************* *)
 
-(** [Description] : Fonction d'impression des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - fun  : Def.misc (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                          *)
+(** [Description] : Fonction d'impression des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - fun : Def.misc (miscellaneous) [Retour] :
+    - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_misc conf _base = function
   | MissingSources ->
       Output.print_sstring conf "<em>";
@@ -739,41 +909,18 @@ let print_misc conf _base = function
       Output.print_sstring conf "</em>"
 
 (* ************************************************************************* *)
-(*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
-
-(* ************************************************************************* *)
-
-(** [Description] : Affiche la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                          *)
-let print_miscs conf base ml =
-  print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
-  List.iter (fun m ->
-      Output.print_sstring conf "<li>";
-      print_misc conf base m;
-      Output.print_sstring conf "</li>")
-
-(* ************************************************************************* *)
 (* [Fonc] print_miscs :
      config -> base -> (Def.warning list * Def.misc list) -> unit *)
 
 (* ************************************************************************* *)
 
-(** [Description] : Affiche sous la même rubrique, la liste des warnings
-                    et la liste des 'informations diverses'.
-    [Args] :
-      - conf : configuration
-      - base : base
-      - wl   : Def.warning list
-      - ml   : Def.misc list (miscellaneous)
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                              *)
+(** [Description] : Affiche sous la même rubrique, la liste des warnings et la
+    liste des 'informations diverses'. [Args] :
+    - conf : configuration
+    - base : base
+    - wl : Def.warning list
+    - ml : Def.misc list (miscellaneous) [Retour] :
+    - unit [Rem] : Exporté en clair hors de ce module. *)
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then (
     Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "warnings"));
@@ -853,8 +1000,55 @@ let error_digest conf =
   Output.print_string conf (string_of_error conf err);
   Output.print_sstring conf "</p>"
 
-let digest_person p = Marshal.to_string p [] |> Mutil.digest
-let digest_family f = Marshal.to_string f [] |> Mutil.digest
+let error_same_file conf =
+  let err = UERR_same_file in
+  prerr conf err @@ fun () ->
+  Output.print_sstring conf "<p>";
+  Output.print_string conf (string_of_error conf err);
+  Output.print_sstring conf "</p>"
+
+let feed_create_info
+    {
+      ci_birth_date;
+      ci_birth_place;
+      ci_death;
+      ci_death_date;
+      ci_death_place;
+      ci_occupation;
+      ci_public;
+    } =
+  Hasher.SHA256.(
+    (option date) ci_birth_date
+    <+> death ci_death
+    <+> (option date) ci_death_date
+    <+> string ci_birth_place
+    <+> string ci_death_place
+    <+> string ci_occupation
+    <+> bool ci_public)
+    [@ocamlformat "disable"]
+
+let feed_create c =
+  match c with
+  | Create (s, i) ->
+      Hasher.SHA256.(string "Create" <+> sex s <+> (option feed_create_info) i)
+  | Link -> Hasher.SHA256.string "Link"
+
+let feed_key (s1, s2, i, c, s3) =
+  Hasher.SHA256.(
+    string s1 <+> string s2 <+> int i <+> feed_create c <+> string s3)
+
+let digest_person ~salt =
+  let feeder p = Hasher.SHA256.((gen_person iper feed_key string) p) in
+  Hasher.SHA256.feeder_to_hasher ~salt feeder
+
+let digest_family ~salt =
+  let feeder (f, c, d) =
+    Hasher.SHA256.(
+      (gen_family feed_key ifam string) f
+      <+> (gen_couple feed_key) c
+      <+> (gen_descend feed_key) d)
+  in
+  Hasher.SHA256.feeder_to_hasher ~salt feeder
 
 let get var key env =
   match p_getenv env (var ^ "_" ^ key) with
@@ -901,7 +1095,7 @@ let reconstitute_date_dmy2 conf var =
       | Some m -> (
           match get_number var "orday" conf.env with
           | Some d ->
-              let dmy2 = { day2 = d; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = { Adef.day2 = d; month2 = m; year2 = y; delta2 = 0 } in
               if
                 dmy2.day2 >= 1 && dmy2.day2 <= 31 && dmy2.month2 >= 1
                 && dmy2.month2 <= 13
@@ -910,7 +1104,7 @@ let reconstitute_date_dmy2 conf var =
                 let d = Date.dmy_of_dmy2 dmy2 in
                 bad_date conf d
           | None ->
-              let dmy2 = { day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = { Adef.day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
               if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
               else
                 let d = Date.dmy_of_dmy2 dmy2 in
@@ -957,7 +1151,7 @@ let reconstitute_date_dmy conf var =
     | Some y -> (
         let prec =
           match prec with
-          | Some "about" -> About
+          | Some "about" -> Adef.About
           | Some "maybe" -> Maybe
           | Some "before" -> Before
           | Some "after" -> After
@@ -979,12 +1173,16 @@ let reconstitute_date_dmy conf var =
         | Some m -> (
             match get_number var "dd" conf.env with
             | Some d ->
-                let d = { day = d; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  { Adef.day = d; month = m; year = y; prec; delta = 0 }
+                in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
                 then Some d
                 else bad_date conf d
             | None ->
-                let d = { day = 0; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  { Adef.day = 0; month = m; year = y; prec; delta = 0 }
+                in
                 if d.month >= 1 && d.month <= 13 then Some d
                 else bad_date conf d)
         | None -> Some { day = 0; month = 0; year = y; prec; delta = 0 })
@@ -995,12 +1193,13 @@ let reconstitute_date_dmy conf var =
 let check_missing_name base p =
   let quest f g =
     (* only raise error if `?` is not already recorded in the database *)
-    f = "?" && p.key_index <> dummy_iper
-    && poi base p.key_index |> g |> sou base |> ( <> ) "?"
+    f = "?"
+    && p.key_index <> Driver.Iper.dummy
+    && Driver.poi base p.key_index |> g |> Driver.sou base |> ( <> ) "?"
   in
-  if p.first_name = "" || quest p.first_name get_first_name then
+  if p.first_name = "" || quest p.first_name Driver.get_first_name then
     Some (UERR_missing_first_name (Adef.safe ""))
-  else if p.surname = "" || quest p.surname get_surname then
+  else if p.surname = "" || quest p.surname Driver.get_surname then
     Some (UERR_missing_surname (Adef.safe ""))
   else None
 
@@ -1032,7 +1231,7 @@ let check_missing_witnesses_names conf get list =
   loop list
 
 let check_greg_day conf d =
-  if d.day > Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.Adef.day > Date.nb_days_in_month d.month d.year then bad_date conf d
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
@@ -1041,14 +1240,16 @@ let reconstitute_date conf var =
         match p_getenv conf.env (var ^ "_cal") with
         | Some "G" | None ->
             check_greg_day conf d;
-            (d, Dgregorian)
+            (d, Adef.Dgregorian)
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
         | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
-        | _ -> (d, Dgregorian)
+        | _ ->
+            check_greg_day conf d;
+            (d, Adef.Dgregorian)
       in
-      Some (Dgreg (d, cal))
-  | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
+      Some (Adef.Dgreg (d, cal))
+  | Some d, true -> Some (Adef.Dgreg (Calendar.gregorian_of_french d, Dfrench))
   | None, _ -> (
       match p_getenv conf.env (var ^ "_text") with
       | Some _ ->
@@ -1061,54 +1262,61 @@ let print_create_conflict conf base p var =
   prerr conf err @@ fun () ->
   print_error conf err;
   let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
+    Gutil.find_free_occ base
+      (Driver.p_first_name base p)
+      (Driver.p_surname base p)
   in
-  Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
-  let aux =
-    List.iter (fun (x, v) ->
-        if x = "notes" || is_label_note x then Util.hidden_textarea conf x v
-        else Util.hidden_input conf x v)
+  let original_occ =
+    match Util.p_getenv conf.env "i" with
+    | Some i ->
+        Gutil.find_same_name base p
+        |> List.find_opt (fun op ->
+            Driver.Iper.to_string (Driver.get_iper op) = i)
+        |> Option.map Driver.get_occ
+    | None -> None
   in
-  aux conf.henv;
-  aux conf.env;
+  let attempted_occ =
+    match Util.p_getenv conf.env "occ" with
+    | Some o -> int_of_string_opt o
+    | None -> Some 0
+  in
+  let click_on s =
+    Printf.sprintf (fcapitale (ftransl conf {|click on "%s"|})) (transl conf s)
+  in
+  Output.printf conf {|<form method="post" action="%s">|} conf.command;
+  List.iter
+    (fun (x, v) ->
+      if x = "notes" || is_label_note x then Util.hidden_textarea conf x v
+      else Util.hidden_input conf x v)
+    (conf.henv @ conf.env);
   if var <> "" then Util.hidden_input conf "field" (Mutil.encode var);
   Util.hidden_input conf "free_occ" (Mutil.encode @@ string_of_int free_n);
-  Output.print_sstring conf "<ul><li>";
-  transl conf "first free number"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf (transl conf ":");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (string_of_int free_n);
-  Output.print_sstring conf ".\n";
-  Output.printf conf
-    (fcapitale (ftransl conf {|click on "%s"|}))
-    (transl conf "create");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "to try again with this number");
-  Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
-  Output.print_sstring conf " ";
-  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "change it (the number) yourself");
-  Output.print_sstring conf ".</li><li>";
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
-  Output.print_sstring conf " ";
-  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf {|use "link" instead of "create"|});
-  Output.print_sstring conf ".</li></ul>";
-  transl conf "create" |> Utf8.capitalize_fst |> Adef.encoded
-  |> Util.submit_input conf "create";
-  transl conf "back" |> Utf8.capitalize_fst |> Adef.encoded
-  |> Util.submit_input conf "return";
-  Output.print_sstring conf {|</form>|};
+  Output.printf conf "<ul><li>%s%s %d. %s %s.</li>"
+    (Utf8.capitalize_fst (transl conf "first free number"))
+    (transl conf ":") free_n (click_on "create")
+    (transl conf "to try again with this number");
+  (match (original_occ, attempted_occ) with
+  | Some orig, Some att when orig <> att ->
+      Output.printf conf "<li>%s%s %d. %s %s.</li>"
+        (Utf8.capitalize_fst (transl conf "previous occurrence number"))
+        (transl conf ":") orig (click_on "back")
+        (transl conf "to restore this value")
+  | _ -> ());
+  Output.printf conf "<li>%s %s %s %s.</li>"
+    (Utf8.capitalize_fst (transl conf "or"))
+    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
+    (transl_nth conf "and" 0)
+    (transl conf "change it (the number) yourself");
+  Output.printf conf "<li>%s %s %s %s.</li></ul>"
+    (Utf8.capitalize_fst (transl conf "or"))
+    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
+    (transl_nth conf "and" 0)
+    (transl conf {|use "link" instead of "create"|});
+  Util.submit_input conf "create"
+    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "create"));
+  Util.submit_input conf "return"
+    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "back"));
+  Output.print_sstring conf "</form>";
   print_same_name conf base p
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
@@ -1118,20 +1326,21 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
   | Create (sex, info) -> (
       try
         if f = "?" || s = "?" then
-          if o <= 0 || o >= nb_of_persons base then raise Not_found
+          if o <= 0 || o >= Driver.nb_of_persons base then raise Not_found
           else
             (* FIXME: this would fail if internal repr of iper is not int *)
-            let ip = Gwdb.iper_of_string @@ string_of_int o in
-            let p = poi base ip in
-            if p_first_name base p = f && p_surname base p = s then ip
+            let ip = Driver.Iper.of_string @@ string_of_int o in
+            let p = Driver.poi base ip in
+            if Driver.p_first_name base p = f && Driver.p_surname base p = s
+            then ip
             else raise Not_found
         else
-          match person_of_key base f s o with
-          | Some ip -> print_create_conflict conf base (poi base ip) var
+          match Driver.person_of_key base f s o with
+          | Some ip -> print_create_conflict conf base (Driver.poi base ip) var
           | None -> raise Not_found
       with Not_found ->
         let o = if f = "?" || s = "?" then 0 else o in
-        let empty_string = Gwdb.empty_string in
+        let empty_string = Driver.Istr.empty in
         let birth, birth_place, baptism, baptism_place =
           match info with
           | Some { ci_birth_date = b; ci_birth_place = bpl; _ } ->
@@ -1170,8 +1379,8 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         in
         let p =
           {
-            first_name = Gwdb.insert_string base f;
-            surname = Gwdb.insert_string base s;
+            first_name = Driver.insert_string base f;
+            surname = Driver.insert_string base s;
             occ = o;
             image = empty_string;
             first_names_aliases = [];
@@ -1182,19 +1391,19 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             titles = [];
             rparents = [];
             related = [];
-            occupation = Gwdb.insert_string base occupation;
+            occupation = Driver.insert_string base occupation;
             sex;
             access;
             birth = Date.cdate_of_od birth;
-            birth_place = Gwdb.insert_string base birth_place;
+            birth_place = Driver.insert_string base birth_place;
             birth_note = empty_string;
             birth_src = empty_string;
             baptism = Date.cdate_of_od baptism;
-            baptism_place = Gwdb.insert_string base baptism_place;
+            baptism_place = Driver.insert_string base baptism_place;
             baptism_note = empty_string;
             baptism_src = empty_string;
             death;
-            death_place = Gwdb.insert_string base death_place;
+            death_place = Driver.insert_string base death_place;
             death_note = empty_string;
             death_src = empty_string;
             burial = UnknownBurial;
@@ -1203,27 +1412,29 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             burial_src = empty_string;
             pevents = [];
             notes = empty_string;
-            psources = Gwdb.insert_string base (only_printable src);
-            key_index = Gwdb.dummy_iper;
+            psources = Driver.insert_string base (only_printable src);
+            key_index = Driver.Iper.dummy;
           }
         in
-        let a = no_ascend in
-        let u = no_union in
-        let ip = insert_person base p a u in
+        let a = Driver.no_ascend in
+        let u = Driver.no_union in
+        let ip = Driver.insert_person_with_union_and_ascendants base p a u in
         if f <> "?" && s <> "?" then
           new_persons := { p with key_index = ip } :: !new_persons;
         ip)
   | Link -> (
       if f = "?" || s = "?" then
-        if o < 0 || o >= nb_of_persons base then print_err_unknown conf (f, s, o)
+        if o < 0 || o >= Driver.nb_of_persons base then
+          print_err_unknown conf (f, s, o)
         else
           (* FIXME: this would fail if internal repr of iper is not int *)
-          let ip = Gwdb.iper_of_string @@ string_of_int o in
-          let p = poi base ip in
-          if p_first_name base p = f && p_surname base p = s then ip
+          let ip = Driver.Iper.of_string @@ string_of_int o in
+          let p = Driver.poi base ip in
+          if Driver.p_first_name base p = f && Driver.p_surname base p = s then
+            ip
           else print_err_unknown conf (f, s, o)
       else
-        match person_of_key base f s o with
+        match Driver.person_of_key base f s o with
         | Some ip -> ip
         | None -> print_err_unknown conf (f, s, o))
 
@@ -1285,12 +1496,12 @@ let update_related_pointers base pi ol nl =
   in
   List.iter
     (fun ip ->
-      let p = gen_person_of_person (poi base ip) in
-      patch_person base ip { p with related = pi :: p.related })
+      let p = Driver.gen_person_of_person (Driver.poi base ip) in
+      Driver.patch_person base ip { p with related = pi :: p.related })
     added_rel;
   List.iter
     (fun ip ->
-      let p = gen_person_of_person (poi base ip) in
+      let p = Driver.gen_person_of_person (Driver.poi base ip) in
       let related =
         if List.mem pi p.related then list_except pi p.related
         else (
@@ -1298,5 +1509,12 @@ let update_related_pointers base pi ol nl =
           flush stderr;
           p.related)
       in
-      patch_person base ip { p with related })
+      Driver.patch_person base ip { p with related })
     removed_rel
+
+let redirect_unchanged conf base p =
+  Output.status conf Geneweb_http.Code.Moved_Temporarily;
+  Output.header conf "Location: %s%s&nomod=1"
+    (commd conf :> string)
+    (acces conf base p :> string);
+  Output.flush conf

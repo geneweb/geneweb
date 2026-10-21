@@ -16,6 +16,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 
@@ -141,7 +142,7 @@
     <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
            %/>[source/sources]1</label><br>
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
-           %/>[update]</label><br>
+           %/>[update::]</label><br>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
            %/>[visualize/show/hide/summary]2… </label>
   </fieldset>
@@ -222,7 +223,8 @@
 </form>
 <div style="clear:both;"></div>
 
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 </body>
 </html>

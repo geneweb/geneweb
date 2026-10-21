@@ -2,8 +2,9 @@
 
 open Config
 open Def
-open Gwdb
 open Util
+module Driver = Geneweb_db.Driver
+module Collection = Geneweb_db.Collection
 
 type date_event = DeBirth | DeDeath of death_reason
 
@@ -25,7 +26,7 @@ let print_anniversary_day conf base dead_people liste =
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, a, date_event, txt_of) ->
-      let is = index_of_sex (get_sex p) in
+      let is = index_of_sex (Driver.get_sex p) in
       Output.print_sstring conf "<li>";
       Output.print_string conf (txt_of conf base p);
       if not dead_people then print_age conf a_ref a
@@ -49,7 +50,104 @@ let print_anniversary_day conf base dead_people liste =
     liste;
   Output.print_sstring conf "</ul>"
 
-let gen_print conf base mois f_scan dead_people =
+let propose_months conf ?max_d mode =
+  let is_cousins = p_getenv conf.env "m" = Some "C" in
+  let max_d = Option.value max_d ~default:250 in
+  let d_val =
+    match p_getint conf.env "d" with
+    | Some d when d > 0 -> string_of_int d
+    | _ -> ""
+  in
+  let sel_month =
+    match p_getint conf.env "v" with
+    | Some v when v >= 1 && v <= 12 -> v
+    | _ -> conf.today.month
+  in
+  let month_options =
+    let buf = Buffer.create 256 in
+    for i = 1 to 12 do
+      Printf.bprintf buf {|<option value="%d"%s>%s</option>|} i
+        (if i = sel_month then " selected" else "")
+        (transl_nth conf "(month)" (i - 1)
+        |> Util.translate_eval |> Utf8.capitalize_fst)
+    done;
+    Buffer.contents buf
+  in
+  Output.printf conf
+    {|<form class="d-flex align-items-center gap-3 my-3 d-print-none"
+method="get" action="%s">|}
+    conf.command;
+  Util.hidden_env conf;
+  mode ();
+  Output.printf conf
+    {|<label for="v_month">%s</label>
+  <select class="form-select w-auto" name="v" id="v_month">%s</select>|}
+    (Utf8.capitalize_fst (transl_nth conf "year/month/day" 1))
+    month_options;
+  if is_cousins then
+    Output.printf conf
+      {|<label for="d_deg">%s</label>
+  <div class="input-group flex-nowrap w-auto">
+    <button type="button" class="btn btn-outline-secondary"
+      onclick="var i=document.getElementById('d_deg');
+      i.value=Math.max(1,+i.value-1)">&minus;</button>
+    <input type="number" name="d" id="d_deg" class="form-control text-center"
+      value="%s" min="1" max="%d" placeholder="∞" style="width:4em">
+    <button type="button" class="btn btn-outline-secondary"
+      onclick="var i=document.getElementById('d_deg');
+      i.value=Math.min(%d,+i.value+1)">+</button></div>|}
+      (Utf8.capitalize_fst (transl_nth conf "degree of kinship" 0))
+      d_val max_d max_d;
+  Output.printf conf
+    {|<button type="submit" class="btn btn-primary">%s</button>
+</form>|}
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
+
+let relatives_title conf base p dead_people h =
+  let raw = (Util.gen_person_text ~html:false conf base p :> string) in
+  Util.transl_a_of_b conf
+    (transl conf
+       (if dead_people then "anniversaries of dead relatives"
+        else "family birthday"))
+    (if h then raw else (Util.referenced_person_text conf base p :> string))
+    raw
+
+let relatives_subtitle conf mois dead_people =
+  let month =
+    Option.map
+      (fun m -> transl_nth conf "(month)" (m - 1) |> Util.translate_eval)
+      mois
+  in
+  let degree =
+    match p_getint conf.env "d" with
+    | Some d when d > 0 ->
+        Some
+          (Printf.sprintf "%d %s" d
+             (transl_nth conf "degree of kinship" (if d > 1 then 1 else 0)))
+    | _ -> None
+  in
+  let events =
+    let births = transl_nth conf "birth/births" 1 in
+    if dead_people then
+      Printf.sprintf "%s %s %s" births (transl conf "and")
+        (transl_nth conf "death/deaths" 1)
+    else births
+  in
+  String.concat " — " (List.filter_map Fun.id [ month; degree; Some events ])
+  |> Utf8.capitalize_fst
+
+let print_header conf base ?mois ?root dead_people title =
+  match root with
+  | None -> Hutil.header conf title
+  | Some p ->
+      let sub = relatives_subtitle conf mois dead_people in
+      Hutil.header conf (fun h ->
+          relatives_title conf base p dead_people h
+          |> Utf8.capitalize_fst |> Output.print_sstring conf;
+          if h then Output.printf conf " — %s" sub);
+      Output.printf conf {|<p class="lead">%s</p>|} sub
+
+let gen_print conf base mois f_scan ?max_d ?mode ?root dead_people =
   let tab = Array.make 31 [] in
   let title _ =
     let lab =
@@ -63,7 +161,9 @@ let gen_print conf base mois f_scan dead_people =
      while true do
        let p, txt_of = f_scan () in
        if not dead_people then
-         match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+         match
+           (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+         with
          | Some d, (NotDead | DontKnowIfDead) ->
              if
                d.prec = Sure && d.day <> 0 && d.month <> 0 && d.month = mois
@@ -74,10 +174,10 @@ let gen_print conf base mois f_scan dead_people =
                  tab.(pred j) <- (p, d.year, DeBirth, txt_of) :: tab.(pred j)
          | _ -> ()
        else
-         match get_death p with
+         match Driver.get_death p with
          | NotDead | DontKnowIfDead -> ()
          | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> (
-             (match Date.cdate_to_dmy_opt (get_birth p) with
+             (match Date.cdate_to_dmy_opt (Driver.get_birth p) with
              | None -> ()
              | Some dt ->
                  if
@@ -88,7 +188,7 @@ let gen_print conf base mois f_scan dead_people =
                      let j = dt.day in
                      tab.(pred j) <-
                        (p, dt.year, DeBirth, txt_of) :: tab.(pred j));
-             match get_death p with
+             match Driver.get_death p with
              | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
              | OfCourseDead ->
                  ()
@@ -107,7 +207,8 @@ let gen_print conf base mois f_scan dead_people =
                            (p, a, DeDeath dr, txt_of) :: tab.(pred j)))
      done
    with Not_found -> ());
-  Hutil.header conf title;
+  print_header conf base ~mois ?root dead_people title;
+  Option.iter (propose_months conf ?max_d) mode;
   if Array.for_all (( = ) []) tab then (
     Output.print_sstring conf "<p>\n";
     Output.printf conf "%s.\n"
@@ -130,7 +231,7 @@ let gen_print conf base mois f_scan dead_people =
   Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
-  let a_ref = dt.year in
+  let a_ref = dt.Adef.year in
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun (p, a, date_event, txt_of) ->
@@ -153,13 +254,15 @@ let print_anniversary_list conf base dead_people dt liste =
       else (
         Output.print_string conf (txt_of conf base p);
         (* TODO year of birth *)
-        match get_death p with NotDead -> print_age conf a_ref a | _ -> ());
+        match Driver.get_death p with
+        | NotDead -> print_age conf a_ref a
+        | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"
 
 let f_scan conf base =
-  let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+  let next = Collection.iterator (Driver.ipers base) in
   fun () ->
     match next () with
     | Some i -> (pget conf base i, referenced_person_title_text)
@@ -196,48 +299,14 @@ let print_birth_day conf base day_name fphrase wd dt list =
       Output.print_sstring conf "...</p>";
       print_anniversary_list conf base false dt list
 
-let propose_months conf mode =
-  begin_centered conf;
-  Output.print_sstring conf "<span>";
-  transl conf "select a month to see all the anniversaries"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</span>";
-  Output.print_sstring conf {|<table border="|};
-  Output.print_sstring conf (string_of_int conf.border);
-  Output.print_sstring conf {|"><tr><td>|};
-  Output.print_sstring conf {|<form class="form-inline" method="get" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"><p>|};
-  Util.hidden_env conf;
-  mode ();
-  Output.print_sstring conf
-    {|<select class="form-control form-control-lg" name="v">|};
-  for i = 1 to 12 do
-    Output.print_sstring conf {|<option value="|};
-    Output.print_sstring conf (string_of_int i);
-    Output.print_sstring conf {|"|};
-    Output.print_sstring conf
-      (if i = conf.today.month then {| selected="selected">|} else ">");
-    transl_nth conf "(month)" (i - 1)
-    |> Util.translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf "</option>"
-  done;
-  Output.print_sstring conf "</select>";
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg ml-2">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></p></form></td></tr></table>";
-  end_centered conf
-
 let day_after d =
   let day, r =
-    if d.day >= Date.nb_days_in_month d.month d.year then (1, 1)
+    if d.Adef.day >= Date.nb_days_in_month d.month d.year then (1, 1)
     else (succ d.day, 0)
   in
   let month, r = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
   let year = d.year + r in
-  { day; month; year; prec = Sure; delta = 0 }
+  { Adef.day; month; year; prec = Sure; delta = 0 }
 
 let print_anniv conf base day_name fphrase wd dt = function
   | [] ->
@@ -271,13 +340,13 @@ let list_aux conf base list cb =
       Output.print_sstring conf "<li>";
       Output.print_string conf
         (referenced_person_title_text conf base
-           (pget conf base (get_father fam)));
+           (pget conf base (Driver.get_father fam)));
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl_nth conf "and" 0);
       Output.print_sstring conf " ";
       Output.print_string conf
         (referenced_person_title_text conf base
-           (pget conf base (get_mother fam)));
+           (pget conf base (Driver.get_mother fam)));
       Output.print_sstring conf ", <em>";
       Output.print_sstring conf (transl conf "in (year)");
       Output.print_sstring conf " ";
@@ -296,14 +365,14 @@ let print_marriage conf base month =
   in
   let tab = Array.make 31 [] in
   Hutil.header conf title;
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
-      match Date.cdate_to_dmy_opt (get_marriage fam) with
+      let fam = Driver.foi base ifam in
+      match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
       | Some { day = d; month = m; year = y; prec = Sure; _ }
         when d <> 0 && m <> 0 ->
-          let father = pget conf base (get_father fam) in
-          let mother = pget conf base (get_mother fam) in
+          let father = pget conf base (Driver.get_father fam) in
+          let mother = pget conf base (Driver.get_mother fam) in
           if
             m = month
             && authorized_age conf base father
@@ -312,7 +381,7 @@ let print_marriage conf base month =
             && not (is_hidden mother)
           then tab.(pred d) <- (fam, y) :: tab.(pred d)
       | _ -> ())
-    (Gwdb.ifams base);
+    (Geneweb_db.Driver.ifams base);
   Output.print_sstring conf "<ul>";
   for i = 1 to 31 do
     match tab.(i - 1) with
@@ -362,14 +431,15 @@ let print_marriage_day conf base day_name fphrase wd dt = function
       print_anniversaries_of_marriage conf base list
 
 let match_dates conf base p d1 d2 =
-  if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
+  if d1.Adef.day = d2.Adef.day && d1.month = d2.month then
+    authorized_age conf base p
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
   then authorized_age conf base p
   else false
 
-let gen_print_menu_birth conf base f_scan mode =
+let gen_print_menu_birth conf base f_scan ?root mode =
   let title _ =
     transl conf "birthdays" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
@@ -378,11 +448,14 @@ let gen_print_menu_birth conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil.header conf title;
+  print_header conf base ?root false title;
+  propose_months conf mode;
   (try
      while true do
        let p, txt_of = f_scan () in
-       match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+       match
+         (Date.cdate_to_dmy_opt (Driver.get_birth p), Driver.get_death p)
+       with
        | Some d, (NotDead | DontKnowIfDead) ->
            if d.prec = Sure && d.day <> 0 && d.month <> 0 then
              if match_dates conf base p d conf.today then
@@ -412,14 +485,11 @@ let gen_print_menu_birth conf base f_scan mode =
     (ftransl conf "%s, it will be %s of")
     ((conf.today_wd + 2) mod 7)
     aft !list_aft;
-  Output.print_sstring conf " ";
-  propose_months conf mode;
-  Output.print_sstring conf " ";
   Hutil.trailer conf
 
 let print_menu_birth conf base =
   let f_scan =
-    let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+    let next = Collection.iterator (Geneweb_db.Driver.ipers base) in
     fun () ->
       match next () with
       | Some i -> (pget conf base i, referenced_person_title_text)
@@ -431,7 +501,7 @@ let print_menu_birth conf base =
   in
   gen_print_menu_birth conf base f_scan mode
 
-let gen_print_menu_dead conf base f_scan mode =
+let gen_print_menu_dead conf base f_scan ?root mode =
   let title _ =
     transl conf "anniversaries of dead people"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -441,14 +511,15 @@ let gen_print_menu_dead conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil.header conf title;
+  print_header conf base ?root true title;
+  propose_months conf mode;
   (try
      while true do
        let p, txt_of = f_scan () in
-       match get_death p with
+       match Driver.get_death p with
        | NotDead | DontKnowIfDead -> ()
        | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> (
-           (match Date.cdate_to_dmy_opt (get_birth p) with
+           (match Date.cdate_to_dmy_opt (Driver.get_birth p) with
            | None -> ()
            | Some d ->
                if d.prec = Sure && d.day <> 0 && d.month <> 0 then
@@ -458,7 +529,7 @@ let gen_print_menu_dead conf base f_scan mode =
                    list_tom := (p, d.year, DeBirth, txt_of) :: !list_tom
                  else if match_dates conf base p d aft then
                    list_aft := (p, d.year, DeBirth, txt_of) :: !list_aft);
-           match get_death p with
+           match Driver.get_death p with
            | Death (dr, d) -> (
                match Date.cdate_to_dmy_opt d with
                | None -> ()
@@ -493,14 +564,11 @@ let gen_print_menu_dead conf base f_scan mode =
     (ftransl conf "%s, it will be %s of")
     ((conf.today_wd + 2) mod 7)
     aft !list_aft;
-  Output.print_sstring conf "\n";
-  propose_months conf mode;
-  Output.print_sstring conf "\n";
   Hutil.trailer conf
 
 let print_menu_dead conf base =
   let f_scan =
-    let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
+    let next = Collection.iterator (Geneweb_db.Driver.ipers base) in
     fun () ->
       match next () with
       | Some i -> (pget conf base i, referenced_person_title_text)
@@ -510,15 +578,15 @@ let print_menu_dead conf base =
       Util.hidden_input conf "m" @@ Adef.encoded "AD")
 
 let match_mar_dates conf base cpl d1 d2 =
-  if d1.day = d2.day && d1.month = d2.month then
-    authorized_age conf base (pget conf base (get_father cpl))
-    && authorized_age conf base (pget conf base (get_mother cpl))
+  if d1.Adef.day = d2.Adef.day && d1.month = d2.month then
+    authorized_age conf base (pget conf base (Driver.get_father cpl))
+    && authorized_age conf base (pget conf base (Driver.get_mother cpl))
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
   then
-    authorized_age conf base (pget conf base (get_father cpl))
-    && authorized_age conf base (pget conf base (get_mother cpl))
+    authorized_age conf base (pget conf base (Driver.get_father cpl))
+    && authorized_age conf base (pget conf base (Driver.get_mother cpl))
   else false
 
 let print_menu_marriage conf base =
@@ -532,13 +600,13 @@ let print_menu_marriage conf base =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Gwdb.Collection.iter
+  Collection.iter
     (fun ifam ->
-      let fam = foi base ifam in
+      let fam = Driver.foi base ifam in
       match
-        ( Date.cdate_to_dmy_opt (get_marriage fam),
-          get_divorce fam,
-          get_separation fam )
+        ( Date.cdate_to_dmy_opt (Driver.get_marriage fam),
+          Driver.get_divorce fam,
+          Driver.get_separation fam )
       with
       | Some d, NotDivorced, NotDivorced
         when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
@@ -551,13 +619,13 @@ let print_menu_marriage conf base =
               list_aft := (cpl, d.year) :: !list_aft
           in
           if conf.use_restrict then (
-            let father = pget conf base (get_father fam) in
-            let mother = pget conf base (get_mother fam) in
+            let father = pget conf base (Driver.get_father fam) in
+            let mother = pget conf base (Driver.get_mother fam) in
             if (not (is_hidden father)) && not (is_hidden mother) then
               update_list fam)
           else update_list fam
       | _ -> ())
-    (Gwdb.ifams base);
+    (Driver.ifams base);
   List.iter
     (fun xx -> xx := List.sort (fun (_, y1) (_, y2) -> compare y1 y2) !xx)
     [ list_tod; list_tom; list_aft ];
@@ -590,13 +658,15 @@ let set_vother x = Vother x
 let print_anniversaries conf =
   if p_getenv conf.env "old" = Some "on" then ()
   else
-    Hutil.interp conf "annivmenu"
-      {
-        Templ.eval_var = (fun _ -> raise Not_found);
-        Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-        Templ.get_vother;
-        Templ.set_vother;
-        Templ.print_foreach = (fun _ -> raise Not_found);
-      }
-      [] ()
+    let ifun =
+      Templ.
+        {
+          eval_var = (fun _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother;
+          set_vother;
+          print_foreach = (fun _ -> raise Not_found);
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () "annivmenu"

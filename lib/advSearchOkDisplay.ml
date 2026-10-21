@@ -26,7 +26,11 @@ let print_result conf base max_answers (list, len) =
         Output.print_sstring conf "</em>")
       list;
     if len > max_answers then Output.print_sstring conf "<li>&hellip;</li>";
-    Output.print_sstring conf "</ul>"
+    Output.print_sstring conf "</ul>";
+    Output.print_sstring conf
+      (Format.sprintf "%s%s %d<br>"
+         (transl conf "total" |> Utf8.capitalize_fst)
+         (transl conf ":") len)
 
 let print conf base =
   let title _ =

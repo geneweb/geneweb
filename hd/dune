@@ -1,0 +1,9 @@
+(install
+ (package geneweb)
+ (section
+  (site
+   (geneweb hd)))
+ (files
+  (glob_files_rec etc/{*.html,*.txt,*.woff,*.woff2,*.js,*.css,*.gz,*.br})
+  (glob_files_rec images/*)
+  (glob_files_rec lang/*)))

@@ -6,6 +6,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 <body%body_prop;>
@@ -170,7 +171,8 @@
   </td>
 </tr>
 </table>
-%base_trailer;
+%include;trl
 %include;copyr
+%query_time;
 </body>
 </html>

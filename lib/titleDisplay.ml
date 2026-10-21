@@ -1,8 +1,18 @@
 open Config
 open Def
-open Gwdb
 open Util
 open Title
+module Driver = Geneweb_db.Driver
+
+let sort_by_key cmp key l =
+  let l = List.rev_map (fun x -> (x, key x)) l in
+  let l = List.sort (fun (_, k1) (_, k2) -> cmp k2 k1) l in
+  List.rev_map fst l
+
+let sort_uniq_by_key cmp key l =
+  let l = List.rev_map (fun x -> (x, key x)) l in
+  let l = List.sort_uniq (fun (_, k1) (_, k2) -> cmp k2 k1) l in
+  List.rev_map fst l
 
 let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
 
@@ -28,41 +38,42 @@ let give_access_someone conf base (x, t) list =
     | Some _d, _ | _, Some _d -> true
     | _ -> false
   in
-  if has_dates then Output.print_sstring conf "<em>";
-  (match t_date_start with
-  | None -> ()
-  | Some d -> Output.print_sstring conf (string_of_int d.year));
+  (if has_dates then
+     match t_date_start with
+     | None -> ()
+     | Some d -> Output.print_sstring conf (string_of_int d.year));
   (match t_date_end with
   | None -> ()
   | Some d ->
-      Output.print_sstring conf "-";
+      Output.print_sstring conf "–";
       Output.print_sstring conf (string_of_int d.year));
-  if has_dates then Output.print_sstring conf "</em>: ";
+  if has_dates then Output.print_sstring conf (transl conf ":");
+  Output.print_sstring conf " ";
   if List.mem x list then Output.print_sstring conf "<em>"
   else
     Output.print_string conf
       ({|<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|">|});
-  (match (t.t_name, get_public_name x, get_qualifiers x) with
-  | Tmain, pn, nn :: _ when sou base pn <> "" ->
-      Output.print_string conf (escape_html @@ sou base pn);
+  (match (t.t_name, Driver.get_public_name x, Driver.get_qualifiers x) with
+  | Tmain, pn, nn :: _ when Driver.sou base pn <> "" ->
+      Output.print_string conf (escape_html @@ Driver.sou base pn);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (escape_html @@ sou base nn);
+      Output.print_string conf (escape_html @@ Driver.sou base nn);
       Output.print_sstring conf "</em> ";
-      Output.print_string conf (escape_html @@ p_surname base x)
-  | Tmain, pn, [] when sou base pn <> "" ->
-      Output.print_string conf (escape_html @@ sou base pn);
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
+  | Tmain, pn, [] when Driver.sou base pn <> "" ->
+      Output.print_string conf (escape_html @@ Driver.sou base pn);
       Output.print_sstring conf " ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | Tname n, _, nn :: _ ->
-      Output.print_string conf (escape_html @@ sou base n);
+      Output.print_string conf (escape_html @@ Driver.sou base n);
       Output.print_sstring conf " <em>";
-      Output.print_string conf (escape_html @@ sou base nn);
+      Output.print_string conf (escape_html @@ Driver.sou base nn);
       Output.print_sstring conf "</em> ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | Tname n, _, [] ->
-      Output.print_string conf (escape_html @@ sou base n);
+      Output.print_string conf (escape_html @@ Driver.sou base n);
       Output.print_sstring conf " ";
-      Output.print_string conf (escape_html @@ p_surname base x)
+      Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | _ -> Output.print_string conf (gen_person_text conf base x));
   Output.print_sstring conf "\n";
   Output.print_string conf (DateDisplay.short_dates_text conf base x);
@@ -70,7 +81,7 @@ let give_access_someone conf base (x, t) list =
     Output.print_sstring conf " (";
     Output.print_sstring conf
       (if t.t_nth >= 100 then string_of_int t.t_nth
-      else transl_nth conf "nth" t.t_nth);
+       else transl_nth conf "nth" t.t_nth);
     Output.print_sstring conf ")");
   if List.mem x list then Output.print_sstring conf "</em>"
   else Output.print_sstring conf "</a>"
@@ -118,7 +129,8 @@ let propose_tree_for_list list conf =
              Output.print_sstring conf "&i";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
-             Output.print_sstring conf (Gwdb.string_of_iper @@ get_iper p);
+             Output.print_sstring conf
+               (Driver.Iper.to_string @@ Driver.get_iper p);
              Output.print_sstring conf "&t";
              Output.print_sstring conf (string_of_int i);
              Output.print_sstring conf "=";
@@ -178,29 +190,29 @@ let print_all_with_place_list conf base p list =
       Output.print_sstring conf "<li>";
       give_access_someone conf base x [];
       Output.print_sstring conf ", ";
-      Output.print_string conf (sou base t.t_ident |> escape_html);
-      Output.printf conf "<li>")
+      Output.print_string conf (Driver.sou base t.t_ident |> escape_html);
+      Output.printf conf "</li>")
     list;
   Output.print_sstring conf "</ul>\n";
   propose_tree_for_list list conf;
   Hutil.trailer conf
 
 let select_title_place conf base title place =
-  select_title_place conf base title place
+  Title.select_title_place conf base title place
     ~absolute:(p_getenv conf.env "a" = Some "A")
 
 let select_title conf base title =
-  select_title conf base title ~absolute:(p_getenv conf.env "a" = Some "A")
+  Title.select_title conf base title ~absolute:(p_getenv conf.env "a" = Some "A")
 
 let print_title_place conf base t p =
-  let l, t, p, t_equiv = select_title_place conf base t p in
-  let list = List.sort (compare_title_order conf base) l in
-  print_title_place_list conf base t p t_equiv list
+  let l, t_equiv = select_title_place conf base t p in
+  let l = List.sort (Title.compare_title_order conf base) l in
+  print_title_place_list conf base t p t_equiv l
 
 let print_all_with_place conf base p =
-  let l, p = select_all_with_place conf base p in
-  let list = List.sort (compare_title_dates conf base) l in
-  print_all_with_place_list conf base p list
+  let l = Title.select_all_with_place conf base p in
+  let l = List.sort (Title.compare_title_dates conf base) l in
+  print_all_with_place_list conf base p l
 
 let print_places_list conf base t t_equiv list =
   let title h =
@@ -216,32 +228,32 @@ let print_places_list conf base t t_equiv list =
   let order s =
     Utf8.capitalize_fst (Name.lower (surname_without_particle base s))
   in
-  let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
+  let list = sort_by_key String.compare order list in
   let absolute = p_getenv conf.env "a" = Some "A" in
   let wprint_elem p =
+    let add_absolute = absolute && p = "" in
     give_access_title_aux conf
       ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p
-      ^>^ if absolute then "&a=A" else "")
+      ^>^ if add_absolute then "&a=A" else "")
       (if p = "" then Adef.safe "..."
-      else
-        ((escape_html @@ surname_without_particle base p)
-         ^^^ escape_html @@ surname_particle base p
-          :> Adef.safe_string))
+       else
+         ((escape_html @@ surname_without_particle base p)
+          ^^^ escape_html @@ surname_particle base p
+           :> Adef.safe_string))
   in
   Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
   Hutil.trailer conf
 
 let print_places conf base t =
-  let l, t, t_equiv = select_title conf base t in
-  let list = List.sort_uniq my_alphabetic l in
-  match list with
+  let l, t_equiv = select_title conf base t in
+  match sort_uniq_by_key String.compare Name.lower l with
   | [ p ] -> print_title_place conf base t p
-  | _ -> print_places_list conf base t t_equiv list
+  | _ -> print_places_list conf base t t_equiv l
 
 let print_titles conf base p =
-  let l, p = select_place conf base p in
-  let list = List.sort_uniq my_alphabetic l in
+  let l = Title.select_place conf base p in
+  let l = sort_uniq_by_key String.compare Name.lower l in
   let title _ =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
@@ -253,9 +265,9 @@ let print_titles conf base p =
       Output.print_sstring conf "<li>";
       give_access_title conf t p;
       Output.print_sstring conf "</li>\n")
-    list;
+    l;
   Output.print_sstring conf "</ul>\n";
-  if List.length list > 1 then (
+  if List.compare_length_with l 1 > 0 then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=TT&sm=A&p=";
@@ -273,7 +285,8 @@ let print_all_titles conf base =
   in
   let list =
     let l = select_all_titles conf base in
-    string_cnt_list_uniq (List.sort compare_titles2 l)
+    string_cnt_list_uniq
+      (sort_by_key String.compare (fun (t, _) -> Name.lower t) l)
   in
   let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
   let wprint_elem (t, cnt) =
@@ -289,9 +302,9 @@ let print_all_places conf base =
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "all the estates"))
   in
-  let list =
+  let l =
     let l = select_all_places conf base in
-    List.sort_uniq my_alphabetic l
+    sort_uniq_by_key String.compare Name.lower l
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
@@ -300,7 +313,7 @@ let print_all_places conf base =
       Output.print_sstring conf "<li>";
       give_access_all_places conf t;
       Output.print_sstring conf "</li>\n")
-    list;
+    l;
   Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 

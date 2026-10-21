@@ -17,15 +17,6 @@ let fast_concat = function
            0 l;
       Bytes.unsafe_to_string b
 
-let args line =
-  List.sort_uniq compare
-  @@ List.fold_left
-       (fun acc list ->
-         List.fold_left
-           (fun acc -> function Lexicon_parser.Arg x -> x :: acc | _ -> acc)
-           acc list)
-       [] line
-
 let import_trad ht keyword line =
   let open Jg_types in
   let open Jg_runtime in
@@ -73,49 +64,3 @@ let make_lang lexicon len lang =
   let ht = Hashtbl.create len in
   List.iter (fun (key, tr) -> import_trad ht key (find_lang lang tr)) lexicon;
   ht
-
-let lexicon_files = ref []
-
-let de_en_es_fi_fr_it_nl_no_pt_sv =
-  lazy
-    (let acc =
-       List.fold_left
-         (fun acc file ->
-           let in_chan = open_in file in
-           let lexbuf = Lexing.from_channel in_chan in
-           try
-             let acc = Lexicon_parser.p_main acc lexbuf in
-             close_in in_chan;
-             acc
-           with Failure msg ->
-             failwith
-               (Printf.sprintf "%s line: %d" msg
-                  lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum))
-         [] !lexicon_files
-     in
-     let lexicon =
-       let rec loop acc = function
-         | [] -> acc
-         | ((key, trad) as hd) :: tl ->
-             let acc =
-               if
-                 List.exists (fun (k, _) -> k = key) acc
-                 || not (List.mem_assoc default_lang trad)
-               then acc
-               else hd :: acc
-             in
-             loop acc tl
-       in
-       loop [] acc
-     in
-     let len = List.length lexicon in
-     ( make_lang lexicon len "de",
-       make_lang lexicon len "en",
-       make_lang lexicon len "es",
-       make_lang lexicon len "fi",
-       make_lang lexicon len "fr",
-       make_lang lexicon len "it",
-       make_lang lexicon len "nl",
-       make_lang lexicon len "no",
-       make_lang lexicon len "pt",
-       make_lang lexicon len "sv" ))

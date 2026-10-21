@@ -1,4 +1,4 @@
-﻿%doctype;
+%doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: templm/anctree.txt v7.0 2015/12/10 21:34:32 $ -->
@@ -23,6 +23,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  %permalink;
   %include;css
 </head>
 
@@ -244,8 +245,9 @@
   %include;tools
   %apply;tools_anctree()
   <div style="clear:both;"></div>
-  %base_trailer;
+  %include;trl
   %include;copyr
+  %query_time;
 %end;
 </body>
 </html>

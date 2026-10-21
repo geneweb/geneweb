@@ -1,20 +1,4 @@
-(*
-let pp_wiki_link = function
-  | WLpage (a, b, c, d, e) ->
-      "WLpage "
-      ^ [%show: int * (string list * string) * string * string * string]
-          (a, b, c, d, e)
-  | WLperson (a, b, c, d) ->
-      "WLperson"
-      ^ [%show: int * (string * string * int) * string option * string option]
-          (a, Obj.magic b, c, d)
-  | WLwizard (a, b, c) -> "WLwizard" ^ [%show: int * string * string] (a, b, c)
-  | WLnone (a, b)-> "WLnone" ^ [%show: int * string] (a, b)
-  *)
-
-open Alcotest
-open Geneweb
-open NotesLinks
+open Geneweb.NotesLinks
 
 let f s =
   let len = String.length s in
@@ -22,23 +6,44 @@ let f s =
     if i = len then List.rev acc
     else
       match misc_notes_link s i with
-      | (WLpage (j, _, _, _, _) | WLperson (j, _, _, _) | WLwizard (j, _, _)) as
-        x ->
+      | ( WLpage (j, _, _, _, _)
+        | WLperson (j, _, _, _, _)
+        | WLwizard (j, _, _)
+        | WLimage (j, _, _, _) ) as x ->
           loop (x :: acc) j
       | WLnone (j, _text) as wn -> loop (wn :: acc) j
   in
   loop [] 0
 
+let expect_failure name speed f =
+  Alcotest.test_case name speed (fun () ->
+      try
+        f ();
+        Alcotest.fail "Expected failure"
+      with _ -> ())
+
 let l =
   [
     ([ WLpage (13, ([], "aaa"), "aaa", "", "bbb") ], "[[[aaa/bbb]]]");
-    ([ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None) ], "[[ccc/ddd]]");
-    ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None) ],
+    ([ WLpage (17, ([], "aaa"), "aaa", "b_2", "ccc") ], "[[[aaa#b_2/ccc]]]");
+    ( [
+        WLpage (31, ([ "Sources" ], "Index"), "Sources:Index", "a_2", "sources");
+      ],
+      "[[[Sources:Index#a_2/sources]]]" );
+    ( [ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None, None) ],
+      "[[ccc/ddd]]" );
+    ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None, None) ],
       "[[ccc/ddd/Texte]]" );
-    ( [ WLperson (21, ("ccc", "ddd", 1), Some "Ccc Ddd", None) ],
+    ( [ WLperson (21, ("ccc", "ddd", 1), Some "Ccc Ddd", None, None) ],
       "[[ccc/ddd/1/Ccc Ddd]]" );
-    ( [ WLperson (25, ("ccc", "ddd", 0), Some "Texte", Some "Texte 2") ],
+    ( [ WLperson (25, ("ccc", "ddd", 0), Some "Texte", Some "Texte 2", None) ],
       "[[ccc/ddd/Texte;Texte 2]]" );
+    ( [ WLperson (13, ("ccc", "ddd", 0), Some "ccc ddd", None, Some 1) ],
+      "[[ccc/ddd]]#1" );
+    ( [ WLperson (14, ("ccc", "ddd", 0), Some "ccc ddd", None, Some 42) ],
+      "[[ccc/ddd]]#42" );
+    ( [ WLperson (17, ("ccc", "ddd", 0), Some "ccc ddd", Some "txt", Some 5) ],
+      "[[ccc/ddd;txt]]#5" );
     ([ WLnone (6, "[[[]]]") ], "[[[]]]");
     ([ WLnone (4, "[[]]") ], "[[]]");
     ([ WLnone (3, "[[w") ], "[[w");
@@ -46,9 +51,9 @@ let l =
       "[[[d_azincourt/d&#039;Azincourt]]]" );
     ( [
         WLnone (1, "[");
-        WLperson (12, ("aaa", "bbb", 0), Some "aaa bbb", None);
+        WLperson (12, ("aaa", "bbb", 0), Some "aaa bbb", None, None);
         WLnone (14, ", ");
-        WLperson (33, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
+        WLperson (33, ("ccc", "ddd", 0), Some "Ccc Ddd", None, None);
         WLnone (58, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
@@ -58,33 +63,54 @@ let l =
     ([ WLwizard (14, "hg", "henri") ], "[[w:hg/henri]]");
     ( [ WLnone (1, "["); WLnone (2, "["); WLwizard (16, "hg", "henri") ],
       "[[[[w:hg/henri]]" );
+    ([ WLimage (19, ([], "photo.jpg"), "", None) ], "[[image:photo.jpg]]");
+    ( [ WLimage (24, ([ "albums" ], "pic.jpg"), "", None) ],
+      "[[image:albums:pic.jpg]]" );
+    ( [ WLimage (28, ([], "photo.jpg"), "my photo", None) ],
+      "[[image:photo.jpg/my photo]]" );
+    ( [ WLimage (34, ([], "photo.jpg"), "my photo", Some "200px") ],
+      "[[image:photo.jpg/my photo/200px]]" );
+    ( [ WLimage (29, ([], "photo.jpg"), "my photo", None) ],
+      "[[image:photo.jpg/my photo/]]" );
+    ([ WLnone (22, "[[image:bad path.jpg]]") ], "[[image:bad path.jpg]]");
+    ( [ WLimage (21, ([ "a"; "b" ], "c.jpg"), "t", None) ],
+      "[[image:a:b:c.jpg/t]]" );
   ]
 
-(* todo fix Fmt *)
-let testable_wiki =
-  testable
-    (fun fmt x ->
-      match x with
-      | WLpage (pos, _b, fname, anchor, text) ->
-          Fmt.pf fmt "WLpage   (%d,_,%S,%S,%S)" pos fname anchor text
-      | WLperson (pos, key, name, text) ->
-          let fn, sn, oc = key in
-          Fmt.pf fmt "WLperson (%d, (%S,%S,%d),%a,%a)" pos fn sn oc
-            (Fmt.option Fmt.string) name (Fmt.option Fmt.string) text
-      | WLwizard (pos, wiz, name) ->
-          Fmt.pf fmt "WLwizard (%d,%S,%S)" pos wiz name
-      | WLnone (pos, s) -> Fmt.pf fmt "WLnone   (%d,%S)" pos s)
-    ( = )
+let pp_token ppf tk =
+  match tk with
+  | WLpage (pos, (p, fname), full, anchor, text) ->
+      Fmt.pf ppf "WLpage (%d, ([%s], %s), %s, %s, %s)" pos
+        (String.concat "; " p) fname full anchor text
+  | WLperson (pos, (fn, sn, oc), name, text, fam_marker) ->
+      Fmt.pf ppf "WLperson (%d, (%s, %s, %d), %a, %a, %a)" pos fn sn oc
+        Fmt.(option ~none:(any "None") string)
+        name
+        Fmt.(option ~none:(any "None") string)
+        text
+        Fmt.(option ~none:(any "None") int)
+        fam_marker
+  | WLwizard (pos, wiz, name) -> Fmt.pf ppf "WLwizard (%d, %s, %s)" pos wiz name
+  | WLimage (pos, (p, fname), alt, width) ->
+      Fmt.pf ppf "WLimage (%d, ([%s], %s), %s, %a)" pos (String.concat "; " p)
+        fname alt
+        Fmt.(option ~none:(any "None") string)
+        width
+  | WLnone (pos, s) -> Fmt.pf ppf "WLnone (%d, %s)" pos s
 
-let test expected s () =
-  (check (list testable_wiki)) "" expected (f s);
-  ()
+let eq_token = ( = )
+let token_t = Alcotest.testable pp_token eq_token
 
-let v =
-  [
-    ( "misc-notes-link",
-      (* todo List.map here or in test? *)
-      List.map
-        (fun (expected, s) -> test_case "Wiki links" `Quick (test expected s))
-        l );
-  ]
+let tests s (expected, input) () =
+  Alcotest.(check (list token_t)) s expected (f input)
+
+let test_cases =
+  List.mapi
+    (fun i (exp, inp) ->
+      Alcotest.test_case
+        (Printf.sprintf "case %d: %s" i inp)
+        `Quick
+        (tests inp (exp, inp)))
+    l
+
+let v = [ ("wiki", test_cases) ]

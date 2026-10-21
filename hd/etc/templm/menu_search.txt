@@ -21,9 +21,6 @@
 %end;
 %if;(not cancel_links and e.m != "MOD_DATA_OK" and e.m != "DEL_IND_OK" and e.m != "DEL_FAM_OK" and e.m != "NOTES" and e.m != "MISC_NOTES" and e.templ="templm" and e.m!="RL")
   <div class="menu3" id="menu_search">
-    %if;(referer != "")
-      <span><a href="%referer;" title="[*back]">⇦</a></span>
-    %end;
     %if;(e.n != "" or e.i != "" or e.m !="")
       <span><a href="%prefix;" title="[*home]"> ⇧ </a></span>
     %end;
@@ -35,7 +32,7 @@
           Alt+%lpc1k; [first name/first names]0<br>
           Alt+%lpc2k; [birth]<br>
           Alt+%lpc3k; [death]<br>
-          Alt+%lpc4k; [add] [event/events]0<br>
+          Alt+%lpc4k; [add::event/events]0<br>
           Alt+%lpc5k; [note/notes]1<br>
           Alt+%lpc6k; [relation/relations]1<br>
           Alt+%lpc7k; [title/titles]1<br>
@@ -43,10 +40,10 @@
           Alt+%lpcOk; [invert::event/events]1<br><br>
           %elseif;(e.m ="MOD_FAM" or e.m ="ADD_FAM")
           Alt+%lfc1k; [first name/first names]0 [father/mother]0<br>
-          Alt+%lfc2k; [add] [child/children]0<br>
+          Alt+%lfc2k; [add::child/children]0<br>
           Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
-          Alt+%lfc4k; [add] [event/events]0<br>
-          Alt+%lfc5k; [marriage notes]<br>
+          Alt+%lfc4k; [add::event/events]0<br>
+          Alt+%lfc5k; [notes on the marriage/notes on the marriages]0<br>
           Alt+%lfc6k; [source/sources]1<br>
           Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>
           %else;

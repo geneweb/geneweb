@@ -1,7 +1,7 @@
 (* $Id: adef.ml,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-type fix = int
+type fix = int [@@deriving show { with_path = false }]
 
 let float_of_fix x = float x /. 1000000.0
 let fix_of_float x = truncate ((x *. 1000000.0) +. 0.5)
@@ -12,9 +12,16 @@ external fix_repr : fix -> int = "%identity"
 let no_consang = fix (-1)
 
 type date = Dgreg of dmy * calendar | Dtext of string
+[@@deriving show { with_path = false }]
+
 and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+[@@deriving show { with_path = false }]
+
 and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
+[@@deriving show { with_path = false }]
+
 and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+[@@deriving show { with_path = false }]
 
 and precision =
   | Sure
@@ -24,6 +31,7 @@ and precision =
   | After
   | OrYear of dmy2
   | YearInt of dmy2
+[@@deriving show { with_path = false }]
 
 type cdate =
   | Cgregorian of int
@@ -33,27 +41,19 @@ type cdate =
   | Ctext of string
   | Cdate of date
   | Cnone
+[@@deriving show { with_path = false }]
 
 type 'person gen_couple = { father : 'person; mother : 'person }
-and 'person gen_parents = { parent : 'person array }
+[@@deriving show { with_path = false }]
 
-let father cpl =
-  if Obj.size (Obj.repr cpl) = 2 then cpl.father else (Obj.magic cpl).parent.(0)
-
-let mother cpl =
-  if Obj.size (Obj.repr cpl) = 2 then cpl.mother else (Obj.magic cpl).parent.(1)
-
+let[@inline] father cpl = cpl.father
+let[@inline] mother cpl = cpl.mother
 let couple father mother = { father; mother }
 let parent parent = { father = parent.(0); mother = parent.(1) }
+let parent_array cpl = [| cpl.father; cpl.mother |]
 
-let parent_array cpl =
-  if Obj.size (Obj.repr cpl) = 2 then [| cpl.father; cpl.mother |]
-  else (Obj.magic cpl).parent
-
-let multi_couple father mother : 'person gen_couple =
-  Obj.magic { parent = [| father; mother |] }
-
-let multi_parent parent : 'person gen_couple = Obj.magic { parent }
+let map_couple_p fp { father; mother } =
+  { father = fp father; mother = fp mother }
 
 type 'a astring = string
 type safe_string = [ `encoded | `escaped | `safe ] astring

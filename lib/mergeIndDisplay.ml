@@ -2,12 +2,13 @@
 
 open Config
 open Def
-open Gwdb
 open Util
 open MergeInd
+module Driver = Geneweb_db.Driver
+module Gutil = Geneweb_db.Gutil
 
 let print_differences conf base branches p1 p2 =
-  let gen_string_field chk1 chk2 (title : Adef.safe_string)
+  let gen_string_field ?(check = true) chk1 chk2 (title : Adef.safe_string)
       (name : Adef.encoded_string) proj =
     let name = (name :> string) in
     let x1 : Adef.safe_string = proj p1 in
@@ -20,45 +21,46 @@ let print_differences conf base branches p1 p2 =
       && x1 <> x2
     then (
       let aux i x chk =
-        Output.print_sstring conf
-          {|<div class="custom-control custom-radio ml-3">|};
-        Output.print_sstring conf
-          {|<input class="custom-control-input" type="radio" id="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|" name="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf {|" value="|};
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|"|};
-        if chk then Output.print_sstring conf " checked";
-        Output.print_sstring conf {|>|};
-        Output.printf conf {|<label class="custom-control-label" for="|};
-        Output.print_sstring conf name;
-        Output.print_sstring conf (string_of_int i);
-        Output.print_sstring conf {|">|};
+        Output.printf conf
+          {|<div class="form-check ms-3%s">
+<input class="form-check-input" type="radio" id="%s%d" name="%s" value="%d"%s>
+<label class="form-check-label" for="%s%d">|}
+          (if i = 1 then " mb-2" else "")
+          name i name i
+          (if chk && check then " checked" else "")
+          name i;
         Output.print_string conf x;
         Output.print_sstring conf {|</label></div>|}
       in
       Output.print_sstring conf "<h4>";
       Output.print_string conf (Adef.safe_fn Utf8.capitalize_fst title);
+      if not check then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|<sup title="%s">
+            <i class="fa fa-info fa-xs"></i></sup>|}
+             (transl conf "help merge" |> Utf8.capitalize_fst));
       Output.print_sstring conf {|</h4>|};
       aux 1 x1 chk1;
       aux 2 x2 chk2)
   in
-  let string_field = gen_string_field true false in
+  let string_field ?(check = true) = gen_string_field ~check true false in
   Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND_OK");
-  Util.hidden_input conf "i1" (get_iper p1 |> string_of_iper |> Mutil.encode);
-  Util.hidden_input conf "i2" (get_iper p2 |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "i1"
+    (Driver.get_iper p1 |> Driver.Iper.to_string |> Mutil.encode);
+  Util.hidden_input conf "i2"
+    (Driver.get_iper p2 |> Driver.Iper.to_string |> Mutil.encode);
   let rec loop = function
     | [ (ip1, ip2) ] ->
-        Util.hidden_input conf "ini1" (ip1 |> string_of_iper |> Mutil.encode);
-        Util.hidden_input conf "ini2" (ip2 |> string_of_iper |> Mutil.encode)
+        Util.hidden_input conf "ini1"
+          (ip1 |> Driver.Iper.to_string |> Mutil.encode);
+        Util.hidden_input conf "ini2"
+          (ip2 |> Driver.Iper.to_string |> Mutil.encode)
     | _ :: branches -> loop branches
     | [] -> ()
   in
@@ -77,18 +79,20 @@ let print_differences conf base branches p1 p2 =
   string_field
     (transl_nth conf "first name/first names" 0 |> Adef.safe)
     ("first_name" |> Adef.encoded)
-    (fun p -> (p_first_name base p |> escape_html :> Adef.safe_string));
+    (fun p -> (Driver.p_first_name base p |> escape_html :> Adef.safe_string));
   string_field
     (transl_nth conf "surname/surnames" 0 |> Adef.safe)
     ("surname" |> Adef.encoded)
-    (fun p -> (p_surname base p |> escape_html :> Adef.safe_string));
-  let select_smallest_num = p_first_name base p1 = p_first_name base p2 in
+    (fun p -> (Driver.p_surname base p |> escape_html :> Adef.safe_string));
+  let select_smallest_num =
+    Driver.p_first_name base p1 = Driver.p_first_name base p2
+  in
   gen_string_field
-    (get_occ p1 < get_occ p2 || not select_smallest_num)
-    (get_occ p1 > get_occ p2 && select_smallest_num)
+    (Driver.get_occ p1 < Driver.get_occ p2 || not select_smallest_num)
+    (Driver.get_occ p1 > Driver.get_occ p2 && select_smallest_num)
     (transl conf "number" |> Adef.safe)
     ("number" |> Adef.encoded)
-    (fun p -> get_occ p |> string_of_int |> Adef.safe);
+    (fun p -> Driver.get_occ p |> string_of_int |> Adef.safe);
   string_field
     (transl_nth conf "image/images" 0 |> Adef.safe)
     ("image" |> Adef.encoded)
@@ -99,7 +103,7 @@ let print_differences conf base branches p1 p2 =
            ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
             :> Adef.safe_string)
       | Some (`Path path) ->
-          let k = Image.default_portrait_filename base p in
+          let k = Image.default_image_filename "portraits" base p in
           let s = Unix.stat path in
           Printf.sprintf
             {|<img src="%sm=IM&d=%s&%s&k=%s" \
@@ -112,20 +116,51 @@ let print_differences conf base branches p1 p2 =
           |> Adef.safe
       | None -> Adef.safe "");
   string_field
+    (transl_nth conf "blason/blasons" 0 |> Adef.safe)
+    ("blason" |> Adef.encoded)
+    (fun p ->
+      match Image.get_blason conf base p true with
+      | Some (`Url url) ->
+          ({|<img src="|} ^<^ escape_html url
+           ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
+            :> Adef.safe_string)
+      | Some (`Path path) ->
+          let s = Unix.stat path in
+          Printf.sprintf
+            {|<img src="%sm=FIM&d=%s&p=%s&n=%s&oc=%d&k=%s" \
+              style="max-width:75px;max-height:100px"> %s|}
+            (commd conf :> string)
+            (string_of_int
+            @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+            (Driver.get_first_name p |> Driver.sou base)
+            (Driver.get_surname p |> Driver.sou base)
+            (Driver.get_occ p)
+            ((acces conf base p : Adef.escaped_string :> string) ^ ".blason")
+            path
+          |> Adef.safe
+      | None -> Adef.safe "");
+  string_field
     (transl conf "public name" |> Adef.safe)
     ("public_name" |> Adef.encoded)
     (fun p ->
-      (get_public_name p |> sou base |> escape_html :> Adef.safe_string));
+      (Driver.get_public_name p |> Driver.sou base |> escape_html
+        :> Adef.safe_string));
   string_field
     (transl_nth conf "occupation/occupations" 0 |> Adef.safe)
     ("occupation" |> Adef.encoded)
-    (fun p -> (get_occupation p |> sou base |> escape_html :> Adef.safe_string));
+    (fun p ->
+      (Driver.get_occupation p |> Driver.sou base |> escape_html
+        :> Adef.safe_string));
   string_field
     (transl conf "sex" |> Adef.safe)
     ("sex" |> Adef.encoded)
     (fun p ->
       Adef.safe
-      @@ match get_sex p with Male -> "M" | Female -> "F" | Neuter -> "");
+      @@
+      match Driver.get_sex p with
+      | Male -> "M"
+      | Female -> "F"
+      | Neuter -> "");
   let date_field trans name get =
     string_field
       (transl conf trans |> Adef.safe)
@@ -140,18 +175,36 @@ let print_differences conf base branches p1 p2 =
       (transl conf trans ^<^ Adef.safe " / "
       ^>^ transl_nth conf "place/places" 0)
       name
-      (fun p -> get p |> sou base |> safe_html)
+      (fun p -> get p |> Driver.sou base |> safe_html)
   in
-  date_field "birth" (Adef.encoded "birth") get_birth;
-  place_field "birth" (Adef.encoded "birth_place") get_birth_place;
-  date_field "baptism" (Adef.encoded "baptism") get_baptism;
-  place_field "baptism" (Adef.encoded "baptism_place") get_baptism_place;
+  let note_field trans name get =
+    string_field ~check:false
+      (transl conf trans ^<^ Adef.safe " / " ^>^ transl_nth conf "note/notes" 0)
+      name
+      (fun p -> get p |> Driver.sou base |> safe_html)
+  in
+  let source_field trans name get =
+    string_field ~check:false
+      (transl conf trans ^<^ Adef.safe " / "
+      ^>^ transl_nth conf "source/sources" 0)
+      name
+      (fun p -> get p |> Driver.sou base |> safe_html)
+  in
+
+  date_field "birth" (Adef.encoded "birth") Driver.get_birth;
+  place_field "birth" (Adef.encoded "birth_place") Driver.get_birth_place;
+  note_field "birth" (Adef.encoded "birth_note") Driver.get_birth_note;
+  source_field "birth" (Adef.encoded "birth_source") Driver.get_birth_src;
+  date_field "baptism" (Adef.encoded "baptism") Driver.get_baptism;
+  place_field "baptism" (Adef.encoded "baptism_place") Driver.get_baptism_place;
+  note_field "baptism" (Adef.encoded "baptism_note") Driver.get_baptism_note;
+  source_field "baptism" (Adef.encoded "baptism_source") Driver.get_baptism_src;
   string_field
     (transl conf "death" |> Adef.safe)
     (Adef.encoded "death")
     (fun p ->
       let is = 2 in
-      match get_death p with
+      match Driver.get_death p with
       | NotDead -> transl_nth conf "alive" is |> Adef.safe
       | Death (dr, cd) ->
           let s =
@@ -167,14 +220,16 @@ let print_differences conf base branches p1 p2 =
       | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
       | DontKnowIfDead | OfCourseDead -> Adef.safe "");
-  place_field "death" (Adef.encoded "death_place") get_death_place;
+  place_field "death" (Adef.encoded "death_place") Driver.get_death_place;
+  note_field "death" (Adef.encoded "death_note") Driver.get_death_note;
+  source_field "death" (Adef.encoded "death_source") Driver.get_death_src;
   string_field
     (transl conf "burial" |> Adef.safe)
     (Adef.encoded "burial")
     (fun p ->
       let is = 2 in
       (* TODO burial_to_string *)
-      match get_burial p with
+      match Driver.get_burial p with
       | UnknownBurial -> Adef.safe ""
       | Buried cod -> (
           transl_nth conf "buried" is
@@ -188,7 +243,14 @@ let print_differences conf base branches p1 p2 =
           match Date.od_of_cdate cod with
           | None -> Adef.safe ""
           | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d));
-  place_field "burial" (Adef.encoded "burial_place") get_burial_place;
+  place_field "burial" (Adef.encoded "burial_place") Driver.get_burial_place;
+  note_field "burial" (Adef.encoded "burial_note") Driver.get_burial_note;
+  source_field "burial" (Adef.encoded "burial_source") Driver.get_burial_src;
+  string_field ~check:false
+    (transl_nth conf "note/notes" 1 |> Adef.safe)
+    ("notes" |> Adef.encoded)
+    (fun p ->
+      (Driver.get_notes p |> Driver.sou base |> escape_html :> Adef.safe_string));
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
@@ -228,8 +290,8 @@ let propose_merge_ind conf base branches p1 p2 =
     Output.print_sstring conf "</p><table>";
     List.iter
       (fun (ip1, ip2) ->
-        let p1 = poi base ip1 in
-        let p2 = poi base ip2 in
+        let p1 = Driver.poi base ip1 in
+        let p2 = Driver.poi base ip2 in
         Output.print_sstring conf "<tr align=\"";
         Output.print_sstring conf conf.left;
         Output.print_sstring conf "\"><td>";
@@ -239,7 +301,7 @@ let propose_merge_ind conf base branches p1 p2 =
         Output.print_string conf (referenced_person_text conf base p2);
         Output.print_string conf (DateDisplay.short_dates_text conf base p2);
         Output.print_sstring conf "</td></tr>")
-      ((get_iper p1, get_iper p2) :: branches);
+      ((Driver.get_iper p1, Driver.get_iper p2) :: branches);
     Output.print_sstring conf "</table>");
   Hutil.trailer conf
 
@@ -249,12 +311,12 @@ let error_loop conf base p =
   in
   Hutil.rheader conf title;
   Output.print_sstring conf "<strong>";
-  Output.print_string conf (p_first_name base p |> escape_html);
-  if get_occ p <> 0 then (
+  Output.print_string conf (Driver.p_first_name base p |> escape_html);
+  if Driver.get_occ p <> 0 then (
     Output.print_sstring conf ".";
-    Output.print_sstring conf (get_occ p |> string_of_int));
+    Output.print_sstring conf (Driver.get_occ p |> string_of_int));
   Output.print_sstring conf " ";
-  Output.print_string conf (p_surname base p |> escape_html);
+  Output.print_string conf (Driver.p_surname base p |> escape_html);
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "would be his/her own ancestor");
   Output.print_sstring conf "";
@@ -343,7 +405,7 @@ let print_merged conf base wl p =
   Output.print_sstring conf "</li></ul>";
   (match (p_getenv conf.env "m", p_getenv conf.env "ip") with
   | Some "MRG_DUP_IND_Y_N", Some ip ->
-      let ip = iper_of_string ip in
+      let ip = Driver.Iper.of_string ip in
       let s1 =
         match p_getenv conf.env "iexcl" with
         | Some "" | None -> Adef.encoded ""
@@ -358,14 +420,14 @@ let print_merged conf base wl p =
       Output.print_sstring conf "<a href=";
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=MRG_DUP&ip=";
-      Output.print_string conf (string_of_iper ip |> Mutil.encode);
+      Output.print_string conf (Driver.Iper.to_string ip |> Mutil.encode);
       Output.print_string conf s1;
       Output.print_string conf s2;
       Output.print_sstring conf ">";
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl conf "continue merging"));
       Output.print_sstring conf "</a>";
-      (let p = poi base ip in
+      (let p = Driver.poi base ip in
        let s = gen_person_text conf base p in
        Output.print_sstring conf "\n(";
        Output.print_sstring conf
@@ -382,18 +444,19 @@ let print_merged conf base wl p =
 let print conf base =
   let p1 =
     match p_getenv conf.env "i" with
-    | Some i1 -> Some (poi base (iper_of_string i1))
+    | Some i1 -> Some (Driver.poi base (Driver.Iper.of_string i1))
     | None -> None
   in
   let p2 =
     match p_getenv conf.env "i2" with
-    | Some i2 -> Some (poi base (iper_of_string i2))
+    | Some i2 -> Some (Driver.poi base (Driver.Iper.of_string i2))
     | None -> (
         match (p_getenv conf.env "select", p_getenv conf.env "n") with
         | (Some "input" | None), Some n -> (
             let ipl = Gutil.person_ht_find_all base n in
-            match ipl with [ ip2 ] -> Some (poi base ip2) | _ -> None)
-        | Some x, (Some "" | None) -> Some (poi base (iper_of_string x))
+            match ipl with [ ip2 ] -> Some (Driver.poi base ip2) | _ -> None)
+        | Some x, (Some "" | None) ->
+            Some (Driver.poi base (Driver.Iper.of_string x))
         | _ -> None)
   in
   match (p1, p2) with
@@ -406,7 +469,7 @@ let print conf base =
       with
       | Error_loop p -> error_loop conf base p
       | Different_sexes (p1, p2) -> different_sexes conf base p1 p2
-      | Same_person -> same_person conf)
+      | Gutil.Same_person -> same_person conf)
   | _ -> not_found_or_incorrect conf
 
 (* Undocumented feature... Kill someone's ancestors *)
@@ -433,7 +496,7 @@ let print_kill_ancestors conf base =
           Util.commit_patches conf base;
           let changed =
             U_Kill_ancestors
-              (Util.string_gen_person base (gen_person_of_person p))
+              (Util.string_gen_person base (Driver.gen_person_of_person p))
           in
           History.record conf base changed "ka";
           print_killed conf base p !nb_ind !nb_fam

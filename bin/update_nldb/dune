@@ -1,0 +1,6 @@
+(executable
+ (package geneweb)
+ (name update_nldb)
+ (public_name update_nldb)
+ (modules update_nldb)
+ (libraries unix str geneweb))

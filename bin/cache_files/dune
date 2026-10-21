@@ -1,0 +1,5 @@
+(executable
+ (package geneweb)
+ (name cache_files)
+ (public_name cache_files)
+ (libraries decompress.gz unix str geneweb))
