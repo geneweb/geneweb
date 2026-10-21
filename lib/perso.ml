@@ -2179,6 +2179,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "event_witness_relation_kind" env with
       | Vstring wk -> VVstring wk
       | _ -> raise Not_found)
+  | "event_witness_relation_note" :: _ -> (
+      match get_env "event_witness_relation_note" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
   | "event_witness_kind" :: _ -> (
       match get_env "event_witness_kind" env with
       | Vstring s -> VVstring s
@@ -5077,6 +5081,7 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
+    let self_ip = Driver.get_iper p in
     let related = List.sort_uniq compare (Driver.get_related p) in
     let events_witnesses =
       let l = ref [] in
@@ -5108,12 +5113,19 @@ let print_foreach conf base print_ast eval_expr =
         events_witnesses
     in
     List.iter
-      (fun (p, wk, evt) ->
+      (fun (p, wk, ((_, _, _, _, _, wl, _) as evt)) ->
         if p_auth then
+          let wnote =
+            match Array.find_opt (fun (ip, _, _) -> ip = self_ip) wl with
+            | Some (_, _, wnote) ->
+                (Util.escape_html (Driver.sou base wnote) :> string)
+            | None -> ""
+          in
           let env =
             Templ.Env.(
               env
               |> add "event_witness_relation" (Vevent (p, evt))
+              |> add "event_witness_relation_note" (Vstring wnote)
               |> add "event_witness_relation_kind"
                    (Vstring (wk : Adef.safe_string :> string)))
           in
