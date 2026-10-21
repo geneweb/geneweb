@@ -14,6 +14,12 @@ val w_base :
     [bfile] is [None], [none conf] is invoked instead. No locking is performed —
     see {!w_lock} for write protection. *)
 
+val print_incompatible_base :
+  Config.config -> string * string * string list -> unit
+(** [print_incompatible_base conf (file, found, expected)] logs the
+    {!Geneweb_db.Driver.Incompatible_format} error and shows the index page with
+    a notification telling how to rebuild the base. *)
+
 val w_lock :
   onerror:(string option, 'a) handler ->
   (string option, 'a) handler ->
