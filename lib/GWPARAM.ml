@@ -316,9 +316,11 @@ let output_error =
     Output.header conf "Content-type: text/html; charset=utf-8";
     Output.header conf "Connection: close";
     List.iter (Output.header conf "%s") headers;
-    Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
     (match content with
-    | Some content -> Output.print_string conf content
+    | Some content ->
+        Output.print_sstring conf
+          (Printf.sprintf "<h1>%s</h1>" (Code.to_string code));
+        Output.print_string conf content
     | None -> (
         let code = Code.to_string code in
         let fname lang =
