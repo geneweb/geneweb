@@ -945,7 +945,7 @@ let with_database ?(read_only = false) bname k =
   let tm_fname = bname // "commit_timestamp" in
   let patches = input_patches bname in
   let pending : patches_ht = empty_patch_ht () in
-  let patches, perm =
+  let patches, perm, rdonly_reason =
     match patches with
     | Ok patches ->
         fst pending.h_person := !(fst patches.h_person);
@@ -955,11 +955,22 @@ let with_database ?(read_only = false) bname k =
         fst pending.h_couple := !(fst patches.h_couple);
         fst pending.h_descend := !(fst patches.h_descend);
         fst pending.h_string := !(fst patches.h_string);
-        (patches, if Sys.file_exists tm_fname then RDONLY else RDRW)
+        if Sys.file_exists tm_fname then
+          ( patches,
+            RDONLY,
+            Printf.sprintf
+              "%s exists: a previous commit was interrupted, the base is \
+               read-only. Check %s (and %s if present), then remove %s"
+              tm_fname (bname // "patches") (bname // "1patches") tm_fname )
+        else (patches, RDRW, "")
     | Error msg ->
-        prerr_endline msg;
-        (empty_patch_ht (), RDONLY)
+        ( empty_patch_ht (),
+          RDONLY,
+          Printf.sprintf
+            "%s: the base is read-only and online changes are ignored" msg )
   in
+  if rdonly_reason <> "" then Log.err (fun k -> k "%s" rdonly_reason);
+  let forbidden loc = HttpExn (Forbidden, loc ^ ": " ^ rdonly_reason) in
   let fname = bname // "particles.txt" in
   let particles =
     if Sys.file_exists fname then Mutil.input_particles fname
@@ -1127,7 +1138,7 @@ let with_database ?(read_only = false) bname k =
     else npb_init ()
   in
   let commit_patches =
-    if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun () -> raise (forbidden __LOC__)
     else fun () ->
       let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
       (* read real person number (considering pending patches) *)
@@ -1272,7 +1283,7 @@ let with_database ?(read_only = false) bname k =
     with Sys_error _ -> ""
   in
   let commit_notes =
-    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun _ _ -> raise (forbidden __LOC__)
     else fun fnotes s ->
       let fname =
         if fnotes = "" then "notes"
@@ -1287,7 +1298,7 @@ let with_database ?(read_only = false) bname k =
         Secure.with_open_out_text fname (fun oc -> output_string oc s)
   in
   let commit_wiznotes =
-    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun _ _ -> raise (forbidden __LOC__)
     else fun fnotes s ->
       if fnotes <> "" && s <> "" then (
         let wiznotes_dir = Filename.concat bname "wiznotes" in

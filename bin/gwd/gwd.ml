@@ -1695,9 +1695,16 @@ let conf_and_connection =
                         (t2 -. t1))
               with
               | Exit -> ()
-              | Def.HttpExn (code, _) as exn ->
+              | Def.HttpExn (code, msg) as exn ->
                   let bt = Printexc.get_raw_backtrace () in
-                  GWPARAM.output_error conf code;
+                  let content =
+                    if conf.wizard && msg <> "" then
+                      Some
+                        (Adef.safe
+                           ("<p>" ^ (Util.escape_html msg :> string) ^ "</p>"))
+                    else None
+                  in
+                  GWPARAM.output_error ?content conf code;
                   Log.err (fun k ->
                       k "%a" (pp_exception ~predictable_mode) (exn, bt))))
 
