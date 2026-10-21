@@ -87,6 +87,17 @@ val load_database : string -> unit
 
     @raise Failwith if the base has already been loaded. *)
 
+exception Incompatible_format of string * string * string list
+(** Raised by {!with_database} when the {i base} or {i patches} file was written
+    in a format this executable cannot read:
+    [(file, found_header, readable_headers)]. *)
+
+val incompatible_format_message : string -> string -> string list -> string
+(** English message for {!Incompatible_format} (logs, command-line tools). *)
+
+val printable_magic : string -> string
+(** Header as found, or ["?"] if it is not printable. *)
+
 val with_database : string -> (base -> 'a) -> 'a
 (** [with_database bname k] loads the database [bname] and invokes the
     continuation [k] with it.
