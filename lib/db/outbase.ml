@@ -452,7 +452,7 @@ let test_size bname =
   if Int64.compare sz (Int64.div (Int64.mul limit 9L) 10L) > 0 then
     Printf.eprintf
       "Warning: %s is %Ld bytes (%.1f%% of the 4 GiB limit of 32-bit positions \
-       in format GnWb0024).\n\
+       in format GnWb0025).\n\
        A wider position format will be required soon.\n\
        %!"
       base_file sz
@@ -493,7 +493,7 @@ let output base =
   in
   (try
      (* output header of "base" *)
-     output_string oc Dutil.magic_GnWb0024;
+     output_string oc Dutil.magic_GnWb0025;
      output_binary_int oc base.data.persons.len;
      output_binary_int oc base.data.families.len;
      output_binary_int oc base.data.strings.len;
