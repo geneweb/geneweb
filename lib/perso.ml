@@ -3576,8 +3576,8 @@ let print_foreach conf' base print_ast eval_expr =
         List.iter (print_ast env ep) al)
       celll
   in
-  let print_foreach_child env al ep = function
-    | Vfam (ifam, fam, (ifath, imoth, isp), _) ->
+  let print_foreach_child env al _ = function
+    | Vfam (_, fam, (_, _, _), _) ->
         let auth =
           Array.for_all
             (fun ip -> Person.is_visible conf' base (Util.pget conf' base ip))
