@@ -223,13 +223,13 @@ let print_nav_variant_bar conf suggestions ~current_mode ~name ?branch_count ()
       | Some n -> Output.printf conf " (%d)" n
       | None -> ());
       Output.printf conf
-        {|<i class="fa fa-arrow-down-a-z ms-3 me-1"></i>\
-<a href="%s" rel="nofollow">%s</a>|}
+        {|<i class="fa fa-arrow-down-a-z ms-3 me-1"></i><a href="%s"
+rel="nofollow">%s</a>|}
         alpha_url alpha_l
   | `Alphabetic ->
       Output.printf conf
-        {|<i class="fa fa-code-fork ms-3 me-1"></i>\
-<a href="%s" rel="nofollow">%s</a>|}
+        {|<i class="fa fa-code-fork ms-3 me-1"></i><a href="%s"
+rel="nofollow">%s</a>|}
         branch_url branch_l;
       Output.printf conf {|<i class="fa fa-arrow-down-a-z ms-3 me-1"></i>%s|}
         alpha_l);

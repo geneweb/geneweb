@@ -31,7 +31,7 @@
   $ gwd-cgi "m=S&pn=galichet&p=&n=" | grep 'Galichet'
   <title>Galichet</title>
   <h1><a href="wicked?b=galichet&m=N&t=A&v=Galichet">Galichet</a></h1>
-  <a href="wicked?b=galichet&m=N&v=Galichet&o=i" rel="nofollow">alphabetical order</a></div><input type="text" list="sn-var-dl" id="sn-var-in"
+  <div>Display by<i class="fa fa-code-fork ms-3 me-1"></i>line (2)<i class="fa fa-arrow-down-a-z ms-3 me-1"></i><a href="wicked?b=galichet&m=N&v=Galichet&o=i"
   </script></div><div id="surname_by_branch"><dl><dt><a href="wicked?b=galichet&m=N&v=Galichet&br=1"
   </li></ul></li></ul></dd><dt><a href="wicked?b=galichet&m=N&v=Galichet&br=2"
 
