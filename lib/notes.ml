@@ -10,6 +10,28 @@ let src = Logs.Src.create ~doc:"Notes" "NOTS"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
+(* notes_links may reference a person or a family that is not in the base:
+   links recorded through patches that are no longer readable, or a base
+   recompiled while keeping an older notes_links. Dereferencing them raises
+   "access ... out of bounds", so such pages are dropped and reported. *)
+let page_exists base pg =
+  match pg with
+  | Def.NLDB.PgInd ip -> Driver.iper_exists base ip
+  | Def.NLDB.PgFam ifam -> Driver.ifam_exists base ifam
+  | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
+
+let existing_pages base db =
+  let db, missing = List.partition (fun (pg, _) -> page_exists base pg) db in
+  (match missing with
+  | [] -> ()
+  | _ :: _ ->
+      Log.warn (fun k ->
+          k
+            "notes_links: %d linked page(s) refer to a person or family absent \
+             from the base (ignored); rebuild notes_links"
+            (List.length missing)));
+  db
+
 let file_path conf base fname =
   String.concat Filename.dir_sep
     [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
@@ -66,7 +88,7 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let db = Driver.read_nldb base in
+  let db = Driver.read_nldb base |> existing_pages base in
   let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
@@ -834,7 +856,7 @@ let fold_linked_pages conf base db key type_filter transform =
             if Def.NLDB.equal_key k key then transform pg k ind acc else acc)
           acc il
       else acc)
-    [] db
+    [] (existing_pages base db)
   |> List.sort_uniq compare
 
 let links_to_ind conf base db key typ =
