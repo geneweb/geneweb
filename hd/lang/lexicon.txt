@@ -19508,6 +19508,38 @@ sv: hoppa till huvudinnehållet
 tr: ana içeriğe atla
 zh: 跳到主要内容
 
+    son of %1 and %2
+af: seun van %1 en %2/dogter van %1 en %2/kind van %1 en %2
+bg: син на :a:%1 и :a:%2/дъщеря на :a:%1 и :a:%2/дете на :a:%1 и :a:%2
+br: mab eus %1 ha %2/mercʼh eus %1 ha %2/bugel eus %1 ha %2
+ca: fill de %1 i de %2/filla de %1 i de %2/fill(a) de %1 i de %2
+co: figliolu d[i |’]%1 è d[i |’]%2/figliola d[i |’]%1 è d[i |’]%2/zittellu(a) d[i |’]%1 è d[i |’]%2
+cs: syn :g:%1 a :g:%2/dcera :g:%1 a :g:%2/dítě :g:%1 a :g:%2
+da: søn af %1 og %2/datter af %1 og %2/barn af %1 og %2
+de: Sohn von :d:%1 und :d:%2/Tochter von :d:%1 und :d:%2/Kind von :d:%1 und :d:%2
+en: son of %1 and %2/daughter of %1 and %2/child of %1 and %2
+eo: filo de %1 kaj %2/filino de %1 kaj %2/ido de %1 kaj %2
+es: hijo de %1 y de %2/hija de %1 y de %2/hijo(a) de %1 y de %2
+et: :g:%1 ja :g:%2 poeg/:g:%1 ja :g:%2 tütar/:g:%1 ja :g:%2 laps
+fi: :g:%1 ja :g:%2 poika/:g:%1 ja :g:%2 tytär/:g:%1 ja :g:%2 lapsi
+fr: fils d[e |’]%1 et d[e |’]%2/fille d[e |’]%1 et d[e |’]%2/enfant d[e |’]%1 et d[e |’]%2
+he: בן של %1 ו-%2/בת של %1 ו-%2/ילד של %1 ו-%2
+is: sonur %1 og %2/dóttir %1 og %2/barn %1 og %2
+it: figlio d[i |’]%1 e d[i |’]%2/figlia d[i |’]%1 e d[i |’]%2/figlio(a) d[i |’]%1 e d[i |’]%2
+lt: sūnus iš %1 ir %2/duktė iš %1 ir %2/vaikas iš %1 ir %2
+lv: dēls: %1 un %2/meita: %1 un %2/bērns: %1 un %2
+nl: zoon van %1 en %2/dochter van %1 en %2/kind van %1 en %2
+no: sønn av %1 og %2/datter av %1 og %2/barn av %1 og %2
+oc: filh d[e |’]%1 e d[e |’]%2/filha d[e |’]%1 e d[e |’]%2/enfant d[e |’]%1 e d[e |’]%2
+pl: syn :g:%1 i :g:%2/córka :g:%1 i :g:%2/dziecko :g:%1 i :g:%2
+pt: filho de %1 e de %2/filha de %1 e de %2/filho(a) de %1 e de %2
+ro: fiul lui %1 si al lui %2/fiica lui %1 si a lui %2/copilul lui %1 si al lui %2
+ru: сын :g:%1 и :g:%2/дочь :g:%1 и :g:%2/ребёнок :g:%1 и :g:%2
+sk: syn :g:%1 a :g:%2/dcéra :g:%1 a :g:%2/dieťa :g:%1 a :g:%2
+sl: sin :g:%1 in :g:%2/hčerka :g:%1 in :g:%2/otrok :g:%1 in :g:%2
+sv: son till %1 och %2/dotter till %1 och %2/barn till %1 och %2
+tr: oğul / %1 ve %2/kız / %1 ve %2/çocuk / %1 ve %2
+
     son/daughter/child
 af: seun/dogter/kind
 bg: син/дъщеря/деца
