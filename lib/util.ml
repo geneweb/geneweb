@@ -444,8 +444,11 @@ let gen_decline_args conf wt args =
 let gen_decline conf wt s1 s2 s2_raw =
   gen_decline_args conf wt [| (s1, s2_raw); (s2, s2_raw) |]
 
-let transl_args conf key args =
-  gen_decline_args conf (transl conf key) (Array.of_list args)
+let transl_args ?n conf key args =
+  let wt =
+    match n with Some n -> transl_nth conf key n | None -> transl conf key
+  in
+  gen_decline_args conf wt (Array.of_list args)
 
 let transl_a_of_b conf x y1 y2 =
   gen_decline conf (transl_nth conf "%1 of %2" 0) x y1 y2
@@ -2036,13 +2039,17 @@ let relation_date conf fam : Adef.safe_string =
   | None -> ""
   | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
 
-let child_of_parent conf base p =
+let child_of_parent ?(link = false) conf base p =
+  let text ?sn x =
+    let t = gen_person_text ?sn conf base x in
+    if link then reference conf base x t else t
+  in
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
     if not (Driver.Istr.equal (Driver.get_surname p) (Driver.get_surname fath))
-    then gen_person_text conf base fath
-    else gen_person_text ~sn:false conf base fath
+    then text fath
+    else text ~sn:false fath
   in
   let a = pget conf base (Driver.get_iper p) in
   match Driver.get_parents a with
@@ -2053,21 +2060,22 @@ let child_of_parent conf base p =
       let moth = pget conf base (Driver.get_mother cpl) in
       let fath_valid = Driver.p_first_name base fath <> "?" in
       let moth_valid = Driver.p_first_name base moth <> "?" in
-      if (not fath_valid) && not moth_valid then Adef.safe ""
-      else
-        let s =
-          if fath_valid && moth_valid then
-            print_father fath ^^^ " " ^<^ transl_nth conf "and" 0 ^<^ " "
-            ^<^ gen_person_text conf base moth
-          else if fath_valid then print_father fath
-          else gen_person_text conf base moth
+      let is = index_of_sex (Driver.get_sex p) in
+      if fath_valid && moth_valid then
+        let arg x (s : Adef.safe_string) =
+          ((s :> string), Driver.p_first_name base x)
         in
-        let is = index_of_sex (Driver.get_sex p) in
+        transl_args ~n:is conf "son of %1 and %2"
+          [ arg fath (print_father fath); arg moth (text moth) ]
+        |> translate_eval |> Adef.safe
+      else if fath_valid || moth_valid then
+        let s = if fath_valid then print_father fath else text moth in
         transl_a_of_gr_eq_gen_lev conf
           (transl_nth conf "son/daughter/child" is)
           (s :> string)
           (s :> string)
         |> translate_eval |> Adef.safe
+      else Adef.safe ""
 
 let husband_wife ?(buf : Buffer.t option) conf base p all =
   let families = Driver.get_family p in

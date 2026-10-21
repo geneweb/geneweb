@@ -328,10 +328,15 @@ val person_title :
     granted returns empty string *)
 
 val child_of_parent :
+  ?link:bool ->
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Adef.safe_string
+(** [child_of_parent ?link conf base p] is "son/daughter/child of <father> and
+    <mother>" for [p] (lexicon entry ["son of %1 and %2"]), or of its only known
+    parent, empty without parents. The father's surname is omitted when it is
+    [p]'s. With [link], the parents are links to their pages. *)
 
 val mod_ind_link :
   config -> Geneweb_db.Driver.person -> Adef.safe_string -> Adef.safe_string
@@ -496,10 +501,11 @@ val transl_a_of_b : config -> string -> string -> string -> string
     declension. i.e. if [b] is wrapped in html, [b_raw] should be that texte
     with no html, and [b_raw] should be [b] otherwise. *)
 
-val transl_args : config -> string -> (string * string) list -> string
-(** [transl_args conf key args] translates [key] and replaces each [%N] with the
-    displayed text of the N-th [(text, raw)] argument. [[x|y]%N] picks [y] when
-    [raw] starts with one of the base vowels, [x] otherwise, and [:c:%N] applies
+val transl_args : ?n:int -> config -> string -> (string * string) list -> string
+(** [transl_args ?n conf key args] translates [key], keeping its [n]-th
+    [/]-separated variant when given, and replaces each [%N] with the displayed
+    text of the N-th [(text, raw)] argument. [[x|y]%N] picks [y] when [raw]
+    starts with one of the base vowels, [x] otherwise, and [:c:%N] applies
     declension [c]. [raw] is [text] without its HTML. *)
 
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
