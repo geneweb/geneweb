@@ -1,8 +1,8 @@
+  <!-- $Id: updfam.txt v7.1 14/10/2026 01:59:36 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
-  <!-- $Id: updfam.txt v7.1 14/10/2026 01:59:36 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,12 +36,12 @@
 %define;nav()
   <div class="container fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
-      <nav class="nav nav-pills nav-fill">
+      <nav class="nav nav-pills nav-fill gap-3">
         <a class="nav-item nav-link p-0" href="#family" title="[*parents]"><i class="fa fa-person fa-fw" aria-hidden="true"></i><i class="fa fa-person-dress" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*parents]</span></a>
-        <a class="nav-item nav-link p-0 ms-2" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link p-0 ms-2" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*child/children]1</span></a>
-        <a class="nav-item nav-link p-0 ms-2" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*source/sources]1</span></a>
-        <a class="nav-item nav-link p-0 ms-2" href="#comments" title="[*comment]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*comment]</span></a>
+        <a class="nav-item nav-link p-0" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link p-0" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*child/children]1</span></a>
+        <a class="nav-item nav-link p-0" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*source/sources]1</span></a>
+        <a class="nav-item nav-link p-0" href="#comments" title="[*comment]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*comment]</span></a>
       </nav>
     </nav>
   </div>
