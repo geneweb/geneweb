@@ -8,7 +8,6 @@ open Dbdisk
 exception Incompatible_format = Dutil.Incompatible_format
 
 let incompatible_format_message = Dutil.incompatible_format_message
-let printable_magic = Dutil.printable_magic
 
 type istr = int
 type ifam = int

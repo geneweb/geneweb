@@ -454,10 +454,13 @@ let unauth_server conn conf ar =
     ~title:(transl conf "NOTIF_TT access refused")
     (transl conf "NOTIF access refused");
   let bfile = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb") in
-  Request.w_base ~none:ignore
-    (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
-    conn conf
-    (if Sys.file_exists bfile then Some bfile else None)
+  try
+    Request.w_base ~none:ignore
+      (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
+      conn conf
+      (if Sys.file_exists bfile then Some bfile else None)
+  with Driver.Incompatible_format (file, found, expected) ->
+    Request.print_incompatible_base conf (file, found, expected)
 
 let gen_match_auth_file test_user_and_password auth_file base_file =
   if auth_file = "" then None
