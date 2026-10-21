@@ -12,6 +12,10 @@ module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Connection = Geneweb_http.Connection
 
+let src = Logs.Src.create ~doc:"Request" "REQ "
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 
 let this_request_updates_database conf =
@@ -236,14 +240,13 @@ let check_nldb_format conf base =
     | `Ok | `NoFile -> ())
 
 let print_incompatible_base conf (file, found, expected) =
-  prerr_endline (Driver.incompatible_format_message file found expected);
+  Log.err (fun k ->
+      k "%s" (Driver.incompatible_format_message file found expected));
   Notif.error
     ~title:(Util.transl conf "NOTIF_TT incompatible base")
     (Printf.sprintf
-       (Util.ftransl conf "NOTIF incompatible base %s %s %s")
-       (Util.escape_html conf.bname :> string)
-       (Util.escape_html (Driver.printable_magic found) :> string)
-       (Util.escape_html (String.concat ", " expected) :> string));
+       (Util.ftransl conf "NOTIF incompatible base %s")
+       (Util.escape_html conf.bname :> string));
   let conf = Notif.inject_pending conf in
   try Templ.output_simple conf Templ.Env.empty "index"
   with _ -> GWPARAM.output_error conf Code.Service_Unavailable

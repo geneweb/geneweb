@@ -95,9 +95,6 @@ exception Incompatible_format of string * string * string list
 val incompatible_format_message : string -> string -> string list -> string
 (** English message for {!Incompatible_format} (logs, command-line tools). *)
 
-val printable_magic : string -> string
-(** Header as found, or ["?"] if it is not printable. *)
-
 val with_database : string -> (base -> 'a) -> 'a
 (** [with_database bname k] loads the database [bname] and invokes the
     continuation [k] with it.
