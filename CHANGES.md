@@ -1,5 +1,19 @@
 # Unreleased
 
+> [!WARNING]
+> **New database format: every existing base must be rebuilt.**
+> Event witnesses now carry a note, so bases are written in format
+> `GnWb0025`. This version refuses bases built by any earlier GeneWeb
+> version (7.0, 7.1 betas included) and reports them as incompatible.
+> Before upgrading, back up each base, then export it to a `.gw` file with
+> the `gwu` of the version you are currently using. After upgrading,
+> recompile it with the new `gwc`. The `gwu` of this version cannot read
+> an old base, and the `gwd` of an older version cannot read a new one.
+> Compiled `.gwo` files must also be regenerated.
+> A `.gw` file containing witness notes (`wnote` lines) is rejected by
+> older `gwc`; export it with `gwu -old_gw` to write those notes as plain
+> text instead.
+
 ## Gwd
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)

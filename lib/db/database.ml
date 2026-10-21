@@ -356,7 +356,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   { find; cursor; next }
 
 let persons_of_first_name = function
-  | GnWb0024 ->
+  | GnWb0025 | GnWb0024 ->
       new_persons_of_first_name_or_surname
         (fun _ -> Dutil.compare_fnames)
         Dutil.compare_fnames_i
@@ -366,7 +366,7 @@ let persons_of_first_name = function
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 let persons_of_surname = function
-  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
+  | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
@@ -501,11 +501,11 @@ let new_strings_of_fname =
   new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
 
 let strings_of_sname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_sname
+  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_sname
   | _ -> old_strings_of_fsname
 
 let strings_of_fname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_fname
+  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
 (* Restrict file *)
@@ -670,7 +670,7 @@ end = struct
     Secure.with_open_in_bin inx @@ fun ic ->
     let start =
       match version with
-      | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
+      | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
       | GnWb0021 | GnWb0020 -> 3 * int_size
     in
     let size = input_binary_int ic in
@@ -978,15 +978,11 @@ let with_database ?(read_only = false) bname k =
   in
   Secure.with_open_in_bin (bname // "base") @@ fun ic ->
   let version =
-    let len = String.length Dutil.magic_GnWb0024 in
+    let len = String.length Dutil.magic_GnWb0025 in
     let found =
       if in_channel_length ic < len then "" else really_input_string ic len
     in
-    if found = Dutil.magic_GnWb0024 then GnWb0024
-    else if found = Dutil.magic_GnWb0023 then GnWb0023
-    else if found = Dutil.magic_GnWb0022 then GnWb0022
-    else if found = Dutil.magic_GnWb0021 then GnWb0021
-    else if found = Dutil.magic_GnWb0020 then GnWb0020
+    if found = Dutil.magic_GnWb0025 then GnWb0025
     else
       raise
         (Dutil.Incompatible_format (bname // "base", found, Dutil.base_magics))
@@ -1458,4 +1454,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       ifam_exists = (fun _ -> assert false);
     }
   in
-  k { data; func; version = GnWb0024 }
+  k { data; func; version = GnWb0025 }

@@ -3,7 +3,7 @@
 open Def
 module Driver = Geneweb_db.Driver
 
-let magic_gwo = "GnWo000o"
+let magic_gwo = "GnWo000p"
 
 (* Option qui force a créer les clés des individus. De fait, *)
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
