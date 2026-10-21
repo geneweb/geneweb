@@ -35,6 +35,9 @@
 - The `robot` tool reads and writes the robot file with the same types as
   gwd: `robot -status` no longer shows wrong request counts, and files it
   writes are read correctly by gwd.
+- The robot summary is shown on one line in the information displayed at
+  server start, instead of being logged at the first request and every
+  four hours.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

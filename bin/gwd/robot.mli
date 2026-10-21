@@ -14,6 +14,10 @@ val robot_excl : unit -> excl * string
 
 val min_disp_req : int ref
 
+val summary : unit -> string
+(** [summary ()] describes the robot file in one line: number of blocked and
+    monitored addresses, and the most active one. *)
+
 val check :
   float ->
   string ->

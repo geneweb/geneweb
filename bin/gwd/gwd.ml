@@ -2113,7 +2113,7 @@ let display_infos () =
       k "%a" Fmt.(styled (`Fg `Green) string) s);
   Log.app (fun k -> k "Type CTRL+C to stop the service");
   Log.app (fun k ->
-      k "\n%a%a%a: %a@\n"
+      k "\n%a%a%a: %a@\n%a"
         Fmt.(list (pp_item string))
         git_info
         Fmt.(list (pp_item pp_path))
@@ -2121,7 +2121,8 @@ let display_infos () =
         Fmt.(styled (`Fg `Blue) string)
         "assets"
         Fmt.(box @@ list ~sep:comma pp_path)
-        (Secure.assets ()))
+        (Secure.assets ()) (pp_item Fmt.string)
+        ("robot", Robot.summary ()))
 
 let geneweb_server ~predictable_mode ~loaded_plugins ?interface ~port ~daemon ()
     =
