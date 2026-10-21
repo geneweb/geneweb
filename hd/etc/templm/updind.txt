@@ -4,10 +4,10 @@
 <!-- $Id: templm/updind.txt v7.0 2016/03/21 15:22:41 $ -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-      [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-      [*modify::person/persons]0 # %index;
-    %else;[*add::person/persons]0%end;
+      [*merge::person/persons]
+    %else;
+      [*modify::person/persons]0
+    %end; # %index;
   </title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
@@ -113,10 +113,8 @@
       %end;
     %end;
     <input type="hidden" name="m" value="MRG_MOD_IND_OK"%/>
-  %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-    <input type="hidden" name="m" value="MOD_IND_OK"%/>
   %else;
-    <input type="hidden" name="m" value="ADD_IND_OK"%/>
+    <input type="hidden" name="m" value="MOD_IND_OK"%/>
   %end;
   %let;l_s;%if;(is_male)M%elseif;(is_female)F%else;N%end;%in;
   %let;l_s1;%if;(is_male)0%elseif;(is_female)1%else;2%end;%in;
@@ -151,12 +149,10 @@
 <fieldset class="f1">
   <legend>
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-    [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-      [*modify::person/persons]0 # %index;
+      [*merge::person/persons]1
     %else;
-      [*add::person/persons]0
-    %end;
+      [*modify::person/persons]0
+    %end; # %index;
     &nbsp;&nbsp;<input type="submit" value="Ok"/>
     <span style="float:right"><label><input id="sex1" name="sex1" class="occ%l_s1;" %lt3; size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
     <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if;(occ="")0%else;%occ;%end;" id="occ"%/></label></span>

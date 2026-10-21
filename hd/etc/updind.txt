@@ -4,11 +4,9 @@
 <html lang="%lang;" id="updform">
 <head>
   %let;mrg;%if;(e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
-  %let;mod;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK")1%end;%in;
   <title>%nn;
     %if;(mrg=1)[*merge::person/persons]1
-    %elseif;(mod=1)[*modify::person/persons]0
-    %else;[*add::person/persons]0
+    %else;[*modify::person/persons]0
     %end;
     # %index;%nn;
   </title>
@@ -750,18 +748,15 @@
         %end;
       %end;
       <input type="hidden" name="m" value="MRG_MOD_IND_OK">
-    %elseif;(mod=1)
-      <input type="hidden" name="m" value="MOD_IND_OK">
     %else;
-      <input type="hidden" name="m" value="ADD_IND_OK">
+      <input type="hidden" name="m" value="MOD_IND_OK">
     %end;
   </div>
 
   <div class="card">
     <h2 class="card-header%if;(mrg=1) mt-5%end;">%nn;
       %if;(mrg=1)[*merge::person/persons]1%nn;
-      %elseif;(mod=1)[*modify::person/persons]0%nn;
-      %else;[*add:person/persons]0%end;[:] %first_name; %surname;%if;(occ!="0") (%occ)%end;
+      %else;[*modify::person/persons]0%end;[:] %first_name; %surname;%if;(occ!="0") (%occ)%end;
     </h2>
     <div class="card-body">
       <h5 class="card-title"><b>[*other action][:] </b>
