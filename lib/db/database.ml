@@ -836,8 +836,9 @@ let make_record_access immut_record (plenr, patches) (_, pending) len =
 
 let magic_patch = "GnPa0001"
 
-let check_patch_magic ic =
-  really_input_string ic (String.length magic_patch) = magic_patch
+let read_patch_magic ic =
+  let len = String.length magic_patch in
+  if in_channel_length ic < len then "" else really_input_string ic len
 
 let empty_patch_ht () =
   {
@@ -856,8 +857,11 @@ let input_patches bname =
   if Sys.file_exists fname then
     try
       Secure.with_open_in_bin fname @@ fun ic ->
+      let found = read_patch_magic ic in
+      if found <> magic_patch && String.starts_with ~prefix:"GnPa" found then
+        raise (Dutil.Incompatible_format (fname, found, [ magic_patch ]));
       let r =
-        if check_patch_magic ic then (input_value ic : patches_ht)
+        if found = magic_patch then (input_value ic : patches_ht)
         else (
           (* old implementation of patches *)
           seek_in ic 0;
@@ -878,7 +882,9 @@ let input_patches bname =
           ht)
       in
       Ok r
-    with _ -> Error (Printf.sprintf "%s: corrupted file" fname)
+    with
+    | Dutil.Incompatible_format _ as exn -> raise exn
+    | _ -> Error (Printf.sprintf "%s: corrupted file" fname)
   else Ok (empty_patch_ht ())
 
 let input_synchro bname =
@@ -961,14 +967,18 @@ let with_database ?(read_only = false) bname k =
   in
   Secure.with_open_in_bin (bname // "base") @@ fun ic ->
   let version =
-    if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
-    else if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
-    else if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
-    else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
-    else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
-    else if really_input_string ic 4 = "GnWb" then
-      failwith "this is a GeneWeb base, but not compatible"
-    else failwith "this is not a GeneWeb base, or it is a very old version"
+    let len = String.length Dutil.magic_GnWb0024 in
+    let found =
+      if in_channel_length ic < len then "" else really_input_string ic len
+    in
+    if found = Dutil.magic_GnWb0024 then GnWb0024
+    else if found = Dutil.magic_GnWb0023 then GnWb0023
+    else if found = Dutil.magic_GnWb0022 then GnWb0022
+    else if found = Dutil.magic_GnWb0021 then GnWb0021
+    else if found = Dutil.magic_GnWb0020 then GnWb0020
+    else
+      raise
+        (Dutil.Incompatible_format (bname // "base", found, Dutil.base_magics))
   in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
