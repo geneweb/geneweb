@@ -118,7 +118,7 @@
       %if;(event_witness_relation.event.spouse!="")
       %sp;[and]
       %apply;short_display_person("event_witness_relation.event.spouse")
-      %end;.
+      %end;%if;(event_witness_relation_note!="")%sp;(%event_witness_relation_note;)%end;.
     </li>
   %end;
   </ul>
@@ -238,6 +238,7 @@
             %apply;short_display_person("event_witness")%nn;
             %if;(event_witness_kind=[officer/officer/officers]0)%nn;
               %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
+            %if;(event_witness_note!="")%sp;(%event_witness_note;)%end;%nn;
           %end;.
         </li>
       %end;
@@ -264,7 +265,7 @@
         %if;(event_witness_relation.event.spouse!="")
         %sp;[and]
         %apply;short_display_person("event_witness_relation.event.spouse")
-        %end;.
+        %end;%if;(event_witness_relation_note!="")%sp;(%event_witness_relation_note;)%end;.
       </li>
     %end;
   </ul>
