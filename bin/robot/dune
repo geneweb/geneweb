@@ -1,6 +1,6 @@
 (executable
  (package geneweb)
- (name robot)
+ (name gwrobot)
  (public_name gwrobot)
- (modules robot)
- (libraries unix geneweb))
+ (modules gwrobot)
+ (libraries unix geneweb geneweb.robot))

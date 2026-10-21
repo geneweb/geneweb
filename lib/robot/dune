@@ -1,0 +1,3 @@
+(library
+ (name geneweb_robot)
+ (public_name geneweb.robot))
