@@ -11,15 +11,8 @@ let magic_GnWb0021 = "GnWb0021"
 let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
 let magic_GnWb0024 = "GnWb0024"
-
-let base_magics =
-  [
-    magic_GnWb0024;
-    magic_GnWb0023;
-    magic_GnWb0022;
-    magic_GnWb0021;
-    magic_GnWb0020;
-  ]
+let magic_GnWb0025 = "GnWb0025"
+let base_magics = [ magic_GnWb0025 ]
 
 exception Incompatible_format of string * string * string list
 

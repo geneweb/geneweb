@@ -23,7 +23,11 @@ val magic_GnWb0023 : string
 (** Header for the {i base} file (version 0023) *)
 
 val magic_GnWb0024 : string
-(** Header for the latest version of {i base} file *)
+(** Header for the {i base} file (version 0024) *)
+
+val magic_GnWb0025 : string
+(** Header for the latest version of {i base} file, where event witnesses carry
+    a note *)
 
 val base_magics : string list
 (** Headers of the {i base} file versions this executable can read, latest

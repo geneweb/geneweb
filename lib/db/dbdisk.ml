@@ -68,5 +68,12 @@ type base_func = {
   ifam_exists : int -> bool;
 }
 
-type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
+type base_version =
+  | GnWb0020
+  | GnWb0021
+  | GnWb0022
+  | GnWb0023
+  | GnWb0024
+  | GnWb0025
+
 type dsk_base = { data : base_data; func : base_func; version : base_version }

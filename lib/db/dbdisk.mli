@@ -151,7 +151,13 @@ type base_func = {
     [commit_patches]. *)
 
 (** Geneweb database version *)
-type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
+type base_version =
+  | GnWb0020
+  | GnWb0021
+  | GnWb0022
+  | GnWb0023
+  | GnWb0024
+  | GnWb0025
 
 type dsk_base = { data : base_data; func : base_func; version : base_version }
 (** Database representation: data and basic requests over this data. *)
