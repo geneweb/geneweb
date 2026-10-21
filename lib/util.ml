@@ -694,8 +694,6 @@ let max_ancestor_level conf base ip max_lvl =
     type kind = At_max_level | Internal | Leaf
     type t = { kind : kind; level : int }
   end in
-  (* Loading ITL cache, up to 10 generations. *)
-  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
   let rec loop ~visited_nodes level ip =
     match Gwdb.IperMap.find_opt ip visited_nodes with
     | None -> visit ~visited_nodes level ip
@@ -725,9 +723,7 @@ let max_ancestor_level conf base ip max_lvl =
             let level =
               match node with
               | Some node -> min level node.Node.level
-              | None ->
-                  !GWPARAM_ITL.max_ancestor_level
-                    conf base ip conf.Config.bname max_lvl level
+              | None -> level
             in
             Some { Node.kind = Node.Leaf; level }
           in
