@@ -112,23 +112,12 @@ let robot_excl () =
 
 let min_disp_req = ref 6
 
-let log_summary xcl nconn =
-  Log.info (fun k -> k "=== ROBOT SUMMARY ===");
-  Log.info (fun k ->
-      k "  Blocked IPs: %d, Monitored: %d" (List.length xcl.excl) nconn);
-  Log.info (fun k ->
-      k "  Most active: %d req by %s" (fst xcl.max_conn) (snd xcl.max_conn));
-  Log.info (fun k -> k "  Blocked robots detail:");
-  List.iter
-    (fun (ip, att) -> Logs.info (fun k -> k "    %s: %d attempts" ip !att))
-    ( List.rev xcl.excl |> fun l ->
-      let rec take n = function
-        | [] -> []
-        | h :: t -> if n = 0 then [] else h :: take (n - 1) t
-      in
-      take 20 l );
-  if List.length xcl.excl > 20 then
-    Log.info (fun k -> k "    ... and %d more" (List.length xcl.excl - 20))
+let summary () =
+  let xcl, _ = robot_excl () in
+  let n, ip = xcl.max_conn in
+  Printf.sprintf "%d blocked, %d monitored%s" (List.length xcl.excl)
+    (W.cardinal xcl.who)
+    (if n > 0 then Printf.sprintf ", most active %s (%d req.)" ip n else "")
 
 let check tm from max_call sec conf suicide =
   let nfw =
@@ -195,20 +184,11 @@ let check tm from max_call sec conf suicide =
             true)
           else false
         in
-        let _list, nconn =
-          W.fold
-            (fun k w (list, nconn) ->
-              let tm = w.oldest_time in
-              let nb = w.nb_connect in
-              if nb > fst xcl.max_conn then xcl.max_conn <- (nb, k);
-              ( (if nb < !min_disp_req then list else (k, tm, nb) :: list),
-                nconn + 1 ))
-            xcl.who ([], 0)
-        in
-        let four_hours = 4.0 *. 3600.0 in
-        if tm -. xcl.last_summary > four_hours then (
-          xcl.last_summary <- tm;
-          log_summary xcl nconn);
+        W.iter
+          (fun k w ->
+            if w.nb_connect > fst xcl.max_conn then
+              xcl.max_conn <- (w.nb_connect, k))
+          xcl.who;
         refused
   in
   (match try Some (Secure.open_out_bin fname) with Sys_error _ -> None with

@@ -132,15 +132,10 @@ Individual blocking (logarithmic scale):
     ROBOT 146.174.180.5: 5 refused attempts
     ROBOT 146.174.180.5: 10 refused attempts
 
-Summary reports (every 4 hours):
-    === ROBOT SUMMARY ===
-    Blocked IPs: 5, Monitored: 12
-    Most active: 127 req by 146.174.180.*
-    Blocked robots detail:
-      146.174.180.*: 127 attempts
-      202.76.165.*: 98 attempts
+Summary, in the information displayed at server start:
+    robot: 5 blocked, 12 monitored, most active 10.0.0.7 (127 req.)
 
-This reduces log spam while maintaining visibility of robot activity.
+The full blacklist is shown by robot -status.
 
 -------------------------------------------------------------------------------
 ADVANCED USAGE
