@@ -2183,6 +2183,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "event_witness_kind" env with
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
+  | "event_witness_note" :: _ -> (
+      match get_env "event_witness_note" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
   | "witness_kind" :: _ -> (
       match get_env "witness_kind" env with
       | Vstring s -> VVstring s
@@ -5047,16 +5051,20 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
       | Vevent (_, (_, _, _, _, _, witnesses, _)) ->
           Array.iteri
-            (fun i (ip, wk, _wnote) ->
+            (fun i (ip, wk, wnote) ->
               let p = pget conf base ip in
               let wk_s =
                 Util.string_of_witness_kind conf (Driver.get_sex p) wk
               in
               let wk_r = Util.string_of_witness_kind_raw wk in
+              let wnote =
+                (Util.escape_html (Driver.sou base wnote) :> string)
+              in
               let env =
                 Templ.Env.(
                   env
                   |> add "event_witness" (Vind p)
+                  |> add "event_witness_note" (Vstring wnote)
                   |> add "witness_kind" (Vstring (wk_r :> string))
                   |> add "event_witness_kind" (Vstring (wk_s :> string))
                   |> add "first" (Vbool (i = 0)))

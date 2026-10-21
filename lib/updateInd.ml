@@ -329,6 +329,23 @@ and eval_simple_var conf base env p = function
               | _ -> raise Not_found)
           | None -> raise Not_found)
       | _ -> raise Not_found)
+  | [ "witness_note" ] -> (
+      match get_env "cnt" env with
+      | Vint i -> (
+          let e =
+            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
+          in
+          match (e, get_env "wcnt" env) with
+          | Some e, Vint i ->
+              let i = i - 1 in
+              if i >= 0 && i < Array.length e.epers_witnesses then
+                let _, _, wnote = e.epers_witnesses.(i) in
+                safe_val (Util.escape_html wnote :> Adef.safe_string)
+              else if i >= 0 && i < 2 && Array.length e.epers_witnesses < 2 then
+                str_val ""
+              else raise Not_found
+          | _ -> raise Not_found)
+      | _ -> raise Not_found)
   | [ "witness_kind" ] -> (
       match get_env "cnt" env with
       | Vint i -> (
