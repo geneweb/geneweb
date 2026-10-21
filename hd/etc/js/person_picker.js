@@ -96,11 +96,14 @@
         }
 
         function run(flash) {
-            if (!isActive()) { paint('neutral'); return Promise.resolve(); }
             const f = fn.value.trim();
             const s = sn.value.trim();
             const o = (oc.value || '0').trim() || '0';
-            if (!f || !s) { paint('invalid'); return Promise.resolve(); }
+            if (!isActive() || !f || !s) {
+                paint('neutral');
+                if (gate) delete gate.dataset.pnocChecked;
+                return Promise.resolve();
+            }
             const sig = f + '|' + s + '|' + o;
             if (gate && gate.dataset.pnocChecked === sig) {
                 return Promise.resolve();
@@ -114,7 +117,7 @@
 
         inputs.forEach(el =>
             el.addEventListener('focusout', () => run(true)));
-        if (gate) gate.addEventListener('change', () => run(false));
+        if (gate) gate.addEventListener('change', e => run(e.isTrusted));
         run(false);
     }
 
