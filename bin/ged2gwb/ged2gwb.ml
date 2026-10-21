@@ -3660,27 +3660,35 @@ let speclist =
       Arg.String
         (fun s ->
           if s = "dates_md" then month_number_dates := MonthDayDates
-          else if s = "dates_dm" then month_number_dates := DayMonthDates)
-    , " Interpret months-numbered dates as year only (default) or month/day/year or day/month/year" );
-    ( "-rs_no_mention", Arg.Unit (fun () -> relation_status := NoMention)
-    , " Force relation status to NoMention (default is Married)" );
-    ( "-charset"
-    , Arg.String begin function
-        | "ANSEL" -> charset_option := Some Ansel
-        | "ASCII" -> charset_option := Some Ascii
-        | "MACINTOSH" -> charset_option := Some MacIntosh
-        | "MSDOS" -> charset_option := Some Msdos
-        | "UTF-8" -> charset_option := Some Utf8
-        | "none" -> charset_option := None
-        | _ -> raise (Arg.Bad "bad -charset value")
-      end
-    , " [ANSEL|ANSI|ASCII|MACINTOSH|MSDOS|UTF-8] Force given charset decoding, \
+          else if s = "dates_dm" then month_number_dates := DayMonthDates),
+      " Interpret months-numbered dates as year only (default) or \
+       month/day/year or day/month/year" );
+    ( "-rs_no_mention",
+      Arg.Unit (fun () -> relation_status := NoMention),
+      " Force relation status to NoMention (default is Married)" );
+    ( "-charset",
+      Arg.String
+        begin function
+          | "ANSEL" -> charset_option := Some Ansel
+          | "ASCII" -> charset_option := Some Ascii
+          | "MACINTOSH" -> charset_option := Some MacIntosh
+          | "MSDOS" -> charset_option := Some Msdos
+          | "UTF-8" -> charset_option := Some Utf8
+          | "none" -> charset_option := None
+          | _ -> raise (Arg.Bad "bad -charset value")
+        end,
+      " [ANSEL|ANSI|ASCII|MACINTOSH|MSDOS|UTF-8] Force given charset decoding, \
        overriding the possible setting in GEDCOM" );
-    ( "-particles"
-    , Arg.String (fun s -> particles := Mutil.input_particles s)
-    , "<FILE> Use the given file as list of particles" )
-    ( "-nowarn", Arg.Set no_warn, " Do not show warnings during import");
-    ("-reorg", Arg.Unit (fun () -> GWPARAM.reorg := true; GWPARAM.reorg_forced := true), " Mode reorg")
+    ( "-particles",
+      Arg.String (fun s -> particles := Mutil.input_particles s),
+      "<FILE> Use the given file as list of particles" )
+      ("-nowarn", Arg.Set no_warn, " Do not show warnings during import");
+    ( "-reorg",
+      Arg.Unit
+        (fun () ->
+          GWPARAM.reorg := true;
+          GWPARAM.reorg_forced := true),
+      " Mode reorg" );
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
