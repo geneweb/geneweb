@@ -5,6 +5,11 @@ let src = Logs.Src.create ~doc:"Driver" "DRV "
 module Log = (val Logs.src_log src : Logs.LOG)
 open Dbdisk
 
+exception Incompatible_format = Dutil.Incompatible_format
+
+let incompatible_format_message = Dutil.incompatible_format_message
+let printable_magic = Dutil.printable_magic
+
 type istr = int
 type ifam = int
 type iper = int

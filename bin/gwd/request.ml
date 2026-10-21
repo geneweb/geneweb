@@ -235,6 +235,19 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
+let print_incompatible_base conf (file, found, expected) =
+  prerr_endline (Driver.incompatible_format_message file found expected);
+  Notif.error
+    ~title:(Util.transl conf "NOTIF_TT incompatible base")
+    (Printf.sprintf
+       (Util.ftransl conf "NOTIF incompatible base %s %s %s")
+       (Util.escape_html conf.bname :> string)
+       (Util.escape_html (Driver.printable_magic found) :> string)
+       (Util.escape_html (String.concat ", " expected) :> string));
+  let conf = Notif.inject_pending conf in
+  try Templ.output_simple conf Templ.Env.empty "index"
+  with _ -> GWPARAM.output_error conf Code.Service_Unavailable
+
 let redirect_to_random_person conn conf base =
   let n = Driver.nb_of_persons base in
   let rec pick k =
@@ -405,7 +418,9 @@ let treat_request =
                      try
                        Driver.with_database bfile ignore;
                        print_page conn
-                     with _ -> handle_no_bfile conn)
+                     with
+                     | Driver.Incompatible_format _ as exn -> raise exn
+                     | _ -> handle_no_bfile conn)
                  | None -> handle_no_bfile conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
@@ -937,4 +952,7 @@ let treat_request conn conf =
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
-  try treat_request conn conf with Update.ModErr _ -> Output.flush conf
+  try treat_request conn conf with
+  | Update.ModErr _ -> Output.flush conf
+  | Driver.Incompatible_format (file, found, expected) ->
+      print_incompatible_base conf (file, found, expected)
