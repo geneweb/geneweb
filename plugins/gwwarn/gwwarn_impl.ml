@@ -146,7 +146,7 @@ let replace_first hay needle rep =
   if i < 0 then hay
   else String.sub hay 0 i ^ rep ^ String.sub hay (i + nl) (hl - i - nl)
 
-let anoma conf _ =
+let anoma _conn conf _base_name =
   (if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
    else
      let path = report_path conf in
@@ -165,7 +165,7 @@ let anoma conf _ =
 
 (* ---- m=OK_ADD : wizard appends one verified entry --------------------- *)
 
-let ok_add conf _ =
+let ok_add _conn conf _base_name =
   (if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
    else
      match (Util.p_getenv conf.env "key", Util.p_getenv conf.env "code") with
@@ -215,7 +215,7 @@ let pre_of path =
   | Some txt -> "<pre>" ^ html_escape txt ^ "</pre>\n"
   | None -> ""
 
-let ok_file conf _ =
+let ok_file _conn conf _base_name =
   if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
   else begin
     let path = ok_path conf in
@@ -259,7 +259,7 @@ let ok_file conf _ =
    which folds <base>.ok.d/*.ok into <base>.ok (claiming each atomically) and
    archives them. Command uses only server-side values (base name, base dir),
    never request input, so there is nothing to inject. *)
-let ok_fold conf _ =
+let ok_fold _conn conf _base_name =
   if not conf.wizard then Output.print_sstring conf "forbidden: wizard only\n"
   else begin
     let cmd =

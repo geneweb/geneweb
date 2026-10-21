@@ -27,7 +27,6 @@ let command = ref ""
 let last_comm_log = ref ""
 let debug = ref false
 let daemon = ref false
-let comm_log = Filename.concat (Sys.getcwd ()) "comm.log"
 let bases_dir = ref None
 let set_bases_dir s = bases_dir := Some s
 
@@ -115,7 +114,7 @@ end = struct
     | Unix.WEXITED _ | Unix.WSIGNALED _ | Unix.WSTOPPED _ -> true
 
   let run { path; args; output } =
-    let fd = Unix.openfile output [ O_WRONLY; O_CREAT; O_TRUNC ] 0o755 in
+    let fd = Unix.openfile output [ O_WRONLY; O_CREAT; O_TRUNC ] 0o644 in
     Fun.protect ~finally:(fun () -> close_noerr fd) @@ fun () ->
     let argv = Array.of_list (path :: args) in
     let pid = Unix.create_process path argv Unix.stdin fd fd in
@@ -267,8 +266,8 @@ let parameters env =
                   in
                   no_o := false;
                   loop (out :: "-o" :: comm) env
-            | "ot" when s <> "" -> s :: "-o" :: comm
-            | "o1" when s <> "" -> s :: "-o" :: comm
+            | "ot" when s <> "" ->loop (s :: "-o" :: comm) env
+            | "o1" when s <> "" ->loop (s :: "-o" :: comm) env
             | "oc_a" -> loop comm env
             | "oc_b" -> loop comm env
             | "od" -> loop comm env
@@ -597,7 +596,7 @@ let rec copy_from_stream conf print strm =
               (* depending on when %f is called, conf may be sketchy *)
               (* conf will know bvars from basename.gwf and evars from url *)
               copy_from_stream conf print (Stream.of_string s)
-          | 'c' -> print comm_log
+          | 'c' -> print (comm_log (log_base conf))
           | 'g' ->
               print_specific_file conf print (comm_log (log_base conf)) strm
           | 'h' ->
@@ -946,7 +945,6 @@ let exec_f conf ~path args =
   in
   let log = comm_log (log_base conf) in
   last_comm_log := log;
-  Printf.eprintf "Last comm log: %s\n" !last_comm_log;
   let cmd = Command.make ~output:log ~path ~args in
   Format.eprintf "$ %a@." Command.pp cmd;
   command := Format.asprintf "%a" Command.pp cmd;
@@ -1123,7 +1121,9 @@ let gwc conn conf =
   Printf.eprintf "\n";
   flush stderr;
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
-  else print_file "create_ok.htm" conn conf
+  else (
+    run_anoma conf;
+    print_file "create_ok.htm" conn conf)
 
 let gwdiff_check conn conf = print_file "confirm.htm" conn conf
 
@@ -1453,23 +1453,23 @@ let ged2gwb conn conf =
       ("-fne" :: "\"\"" :: parameters conf.env)
   in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
-  else
+  else (
     let bname = try List.assoc "o" conf.env with Not_found -> "" in
     Util.print_default_gwf_file bname;
     run_anoma conf;
-    print_file conf "create_ok.htm"
+    print_file "create_ok.htm" conn conf)
 
 let consang ok_file conn conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
   else print_file ok_file conn conf
 
-let anoma conf =
+let anoma conn conf =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
-  if Command.is_failure rc then print_file conf "err_standard.htm"
-  else print_file conf "anoma_ok.htm"
+  if Command.is_failure rc then print_file "err_standard.htm" conn conf
+  else print_file "anoma_ok.htm" conn conf
 
-let update_nldb conf ok_file =
+let update_nldb ok_file conn conf  =
   let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
   else print_file ok_file conn conf
@@ -1507,46 +1507,45 @@ let with_opt_check check_fn run_fn conn conf =
   | Some "check" -> check_fn conn conf
   | _ -> run_fn conn conf
 
-let setup_comm_ok conf = function
-  | "anoma" -> anoma conf
-  | "gwsetup" -> setup_gen conf
-  | "simple" -> simple conf
-  | "cleanup" -> cleanup conf
-  | "cleanup_1" -> cleanup_1 conf
-  | "rename" -> rename conf
-  | "delete" -> delete conf
-  | "delete_1" -> delete_1 conf
-  | "merge" -> merge conf
-  | "merge_1" -> merge_1 conf
-  | "gwf" -> gwf conf
-  | "gwf_1" -> gwf_1 conf
-  | "gwc" -> with_opt_check gwc_check gwc conf
-  | "gwu" -> with_opt_check gwu_check gwu conf
-  | "ged2gwb" -> with_opt_check ged2gwb_check ged2gwb conf
-  | "gwb2ged" -> with_opt_check gwb2ged_check gwb2ged conf
+let setup_comm_ok conn comm conf =
+  match comm with
+  | "anoma" -> anoma conn conf
+  | "gwsetup" -> setup_gen conn conf
+  | "simple" -> simple conn conf
+  | "cleanup" -> cleanup conn conf
+  | "cleanup_1" -> cleanup_1 conn conf
+  | "rename" -> rename conn conf
+  | "delete" -> delete conn conf
+  | "delete_1" -> delete_1 conn conf
+  | "merge" -> merge conn conf
+  | "merge_1" -> merge_1 conn conf
+  | "gwc" -> with_opt_check gwc_check gwc conn conf
+  | "gwu" -> with_opt_check gwu_check gwu conn conf
+  | "ged2gwb" -> with_opt_check ged2gwb_check ged2gwb conn conf
+  | "gwb2ged" -> with_opt_check gwb2ged_check gwb2ged conn conf
   | "consang" ->
-      with_opt_check consang_check (fun c -> consang c "consang_ok.htm") conf
+      with_opt_check consang_check (fun c -> consang "consang_ok.htm" c) conn conf
   | "update_nldb" ->
-      with_opt_check update_nldb_check (update_nldb "update_nldb_ok.htm")
+      with_opt_check update_nldb_check (update_nldb "update_nldb_ok.htm") conn conf
   | "cache_files" ->
-      with_opt_check cache_files_check (cache_files "cache_files_ok.htm")
-  | "connex" -> with_opt_check connex_check (connex "connex_ok.htm")
-  | "gwdiff" -> with_opt_check gwdiff_check (gwdiff "gwdiff_ok.htm")
-  | "gwfixbase" -> with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm")
+      with_opt_check cache_files_check (cache_files "cache_files_ok.htm") conn conf
+  | "connex" -> with_opt_check connex_check (connex "connex_ok.htm") conn conf
+  | "gwdiff" -> with_opt_check gwdiff_check (gwdiff "gwdiff_ok.htm") conn conf
+  | "gwfixbase" -> with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm") conn conf
   | x ->
       if
         String.starts_with ~prefix:"doc/" x
         || String.starts_with ~prefix:"images/" x
         || String.starts_with ~prefix:"css/" x
-      then raw_file x
-      else error ("bad command: \"" ^ x ^ "\"")
+      then raw_file x conn conf
+      else error ("bad command: \"" ^ x ^ "\"") conn conf
 
 let setup_comm comm conn conf =
   match p_getenv conf.env "cancel" with
   | Some _ ->
       setup_gen conn
         { conf with env = [ ("lang", conf.lang); ("v", "main.htm") ] }
-  | None -> setup_comm_ok comm conn conf
+  | None -> setup_comm_ok conn comm conf
 
 (* FIXME: This module mimics the in_channel behavior for strings to avoid
    rewriting the input_lexicon parser. We must rewrite it in another PR. *)
