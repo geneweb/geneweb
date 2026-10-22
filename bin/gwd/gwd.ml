@@ -1563,7 +1563,7 @@ let log_and_robot_check conf auth from request script_name contents =
   let cnt, sec =
     match !robot_xcl with
     | Some (cnt, sec) -> (cnt, sec)
-    | None -> (max_int, max_int)
+    | None -> (max_int, !login_timeout)
   in
   let suicide = Util.p_getenv conf.env "suicide" <> None in
   conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide);

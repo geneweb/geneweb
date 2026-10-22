@@ -38,6 +38,9 @@
 - The robot summary is shown on one line in the information displayed at
   server start, instead of being logged at the first request and every
   four hours.
+- Without `--ban-threshold`, clients are tracked over the login timeout
+  instead of forever: the robot file no longer grows on every request, and
+  the footer only counts recently active users as connected (#3066).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
