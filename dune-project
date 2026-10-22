@@ -30,6 +30,7 @@
     logs
     logs-syslog
     ptime
+    ipaddr
     jingoo
     markup
     ounit

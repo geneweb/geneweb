@@ -34,6 +34,7 @@
   digestif,
   pp_loc,
   ptime,
+  ipaddr,
   geneweb-compat,
   geneweb-http,
 }:
@@ -86,6 +87,7 @@ buildDunePackage {
     digestif
     pp_loc
     ptime
+    ipaddr
   ];
 
   postPatch = "patchShebangs test/gwd/gwd-cgi.sh";
