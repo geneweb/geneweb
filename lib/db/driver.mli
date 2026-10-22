@@ -680,6 +680,20 @@ val base_format_of_dir : string -> string
 (** Header of the {i base} file of the database [bname], read without opening
     the database; [""] if it cannot be read. *)
 
+type base_format_status = Database.base_format_status =
+  | Current  (** Written by this version. *)
+  | Older of string
+      (** Header of an earlier format, read with conversion on every access:
+          rebuild the base (gwu then gwc). *)
+  | Unreadable of string
+      (** Header of a {i base} or {i patches} format this version cannot read
+          (written by another version), or [""] if the {i base} file cannot be
+          read at all. *)
+
+val base_format_status_of_dir : string -> base_format_status
+(** Whether the database [bname] can be read by this version, from the headers
+    of its {i base} and {i patches} files only, without opening it. *)
+
 val check_nldb_format : base -> [ `Ok | `BadFormat | `NoFile ]
 (** Check notes_links file format without reading content. *)
 
