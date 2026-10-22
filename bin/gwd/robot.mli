@@ -12,8 +12,6 @@ val robot_excl : unit -> excl * string
 (** Reads the content of the admin file managing robots and returns its content
     and the full file name. *)
 
-val min_disp_req : int ref
-
 val summary : unit -> string
 (** [summary ()] describes the robot file in one line: number of blocked and
     monitored addresses, and the most active one. *)

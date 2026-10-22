@@ -2330,7 +2330,6 @@ let parse_cmd () =
       only_addresses := o.allowed_addresses;
       redirected_addr := o.redirect_interface;
       robot_xcl := o.ban_threshold;
-      Robot.min_disp_req := o.min_disp_req;
       trace_failed_passwd := o.trace_failed_password;
       debug := o.debug;
       check := o.check;

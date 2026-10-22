@@ -27,7 +27,6 @@ type t = {
   allowed_addresses : string list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
-  min_disp_req : int;
   (* HTTP server *)
   interface : string;
   redirect_interface : string option;
