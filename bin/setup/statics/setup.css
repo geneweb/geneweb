@@ -33,7 +33,8 @@ div.welcome {
   margin-right: auto;
   padding:5px;
 }
-.old-format {
+.old-format,
+.unreadable-format {
   color: #c00;
   font-weight: bold;
   cursor: help;

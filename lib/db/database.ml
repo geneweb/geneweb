@@ -917,6 +917,28 @@ let input_patches ~witness_notes bname =
     | _ -> Error (Printf.sprintf "%s: corrupted file" fname)
   else Ok (empty_patch_ht ())
 
+type base_format_status = Current | Older of string | Unreadable of string
+
+let base_format_status_of_dir bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let found = base_format_of_dir bname in
+  match base_version_of_magic found with
+  | None -> Unreadable found
+  | Some version -> (
+      let patches_magic =
+        read_header (Filename.concat bname "patches") read_patch_magic
+      in
+      if
+        patches_magic <> magic_patch
+        && String.starts_with ~prefix:"GnPa" patches_magic
+      then Unreadable patches_magic
+      else
+        match version with
+        | GnWb0025 -> Current
+        | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> Older found)
+
 let input_synchro bname =
   try
     Secure.with_open_in_bin (Filename.concat bname "synchro_patches")

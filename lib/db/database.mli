@@ -41,6 +41,19 @@ val base_format_of_dir : string -> string
     [bname] (with or without its [.gwb] suffix), without opening the database;
     [""] if it cannot be read. *)
 
+type base_format_status =
+  | Current  (** Written by this version. *)
+  | Older of string
+      (** Header of an earlier format, read with conversion on every access. *)
+  | Unreadable of string
+      (** Header of a {i base} or {i patches} format this version cannot read,
+          or [""] if the {i base} file cannot be read at all. *)
+
+val base_format_status_of_dir : string -> base_format_status
+(** [base_format_status_of_dir bname] tells whether the database [bname] (with
+    or without its [.gwb] suffix) can be read by this version, from the headers
+    of its {i base} and {i patches} files only. *)
+
 (* Ajout pour l'API *)
 
 type synchro_patch = {
