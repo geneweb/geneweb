@@ -1,16 +1,21 @@
-(** A module handling robots requests *)
-(* S: This module seems obsolete *)
+(** Robot detection for gwd. Every request goes through {!check}, which records
+    the client in the robot file ([cnt/robot] in the bases directory), blocks
+    clients exceeding the [--ban-threshold] limits and counts the connected
+    users shown in the footer. *)
 
 include module type of struct
   include Geneweb_robot
 end
 
 val robot_error : Geneweb.Config.config -> int -> int -> 'a
-(** Prints an error "Access refuned" in HTML and raises an `Exit` exception. *)
+(** [robot_error conf max_call sec] sends a 403 page from the [robot] template,
+    with [max_call] and [sec] as its [cnt] and [sec] variables, then raises
+    [Exit]. *)
 
 val robot_excl : unit -> excl * string
-(** Reads the content of the admin file managing robots and returns its content
-    and the full file name. *)
+(** [robot_excl ()] reads the robot file and returns its content with its path.
+    A file in the previous [GWRB0007] format is migrated; a missing or
+    unreadable file gives empty data. *)
 
 val summary : unit -> string
 (** [summary ()] describes the robot file in one line: number of blocked and
@@ -24,9 +29,17 @@ val check :
   Geneweb.Config.config ->
   bool ->
   int * int * int * (string * float) list
-(** [check tm from max_call sec conf suicide] Returns a tuple containing: * the
-    number of robots who attempted to connect twice * the number of wizard
-    robots who attempted to connect twice * the number of friend robots who
-    attempted to connect twice * the wizards list and their last connection
-    attempt. It also updates the robot file by blocking robots who did too many
-    attempts. *)
+(** [check tm from max_call sec conf suicide] records a request made at time
+    [tm] by the client address [from], then saves the robot file.
+
+    The client is blocked when it made more than [max_call] requests within the
+    last [sec] seconds, or when [suicide] is set (the request has a [suicide]
+    parameter). A blocked client, or one matching a blocked pattern, gets
+    {!robot_error}, which raises [Exit].
+
+    Otherwise, returns for the base of [conf]:
+    - the number of connected users: wizards, plus friends and visitors with
+      more than two requests within the window;
+    - the number of distinct wizards;
+    - the number of friends with more than two requests within the window;
+    - each wizard with the time of their last request. *)
