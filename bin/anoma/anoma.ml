@@ -45,6 +45,7 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Dirs = Geneweb_dirs
+module GWPARAM = Geneweb.GWPARAM
 
 (* ------------------------------------------------------------------ *)
 (* Command line                                                        *)
@@ -1790,9 +1791,11 @@ let () =
   (* load the lexicon for the report's headers/buttons from the embedded copy
      (or a -lex override); a missing key still shows as [key]. *)
   lexicon := input_lexicon !lang (lexicon_source ());
-  (* All per-base anoma files live together in
-     <bases_dir>/<basename>.gwb/config/ (created if missing). *)
-  let config_dir = !bases_dir // (!base_name ^ ".gwb") // "config" in
+  (* All per-base anoma files live together in GWPARAM.base_config_dir
+     (<bases_dir>/<basename>.gwb/config/, classic or reorg; created if
+     missing), the directory gwsetup and gwd use too. *)
+  Secure.set_base_dir !bases_dir;
+  let config_dir = GWPARAM.base_config_dir !base_name in
   mkdir_p config_dir;
   if !ignored_file = "" then
     ignored_file := config_dir // "whitelist_warnings.txt";

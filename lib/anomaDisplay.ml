@@ -2,9 +2,7 @@ open Config
 module Code = Geneweb_http.Code
 
 let ( // ) = Filename.concat
-
-(* Same layout as anoma: <bases_dir>/<base>.gwb/config/ *)
-let config_dir conf = !GWPARAM.bpath conf.bname // "config"
+let config_dir conf = GWPARAM.base_config_dir conf.bname
 let report_path conf = config_dir conf // "anomalies.html"
 let whitelist_path conf = config_dir conf // "whitelist_warnings.txt"
 let fragments_dir conf = config_dir conf // "whitelist_d"

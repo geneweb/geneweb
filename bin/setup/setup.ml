@@ -969,7 +969,7 @@ let run_anoma conf =
        config dir so anoma — and the comm.log view — find it there. *)
     let clog =
       let src = !last_comm_log in
-      let dir = get_bases_dir () // (base ^ ".gwb") // "config" in
+      let dir = GWPARAM.base_config_dir base in
       let dst = dir // "comm.log" in
       if src <> "" && src <> dst && Sys.file_exists src then begin
         (try Unix.mkdir dir 0o755

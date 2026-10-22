@@ -139,6 +139,13 @@ module Legacy = struct
     Filename.concat (base_dir ()) (bname ^ ".gwb")
 end
 
+(* Per-base working files (anoma report, whitelist, comm.log): the same
+   <bases>/<base>.gwb/config/ in reorg AND classic mode. Creating this
+   directory does not turn a classic base into a reorg one: only
+   config/<base>.gwf does (see [is_reorg_base]). *)
+let base_config_dir bname =
+  path_concat [ base_dir (); clean_bname bname ^ ".gwb"; "config" ]
+
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
   let bname = Filename.remove_extension bname in
