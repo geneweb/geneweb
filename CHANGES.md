@@ -1,15 +1,15 @@
 # Unreleased
 
 > [!WARNING]
-> **New database format: every existing base must be rebuilt.**
+> **New database format.**
 > Event witnesses now carry a note, so bases are written in format
-> `GnWb0025`. This version refuses bases built by any earlier GeneWeb
-> version (7.0, 7.1 betas included) and reports them as incompatible.
-> Before upgrading, back up each base, then export it to a `.gw` file with
-> the `gwu` of the version you are currently using. After upgrading,
-> recompile it with the new `gwc`. The `gwu` of this version cannot read
-> an old base, and the `gwd` of an older version cannot read a new one.
-> Compiled `.gwo` files must also be regenerated.
+> `GnWb0025`. Bases of the earlier formats of GeneWeb 7 (`GnWb0020` to
+> `GnWb0024`) and their history files are still read, their witnesses
+> getting an empty note, but they are read-only. To edit such a base
+> again, export it with the `gwu` of this version, then rebuild it with
+> its `gwc`; until then, the version that built it can still use it. A
+> base rebuilt by this version cannot be read by an older one.
+> Compiled `.gwo` files must be regenerated.
 > A `.gw` file containing witness notes (`wnote` lines) is rejected by
 > older `gwc`; export it with `gwu -old_gw` to write those notes as plain
 > text instead.
