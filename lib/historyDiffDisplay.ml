@@ -91,7 +91,7 @@ let print_clean_ok conf =
            with Sys_error _ -> None
          with
          | Some oc ->
-             List.iter (fun v -> output_value oc (v : gen_record)) new_history;
+             List.iter (output_record oc) new_history;
              close_out oc
          | None -> ());
       Hutil.trailer conf
