@@ -17,11 +17,11 @@
     geneweb.gwc_lib
     geneweb
     alcotest
+    geneweb.test_utils
     )
   (modules
     test
-    check
-    mock_db
+    mock_db_test
     date_test
     place_test
     sosa_test

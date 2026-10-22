@@ -1,0 +1,10 @@
+(library
+ (name geneweb_test_utils)
+ (public_name geneweb.test_utils)
+ (libraries
+  geneweb.def
+  geneweb.gwdb
+  geneweb.util
+  geneweb
+  alcotest)
+ (modules mock_db check))
