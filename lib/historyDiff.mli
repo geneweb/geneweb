@@ -37,6 +37,9 @@ val record_diff :
 (** [record_diff conf base change] records new updated information [change]
     inside the history files of concerned by [change] persons. *)
 
+val output_record : out_channel -> gen_record -> unit
+(** Append a record to a history file. *)
+
 val load_person_history : Config.config -> string -> gen_record list
 (** Load list of modification records for a giving person's history file. The
     most recent modification is at the head of the list *)

@@ -1,0 +1,6 @@
+(cram
+ (package geneweb)
+ (deps
+  %{bin:gwu}
+  %{bin:gwc}
+  (source_tree old.gwb)))
