@@ -392,21 +392,28 @@ let macro conf = function
       let lang_def = transl conf "!languages" in
       Translate.language_name ~sep:'|' lang lang_def
   | 'P' -> string_of_int !gwd_port
-  | 'B' ->
-      let found =
-        Geneweb_db.Driver.base_format_of_dir
-          (base_path (strip_spaces (s_getenv conf.env "anon")))
-      in
-      if found = "" || found = Geneweb_db.Driver.current_base_format then ""
-      else
-        let tip =
-          transl conf
-            "old format, read-only: export with gwu then rebuild with gwc"
-        in
+  | 'B' -> (
+      let sign cls symbol tip =
         Printf.sprintf
-          " <span class=\"old-format\" title=\"%s\" \
-           aria-label=\"%s\">&#9888;</span>"
-          tip tip
+          " <span class=\"%s\" title=\"%s\" aria-label=\"%s\">%s</span>" cls tip
+          tip symbol
+      in
+      match
+        Geneweb_db.Driver.base_format_status_of_dir
+          (base_path (strip_spaces (s_getenv conf.env "anon")))
+      with
+      | Current -> ""
+      | Older _ ->
+          sign "old-format" "&#9888;"
+            (transl conf
+               "old format, read-only: export with gwu then rebuild with gwc")
+      | Unreadable found ->
+          let tip = transl conf "cannot be read by this version of GeneWeb" in
+          let tip =
+            if found = "" then tip
+            else tip ^ " (" ^ Geneweb_db.Dutil.printable_magic found ^ ")"
+          in
+          sign "unreadable-format" "&#10006;" tip)
   | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c
 
