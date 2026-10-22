@@ -34,7 +34,6 @@ type t = {
   allowed_addresses : string list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
-  min_disp_req : int;
   (* HTTP server *)
   interface : string;
   redirect_interface : string option;
@@ -365,8 +364,10 @@ let ban_threshold =
 
 let min_disp_req =
   let doc = "Set minimum traced requests by robot to $(docv)." in
+  let deprecated = "No effect." in
   C.Arg.(
-    value & opt int 0 & info [ "min-disp-req" ] ~docs:security_section ~doc)
+    value & opt int 0
+    & info [ "min-disp-req" ] ~docs:security_section ~doc ~deprecated)
 
 (* HTTP server commands *)
 
@@ -637,7 +638,7 @@ let t =
   and+ no_reverse_host = no_reverse_host
   and+ allowed_addresses = allowed_addresses
   and+ ban_threshold = ban_threshold
-  and+ min_disp_req = min_disp_req
+  and+ _ : int = min_disp_req
   and+ interface = interface
   and+ redirect_interface = redirect_interface
   and+ port = port
@@ -678,7 +679,6 @@ let t =
     allowed_addresses;
     no_reverse_host;
     ban_threshold;
-    min_disp_req;
     interface;
     redirect_interface;
     port;

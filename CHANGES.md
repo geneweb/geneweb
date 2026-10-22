@@ -75,6 +75,7 @@
   binary invoked directly by the web server receives no command line
   arguments, so `--cgi` requires a wrapper script; this has to be settled
   before the inference is actually removed.
+- The `--min-disp-req` option of `gwd` has no effect and is deprecated (#3066).
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)

@@ -110,8 +110,6 @@ let robot_excl () =
   in
   (xcl, fname)
 
-let min_disp_req = ref 6
-
 let summary () =
   let xcl, _ = robot_excl () in
   let n, ip = xcl.max_conn in
