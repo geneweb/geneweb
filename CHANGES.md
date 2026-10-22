@@ -41,6 +41,10 @@
 - Without `--ban-threshold`, clients are tracked over the login timeout
   instead of forever: the robot file no longer grows on every request, and
   the footer only counts recently active users as connected (#3066).
+- `--trusted-proxy ADDR,...` lists the reverse proxies in front of gwd: for
+  the requests they relay, the client address is read from
+  `X-Forwarded-For`, so that logs, address restrictions and robot detection
+  apply to the visitor rather than to the proxy (#3067).
 - Requests on different bases no longer read and write the robot file at
   the same time in reorg mode, which could reset the blacklist; the
   `robot` tool takes the same lock when it writes the file.

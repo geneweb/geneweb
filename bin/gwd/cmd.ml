@@ -32,6 +32,7 @@ type t = {
   digest_password : bool;
   allowed_tags_file : string option;
   allowed_addresses : string list;
+  trusted_proxies : Ipaddr.t list;
   no_reverse_host : bool;
   ban_threshold : (int * int) option;
   (* HTTP server *)
@@ -131,6 +132,12 @@ let log_pp ppf l =
   | File s -> Fmt.string ppf s
 
 let log_conv = C.Arg.Conv.make ~docv:"LOG" ~parser:log_parser ~pp:log_pp ()
+
+let ipaddr_parser s =
+  Ipaddr.of_string (String.trim s) |> Result.map_error (fun (`Msg m) -> m)
+
+let ipaddr_conv =
+  C.Arg.Conv.make ~docv:"ADDR" ~parser:ipaddr_parser ~pp:Ipaddr.pp ()
 
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
@@ -346,6 +353,20 @@ let allowed_addresses =
     value
     & opt (list string) []
     & info [ "allowed-address" ] ~docs:security_section ~doc)
+
+let trusted_proxies =
+  let doc =
+    "IPv4 or IPv6 addresses of the reverse proxies placed in front of the \
+     server. For requests relayed by these proxies, the client address is read \
+     from the X-Forwarded-For header, without reverse lookup, so that access \
+     logs, address restrictions and robot detection apply to the actual \
+     visitor. Each proxy must set or append to this header itself, otherwise \
+     clients can forge it."
+  in
+  C.Arg.(
+    value
+    & opt (list ipaddr_conv) []
+    & info [ "trusted-proxy" ] ~docs:security_section ~docv:"ADDR,..." ~doc)
 
 let no_reverse_host =
   let doc = "Force no reverse host by address." in
@@ -637,6 +658,7 @@ let t =
   and+ allowed_tags_file = allowed_tags_file
   and+ no_reverse_host = no_reverse_host
   and+ allowed_addresses = allowed_addresses
+  and+ trusted_proxies = trusted_proxies
   and+ ban_threshold = ban_threshold
   and+ _ : int = min_disp_req
   and+ interface = interface
@@ -677,6 +699,7 @@ let t =
     digest_password;
     allowed_tags_file;
     allowed_addresses;
+    trusted_proxies;
     no_reverse_host;
     ban_threshold;
     interface;

@@ -22,6 +22,7 @@
   digestif
   dune-site
   dune-site.plugins
+  ipaddr
   cmdliner)
  (modules request sites cmd cmd_legacy robot gwd_oidc))
 
@@ -37,6 +38,7 @@
   geneweb_http
   geneweb_register
   gwd_lib
+  ipaddr
   logs
   logs-syslog
   logs-syslog.unix
