@@ -1,3 +1,5 @@
+open Geneweb_test_utils
+
 let test_is_ancestor =
   let db = Mock_db.create () in
   let child = Mock_db.add_person db ~occ:0 () in

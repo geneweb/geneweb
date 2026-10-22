@@ -1,3 +1,5 @@
+open Geneweb_test_utils
+
 let normalize () =
   let cases =
     [
