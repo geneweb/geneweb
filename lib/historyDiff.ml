@@ -13,6 +13,48 @@ type gen_record = {
   gen_c : Driver.iper array list;
 }
 
+(* Records written before witness notes (GnWb0025): witnesses are pairs. A
+   history file can hold both kinds, older records first. Each newer record
+   is preceded by the marshaled [record_marker], whose bytes cannot be those
+   of an older record. *)
+type gen_record_0024 = {
+  date_0024 : Adef.safe_string;
+  wizard_0024 : Adef.safe_string;
+  gen_p_0024 : (Driver.iper, Driver.iper, string) Def_gnwb0024.gen_person;
+  gen_f_0024 : (Driver.iper, Driver.ifam, string) Def_gnwb0024.gen_family list;
+  gen_c_0024 : Driver.iper array list;
+}
+
+let record_marker = "GnHd0002"
+
+let output_record oc (gr : gen_record) =
+  output_value oc record_marker;
+  output_value oc gr
+
+(* The next marshaled value of [ic], as bytes. *)
+let input_marshaled ic =
+  let header = Bytes.create Marshal.header_size in
+  really_input ic header 0 Marshal.header_size;
+  let size = Marshal.data_size header 0 in
+  let b = Bytes.create (Marshal.header_size + size) in
+  Bytes.blit header 0 b 0 Marshal.header_size;
+  really_input ic b Marshal.header_size size;
+  b
+
+let input_record ic =
+  let b = input_marshaled ic in
+  if Bytes.equal b (Marshal.to_bytes record_marker []) then
+    (input_value ic : gen_record)
+  else
+    let r : gen_record_0024 = Marshal.from_bytes b 0 in
+    {
+      date = r.date_0024;
+      wizard = r.wizard_0024;
+      gen_p = Def_gnwb0024.person ~empty:"" r.gen_p_0024;
+      gen_f = List.map (Def_gnwb0024.family ~empty:"") r.gen_f_0024;
+      gen_c = r.gen_c_0024;
+    }
+
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
   let space_to_unders = Mutil.tr ' ' '_' in
@@ -93,7 +135,7 @@ let write_history_file conf person_file fname gr =
     with Sys_error _ -> None
   with
   | Some oc ->
-      output_value oc (gr : gen_record);
+      output_record oc gr;
       close_out oc
   | None -> ()
 
@@ -288,7 +330,7 @@ let load_person_history conf fname =
   | Some ic ->
       (try
          while true do
-           let v : gen_record = input_value ic in
+           let v = input_record ic in
            history := v :: !history
          done
        with End_of_file -> ());
