@@ -45,7 +45,7 @@
   the same time in reorg mode, which could reset the blacklist; the
   `robot` tool takes the same lock when it writes the file.
 - The `robot` tool accepts `-bd <dir>` anywhere on its command line.
-
+- `robot -status` shows the base each monitored IP was last seen on (#3069).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
