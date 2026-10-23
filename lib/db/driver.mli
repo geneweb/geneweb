@@ -668,6 +668,18 @@ val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Collection.Marker.t
 (** [ifam_marker c v] create marker over collection of family's ids and
     initialise it for every element with [v] *)
 
+val current_base_format : string
+(** Header of the {i base} files written by this version. *)
+
+val base_format : base -> string
+(** Header of the {i base} file of an open base. A base of an earlier format
+    than {!current_base_format} is converted on every read: it works, but more
+    slowly, until it is rebuilt (gwu then gwc). *)
+
+val base_format_of_dir : string -> string
+(** Header of the {i base} file of the database [bname], read without opening
+    the database; [""] if it cannot be read. *)
+
 val check_nldb_format : base -> [ `Ok | `BadFormat | `NoFile ]
 (** Check notes_links file format without reading content. *)
 

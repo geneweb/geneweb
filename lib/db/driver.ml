@@ -343,6 +343,9 @@ module NLDB = struct
       Sys.rename fname_tmp fname_def
 end
 
+let current_base_format = Dutil.magic_GnWb0025
+let base_format base = Database.magic_of_version base.version
+let base_format_of_dir = Database.base_format_of_dir
 let check_nldb_format = NLDB.check_format
 let read_nldb = NLDB.read
 let nldb_is_empty = NLDB.is_empty

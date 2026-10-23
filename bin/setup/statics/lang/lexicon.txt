@@ -3942,6 +3942,11 @@ it: non rimane nessuna base di dati
 lv: nav nevienas datu bâzes
 sv: det finns ingen databas
 
+    old format, read-only: export with gwu then rebuild with gwc
+de: altes Format, schreibgeschützt: mit gwu exportieren, dann mit gwc neu erstellen
+en: old format, read-only: export with gwu then rebuild with gwc
+fr: ancien format, lecture seule : exporter avec gwu puis reconstruire avec gwc
+
     there is no database at present
 aa: gwb2ged.htm
 co: ùn ci hè alcuna basa di dati à st’ora
