@@ -46,40 +46,33 @@ init() {
 
 start() {
 	cd ${GENEWEB_HOME}/share/data || exit 1
-	echo "${GWSETUP_IP}" > ${GENEWEB_HOME}/share/dist/gw/etc/gwsetup_only
-
-	gwlaunch_log "Starting gwsetup."
-	${GENEWEB_HOME}/share/dist/gw/gwsetup \
-	-daemon \
-	-gd ${GENEWEB_HOME}/share/dist/gw \
-	-only etc/gwsetup_only \
-	>>${GENEWEB_HOME}/log/gwsetup.log 2>&1
-	gwlaunch_log "-- Started gwsetup!"
 
 	GWD_AUTH_FILE=${GWD_AUTH_FILE:=${GENEWEB_HOME}/etc/gwd_passwd}
 	if [ -f $GWD_AUTH_FILE ]; then
-		AUTH_ARG="-auth $GWD_AUTH_FILE"
+		AUTH_ARG="--authorization-file $GWD_AUTH_FILE"
 	else
 		AUTH_ARG=""
 	fi
 
+	# Since 7.1, gwd uses long options (see gwd --help). In particular -plugins
+	# no longer takes a directory argument: plugins are loaded from the
+	# distribution tree with the --load-all-plugins flag.
 	gwlaunch_log "Starting gwd."
 	${GENEWEB_HOME}/share/dist/gw/gwd \
-	-daemon \
-	-plugins -unsafe ${GENEWEB_HOME}/share/dist/gw/plugins \
-	-trace_failed_passwd \
-	-lang fr \
-	-bd ${GENEWEB_BASE_PATH} \
-	-hd ${GENEWEB_HOME}/share/dist/gw \
-	-digest \
-	-log ${GENEWEB_HOME}/log/gwd.log \
+	--daemon \
+	--load-all-plugins \
+	--trace-failed-password \
+	--default-lang fr \
+	--bd ${GENEWEB_BASE_PATH} \
+	--gw-prefix ${GENEWEB_HOME}/share/dist/gw \
+	--digest-password \
+	--log ${GENEWEB_HOME}/log/gwd.log \
 	$AUTH_ARG 2>&1
-	#	-cache-in-memory ${GENEWEB_DB} \ # Preload this database in memory
+	#	--cache-database ${GENEWEB_DB} \ # Preload this database in memory
 	gwlaunch_log "-- Started gwd!"
 
 	gwlaunch_log "Launch complete! -------------------------------------------------------"
 
-	tail -f ${GENEWEB_HOME}/log/gwsetup.log | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwsetup: /" & \
 	tail -f ${GENEWEB_HOME}/log/gwd.log | sed "s/^/$(date +%Y-%m-%d_%H:%M:%S) gwd: /"
 
 }
