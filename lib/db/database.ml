@@ -596,6 +596,49 @@ let read_base_magic ic =
 let read_header fname read =
   try Secure.with_open_in_bin fname read with Sys_error _ -> ""
 
+(* GeneWeb 7 changed the person and family records (events, sources...)
+   without changing the GnWb0020 header: a base written by GeneWeb 6 or
+   earlier has the same header but shorter records. The number of fields of
+   the first person and of the first family tells them apart; it is the same
+   with or without witness notes. *)
+let person_fields =
+  Iovalue.marshaled_block_size
+    (Mutil.empty_person 0 0 : (unit, int, int) gen_person)
+
+let family_fields =
+  Iovalue.marshaled_block_size
+    (Mutil.empty_family 0 : (int, unit, int) gen_family)
+
+(* [ic] is just after the header of the base file. *)
+let records_have_current_layout ic ic_acc =
+  let persons_len = input_binary_int ic in
+  let families_len = input_binary_int ic in
+  let first_record i expected =
+    seek_in ic_acc (i * Iovalue.sizeof_long);
+    Position.seek_in ic (Position.input ic_acc);
+    match expected with
+    | None -> true
+    | Some _ -> Iovalue.block_size ic = expected
+  in
+  (persons_len = 0 || first_record 0 person_fields)
+  && (families_len = 0 || first_record (3 * persons_len) family_fields)
+
+let has_current_layout bname =
+  try
+    Secure.with_open_in_bin (Filename.concat bname "base.acc") @@ fun ic_acc ->
+    Secure.with_open_in_bin (Filename.concat bname "base") @@ fun ic ->
+    ignore (read_base_magic ic : string);
+    records_have_current_layout ic ic_acc
+  with
+  | Sys_error _ -> true
+  | End_of_file | Failure _ -> false
+
+let readable_version bname version =
+  match version with
+  | GnWb0025 -> true
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
+      has_current_layout bname
+
 let magic_of_version version =
   match version with
   | GnWb0025 -> Dutil.magic_GnWb0025
@@ -926,6 +969,7 @@ let base_format_status_of_dir bname =
   let found = base_format_of_dir bname in
   match base_version_of_magic found with
   | None -> Unreadable found
+  | Some version when not (readable_version bname version) -> Unreadable found
   | Some version -> (
       let patches_magic =
         read_header (Filename.concat bname "patches") read_patch_magic
@@ -997,9 +1041,15 @@ let with_database ?(read_only = false) bname k =
   let tm_fname = bname // "commit_timestamp" in
   let version =
     let fname = bname // "base" in
-    let found = Secure.with_open_in_bin fname read_base_magic in
+    (* A missing or unreadable base file is reported like an unknown
+       format, rather than as an uncaught Sys_error. *)
+    let found = read_header fname read_base_magic in
     match base_version_of_magic found with
-    | Some version -> version
+    | Some version when readable_version bname version -> version
+    | Some _ ->
+        raise
+          (Dutil.Incompatible_format
+             (fname, found ^ " (GeneWeb 6 or earlier)", Dutil.base_magics))
     | None ->
         raise (Dutil.Incompatible_format (fname, found, Dutil.base_magics))
   in
