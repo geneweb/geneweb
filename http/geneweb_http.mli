@@ -61,6 +61,18 @@ module Connection : sig
   (** [Output.status conf answer] sends the http header where [answer]
       represents the answer status. *)
 
+  val defer_header : t -> string -> unit
+  (** [defer_header conn h] queues the header line [h] to be sent with the
+      response, right after its status line, whatever that status is. Unlike
+      [header], it does not commit the response to [200 OK]: the request handler
+      can still choose the status (404, 401, redirect...). If the status has
+      already been sent, [h] is written immediately. *)
+
+  val take_deferred_headers : t -> string list
+  (** Returns and clears the headers queued by [defer_header] that have not been
+      sent yet. For output paths that write the status line themselves instead
+      of calling [http]. *)
+
   val http_redirect_temporarily : t -> string -> unit
   (** [Output.status conf_redirect url] sends the http header where [url]
       represents the Location where the request needs to be redirected. *)

@@ -22,6 +22,7 @@ val session_max_age : (string * string) list -> int
     limit). *)
 
 val renew_session :
+  Geneweb_http.Connection.t ->
   Geneweb.Config.config ->
   base_file:string ->
   acc:char ->
