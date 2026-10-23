@@ -118,7 +118,9 @@ let print_status () =
           List.iter
             (fun (ip, who) ->
               if who.acc_times <> [] then
-                printf "  %s: %d req, last: %.0f s ago\n" ip who.nb_connect
+                printf "  %s (%s): %d req, last: %.0f s ago\n" ip
+                  (if who.nbase = "" then "?" else who.nbase)
+                  who.nb_connect
                   (Unix.time () -. List.hd who.acc_times))
             top_10
 
