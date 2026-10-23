@@ -15492,6 +15492,16 @@ de: Die Datenbank <b>%s</b> ist leer oder wurde mit einer anderen GeneWeb-Versio
 en: Database <b>%s</b> is empty or was created by another version of GeneWeb and cannot be opened by this one. Export it as a .gw file with the GeneWeb version you used until now, then recreate it from that file with this version.
 fr: La base <b>%s</b> est vide ou a été créée par une autre version de GeneWeb et ne peut pas être ouverte par celle-ci. Exportez-la au format .gw avec la version de GeneWeb que vous utilisiez jusqu’ici, puis recréez-la à partir de ce fichier avec la présente version.
 
+    NOTIF_TT old base format
+de: Datenbank im alten Format
+en: Database in an old format
+fr: Base dans un ancien format
+
+    NOTIF old base format %s
+de: Die Datenbank <b>%s</b> wurde mit einer früheren GeneWeb-Version erstellt: Sie kann angezeigt, aber nicht geändert werden. Um sie zu ändern, exportieren Sie sie als .gw-Datei und erstellen Sie sie aus dieser Datei neu, beides mit dieser GeneWeb-Version.
+en: Database <b>%s</b> was created by an earlier version of GeneWeb: it can be viewed but not modified. To modify it, export it as a .gw file and recreate it from that file, with this version of GeneWeb.
+fr: La base <b>%s</b> a été créée par une version antérieure de GeneWeb : elle peut être consultée mais pas modifiée. Pour la modifier, exportez-la au format .gw et recréez-la à partir de ce fichier, avec cette version de GeneWeb.
+
     NOTIF_TT incorrect request
 ->: incorrect request
 

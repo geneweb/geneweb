@@ -33,6 +33,14 @@ val make :
     particular, the functionality part of the [dsk_base] structure is not
     initalized. *)
 
+val magic_of_version : Dbdisk.base_version -> string
+(** Header written in the {i base} file of this version. *)
+
+val base_format_of_dir : string -> string
+(** [base_format_of_dir bname] is the header of the {i base} file of database
+    [bname] (with or without its [.gwb] suffix), without opening the database;
+    [""] if it cannot be read. *)
+
 (* Ajout pour l'API *)
 
 type synchro_patch = {

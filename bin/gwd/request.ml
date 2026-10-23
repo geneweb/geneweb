@@ -251,6 +251,22 @@ let print_incompatible_base conf (file, found, expected) =
   try Templ.output_simple conf Templ.Env.empty "index"
   with _ -> GWPARAM.output_error conf Code.Service_Unavailable
 
+(* A base of an earlier format is read-only. Wizards are told on the welcome
+   page, where the warning is not repeated on each page. *)
+let warn_old_base_format conf base =
+  let found = Driver.base_format base in
+  if conf.wizard && found <> Driver.current_base_format then (
+    Log.warn (fun k ->
+        k
+          "base %s is in format %s, converted on every read and read-only; \
+           rebuild it (gwu then gwc) to write format %s"
+          conf.bname found Driver.current_base_format);
+    Notif.warning ~mode:Notif.Dismissible
+      ~title:(Util.transl conf "NOTIF_TT old base format")
+      (Printf.sprintf
+         (Util.ftransl conf "NOTIF old base format %s")
+         (Util.escape_html conf.bname :> string)))
+
 let redirect_to_random_person conn conf base =
   let n = Driver.nb_of_persons base in
   let rec pick k =
@@ -338,7 +354,11 @@ let treat_request =
     in
     w_base ~none
   in
-  let print_welcome _conn = SrcfileDisplay.print_welcome in
+  let print_welcome _conn conf base =
+    warn_old_base_format conf base;
+    let conf = Notif.inject_pending conf in
+    SrcfileDisplay.print_welcome conf base
+  in
   let w_person = w_person ~none:print_welcome in
   let print_page conn conf l =
     w_base
