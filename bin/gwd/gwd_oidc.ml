@@ -228,19 +228,23 @@ let oidc_error_page conf msg =
 
 let conf_secret conf = match conf.secret_salt with Some s -> s | None -> ""
 
-let set_cookie conf ~name ~value ~max_age =
+(* Deferred, so that a cookie set before the request handler runs (session
+   renewal) does not commit the response to 200 OK: the handler may still
+   answer 404, 401, a redirect, or an image with its own status. *)
+let set_cookie conn ~name ~value ~max_age =
   let max_age =
     match max_age with Some n -> Printf.sprintf "; Max-Age=%d" n | None -> ""
   in
-  Output.header conf
-    "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax%s" name value
-    max_age
+  Connection.defer_header conn
+    (Printf.sprintf
+       "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax%s" name value
+       max_age)
 
-let set_login_cookie conf base_file value =
-  set_cookie conf ~name:(login_cookie_name base_file) ~value ~max_age:(Some 600)
+let set_login_cookie conn base_file value =
+  set_cookie conn ~name:(login_cookie_name base_file) ~value ~max_age:(Some 600)
 
-let clear_login_cookie conf base_file =
-  set_cookie conf
+let clear_login_cookie conn base_file =
+  set_cookie conn
     ~name:(login_cookie_name base_file)
     ~value:"" ~max_age:(Some 0)
 
@@ -260,7 +264,7 @@ let session_max_age base_env =
       | _ -> 0)
   | None -> 0
 
-let renew_session conf ~base_file ~acc ~user ~username ~deadline =
+let renew_session conn conf ~base_file ~acc ~user ~username ~deadline =
   match conf_secret conf with
   | "" -> ()
   | secret ->
@@ -270,7 +274,7 @@ let renew_session conf ~base_file ~acc ~user ~username ~deadline =
         make_session_cookie secret ~base_file ~acc ~user ~username ~exp
           ~deadline
       in
-      set_cookie conf
+      set_cookie conn
         ~name:(session_cookie_name base_file)
         ~value:cookie ~max_age:(Some timeout)
 
@@ -281,7 +285,7 @@ let send_redirect conf url =
   Output.print_sstring conf "";
   Output.flush conf
 
-let handle_oidc_login conf base_env base_file =
+let handle_oidc_login conn conf base_env base_file =
   match (conf_secret conf, read_oidc_config base_env) with
   | "", _ -> oidc_error_page conf "OIDC unavailable: no secret salt configured"
   | _, None ->
@@ -317,7 +321,7 @@ let handle_oidc_login conf base_env base_file =
               in
               Log.info (fun k -> k "login initiated: base=%s" base_file);
               Output.status conf Code.Moved_Temporarily;
-              set_login_cookie conf base_file cookie;
+              set_login_cookie conn base_file cookie;
               send_redirect conf url))
 
 let handle_oidc_callback conn conf base_env from_addr base_file =
@@ -432,7 +436,7 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
           k "login as visitor (no role): base=%s user=%s from=%s" base_file user
             from_addr);
       Output.status conf Code.Moved_Temporarily;
-      clear_login_cookie conf base_file;
+      clear_login_cookie conn base_file;
       send_redirect conf base_url
   | Ok (acc, claim_value, username) ->
       Log.info (fun k ->
@@ -448,8 +452,8 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
           ~username ~exp ~deadline
       in
       Output.status conf Code.Moved_Temporarily;
-      clear_login_cookie conf base_file;
-      set_cookie conf
+      clear_login_cookie conn base_file;
+      set_cookie conn
         ~name:(session_cookie_name base_file)
         ~value:cookie ~max_age:(Some timeout);
       send_redirect conf base_url
@@ -487,7 +491,7 @@ let handle_oidc_logout conn conf base_env _from_addr base_file =
               | Some url -> url))
     in
     Output.status conf Code.Moved_Temporarily;
-    set_cookie conf
+    set_cookie conn
       ~name:(session_cookie_name base_file)
       ~value:"" ~max_age:(Some 0);
     send_redirect conf logout_target
@@ -503,7 +507,7 @@ let handle_mode conn conf mode =
       oidc_error_page conf "OIDC is not available on Windows";
       true
   | Some "OIDC_LOGIN" ->
-      handle_oidc_login conf base_env base_file;
+      handle_oidc_login conn conf base_env base_file;
       true
   | Some "OIDC_CALLBACK" ->
       handle_oidc_callback conn conf base_env from_addr base_file;

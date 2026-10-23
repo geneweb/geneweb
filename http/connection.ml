@@ -8,6 +8,8 @@ let of_out_channel ~cgi _oc = cgi_alias := cgi
 let close = close_connection
 let header () = header
 let http () = http
+let defer_header () = defer_header
+let take_deferred_headers () = take_deferred_headers ()
 let woc = woc
 let wsocket = wsocket
 let wflush = wflush

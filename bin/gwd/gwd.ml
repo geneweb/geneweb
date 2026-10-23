@@ -103,6 +103,9 @@ let make_gzip_output_conf ~cgi ~level conn request =
               end;
               Printf.fprintf oc "Content-Length: %d\r\n"
                 (String.length final_body);
+              List.iter
+                (fun h -> Printf.fprintf oc "%s\r\n" h)
+                (Connection.take_deferred_headers conn);
               let headers = Buffer.contents headers_buf in
               output_string oc headers;
               output_string oc "\r\n";
@@ -1667,8 +1670,8 @@ let conf_and_connection =
               enable_gzip ();
               (match oidc_renew with
               | Some (base_file, acc, user, username, deadline) ->
-                  Gwd_oidc.renew_session conf ~base_file ~acc ~user ~username
-                    ~deadline
+                  Gwd_oidc.renew_session conn conf ~base_file ~acc ~user
+                    ~username ~deadline
               | None -> ());
               try
                 let t1 = Unix.gettimeofday () in
