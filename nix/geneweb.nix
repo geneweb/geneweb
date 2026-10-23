@@ -87,4 +87,6 @@ buildDunePackage {
     pp_loc
     ptime
   ];
+
+  postPatch = "patchShebangs test/gwd/gwd-cgi.sh";
 }

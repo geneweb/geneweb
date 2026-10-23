@@ -24,7 +24,7 @@
   *** ok
   Database generation: 0 min 0 sec
 
-  $ alias gwd-cgi="bash ./gwd-cgi.sh"
+  $ alias gwd-cgi="./gwd-cgi.sh"
   $ gwd-cgi | grep '</html>'
   </html>
 
