@@ -2299,8 +2299,9 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
       let bpath = !GWPARAM.bpath dbn in
       try Driver.load_database bpath
-      with Sys_error _ ->
-        (* HOTFIX: we cannot print the Sys_error payload in tests. *)
+      with Sys_error _ | Driver.Incompatible_format _ ->
+        (* HOTFIX: we cannot print the Sys_error payload in tests. A missing
+           base file is reported as Incompatible_format. *)
         Log.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;
