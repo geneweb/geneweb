@@ -593,6 +593,24 @@ let read_base_magic ic =
   let len = String.length Dutil.magic_GnWb0025 in
   if in_channel_length ic < len then "" else really_input_string ic len
 
+let read_header fname read =
+  try Secure.with_open_in_bin fname read with Sys_error _ -> ""
+
+let magic_of_version version =
+  match version with
+  | GnWb0025 -> Dutil.magic_GnWb0025
+  | GnWb0024 -> Dutil.magic_GnWb0024
+  | GnWb0023 -> Dutil.magic_GnWb0023
+  | GnWb0022 -> Dutil.magic_GnWb0022
+  | GnWb0021 -> Dutil.magic_GnWb0021
+  | GnWb0020 -> Dutil.magic_GnWb0020
+
+let base_format_of_dir bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  read_header (Filename.concat bname "base") read_base_magic
+
 module type X = sig
   val equal : string -> string -> bool
   (** [equal s1 s2] checks if [s1] and [s2] are equal. *)
