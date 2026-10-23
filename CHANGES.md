@@ -41,6 +41,9 @@
 - Without `--ban-threshold`, clients are tracked over the login timeout
   instead of forever: the robot file no longer grows on every request, and
   the footer only counts recently active users as connected (#3066).
+- Requests on different bases no longer read and write the robot file at
+  the same time in reorg mode, which could reset the blacklist; the
+  `robot` tool takes the same lock when it writes the file.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
