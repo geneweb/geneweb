@@ -125,22 +125,19 @@ val p_auth :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   bool
-(** Calculate the access rights to the person's information in according to his
-    age. Returns (in the order of the tests) :
-    - `true` if requester is wizard or friend or person is public
-    - `true` if person has at least one title and {i public_if_title} is set to
-      {i yes} in gwf config file
-    - `false` if person is alive and {i private_years} > 0
-    - `true` if person is older (depending on the date of birth or baptism date)
-      then {i privates_years}
-    - `false` if person is younger (depending on the date of birth or baptism
-      date) then {i privates_years}
-    - `true` if person has been deceased for more than {i privates_years}
-    - `false` if person has been deceased for less than {i privates_years}
-    - `true` if person is between 80 and 120 years old and he is not beeing
-      private and {i public_if_no_date} is set to {i yes} in gwf config file
-    - `true` if person has been married for more than {i private_years}
-    - `false` otherwise *)
+(** [p_auth ?view conf base p] tells whether the data of [p] can be shown,
+    [view] selecting whose rights are tested (default: the current user). It
+    holds for a wizard, a friend outside semi-public mode or [p] himself; when
+    [p] is public, titled with [public_if_titles], consenting or related in
+    semi-public mode, or undated with [public_if_no_date] (the last two unless
+    private); when [private_years] is negative; and when [p] was born or
+    baptised more than [private_years] ago, died or was buried more than
+    [private_years_death] ago, or married more than [private_years_marriage]
+    ago. Without birth nor baptism date, any date of a child, the death or
+    burial of a spouse more than [private_years] ago, or of a parent more than
+    [private_years] + 1 years ago, gives the same proof. A date known only as
+    "after" proves nothing; "or" and "between" dates count by their later year.
+*)
 
 val p_auth_sp :
   Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
