@@ -44,6 +44,8 @@
 - Requests on different bases no longer read and write the robot file at
   the same time in reorg mode, which could reset the blacklist; the
   `robot` tool takes the same lock when it writes the file.
+- The `robot` tool accepts `-bd <dir>` anywhere on its command line.
+
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
