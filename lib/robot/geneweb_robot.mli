@@ -4,6 +4,15 @@
 val magic_robot : string
 (** Header of the robot file. Must change whenever a type below changes. *)
 
+val file : unit -> string
+(** [file ()] is the robot file, [cnt/robot] in the bases directory, shared by
+    all the bases served by gwd. *)
+
+val lock_file : unit -> string
+(** [lock_file ()] is the lock guarding {!file}; its directory is created if
+    needed. Unlike [gwd.lck], which is per base in reorg mode, it is shared by
+    all the bases. *)
+
 module W : Map.S with type key = string
 (** Maps keyed by client address. *)
 

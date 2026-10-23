@@ -4,8 +4,14 @@
 open Printf
 open Geneweb_robot
 
-let get_robot_file () =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+let get_robot_file = file
+
+let with_lock k =
+  let on_exn exn bt =
+    Format.eprintf "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:true ~lock_file:(lock_file ()) k
 
 let read_robot_file fname =
   try
@@ -379,11 +385,11 @@ let rec parse_args = function
       let threshold = try int_of_string threshold_str with _ -> 10 in
       suggest_ranges threshold
   | [ "-export"; output ] -> export_blacklist output
-  | [ "-import"; input ] -> import_blacklist input
-  | [ "-add"; ip ] -> add_ip ip
-  | [ "-rm"; ip ] -> remove_ip ip
-  | [ "-clear" ] -> clear_all ()
-  | [ "-clear-monitoring" ] -> clear_monitoring ()
+  | [ "-import"; input ] -> with_lock (fun () -> import_blacklist input)
+  | [ "-add"; ip ] -> with_lock (fun () -> add_ip ip)
+  | [ "-rm"; ip ] -> with_lock (fun () -> remove_ip ip)
+  | [ "-clear" ] -> with_lock clear_all
+  | [ "-clear-monitoring" ] -> with_lock clear_monitoring
   | _ -> usage ()
 
 let () =

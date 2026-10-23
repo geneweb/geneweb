@@ -74,9 +74,7 @@ let purge_who tm xcl sec =
   List.iter (fun k -> xcl.who <- W.remove k xcl.who) to_remove
 
 let robot_excl () =
-  let fname =
-    String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
-  in
+  let fname = file () in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
     | Some ic -> (

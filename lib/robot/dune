@@ -1,3 +1,4 @@
 (library
  (name geneweb_robot)
- (public_name geneweb.robot))
+ (public_name geneweb.robot)
+ (libraries geneweb.util))
