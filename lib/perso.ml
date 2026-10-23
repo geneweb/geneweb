@@ -4127,11 +4127,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "keydir" ->
       if is_hide_names conf p && not p_auth then null_val
       else
-        Format.sprintf "%s.%d.%s"
-          (Driver.p_first_name base p |> Name.lower)
-          (Driver.get_occ p)
-          (Driver.p_surname base p |> Name.lower)
-        |> str_val
+        Image.default_image_filename "portraits" base p
+        |> Util.escape_html |> safe_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
