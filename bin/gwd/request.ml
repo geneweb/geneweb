@@ -29,6 +29,21 @@ let this_request_updates_database conf =
       true
   | _ -> false
 
+(* Wider than [this_request_updates_database]: also the forms that only
+   lead to an update and every validation ([*_OK]) but the advanced search.
+   Used for a base of an earlier format, which is read-only. *)
+let this_request_edits conf =
+  this_request_updates_database conf
+  ||
+  match p_getenv conf.env "m" with
+  | Some "AS_OK" | None -> false
+  | Some
+      ( "ADD_PAR" | "CHG_EVT_IND_ORD" | "CHG_EVT_FAM_ORD" | "MOD_GALLERY"
+      | "HIST_CLEAN" | "MRG" | "MRG_DUP" | "MRG_FAM" | "UNKNOWN" | "SND_IMAGE_C"
+      | "BLASON_MOVE_TO_ANC" | "PORTRAIT_TO_BLASON" | "IMAGE_TO_BLASON" ) ->
+      true
+  | Some m -> String.ends_with ~suffix:"_OK" m
+
 let request_issue ?(level = `Warning) ~key _conn conf base =
   let title = Util.transl conf ("NOTIF_TT " ^ key) in
   let comment = Util.transl conf ("NOTIF " ^ key) in
@@ -391,6 +406,14 @@ let treat_request =
         conf.wizard || conf.friend
         || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
       then (
+        let old_format () =
+          match bfile with
+          | Some f -> (
+              match Driver.base_format_status_of_dir f with
+              | Older _ -> true
+              | Current | Unreadable _ -> false)
+          | None -> false
+        in
         if
           List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
           && this_request_updates_database conf
@@ -399,6 +422,12 @@ let treat_request =
             (fun conn conf base ->
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
+            conn conf bfile
+        else if this_request_edits conf && old_format () then
+          w_base
+            (fun conn conf base ->
+              request_issue conn conf base ~level:`Error
+                ~key:"old base format read only")
             conn conf bfile
         else if p_getenv conf.env "rnd" = Some "1" then
           w_base redirect_to_random_person conn conf bfile

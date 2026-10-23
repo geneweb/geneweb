@@ -15562,6 +15562,16 @@ de: Ungültige Personen-Konfiguration (em=, ei=, ep=, en=, eoc=).
 en: Invalid person configuration (em=, ei=, ep=, en=, eoc=).
 fr: Configuration de personne incorrecte (em=, ei=, ep=, en=, eoc=).
 
+    NOTIF_TT old base format read only
+de: Datenbank schreibgeschützt
+en: Read-only database
+fr: Base en lecture seule
+
+    NOTIF old base format read only
+de: Diese Datenbank wurde mit einer früheren GeneWeb-Version erstellt und kann nicht geändert werden. Exportieren Sie sie als .gw-Datei und erstellen Sie sie aus dieser Datei neu, beides mit dieser GeneWeb-Version.
+en: This database was created by an earlier version of GeneWeb and cannot be modified. Export it as a .gw file and recreate it from that file, with this version of GeneWeb.
+fr: Cette base a été créée par une version antérieure de GeneWeb et ne peut pas être modifiée. Exportez-la au format .gw et recréez-la à partir de ce fichier, avec cette version de GeneWeb.
+
     NOTIF_TT wizards cant write
 de: Zugriff verweigert
 en: Access denied
