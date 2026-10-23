@@ -5,10 +5,13 @@
 > Event witnesses now carry a note, so bases are written in format
 > `GnWb0025`. Bases of the earlier formats of GeneWeb 7 (`GnWb0020` to
 > `GnWb0024`) and their history files are still read, their witnesses
-> getting an empty note, but they are read-only. To edit such a base
+> getting an empty note, but they are read-only: gwd refuses the edit
+> forms and tells wizards so on the welcome page. To edit such a base
 > again, export it with the `gwu` of this version, then rebuild it with
 > its `gwc`; until then, the version that built it can still use it. A
 > base rebuilt by this version cannot be read by an older one.
+> Bases written by GeneWeb 6 or earlier are refused: export them with the
+> `gwu` of their own version.
 > Compiled `.gwo` files must be regenerated.
 > A `.gw` file containing witness notes (`wnote` lines) is rejected by
 > older `gwc`; export it with `gwu -old_gw` to write those notes as plain
