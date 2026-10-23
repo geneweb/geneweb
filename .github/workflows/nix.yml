@@ -5,11 +5,14 @@ on:
       - 'nix/*'
       - 'flake.*'
       - 'dune-project'
+      - '.github/workflows/nix.yml'
+
   pull_request:
     paths:
       - 'nix/*'
       - 'flake.*'
       - 'dune-project'
+      - '.github/workflows/nix.yml'
 
 jobs:
   nix:
