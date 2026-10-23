@@ -8,6 +8,15 @@ val input : in_channel -> 'a
 (** Input a value from the giving channel. Identical to [Marshal.from_channel].
 *)
 
+val block_size : in_channel -> int option
+(** [block_size ic] reads the header of the value starting at the current
+    position of [ic], as written by [output_value] or {!output_array_access}'s
+    writer, and returns its number of fields if it is a block. *)
+
+val marshaled_block_size : 'a -> int option
+(** Number of fields of [v] once marshaled, if it is a block; [None] also if the
+    marshaling header is of an unknown kind. *)
+
 val output_array_access :
   out_channel -> (int -> 'a) -> int -> Position.t -> Position.t
 (** [output_array_acces oc getf arr_get arr_len pos] prints to the channel

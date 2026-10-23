@@ -88,6 +88,35 @@ and input_block ifuns ic tag size =
   done;
   v
 
+let block_size_of input_byte =
+  let input_int n =
+    let rec loop k h =
+      if k = 0 then h else loop (k - 1) ((h lsl 8) + input_byte ())
+    in
+    loop n 0
+  in
+  let code = input_byte () in
+  if code >= prefix_SMALL_BLOCK then Some ((code lsr 4) land 0x7)
+  else if code = code_BLOCK32 then Some (input_int 4 lsr 10)
+  else if code = code_BLOCK64 then Some (input_int 8 lsr 10)
+  else None
+
+let block_size ic = block_size_of (fun () -> input_byte ic)
+
+let marshaled_block_size v =
+  let s = Marshal.to_string v [ Marshal.No_sharing ] in
+  (* Neither [Marshal.header_size] (16 with OCaml 5) nor the sizes in the
+     header give the length of the header with every OCaml version: tell it
+     from the magic number, as intern.c does. *)
+  match String.sub s 0 4 with
+  | ("\x84\x95\xa6\xbe" | "\x84\x95\xa6\xbf") as magic ->
+      let pos = ref (if magic = "\x84\x95\xa6\xbe" then 20 else 32) in
+      block_size_of (fun () ->
+          let c = Char.code s.[!pos] in
+          incr pos;
+          c)
+  | _ -> None
+
 let in_channel_funs = { input_byte; input_binary_int; input = really_input }
 let input ic = Obj.magic (input_loop in_channel_funs ic)
 
