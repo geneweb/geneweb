@@ -555,7 +555,8 @@ val base_visible_get : base -> (person -> bool) -> iper -> bool
     then set it with [fct]. Used when mode `use_restrict` is ativated *)
 
 val base_visible_write : base -> unit
-(** Write updated visibility information to the {i restricted} file. *)
+(** Write updated visibility information to the {i restricted} file; nothing on
+    a read-only base, the file being a cache. *)
 
 val base_particles : base -> Re.re
 (** Return regular expression that matches all defined in the [base] particles.
