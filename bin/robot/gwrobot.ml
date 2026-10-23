@@ -375,10 +375,16 @@ let usage () =
   printf "  robot -export blacklist.txt\n";
   printf "\nRobot file location: %s\n" (get_robot_file ())
 
-let rec parse_args = function
-  | "-bd" :: basedir :: rest ->
-      Secure.set_base_dir basedir;
-      parse_args rest
+let rec extract_bd acc args =
+  match args with
+  | "-bd" :: dir :: rest ->
+      Secure.set_base_dir dir;
+      extract_bd acc rest
+  | arg :: rest -> extract_bd (arg :: acc) rest
+  | [] -> List.rev acc
+
+let parse_args args =
+  match extract_bd [] args with
   | [ "-status" ] -> print_status ()
   | [ "-suggest" ] -> suggest_ranges 10
   | [ "-suggest"; threshold_str ] ->
