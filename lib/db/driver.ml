@@ -576,15 +576,13 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
-  else
-    let fname = Filename.concat base.data.bdir "restrict" in
-    match !visible_ref with
-    | Some visible ->
-        Secure.with_open_out_bin fname @@ fun oc ->
-        output_string oc Mutil.executable_magic;
-        output_value oc visible
-    | None -> ()
+  match (base.data.perm, !visible_ref) with
+  | RDRW, Some visible ->
+      let fname = Filename.concat base.data.bdir "restrict" in
+      Secure.with_open_out_bin fname @@ fun oc ->
+      output_string oc Mutil.executable_magic;
+      output_value oc visible
+  | RDRW, None | RDONLY, (Some _ | None) -> ()
 
 let base_visible_get base fct i =
   let visible =
