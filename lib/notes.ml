@@ -471,16 +471,118 @@ let commit_wiznotes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf base pg s
 
-(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
-(* TODO adjust replacement to news capital variants *)
-let replace olds news str =
-  let olds_l = Name.lower olds in
-  let olds_u1 = Utf8.capitalize_fst olds_l in
-  let olds_u2 = Utf8.uppercase olds_l in
-  (* Names are data: match and substitute them literally. *)
-  let alts = List.map Str.quote [ olds; olds_l; olds_u1; olds_u2 ] in
-  let regexp = Str.regexp (String.concat "\\|" alts) in
-  Str.global_substitute regexp (fun _ -> news) str
+(* Matching person names in note texts.
+   A name is compared word by word through Name.lower (case, accent and
+   hyphen insensitive). Words are maximal runs of ASCII letters/digits and
+   non-ASCII bytes (so "d’Antoine" is one word, as for Name.lower). *)
+
+let name_words s =
+  String.split_on_char ' ' (Name.lower s)
+  |> List.concat_map (String.split_on_char '.')
+  |> List.filter (fun w -> w <> "")
+
+let text_words text =
+  let len = String.length text in
+  let is_word_byte c =
+    match c with
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> true
+    | _ -> Char.code c >= 0x80
+  in
+  let rec loop acc i =
+    if i >= len then Array.of_list (List.rev acc)
+    else if is_word_byte text.[i] then (
+      let j = ref i in
+      while !j < len && is_word_byte text.[!j] do
+        incr j
+      done;
+      loop ((i, !j) :: acc) !j)
+    else loop acc (i + 1)
+  in
+  loop [] 0
+
+(* a code point is an uppercase letter if uppercasing leaves it unchanged
+   while Name.lower changes it into a non-empty string *)
+let has_upper s =
+  let rec loop i =
+    i < String.length s
+    &&
+    let j = Utf8.next s i in
+    let c = String.sub s i (j - i) in
+    let l = Name.lower c in
+    (Utf8.uppercase c = c && l <> "" && l <> c) || loop j
+  in
+  loop 0
+
+(* [match_name text words i ow] matches the name words [ow] starting at word
+   [i]. The words may only be separated by spaces, '-', '\'' or '.', and the
+   match may not be glued by '-' or '\'' to a neighbouring word ("Jean" is not
+   found in "Jean-Pierre", nor "Martin" in "Saint-Martin"). Returns the
+   number of words and the byte range of the match. *)
+let match_name text words i ow =
+  let nw = Array.length words in
+  let cnt = List.length ow in
+  let sep k =
+    String.sub text (snd words.(k)) (fst words.(k + 1) - snd words.(k))
+  in
+  let glued k = String.for_all (fun c -> c = '-' || c = '\'') (sep k) in
+  let inner_ok k =
+    String.for_all (fun c -> c = ' ' || c = '-' || c = '\'' || c = '.') (sep k)
+  in
+  let rec inner k = k >= i + cnt - 1 || (inner_ok k && inner (k + 1)) in
+  if cnt = 0 || i + cnt > nw || not (inner i) then None
+  else if i > 0 && glued (i - 1) then None
+  else if i + cnt < nw && glued (i + cnt - 1) then None
+  else
+    let a = fst words.(i) and b = snd words.(i + cnt - 1) in
+    if name_words (String.sub text a (b - a)) = ow then Some (cnt, a, b)
+    else None
+
+let rename_in_text (ofn, osn, _) (nfn, nsn, _) text =
+  let parts =
+    List.filter_map
+      (fun (o, n) ->
+        let ow = name_words o in
+        if ow = [] || ow = name_words n then None else Some (ow, n))
+      [ (ofn, nfn); (osn, nsn) ]
+    (* longest first: "Jean Pierre" before "Pierre" *)
+    |> List.stable_sort (fun (a, _) (b, _) ->
+        compare (List.length b) (List.length a))
+  in
+  if parts = [] || not (String.is_valid_utf_8 text) then text
+  else
+    let bare =
+      let t = name_words text in
+      t = name_words (ofn ^ " " ^ osn)
+      || t = name_words (osn ^ " " ^ ofn)
+      || t = name_words ofn
+      || t = name_words osn
+    in
+    let words = text_words text in
+    let nw = Array.length words in
+    let try_part i (ow, n) =
+      match match_name text words i ow with
+      | Some (cnt, a, b) ->
+          let span = String.sub text a (b - a) in
+          if bare || has_upper span then
+            let caps = String.length span > 1 && Utf8.uppercase span = span in
+            Some (cnt, a, b, if caps then Utf8.uppercase n else n)
+          else None
+      | None -> None
+    in
+    let len = String.length text in
+    let buf = Buffer.create (len + 16) in
+    let rec loop pos i =
+      if i >= nw then Buffer.add_substring buf text pos (len - pos)
+      else
+        match List.find_map (try_part i) parts with
+        | Some (cnt, a, b, repl) ->
+            Buffer.add_substring buf text pos (a - pos);
+            Buffer.add_string buf repl;
+            loop b (i + cnt)
+        | None -> loop pos (i + 1)
+    in
+    loop 0 0;
+    Buffer.contents buf
 
 (*
 TITLE=Test imap
@@ -625,21 +727,24 @@ let rewrite_key s oldk newk _file =
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
-            let ofn, osn, _ooc = oldk in
-            let name =
-              Some
-                (replace ofn fn (NotesLinks.display_text name) |> replace osn sn)
+            let ofn, osn, _ = oldk in
+            let path =
+              match name with
+              | NotesLinks.Short (tfn, tsn) ->
+                  let keep typed o n = if Name.lower n = o then typed else n in
+                  let fn = keep tfn ofn fn and sn = keep tsn osn sn in
+                  if oc = 0 then Printf.sprintf "%s/%s" fn sn
+                  else Printf.sprintf "%s/%s/%d" fn sn oc
+              | Explicit t ->
+                  Printf.sprintf "%s/%s/%d/%s" fn sn oc
+                    (rename_in_text oldk newk t)
             in
             let fam_suffix =
               match fam_marker with
               | Some n -> "#" ^ string_of_int n
               | None -> ""
             in
-            Printf.bprintf out "[[%s/%s/%d/%s%s]]%s" fn sn oc
-              (Option.fold
-                 ~none:(Printf.sprintf "%s %s" fn sn)
-                 ~some:(fun txt -> txt)
-                 name)
+            Printf.bprintf out "[[%s%s]]%s" path
               (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
               fam_suffix
           else Buffer.add_substring out s i (j - i);
