@@ -985,7 +985,7 @@ let print_mod_ok conf base wl pgl ~remains p ofn osn oocc =
       (Utf8.capitalize_fst (transl conf "linked pages"))
       (transl conf ":");
     NotesDisplay.print_linked_list conf base pgl;
-    NotesDisplay.print_old_name_remains conf base remains);
+    NotesDisplay.print_old_name_remains conf base ~old_name:(ofn, osn) remains);
   Hutil.trailer conf
 
 let relation_sex_is_coherent base warning p =

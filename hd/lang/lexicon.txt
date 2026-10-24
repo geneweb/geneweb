@@ -18662,6 +18662,13 @@ en: search matches in the Insee death index files
 es: buscar coincidencias en los archivos de defunciones del Insee
 fr: recherche de correspondances dans les fichiers des décès de l’Insee
 
+    search the old name in all notes
+de: den alten Namen in allen Notizen suchen
+en: search the old name in all notes
+es: buscar el nombre anterior en todas las notas
+fr: rechercher l’ancien nom dans toutes les notes
+it: cercare il vecchio nome in tutte le note
+
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
 ca: recerca/coincidir maj_min

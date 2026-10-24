@@ -69,7 +69,10 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     NotesDisplay.print_linked_list conf base pgl1;
     aux "2" "old name" ofn2 osn2 oocc2;
     NotesDisplay.print_linked_list conf base pgl2;
-    NotesDisplay.print_old_name_remains conf base remains);
+    let old_name =
+      if ofn2 <> nfn || osn2 <> nsn then (ofn2, osn2) else (ofn1, osn1)
+    in
+    NotesDisplay.print_old_name_remains conf base ~old_name remains);
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 

@@ -326,7 +326,7 @@ let print_linked_list conf base ?person pgl =
   | Some "gallery" -> print_linked_list_gallery conf base ?person pgl
   | _ -> print_linked_list_standard conf base ?person pgl
 
-let print_old_name_remains conf base pgl =
+let print_old_name_remains conf base ~old_name:(ofn, osn) pgl =
   if pgl <> [] then (
     Output.print_sstring conf
       {|<div class="alert alert-warning mx-auto mt-3" role="alert">|};
@@ -334,7 +334,20 @@ let print_old_name_remains conf base pgl =
       (Utf8.capitalize_fst
          (transl conf "old name still present. please check these pages"));
     Output.print_sstring conf "</div>\n";
-    print_linked_list_standard conf base pgl)
+    print_linked_list_standard conf base pgl);
+  (* pages that do not link to the person are not scanned here: offer the
+     base-wide notes search, run on demand on its folded corpus *)
+  let words x =
+    String.split_on_char ' ' (Name.lower x) |> List.filter (( <> ) "")
+  in
+  match words ofn @ words osn with
+  | [] -> ()
+  | w ->
+      Output.printf conf
+        {|<div class="mt-2"><a href="%sm=NOTES_SEARCH&word=on&s=%s">%s</a></div>|}
+        (commd conf :> string)
+        (Mutil.encode (String.concat "?" w) :> string)
+        (Utf8.capitalize_fst (transl conf "search the old name in all notes"))
 
 (* copied from perso.ml *)
 let simple_person_text conf base p p_auth : Adef.safe_string =
