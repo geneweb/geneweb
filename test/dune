@@ -16,7 +16,8 @@
   cache_test
   blank_name_test
   notes_search_test
-  notes_corpus_test)
+  notes_corpus_test
+  notes_rename_test)
  (libraries alcotest geneweb geneweb.oidc fmt))
 
 (test

@@ -68,6 +68,15 @@ val merge_possible_aliases :
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
 
+val rename_in_text :
+  string * string * int -> string * string * int -> string -> string
+(** [rename_in_text oldk newk text] rewrites, in the display text of a
+    [[fn/sn/oc/text]] link, the occurrences of the old first name and surname of
+    [oldk] that changed in [newk]. Matching is on whole words, insensitive to
+    case, accents and hyphenation ([Name.lower]); words glued by ['-'] or ['\'']
+    to a neighbour are not matched; first name and surname are substituted in a
+    single pass. *)
+
 val update_ind_key :
   Config.config ->
   Geneweb_db.Driver.base ->

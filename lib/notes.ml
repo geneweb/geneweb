@@ -471,16 +471,128 @@ let commit_wiznotes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf base pg s
 
-(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
-(* TODO adjust replacement to news capital variants *)
-let replace olds news str =
-  let olds_l = Name.lower olds in
-  let olds_u1 = Utf8.capitalize_fst olds_l in
-  let olds_u2 = Utf8.uppercase olds_l in
-  (* Names are data: match and substitute them literally. *)
-  let alts = List.map Str.quote [ olds; olds_l; olds_u1; olds_u2 ] in
-  let regexp = Str.regexp (String.concat "\\|" alts) in
-  Str.global_substitute regexp (fun _ -> news) str
+(* Matching person names in note texts.
+   A name is compared word by word through Name.lower (case, accent and
+   hyphen insensitive). Words are maximal runs of ASCII letters/digits and
+   non-ASCII bytes (so "d’Antoine" is one word, as for Name.lower). *)
+
+let name_words s =
+  String.split_on_char ' ' (Name.lower s)
+  |> List.concat_map (String.split_on_char '.')
+  |> List.filter (fun w -> w <> "")
+
+let text_words text =
+  let len = String.length text in
+  let is_word_byte = function
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> true
+    | c -> Char.code c >= 0x80
+  in
+  let rec loop acc i =
+    if i >= len then Array.of_list (List.rev acc)
+    else if is_word_byte text.[i] then (
+      let j = ref i in
+      while !j < len && is_word_byte text.[!j] do
+        incr j
+      done;
+      loop ((i, !j) :: acc) !j)
+    else loop acc (i + 1)
+  in
+  loop [] 0
+
+(* a code point is an uppercase letter if uppercasing leaves it unchanged
+   while Name.lower changes it into a non-empty string *)
+let has_upper s =
+  let rec loop i =
+    i < String.length s
+    &&
+    let j = Utf8.next s i in
+    let c = String.sub s i (j - i) in
+    let l = Name.lower c in
+    (Utf8.uppercase c = c && l <> "" && l <> c) || loop j
+  in
+  loop 0
+
+(* [match_name text words i ow] matches the name words [ow] starting at word
+   [i]. The words may only be separated by spaces, '-', '\'' or '.', and the
+   match may not be glued by '-' or '\'' to a neighbouring word ("Jean" is not
+   found in "Jean-Pierre", nor "Martin" in "Saint-Martin"). Returns the
+   number of words and the byte range of the match. *)
+let match_name text words i ow =
+  let nw = Array.length words in
+  let cnt = List.length ow in
+  let sep k =
+    String.sub text (snd words.(k)) (fst words.(k + 1) - snd words.(k))
+  in
+  let glued k = String.for_all (fun c -> c = '-' || c = '\'') (sep k) in
+  let inner_ok k =
+    String.for_all (fun c -> c = ' ' || c = '-' || c = '\'' || c = '.') (sep k)
+  in
+  let rec inner k = k >= i + cnt - 1 || (inner_ok k && inner (k + 1)) in
+  if cnt = 0 || i + cnt > nw || not (inner i) then None
+  else if i > 0 && glued (i - 1) then None
+  else if i + cnt < nw && glued (i + cnt - 1) then None
+  else
+    let a = fst words.(i) and b = snd words.(i + cnt - 1) in
+    if name_words (String.sub text a (b - a)) = ow then Some (cnt, a, b)
+    else None
+
+(* Rename a person inside the display text of a wiki link.
+   [oldk] is the (lowered) key, [newk] the new raw names.
+   A first name or surname is replaced only if it changed (modulo
+   Name.lower: exactly when the corresponding key part changed). A match
+   (see [match_name]) must contain a capital letter (so the surname "Rose"
+   is not found in "une rose", while "d’Antoine" or "de La Fontaine" are
+   found), unless the display text is nothing but the name (full name,
+   first name or surname alone). First name and surname are substituted
+   in a single pass, so that swapping them (or a new value containing the
+   old one) is safe. An all-uppercase occurrence is replaced by the
+   uppercased new name. *)
+let rename_in_text (ofn, osn, _) (nfn, nsn, _) text =
+  let parts =
+    List.filter_map
+      (fun (o, n) ->
+        let ow = name_words o in
+        if ow = [] || ow = name_words n then None else Some (ow, n))
+      [ (ofn, nfn); (osn, nsn) ]
+    (* longest first: "Jean Pierre" before "Pierre" *)
+    |> List.stable_sort (fun (a, _) (b, _) ->
+        compare (List.length b) (List.length a))
+  in
+  if parts = [] then text
+  else
+    let bare =
+      let t = name_words text in
+      t = name_words (ofn ^ " " ^ osn)
+      || t = name_words (osn ^ " " ^ ofn)
+      || t = name_words ofn
+      || t = name_words osn
+    in
+    let words = text_words text in
+    let nw = Array.length words in
+    let try_part i (ow, n) =
+      match match_name text words i ow with
+      | Some (cnt, a, b) ->
+          let span = String.sub text a (b - a) in
+          if bare || has_upper span then
+            let caps = String.length span > 1 && Utf8.uppercase span = span in
+            Some (cnt, a, b, if caps then Utf8.uppercase n else n)
+          else None
+      | None -> None
+    in
+    let len = String.length text in
+    let buf = Buffer.create (len + 16) in
+    let rec loop pos i =
+      if i >= nw then Buffer.add_substring buf text pos (len - pos)
+      else
+        match List.find_map (try_part i) parts with
+        | Some (cnt, a, b, repl) ->
+            Buffer.add_substring buf text pos (a - pos);
+            Buffer.add_string buf repl;
+            loop b (i + cnt)
+        | None -> loop pos (i + 1)
+    in
+    loop 0 0;
+    Buffer.contents buf
 
 (*
 TITLE=Test imap
@@ -625,12 +737,7 @@ let rewrite_key s oldk newk _file =
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
-            let ofn, osn, _ooc = oldk in
-            let name =
-              match name with
-              | Some str -> Some (replace ofn fn str |> replace osn sn)
-              | None -> None
-            in
+            let name = Option.map (rename_in_text oldk newk) name in
             let fam_suffix =
               match fam_marker with
               | Some n -> "#" ^ string_of_int n
