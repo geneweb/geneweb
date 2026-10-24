@@ -463,7 +463,7 @@ let effective_send_c_ok conf base p file file_name =
   in
   History.record conf base changed
     (match mode with
-    | "portraits" -> "sp"
+    | "portraits" -> "si"
     | "blasons" -> "sb"
     | "carrousel" ->
         let image = file_name <> "" || image_url <> "" in
