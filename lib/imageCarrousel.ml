@@ -538,7 +538,7 @@ let effective_delete_ok conf base p =
   let changed =
     U_Delete_image (Util.string_gen_person base (Driver.gen_person_of_person p))
   in
-  History.record conf base changed "di";
+  History.record conf base changed "dq";
   print_deleted conf base p
 
 let print_del_ok conf base =
@@ -606,9 +606,9 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
   in
   History.record conf base changed
     (match mode with
-    | "portraits" -> "dq"
-    | "blasons" -> "db"
-    | "carrousel" -> "dc"
+    | "portraits" -> if delete then "di" else "dq"
+    | "blasons" -> if delete then "eb" else "db"
+    | "carrousel" -> if delete then "ec" else "dc"
     | _ -> "d?");
   fname
 
