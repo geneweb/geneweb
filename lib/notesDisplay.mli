@@ -31,11 +31,14 @@ val print_what_links : Config.config -> Driver.base -> string -> unit
 val print_old_name_remains :
   Config.config ->
   Driver.base ->
+  old_name:string * string ->
   (Driver.iper, Driver.ifam) Def.NLDB.page list ->
   unit
-(** [print_old_name_remains conf base pgl] after a rename, warns that the old
-    full name still appears in the text of the linked pages [pgl] and lists
-    them; prints nothing if [pgl] is empty. See {!Notes.update_ind_key}. *)
+(** [print_old_name_remains conf base ~old_name:(fn, sn) pgl], after a rename
+    from [fn sn]: if [pgl] is not empty, warns that the old full name still
+    appears in the text of these linked pages and lists them (see
+    {!Notes.update_ind_key}); then links to [m=NOTES_SEARCH] for the old name,
+    to look for it in the notes that do not link to the person. *)
 
 val print_what_links_p : Config.config -> Driver.base -> Driver.person -> unit
 (** [print_what_links_p conf base p] renders the linked-pages view for person

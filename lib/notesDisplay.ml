@@ -326,13 +326,21 @@ let print_linked_list conf base ?person pgl =
   | Some "gallery" -> print_linked_list_gallery conf base ?person pgl
   | _ -> print_linked_list_standard conf base ?person pgl
 
-let print_old_name_remains conf base pgl =
+let print_old_name_remains conf base ~old_name:(ofn, osn) pgl =
   if pgl <> [] then (
     Output.printf conf
       {|<div class="alert alert-warning mx-auto mt-3" role="alert">%s</div>|}
       (Utf8.capitalize_fst
          (transl conf "old name still present. please check these pages"));
-    print_linked_list_standard conf base pgl)
+    print_linked_list_standard conf base pgl);
+  match Notes.name_term ofn osn with
+  | "" -> ()
+  | term ->
+      Output.printf conf
+        {|<div class="mt-2"><a href="%sm=NOTES_SEARCH&word=on&s=%s">%s</a></div>|}
+        (commd conf :> string)
+        (Mutil.encode term :> string)
+        (Utf8.capitalize_fst (transl conf "search the old name in all notes"))
 
 (* copied from perso.ml *)
 let simple_person_text conf base p p_auth : Adef.safe_string =
