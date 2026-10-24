@@ -612,16 +612,16 @@ let rewrite_key s oldk newk _file =
     else s
   in
   let slen = String.length s in
-  let rec rebuild rs i =
-    if i >= slen then rs
-    else
+  let out = Buffer.create (slen + 64) in
+  let rec rebuild i =
+    if i < slen then
       match NotesLinks.misc_notes_link s i with
       | WLpage (j, _, _, _, _)
       | WLwizard (j, _, _)
       | WLimage (j, _, _, _)
       | WLnone (j, _) ->
-          let ss = String.sub s i (j - i) in
-          rebuild (rs ^ ss) j
+          Buffer.add_substring out s i (j - i);
+          rebuild j
       | WLperson (j, k, name, text, fam_marker) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
@@ -636,21 +636,18 @@ let rewrite_key s oldk newk _file =
               | Some n -> "#" ^ string_of_int n
               | None -> ""
             in
-            let ss =
-              Printf.sprintf "[[%s/%s/%d/%s%s]]%s" fn sn oc
-                (Option.fold
-                   ~none:(Printf.sprintf "%s %s" fn sn)
-                   ~some:(fun txt -> txt)
-                   name)
-                (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
-                fam_suffix
-            in
-            rebuild (rs ^ ss) j
-          else
-            let ss = String.sub s i (j - i) in
-            rebuild (rs ^ ss) j
+            Printf.bprintf out "[[%s/%s/%d/%s%s]]%s" fn sn oc
+              (Option.fold
+                 ~none:(Printf.sprintf "%s %s" fn sn)
+                 ~some:(fun txt -> txt)
+                 name)
+              (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
+              fam_suffix
+          else Buffer.add_substring out s i (j - i);
+          rebuild j
   in
-  rebuild "" 0
+  rebuild 0;
+  Buffer.contents out
 
 let replace_ind_key_in_str base is oldk newk p =
   let s = Driver.sou base is in
