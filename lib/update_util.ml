@@ -83,43 +83,43 @@ let reconstitute_somebody removed_string conf var =
   let create = getn_p conf var sex in
   (first_name, surname, occ, create, var)
 
-let update_ci conf create key =
-  let public =
-    match p_getenv conf.env (key ^ "_pub") with Some "on" -> true | _ -> false
+(* Data of a person created from an update form (parent, child, witness,
+   relation parent), read from the fields emitted by the create_data macro
+   of upd_utils.txt: [var]b_* and [var]d_* (dates, optional), [var]_occu,
+   [var]_od, [var]_pub. Missing fields are taken as empty. *)
+let reconstitute_create_info conf var =
+  let opt k = Option.value ~default:"" (p_getenv conf.env (var ^ k)) in
+  let date kind =
+    match p_getenv conf.env (var ^ kind ^ "_yyyy") with
+    | None -> None
+    | Some _ -> Update.reconstitute_date conf (var ^ kind)
   in
   let death =
-    match p_getenv conf.env (key ^ "_od") with
-    | Some "on" -> OfCourseDead
-    | _ -> DontKnowIfDead
+    if opt "_od" = "on" then OfCourseDead
+    else
+      match opt "d_yyyy" with
+      | "+" -> DeadDontKnowWhen
+      | "-" | "=" -> NotDead
+      | _ -> DontKnowIfDead
   in
-  let occupation =
-    match p_getenv conf.env (key ^ "_occu") with Some s -> s | _ -> ""
-  in
-  let x =
-    match create with
-    | Update.Create (s, Some ci) ->
-        Some
-          ( s,
-            {
-              ci with
-              ci_public = public;
-              ci_occupation = occupation;
-              ci_death = death;
-            } )
-    | Update.Create (s, None) ->
-        Some
-          ( s,
-            {
-              ci_empty with
-              ci_public = public;
-              ci_occupation = occupation;
-              ci_death = death;
-            } )
-    | Update.Link -> None
-  in
-  match x with
-  | Some (s, ci) -> Update.Create (s, Some ci)
-  | None -> Update.Link
+  {
+    ci_birth_date = date "b";
+    ci_birth_place = only_printable (opt "b_pl");
+    ci_death = death;
+    ci_death_date = date "d";
+    ci_death_place = only_printable (opt "d_pl");
+    ci_occupation = only_printable (opt "_occu");
+    ci_public =
+      opt "_pub" = "on"
+      (* legacy Roglo convention: birth year "p" = no date, but public *)
+      || opt "b_yyyy" = "p";
+  }
+
+let update_ci conf create key =
+  match create with
+  | Update.Create (s, _) ->
+      Update.Create (s, Some (reconstitute_create_info conf key))
+  | Update.Link -> Update.Link
 
 (* -- Template stuff -- *)
 
@@ -306,7 +306,7 @@ let eval_create c = function
           | Some (Dgreg ({ year = y; prec = p; _ }, _)) ->
               add_precision (string_of_int y) p
           | Some _ -> ""
-          | None -> if ci.ci_public then "p" else "")
+          | None -> "")
       | _ -> "")
   | "death_day" -> (
       str_val
@@ -362,6 +362,14 @@ let eval_create c = function
       | Update.Create (_, Some { ci_occupation = occupation; _ }) ->
           safe_val (Util.escape_html occupation :> Adef.safe_string)
       | _ -> str_val "")
+  | "public" -> (
+      match c with
+      | Update.Create (_, Some { ci_public = p; _ }) -> bool_val p
+      | _ -> bool_val false)
+  | "of_course_dead" -> (
+      match c with
+      | Update.Create (_, Some { ci_death = OfCourseDead; _ }) -> bool_val true
+      | _ -> bool_val false)
   | "sex" -> (
       str_val
       @@
