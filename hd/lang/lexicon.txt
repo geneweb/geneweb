@@ -2979,6 +2979,13 @@ pt: árvore em H 8 gerações
 sv: 8 generationer H-träd
 tr: 8 kuşak H ağacı
 
+    archive
+co: archivià
+de: archivieren
+en: archive
+es: archivar
+fr: archiver
+
     are
 af: is
 bg: са
@@ -10083,13 +10090,6 @@ sl: pogostosti
 sv: frekvensordning
 tr: frekans
 zh: 访问次数
-
-    from carrousel
-co: da u carusellu
-de: vom Karussell
-en: from carrousel
-es: del carrusel
-fr: du carrousel
 
     from/to (date year)
 bg: от/до
