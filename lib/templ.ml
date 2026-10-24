@@ -174,19 +174,31 @@ let substr_start_aux n s =
 
 let value conf v = if conf.Config.predictable_mode then "UNPREDICTABLE" else v
 
+(* Configuration parameters hidden from non-wizards in %bvar.list;. *)
+let wizard_only_bvars =
+  [
+    "friend_passwd";
+    "wizard_passwd";
+    "manitou";
+    "supervisor";
+    "friend_passwd_file";
+    "wizard_passwd_file";
+    "oidc_client_secret";
+    "oidc_client_secret_file";
+  ]
+
+(* Configuration parameters never shown in %bvar.list;, even to wizards. *)
+let hidden_bvars = [ "oidc_client_secret" ]
+
+let masked_bvar_value ~wizard key value =
+  if List.mem key hidden_bvars then if value = "" then "" else "####"
+  else if wizard || not (List.mem key wizard_only_bvars) then value
+  else if value = "" then ""
+  else "####"
+
 let rec eval_variable (conf : Config.config) = function
   | [ "base"; "name" ] -> conf.bname
   | [ "bvar"; "list" ] ->
-      let wizard_only =
-        [
-          "friend_passwd";
-          "wizard_passwd";
-          "manitou";
-          "supervisor";
-          "friend_passwd_file";
-          "wizard_passwd_file";
-        ]
-      in
       let is_duplicate key assoc_list =
         let rec aux count = function
           | [] -> count > 1
@@ -206,10 +218,8 @@ let rec eval_variable (conf : Config.config) = function
           in
           acc
           ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
-              (if conf.wizard || not (List.mem k wizard_only) then
-                 (Util.escape_html v :> string)
-               else if (Util.escape_html v :> string) = "" then ""
-               else "####"))
+              (masked_bvar_value ~wizard:conf.wizard k
+                 (Util.escape_html v :> string)))
         "" l
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "evt_symbol"; name ] -> Util.event_symbol conf name

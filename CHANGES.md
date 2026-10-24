@@ -3,6 +3,9 @@
 ## Gwd
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)
+- The configuration page (`m=H&v=conf`) no longer displays the OIDC client
+  secret: `oidc_client_secret` is masked for every visitor (wizard
+  included) and `oidc_client_secret_file` for non-wizards.
 - Use `getaddrinfo` to retrieve addresses from the operating system (#2757)
 - The HTTP server binds `::` (all interfaces, IPv4+IPv6) explicitly by
   default, restoring the pre-#2757 behavior on every platform. Hosts
