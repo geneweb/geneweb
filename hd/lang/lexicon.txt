@@ -16179,6 +16179,13 @@ pt: nome antigo
 sv: tidigare namn
 tr: eski adı
 
+    old name still present. please check these pages
+de: Der alte Name kommt im Text der folgenden Seiten außerhalb der Links noch vor. Bitte prüfen Sie diese Seiten.
+en: The old name still appears in the text of the pages below, outside the links. Please check these pages.
+es: El nombre anterior aún aparece en el texto de las páginas siguientes, fuera de los enlaces. Por favor, revise estas páginas.
+fr: L’ancien nom apparaît encore dans le texte des pages ci-dessous, hors des liens. Veuillez vérifier ces pages.
+it: Il vecchio nome compare ancora nel testo delle pagine seguenti, al di fuori dei link. Si prega di controllare queste pagine.
+
     on %s's siblings side
 co: di u latu di i fratelli o surelle di %s
 de: vonseiten der Geschwister von %s

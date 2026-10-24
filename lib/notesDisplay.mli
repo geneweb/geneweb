@@ -28,6 +28,16 @@ val print_what_links : Config.config -> Driver.base -> string -> unit
     standard HTML header/trailer, a title [linked pages: fnotes], and delegates
     the list rendering to {!print_linked_list} with no [person] scope. *)
 
+val print_old_name_remains :
+  Config.config ->
+  Driver.base ->
+  (Driver.iper, Driver.ifam) Def.NLDB.page list ->
+  unit
+(** [print_old_name_remains conf base pgl] after a rename, warns that the old
+    full name still appears in the plain text (outside wiki links) of the linked
+    pages [pgl] and lists them; prints nothing if [pgl] is empty. See
+    {!Notes.update_ind_key}. *)
+
 val print_what_links_p : Config.config -> Driver.base -> Driver.person -> unit
 (** [print_what_links_p conf base p] renders the linked-pages view for person
     [p] (URL [m=LINKED&p=...&n=...] or [m=LINKED&i=N]). Checks

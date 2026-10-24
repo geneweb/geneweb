@@ -8,6 +8,11 @@ let case (ofn, osn) (nfn, nsn) text expected =
       check string text expected
         (Notes.rename_in_text (lk (ofn, osn, 0)) (nfn, nsn, 0) text))
 
+let remains (ofn, osn) (nfn, nsn) text expected =
+  test_case text `Quick (fun () ->
+      check bool text expected
+        (Notes.old_name_remains (lk (ofn, osn, 0)) (nfn, nsn, 0) text))
+
 let v =
   [
     ( "notes-rename-text",
@@ -51,5 +56,25 @@ let v =
           ("Jacques", "de Lafontaine")
           "le fabuliste de La Fontaine" "le fabuliste de Lafontaine";
         case ("Marie", "Rose") ("Marie", "Rosa") "rose" "Rosa";
+      ] );
+    ( "notes-old-name-remains",
+      [
+        remains ("Jean", "Dupont") ("Pierre", "Dupont")
+          "Jean Dupont était cultivateur." true;
+        remains ("Jean", "Dupont") ("Pierre", "Dupont") "DUPONT Jean, son fils"
+          true;
+        remains ("Jean", "Dupont") ("Pierre", "Dupont") "voir jean-dupont.html"
+          true;
+        remains ("Jean", "Dupont") ("Pierre", "Dupont") "Marie Dupont, sa sœur"
+          false;
+        remains ("Jean", "Dupont") ("Jean", "Dupont-Durand")
+          "Jean Dupont-Durand" false;
+        remains ("Jean", "Dupont") ("Jean", "Dupont") "Jean Dupont" false;
+        (* ' and ’ are equal for the notes search *)
+        remains ("Jacques", "d’Antoine") ("Jacques", "d'Antoine")
+          "Jacques d’Antoine, notaire" false;
+        remains ("Jean", "Dupont") ("Pierre", "Dupont") "<b>Jean</b> Dupont"
+          true;
+        remains ("?", "Dupont") ("Jean", "Dupont") "un Dupont" false;
       ] );
   ]
