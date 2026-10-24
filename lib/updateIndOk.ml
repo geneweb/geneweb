@@ -958,7 +958,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
     && ((not (String.equal ofn nfn && String.equal osn nsn)) || oocc <> nocc)
   then (
     Output.print_sstring conf
-      {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
+      {|<div class="alert alert-info mx-auto mt-1" role="alert">|};
     Output.print_sstring conf (transl conf "name changed. updated linked pages");
     Output.print_sstring conf "</div>\n";
     let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
