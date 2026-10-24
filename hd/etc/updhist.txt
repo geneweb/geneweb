@@ -143,6 +143,7 @@
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
   %elseif;(uu = "if")[invert::family/families]1%nn;
   %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
+  %elseif;(uu = "mb")[move::blason/blasons]0%nn;
   %elseif;(uu = "md")[modify::domain/domains]0%nn;
   %elseif;(uu = "mf")[modify::family/families]0%nn;
   %elseif;(uu = "mn")[modify::note/notes]1%nn;
@@ -165,6 +166,7 @@
   %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "s?")[send::unknown]0%nn;
+  %elseif;(uu = "xb")stop [blason/blasons]0%nn;
   %else;%apply;interp(uu) %nn;
   %end;
 %end;

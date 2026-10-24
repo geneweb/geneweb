@@ -113,6 +113,9 @@ let create_blason_stop conf base p =
   in
   let oc = open_out blason_stop in
   close_out oc;
+  History.record conf base
+    (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
+    "xb";
   blason_stop
 
 let move_blason_file conf base src dst =
@@ -135,6 +138,10 @@ let move_blason_file conf base src dst =
         ]
     in
     rn blason_src blason_dst;
+    History.record conf base
+      (U_Send_image
+         (Util.string_gen_person base (Driver.gen_person_of_person dst)))
+      "mb";
     blason_dst)
   else ""
 
