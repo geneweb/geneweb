@@ -26,23 +26,23 @@
   %if;("http" in portrait or "http" in old_portrait)
     WARNING
   %elseif;(e.mode="carrousel")
-    %if;(e.em="SND_IMAGE_C_OK")[*image received]%if;(e.notes!="") [with note]%end;
+    %if;(e.em="SND_IMAGE_OK")[*image received]%if;(e.notes!="") [with note]%end;
     %elseif;(e.em="DEL_IMAGE_C_OK")[*image deleted]%if;(e.delete!="on") [and] [saved]1%end;
     %elseif;(e.em="RESET_IMAGE_C_OK")[*image/images]0 [copied/copied]1%nn;
     %end;%nn;
   %elseif;(e.mode="blasons")
-    %if;(e.em="SND_IMAGE_C_OK")[*blason/blasons]0 [uploaded]0%nn;
+    %if;(e.em="SND_IMAGE_OK")[*blason/blasons]0 [uploaded]0%nn;
     %elseif;(e.em="DEL_IMAGE_C_OK")[*blason/blasons]0 [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK")[*blason/blasons]0 [restored]0%nn;
     %elseif;(e.em="IMAGE_TO_BLASON")[*image/images]0 [copied/copied]1 [to] [blason/blasons]0%nn;
     %end;%nn;
   %elseif;(e.mode="portraits")
-    %if;(e.em="SND_IMAGE_C_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
+    %if;(e.em="SND_IMAGE_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
     %elseif;(e.em="DEL_IMAGE_C_OK")[*portrait] [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK")[*portrait] [restored]0%nn;
     %end;%nn;
   %elseif;(e.mode="note")
-    %if;(e.em="SND_IMAGE_C_OK")[*note/notes]0 [update::]%nn;
+    %if;(e.em="SND_IMAGE_OK")[*note/notes]0 [update::]%nn;
     %end;%nn;
   %end;
 %end;
@@ -53,7 +53,7 @@
   %elseif;(e.mode="note")
     <strong>></strong> %images_store;%X;%e.file_name_2;
   %elseif;(e.mode="carrousel")<samp>
-    %if;(e.em="SND_IMAGE_C_OK")
+    %if;(e.em="SND_IMAGE_OK")
       <strong>></strong> %images_store;%X;%e.file_name;
     %elseif;(e.em="DEL_IMAGE_C_OK")
       %if;(e.delete="on")%images_store;%X;%keydir;%X;%e.file_name;%else;%nn;
@@ -65,7 +65,7 @@
     %end;
     </samp>
   %elseif;(e.mode="portraits")<samp>
-    %if;(e.em="SND_IMAGE_C_OK")%portraits_store;%X;%portrait_name;
+    %if;(e.em="SND_IMAGE_OK")%portraits_store;%X;%portrait_name;
     %elseif;(e.em="DEL_IMAGE_C_OK")
       %if;(e.delete="on")%old_portraits_store;%X;%e.file_name;%else;%nn;
         %( attention, %portrait_name; may be gone!! %)
@@ -75,7 +75,7 @@
     %else;bad command %e.em; (%e.mode;)%end;
     </samp>
   %elseif;(e.mode="blasons")<samp>
-    %if;(e.em="SND_IMAGE_C_OK")
+    %if;(e.em="SND_IMAGE_OK")
       %portraits_store;%X;%carrousel;%X;%blason_name;
     %elseif;(e.em="DEL_IMAGE_C_OK")
       %if;(e.delete="on")%portraits_store;%X;saved%X;%e.file_name;%else;%nn;
@@ -93,7 +93,7 @@
 %define;alert_color()
   %if;("http" in portrait or "http" in old_portrait)warning
   %elseif;(e.mode="note")primary
-  %elseif;(e.em="SND_IMAGE_C_OK" or e.em="RESET_IMAGE_C_OK")success
+  %elseif;(e.em="SND_IMAGE_OK" or e.em="RESET_IMAGE_C_OK")success
   %elseif;(e.em="DEL_IMAGE_C_OK" and e.delete="on")danger
   %else;warning%end;
 %end;
@@ -130,7 +130,7 @@
       <form class="row g-2 align-items-center" method="post" action="%action;"
             enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
-        <input type="hidden" name="m" value="SND_IMAGE_C_OK">
+        <input type="hidden" name="m" value="SND_IMAGE_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="notes" value="">
         <input type="hidden" name="mode" value="portraits">
@@ -147,7 +147,7 @@
       <form class="row g-2 align-items-center" method="post" action="%action;"
             enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
-        <input type="hidden" name="m" value="SND_IMAGE_C_OK">
+        <input type="hidden" name="m" value="SND_IMAGE_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="notes" value="">
         <input type="hidden" name="mode" value="blasons">
@@ -171,7 +171,7 @@
       </div>
       <form method="post" action="%action;" enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
-        <input type="hidden" name="m" value="SND_IMAGE_C_OK">
+        <input type="hidden" name="m" value="SND_IMAGE_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="mode" id="mode_2" value="carrousel">
         <input type="hidden" name="file_name_2" id="file_name_2" value="">

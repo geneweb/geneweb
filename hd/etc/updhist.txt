@@ -123,8 +123,7 @@
 %end;
 
 %( changes in 2 letters labels may create backward incompatibility with
-   old history files.
-%)
+   old history files. %)
 %define;update_text(uu)
   %if;(uu = "aa")[add::parents]%nn;
   %elseif;(uu = "ap")[add::person/persons]0%nn;
@@ -157,7 +156,7 @@
   %elseif;(uu = "rb")[restore::blason/blasons]0%nn;
   %elseif;(uu = "rc")[restore::carrousel image]%nn;
   %elseif;(uu = "rp")[restore::portrait]%nn;
-  %elseif;(uu = "sp")[send::portrait]%nn;
+  %elseif;(uu = "sp" or uu = "si")[send::portrait]%nn;
   %elseif;(uu = "sb")[send::blason/blasons]0%nn;
   %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "sf" or uu = "sx")[send::image/images]0 [to carrousel]%nn;

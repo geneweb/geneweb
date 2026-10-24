@@ -298,7 +298,7 @@ let print_send_image conf base mode p =
   Output.print_sstring conf
     {|<div class="d-flex align-items-center gap-2 mt-2 flex-wrap">|};
   Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
+  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
   Util.hidden_input conf "i"
     (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
   Util.hidden_input conf "mode" (Adef.encoded mode);
@@ -324,82 +324,6 @@ let print_send_image conf base mode p =
   Output.print_sstring conf {|</form>|};
   print_link_delete_image conf base p;
   Hutil.trailer conf
-
-let print_sent conf base p =
-  let title _ =
-    transl conf "image received"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
-  in
-  Hutil.header conf title;
-  Output.print_sstring conf "<ul><li>";
-  Output.print_string conf (referenced_person_text conf base p);
-  Output.print_sstring conf "</li></ul>";
-  Hutil.trailer conf
-
-let effective_send_ok conf base p file =
-  let mode =
-    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
-  in
-  let strm = Stream.of_string file in
-  let request, content = Server.get_request_and_content strm in
-  let content =
-    let s =
-      let rec loop len (strm__ : _ Stream.t) =
-        match Stream.peek strm__ with
-        | Some x ->
-            Stream.junk strm__;
-            loop (Buff.store len x) strm
-        | _ -> Buff.get len
-      in
-      loop 0 strm
-    in
-    (content :> string) ^ s
-  in
-  let typ, content =
-    match image_type content with
-    | None ->
-        dump_bad_image conf content;
-        Header.extract_param "content-type: " '\n' request
-        |> incorrect_content_type conf base p
-    | Some (typ, content) -> (
-        match
-          Option.map int_of_string
-          @@ List.assoc_opt "max_images_size" conf.base_env
-        with
-        | Some len when String.length content > len ->
-            error_too_big_image conf base p (String.length content) len
-        | _ -> (typ, content))
-  in
-  let fname = Image.default_image_filename mode base p in
-  let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else !GWPARAM.images_d conf.bname
-  in
-  Filesystem.create_dir ~parent:true dir;
-  let fname =
-    Filename.concat dir
-      (if mode = "portraits" || mode = "blasons" then
-         fname ^ extension_of_type typ
-       else fname)
-  in
-  let _moved = move_file_to_save dir fname in
-  write_file fname content;
-  let changed =
-    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
-  in
-  History.record conf base changed "si";
-  print_sent conf base p
-
-let print_send_ok conf base =
-  try
-    let ip =
-      try raw_get conf "i" |> Mutil.decode |> Driver.Iper.of_string
-      with Failure _ -> incorrect conf "print send ok"
-    in
-    let p = Driver.poi base ip in
-    raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
-  with Done -> ()
 
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
@@ -839,7 +763,7 @@ let print_main_c conf base =
                 let p = Driver.poi base (Driver.Iper.of_string ip) in
                 let processed_filename =
                   match m with
-                  | "SND_IMAGE_C_OK" ->
+                  | "SND_IMAGE_OK" ->
                       let mode =
                         try (List.assoc "mode" conf.env :> string)
                         with Not_found -> "portraits"
