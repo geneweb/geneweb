@@ -63,7 +63,7 @@
     </thead>
     %foreach;history_line(kk, e.pos, e.wiz)
       <tr>
-        <td><span class="gw-hist-time" data-epoch="%time_epoch;">%time;</span></td>
+        <td>%time;</td>
         <td class="text-center">
         %if;is_person;
           %if;(person.is_private)
@@ -127,20 +127,21 @@
 %)
 %define;update_text(uu)
   %if;(uu = "aa")[add::parents]%nn;
-  %elseif;(uu = "ap")[add::person/persons]0%nn;
   %elseif;(uu = "af")[add::family/families]0%nn;
+  %elseif;(uu = "ap")[add::person/persons]0%nn;
   %elseif;(uu = "cb")[copy portrait to blason]0%nn;
   %elseif;(uu = "cd")[copy image to blason]0%nn;
   %elseif;(uu = "cn")[change children's names]%nn;
   %elseif;(uu = "db")[delete::blason/blasons]0%nn;
   %elseif;(uu = "dc")[delete::image/images]0 [from carrousel]%nn;
   %elseif;(uu = "df")[delete::family/families]0%nn;
+  %elseif;(uu = "di")[delete::image]%nn;
   %elseif;(uu = "dp")[delete::person/persons]0%nn;
   %elseif;(uu = "dq")[delete::portrait]0%nn;
   %elseif;(uu = "d?")[delete::unknown]0%nn;
+  %elseif;(uu = "fa")[modify::first name alias]0%nn;
   %elseif;(uu = "ff")[merge::family/families]1%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
-  %elseif;(uu = "fa")[modify::first name alias]0%nn;
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
   %elseif;(uu = "if")[invert::family/families]1%nn;
   %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
@@ -157,14 +158,15 @@
   %elseif;(uu = "rb")[restore::blason/blasons]0%nn;
   %elseif;(uu = "rc")[restore::carrousel image]%nn;
   %elseif;(uu = "rp")[restore::portrait]%nn;
-  %elseif;(uu = "sp")[send::portrait]%nn;
-  %elseif;(uu = "sb")[send::blason/blasons]0%nn;
-  %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "sf" or uu = "sx")[send::image/images]0 [to carrousel]%nn;
-  %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
   %elseif;(uu = "sa")[modify::surname alias]0%nn;
+  %elseif;(uu = "sb")[send::blason/blasons]0%nn;
+  %elseif;(uu = "sf" or uu = "sx")[send::image/images]0 [to carrousel]%nn;
+  %elseif;(uu = "si")[send::image/images]0%nn;
+  %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
   %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
+  %elseif;(uu = "sp")[send::portrait]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
+  %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "s?")[send::unknown]0%nn;
   %else;%apply;interp(uu) %nn;
   %end;
@@ -197,6 +199,8 @@
   %if;not cancel_links;<div class="order-1">%apply;search_form()</div>%end;
   <div class="order-3 w-100">%apply;table()</div>
   %if;not cancel_links;<div class="order-2 ms-auto">%apply;nav()</div>%end;
+  %if;not cancel_links;<div class="order-3">%apply;search_form()</div>%end;
+  %if;not cancel_links;<div class="order-4 ms-auto">%apply;nav()</div>%end;
 </div>
 
 %include;trl
