@@ -56,11 +56,6 @@ type string_person_index = {
 (** Data structure for optimised search throughout index by name (surname or
     first name). Considers also patched persons. *)
 
-type visible_record_access = {
-  v_write : unit -> unit;
-  v_get : (dsk_person -> bool) -> int -> bool;
-}
-
 type perm = RDONLY | RDRW
 
 type base_data = {
@@ -70,8 +65,6 @@ type base_data = {
   ascends : dsk_ascend record_access;
   (* Array of persons' unions *)
   unions : dsk_union record_access;
-  (* unused by default *)
-  visible : visible_record_access;
   (* Array of families *)
   families : dsk_family record_access;
   (* Array of families' couples *)
@@ -151,7 +144,13 @@ type base_func = {
     [commit_patches]. *)
 
 (** Geneweb database version *)
-type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
+type base_version =
+  | GnWb0020
+  | GnWb0021
+  | GnWb0022
+  | GnWb0023
+  | GnWb0024
+  | GnWb0025
 
 type dsk_base = { data : base_data; func : base_func; version : base_version }
 (** Database representation: data and basic requests over this data. *)

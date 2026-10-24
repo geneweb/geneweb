@@ -23,7 +23,28 @@ val magic_GnWb0023 : string
 (** Header for the {i base} file (version 0023) *)
 
 val magic_GnWb0024 : string
-(** Header for the latest version of {i base} file *)
+(** Header for the {i base} file (version 0024) *)
+
+val magic_GnWb0025 : string
+(** Header for the latest version of {i base} file, where event witnesses carry
+    a note *)
+
+val base_magics : string list
+(** Headers of the {i base} file versions this executable can read, latest
+    first. *)
+
+exception Incompatible_format of string * string * string list
+(** [Incompatible_format (file, found, expected)] is raised when [file] starts
+    with a GeneWeb header [found] that is none of the [expected] ones. A printer
+    is registered, so an uncaught one reports an explicit message. *)
+
+val printable_magic : string -> string
+(** [printable_magic found] is [found] if it is printable ASCII, ["?"] otherwise
+    (binary garbage at the start of a file). *)
+
+val incompatible_format_message : string -> string -> string list -> string
+(** English message for {!Incompatible_format}, for logs and command-line tools.
+*)
 
 val table_size : int
 (** Maximal size of hash table for name indexation (inside {i names.inx}) *)

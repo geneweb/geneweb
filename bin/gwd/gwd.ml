@@ -454,10 +454,13 @@ let unauth_server conn conf ar =
     ~title:(transl conf "NOTIF_TT access refused")
     (transl conf "NOTIF access refused");
   let bfile = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb") in
-  Request.w_base ~none:ignore
-    (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
-    conn conf
-    (if Sys.file_exists bfile then Some bfile else None)
+  try
+    Request.w_base ~none:ignore
+      (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
+      conn conf
+      (if Sys.file_exists bfile then Some bfile else None)
+  with Driver.Incompatible_format (file, found, expected) ->
+    Request.print_incompatible_base conf (file, found, expected)
 
 let gen_match_auth_file test_user_and_password auth_file base_file =
   if auth_file = "" then None
@@ -1695,9 +1698,16 @@ let conf_and_connection =
                         (t2 -. t1))
               with
               | Exit -> ()
-              | Def.HttpExn (code, _) as exn ->
+              | Def.HttpExn (code, msg) as exn ->
                   let bt = Printexc.get_raw_backtrace () in
-                  GWPARAM.output_error conf code;
+                  let content =
+                    if conf.wizard && msg <> "" then
+                      Some
+                        (Adef.safe
+                           ("<p>" ^ (Util.escape_html msg :> string) ^ "</p>"))
+                    else None
+                  in
+                  GWPARAM.output_error ?content conf code;
                   Log.err (fun k ->
                       k "%a" (pp_exception ~predictable_mode) (exn, bt))))
 
@@ -2289,8 +2299,9 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
       let bpath = !GWPARAM.bpath dbn in
       try Driver.load_database bpath
-      with Sys_error _ ->
-        (* HOTFIX: we cannot print the Sys_error payload in tests. *)
+      with Sys_error _ | Driver.Incompatible_format _ ->
+        (* HOTFIX: we cannot print the Sys_error payload in tests. A missing
+           base file is reported as Incompatible_format. *)
         Log.err (fun k -> k "Cannot load the database %s" dbn);
         exit 2)
     !cache_databases;

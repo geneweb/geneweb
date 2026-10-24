@@ -8,7 +8,7 @@ val reconstitute_from_fevents :
   ('person, 'string) gen_fam_event list ->
   (relation_kind * Adef.cdate * 'string * 'string * 'string)
   * divorce
-  * ('person * witness_kind) array
+  * ('person * witness_kind * 'string) array
 (** [reconstitute_from_fevents nsck empty fevents] derives the summary fields of
     a family from its events [fevents], whatever the representation of persons
     and strings ([empty] being the empty string):

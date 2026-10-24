@@ -23,7 +23,38 @@ let cleanup { workers } =
       try Unix.kill pid Sys.sigterm with _ -> ())
     workers
 
-let wait_any_child () = My_unix.waitpid_noeintr [] (-1) |> fst
+let wait_any_child () = My_unix.waitpid_noeintr [] (-1)
+
+let signal_name signal =
+  let names =
+    [
+      (Sys.sigsegv, "SIGSEGV");
+      (Sys.sigbus, "SIGBUS");
+      (Sys.sigabrt, "SIGABRT");
+      (Sys.sigkill, "SIGKILL");
+      (Sys.sigterm, "SIGTERM");
+      (Sys.sigfpe, "SIGFPE");
+      (Sys.sigill, "SIGILL");
+    ]
+  in
+  match List.assoc_opt signal names with
+  | Some name -> name
+  | None -> Printf.sprintf "signal %d" signal
+
+let report_dead_worker pid status =
+  match status with
+  | Unix.WEXITED 0 -> Log.debug (fun k -> k "Worker %d is dead, replace it" pid)
+  | Unix.WEXITED code ->
+      Log.err (fun k -> k "Worker %d exited with code %d, replace it" pid code)
+  | Unix.WSIGNALED signal ->
+      Log.err (fun k ->
+          k
+            "Worker %d killed by %s while serving its last request (see the \
+             request logged by this pid just before), replace it"
+            pid (signal_name signal))
+  | Unix.WSTOPPED signal ->
+      Log.err (fun k ->
+          k "Worker %d stopped by %s, replace it" pid (signal_name signal))
 
 let start n k =
   if (not Sys.unix) || n < 1 then invalid_arg "start";
@@ -35,13 +66,13 @@ let start n k =
     add_worker t k
   done;
   while true do
-    let pid = wait_any_child () in
+    let pid, status = wait_any_child () in
     (* We never run out of children because each time a worker terminates,
        it is immediately replaced with a new one. *)
     assert (pid > 0);
     match Hashtbl.find t.workers { pid } with
     | () ->
-        Log.debug (fun k -> k "Worker %d is dead, replace it" pid);
+        report_dead_worker pid status;
         add_worker t k
     | exception Not_found -> assert false
   done
