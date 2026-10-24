@@ -508,59 +508,6 @@ let strings_of_fname = function
   | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
-(* Restrict file *)
-
-type visible_state = VsNone | VsTrue | VsFalse
-
-let verbose = Mutil.verbose
-
-let make_visible_record_access perm bname persons =
-  let visible_ref = ref None in
-  let fname = bname // "restrict" in
-  let read_or_create_visible () =
-    let visible =
-      try
-        Secure.with_open_in_text fname @@ fun ic ->
-        if Sys.unix && !verbose then (
-          Printf.eprintf "*** read restrict file\n";
-          flush stderr);
-        input_value ic
-      with Sys_error _ -> Array.make persons.len VsNone
-    in
-    visible_ref := Some visible;
-    visible
-  in
-  let v_write () =
-    match !visible_ref with
-    | Some visible ->
-        if perm = RDONLY then raise (HttpExn (Forbidden, __LOC__))
-        else
-          Secure.with_open_out_text fname @@ fun oc ->
-          if Sys.unix && !verbose then (
-            Printf.eprintf "*** write restrict file\n";
-            flush stderr);
-          output_value oc visible
-    | None -> ()
-  in
-  let v_get fct i =
-    let visible =
-      match !visible_ref with
-      | Some visible -> visible
-      | None -> read_or_create_visible ()
-    in
-    if i < Array.length visible then
-      match visible.(i) with
-      | VsNone ->
-          let status = fct (persons.get i) in
-          visible.(i) <- (if status then VsTrue else VsFalse);
-          visible_ref := Some visible;
-          status
-      | VsTrue -> true
-      | VsFalse -> false
-    else fct (persons.get i)
-  in
-  { v_write; v_get }
-
 (*
    Synchro:
      - synchro_person contient la liste des ip des personnes patchées.
@@ -1328,7 +1275,6 @@ let with_database ?(read_only = false) bname k =
       persons;
       ascends;
       unions;
-      visible = make_visible_record_access perm bname persons;
       families;
       couples;
       descends;
@@ -1405,8 +1351,6 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       ascends = record_access_of ascends;
       unions = record_access_of unions;
       families = record_access_of families;
-      visible =
-        { v_write = (fun _ -> assert false); v_get = (fun _ -> assert false) };
       couples = record_access_of couples;
       descends = record_access_of descends;
       strings = record_access_of strings;

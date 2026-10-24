@@ -56,11 +56,6 @@ type string_person_index = {
 (** Data structure for optimised search throughout index by name (surname or
     first name). Considers also patched persons. *)
 
-type visible_record_access = {
-  v_write : unit -> unit;
-  v_get : (dsk_person -> bool) -> int -> bool;
-}
-
 type perm = RDONLY | RDRW
 
 type base_data = {
@@ -70,8 +65,6 @@ type base_data = {
   ascends : dsk_ascend record_access;
   (* Array of persons' unions *)
   unions : dsk_union record_access;
-  (* unused by default *)
-  visible : visible_record_access;
   (* Array of families *)
   families : dsk_family record_access;
   (* Array of families' couples *)
