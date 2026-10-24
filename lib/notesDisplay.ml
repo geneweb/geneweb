@@ -326,6 +326,14 @@ let print_linked_list conf base ?person pgl =
   | Some "gallery" -> print_linked_list_gallery conf base ?person pgl
   | _ -> print_linked_list_standard conf base ?person pgl
 
+let print_old_name_remains conf base pgl =
+  if pgl <> [] then (
+    Output.printf conf
+      {|<div class="alert alert-warning mx-auto mt-3" role="alert">%s</div>|}
+      (Utf8.capitalize_fst
+         (transl conf "old name still present. please check these pages"));
+    print_linked_list_standard conf base pgl)
+
 (* copied from perso.ml *)
 let simple_person_text conf base p p_auth : Adef.safe_string =
   if p_auth then

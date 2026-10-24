@@ -43,5 +43,6 @@ val effective_mod_merge :
   string ->
   string ->
   int ->
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   'a) ->
   'a
