@@ -14369,6 +14369,13 @@ sl: več kot %d zadetkov
 sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
+    move
+co: dispiazzà
+de: verschieben
+en: move
+es: mover
+fr: déplacer
+
     move coat of arms to
 co: dispiazzà l’armuratura versu/cullà l’armuratura à u primu antenatu cunnisciutu chì l’hà purtata
 de: das Wappen verschieben zu/das Wappen zum ersten bekannten Vorfahren zurückführen, der es getragen hat
