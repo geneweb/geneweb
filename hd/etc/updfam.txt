@@ -33,6 +33,7 @@
 %let;datalist_places;%apply;attr("places","place")%in;
 %let;datalist_occupations;%apply;attr("occupations","occu")%in;
 %let;datalist_sources;%apply;attr("sources","src")%in;
+%include;upd_utils
 %define;nav()
   <div class="container fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
@@ -211,59 +212,6 @@
   </div>
 %end;
 
-%define;small_date(kind,xvar,xx,verbose)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
-  %let;year_input;pattern="[?><~\/+\-]?\d*\/?" size="4" maxlength="8"%in;
-  <div class="row align-items-center">
-    <span class="col-sm-2 col-form-label">[*kind]</span>
-    <div class="col-sm-auto d-inline-flex">
-      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-      %elseif;([!dates order]0="mmddyyyy")
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-      %else;
-        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]0</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-        <label for="xvar_mm" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]1</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label%if;(verbose=true) visually-hidden%end;">[year/month/day]2</label>
-        <input type="text" class="form-control form-control-inline me-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-      %end;
-    </div>
-    <label for="xvar_pl" class="%if;(verbose=true)visually-hidden%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
-    <div class="col">
-      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0"%datalist_places;>
-    </div>
-  </div>
-%end;
-
-%define;birth(xvar,xx,verbose)
-  %apply;small_date("birth","xvarb","xx","verbose")
-%end;
-
-%define;death(xvar,xx,verbose)
-  %apply;small_date("death","xvard","xx","verbose")
-%end;
-
-%define;w_birth(xcnt, wcnt,xx,verbose)
-  %apply;small_date("birth","excnt_witnwcnt_b","fwitness","verbose")
-%end;
-
-%define;w_death(xcnt, wcnt,xx,verbose)
-  %apply;small_date("death","excnt_witnwcnt_d","fwitness","verbose")
-%end;
-
 %define;parent(xcnt,xx,psex)
   <div class="row%if;(xcnt>1) mt-3%end;">
    <label for="paxcnt_fn" class="col-sm-2 col-form-label">%nn;
@@ -279,7 +227,7 @@
        <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" title="[*number] (occurence)">
     </div>
   </div>
-  <div class="row mt-2">
+  <div class="row mt-1">
     <label for="paxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="%if;(xcnt>2 and xcnt%2=1 and parent.surname!="")%parent.surname;%else;[*surname/surnames]0%end;"%datalist_snames;>
@@ -291,16 +239,7 @@
       </select>
     </div>
   </div>
-  <div id="paxcnt_p_selct_data">
-    %apply;birth("paxcnt","xx","true")
-    %apply;death("paxcnt","xx","true")
-    <div class="row">
-      <label for="paxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm">
-        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;"%datalist_occupations;>
-      </div>
-    </div>
-  </div>
+  %apply;create_data("paxcnt","xx")
 %end;
 
 %( pa<k><j>: parent j of family parent k; pa<k>_comment: their family comment (UpdateFamOk.reconstitute_grandparents) %)
@@ -474,23 +413,7 @@
         </div>
       </div>
     </div>
-    <div class="row" id="excnt_witnwcnt_p_selct_data">
-      <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm-6">
-        <input class="form-control" type="text" name="excnt_witnwcnt_occu" id="excnt_witnwcnt_occu"
-           value="%fwitness.create.occupation;" placeholder="[*occupation/occupations]0"%datalist_occupations;>
-      </div>
-      <div class="d-inline-flex align-items-center col-sm-auto">
-        <div class="form-check form-check-inline me-3">
-          <input class="form-check-input" type="checkbox" name="excnt_witnwcnt_od" id="excnt_witnwcnt_od">
-          <label for="excnt_witnwcnt_od" class="form-check-label">[*of course dead]</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" name="excnt_witnwcnt_pub" id="excnt_witnwcnt_pub">
-          <label for="excnt_witnwcnt_pub" class="form-check-label">[*public]</label>
-        </div>
-      </div>
-    </div>
+    %apply;create_data("excnt_witnwcnt","fwitness")
   </div>
 %end;
 
@@ -735,16 +658,7 @@
       </div>
     </div>
   </div>
-  <div id="chxcnt_p_selct_data">
-    %apply;birth("chxcnt", "child", "true")
-    %apply;death("chxcnt", "child", "true")
-    <div class="row">
-      <label for="chxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm">
-         <input class="form-control" type="text" name="chxcnt_occu" value="%child.create.occupation;" id="chxcnt_occu" placeholder="[*occupation/occupations]0"%datalist_occupations;>
-      </div>
-    </div>
-  </div>
+  %apply;create_data("chxcnt","child")
 %end;
 
   <div class="card">

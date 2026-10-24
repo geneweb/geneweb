@@ -29,29 +29,7 @@ let reconstitute_parent_or_child conf var default_surname =
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
   let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
-  let create_info =
-    let b = Update.reconstitute_date conf (var ^ "b") in
-    let bpl = getn conf (var ^ "b") "pl" in
-    let death =
-      match p_getenv conf.env (var ^ "d_yyyy") with
-      | Some "+" -> DeadDontKnowWhen
-      | Some ("-" | "=") -> NotDead
-      | Some _ | None -> DontKnowIfDead
-    in
-    let d = Update.reconstitute_date conf (var ^ "d") in
-    let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = only_printable (getn conf var "occu") in
-    let public = getn conf (var ^ "b") "yyyy" = "p" in
-    {
-      ci_birth_date = b;
-      ci_birth_place = bpl;
-      ci_death = death;
-      ci_death_date = d;
-      ci_death_place = dpl;
-      ci_occupation = occupation;
-      ci_public = public;
-    }
-  in
+  let create_info = Update_util.reconstitute_create_info conf var in
   let sex = getenv_sex conf var in
   let create = getn_p conf var ~create_info sex in
   (first_name, surname, occ, create, var)

@@ -90,6 +90,9 @@
 - Remove the back links built from the HTTP Referer.
 - New `is_upd_ind` and `is_upd_fam` template variables, true on the
   person and family update forms.
+- The family and person forms create a parent, child, witness or related
+  person with the same fields (upd_utils.txt): birth and death date and
+  place, occupation, and the "of course dead" and "public" boxes.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
