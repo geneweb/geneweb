@@ -9,6 +9,9 @@ val bases : string ref
 val reorg : bool ref
 (** set to true when base is in reorg format *)
 
+val reorg_forced : bool ref
+(** set to true when base is requested to be in reorg format *)
+
 val force : bool ref
 (** force creation of database if already existing *)
 
@@ -41,6 +44,12 @@ val albums_d : my_fun_2 ref
 
 val init : unit -> unit
 (** Function called to initialize path functions based on the reorg flag. *)
+
+val base_config_dir : string -> string
+(** [base_config_dir bname] is [<bases>/<bname>.gwb/config], whatever the mode
+    (reorg or classic), for per-base working files such as the anoma report and
+    its whitelist. The directory alone does not make the base reorg: only
+    [config/<bname>.gwf] does. Requires [Secure.set_base_dir]. *)
 
 val is_reorg_base : string -> bool
 (** returns true iff mybase.gwb/config/mybase.gwf exists *)

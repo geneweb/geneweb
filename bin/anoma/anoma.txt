@@ -1,0 +1,31 @@
+"died at the advanced age of %d years old\n"
+"is born more than 2 years after the death of his/her father";
+"%s's %s before his/her %s\n"
+"witnessed the %s after his/her death\n"
+"witnessed the %s before his/her birth\n"
+"sex not coherent with relations"
+"has a younger ancestor:";
+"marriage after his/her death\n"
+"marriage before his/her birth\n"
+"is born after the death of his/her mother %s\n"
+"born after his/her child %s\n"
+"was parent at age of %d\n" (designation base p)
+"born after his/her death\n" (designation base p)
+"witnessed the %s after his/her death\n"
+"witnessed the %s before his/her birth\n"
+"has incorrect title dates as:\n";
+"married at age %d\n" (designation base p) a.year
+"Undefined sex for %s\n" (designation base p)
+
+
+"The following children of\n  %s\nand\n  %s\nare born very close:\n"
+"The difference of age between %s and %s is quite important: %d\n"
+"Changed order of children of %s and %s\n"
+"The following children of\n  %s\nand\n  %s\nare not in order:\n"
+"Changed order of marriages of %s\n"
+"Changed order of family's events for %s\n"
+"Changed order of family's events for %s\n"
+"Changed order of person's events for %s\n"
+"possible duplicate families: %s and %s\n"
+"possible duplicate families: %s and %s, %s has unions with several \
+  persons named %s\n"

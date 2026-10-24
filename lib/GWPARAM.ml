@@ -13,6 +13,7 @@ let errors_other = ref []
 let set_vars = ref []
 let gwd_cmd = ref ""
 let reorg = ref false
+let reorg_forced = ref false
 let force = ref false
 let cnt_dir = ref ""
 let bases = ref (Secure.base_dir ())
@@ -137,6 +138,13 @@ module Legacy = struct
     let bname = clean_bname bname in
     Filename.concat (base_dir ()) (bname ^ ".gwb")
 end
+
+(* Per-base working files (anoma report, whitelist, comm.log): the same
+   <bases>/<base>.gwb/config/ in reorg AND classic mode. Creating this
+   directory does not turn a classic base into a reorg one: only
+   config/<base>.gwf does (see [is_reorg_base]). *)
+let base_config_dir bname =
+  path_concat [ base_dir (); clean_bname bname ^ ".gwb"; "config" ]
 
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =

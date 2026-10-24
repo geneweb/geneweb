@@ -2939,6 +2939,26 @@ pt: anulação
 sv: upphävande
 tr: i̇ptal
 
+    anomalies
+en: anomalies
+fr: anomalies
+
+    anoma exit status %d
+en: anoma ended with exit status %d
+fr: anoma s'est terminé avec le code de sortie %d
+
+    anoma not found at %s
+en: anoma not found at %s: install it beside gwd
+fr: anoma introuvable à %s : installez-le à côté de gwd
+
+    anomalies report not found
+en: anomalies report not found: run anoma first
+fr: rapport d'anomalies introuvable : lancez d'abord anoma
+
+    anomalies whitelist consolidation
+en: consolidation of the verified anomalies
+fr: consolidation des anomalies vérifiées
+
     any individual in the base
 co: una persona di a basa
 de: jede beliebige Person im Stammbaum
@@ -5600,6 +5620,10 @@ sk: koeficient krvného príbuzenského vzťahu/percento krvného príbuzenskéh
 sl: koeficient krvnega sorodstva/odstotek krvnega sorodstva
 sv: koefficient för blodsbandsläktskap/procent av blodsbandsläktskap
 tr: akrabalık katsayısı/akrabalık yüzdesi
+
+    consolidate now
+en: consolidate now (merge into the list and archive)
+fr: consolider maintenant (intégrer à la liste et archiver)
 
     continue
 co: cuntinuà
@@ -11276,6 +11300,10 @@ pt: ignorar os implexos
 sv: ignorera implex
 tr: implexi yoksay
 
+    ignored anomalies
+en: ignored (verified) anomalies
+fr: anomalies ignorées (vérifiées)
+
     illness
 co: malatia
 de: Krankheit
@@ -14930,6 +14958,10 @@ sl: nobenega rojstnega dneva
 sv: ingen födelsedag
 tr: doğum günü yok
 
+    no consolidated whitelist yet
+en: no consolidated list yet, see the pending contributions below
+fr: pas encore de liste consolidée, voir les contributions en attente ci-dessous
+
     no descendants
 co: senza discendenza
 de: Ohne Nachkommen
@@ -16742,6 +16774,10 @@ de: Weg/Wege
 en: path/paths
 es: camino/caminos
 fr: chemin/chemins
+
+    pending wizard contributions
+en: wizard contributions not yet consolidated
+fr: contributions des magiciens non encore consolidées
 
     person added
 af: persoon bygevoeg
