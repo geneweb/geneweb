@@ -20,7 +20,7 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
-    =
+    remains =
   Hutil.header conf (fun _ ->
       transl conf "merge done" |> Utf8.capitalize_fst
       |> Output.print_sstring conf);
@@ -68,7 +68,8 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     aux "1" "old name" ofn1 osn1 oocc1;
     NotesDisplay.print_linked_list conf base pgl1;
     aux "2" "old name" ofn2 osn2 oocc2;
-    NotesDisplay.print_linked_list conf base pgl2);
+    NotesDisplay.print_linked_list conf base pgl2;
+    NotesDisplay.print_old_name_remains conf base remains);
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 

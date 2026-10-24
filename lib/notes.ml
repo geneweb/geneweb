@@ -584,20 +584,32 @@ let rename_in_text (ofn, osn, _) (nfn, nsn, _) text =
     loop 0 0;
     Buffer.contents buf
 
-(*
-TITLE=Test imap
-TYPE=gallery
-{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
- "map":
- [{"shape":"rect","coords":"104,100.7,145,152.7",
-   "fn":"henri",
-   "sn":"gouraud",
-   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
-   "oc":"0",
-   "alt":"Henri Gouraud",
-   "group":"1"},{...}],
- "groups":[]}
-*)
+let name_term fn sn =
+  let fn = Name.lower fn and sn = Name.lower sn in
+  if fn = "" || sn = "" then "" else Mutil.tr ' ' '?' (fn ^ " " ^ sn)
+
+let old_name_remains (ofn, osn, _) (nfn, nsn, _) text =
+  let f = name_words ofn and s = name_words osn in
+  if f = [] || s = [] || (f = name_words nfn && s = name_words nsn) then false
+  else
+    let old_terms = [ name_term ofn osn; name_term osn ofn ] in
+    let count terms t =
+      NotesSearch.count_occurrences ~full_word:true false terms t
+    in
+    let p = NotesSearch.plain_text text in
+    let n_old = count old_terms p in
+    n_old > 0
+    &&
+    (* overlap is tested on the new name as text: in a term, '?' is a
+       wildcard, and Name.lower has turned ' into a separator *)
+    let overlapping =
+      List.filter_map
+        (fun (a, b) ->
+          if count old_terms (a ^ " " ^ b) > 0 then Some (name_term a b)
+          else None)
+        [ (nfn, nsn); (nsn, nfn) ]
+    in
+    n_old > if overlapping = [] then 0 else count overlapping p
 
 let _print_key label (fn, sn, oc) =
   Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn
@@ -715,54 +727,68 @@ let rewrite_key s oldk newk _file =
   in
   let slen = String.length s in
   let out = Buffer.create (slen + 64) in
+  (* the text as displayed: links to the person by their new display text,
+     other links by a two-byte break, so that a '?' of the search cannot join
+     the words around them *)
+  let prose = Buffer.create slen in
+  let brk = "\000\000" in
   let rec rebuild i =
     if i < slen then
       match NotesLinks.misc_notes_link s i with
-      | WLpage (j, _, _, _, _)
-      | WLwizard (j, _, _)
-      | WLimage (j, _, _, _)
       | WLnone (j, _) ->
           Buffer.add_substring out s i (j - i);
+          Buffer.add_substring prose s i (j - i);
+          rebuild j
+      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLimage (j, _, _, _) ->
+          Buffer.add_substring out s i (j - i);
+          Buffer.add_string prose brk;
           rebuild j
       | WLperson (j, k, name, text, fam_marker) ->
-          if Def.NLDB.equal_key k oldk then
+          if Def.NLDB.equal_key k oldk then (
             let fn, sn, oc = newk in
             let ofn, osn, _ = oldk in
-            let path =
+            let path, shown =
               match name with
               | NotesLinks.Short (tfn, tsn) ->
                   let keep typed o n = if Name.lower n = o then typed else n in
                   let fn = keep tfn ofn fn and sn = keep tsn osn sn in
-                  if oc = 0 then Printf.sprintf "%s/%s" fn sn
-                  else Printf.sprintf "%s/%s/%d" fn sn oc
+                  ( (if oc = 0 then Printf.sprintf "%s/%s" fn sn
+                     else Printf.sprintf "%s/%s/%d" fn sn oc),
+                    fn ^ " " ^ sn )
               | Explicit t ->
-                  Printf.sprintf "%s/%s/%d/%s" fn sn oc
-                    (rename_in_text oldk newk t)
+                  let t = rename_in_text oldk newk t in
+                  (Printf.sprintf "%s/%s/%d/%s" fn sn oc t, t)
             in
             let fam_suffix =
               match fam_marker with
               | Some n -> "#" ^ string_of_int n
               | None -> ""
             in
+            Buffer.add_string prose shown;
             Printf.bprintf out "[[%s%s]]%s" path
               (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
-              fam_suffix
-          else Buffer.add_substring out s i (j - i);
+              fam_suffix)
+          else (
+            Buffer.add_substring out s i (j - i);
+            Buffer.add_string prose brk);
           rebuild j
   in
   rebuild 0;
-  Buffer.contents out
+  (Buffer.contents out, old_name_remains oldk newk (Buffer.contents prose))
 
 let replace_ind_key_in_str base is oldk newk p =
   let s = Driver.sou base is in
   let design = Gutil.designation base p in
-  let s' = rewrite_key s oldk newk design in
-  Driver.insert_string base s'
+  let s', remains = rewrite_key s oldk newk design in
+  (Driver.insert_string base s', remains)
 
 let update_ind_key_pgind conf base p oldk newk =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
+  let remains = ref false in
   let replace is =
-    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
+    let is, r = replace_ind_key_in_str base is oldk newk (Driver.poi base p) in
+    if r then remains := true;
+    is
   in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
@@ -803,7 +829,8 @@ let update_ind_key_pgind conf base p oldk newk =
     }
   in
   Driver.patch_person base p newp;
-  update_notes_links_person conf base newp
+  update_notes_links_person conf base newp;
+  !remains
 
 let update_ind_key_pgfam conf base f oldk newk =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
@@ -813,7 +840,12 @@ let update_ind_key_pgfam conf base f oldk newk =
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
-  let replace is = replace_ind_key_in_str base is oldk newk fath in
+  let remains = ref false in
+  let replace is =
+    let is, r = replace_ind_key_in_str base is oldk newk fath in
+    if r then remains := true;
+    is
+  in
   let marriage_note = replace oldf.marriage_note in
   let marriage_src = replace oldf.marriage_src in
   let comment = replace oldf.comment in
@@ -832,24 +864,28 @@ let update_ind_key_pgfam conf base f oldk newk =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
   Driver.patch_family base f newf;
-  update_notes_links_family conf base newf
+  update_notes_links_family conf base newf;
+  !remains
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_notes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
-  commit_notes conf base f newn
+  let newn, remains = rewrite_key oldn oldk newk f in
+  commit_notes conf base f newn;
+  remains
 
 let update_ind_key_pgwiz conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_wiznotes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
-  commit_wiznotes conf base f newn
+  let newn, remains = rewrite_key oldn oldk newk f in
+  commit_wiznotes conf base f newn;
+  remains
 
 let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
-  List.iter
-    (function
+  List.filter
+    (fun pg ->
+      match pg with
       | Def.NLDB.PgInd p -> update_ind_key_pgind conf base p oldk newk
       | PgFam f -> update_ind_key_pgfam conf base f oldk newk
       | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
@@ -949,6 +985,7 @@ let on_person_saved conf base ~old_key ?old_text
   if old_key <> Util.make_key base p then
     update_ind_key conf base (pgl ()) old_key
       (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
+  else []
 
 let linked_pages_nbr conf base ip =
   let key =
