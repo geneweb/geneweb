@@ -579,11 +579,15 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let new_key =
     (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
   in
-  if
-    (not (String.equal ofn1 sp.first_name && String.equal osn1 sp.surname))
-    || oocc1 <> sp.occ
-  then Notes.update_ind_key conf base pgl1 key1 new_key;
-  Notes.update_ind_key conf base pgl2 key2 new_key;
+  let remains1 =
+    if
+      (not (String.equal ofn1 sp.first_name && String.equal osn1 sp.surname))
+      || oocc1 <> sp.occ
+    then Notes.update_ind_key conf base pgl1 key1 new_key
+    else []
+  in
+  let remains2 = Notes.update_ind_key conf base pgl2 key2 new_key in
+  let remains = List.sort_uniq compare (remains1 @ remains2) in
   let u = { family = Array.append p_family p2_family } in
   if p2_family <> [||] then Driver.patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
@@ -604,3 +608,4 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   Notes.update_notes_links_db conf base (Def.NLDB.PgInd o_p2.key_index) "";
   Update.delete_topological_sort conf base;
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
+    remains

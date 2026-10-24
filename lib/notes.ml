@@ -471,31 +471,157 @@ let commit_wiznotes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf base pg s
 
-(* TODO Henri -> Henri-xx -> Henri fails to remove the -xx !! *)
-(* TODO adjust replacement to news capital variants *)
-let replace olds news str =
-  let olds_l = Name.lower olds in
-  let olds_u1 = Utf8.capitalize_fst olds_l in
-  let olds_u2 = Utf8.uppercase olds_l in
-  (* Names are data: match and substitute them literally. *)
-  let alts = List.map Str.quote [ olds; olds_l; olds_u1; olds_u2 ] in
-  let regexp = Str.regexp (String.concat "\\|" alts) in
-  Str.global_substitute regexp (fun _ -> news) str
+(* Matching person names in note texts.
+   A name is compared word by word through Name.lower (case, accent and
+   hyphen insensitive). Words are maximal runs of ASCII letters/digits and
+   non-ASCII bytes (so "d’Antoine" is one word, as for Name.lower). *)
 
-(*
-TITLE=Test imap
-TYPE=gallery
-{"title":"Test imap","desc":"","path":"doc","img":"famille-ph-gouraud.jpg",
- "map":
- [{"shape":"rect","coords":"104,100.7,145,152.7",
-   "fn":"henri",
-   "sn":"gouraud",
-   "gw":"[[Henri/Gouraud/0/Henri Gouraud]]",
-   "oc":"0",
-   "alt":"Henri Gouraud",
-   "group":"1"},{...}],
- "groups":[]}
-*)
+let name_words s =
+  String.split_on_char ' ' (Name.lower s)
+  |> List.concat_map (String.split_on_char '.')
+  |> List.filter (fun w -> w <> "")
+
+let text_words text =
+  let len = String.length text in
+  let is_word_byte = function
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> true
+    | c -> Char.code c >= 0x80
+  in
+  let rec loop acc i =
+    if i >= len then Array.of_list (List.rev acc)
+    else if is_word_byte text.[i] then (
+      let j = ref i in
+      while !j < len && is_word_byte text.[!j] do
+        incr j
+      done;
+      loop ((i, !j) :: acc) !j)
+    else loop acc (i + 1)
+  in
+  loop [] 0
+
+(* a code point is an uppercase letter if uppercasing leaves it unchanged
+   while Name.lower changes it into a non-empty string *)
+let has_upper s =
+  let rec loop i =
+    i < String.length s
+    &&
+    let j = Utf8.next s i in
+    let c = String.sub s i (j - i) in
+    let l = Name.lower c in
+    (Utf8.uppercase c = c && l <> "" && l <> c) || loop j
+  in
+  loop 0
+
+(* [match_name text words i ow] matches the name words [ow] starting at word
+   [i]. The words may only be separated by spaces, '-', '\'' or '.', and the
+   match may not be glued by '-' or '\'' to a neighbouring word ("Jean" is not
+   found in "Jean-Pierre", nor "Martin" in "Saint-Martin"). Returns the
+   number of words and the byte range of the match. *)
+let match_name text words i ow =
+  let nw = Array.length words in
+  let cnt = List.length ow in
+  let sep k =
+    String.sub text (snd words.(k)) (fst words.(k + 1) - snd words.(k))
+  in
+  let glued k = String.for_all (fun c -> c = '-' || c = '\'') (sep k) in
+  let inner_ok k =
+    String.for_all (fun c -> c = ' ' || c = '-' || c = '\'' || c = '.') (sep k)
+  in
+  let rec inner k = k >= i + cnt - 1 || (inner_ok k && inner (k + 1)) in
+  if cnt = 0 || i + cnt > nw || not (inner i) then None
+  else if i > 0 && glued (i - 1) then None
+  else if i + cnt < nw && glued (i + cnt - 1) then None
+  else
+    let a = fst words.(i) and b = snd words.(i + cnt - 1) in
+    if name_words (String.sub text a (b - a)) = ow then Some (cnt, a, b)
+    else None
+
+(* Rename a person inside the display text of a wiki link.
+   [oldk] is the (lowered) key, [newk] the new raw names.
+   A first name or surname is replaced only if it changed (modulo
+   Name.lower: exactly when the corresponding key part changed). A match
+   (see [match_name]) must contain a capital letter (so the surname "Rose"
+   is not found in "une rose", while "d’Antoine" or "de La Fontaine" are
+   found), unless the display text is nothing but the name (full name,
+   first name or surname alone). First name and surname are substituted
+   in a single pass, so that swapping them (or a new value containing the
+   old one) is safe. An all-uppercase occurrence is replaced by the
+   uppercased new name. *)
+let rename_in_text (ofn, osn, _) (nfn, nsn, _) text =
+  let parts =
+    List.filter_map
+      (fun (o, n) ->
+        let ow = name_words o in
+        if ow = [] || ow = name_words n then None else Some (ow, n))
+      [ (ofn, nfn); (osn, nsn) ]
+    (* longest first: "Jean Pierre" before "Pierre" *)
+    |> List.stable_sort (fun (a, _) (b, _) ->
+        compare (List.length b) (List.length a))
+  in
+  if parts = [] then text
+  else
+    let bare =
+      let t = name_words text in
+      t = name_words (ofn ^ " " ^ osn)
+      || t = name_words (osn ^ " " ^ ofn)
+      || t = name_words ofn
+      || t = name_words osn
+    in
+    let words = text_words text in
+    let nw = Array.length words in
+    let try_part i (ow, n) =
+      match match_name text words i ow with
+      | Some (cnt, a, b) ->
+          let span = String.sub text a (b - a) in
+          if bare || has_upper span then
+            let caps = String.length span > 1 && Utf8.uppercase span = span in
+            Some (cnt, a, b, if caps then Utf8.uppercase n else n)
+          else None
+      | None -> None
+    in
+    let len = String.length text in
+    let buf = Buffer.create (len + 16) in
+    let rec loop pos i =
+      if i >= nw then Buffer.add_substring buf text pos (len - pos)
+      else
+        match List.find_map (try_part i) parts with
+        | Some (cnt, a, b, repl) ->
+            Buffer.add_substring buf text pos (a - pos);
+            Buffer.add_string buf repl;
+            loop b (i + cnt)
+        | None -> loop pos (i + 1)
+    in
+    loop 0 0;
+    Buffer.contents buf
+
+(* [old_name_remains oldk newk text] tells whether the old full name (first
+   name and surname, in either order) still appears in the plain text of the
+   note source [text], when the name changed. The search is the one of
+   m=NOTES_SEARCH in word mode ([NotesSearch]: case and accent insensitive,
+   ' and ’ equal), each space or hyphen of the name standing for any one
+   character. Occurrences that are part of the new name (Dupont in
+   Dupont-Durand) are not counted. *)
+let old_name_remains (ofn, osn, _) (nfn, nsn, _) text =
+  let f = name_words ofn and s = name_words osn in
+  if f = [] || s = [] || (f = name_words nfn && s = name_words nsn) then false
+  else
+    let term a b =
+      let w x =
+        String.split_on_char ' ' (Name.lower x) |> List.filter (( <> ) "")
+      in
+      String.concat "?" (w a @ w b)
+    in
+    let old_terms = [ term ofn osn; term osn ofn ] in
+    let count terms t =
+      NotesSearch.count_occurrences ~full_word:true false terms t
+    in
+    let p = NotesSearch.plain_text text in
+    let n_old = count old_terms p in
+    n_old > 0
+    &&
+    let new_terms = [ nfn ^ " " ^ nsn; nsn ^ " " ^ nfn ] in
+    let overlapping = List.filter (fun t -> count old_terms t > 0) new_terms in
+    n_old > if overlapping = [] then 0 else count overlapping p
 
 let _print_key label (fn, sn, oc) =
   Printf.eprintf "Key: %s: %s.%d %s\n" label fn oc sn
@@ -605,6 +731,8 @@ let update_gallery s oldk newk =
       let updated_json = update_map json oldk newk in
       title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
 
+(* Rewrites the links to [oldk] in [s]; also tells whether the old name
+   still appears in the plain text of [s]. *)
 let rewrite_key s oldk newk _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
@@ -612,56 +740,59 @@ let rewrite_key s oldk newk _file =
     else s
   in
   let slen = String.length s in
-  let rec rebuild rs i =
-    if i >= slen then rs
-    else
+  let out = Buffer.create (slen + 64) in
+  (* text outside links; a link becomes a two-byte break, so that a '?' of
+     the search cannot join the words around it *)
+  let prose = Buffer.create slen in
+  let brk = "\000\000" in
+  let rec rebuild i =
+    if i < slen then
       match NotesLinks.misc_notes_link s i with
-      | WLpage (j, _, _, _, _)
-      | WLwizard (j, _, _)
-      | WLimage (j, _, _, _)
       | WLnone (j, _) ->
-          let ss = String.sub s i (j - i) in
-          rebuild (rs ^ ss) j
+          Buffer.add_substring out s i (j - i);
+          Buffer.add_substring prose s i (j - i);
+          rebuild j
+      | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLimage (j, _, _, _) ->
+          Buffer.add_substring out s i (j - i);
+          Buffer.add_string prose brk;
+          rebuild j
       | WLperson (j, k, name, text, fam_marker) ->
+          Buffer.add_string prose brk;
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
-            let ofn, osn, _ooc = oldk in
-            let name =
-              match name with
-              | Some str -> Some (replace ofn fn str |> replace osn sn)
-              | None -> None
-            in
+            let name = Option.map (rename_in_text oldk newk) name in
             let fam_suffix =
               match fam_marker with
               | Some n -> "#" ^ string_of_int n
               | None -> ""
             in
-            let ss =
-              Printf.sprintf "[[%s/%s/%d/%s%s]]%s" fn sn oc
-                (Option.fold
-                   ~none:(Printf.sprintf "%s %s" fn sn)
-                   ~some:(fun txt -> txt)
-                   name)
-                (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
-                fam_suffix
-            in
-            rebuild (rs ^ ss) j
-          else
-            let ss = String.sub s i (j - i) in
-            rebuild (rs ^ ss) j
+            Printf.bprintf out "[[%s/%s/%d/%s%s]]%s" fn sn oc
+              (Option.fold
+                 ~none:(Printf.sprintf "%s %s" fn sn)
+                 ~some:(fun txt -> txt)
+                 name)
+              (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
+              fam_suffix
+          else Buffer.add_substring out s i (j - i);
+          rebuild j
   in
-  rebuild "" 0
+  rebuild 0;
+  let s' = Buffer.contents out in
+  (s', old_name_remains oldk newk (Buffer.contents prose))
 
 let replace_ind_key_in_str base is oldk newk p =
   let s = Driver.sou base is in
   let design = Gutil.designation base p in
-  let s' = rewrite_key s oldk newk design in
-  Driver.insert_string base s'
+  let s', remains = rewrite_key s oldk newk design in
+  (Driver.insert_string base s', remains)
 
 let update_ind_key_pgind conf base p oldk newk =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
+  let remains = ref false in
   let replace is =
-    replace_ind_key_in_str base is oldk newk (Driver.poi base p)
+    let is, r = replace_ind_key_in_str base is oldk newk (Driver.poi base p) in
+    if r then remains := true;
+    is
   in
   let notes = replace oldp.notes in
   let occupation = replace oldp.occupation in
@@ -702,7 +833,8 @@ let update_ind_key_pgind conf base p oldk newk =
     }
   in
   Driver.patch_person base p newp;
-  update_notes_links_person conf base newp
+  update_notes_links_person conf base newp;
+  !remains
 
 let update_ind_key_pgfam conf base f oldk newk =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
@@ -712,7 +844,12 @@ let update_ind_key_pgfam conf base f oldk newk =
   let _family =
     Gutil.designation base fath ^ " x " ^ Gutil.designation base moth
   in
-  let replace is = replace_ind_key_in_str base is oldk newk fath in
+  let remains = ref false in
+  let replace is =
+    let is, r = replace_ind_key_in_str base is oldk newk fath in
+    if r then remains := true;
+    is
+  in
   let marriage_note = replace oldf.marriage_note in
   let marriage_src = replace oldf.marriage_src in
   let comment = replace oldf.comment in
@@ -731,24 +868,28 @@ let update_ind_key_pgfam conf base f oldk newk =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
   Driver.patch_family base f newf;
-  update_notes_links_family conf base newf
+  update_notes_links_family conf base newf;
+  !remains
 
 let update_ind_key_pgmisc conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_notes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
-  commit_notes conf base f newn
+  let newn, remains = rewrite_key oldn oldk newk f in
+  commit_notes conf base f newn;
+  remains
 
 let update_ind_key_pgwiz conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_wiznotes_read base fname in
-  let newn = rewrite_key oldn oldk newk f in
-  commit_wiznotes conf base f newn
+  let newn, remains = rewrite_key oldn oldk newk f in
+  commit_wiznotes conf base f newn;
+  remains
 
 let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
-  List.iter
-    (function
+  List.filter
+    (fun pg ->
+      match pg with
       | Def.NLDB.PgInd p -> update_ind_key_pgind conf base p oldk newk
       | PgFam f -> update_ind_key_pgfam conf base f oldk newk
       | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
@@ -848,6 +989,7 @@ let on_person_saved conf base ~old_key ?old_text
   if old_key <> Util.make_key base p then
     update_ind_key conf base (pgl ()) old_key
       (Driver.sou base p.first_name, Driver.sou base p.surname, p.occ)
+  else []
 
 let linked_pages_nbr conf base ip =
   let key =

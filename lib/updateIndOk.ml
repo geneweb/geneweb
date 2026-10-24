@@ -910,7 +910,7 @@ let effective_del conf base p =
 let print_title conf fmt _ =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
 
-let print_mod_ok conf base wl pgl p ofn osn oocc =
+let print_mod_ok conf base wl pgl ~remains p ofn osn oocc =
   Hutil.header conf @@ print_title conf "person modified";
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
@@ -958,7 +958,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
     && ((not (String.equal ofn nfn && String.equal osn nsn)) || oocc <> nocc)
   then (
     Output.print_sstring conf
-      {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
+      {|<div class="alert alert-info mx-auto mt-1" role="alert">|};
     Output.print_sstring conf (transl conf "name changed. updated linked pages");
     Output.print_sstring conf "</div>\n";
     let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
@@ -984,7 +984,8 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
     Output.printf conf "<span>%s%s</span>"
       (Utf8.capitalize_fst (transl conf "linked pages"))
       (transl conf ":");
-    NotesDisplay.print_linked_list conf base pgl);
+    NotesDisplay.print_linked_list conf base pgl;
+    NotesDisplay.print_old_name_remains conf base ~old_name:(ofn, osn) remains);
   Hutil.trailer conf
 
 let relation_sex_is_coherent base warning p =
@@ -1094,7 +1095,11 @@ let print_mod ?prerr o_conf base =
     else
       let u = { family = Driver.get_family op } in
       Driver.patch_person base p.key_index p;
-      Notes.on_person_saved conf base ~old_key ~old_text ~pgl:(fun () -> pgl) p;
+      let remains =
+        Notes.on_person_saved conf base ~old_key ~old_text
+          ~pgl:(fun () -> pgl)
+          p
+      in
       let wl =
         let a = Driver.poi base p.key_index in
         let a =
@@ -1106,7 +1111,7 @@ let print_mod ?prerr o_conf base =
       let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
       History.record conf base changed "mp";
       Update.delete_topological_sort_v conf base;
-      print_mod_ok conf base wl pgl p ofn osn oocc
+      print_mod_ok conf base wl pgl ~remains p ofn osn oocc
   in
   print_mod_aux conf base callback
 

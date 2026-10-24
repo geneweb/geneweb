@@ -20,7 +20,7 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
-    =
+    remains =
   Hutil.header conf (fun _ ->
       transl conf "merge done" |> Utf8.capitalize_fst
       |> Output.print_sstring conf);
@@ -39,13 +39,13 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     || ((ofn2 <> nfn || osn2 <> nsn || oocc2 <> nocc) && pgl2 <> [])
   then (
     Output.print_sstring conf
-      {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
+      {|<div class="alert alert-info mx-auto mt-1" role="alert">|};
     Output.printf conf (ftransl conf "name changed. updated linked pages");
     Output.print_sstring conf "</div>";
     let aux n txt ofn osn oocc =
       Output.print_sstring conf {|<span class="unselectable float-start">|};
       transl conf txt |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      if n = "" then (
+      if n <> "" then (
         Output.print_sstring conf " ";
         Output.print_sstring conf n);
       Output.print_sstring conf (transl conf ":");
@@ -68,7 +68,11 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
     aux "1" "old name" ofn1 osn1 oocc1;
     NotesDisplay.print_linked_list conf base pgl1;
     aux "2" "old name" ofn2 osn2 oocc2;
-    NotesDisplay.print_linked_list conf base pgl2);
+    NotesDisplay.print_linked_list conf base pgl2;
+    let old_name =
+      if ofn2 <> nfn || osn2 <> nsn then (ofn2, osn2) else (ofn1, osn1)
+    in
+    NotesDisplay.print_old_name_remains conf base ~old_name remains);
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 

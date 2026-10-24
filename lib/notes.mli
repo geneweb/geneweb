@@ -68,17 +68,36 @@ val merge_possible_aliases :
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
 
+val rename_in_text :
+  string * string * int -> string * string * int -> string -> string
+(** [rename_in_text oldk newk text] rewrites, in the display text of a
+    [[fn/sn/oc/text]] link, the occurrences of the old first name and surname of
+    [oldk] that changed in [newk]. Matching is on whole words, insensitive to
+    case, accents and hyphenation ([Name.lower]); words glued by ['-'] or ['\'']
+    to a neighbour are not matched; first name and surname are substituted in a
+    single pass. *)
+
 val update_ind_key :
   Config.config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list ->
   Def.NLDB.key ->
   string * string * int ->
-  unit
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list
 (** [update_ind_key conf base pgl oldk newk] rewrites the links to [oldk] in
     every page of [pgl] so they designate [newk]. [oldk] is lower-cased (as
     built by [Util.make_key]); [newk] carries the case-preserved first name and
-    surname, since it is written back into the notes. *)
+    surname, since it is written back into the notes. Returns the pages of [pgl]
+    whose plain text (outside wiki links, not rewritten) still contains the old
+    full name, so that the user can check them. *)
+
+val old_name_remains :
+  string * string * int -> string * string * int -> string -> bool
+(** [old_name_remains oldk newk text] is [true] if the name changed and the old
+    first name and surname still appear together, in either order, in the plain
+    text ({!NotesSearch.plain_text}) of [text], as found by the word-mode search
+    of [m=NOTES_SEARCH]. Occurrences that belong to the new name are not
+    counted. *)
 
 val source :
   Config.config -> Geneweb_db.Driver.base -> string -> Adef.safe_string
@@ -153,12 +172,13 @@ val on_person_saved :
     Geneweb_db.Driver.iper,
     Geneweb_db.Driver.istr )
   Def.gen_person ->
-  unit
+  (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam) Def.NLDB.page list
 (** [on_person_saved conf base ~old_key ?old_text ~pgl p], called right after
     [Driver.patch_person] for an existing person, re-indexes [p]'s note-bearing
     fields (see [update_notes_links_person] for [?old_text]); if [p]'s key
     differs from [old_key], rewrites the pages returned by [pgl ()] and updates
-    the linked-pages cache. [pgl] is only forced on a rename. *)
+    the linked-pages cache. [pgl] is only forced on a rename. Returns the pages
+    where the old name may remain (see [update_ind_key]), [[]] if no rename. *)
 
 val json_extract_img : Config.config -> string -> string * string
 

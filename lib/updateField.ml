@@ -242,7 +242,8 @@ let commit conf base o_p ip sp =
     let db = Notes.merge_possible_aliases conf db in
     Notes.links_to_ind conf base db old_key None
   in
-  Notes.on_person_saved conf base ~old_key ~old_text ~pgl p;
+  (* no result page here to list the pages where the old name remains *)
+  ignore (Notes.on_person_saved conf base ~old_key ~old_text ~pgl p);
   Util.commit_patches conf base;
   let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
   History.record conf base changed "mp";
