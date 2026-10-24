@@ -43,6 +43,10 @@ val eval_transl : Config.config -> bool -> string -> string -> string
 val eval_transl_lexicon : Config.config -> bool -> string -> string -> string
 val eval_date_var : Config.config -> int -> string list -> 'a expr_val
 
+val masked_bvar_value : wizard:bool -> string -> string -> string
+(** [masked_bvar_value ~wizard key value] returns [value] as displayed by
+    [%bvar.list;], masking secrets and wizard-only parameters. *)
+
 val output :
   Config.config -> ('a, 'b) interp_fun -> 'a Env.t -> 'b -> string -> unit
 (** [output conf ifun env v fl] outputs on the client socket the template [fl]

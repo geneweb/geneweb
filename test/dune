@@ -12,6 +12,7 @@
   dag2html_test
   oidc_test
   userkey_test
+  templ_test
   cache_test
   blank_name_test
   notes_search_test
