@@ -64,38 +64,86 @@ let test_kinds () =
         (kind_of_name (kind_name k) = Some k))
     all_kinds
 
+let hg = { time = "2026-10-24 09:00:00"; wizard = "hg" }
+
+let who_jean =
+  {
+    signers =
+      [ { ident = "a2"; signed = "2019-03-12" }; { ident = "hg"; signed = "" } ];
+    first = Some { time = "2015-01-02 10:00:00"; wizard = "old" };
+    last = Some hg;
+  }
+
 let test_json_roundtrip () =
   let dir = tmp_dir () in
-  let report =
-    {
-      date = "2026-10-25 10:00:00";
-      producer = "test";
-      history_days = 8;
-      anomalies = samples;
-      changes =
-        [ (person_key jean, { time = "2026-10-24 09:00:00"; wizard = "hg" }) ];
-    }
+  let items =
+    List.map
+      (fun a ->
+        { anomaly = a; who = List.map (fun _ -> who_jean) (subjects a) })
+      samples
   in
+  let report = { date = "2026-10-25 10:00:00"; producer = "test"; items } in
   save dir report;
   match load dir with
   | Error e -> Alcotest.fail e
   | Ok r ->
-      Alcotest.(check int)
-        "count" (List.length samples) (List.length r.anomalies);
+      Alcotest.(check int) "count" (List.length items) (List.length r.items);
       List.iter2
-        (fun a b -> Alcotest.(check bool) (kind_name (kind a)) true (a = b))
-        samples r.anomalies;
-      Alcotest.(check bool) "changes" true (r.changes = report.changes);
+        (fun (i : item) (j : item) ->
+          Alcotest.(check bool) (kind_name (kind i.anomaly)) true (i = j))
+        items r.items;
       (* reading one kind skips the others, PossibleDuplicateFam being a
          prefix of PossibleDuplicateFamHomonymous *)
       List.iter
         (fun k ->
           match
-            fold ~kind:k dir (fun n a -> if kind a = k then n + 1 else -100) 0
+            fold ~kind:k dir
+              (fun n (it : item) -> if kind it.anomaly = k then n + 1 else -100)
+              0
           with
           | Ok (_, n) -> Alcotest.(check int) (kind_name k) 1 n
           | Error e -> Alcotest.fail e)
         all_kinds
+
+let test_signatures () =
+  let sigs =
+    signatures_of_text
+      "Acte de naissance, [[w:hgouraud]] (registre) 3/X/2019, recensement \
+       [[w:a2|A2]] (AD50) 12/III/2021, [[w:sans_date]] (note)"
+  in
+  Alcotest.(check (list (pair string string)))
+    "idents and dates"
+    [ ("hgouraud", "2019-10-03"); ("a2", "2021-03-12"); ("sans_date", "") ]
+    (List.map (fun g -> (g.ident, g.signed)) sigs)
+
+let test_responsible () =
+  let it who = { anomaly = DeadOld (jean, 104); who = [ who ] } in
+  let by rule w =
+    Option.map
+      (fun (r : responsible) -> (r.by, r.signed))
+      (responsible rule (it w))
+  in
+  let check name expected got =
+    Alcotest.(check (option (pair string bool))) name expected got
+  in
+  let dated =
+    {
+      who_jean with
+      signers =
+        [
+          { ident = "late"; signed = "2024-01-01" };
+          { ident = "early"; signed = "2001-05-06" };
+        ];
+    }
+  in
+  check "last signer, by date" (Some ("late", true)) (by Last_signer dated);
+  check "first signer, by date" (Some ("early", true)) (by First_signer dated);
+  check "undated: text order" (Some ("hg", true)) (by Last_signer who_jean);
+  let unsigned = { who_jean with signers = [] } in
+  check "history, last" (Some ("hg", false)) (by Last_signer unsigned);
+  check "history, first" (Some ("old", false)) (by First_signer unsigned);
+  check "nobody" None
+    (by Last_signer { signers = []; first = None; last = None })
 
 let test_identity () =
   Alcotest.(check bool)
@@ -163,6 +211,8 @@ let v =
       [
         Alcotest.test_case "kinds" `Quick test_kinds;
         Alcotest.test_case "json roundtrip" `Quick test_json_roundtrip;
+        Alcotest.test_case "signatures" `Quick test_signatures;
+        Alcotest.test_case "responsible" `Quick test_responsible;
         Alcotest.test_case "identity" `Quick test_identity;
         Alcotest.test_case "whitelist" `Quick test_whitelist;
       ] );

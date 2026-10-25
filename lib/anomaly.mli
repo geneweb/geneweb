@@ -154,32 +154,72 @@ val collect : Geneweb_db.Driver.base -> t list
 (** {1 Report} *)
 
 type change = { time : string; wizard : string }
-(** Last change of a person in the base history: ["YYYY-MM-DD HH:MM:SS"] and the
-    wizard's login. *)
+(** A line of the base history: ["YYYY-MM-DD HH:MM:SS"] and the wizard. *)
+
+type signature = { ident : string; signed : string }
+(** A [[[w:ident]]] signature found in the sources (the "sign" button of the
+    update forms), with the date written after it, ["YYYY-MM-DD"], or [""]. *)
+
+val signatures_of_text : string -> signature list
+(** The signatures of a source text, in order. *)
+
+type who = {
+  signers : signature list;
+      (** in the sources of the person (and of their events), or of the family
+          for a couple; chronological when all are dated *)
+  first : change option;  (** first history line naming the person *)
+  last : change option;  (** last history line naming the person *)
+}
+(** Who may be responsible for a subject. For a couple, the history of both
+    spouses. *)
+
+type item = { anomaly : t; who : who list  (** one per {!subjects} *) }
 
 type report = {
   date : string;  (** analysis time, ["YYYY-MM-DD HH:MM:SS"] local *)
   producer : string;  (** ["gwc"], ["ged2gwb"] or ["anoma"] *)
-  history_days : int;  (** window of [changes] *)
-  anomalies : t list;
-  changes : (string * change) list;
-      (** last change of the persons of [anomalies] within the last
-          [history_days] days, by {!person_key} *)
+  items : item list;
 }
 
-val default_history_days : int
-
 val make :
-  ?history_days:int -> bdir:string -> producer:string -> t list -> report
-(** [make ~bdir ~producer anomalies] dates the report and reads the recent
-    changes of its persons from [<bdir>/history]. *)
+  base:Geneweb_db.Driver.base ->
+  bdir:string ->
+  producer:string ->
+  t list ->
+  report
+(** [make ~base ~bdir ~producer anomalies] dates the report and gathers, for
+    each subject, the signers in its sources and its first and last line in
+    [<bdir>/history] (read once, whole). *)
 
 val write :
-  ?history_days:int -> bdir:string -> producer:string -> t list -> unit
-(** [write ~bdir ~producer anomalies] saves [make ~bdir ~producer anomalies] in
-    [<bdir>/config] ({!GWPARAM.base_config_dir}), silently: gwc and ged2gwb
-    output is unchanged. A failure is reported on stderr and otherwise ignored:
-    the report must never make a build fail. *)
+  base:Geneweb_db.Driver.base ->
+  bdir:string ->
+  producer:string ->
+  t list ->
+  unit
+(** [write ~base ~bdir ~producer anomalies] saves [make] in [<bdir>/config]
+    ({!GWPARAM.base_config_dir}), silently: gwc and ged2gwb output is unchanged.
+    A failure is reported on stderr and otherwise ignored: the report must never
+    make a build fail. *)
+
+(** {1 Responsible wizard} *)
+
+type rule = First_signer | Last_signer
+
+val rule_of_string : string -> rule
+(** ["first_signer"], anything else [Last_signer]: the [anomalies_responsible]
+    base parameter. *)
+
+type responsible = {
+  by : string;  (** wizard's login *)
+  signed : bool;  (** from a signature, else from the history *)
+  at : string;  (** ["YYYY-MM-DD"], or [""] for an undated signature *)
+}
+
+val responsible : rule -> item -> responsible option
+(** The wizard most likely responsible for an anomaly: the first or last signer
+    of its subjects' sources; failing a signature, the first or last wizard in
+    their history. *)
 
 val file : string -> string
 (** [file config_dir] is the report path in the base config directory
@@ -187,16 +227,20 @@ val file : string -> string
 
 val save : string -> report -> unit
 (** [save config_dir report] writes the report atomically, creating the
-    directory if needed. The file is JSON Lines: the header (date, producer,
-    changes) on the first line, then one anomaly per line. *)
+    directory if needed. The file is JSON Lines: the header (date, producer) on
+    the first line, then one anomaly per line with its [who]. *)
 
 val fold :
-  ?kind:kind -> string -> ('a -> t -> 'a) -> 'a -> (report * 'a, string) result
+  ?kind:kind ->
+  string ->
+  ('a -> item -> 'a) ->
+  'a ->
+  (report * 'a, string) result
 (** [fold ?kind config_dir f init] reads the report line by line, folding [f]
-    over its anomalies (only those of [kind] when given: the other lines are
-    skipped unparsed). Returns the header, as a report with no anomalies, and
-    the result. [Error] for a missing or unreadable file, or a format this
-    version does not know; a damaged line is skipped. *)
+    over its items (only those of [kind] when given: the other lines are skipped
+    unparsed). Returns the header, as a report with no items, and the result.
+    [Error] for a missing or unreadable file, or a format this version does not
+    know; a damaged line is skipped. *)
 
 val load : string -> (report, string) result
 (** [load config_dir] reads the whole report. *)

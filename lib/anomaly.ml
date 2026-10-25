@@ -386,17 +386,19 @@ let collect base =
 (* ---- report -------------------------------------------------------------- *)
 
 type change = { time : string; wizard : string }
+type signature = { ident : string; signed : string }
 
-type report = {
-  date : string;
-  producer : string;
-  history_days : int;
-  anomalies : t list;
-  changes : (string * change) list;
+type who = {
+  signers : signature list;
+  first : change option;
+  last : change option;
 }
 
-let default_history_days = 8
-let format_version = 1
+type item = { anomaly : t; who : who list }
+type report = { date : string; producer : string; items : item list }
+
+let nobody = { signers = []; first = None; last = None }
+let format_version = 2
 
 let stamp_of_time t =
   let tm = Unix.localtime t in
@@ -404,11 +406,107 @@ let stamp_of_time t =
     (tm.Unix.tm_mon + 1) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec
 
+(* ---- signatures in the sources ------------------------------------------- *)
+
+(* The "sign" button of the update forms appends "[[w:ident]] (source)
+   day/ROMAN-MONTH/year" to the source fields. *)
+let re_signature = Str.regexp {|\[\[w:\([^]|]+\)\(|[^]]*\)?\]\]|}
+
+let re_sign_date =
+  Str.regexp {|\([0-9][0-9]?\)/\([IVXivx]+\)/\([0-9][0-9][0-9][0-9]\)|}
+
+let roman_month s =
+  match String.uppercase_ascii s with
+  | "I" -> Some 1
+  | "II" -> Some 2
+  | "III" -> Some 3
+  | "IV" -> Some 4
+  | "V" -> Some 5
+  | "VI" -> Some 6
+  | "VII" -> Some 7
+  | "VIII" -> Some 8
+  | "IX" -> Some 9
+  | "X" -> Some 10
+  | "XI" -> Some 11
+  | "XII" -> Some 12
+  | _ -> None
+
+(* the signatures of a text, in order, each with the date that follows it
+   (before the next signature), "YYYY-MM-DD" or "" *)
+let signatures_in s =
+  let rec loop pos acc =
+    match Str.search_forward re_signature s pos with
+    | exception Not_found -> List.rev acc
+    | _ ->
+        let ident = String.trim (Str.matched_group 1 s) in
+        let after = Str.match_end () in
+        let next =
+          match Str.search_forward re_signature s after with
+          | j -> j
+          | exception Not_found -> String.length s
+        in
+        let signed =
+          match Str.search_forward re_sign_date s after with
+          | j when j < next -> (
+              match roman_month (Str.matched_group 2 s) with
+              | Some m ->
+                  Printf.sprintf "%s-%02d-%02d" (Str.matched_group 3 s) m
+                    (int_of_string (Str.matched_group 1 s))
+              | None -> "")
+          | _ -> ""
+          | exception Not_found -> ""
+        in
+        loop after (if ident = "" then acc else { ident; signed } :: acc)
+  in
+  loop 0 []
+
+(* Chronological when every signature is dated, else in text order; a
+   signature repeated in several fields counts once. *)
+let order_signatures sigs =
+  let seen = Hashtbl.create 8 in
+  let sigs =
+    List.filter
+      (fun g ->
+        if Hashtbl.mem seen g then false
+        else (
+          Hashtbl.add seen g ();
+          true))
+      sigs
+  in
+  if List.for_all (fun g -> g.signed <> "") sigs then
+    List.stable_sort (fun g1 g2 -> compare g1.signed g2.signed) sigs
+  else sigs
+
+let person_sources base p =
+  let s = Driver.sou base in
+  s (Driver.get_psources p)
+  :: s (Driver.get_birth_src p)
+  :: s (Driver.get_baptism_src p)
+  :: s (Driver.get_death_src p)
+  :: s (Driver.get_burial_src p)
+  :: List.map
+       (fun (e : Driver.pers_event) -> s e.epers_src)
+       (Driver.get_pevents p)
+
+let family_sources base fam =
+  let s = Driver.sou base in
+  s (Driver.get_fsources fam)
+  :: s (Driver.get_marriage_src fam)
+  :: List.map
+       (fun (e : Driver.fam_event) -> s e.efam_src)
+       (Driver.get_fevents fam)
+
+let signatures_of_text = signatures_in
+
+let signers_of sources =
+  order_signatures (List.concat_map signatures_in sources)
+
+(* ---- history ------------------------------------------------------------- *)
+
 (* A history line is "YYYY-MM-DD HH:MM:SS [wizard] action (fn.occ sn)", written
-   by History.record; times sort as strings. Only the persons in [wanted] are
-   kept, so the table stays small on a large history; the file is read line by
-   line. *)
-let recent_changes ~history_file ~cutoff wanted =
+   by History.record; times sort as strings. For the persons in [wanted], the
+   first and the last line naming them. The file is read line by line. *)
+let history_changes ~history_file wanted =
   let tbl = Hashtbl.create 1024 in
   let parse line =
     let len = String.length line in
@@ -416,17 +514,23 @@ let recent_changes ~history_file ~cutoff wanted =
       match String.index_from_opt line 21 ']' with
       | None -> ()
       | Some j -> (
-          let time = String.sub line 0 19 in
-          if time >= cutoff then
-            match String.rindex_opt line '(' with
-            | Some k when k > j -> (
-                let key = String.sub line (k + 1) (len - k - 2) in
-                if Hashtbl.mem wanted key then
-                  let wizard = String.sub line 21 (j - 21) in
-                  match Hashtbl.find_opt tbl key with
-                  | Some c when c.time >= time -> ()
-                  | Some _ | None -> Hashtbl.replace tbl key { time; wizard })
-            | Some _ | None -> ())
+          match String.rindex_opt line '(' with
+          | Some k when k > j ->
+              let key = String.sub line (k + 1) (len - k - 2) in
+              if Hashtbl.mem wanted key then
+                let c =
+                  {
+                    time = String.sub line 0 19;
+                    wizard = String.sub line 21 (j - 21);
+                  }
+                in
+                Hashtbl.replace tbl key
+                  (match Hashtbl.find_opt tbl key with
+                  | Some (first, last) ->
+                      ( (if c.time < first.time then c else first),
+                        if c.time >= last.time then c else last )
+                  | None -> (c, c))
+          | Some _ | None -> ())
   in
   (match open_in history_file with
   | exception Sys_error _ -> ()
@@ -442,27 +546,137 @@ let recent_changes ~history_file ~cutoff wanted =
             | exception End_of_file -> ()
           in
           loop ()));
-  Hashtbl.fold (fun k c acc -> (k, c) :: acc) tbl []
-  |> List.sort (fun (k1, _) (k2, _) -> compare k1 k2)
+  tbl
 
-let make ?(history_days = default_history_days) ~bdir ~producer anomalies =
-  let now = Unix.time () in
-  let changes =
-    if history_days <= 0 then []
-    else
-      let wanted = Hashtbl.create 4096 in
+let earliest a b =
+  match (a, b) with
+  | Some x, Some y -> Some (if y.time < x.time then y else x)
+  | Some _, None -> a
+  | None, _ -> b
+
+let latest a b =
+  match (a, b) with
+  | Some x, Some y -> Some (if y.time >= x.time then y else x)
+  | Some _, None -> a
+  | None, _ -> b
+
+let make ~base ~bdir ~producer anomalies =
+  let wanted = Hashtbl.create 4096 in
+  List.iter
+    (fun a ->
       List.iter
-        (fun a ->
-          List.iter
-            (fun p -> Hashtbl.replace wanted (person_key p) ())
-            (persons a))
-        anomalies;
-      recent_changes
-        ~history_file:(Filename.concat bdir "history")
-        ~cutoff:(stamp_of_time (now -. (float_of_int history_days *. 86400.)))
-        wanted
+        (fun s ->
+          match s with
+          | Person p -> Hashtbl.replace wanted (person_key p) ()
+          | Couple c ->
+              Hashtbl.replace wanted (person_key c.father) ();
+              Hashtbl.replace wanted (person_key c.mother) ())
+        (subjects a))
+    anomalies;
+  let hist =
+    history_changes ~history_file:(Filename.concat bdir "history") wanted
   in
-  { date = stamp_of_time now; producer; history_days; anomalies; changes }
+  let history p =
+    match Hashtbl.find_opt hist (person_key p) with
+    | Some (first, last) -> (Some first, Some last)
+    | None -> (None, None)
+  in
+  let resolve p =
+    if is_unnamed p then None
+    else
+      Option.map (Driver.poi base)
+        (Driver.person_of_key base p.first_name p.surname p.occ)
+  in
+  let cache = Hashtbl.create 4096 in
+  let who_of_subject s =
+    match Hashtbl.find_opt cache s with
+    | Some w -> w
+    | None ->
+        let w =
+          match s with
+          | Person p ->
+              let first, last = history p in
+              let signers =
+                match resolve p with
+                | Some dp -> signers_of (person_sources base dp)
+                | None -> []
+              in
+              { signers; first; last }
+          | Couple c ->
+              let f1, l1 = history c.father and f2, l2 = history c.mother in
+              let signers =
+                match (resolve c.father, resolve c.mother) with
+                | Some f, Some m ->
+                    let ip_m = Driver.get_iper m in
+                    Driver.get_family f |> Array.to_list
+                    |> List.filter_map (fun ifam ->
+                        let fam = Driver.foi base ifam in
+                        if
+                          Driver.Iper.equal (Driver.get_mother fam) ip_m
+                          || Driver.Iper.equal (Driver.get_father fam) ip_m
+                        then Some fam
+                        else None)
+                    |> List.concat_map (family_sources base)
+                    |> signers_of
+                    |> fun family_signers ->
+                    (* a union often carries no source of its own: then the
+                       spouses' signatures *)
+                    if family_signers <> [] then family_signers
+                    else
+                      signers_of
+                        (List.concat_map (person_sources base) [ f; m ])
+                | Some _, None | None, Some _ | None, None -> []
+              in
+              { signers; first = earliest f1 f2; last = latest l1 l2 }
+        in
+        Hashtbl.add cache s w;
+        w
+  in
+  {
+    date = stamp_of_time (Unix.time ());
+    producer;
+    items =
+      List.map
+        (fun a -> { anomaly = a; who = List.map who_of_subject (subjects a) })
+        anomalies;
+  }
+
+(* ---- responsible wizard --------------------------------------------------- *)
+
+type rule = First_signer | Last_signer
+
+let rule_of_string s =
+  match s with "first_signer" -> First_signer | _ -> Last_signer
+
+type responsible = { by : string; signed : bool; at : string }
+
+let responsible rule item =
+  let last l = List.fold_left (fun _ x -> Some x) None l in
+  match List.concat_map (fun w -> w.signers) item.who with
+  | _ :: _ as sigs -> (
+      let sigs = order_signatures sigs in
+      let pick =
+        match (rule, sigs) with
+        | First_signer, g :: _ -> Some g
+        | First_signer, [] -> None
+        | Last_signer, _ -> last sigs
+      in
+      match pick with
+      | Some g -> Some { by = g.ident; signed = true; at = g.signed }
+      | None -> None)
+  | [] -> (
+      let change =
+        List.fold_left
+          (fun acc w ->
+            match rule with
+            | First_signer -> earliest acc w.first
+            | Last_signer -> latest acc w.last)
+          None item.who
+      in
+      match change with
+      | Some c ->
+          Some { by = c.wizard; signed = false; at = String.sub c.time 0 10 }
+      | None -> None)
 
 (* ---- JSON ---------------------------------------------------------------- *)
 
@@ -814,19 +1028,82 @@ let identity a =
    anomaly per line. gwc writes it without building one large JSON tree, and
    gwd reads it line by line, skipping the lines of other kinds unparsed. *)
 
+let change_to_json c = `List [ `String c.time; `String c.wizard ]
+
+let change_of_json (j : Yojson.Safe.t) =
+  match j with
+  | `List [ `String time; `String wizard ] -> Some { time; wizard }
+  | _ -> None
+
+let who_to_json w =
+  `Assoc
+    (List.filter_map Fun.id
+       [
+         (if w.signers = [] then None
+          else
+            Some
+              ( "s",
+                `List
+                  (List.map
+                     (fun g -> `List [ `String g.ident; `String g.signed ])
+                     w.signers) ));
+         Option.map (fun c -> ("f", change_to_json c)) w.first;
+         Option.map (fun c -> ("l", change_to_json c)) w.last;
+       ])
+
+let who_of_json (j : Yojson.Safe.t) =
+  match j with
+  | `Assoc fields ->
+      let signers =
+        match List.assoc_opt "s" fields with
+        | Some (`List l) ->
+            List.filter_map
+              (fun (g : Yojson.Safe.t) ->
+                match g with
+                | `List [ `String ident; `String signed ] ->
+                    Some { ident; signed }
+                | _ -> None)
+              l
+        | _ -> []
+      in
+      {
+        signers;
+        first = Option.bind (List.assoc_opt "f" fields) change_of_json;
+        last = Option.bind (List.assoc_opt "l" fields) change_of_json;
+      }
+  | _ -> nobody
+
+(* an item is its anomaly with a "w" field: one entry per subject *)
+let item_to_json it =
+  match to_json it.anomaly with
+  | `Assoc fields ->
+      `Assoc
+        (List.rev
+           (("w", `List (List.map who_to_json it.who)) :: List.rev fields))
+  | j -> j
+
+let item_of_json (j : Yojson.Safe.t) =
+  match (of_json j, j) with
+  | Some anomaly, `Assoc fields ->
+      let who =
+        match List.assoc_opt "w" fields with
+        | Some (`List l) -> List.map who_of_json l
+        | _ -> []
+      in
+      Some { anomaly; who }
+  | Some _, _ | None, _ -> None
+
+(* The report is JSON Lines: a header object on the first line, then one
+   anomaly per line. gwc writes it without building one large JSON tree, and
+   gwd reads it line by line, skipping the lines of other kinds unparsed. *)
+
 let header_to_json r =
   `Assoc
     [
       ("version", `Int format_version);
       ("date", `String r.date);
       ("producer", `String r.producer);
-      ("history_days", `Int r.history_days);
-      ("count", `Int (List.length r.anomalies));
-      ( "changes",
-        `Assoc
-          (List.map
-             (fun (k, c) -> (k, `List [ `String c.time; `String c.wizard ]))
-             r.changes) );
+      ("count", `Int (List.length r.items));
     ]
 
 let header_of_json (j : Yojson.Safe.t) =
@@ -837,32 +1114,9 @@ let header_of_json (j : Yojson.Safe.t) =
       in
       match List.assoc_opt "version" fields with
       | Some (`Int v) when v = format_version ->
-          let changes =
-            match List.assoc_opt "changes" fields with
-            | Some (`Assoc l) ->
-                List.filter_map
-                  (fun (k, (v : Yojson.Safe.t)) ->
-                    match v with
-                    | `List [ `String time; `String wizard ] ->
-                        Some (k, { time; wizard })
-                    | _ -> None)
-                  l
-            | _ -> []
-          in
-          let history_days =
-            match List.assoc_opt "history_days" fields with
-            | Some (`Int n) -> n
-            | _ -> 0
-          in
-          Ok
-            {
-              date = str "date";
-              producer = str "producer";
-              history_days;
-              anomalies = [];
-              changes;
-            }
-      | Some _ | None -> Error "unknown anomalies report format version")
+          Ok { date = str "date"; producer = str "producer"; items = [] }
+      | Some _ | None ->
+          Error "unknown anomalies report format version: run anoma again")
   | _ -> Error "the anomalies report does not start with a JSON object"
 
 let file config_dir = Filename.concat config_dir "anomalies.jsonl"
@@ -881,7 +1135,7 @@ let save config_dir r =
         output_char oc '\n'
       in
       line (header_to_json r);
-      List.iter (fun a -> line (to_json a)) r.anomalies);
+      List.iter (fun it -> line (item_to_json it)) r.items);
   Sys.rename tmp path
 
 (* to_json puts "k" first: a line starts with {"k":"<kind name>", the
@@ -918,20 +1172,20 @@ let fold ?kind config_dir f init =
                         match Yojson.Safe.from_string line with
                         | exception Yojson.Json_error _ -> loop acc
                         | j -> (
-                            match of_json j with
-                            | Some a -> loop (f acc a)
+                            match item_of_json j with
+                            | Some it -> loop (f acc it)
                             | None -> loop acc))
                   in
                   Ok (header, loop init)))
 
 let load config_dir =
   Result.map
-    (fun (header, rev) -> { header with anomalies = List.rev rev })
-    (fold config_dir (fun acc a -> a :: acc) [])
+    (fun (header, rev) -> { header with items = List.rev rev })
+    (fold config_dir (fun acc it -> it :: acc) [])
 
-let write ?history_days ~bdir ~producer anomalies =
+let write ~base ~bdir ~producer anomalies =
   let dir = Filename.concat bdir "config" in
-  match save dir (make ?history_days ~bdir ~producer anomalies) with
+  match save dir (make ~base ~bdir ~producer anomalies) with
   | () -> ()
   | exception (Sys_error msg | Failure msg) ->
       Printf.eprintf "Cannot write the anomalies report: %s\n%!" msg

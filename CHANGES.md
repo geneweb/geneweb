@@ -73,6 +73,11 @@
   the check they already run; the new `anoma` tool refreshes it for an
   existing base. Base parameter `anomalies_hidden` lists the kinds shown
   apart (default: the order, sex, duplicate and witness checks).
+- Each anomaly names the wizard most likely responsible for it: the last
+  `[[w:ident]]` signer in the sources of its persons (or family), else the
+  last wizard in the base history; base parameter
+  `anomalies_responsible=first_signer` takes the first one instead. The
+  anomalies pages filter by wizard, with a "my anomalies" view.
 - Verified anomalies: a wizard marks an anomaly as verified (a real
   marriage at 12, a real death at 104) in one click, and it leaves the
   report; the verification covers that anomaly only, and can be

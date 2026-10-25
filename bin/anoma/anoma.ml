@@ -17,7 +17,6 @@ let usage =
 
 let () =
   let bname = ref "" in
-  let history_days = ref Anomaly.default_history_days in
   let fold_only = ref false in
   let speclist =
     Arg.align
@@ -26,12 +25,6 @@ let () =
           Arg.String Secure.set_base_dir,
           Printf.sprintf "<DIR> bases directory (default %S)"
             (Dirs.path Secure.default_base_dir) );
-        ( "-hist",
-          Arg.Set_int history_days,
-          Printf.sprintf
-            "<DAYS> report who last modified each person within this many days \
-             (default %d; 0: none)"
-            Anomaly.default_history_days );
         ("-fold", Arg.Set fold_only, " only merge the pending verifications");
       ]
   in
@@ -48,15 +41,17 @@ let () =
   if not (Sys.file_exists bdir) then (
     Printf.eprintf "anoma: no base %s\n" bdir;
     exit 2);
-  if not !fold_only then (
-    let anomalies =
-      Driver.with_database
-        (Filename.concat (Secure.base_dir ()) bname)
-        Anomaly.collect
-    in
-    Anomaly.write ~history_days:!history_days ~bdir ~producer:"anoma" anomalies;
-    Printf.eprintf "%d anomalies written to %s\n%!" (List.length anomalies)
-      (Anomaly.file (GWPARAM.base_config_dir bname)));
+  (if not !fold_only then
+     let anomalies =
+       Driver.with_database
+         (Filename.concat (Secure.base_dir ()) bname)
+         (fun base ->
+           let anomalies = Anomaly.collect base in
+           Anomaly.write ~base ~bdir ~producer:"anoma" anomalies;
+           anomalies)
+     in
+     Printf.eprintf "%d anomalies written to %s\n%!" (List.length anomalies)
+       (Anomaly.file (GWPARAM.base_config_dir bname)));
   let r = AnomalyWhitelist.fold (GWPARAM.base_config_dir bname) in
   Printf.eprintf "%d verification files merged, %d verified anomalies\n%!"
     r.fragments r.entries
