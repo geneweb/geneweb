@@ -8,8 +8,8 @@ let can_verify k =
   | K_DeadOld | K_BigAgeBetweenSpouses | K_CloseChildren | K_DistantChildren
   | K_ChildrenNotInOrder | K_ChangedOrderOfChildren | K_PossibleDuplicateFam
   | K_PossibleDuplicateFamHomonymous | K_PEventOrder | K_FEventOrder
-  | K_ChangedOrderOfFamilyEvents | K_ChangedOrderOfPersonEvents
-  | K_UndefinedSex ->
+  | K_ChangedOrderOfFamilyEvents | K_ChangedOrderOfPersonEvents | K_UndefinedSex
+    ->
       true
   | K_BirthAfterDeath | K_ChangedOrderOfMarriages | K_DeadTooEarlyToBeFather
   | K_FWitnessEventAfterDeath | K_FWitnessEventBeforeBirth
@@ -43,8 +43,10 @@ let record_of_json (j : Yojson.Safe.t) =
           List.assoc_opt "at" fields,
           List.assoc_opt "ok" fields )
       with
-      | Some anomaly, Some (`String wizard), Some (`String date), Some (`Bool ok)
-        ->
+      | ( Some anomaly,
+          Some (`String wizard),
+          Some (`String date),
+          Some (`Bool ok) ) ->
           Some { entry = { anomaly; wizard; date }; verified = ok }
       | _ -> None)
   | _ -> None
@@ -115,7 +117,9 @@ let load config_dir =
   apply t (pending_records (List.map snd (pending config_dir)));
   t
 
-let find t a = if Hashtbl.length t = 0 then None else Hashtbl.find_opt t (identity a)
+let find t a =
+  if Hashtbl.length t = 0 then None else Hashtbl.find_opt t (identity a)
+
 let mem t a = Option.is_some (find t a)
 let size t = Hashtbl.length t
 
@@ -144,7 +148,8 @@ let fragment_name wizard =
   ^ ".jsonl"
 
 let record config_dir ~wizard ~verified a =
-  if not (can_verify (kind a)) then Error "this kind of anomaly cannot be verified"
+  if not (can_verify (kind a)) then
+    Error "this kind of anomaly cannot be verified"
   else if List.exists is_unnamed (persons a) then
     Error "an anomaly about an unnamed person cannot be verified"
   else

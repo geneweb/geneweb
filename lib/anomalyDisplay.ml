@@ -89,17 +89,16 @@ let age_text conf n =
 let pevent conf base (e : pevent) =
   match e with
   | Epers_Name s -> esc s
-  | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-    | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
-    | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
-    | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
-    | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
-    | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
-    | Epers_Dotation | Epers_DotationLDS | Epers_Education | Epers_Election
-    | Epers_Emigration | Epers_Excommunication | Epers_FamilyLinkLDS
-    | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
-    | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
-    | Epers_ListePassenger | Epers_MilitaryDistinction
+  | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
+    | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+    | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
+    | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
+    | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
+    | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+    | Epers_Education | Epers_Election | Epers_Emigration
+    | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
+    | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
+    | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
     | Epers_MilitaryPromotion | Epers_MilitaryService
     | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
     | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
@@ -112,8 +111,8 @@ let fevent conf base (e : fevent) =
   | Efam_Name s -> esc s
   | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
     | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
-    | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
-    | Efam_Residence ) as e ->
+    | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS | Efam_Residence
+      ) as e ->
       (Util.string_of_fevent_name conf base e :> string)
 
 (* ---- messages ------------------------------------------------------------ *)
@@ -172,8 +171,7 @@ let print_message conf base resolve a =
   | ChildrenNotInOrder (c, p1, p2) ->
       children "the following children of %t and %t are not in order" c p1 p2
   | CloseChildren (c, p1, p2) ->
-      children "the following children of %t and %t are born very close" c p1
-        p2
+      children "the following children of %t and %t are born very close" c p1 p2
   | DistantChildren (c, p1, p2) ->
       children "the following children of %t and %t are born very distant" c p1
         p2
@@ -211,16 +209,13 @@ let print_message conf base resolve a =
         (fun _ -> who p)
         (fun _ -> who anc)
   | IncoherentSex p ->
-      Output.printf conf
-        (fmt "%t's sex is not coherent with his/her relations")
+      Output.printf conf (fmt "%t's sex is not coherent with his/her relations")
         (fun _ -> who p)
   | MarriageDateAfterDeath p ->
-      Output.printf conf
-        (fmt "marriage had occurred after the death of %t")
+      Output.printf conf (fmt "marriage had occurred after the death of %t")
         (fun _ -> who p)
   | MarriageDateBeforeBirth p ->
-      Output.printf conf
-        (fmt "marriage had occurred before the birth of %t")
+      Output.printf conf (fmt "marriage had occurred before the birth of %t")
         (fun _ -> who p)
   | MotherDeadBeforeChildBirth (mother, child) ->
       Output.printf conf
@@ -233,8 +228,7 @@ let print_message conf base resolve a =
       out (tr conf "is born after his/her child");
       out " ";
       out (who c)
-  | ParentTooYoung (p, n, _) ->
-      parent_age p "is a very young parent" n
+  | ParentTooYoung (p, n, _) -> parent_age p "is a very young parent" n
   | ParentTooOld (p, n, _) -> parent_age p "is a very old parent" n
   | PEventOrder (p, e1, e2) ->
       Output.printf conf
@@ -273,9 +267,8 @@ let print_message conf base resolve a =
   | YoungForMarriage (p, n, _) | OldForMarriage (p, n, _) ->
       out (who p);
       out " ";
-      Output.printf conf
-        (Util.ftransl conf "married at age %t")
-        (fun _ -> age_text conf n)
+      Output.printf conf (Util.ftransl conf "married at age %t") (fun _ ->
+          age_text conf n)
 
 (* ---- edit links ---------------------------------------------------------- *)
 
@@ -286,7 +279,9 @@ let edit_person conf resolve p =
   | Some dp ->
       Printf.sprintf {|<a class="ms-2" href="%s" title="%s">%s</a>|}
         (url conf
-           [ ("m", "MOD_IND"); ("i", Driver.Iper.to_string (Driver.get_iper dp)) ])
+           [
+             ("m", "MOD_IND"); ("i", Driver.Iper.to_string (Driver.get_iper dp));
+           ])
         (esc (ctr conf "modify" ^ " " ^ person_key p))
         wrench
   | None -> ""
@@ -329,7 +324,9 @@ type state = {
 }
 
 let last_change st a =
-  List.find_map (fun p -> Hashtbl.find_opt st.changes (person_key p)) (persons a)
+  List.find_map
+    (fun p -> Hashtbl.find_opt st.changes (person_key p))
+    (persons a)
 
 let verified st a = AnomalyWhitelist.mem st.whitelist a
 
@@ -445,7 +442,9 @@ let print_several conf base resolve todo =
       List.iter
         (fun s ->
           let ps =
-            match s with Person p -> [ p ] | Couple c -> [ c.father; c.mother ]
+            match s with
+            | Person p -> [ p ]
+            | Couple c -> [ c.father; c.mother ]
           in
           List.iter
             (fun p ->
@@ -653,7 +652,8 @@ let print_item ?(with_kind = false) conf base resolve ~entry ~change a =
   (match change with
   | Some c ->
       Output.printf conf {|<span class="text-muted ms-2">· %s %s</span>|}
-        (esc c.wizard) (esc (day c.time))
+        (esc c.wizard)
+        (esc (day c.time))
   | None -> ());
   Output.print_sstring conf "</div></li>\n"
 
@@ -696,9 +696,7 @@ let print_kind conf base st anomalies k =
     | Some w ->
         List.filter
           (fun a ->
-            match last_change st a with
-            | Some c -> c.wizard = w
-            | None -> false)
+            match last_change st a with Some c -> c.wizard = w | None -> false)
           of_kind
   in
   let total = List.length items in
@@ -846,7 +844,7 @@ let print_ok_fold conf _base =
                   (Util.ftransl conf
                      "ANOMALY %d contributions merged, %d verified anomalies")
                   r.fragments r.entries))
-      | exception (Sys_error _ as e) | exception (Unix.Unix_error _ as e) ->
+      | (exception (Sys_error _ as e)) | (exception (Unix.Unix_error _ as e)) ->
           Output.printf conf {|<div class="alert alert-danger">%s</div>|}
             (esc (Printexc.to_string e)));
       Output.printf conf {|<p><a href="%s">%s</a> · <a href="%s">%s</a></p>|}

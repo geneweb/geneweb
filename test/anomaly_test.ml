@@ -55,8 +55,7 @@ let tmp_dir () =
 
 let test_kinds () =
   Alcotest.(check int)
-    "one sample per kind"
-    (List.length all_kinds)
+    "one sample per kind" (List.length all_kinds)
     (List.length (List.sort_uniq compare (List.map kind samples)));
   List.iter
     (fun k ->
@@ -73,14 +72,16 @@ let test_json_roundtrip () =
       producer = "test";
       history_days = 8;
       anomalies = samples;
-      changes = [ (person_key jean, { time = "2026-10-24 09:00:00"; wizard = "hg" }) ];
+      changes =
+        [ (person_key jean, { time = "2026-10-24 09:00:00"; wizard = "hg" }) ];
     }
   in
   save dir report;
   match load dir with
   | Error e -> Alcotest.fail e
   | Ok r ->
-      Alcotest.(check int) "count" (List.length samples) (List.length r.anomalies);
+      Alcotest.(check int)
+        "count" (List.length samples) (List.length r.anomalies);
       List.iter2
         (fun a b -> Alcotest.(check bool) (kind_name (kind a)) true (a = b))
         samples r.anomalies;
@@ -89,7 +90,9 @@ let test_json_roundtrip () =
          prefix of PossibleDuplicateFamHomonymous *)
       List.iter
         (fun k ->
-          match fold ~kind:k dir (fun n a -> if kind a = k then n + 1 else -100) 0 with
+          match
+            fold ~kind:k dir (fun n a -> if kind a = k then n + 1 else -100) 0
+          with
           | Ok (_, n) -> Alcotest.(check int) (kind_name k) 1 n
           | Error e -> Alcotest.fail e)
         all_kinds
@@ -140,13 +143,15 @@ let test_whitelist () =
   let r = AnomalyWhitelist.fold dir in
   Alcotest.(check int) "fragments merged" 3 r.fragments;
   Alcotest.(check int) "verified after merge" 1 r.entries;
-  Alcotest.(check int) "nothing pending" 0
+  Alcotest.(check int)
+    "nothing pending" 0
     (List.length (AnomalyWhitelist.pending dir));
   let t = AnomalyWhitelist.load dir in
   check t "after merge" true (DeadOld (jean, 104));
   check t "cancellation merged" false young;
   ok (record true young);
-  Alcotest.(check int) "verified again" 2
+  Alcotest.(check int)
+    "verified again" 2
     (AnomalyWhitelist.size (AnomalyWhitelist.load dir));
   ignore (AnomalyWhitelist.fold dir);
   Alcotest.(check bool)

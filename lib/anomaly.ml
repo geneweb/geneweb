@@ -196,8 +196,8 @@ let age a =
   | MarriageDateAfterDeath _ | MarriageDateBeforeBirth _
   | MotherDeadBeforeChildBirth _ | ParentBornAfterChild _ | PEventOrder _
   | PossibleDuplicateFam _ | PossibleDuplicateFamHomonymous _
-  | PWitnessEventAfterDeath _ | PWitnessEventBeforeBirth _
-  | TitleDatesError _ | UndefinedSex _ ->
+  | PWitnessEventAfterDeath _ | PWitnessEventBeforeBirth _ | TitleDatesError _
+  | UndefinedSex _ ->
       None
 
 type subject = Person of person | Couple of couple
@@ -419,9 +419,9 @@ let recent_changes ~history_file ~cutoff wanted =
           let time = String.sub line 0 19 in
           if time >= cutoff then
             match String.rindex_opt line '(' with
-            | Some k when k > j ->
+            | Some k when k > j -> (
                 let key = String.sub line (k + 1) (len - k - 2) in
-                if Hashtbl.mem wanted key then (
+                if Hashtbl.mem wanted key then
                   let wizard = String.sub line 21 (j - 21) in
                   match Hashtbl.find_opt tbl key with
                   | Some c when c.time >= time -> ()
@@ -550,20 +550,20 @@ let pevent_to_json (e : pevent) =
   match e with
   | Epers_Name s -> `List [ `String s ]
   | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
-  | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
-  | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
-  | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
-  | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
-  | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
-  | Epers_Education | Epers_Election | Epers_Emigration
-  | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
-  | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
-  | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
-  | Epers_MilitaryPromotion | Epers_MilitaryService
-  | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
-  | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
-  | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
-  | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will ->
+  | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion | Epers_BaptismLDS
+  | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName
+  | Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS
+  | Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma
+  | Epers_Distinction | Epers_Dotation | Epers_DotationLDS | Epers_Education
+  | Epers_Election | Epers_Emigration | Epers_Excommunication
+  | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+  | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+  | Epers_ListePassenger | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+  | Epers_MilitaryService | Epers_MobilisationMilitaire | Epers_Naturalisation
+  | Epers_Occupation | Epers_Ordination | Epers_Property | Epers_Recensement
+  | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+  | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+  | Epers_Will ->
       event_to_json pevent_names e
 
 let fevent_to_json (e : fevent) =
@@ -592,7 +592,8 @@ let person_of_json (j : Yojson.Safe.t) =
       Some { first_name; surname; occ }
   | _ -> None
 
-let couple_to_json c = `List [ person_to_json c.father; person_to_json c.mother ]
+let couple_to_json c =
+  `List [ person_to_json c.father; person_to_json c.mother ]
 
 let couple_of_json (j : Yojson.Safe.t) =
   match j with
@@ -721,8 +722,8 @@ let of_fields k f =
   | ( ( K_BigAgeBetweenSpouses | K_BirthAfterDeath | K_ChangedOrderOfChildren
       | K_ChangedOrderOfFamilyEvents | K_ChangedOrderOfMarriages
       | K_ChangedOrderOfPersonEvents | K_ChildrenNotInOrder | K_CloseChildren
-      | K_DeadOld | K_DeadTooEarlyToBeFather | K_DistantChildren
-      | K_FEventOrder | K_FWitnessEventAfterDeath | K_FWitnessEventBeforeBirth
+      | K_DeadOld | K_DeadTooEarlyToBeFather | K_DistantChildren | K_FEventOrder
+      | K_FWitnessEventAfterDeath | K_FWitnessEventBeforeBirth
       | K_IncoherentAncestorDate | K_IncoherentSex | K_MarriageDateAfterDeath
       | K_MarriageDateBeforeBirth | K_MotherDeadBeforeChildBirth
       | K_OldForMarriage | K_ParentBornAfterChild | K_ParentTooOld
@@ -782,11 +783,11 @@ let of_json (j : Yojson.Safe.t) =
       with
       | Some k, Some p, Some c, Some n, Some s ->
           of_fields k { p; c; n; e = list "e"; s }
-      | (None, _, _, _, _)
-      | (_, None, _, _, _)
-      | (_, _, None, _, _)
-      | (_, _, _, None, _)
-      | (_, _, _, _, None) ->
+      | None, _, _, _, _
+      | _, None, _, _, _
+      | _, _, None, _, _
+      | _, _, _, None, _
+      | _, _, _, _, None ->
           None)
   | _ -> None
 

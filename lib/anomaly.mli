@@ -2,15 +2,15 @@
     values that survive the base being rebuilt.
 
     A {!Def.warning} refers to persons and families by [iper] and [ifam], which
-    change at every gwu/gwc cycle. An anomaly refers to them by key (first
-    name, occurrence number, surname) instead, so that a report written by gwc
-    can be read later by gwd, and a verified anomaly can be recorded in the
-    whitelist ({!AnomalyWhitelist}) and still match after a rebuild.
+    change at every gwu/gwc cycle. An anomaly refers to them by key (first name,
+    occurrence number, surname) instead, so that a report written by gwc can be
+    read later by gwd, and a verified anomaly can be recorded in the whitelist
+    ({!AnomalyWhitelist}) and still match after a rebuild.
 
     The report is produced by gwc and ged2gwb during the check they already run
     while building a base, or by the [anoma] tool on an existing base. It is
-    stored as JSON Lines in [<base>.gwb/config/anomalies.jsonl] and rendered by gwd
-    (m=ANOMA, {!AnomalyDisplay}) in the reader's language. *)
+    stored as JSON Lines in [<base>.gwb/config/anomalies.jsonl] and rendered by
+    gwd (m=ANOMA, {!AnomalyDisplay}) in the reader's language. *)
 
 type person = { first_name : string; surname : string; occ : int }
 (** A person, by key. *)
@@ -130,8 +130,9 @@ val identity : t -> string
     change of date that keeps the anomaly. *)
 
 val to_json : t -> Yojson.Safe.t
-(** One anomaly, as in the report: [{"k": kind, "p": persons, "c": couples,
-    "n": integers, "e": events, "s": strings}]. *)
+(** One anomaly, as in the report:
+    [{"k": kind, "p": persons, "c": couples, "n": integers, "e": events, "s":
+     strings}]. *)
 
 val of_json : Yojson.Safe.t -> t option
 
@@ -153,8 +154,8 @@ val collect : Geneweb_db.Driver.base -> t list
 (** {1 Report} *)
 
 type change = { time : string; wizard : string }
-(** Last change of a person in the base history: ["YYYY-MM-DD HH:MM:SS"] and
-    the wizard's login. *)
+(** Last change of a person in the base history: ["YYYY-MM-DD HH:MM:SS"] and the
+    wizard's login. *)
 
 type report = {
   date : string;  (** analysis time, ["YYYY-MM-DD HH:MM:SS"] local *)
@@ -175,8 +176,8 @@ val make :
 
 val write :
   ?history_days:int -> bdir:string -> producer:string -> t list -> unit
-(** [write ~bdir ~producer anomalies] saves [make ~bdir ~producer anomalies]
-    in [<bdir>/config] ({!GWPARAM.base_config_dir}). A failure is reported on
+(** [write ~bdir ~producer anomalies] saves [make ~bdir ~producer anomalies] in
+    [<bdir>/config] ({!GWPARAM.base_config_dir}). A failure is reported on
     stderr and otherwise ignored: the report must never make a build fail. *)
 
 val file : string -> string
@@ -189,11 +190,7 @@ val save : string -> report -> unit
     changes) on the first line, then one anomaly per line. *)
 
 val fold :
-  ?kind:kind ->
-  string ->
-  ('a -> t -> 'a) ->
-  'a ->
-  (report * 'a, string) result
+  ?kind:kind -> string -> ('a -> t -> 'a) -> 'a -> (report * 'a, string) result
 (** [fold ?kind config_dir f init] reads the report line by line, folding [f]
     over its anomalies (only those of [kind] when given: the other lines are
     skipped unparsed). Returns the header, as a report with no anomalies, and
