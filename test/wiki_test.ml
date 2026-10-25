@@ -30,19 +30,26 @@ let l =
         WLpage (31, ([ "Sources" ], "Index"), "Sources:Index", "a_2", "sources");
       ],
       "[[[Sources:Index#a_2/sources]]]" );
-    ( [ WLperson (11, ("ccc", "ddd", 0), Some "ccc ddd", None, None) ],
+    ( [ WLperson (11, ("ccc", "ddd", 0), Short ("ccc", "ddd"), None, None) ],
       "[[ccc/ddd]]" );
-    ( [ WLperson (17, ("ccc", "ddd", 0), Some "Texte", None, None) ],
+    ( [ WLperson (13, ("ccc", "ddd", 1), Short ("ccc", "ddd"), None, None) ],
+      "[[ccc/ddd/1]]" );
+    ( [ WLperson (17, ("ccc", "ddd", 0), Explicit "Texte", None, None) ],
       "[[ccc/ddd/Texte]]" );
-    ( [ WLperson (21, ("ccc", "ddd", 1), Some "Ccc Ddd", None, None) ],
+    ( [ WLperson (21, ("ccc", "ddd", 1), Explicit "Ccc Ddd", None, None) ],
       "[[ccc/ddd/1/Ccc Ddd]]" );
-    ( [ WLperson (25, ("ccc", "ddd", 0), Some "Texte", Some "Texte 2", None) ],
+    ( [
+        WLperson (25, ("ccc", "ddd", 0), Explicit "Texte", Some "Texte 2", None);
+      ],
       "[[ccc/ddd/Texte;Texte 2]]" );
-    ( [ WLperson (13, ("ccc", "ddd", 0), Some "ccc ddd", None, Some 1) ],
+    ( [ WLperson (13, ("ccc", "ddd", 0), Short ("ccc", "ddd"), None, Some 1) ],
       "[[ccc/ddd]]#1" );
-    ( [ WLperson (14, ("ccc", "ddd", 0), Some "ccc ddd", None, Some 42) ],
+    ( [ WLperson (14, ("ccc", "ddd", 0), Short ("ccc", "ddd"), None, Some 42) ],
       "[[ccc/ddd]]#42" );
-    ( [ WLperson (17, ("ccc", "ddd", 0), Some "ccc ddd", Some "txt", Some 5) ],
+    ( [
+        WLperson
+          (17, ("ccc", "ddd", 0), Short ("ccc", "ddd"), Some "txt", Some 5);
+      ],
       "[[ccc/ddd;txt]]#5" );
     ([ WLnone (6, "[[[]]]") ], "[[[]]]");
     ([ WLnone (4, "[[]]") ], "[[]]");
@@ -51,9 +58,9 @@ let l =
       "[[[d_azincourt/d&#039;Azincourt]]]" );
     ( [
         WLnone (1, "[");
-        WLperson (12, ("aaa", "bbb", 0), Some "aaa bbb", None, None);
+        WLperson (12, ("aaa", "bbb", 0), Short ("aaa", "bbb"), None, None);
         WLnone (14, ", ");
-        WLperson (33, ("ccc", "ddd", 0), Some "Ccc Ddd", None, None);
+        WLperson (33, ("ccc", "ddd", 0), Explicit "Ccc Ddd", None, None);
         WLnone (58, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
@@ -83,9 +90,10 @@ let pp_token ppf tk =
       Fmt.pf ppf "WLpage (%d, ([%s], %s), %s, %s, %s)" pos
         (String.concat "; " p) fname full anchor text
   | WLperson (pos, (fn, sn, oc), name, text, fam_marker) ->
-      Fmt.pf ppf "WLperson (%d, (%s, %s, %d), %a, %a, %a)" pos fn sn oc
-        Fmt.(option ~none:(any "None") string)
-        name
+      Fmt.pf ppf "WLperson (%d, (%s, %s, %d), %s, %a, %a)" pos fn sn oc
+        (match name with
+        | Short (f, s) -> Printf.sprintf "Short (%s, %s)" f s
+        | Explicit t -> "Explicit " ^ t)
         Fmt.(option ~none:(any "None") string)
         text
         Fmt.(option ~none:(any "None") int)

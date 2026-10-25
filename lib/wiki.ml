@@ -332,7 +332,7 @@ let syntax_links conf wi s =
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _, _) ->
           let name =
             if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
-            then Option.value ~default:"??" name
+            then NotesLinks.display_text name
             else Util.private_txt conf ""
           in
           let name = bold_italic_syntax name in
@@ -484,10 +484,10 @@ let remove_links s =
       let len, i =
         match NotesLinks.misc_notes_link s i with
         | NotesLinks.WLpage (j, _, _, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLperson (j, (fn, sn, _), name, text, _) ->
+        | NotesLinks.WLperson (j, _, name, text, _) ->
             let text =
               match text with
-              | None | Some "" -> Option.value ~default:(fn ^ " " ^ sn) name
+              | None | Some "" -> NotesLinks.display_text name
               | Some text -> text
             in
             (Buff.mstore len text, j)

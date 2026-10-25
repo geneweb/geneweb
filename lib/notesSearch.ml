@@ -138,12 +138,11 @@ let plain_text m =
           let j =
             match NotesLinks.misc_notes_link m i with
             | NotesLinks.WLpage (j, _, _, _, text)
-            | NotesLinks.WLperson (j, _, Some text, _, _)
             | NotesLinks.WLwizard (j, _, text) ->
                 add_text text;
                 j
-            | NotesLinks.WLperson (j, (fn, sn, _), None, _, _) ->
-                add_text (fn ^ " " ^ sn);
+            | NotesLinks.WLperson (j, _, t, _, _) ->
+                add_text (NotesLinks.display_text t);
                 j
             | NotesLinks.WLimage (j, _, alt, _) ->
                 add_text alt;
