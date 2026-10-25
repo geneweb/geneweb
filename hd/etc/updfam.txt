@@ -1,5 +1,5 @@
-  <!-- $Id: updfam.txt v7.1 14/10/2026 01:59:36 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+<!-- $Id: updfam.txt v7.1 25/10/2026 02:59:03 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="updform">
 <head>
@@ -27,22 +27,16 @@
 <div class="container">
 %( do not use %include;menubar %)
 %include_menubar;
-%define;attr(xx,yy)%if;(b.datalist_xx=1 or b.rpc_datalist=1) list="datalist_xx"%end; data-book="yy"%end;
-%let;datalist_fnames;%apply;attr("fnames","fn")%in;
-%let;datalist_snames;%apply;attr("snames","sn")%in;
-%let;datalist_places;%apply;attr("places","place")%in;
-%let;datalist_occupations;%apply;attr("occupations","occu")%in;
-%let;datalist_sources;%apply;attr("sources","src")%in;
 %include;upd_utils
 %define;nav()
   <div class="container fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
       <nav class="nav nav-pills nav-fill gap-3">
-        <a class="nav-item nav-link p-0" href="#family" title="[*parents]"><i class="fa fa-person fa-fw" aria-hidden="true"></i><i class="fa fa-person-dress" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*parents]</span></a>
-        <a class="nav-item nav-link p-0" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link p-0" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ms-1">[*child/children]1</span></a>
-        <a class="nav-item nav-link p-0" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*source/sources]1</span></a>
-        <a class="nav-item nav-link p-0" href="#comments" title="[*comment]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ms-1">[*comment]</span></a>
+        %apply;nav_item("family","person","person-dress","md",[*spouse/spouses]1)
+        %apply;nav_item("events","graduation-cap","","md",[*event/events]1)
+        %apply;nav_item("children","child","","md",[*child/children]1)
+        %apply;nav_item("sources","star","","lg",[*source/sources]1)
+        %apply;nav_item("comments","file-lines","","lg",[*comment]1)
       </nav>
     </nav>
   </div>
@@ -469,10 +463,6 @@
     %end;
   </div>
   <hr class="w-100">
-%end;
-
-%define;card_header(xx,yy)
-  <h3 class="card-header py-1 text-center" id="xx" aria-label="§ [*yy]1">[*yy]1</h3>
 %end;
 
 <h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
