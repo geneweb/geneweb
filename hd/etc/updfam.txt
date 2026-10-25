@@ -190,7 +190,7 @@
         %if;(event.e_name="#marr") data-marr%end; placeholder="[*note/notes]1">%event.e_note;</textarea>
     </div>
   </div>
-  <div class="row mt-0">
+  <div class="row mt-1">
     <label for="e_srcxcnt" class="col-sm-2 col-form-label">[*source/sources]0</label>
     <div class="col-sm-10">
       %if;(event.e_src!="")
