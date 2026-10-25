@@ -3727,7 +3727,10 @@ let main () =
       Check.print_base_error !log_oc base x;
       Printf.fprintf !log_oc "\n"
     in
-    let base_warning = function
+    let add_anomaly, anomalies = Anomaly.collector base in
+    let base_warning x =
+      add_anomaly x;
+      match x with
       | UndefinedSex _ -> ()
       | _ when !no_warn -> ()
       | x ->
@@ -3735,7 +3738,8 @@ let main () =
           Printf.fprintf !log_oc "\n"
     in
     Check.check_base base base_error base_warning ignore;
-    flush !log_oc
+    flush !log_oc;
+    Anomaly.write ~base ~bdir:!out_file ~producer:"ged2gwb" (anomalies ())
   end;
   if !log_oc != stdout then close_out !log_oc
 

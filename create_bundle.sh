@@ -28,7 +28,7 @@ cp "${DISTRIB_DIR}"/*.htm "${BUNDLE_DIR}/Resources/" 2>/dev/null || true
 mkdir -p "${BUNDLE_DIR}/Resources/bases"
 
 EXECUTABLES=(
-    "connex" "consang" "gwfixbase" "ged2gwb" "gwb2ged" 
+    "anoma" "connex" "consang" "gwfixbase" "ged2gwb" "gwb2ged" 
     "cache_files" "gwc" "gwd" "gwdiff" "gwu" 
     "robot" "gwsetup" "update_nldb"
 )

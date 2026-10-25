@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- $Id: anoma.htm,v 7.10 2026-10-25 GeneWeb Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[analyse anomalies]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">[analyse anomalies]</h1>
+</div>
+<div>
+<p>[anomalies analysis explained]</p>
+<form method="get" action="anoma">
+<input type="hidden" name="opt" value="check">
+<input type="hidden" name="lang" value="%l">
+[select base]
+<p>
+<table class="setup">
+%b{
+<tr align="left">
+<td><input type="radio" name="anon" value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:%P/%a?w=w&m=ANOMA">%a</a></td>
+</tr>|
+<tr align="left"><td>- [no base provided]</td></tr>}
+</table>
+<p>
+<input type="submit" value="[Run anomalies analysis]">
+</form>
+</div>
