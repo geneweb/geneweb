@@ -1,6 +1,24 @@
 <!-- $Id: upd_utils v7.1 25/10/2026 02:41:22 $ -->
-%( Date (dd/mm/yyyy in [!dates order]) and place of a created person.
-   kind: birth or death; xvar: field prefix; xx: template variable. %)
+%define;attr(xx,yy)%if;(b.datalist_xx=1 or b.rpc_datalist=1) list="datalist_xx"%end; data-book="yy"%end;
+%let;datalist_fnames;%apply;attr("fnames","fn")%in;
+%let;datalist_snames;%apply;attr("snames","sn")%in;
+%let;datalist_places;%apply;attr("places","place")%in;
+%let;datalist_occupations;%apply;attr("occupations","occu")%in;
+%let;datalist_sources;%apply;attr("sources","src")%in;
+%let;datalist_aliases;%apply;attr("aliases","alias")%in;
+%let;datalist_estates;%apply;attr("estates","domain")%in;
+%let;datalist_pub_names;%apply;attr("pub_names","pubn")%in;
+%let;datalist_qualifiers;%apply;attr("qualifiers","qual")%in;
+%let;datalist_titles;%apply;attr("titles","title")%in;
+
+%define;nav_item(anchor,icon,extra,bp,label)
+  <a class="nav-item nav-link p-0" href="#anchor" title="label"><i class="fa fa-icon fa-fw" aria-hidden="true"></i>%if;("extra"!="")<i class="fa fa-extra" aria-hidden="true"></i>%end;<span class="d-none d-bp-inline-flex ms-1">label</span></a>
+%end;
+
+%define;card_header(xx,yy)
+  <h3 class="card-header pt-2 pb-1 text-center" id="xx">[*yy]1</h3>
+%end;
+
 %define;small_date(kind,xvar,xx)
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
