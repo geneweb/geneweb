@@ -392,6 +392,7 @@ and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "create" ] -> str_val (if create <> Update.Link then "create" else "link")
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
+  | [ "link" ] -> bool_val (create = Update.Link)
   | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "sex" ] ->

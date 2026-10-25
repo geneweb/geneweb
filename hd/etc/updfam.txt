@@ -160,111 +160,6 @@
   </div>
 %end;
 
-%define;insert_witness(xcnt, wcnt)
-  <div class="row mt-3 mb-1">
-    <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
-    <div class="btn-group col-auto">
-      <div class="input-group">
-        <select class="form-select bg-light border-primary border-end-0" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
-          %for;i;0;11;<option>%i;</option> %end;
-        </select>
-          <span class="input-group-text bg-transparent border-primary border-start-0 text-primary">[witness/witness/witnesses]3</span>
-          <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
-      </div>
-    </div>
-  </div>
-%end;
-
-%define;one_witness(xcnt, wcnt)
-  <hr>
-  <div class="mb-3 mt-1">
-    <div class="row">
-      <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt</h5>
-      <div class="col-2">
-        <select class="form-select" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct"%if;(fwitness.index!="-1") data-pnoc-checked="%fwitness.first_name;|%fwitness.surname;|%if;(fwitness.occ!="" and fwitness.occ!="0")%fwitness.occ;%else;0%end;"%end;>
-          <option value="create"%if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create="create") selected%end;>[*create]0</option>
-          <option value="link"%if;(fwitness.create="link") selected%end;>[*link]0</option>
-        </select>
-      </div>
-      <div class="col-4">
-        <select class="form-select" name="excnt_witnwcnt_kind">
-          <option value=""%if;(fwitness_kind="") selected%end;>[*witness/witnesses]0</option>
-          <option value="info"%if;(fwitness_kind="info") selected%end;>[*informant/informant/informant]2</option>
-          <option value="atte"%if;(fwitness_kind="atte") selected%end;>[*present/present/present]2</option>
-          <option value="ment"%if;(fwitness_kind="ment") selected%end;>[*mentioned/mentioned/mentioned]2</option>
-          <option value="offi"%if;(fwitness_kind="offi") selected%end;>[*civil registrar/civil registrar/civil registrar]2</option>
-          <option value="reli"%if;(fwitness_kind="reli") selected%end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
-          <option value="othe"%if;(fwitness_kind="othe") selected%end;>[*other/other/other]2</option>
-        </select>
-      </div>
-      %if;(wcnt!=1)
-        <div class="d-inline-flex align-items-center col-2 ms-auto">
-          <button type="submit" class="btn btn-outline-secondary btn-sm" name="excnt_inv_witnwcnt" value="on"
-            title="[*invert] [witness/witness/witnesses]2 %expr(wcnt-1) [and] wcnt">%nn;
-            <i class="far fa-user"></i> %expr(wcnt-1)%nn;
-            <i class="fa fa-right-left fa-rotate-90 mx-2"></i>%nn;
-            wcnt <i class="far fa-user"></i>%nn;
-          </button>
-        </div>
-      %end;
-    </div>
-    <div class="row">
-      <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
-          value="%fwitness.first_name;" placeholder="[*first name/first names]0"%datalist_fnames;>
-      </div>
-      <label for="excnt_witnwcnt_occ" class="col-sm-2 col-form-label">[*number]0</label>
-      <div class="col-sm-2">
-        <input type="number" class="form-control" name="excnt_witnwcnt_occ" id="excnt_witnwcnt_occ"
-          min="0" value="%fwitness.occ;" placeholder="#">
-       </div>
-    </div>
-    <div class="row">
-      <label for="excnt_witnwcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" name="excnt_witnwcnt_sn" id="excnt_witnwcnt_sn"
-          value="%fwitness.surname;" placeholder="[*surname/surnames]0"%datalist_snames;>
-      </div>
-      <div id="excnt_witnwcnt_p_selct_mod" class="col-auto col-form-label">
-        %if;(fwitness.index!="-1")
-          <a href="%prefix_base_password;m=MOD_IND&i=%fwitness.index;" title="[*modify::person/persons]0
-            %fwitness.first_name;%if;(fwitness.occ!="").%fwitness.occ%end; %fwitness.surname;"
-            aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%fwitness.sex;%end;">
-            <i class="fa fa-user-pen fa-fw %if;(fwitness.sex=1)fe%end;male ms-2 me-1" aria-hidden="true"></i>
-            [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
-        %end;
-      </div>
-      <div id="excnt_witnwcnt_p_selct_sex" class="col-sm-4">
-        <div class="row">
-          <span class="col-6 col-form-label">[*sex]</span>
-          <div class="col-6 mt-2">
-            <div class="form-check form-check-inline">
-              <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                  value="M"%if;(fwitness.create.sex="male") checked%end;>[M/F]0
-              </label>
-            </div>
-            <div class="form-check form-check-inline">
-              <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                  value="N"%if;(fwitness.create.sex="neuter") checked%end;>?
-              </label>
-            </div>
-            <div class="form-check form-check-inline">
-              <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
-                  value="F"%if;(fwitness.create.sex="female") checked%end;>[M/F]1
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    %apply;create_data("excnt_witnwcnt","fwitness")
-  </div>
-%end;
-
 %define;one_fevent(xcnt, has_fevents)
   <div class="row">
     <h5 class="col-form-label col-sm-2 mb-1 text-uppercase"><label for="fevent_selectxcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
@@ -307,12 +202,12 @@
   </div>
   <div class="row">
     <div class="col-12">
-      %apply;insert_witness(xcnt, "0")
+      %apply;insert_witness(xcnt, "0", "")
     </div>
     %foreach;fwitness;
       <div class="col-12">
-        %apply;one_witness(xcnt, wcnt)
-        %apply;insert_witness(xcnt, wcnt)
+        %apply;one_witness(xcnt, wcnt, "", "fwitness")
+        %apply;insert_witness(xcnt, wcnt, "")
       </div>
     %end;
   </div>
