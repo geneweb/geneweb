@@ -78,6 +78,9 @@
   %if;(e.m="CHK_DATA")
     <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
   %end;
+  %if;(e.m="ANOMA" or e.m="OK_FILE")
+    <script src="%etc_prefix;js/anomalies.min.js?hash=%apply;hash%with;%etc_prefix;js/anomalies.min.js%end;"></script>
+  %end;
   %if;(e.m="RM")
     <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
   %end;
