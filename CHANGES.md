@@ -65,6 +65,21 @@
   ' and ’ as equal (#3051).
 - The descendant counters of the templates (number_of_descendants,
   max_desc_level…) no longer scan nor allocate per person of the base.
+- Anomalies report for wizards (`m=ANOMA`, "Anomalies" button on the welcome
+  page): the warnings found by the base check, per kind, with their
+  messages in the reader's language, links to the persons and their edit
+  forms, extreme ages and the persons with several kinds of anomalies.
+  gwc and ged2gwb write it (`<base>.gwb/config/anomalies.jsonl`) during
+  the check they already run; the new `anoma` tool refreshes it for an
+  existing base. Base parameter `anomalies_hidden` lists the kinds shown
+  apart (default: the order, sex, duplicate and witness checks).
+- Verified anomalies: a wizard marks an anomaly as verified (a real
+  marriage at 12, a real death at 104) in one click, and it leaves the
+  report; the verification covers that anomaly only, and can be
+  cancelled. Each wizard's verifications go to a file of their own and
+  count at once; `m=OK_FOLD` (or `anoma`) merges them into
+  `<base>.gwb/config/verified.jsonl`. `m=OK_FILE` lists the verified
+  anomalies with who verified them and when.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
@@ -81,6 +96,8 @@
   and ignored (#3033).
 - `comm.log` is written next to `gwsetup.log` in the launch directory
   instead of the shared temporary directory (#3033).
+- New page to run `anoma` on an existing base; the page after a base
+  creation links to its anomalies report.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person

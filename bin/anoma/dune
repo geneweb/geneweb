@@ -1,0 +1,5 @@
+(executable
+ (package geneweb)
+ (name anoma)
+ (public_name anoma)
+ (libraries geneweb geneweb_db geneweb_dirs geneweb_util unix))

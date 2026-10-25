@@ -1696,10 +1696,22 @@ let link ?(no_warn = false) next_family_fun bdir =
   Gc.full_major ();
   close_in per_index_ic;
   close_in per_ic;
-  if !do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base no_warn) ignore;
-    if !pr_stats then Stats.(print_stats base @@ stat_base base));
+  let anomalies =
+    if !do_check && gen.g_pcnt > 0 then (
+      let add_anomaly, anomalies = Anomaly.collector base in
+      Check.check_base base (set_error base gen)
+        (fun w ->
+          set_warning base no_warn w;
+          add_anomaly w)
+        ignore;
+      if !pr_stats then Stats.(print_stats base @@ stat_base base);
+      Some anomalies)
+    else None
+  in
   if not gen.g_errored then (
+    Option.iter
+      (fun anomalies -> Anomaly.write ~bdir ~producer:"gwc" (anomalies ()))
+      anomalies;
     if !do_consang then (
       ignore @@ ConsangAll.compute base true;
       Driver.sync base);
