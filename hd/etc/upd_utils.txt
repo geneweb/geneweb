@@ -203,19 +203,9 @@
     %apply;small_date("death","xvard","xx")
     <div class="row">
       <label for="xvar_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-      <div class="col-sm-6">
+      <div class="col-sm-10 mt-1">
         <input class="form-control" type="text" name="xvar_occu" id="xvar_occu"
           value="%xx.create.occupation;" placeholder="[*occupation/occupations]0"%datalist_occupations;>
-      </div>
-      <div class="col-sm-auto d-inline-flex align-items-center">
-        <div class="form-check form-check-inline me-3">
-          <input class="form-check-input" type="checkbox" name="xvar_od" id="xvar_od"%if;xx.create.of_course_dead; checked%end;>
-          <label for="xvar_od" class="form-check-label">[*of course dead]</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" name="xvar_pub" id="xvar_pub"%if;xx.create.public; checked%end;>
-          <label for="xvar_pub" class="form-check-label">[*public]</label>
-        </div>
       </div>
     </div>
   </div>

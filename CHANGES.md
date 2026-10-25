@@ -92,7 +92,13 @@
   person and family update forms.
 - The family and person forms create a parent, child, witness or related
   person with the same fields (upd_utils.txt): birth and death date and
-  place, occupation, and the "of course dead" and "public" boxes.
+  place, occupation and a "public" box.
+- The "of course dead" and "public" boxes of the persons created from
+  the forms are removed: enter `+` as death year for a dead person
+  without date, or for instance `>1750` for a witness of an event of
+  1750 (a birth or baptism date more than 125 years old still makes the
+  person of course dead), and `p` as birth year for a public person.
+  Both statuses stay on the person form.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
