@@ -85,8 +85,9 @@ let reconstitute_somebody removed_string conf var =
 
 (* Data of a person created from an update form (parent, child, witness,
    relation parent), read from the fields emitted by the create_data macro
-   of upd_utils.txt: [var]b_* and [var]d_* (dates, optional), [var]_occu,
-   [var]_od, [var]_pub. Missing fields are taken as empty. *)
+   of upd_utils.txt: [var]b_* and [var]d_* (dates, optional) and
+   [var]_occu; "p" as birth year makes the person public. Missing fields
+   are taken as empty. *)
 let reconstitute_create_info conf var =
   let opt k = Option.value ~default:"" (p_getenv conf.env (var ^ k)) in
   let date kind =
@@ -95,12 +96,10 @@ let reconstitute_create_info conf var =
     | Some _ -> Update.reconstitute_date conf (var ^ kind)
   in
   let death =
-    if opt "_od" = "on" then OfCourseDead
-    else
-      match opt "d_yyyy" with
-      | "+" -> DeadDontKnowWhen
-      | "-" | "=" -> NotDead
-      | _ -> DontKnowIfDead
+    match opt "d_yyyy" with
+    | "+" -> DeadDontKnowWhen
+    | "-" | "=" -> NotDead
+    | _ -> DontKnowIfDead
   in
   {
     ci_birth_date = date "b";
@@ -109,10 +108,8 @@ let reconstitute_create_info conf var =
     ci_death_date = date "d";
     ci_death_place = only_printable (opt "d_pl");
     ci_occupation = only_printable (opt "_occu");
-    ci_public =
-      opt "_pub" = "on"
-      (* legacy Roglo convention: birth year "p" = no date, but public *)
-      || opt "b_yyyy" = "p";
+    ci_public = opt "b_yyyy" = "p";
+    (* legacy Roglo convention: birth year "p" = no date, but public *)
   }
 
 let update_ci conf create key =
@@ -362,14 +359,6 @@ let eval_create c = function
       | Update.Create (_, Some { ci_occupation = occupation; _ }) ->
           safe_val (Util.escape_html occupation :> Adef.safe_string)
       | _ -> str_val "")
-  | "public" -> (
-      match c with
-      | Update.Create (_, Some { ci_public = p; _ }) -> bool_val p
-      | _ -> bool_val false)
-  | "of_course_dead" -> (
-      match c with
-      | Update.Create (_, Some { ci_death = OfCourseDead; _ }) -> bool_val true
-      | _ -> bool_val false)
   | "sex" -> (
       str_val
       @@
