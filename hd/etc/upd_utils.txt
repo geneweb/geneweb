@@ -251,7 +251,7 @@
         </div>
       %end;
     </div>
-    <div class="row">
+    <div class="row mt-2">
       <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-sm-6">
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn"
