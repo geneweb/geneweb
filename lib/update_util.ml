@@ -98,7 +98,7 @@ let reconstitute_create_info conf var =
   let death =
     match opt "d_yyyy" with
     | "+" -> DeadDontKnowWhen
-    | "-" | "=" -> NotDead
+    | "-" -> NotDead
     | _ -> DontKnowIfDead
   in
   {
@@ -303,7 +303,7 @@ let eval_create c = function
           | Some (Dgreg ({ year = y; prec = p; _ }, _)) ->
               add_precision (string_of_int y) p
           | Some _ -> ""
-          | None -> "")
+          | None -> if ci.ci_public then "p" else "")
       | _ -> "")
   | "death_day" -> (
       str_val
