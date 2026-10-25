@@ -627,9 +627,8 @@ let rewrite_key s oldk newk _file =
             let fn, sn, oc = newk in
             let ofn, osn, _ooc = oldk in
             let name =
-              match name with
-              | Some str -> Some (replace ofn fn str |> replace osn sn)
-              | None -> None
+              Some
+                (replace ofn fn (NotesLinks.display_text name) |> replace osn sn)
             in
             let fam_suffix =
               match fam_marker with

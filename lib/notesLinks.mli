@@ -1,6 +1,12 @@
+type person_text =
+  | Short of string * string
+      (** short link [[fn/sn]] or [[fn/sn/oc]]: its text is the first name and
+          surname as typed *)
+  | Explicit of string  (** text written in the link: [[fn/sn/oc/text]] *)
+
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * Def.NLDB.key * string option * string option * int option
+  | WLperson of int * Def.NLDB.key * person_text * string option * int option
   | WLwizard of int * string * string
   | WLimage of int * (string list * string) * string * string option
       (** [WLimage (end_pos, fpath, alt, width_opt)] inline image from the image
@@ -16,6 +22,10 @@ val char_dir_sep : char
 val dir_sep : string
 val check_file_name : string -> (string list * string) option
 val misc_notes_link : string -> int -> wiki_link
+
+val display_text : person_text -> string
+(** Text shown for a person link: the typed names of a short link, separated by
+    a space, or its explicit text. *)
 
 val advances_pos : wiki_link -> bool
 (** Whether a link takes a slot in the [#p_N] anchor numbering shared by

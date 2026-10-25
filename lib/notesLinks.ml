@@ -24,9 +24,11 @@ let check_file_name s =
   in
   loop [] 0 0
 
+type person_text = Short of string * string | Explicit of string
+
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string option * string option * int option
+  | WLperson of int * key * person_text * string option * int option
   | WLwizard of int * string * string
   | WLimage of int * (string list * string) * string * string option
   | WLnone of int * string
@@ -145,51 +147,49 @@ let misc_notes_link s i =
               in
               WLimage (j, fpath, alt, width_opt)
         else
-          try
-            let k = 0 in
-            let l = String.index_from b k '/' in
-            let fn = String.sub b k (l - k) in
-            let k = l + 1 in
-            let fn, sn, oc, name =
-              try
-                let l = String.index_from b k '/' in
-                let sn = String.sub b k (l - k) in
-                let oc, name =
-                  try
-                    let k = l + 1 in
-                    let l = String.index_from b k '/' in
-                    let x = String.sub b k (l - k) in
-                    (x, String.sub b (l + 1) (String.length b - l - 1))
-                  with Not_found ->
-                    ("", String.sub b (l + 1) (String.length b - l - 1))
-                in
-                let oc1 = try int_of_string name with Failure _ -> -1 in
-                let oc = try int_of_string oc with Failure _ -> 0 in
-                if oc1 = -1 then (fn, sn, oc, Some name)
-                else (fn, sn, oc1, Some (fn ^ " " ^ sn))
-              with Not_found ->
-                let sn = String.sub b k (String.length b - k) in
-                (fn, sn, 0, Some (fn ^ " " ^ sn))
-            in
-            let fn = Name.lower fn in
-            let sn = Name.lower sn in
-            let j, fam_marker =
-              if j < slen && (s.[j] = '#' || s.[j] = '&') then
-                let rec parse_int acc k =
-                  if k < slen && s.[k] >= '0' && s.[k] <= '9' then
-                    parse_int
-                      ((acc * 10) + Char.code s.[k] - Char.code '0')
-                      (k + 1)
-                  else (k, acc)
-                in
-                let k, acc = parse_int 0 (j + 1) in
-                if acc > 0 then (k, Some acc) else (j, None)
-              else (j, None)
-            in
-            WLperson (j, (fn, sn, oc), name, text, fam_marker)
-          with Not_found -> wlnone j
+          let cut s =
+            match String.index_opt s '/' with
+            | Some l ->
+                Some
+                  ( String.sub s 0 l,
+                    String.sub s (l + 1) (String.length s - l - 1) )
+            | None -> None
+          in
+          match cut b with
+          | None -> wlnone j
+          | Some (fn, r) ->
+              let sn, oc, name =
+                match cut r with
+                | None -> (r, 0, Short (fn, r))
+                | Some (sn, r) -> (
+                    let oc, t = Option.value ~default:("", r) (cut r) in
+                    match int_of_string_opt t with
+                    | Some oc -> (sn, oc, Short (fn, sn))
+                    | None ->
+                        ( sn,
+                          Option.value ~default:0 (int_of_string_opt oc),
+                          Explicit t ))
+              in
+              let j, fam_marker =
+                if j < slen && (s.[j] = '#' || s.[j] = '&') then
+                  let rec parse_int acc k =
+                    if k < slen && s.[k] >= '0' && s.[k] <= '9' then
+                      parse_int
+                        ((acc * 10) + Char.code s.[k] - Char.code '0')
+                        (k + 1)
+                    else (k, acc)
+                  in
+                  let k, acc = parse_int 0 (j + 1) in
+                  if acc > 0 then (k, Some acc) else (j, None)
+                else (j, None)
+              in
+              WLperson
+                (j, (Name.lower fn, Name.lower sn, oc), name, text, fam_marker)
       else wlnone j
   else wlnone (i + 1)
+
+let display_text t =
+  match t with Short (fn, sn) -> fn ^ " " ^ sn | Explicit t -> t
 
 let end_pos link =
   match link with
