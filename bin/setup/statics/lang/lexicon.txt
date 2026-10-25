@@ -366,6 +366,36 @@ lv: Vai Jûs varat atgriezties uz <a \
 sv: Eller du kan återvända till <a \
   href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 
+    analyse anomalies
+aa: anoma.htm
+en: analyse the anomalies of a database
+fr: analyser les anomalies d’une base
+
+    anomalies analysis explained
+aa: anoma.htm
+en: anoma checks a database and writes its anomalies report, which gwd shows \
+  to the wizards. gwc and ged2gwb already write it when they build a database: \
+  run anoma to refresh it after changes made through gwd.
+fr: anoma contrôle une base et écrit son rapport d’anomalies, que gwd montre \
+  aux magiciens. gwc et ged2gwb l’écrivent déjà quand ils construisent une \
+  base : lancez anoma pour le mettre à jour après des modifications faites \
+  dans gwd.
+
+    Run anomalies analysis
+aa: anoma.htm
+en: Run the analysis
+fr: Lancer l’analyse
+
+    Anomalies analysed
+aa: anoma_ok.htm
+en: Anomalies analysed
+fr: Anomalies analysées
+
+    See the anomalies of the base
+aa: anoma_ok.htm create_ok.htm
+en: See the anomalies of the database
+fr: Voir les anomalies de la base
+
     applied operation
 co: L’operazione « %d » hà da esse appiecata nant’à a vostra basa \
   di dati « %a ». Avertimentu : st’operazione pò piglià da qualchì \

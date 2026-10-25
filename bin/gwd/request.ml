@@ -20,8 +20,8 @@ let this_request_updates_database conf =
       ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
       | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE"
-      | "UNKNOWN_OK" ) ->
+      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "OK_ADD"
+      | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" ) ->
       true
   | _ -> false
 
@@ -413,6 +413,7 @@ let treat_request =
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
              | "ADD_PAR_OK" ->
                  w_wizard @@ w_base @@ UpdateFamOk.print_add_parents
+             | "ANOMA" -> w_wizard @@ w_base @@ AnomalyDisplay.print
              | "ANM" ->
                  w_base @@ fun conf _ ->
                  BirthdayDisplay.print_anniversaries conf
@@ -682,6 +683,10 @@ let treat_request =
                          NotesDisplay.print_what_links conf base fnotes
                      | _ -> NotesDisplay.print conf base)
              | "NOTES_SEARCH" -> w_base @@ NotesSearchDisplay.print
+             | "OK_ADD" -> w_wizard @@ w_base @@ AnomalyDisplay.print_ok_add
+             | "OK_DEL" -> w_wizard @@ w_base @@ AnomalyDisplay.print_ok_del
+             | "OK_FILE" -> w_wizard @@ w_base @@ AnomalyDisplay.print_ok_file
+             | "OK_FOLD" -> w_wizard @@ w_base @@ AnomalyDisplay.print_ok_fold
              | "OA" -> w_base @@ BirthDeathDisplay.print_oldest_alive
              | "OE" -> w_base @@ BirthDeathDisplay.print_oldest_engagements
              | "P" -> (
