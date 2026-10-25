@@ -48,13 +48,15 @@ let () =
   if not (Sys.file_exists bdir) then (
     Printf.eprintf "anoma: no base %s\n" bdir;
     exit 2);
-  (if not !fold_only then
-     let anomalies =
-       Driver.with_database
-         (Filename.concat (Secure.base_dir ()) bname)
-         Anomaly.collect
-     in
-     Anomaly.write ~history_days:!history_days ~bdir ~producer:"anoma" anomalies);
+  if not !fold_only then (
+    let anomalies =
+      Driver.with_database
+        (Filename.concat (Secure.base_dir ()) bname)
+        Anomaly.collect
+    in
+    Anomaly.write ~history_days:!history_days ~bdir ~producer:"anoma" anomalies;
+    Printf.eprintf "%d anomalies written to %s\n%!" (List.length anomalies)
+      (Anomaly.file (GWPARAM.base_config_dir bname)));
   let r = AnomalyWhitelist.fold (GWPARAM.base_config_dir bname) in
   Printf.eprintf "%d verification files merged, %d verified anomalies\n%!"
     r.fragments r.entries

@@ -932,9 +932,7 @@ let load config_dir =
 let write ?history_days ~bdir ~producer anomalies =
   let dir = Filename.concat bdir "config" in
   match save dir (make ?history_days ~bdir ~producer anomalies) with
-  | () ->
-      Printf.eprintf "%d anomalies written to %s\n%!" (List.length anomalies)
-        (file dir)
+  | () -> ()
   | exception (Sys_error msg | Failure msg) ->
       Printf.eprintf "Cannot write the anomalies report: %s\n%!" msg
   | exception Unix.Unix_error (e, _, arg) ->

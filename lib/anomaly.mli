@@ -177,8 +177,9 @@ val make :
 val write :
   ?history_days:int -> bdir:string -> producer:string -> t list -> unit
 (** [write ~bdir ~producer anomalies] saves [make ~bdir ~producer anomalies] in
-    [<bdir>/config] ({!GWPARAM.base_config_dir}). A failure is reported on
-    stderr and otherwise ignored: the report must never make a build fail. *)
+    [<bdir>/config] ({!GWPARAM.base_config_dir}), silently: gwc and ged2gwb
+    output is unchanged. A failure is reported on stderr and otherwise ignored:
+    the report must never make a build fail. *)
 
 val file : string -> string
 (** [file config_dir] is the report path in the base config directory
