@@ -99,9 +99,9 @@ val candidate : string list * string list -> string -> bool
 val highlight_note :
   ?anchor:bool -> Config.config -> Adef.safe_string -> Adef.safe_string
 (** [highlight_note conf html] highlights in the rendered note [html] the terms
-    of the [hl] URL parameter ([hl_c=on]: case sensitive, [hl_w=on]: word
+    of the [hl_q] URL parameter ([hl_c=on]: case sensitive, [hl_w=on]: word
     match), as carried by the links of [m=NOTES_SEARCH]; [html] is returned
-    unchanged without [hl]. With [~anchor:true], the first occurrence gets
+    unchanged without [hl_q]. With [~anchor:true], the first occurrence gets
     [id="first-found"]: only for a page showing a single note. *)
 
 val short_words : string list -> string list

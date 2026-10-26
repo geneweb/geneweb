@@ -635,7 +635,7 @@ let candidate (terms, _excluded) =
   fun folded -> List.for_all (List.for_all (contains folded)) pieces
 
 let highlight_note ?(anchor = false) conf (html : Adef.safe_string) =
-  match Util.p_getenv conf.Config.env "hl" with
+  match Util.p_getenv conf.Config.env "hl_q" with
   | None | Some "" -> html
   | Some s ->
       let case_sens = Util.p_getenv conf.env "hl_c" = Some "on" in

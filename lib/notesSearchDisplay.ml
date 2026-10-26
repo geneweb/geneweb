@@ -124,7 +124,7 @@ let snippet q text =
 
 (* read back by [NotesSearch.highlight_note] *)
 let highlight_params q =
-  "&hl="
+  "&hl_q="
   ^ (Mutil.encode q.text :> string)
   ^ (if q.case_sens then "&hl_c=on" else "")
   ^ if q.full_word then "&hl_w=on" else ""
