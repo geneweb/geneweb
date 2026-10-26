@@ -101,6 +101,10 @@
   1750 (a birth or baptism date more than 125 years old still makes the
   person of course dead), and `p` as birth year for a public person.
   Both statuses stay on the person form.
+- Descendant table: continuous d'Aboville numbers across unions,
+  consistent rows with collapsed implexes or without family column,
+  generation names in every language. Ancestor table: consistent rows
+  with the children column alone.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
