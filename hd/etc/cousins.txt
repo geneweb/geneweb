@@ -31,7 +31,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container%if;(evar.wide="on")-fluid%end;">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %include;perso_utils
 %include;menubar
 <div class="alert alert-warning px-4" role="alert">

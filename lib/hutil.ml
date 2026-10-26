@@ -74,9 +74,13 @@ let header_without_http_nor_home conf title =
   Templ.output_simple conf Templ.Env.empty "hed";
   Util.message_to_wizard conf
 
+(* Same rule as the templates:
+   [(e.wide="on" or b.wide="on") and e.wide!="off"] *)
 let is_fluid conf =
-  (try List.assoc "wide" conf.env = Adef.encoded "on" with Not_found -> false)
-  || try List.assoc "wide" conf.base_env = "on" with Not_found -> false
+  match List.assoc_opt "wide" conf.env with
+  | Some v when v = Adef.encoded "on" -> true
+  | Some v when v = Adef.encoded "off" -> false
+  | _ -> List.assoc_opt "wide" conf.base_env = Some "on"
 
 let header_without_title ?(title = fun _ -> ()) conf =
   let fluid = is_fluid conf in

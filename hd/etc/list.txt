@@ -17,7 +17,7 @@
 %include;hed
 %include;home
 %message_to_wizard;
-<div class="container%if;(e.wide="on")-fluid%end;">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %include;perso_utils
 %define;get_ip(n)
   %e.in;
