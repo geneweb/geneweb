@@ -650,11 +650,6 @@ html {
   scroll-padding-top: 52px;
 }
 
-/* Ascendant table by couple anchor fix */
-#scrollfix {
-  scroll-padding-top: 48px;
-}
-
 /* Carrousel */
 .text-pre-line {
   white-space: pre-line;
@@ -951,7 +946,7 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 }
 
 /* Descendant table: cell reached through a d'Aboville link */
-#destable td:target {
+#destable td:target, #anctableX td:target
   --bs-table-bg-state: var(--bs-warning-bg-subtle);
 }
 
