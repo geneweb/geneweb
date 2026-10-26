@@ -4235,6 +4235,20 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> safe_val
         else null_val
       else null_val
+  | "nb_children_before" -> (
+      match get_env "fam" env with
+      | Vfam (ifam, _, _, _) ->
+          let fams = Driver.get_family p in
+          let rec loop i n =
+            if i = Array.length fams || fams.(i) = ifam then n
+            else
+              loop (i + 1)
+                (n
+                + Array.length (Driver.get_children (Driver.foi base fams.(i)))
+                )
+          in
+          loop 0 0 |> string_of_int |> str_val
+      | _ -> raise Not_found)
   | "nb_children_total" ->
       Array.fold_left
         (fun n ifam ->
@@ -5771,6 +5785,10 @@ let eval_predefined_apply conf env f vl =
       | Vslist l ->
           l := SortedList.add sl !l;
           ""
+      | _ -> raise Not_found)
+  | "mem_sorted_list", name :: sl -> (
+      match get_env name env with
+      | Vslist l -> if SortedList.mem sl !l then "1" else "0"
       | _ -> raise Not_found)
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
