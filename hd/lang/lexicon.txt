@@ -16720,6 +16720,26 @@ en: passing by
 es: pasando por
 fr: en passant par
 
+    paternal and maternal lines in Sosa order/near the axis/on the edges
+ca: línies paterna i materna en ordre Sosa/línies paterna i materna a prop de l'eix/línies paterna i materna a les vores
+cs: otcovská a mateřská linie v pořadí Sosa/otcovská a mateřská linie u osy/otcovská a mateřská linie na okrajích
+da: fædrene og mødrene linje i Sosa-rækkefølge/fædrene og mødrene linje ved aksen/fædrene og mødrene linje ved kanterne
+de: Vater- und Mutterlinie in Sosa-Reihenfolge/Vater- und Mutterlinie an der Achse/Vater- und Mutterlinie an den Rändern
+en: paternal and maternal lines in Sosa order/paternal and maternal lines near the axis/paternal and maternal lines on the edges
+eo: patra kaj patrina linioj laŭ Sosa-ordo/patra kaj patrina linioj apud la akso/patra kaj patrina linioj ĉe la randoj
+es: líneas paterna y materna en orden Sosa/líneas paterna y materna junto al eje/líneas paterna y materna en los bordes
+fi: isän ja äidin linja Sosa-järjestyksessä/isän ja äidin linja akselin vieressä/isän ja äidin linja reunoilla
+fr: lignées paternelle et maternelle dans l’ordre Sosa/lignées paternelle et maternelle près de l’axe/lignées paternelle et maternelle aux bords
+it: linee paterna e materna in ordine Sosa/linee paterna e materna vicino all'asse/linee paterna e materna ai bordi
+nl: vader- en moederlijn in Sosa-volgorde/vader- en moederlijn bij de as/vader- en moederlijn aan de randen
+no: farslinje og morslinje i Sosa-rekkefølge/farslinje og morslinje ved aksen/farslinje og morslinje i kantene
+pl: linia ojcowska i matczyna w kolejności Sosa/linia ojcowska i matczyna przy osi/linia ojcowska i matczyna na brzegach
+pt: linhas paterna e materna em ordem Sosa/linhas paterna e materna junto ao eixo/linhas paterna e materna nas bordas
+ro: liniile paternă și maternă în ordinea Sosa/liniile paternă și maternă lângă axă/liniile paternă și maternă la margini
+ru: отцовская и материнская линии в порядке Sosa/отцовская и материнская линии у оси/отцовская и материнская линии по краям
+sv: fäderne- och möderneslinjen i Sosa-ordning/fäderne- och möderneslinjen vid axeln/fäderne- och möderneslinjen vid kanterna
+tr: baba ve anne soyu Sosa sırasında/baba ve anne soyu eksenin yanında/baba ve anne soyu kenarlarda
+
     paternal grand-parents
 co: caccari paterni
 de: Großeltern väterlicherseits
