@@ -180,6 +180,17 @@ svg {
   gap: 3px;
 }
 
+.btn-group-fanchart + .btn-group-fanchart {
+  margin-top: 3px;
+}
+
+/* Glyphes texte des boutons de disposition des lignées (_|, ||, __) */
+.fc-glyph {
+  font-family: monospace;
+  font-weight: 600;
+  letter-spacing: -0.15em;
+}
+
 /* Sélecteur de police */
 .custom-select {
   padding: 3px 6px;

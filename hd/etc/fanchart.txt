@@ -170,6 +170,11 @@
       <button id="b-angle-220" class="btn-fanchart active" title="220° ([half-disc/standard/double half-disc]1)">220</button>
       <button id="b-angle-360" class="btn-fanchart" title="2×180° ([half-disc/standard/double half-disc]2)">360</button>
     </div>
+    <div class="btn-group-fanchart">
+      <button id="b-lines-sosa" class="btn-fanchart fc-glyph active" title="[*paternal and maternal lines in Sosa order/near the axis/on the edges]0">_|</button>
+      <button id="b-lines-center" class="btn-fanchart fc-glyph" title="[*paternal and maternal lines in Sosa order/near the axis/on the edges]1">||</button>
+      <button id="b-lines-edges" class="btn-fanchart fc-glyph" title="[*paternal and maternal lines in Sosa order/near the axis/on the edges]2">__</button>
+    </div>
   </div>
 
   <div class="control-section">
