@@ -1,11 +1,8 @@
-<!-- $Id: buttons.txt v7.1 31/03/2026 17:11:23 $ -->
+<!-- $Id: buttons.txt v7.1 26/10/2026 03:45:19 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %)
-%let;l_v0;%if;(e.v!="")
-            %if;(e.m="A" and e.v>static_max_anc_level)%static_max_anc_level;
-            %elseif;(e.m="D" and e.v>static_max_desc_level)%static_max_desc_level;
-            %else;%e.v;%end;
-          %else;1%end;%in;
+%let;max_lev;%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;%in;
+%let;l_v0;%if;(e.v="")1%elseif;(e.v>max_lev)%max_lev;%else;%e.v;%end;%in;
 %let;l_v;%if;(e.m="A")
            %if;(bvar.max_anc_level="" or bvar.max_anc_level>l_v0)%l_v0;%else;%bvar.max_anc_level;%end;
          %elseif;(e.m="D")
@@ -40,13 +37,7 @@
           %foreach;env_binding;
             %if;(env.key="m")&m=%if;(cond=1)D%else;A%end;%nn;
             %elseif;(env.key="t")&t=%if;(cond=1)H%else;Z%end;%nn;
-            %elseif;(env.key="v")&v=%if;(e.v!="")
-                                      %if;(e.m="D")
-                                        %if;(e.v>static_max_anc_level)%static_max_anc_level;%else;%expr(e.v-1)%end;
-                                      %elseif;(e.m="A")
-                                        %if;(e.v>static_max_desc_level)%static_max_desc_level;%else;%expr(e.v+1)%end;
-                                      %end;
-                                    %else;1%end;
+            %elseif;(env.key="v")&v=%if;(e.v="")1%elseif;(e.m="D")%expr(e.v-1)%elseif;(e.m="A")%expr(e.v+1)%end;%nn;
             %elseif;(env.key!="")&%env.key=%env.val;%nn;
             %end;%nn;
           %end;
@@ -73,7 +64,7 @@
       href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;%root;%nn;
             %if;(cond2=1)&m=A&t=H%nn;
             %else;&m=D&t=D%nn;
-            %end;&v=%if;(evar.v="")1%else;%if;(cond2=1)%expr(evar.v+1)%else;%expr(evar.v-1);%end;%end;">%nn;
+            %end;&v=%if;(evar.v="")1%else;%if;(cond2=1)%expr(evar.v+1)%else;%expr(evar.v-1)%end;%end;">%nn;
       <i class="fa fa-%if;(e.m="D")code-branch fa-flip-vertical%elseif;(e.m="A")code-fork%end; fa-rotate-90 fa-fw me-1" aria-hidden="true"></i>%nn;
       %if;(cond2=1)[*horizontal tree]%else;[*descendant tree view]%end;%nn;
     </a>
@@ -97,7 +88,7 @@
           <i class="fas fa-address-%if;(e.fn=1)book%else;card%end; fa-fw fa-lg" aria-hidden="true"></i>%nn;
         </a>
         <a role="button" class="btn btn-link mx-0 px-0 ms-1 %if;(e.t="Y" or e.csv=1) disabled%end;%if;(e.tt=1) text-danger%end;"
-          href="%if;(e.tt=1)%url_set.tt;%else;%url_set.tt.1;%end;" title="%if;(e.tt=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
+          href="%if;(e.tt=1)%url_set.tt;%else;%url_set.tt.1;%end;" title="%if;(e.tt=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
           <i class="fas fa-crown fa-fw fa-lg" aria-hidden="true"></i>%nn;
         </a>
         <a role="button" class="btn btn-link mx-0 px-0 ms-1%if;(e.csv=1) disabled%end;%if;(e.im=0) text-danger%end;"
@@ -118,7 +109,7 @@
           <span class="notecolor">[*note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>%nn;
         </a>
         %end;
-        %if;(e.m="D" and (e.marr="on" or e.marr_place="on" or e.marr_date="on"))
+        %if;(e.m="D" and (e.marr="on" or e.marr_place="on" or e.marr_date="on" or e.child="on"))
           <span class="visually-hidden">—</span>
           <a role="button" class="btn btn-link ms-2 px-0"
              href="%prefix_base_password;%nn;
@@ -138,7 +129,7 @@
         </a>
       %end;
       <span class="visually-hidden">—</span>
-      %if;(e.csv!="on" and e.m="A" and (e.t="Z" or e.t="Y"))
+      %if;(e.csv!=1 and e.m="A" and (e.t="Z" or e.t="Y"))
         <span class="visually-hidden">—</span>
         <a role="button" class="btn btn-link px-0 ms-1"
           href="%prefix_base_password;%access;&m=A%nn;
@@ -198,7 +189,7 @@
             <input type="number" id="input_v0" name="v0" class="form-control"
               value="%if;(e.t="Y" and e.v0="")1%elseif;(only=1 or v0>l_v)%l_v;%elseif;(v0!="")%v0;%else;0%end;"
               min="%if;(e.t="Y")1%else;0%end;"
-              max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" autofocus>
+              max="%max_lev;" autofocus>
           </div>
         %end;
         <div class="input-group flex-nowrap me-2">
@@ -213,18 +204,18 @@
          href="%apply;urlset%with;v%and;%expr(e.v-1)%end;">
         <i class="fa fa-minus fa-fw"></i>
       </a>
-      <a role="button" class="btn btn-link px-0 mx-0 %if;((e.m="D" and e.v>=static_max_desc_level) or (e.m="A" and e.v>static_max_anc_level)) disabled%end;"
-        title="[*add] 1 [generation/generations]0%if;(e.v < static_max_desc_level and static_max_desc_level > 1) (max %static_max_desc_level; [generation/generations]1)%end;" 
+      <a role="button" class="btn btn-link px-0 mx-0%if;(e.v>=max_lev) disabled%end;"
+        title="[*add] 1 [generation/generations]0%if;(e.v<max_lev and max_lev>1) (max %max_lev; [generation/generations]1)%end;"
         href="%apply;urlset%with;v%and;%expr(e.v+1)%end;">
         <i class="fa fa-plus fa-fw"></i>
       </a>
       %if;((e.m="A" and e.t="G") or (e.m="D" and e.t="L"))
-        <a role="button" class="btn btn-link ms-3px-0" href="%if;(e.inline!="on")%url_set.inline.on;%else;%url_set.inline;%end;">
+        <a role="button" class="btn btn-link ms-3 px-0" href="%if;(e.inline!="on")%url_set.inline.on;%else;%url_set.inline;%end;">
           <i class="fa%if;(e.inline="on")r%end; fa-address-card fa-lg fa-fw me-1" aria-hidden="true"></i>[*display notes and sources inline]
         </a>
       %end;
       %if;(e.m="A" and e.t="G")
-        <a role="button" class="btn btn-link ms-3px-0" href="%if;(e.siblings!="on")%url_set.siblings.on;%else;%url_set.siblings;%end;">
+        <a role="button" class="btn btn-link ms-3 px-0" href="%if;(e.siblings!="on")%url_set.siblings.on;%else;%url_set.siblings;%end;">
           <i class="fa fa-child fa-lg fa-fw%if;(e.siblings="on") text-danger%end;" aria-hidden="true"></i>%if;(e.siblings!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [siblings]%nn;
         </a>
       %end;
