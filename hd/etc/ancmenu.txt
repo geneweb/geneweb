@@ -29,14 +29,14 @@
 function no_options() {
   /* Décoche toutes les options sauf only/image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
 }
 
 function long_display_options() {
   /* Décoche tout sauf ld_* et only/image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="ld_"]):not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="ld_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
   /* Coche les defaults si aucun ld_* n'est coché */
   const ldAll      = document.querySelectorAll('input[type="checkbox"][id^="ld_"]');
@@ -52,7 +52,7 @@ function long_display_options() {
 function table_options() {
   /* Décoche tout sauf t_* et only/image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="t_"]):not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="t_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
   /* Coche les defaults si aucun t_* n'est coché */
   const tAll      = document.querySelectorAll('input[type="checkbox"][id^="t_"]');
@@ -68,10 +68,23 @@ function table_options() {
   }
 }
 
+function couple_table_options() {
+  /* Décoche tout sauf y_* et only/im/cgl */
+  document.querySelectorAll(
+    'input[type="checkbox"]:not([id^="y_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
+  ).forEach(function(cb) { cb.checked = false; });
+  /* Coche les defaults si aucun y_* n'est coché */
+  if (!document.querySelector('input[type="checkbox"][id^="y_"]:checked')) {
+    ['y_gen', 'y_hl'].forEach(function(id) {
+      document.getElementById(id).checked = true;
+    });
+  }
+}
+
 function book_of_ascendants_options() {
   /* Décoche tout sauf boa_* et only/image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="boa_"]):not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="boa_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
   /* Coche les defaults si aucun boa_* n'est coché */
   const boaAll      = document.querySelectorAll('input[type="checkbox"][id^="boa_"]');
@@ -87,14 +100,14 @@ function book_of_ascendants_options() {
 function tree_options() {
   /* Décoche tout sauf tree_* et image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="tree_"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="tree_"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
 }
 
 function missing_ancestors_options() {
   /* Décoche tout sauf ma_* et only/image/cgl */
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="ma_"]):not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="ma_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
   /* Coche les defaults si aucun ma_* n'est coché */
   const maAll      = document.querySelectorAll('input[type="checkbox"][id^="ma_"]');
@@ -109,7 +122,7 @@ function missing_ancestors_options() {
 
 function missing_events_options() {
   document.querySelectorAll(
-    'input[type="checkbox"]:not([id^="me_"]):not([name="only"]):not([name="image"]):not([name="cgl"])'
+    'input[type="checkbox"]:not([id^="me_"]):not([name="only"]):not([name="im"]):not([name="cgl"])'
   ).forEach(function(cb) { cb.checked = false; });
   const evt = document.querySelector('input[type="hidden"][name="evt"]');
   if (evt) evt.disabled = false;
@@ -282,8 +295,18 @@ function missing_events_options() {
         <div class="ms-1">
           <hr>
           <div class="form-check text-nowrap">
-            <input type="radio" class="form-check-input" id="tY" name="t" value="Y" onclick="no_options()">
+            <input type="radio" class="form-check-input" id="tY" name="t" value="Y" onclick="couple_table_options()">
             <label class="form-check-label" for="tY"><i class="fa fa-table fa-fw me-1"></i>[*table] [by couple]0 <span class="text-primary">✱</span><span class="text-info">✘</span></label>
+          </div>
+          <div class="ms-1">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="y_gen" name="gen" value="1">
+              <label class="form-check-label" for="y_gen">[*display generation]</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="y_hl" name="hl" value="1">
+              <label class="form-check-label" for="y_hl">[*highlight gaps/hide highlighting]0</label>
+            </div>
           </div>
           <div class="form-check text-nowrap">
             <input type="radio" class="form-check-input" id="tZ" name="t" value="Z" onclick="table_options()">
