@@ -190,7 +190,7 @@
   %foreach;ancestor_level(l_v)
     %if;(level>=lmin)
       <tbody>
-        %if;(e.gen=1)
+        %if;(e.gen=1 and level>1)
           <tr><th scope="rowgroup" colspan="7" class="text-center gen-row">[*generation/generations]0 %level;</th></tr>
         %end;
         %foreach;ancestor;
