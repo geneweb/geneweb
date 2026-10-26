@@ -2,8 +2,9 @@
 
 type query
 (** A query read from the URL: text [s], options [c=on] (case sensitive) and
-    [word=on] (word match), the scopes and [k], the maximum number of corpus
-    hits. *)
+    [word=on] (word match), the scopes, [k], the maximum number of corpus hits,
+    and [near], the maximum distance in words between the required terms (see
+    {!NotesSearch.within}). *)
 
 val query_of_env : Config.config -> query
 (** [query_of_env conf] reads the query of [conf.env]. The scopes are the ticked
@@ -20,7 +21,8 @@ val print_form : Config.config -> query -> unit
 val print : Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] renders [m=NOTES_SEARCH]. The query follows
     {!NotesSearch.query}: AND-ed words, ["phrases"], [-excluded], [*] and [?]; a
-    query without a required term searches nothing.
+    query without a required term searches nothing. Required words of 2 or 3
+    letters outside a phrase get a warning (see {!NotesSearch.short_words}).
 
     Misc and wizard notes are read live, galleries on their displayed texts
     (title, chronicle, descriptions, labels). Person, family and event notes

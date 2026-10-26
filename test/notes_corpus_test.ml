@@ -160,6 +160,49 @@ let test_matches () =
     (NotesSearch.matches false q "le moulin de Dupont");
   Alcotest.(check bool) "missing" false (NotesSearch.matches false q "rien")
 
+let test_near () =
+  let text = "Jean Dupont meunier au moulin de Saint-Pair, puis à Granville" in
+  let within n q =
+    NotesSearch.within false (NotesSearch.terms false q) n text
+  in
+  Alcotest.(check bool) "adjacent words" true (within 1 "jean dupont");
+  Alcotest.(check bool) "any order" true (within 1 "dupont jean");
+  (* Jean 0, Dupont 1, meunier 2, au 3, moulin 4, de 5, Saint 6, Pair 7,
+     puis 8, à 9, Granville 10 *)
+  Alcotest.(check bool) "3 words apart, n=3" true (within 3 "dupont moulin");
+  Alcotest.(check bool) "3 words apart, n=2" false (within 2 "dupont moulin");
+  (* window: every pair within n, not a chain of successive pairs *)
+  Alcotest.(check bool)
+    "window too wide" false
+    (within 4 "jean moulin granville");
+  Alcotest.(check bool)
+    "window wide enough" true
+    (within 10 "jean moulin granville");
+  Alcotest.(check bool) "one word" true (within 0 "moulin");
+  (* the phrase "de saint" starts at word 5, next to moulin *)
+  Alcotest.(check bool)
+    "phrase counts at its start" true
+    (within 1 {|"de saint" moulin|});
+  Alcotest.(check bool) "phrase too far" false (within 0 {|"de saint" moulin|});
+  Alcotest.(check bool) "word missing" false (within 50 "jean paris");
+  Alcotest.(check bool)
+    "matches with near" false
+    (NotesSearch.matches ~near:2 false
+       (NotesSearch.query false "jean granville")
+       text);
+  Alcotest.(check bool)
+    "matches without near" true
+    (NotesSearch.matches false (NotesSearch.query false "jean granville") text)
+
+let test_short_words () =
+  Alcotest.(check (list string))
+    "short words outside phrases" [ "le"; "de" ]
+    (NotesSearch.short_words
+       (NotesSearch.terms false {|le moulin de "de la Roche" Église|}));
+  Alcotest.(check (list string))
+    "jokers and stars not counted" [ "d?" ]
+    (NotesSearch.short_words (NotesSearch.terms false "d? dupon? *ette"))
+
 let v =
   [
     ( "notes-corpus",
@@ -168,5 +211,7 @@ let v =
         Alcotest.test_case "synchro changes" `Quick test_changes;
         Alcotest.test_case "matches" `Quick test_matches;
         Alcotest.test_case "folded candidates" `Quick test_candidate;
+        Alcotest.test_case "near" `Quick test_near;
+        Alcotest.test_case "short words" `Quick test_short_words;
       ] );
   ]
