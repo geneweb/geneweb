@@ -15396,10 +15396,20 @@ de: das Fragezeichen steht für genau ein Zeichen, auch ein Leerzeichen
 en: the question mark stands for exactly one character, a space included
 fr: le point d’interrogation remplace exactement un caractère, espace compris
 
+    notes search help near
+de: mit max. Abstand 5: alle Wörter höchstens 5 Wörter voneinander entfernt, in beliebiger Reihenfolge
+en: with a max. distance of 5: all the words at most 5 words apart from each other, in any order
+fr: avec une distance max. de 5 : tous les mots à 5 mots au plus les uns des autres, dans n’importe quel ordre
+
     notes search help phrase
 de: genau diese Wortfolge
 en: this exact sequence of words
 fr: cette suite de mots exacte
+
+    notes search help short
+de: Wörter mit 2 oder 3 Buchstaben kommen überall vor: nicht allein suchen, sondern in einer „Phrase“
+en: words of 2 or 3 letters occur everywhere: do not search them alone, but inside a “phrase”
+fr: les mots de 2 ou 3 lettres sont partout : ne pas les chercher seuls, mais dans une « phrase »
 
     notes search help star
 de: mit „ganzes Wort“ steht ein Sternchen am Anfang oder Ende für den Rest des Wortes
@@ -15430,6 +15440,16 @@ fr: L’index des notes n’a pas encore été construit : lancer « cache_files
 de: Der Notizenindex stammt von einer älteren Version der Datenbank: „cache_files -notes %s“ erneut ausführen.
 en: The notes index was built for an earlier version of the base: run “cache_files -notes %s” again.
 fr: L’index des notes date d’une version antérieure de la base : relancer « cache_files -notes %s ».
+
+    notes search near
+de: max. Abstand (Wörter)
+en: max. distance (words)
+fr: distance max. (mots)
+
+    notes search short words %s
+de: Wörter mit 2 oder 3 Buchstaben (%s) kommen in fast jeder Notiz vor: Die Ergebnisse sind nicht aussagekräftig und die Suche kann abbrechen (Zeitüberschreitung). In einer „Phrase“ sind sie dagegen nützlich.
+en: words of 2 or 3 letters (%s) occur in almost every note: the results are not significant and the search may time out. They are useful inside a “phrase”.
+fr: les mots de 2 ou 3 lettres (%s) figurent dans presque toutes les notes : les résultats ne sont pas significatifs et la recherche risque d’échouer (délai dépassé). Ils sont utiles dans une « phrase ».
 
     notes search scopes
 de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen

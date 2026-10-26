@@ -327,8 +327,81 @@ let find_any ~full_word case_sens terms p i =
 let mem_all ?(full_word = false) case_sens terms p =
   List.for_all (fun t -> find_term ~full_word case_sens t p 0 <> None) terms
 
-let matches ?(full_word = false) case_sens (terms, excluded) p =
-  mem_all ~full_word case_sens terms p
+(* Proximity. Words are the maximal runs of word characters (letters,
+   digits, combining marks); an occurrence is placed at the word where it
+   starts. [within ~full_word case_sens terms n p]: some passage of [p]
+   holds an occurrence of every term with at most [n] words between the
+   first and the last, i.e. every pair of terms is at most [n] words apart
+   (a window rather than a chain of successive pairs: independent of the
+   order of the terms, and checked in one pass). *)
+let word_starts p =
+  let len = String.length p in
+  let rec loop acc prev_word i =
+    if i >= len then Array.of_list (List.rev acc)
+    else
+      let w = is_word_char (uchar_at p i) in
+      let acc = if w && not prev_word then i :: acc else acc in
+      loop acc w (Utf8.next p i)
+  in
+  loop [] false 0
+
+(* index of the word holding byte [off], or of the last word before it *)
+let word_index starts off =
+  let rec search lo hi =
+    if lo >= hi then lo - 1
+    else
+      let mid = (lo + hi) / 2 in
+      if starts.(mid) <= off then search (mid + 1) hi else search lo mid
+  in
+  max 0 (search 0 (Array.length starts))
+
+let within ?(full_word = false) case_sens terms n p =
+  match terms with
+  | [] | [ _ ] -> true
+  | _ :: _ :: _ ->
+      let starts = word_starts p in
+      let k = List.length terms in
+      (* (word index, term number) of every occurrence, sorted *)
+      let occ =
+        List.fold_left
+          (fun (ti, acc) t ->
+            let rec loop acc i =
+              match find_term ~full_word case_sens t p i with
+              | Some (x, y) ->
+                  loop ((word_index starts x, ti) :: acc) (max y (x + 1))
+              | None -> acc
+            in
+            (ti + 1, loop acc 0))
+          (0, []) terms
+        |> snd |> Array.of_list
+      in
+      Array.sort compare occ;
+      (* sliding window over [occ]: the narrowest windows holding all terms *)
+      let cnt = Array.make k 0 in
+      let have = ref 0 in
+      let left = ref 0 in
+      let ok = ref false in
+      Array.iter
+        (fun (wr, tr) ->
+          if not !ok then (
+            if cnt.(tr) = 0 then incr have;
+            cnt.(tr) <- cnt.(tr) + 1;
+            while !have = k && not !ok do
+              let wl, tl = occ.(!left) in
+              if wr - wl <= n then ok := true
+              else (
+                cnt.(tl) <- cnt.(tl) - 1;
+                if cnt.(tl) = 0 then decr have;
+                incr left)
+            done))
+        occ;
+      !ok
+
+let matches ?(full_word = false) ?near case_sens (terms, excluded) p =
+  (match near with
+    | Some n -> within ~full_word case_sens terms n p
+    | None -> true)
+  && mem_all ~full_word case_sens terms p
   && not (List.exists (fun t -> mem_all ~full_word case_sens [ t ] p) excluded)
 
 let count_occurrences ?(full_word = false) case_sens terms p =
@@ -572,3 +645,15 @@ let highlight_note ?(anchor = false) conf (html : Adef.safe_string) =
         ~anchor case_sens (terms case_sens s)
         (html :> string)
       |> Adef.safe
+
+(* Required terms of at most 3 letters outside a phrase (le, la, de, the):
+   they occur in almost every note, so they select nothing and make the
+   search check every note. *)
+let short_words terms =
+  List.filter
+    (fun t ->
+      (not (String.contains t ' '))
+      &&
+      let c = String.concat "" (String.split_on_char '?' (core t)) in
+      c <> "" && Utf8.length c <= 3)
+    terms

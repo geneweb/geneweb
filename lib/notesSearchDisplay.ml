@@ -65,6 +65,8 @@ type query = {
   terms : string list * string list;
   scope : group list;
   max_hits : int;  (** corpus hits only *)
+  near : int option;
+      (** maximum distance in words between the required terms (near=N) *)
 }
 
 let query_of_env conf =
@@ -82,6 +84,10 @@ let query_of_env conf =
     text;
     case_sens;
     full_word = Util.p_getenv conf.env "word" = Some "on";
+    near =
+      (match Util.p_getint conf.env "near" with
+      | Some n when n > 0 -> Some n
+      | Some _ | None -> None);
     terms = NotesSearch.query case_sens text;
     scope = (match ticked with [] -> allowed_groups | _ :: _ -> ticked);
     max_hits = max_results conf;
@@ -106,7 +112,8 @@ type hit = {
 }
 
 let matches q text =
-  NotesSearch.matches ~full_word:q.full_word q.case_sens q.terms text
+  NotesSearch.matches ~full_word:q.full_word ?near:q.near q.case_sens q.terms
+    text
 
 let count q text =
   NotesSearch.count_occurrences ~full_word:q.full_word q.case_sens (fst q.terms)
@@ -355,6 +362,8 @@ let print_help_panel conf =
       ("henri*", "Henri, Henriette", "notes search help star");
       ("jean", "Jean, Jean-Pierre", "notes search help word");
       ("l'eglise", "L’Église, l'église", "notes search help case");
+      ("moulin dupont", "≤ 5", "notes search help near");
+      ({|"de la roche"|}, "De la Roche", "notes search help short");
     ]
   in
   Output.printf conf
@@ -392,10 +401,15 @@ let print_form conf q =
   check "word" (Util.transl conf "word match") q.full_word;
   if allowed conf (Corpus NotesCorpus.Person) then
     Output.printf conf
-      {|<label for="k">%s</label>
-<input type="number" class="form-control w-auto" id="k" name="k" min="1" value="%d">|}
+      {|<div class="d-flex align-items-center gap-2"><label for="k">%s</label>
+<input type="number" class="form-control" style="width:6em" id="k" name="k" min="1" value="%d"></div>|}
       (Util.transl conf "maximum" |> Utf8.capitalize_fst)
       q.max_hits;
+  Output.printf conf
+    {|<div class="d-flex align-items-center gap-2"><label class="text-nowrap" for="near">%s</label>
+<input type="number" class="form-control" style="width:6em" id="near" name="near" min="1" max="999" value="%s"></div>|}
+    (Util.transl conf "notes search near" |> Utf8.capitalize_fst)
+    (match q.near with Some n -> string_of_int n | None -> "");
   Output.printf conf
     {|<div class="d-flex gap-2"><button type="submit" class="btn btn-primary text-nowrap">%s</button>|}
     (Util.transl_nth conf "search/case sensitive" 0 |> Utf8.capitalize_fst);
@@ -598,6 +612,13 @@ let print conf base =
   in
   Hutil.header conf title;
   print_form conf q;
+  (match NotesSearch.short_words (fst q.terms) with
+  | [] -> ()
+  | words ->
+      print_message conf
+        (Printf.sprintf
+           (Util.ftransl conf "notes search short words %s")
+           (Util.escape_html (String.concat ", " words) :> string)));
   (match fst q.terms with
   | [] -> ()
   | _ :: _ -> (
