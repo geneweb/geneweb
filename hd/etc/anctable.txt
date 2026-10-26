@@ -53,8 +53,7 @@
     %if;(e.ns=1)
         %if;(ancestor.has_notes) note%if;(ancestor.has_psources)source%end;%elseif;(ancestor.has_psources) source%end;
     %end;
-    %if;(e.hl=1 and ("?" is_substr ancestor or ancestor.first_name="N." or ancestor.first_name="Nn"
-              or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) bg-ly-incomplete%end;"%sp;
+    %apply;incomplete("ancestor")"%sp;
     %if;(e.ns=1 and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
       title="[*click] [notes sources show help]%sp;
              %if;(ancestor.has_notes)[note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
@@ -83,21 +82,19 @@
     </div>
   </td>
 %( Date de naissance %)
-  %apply;date_popup%with;ancestor%and;birth%and;0%end;
+  %apply;date_popup("ancestor", "birth")
 %( Lieu de naissance %)
-  %apply;place_popup%with;ancestor%and;birth%and;0%end;
+  %apply;place_popup("ancestor", "birth")
 %( Date de baptême %)
-  %apply;date_popup%with;ancestor%and;baptism%and;0%end;
+  %apply;date_popup("ancestor", "baptism")
 %( Lieu de baptême %)
-  %apply;place_popup%with;ancestor%and;baptism%and;0%end;
+  %apply;place_popup("ancestor", "baptism")
 %( Conjoints %)
   %if;(e.marr="on")
     %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt=1)
-        <td class="align-middle
-        %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
-              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;">
+        <td class="align-middle%apply;incomplete("spouse")">
           %apply;image_MF("spouse")
           %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
         </td>
@@ -163,13 +160,13 @@
     %end;
   %end;
 %( Date du décès %)
-  %apply;date_popup%with;ancestor%and;death%and;0%end;
+  %apply;date_popup("ancestor", "death")
 %( Lieu du décès %)
-  %apply;place_popup%with;ancestor%and;death%and;0%end;
+  %apply;place_popup("ancestor", "death")
 %( Date de la sépulture %)
-  %apply;date_popup%with;ancestor%and;burial%and;0%end;
+  %apply;date_popup("ancestor", "burial")
 %( Lieu de la sépulture %)
-  %apply;place_popup%with;ancestor%and;burial%and;0%end;
+    %apply;place_popup("ancestor", "burial")
 %( Âge %)
   %if;(e.age="on")
     <td class="align-middle text-center"%rowspan;
@@ -192,15 +189,13 @@
       %if;(family_cnt!=1)
         <tr>
           %if;(e.marr="on")
-            <td class="align-middle
+            <td class="align-middle%apply;incomplete("spouse")"
                 %if;(e.ns=1)
                   %if;(spouse.has_pnotes and not spouse.has_psources) note%nn;
                   %elseif;(not spouse.has_pnotes and spouse.has_psources) source%nn;
                   %elseif;(spouse.has_pnotes and spouse.has_psources) notesource%nn;
                   %end;
                 %end;
-                %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
-              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"
               %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0" %apply;popover_params("bottom")
               data-bs-content='%if;(spouse.has_pnotes)%apply;clean_comment_tags(spouse.pnotes)%end;
                             %if;(spouse.has_psources)
