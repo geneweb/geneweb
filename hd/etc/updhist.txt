@@ -14,7 +14,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %include;home
 <h1>[*history of updates]%if;(e.wiz!="") — [wizard/wizards/friend/friends/exterior]0 %e.wiz;%end;</h1>
 %define;search_form()

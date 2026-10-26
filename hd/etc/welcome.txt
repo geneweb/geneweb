@@ -12,7 +12,7 @@
   %include;css
 </head>
 <body%body_prop;>
-<main class="container" id="welcome">
+<main class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;" id="welcome">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
 %define;connect_with(xx)[*connect with %s:::xx]%end;

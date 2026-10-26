@@ -13,7 +13,7 @@
 <body%body_prop;>
 %include;hed
 %include;home
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 <script>
 function updateRadios(changed) {
   const newEl = document.querySelector('input[name=new]:checked');

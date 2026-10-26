@@ -22,7 +22,7 @@
 %include;hed
 %message_to_wizard;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
-<div class="container%if;(e_v>3 and e.t!="A" and e.t!="C")-fluid%end; pb-6">
+<div class="container%if;(((e.wide="on" or b.wide="on") and e.wide!="off") or (e_v>3 and e.t!="A" and e.t!="C"))-fluid%end; pb-6">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar

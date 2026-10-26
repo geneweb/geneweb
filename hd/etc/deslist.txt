@@ -20,7 +20,7 @@
   %include;css
 </head>
 <body%body_prop;>
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %message_to_wizard;
 %include;hed
 %include;menubar

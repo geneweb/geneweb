@@ -22,7 +22,7 @@
 %include;hed
 %message_to_wizard;
 %let;e_v;%if;(e.v!="")%if;(e.v>cousins.max_a)%expr(cousins.max_a-1)%else;%e.v;%end;%else;5%end;%in;
-<div class="container%if;(e_v>6)-fluid%end;" id="cousins-container">
+<div class="container%if;(((e.wide="on" or b.wide="on") and e.wide!="off") or (e_v>6))-fluid%end;" id="cousins-container">
   <div class="d-flex flex-column justify-content-center">
 %include;perso_utils
 %include;menubar

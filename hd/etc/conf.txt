@@ -11,7 +11,7 @@
 %include.css
 </head>
 <body>
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %include;home
 %define;language(x)
   %apply;nth%with;

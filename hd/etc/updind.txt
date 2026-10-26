@@ -19,14 +19,14 @@
 </head>
 <body%body_prop; id="person">
 %include;hed
-<div class="container ps-lg-0 pe-lg-3">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end; ps-lg-0 pe-lg-3">
 %message_to_wizard;
 %( do not use %include;menubar %)
 %include_menubar;
 %include;upd_utils
 
 %define;nav()
-  <div class="container fixed-top">
+  <div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end; fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-1" id="banner">
       <nav class="nav nav-pills nav-fill gap-3">
         %apply;nav_item("person","user","","lg",[*person/persons]0)

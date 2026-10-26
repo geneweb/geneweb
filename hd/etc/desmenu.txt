@@ -23,7 +23,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %include;perso_header
 <h1 class="text-center my-3">%nn;
   %apply;a_of_b_gr_eq_lev%with;

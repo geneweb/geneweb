@@ -15,7 +15,7 @@
 %include;hed
 %include;home
 %message_to_wizard;
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 
 %define;fun_day(ccc, nnn)
   <td><button class="btn btn-sm btn-outline-secondary" type="submit" name="dccc1">&lsaquo;</button></td>

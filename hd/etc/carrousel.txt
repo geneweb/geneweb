@@ -12,7 +12,7 @@
 </head>
 <body%body_prop; id="person">
 %include.hed;
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %message_to_wizard;
 %include.perso_header;
 %( Logic for variables:

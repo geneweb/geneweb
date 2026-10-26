@@ -37,7 +37,7 @@
 <body%body_prop; id="ancsosa">
 %include;hed
 %message_to_wizard;
-<div class="container%if;(e.t!="G")-fluid%end;%if;(e.t="Z") ms-2%end;">
+<div class="container%if;(((e.wide="on" or b.wide="on") and e.wide!="off") or (e.t!="G"))-fluid%end;%if;(e.t="Z") ms-2%end;">
 %if;not cancel_links;
   %include;menubar
 %end;

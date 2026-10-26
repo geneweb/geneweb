@@ -24,12 +24,12 @@
 <body%body_prop; id="family">
 %include;hed
 %message_to_wizard;
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 %( do not use %include;menubar %)
 %include_menubar;
 %include;upd_utils
 %define;nav()
-  <div class="container fixed-top">
+  <div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end; fixed-top">
     <nav class="navbar navbar-light justify-content-center mx-2" id="banner">
       <nav class="nav nav-pills nav-fill gap-3">
         %apply;nav_item("family","person","person-dress","md",[*spouse/spouses]1)

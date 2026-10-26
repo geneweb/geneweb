@@ -10,7 +10,7 @@
   %include;css
 </head>
 <body%body_prop;>
-<div class="container text-center">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end; text-center">
 <h1 class="mt-5">[*choose a genealogy]</h1>
 
 <div class="mt-5">[*input database][:]</div>

@@ -22,7 +22,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container%if;(e.v>15)-fluid%end;">
+<div class="container%if;(((e.wide="on" or b.wide="on") and e.wide!="off") or (e.v>15))-fluid%end;">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar

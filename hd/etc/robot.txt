@@ -10,7 +10,7 @@
   %include;css
 </head>
 <body>
-<div class="container">
+<div class="container%if;((e.wide="on" or b.wide="on") and e.wide!="off")-fluid%end;">
 <h1>Access refused</h1>
 
 <p>This address has been considered to be a robot and its access has
