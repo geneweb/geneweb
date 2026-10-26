@@ -250,7 +250,7 @@
                                 %if;(has_fnotes)<hr>%end;
                                 %apply;capitalize(fsources)
                               %end;'
-                title="%if;(has_fsources or has_fnotes)
+                data-bs-title="%if;(has_fsources or has_fnotes)
                          %if;(has_fnotes and not has_fsources)[*note/notes]1%nn;
                          %elseif;(not has_fnotes and has_fsources)[*source/sources]1%nn;
                          %elseif;(has_fnotes and has_fsources)[*note/notes]1 [and] [source/sources]1%nn;
@@ -307,9 +307,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %if;(e.csv!=1)
   %reset_count;
-  <table id="anctable" class="table table-hover table-sm w-auto asc-desc-table mt-2"
-    aria-labelledby="[table]-[ancestor]">
-    %( table_headed defined in perso_utils for both tables %)
+  <table id="anctable" class="table table-hover table-sm w-auto asc-desc-table mt-2">
     %apply;table_header()
     <tbody>
       %let;nb_col;%count;%in;
@@ -317,7 +315,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %foreach;ancestor_level(l_v)
         %if;((v0=1 and level=0) or level>=v0)
           %if;(only=0 and e.gen=1 and level!=0)
-            <tr class="no-hover-highlight">
+            <tr>
               <th class="text-start border-0 gen-row" scope="row" colspan="%nb_col;">
                 <span class="ms-1">[*generation/generations]0 %level;</span>
               </th>
