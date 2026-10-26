@@ -195,7 +195,7 @@
         <div class="input-group flex-nowrap me-2">
           <label for="input_v" class="input-group-text" title="v=…">max</label>
           <input type="number" id="input_v" name="v" class="form-control"
-            value="%e.v;" min="0" max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" required>
+            value="%l_v;" min="0" max="%if;(e.m="A")%static_max_anc_level;%elseif;(e.m="D")%static_max_desc_level;%end;" required>
         </div>
         <button type="submit" class="btn btn-primary" title="[*validate/delete]0">OK</button>
       </form>
