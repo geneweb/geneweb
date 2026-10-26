@@ -1,4 +1,4 @@
-<!-- $Id: anctable.txt v7.1 08/04/2026 23:05:03 $ -->
+<!-- $Id: anctable.txt v7.1 26/10/2026 03:45:25 $ -->
 %( table_utils mutualize asc./desc. tables headers and common functions %)
 %include;table_utils
 %define;implex()
@@ -16,11 +16,11 @@
 %end;
 %define;table_row()
   %lazy_force;
+  %let;rowspan;%if;(ancestor.nb_families>1 and famcols=1) rowspan="%ancestor.nb_families;"%end;%in;
   %if;(level!=0 and ancestor.same="" and (ancestor.first_name!="?" and ancestor.surname!="?"))%incr_count;%end;
 %( Sosa %)
   %if;(e.num="on")
-    <td class="align-middle text-center%if;(ancestor.anc_sosa!=1) table_big_cell%end; lh_implex%if;(ancestor.has_parents) text-alert%end;"
-    %if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+    <td class="align-middle text-center%if;(ancestor.anc_sosa!=1) table_big_cell%end; lh_implex"%rowspan;>%nn;
       %if;(ancestor.anc_sosa!=1 and not cancel_links)
         %if;ancestor.has_parents;
           <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
@@ -49,8 +49,7 @@
     </td>
   %end;
 %( Ancêtre %)
-  <td%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;%sp;
-      class="align-middle%if;(e.nowrap="on") text-nowrap%end; ps-2%nn;
+  <td%rowspan; class="align-middle%if;(e.nowrap="on") text-nowrap%end; ps-2%nn;
     %if;(e.ns=1)
         %if;(ancestor.has_notes) note%if;(ancestor.has_psources)source%end;%elseif;(ancestor.has_psources) source%end;
     %end;
@@ -100,7 +99,7 @@
         %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;">
           %apply;image_MF("spouse")
-          %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
+          %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
         </td>
       %end;
     %end;
@@ -145,25 +144,21 @@
     %if;(ancestor.nb_families=0)
       <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
-      %if;(e.marr="on" or e.marr_date="on" or e.marr_place="on")
-        %foreach;ancestor.family;
-          %if;(family_cnt=1)
-            <td class="align-middle text-center
-                  %if;(e.ns=1)
-                    %if;has_fnotes; note%if;has_fsources;source%end;
-                    %elseif;has_fsources; source%end;
-                  %end;"
-                %if;(e.ns=1 and (has_fsources or has_fnotes)) tabindex="0" %apply;popover_params("bottom")
-                data-bs-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
-                              %if;has_fsources;%if;has_fnotes;<hr>%end;%fsources;%end;'
-                data-bs-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
-                           %elseif;has_fsources;[*source/sources]1%end;"%nn;
-                %end;>
-            %nb_children;</td>
-          %end;
+      %foreach;ancestor.family;
+        %if;(family_cnt=1)
+          <td class="align-middle text-center
+                %if;(e.ns=1)
+                  %if;has_fnotes; note%if;has_fsources;source%end;
+                  %elseif;has_fsources; source%end;
+                %end;"
+              %if;(e.ns=1 and (has_fsources or has_fnotes)) tabindex="0" %apply;popover_params("bottom")
+              data-bs-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
+                            %if;has_fsources;%if;has_fnotes;<hr>%end;%fsources;%end;'
+              data-bs-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
+                         %elseif;has_fsources;[*source/sources]1%end;"%nn;
+              %end;>
+          %nb_children;</td>
         %end;
-      %else;
-        <td>%ancestor.nb_children;</td>
       %end;
     %end;
   %end;
@@ -177,26 +172,22 @@
   %apply;place_popup%with;ancestor%and;burial%and;0%end;
 %( Âge %)
   %if;(e.age="on")
-    <td class="align-middle text-center"
-      %if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;
-      %if;ancestor.computable_death_age; title="%ancestor.death_age;">%ancestor.death_age.short;%end;%nn;
-      %if;ancestor.computable_age; title="%ancestor.age;">%ancestor.age.short;%end;%nn;
+    <td class="align-middle text-center"%rowspan;
+      %if;ancestor.computable_death_age; title="%ancestor.death_age;">%ancestor.death_age.short;%nn;
+      %elseif;ancestor.computable_age; title="%ancestor.age;">%ancestor.age.short;%nn;
+      %else;>%end;
     </td>
   %end;
 %( Profession %)
   %if;(e.occu="on")
-    <td class="align-middle"%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
-      %if;(ancestor.has_occupation)
-        %ancestor.occupation%nn;
-      %else;
-        &nbsp;%nn;
-      %end;
+    <td class="align-middle"%rowspan;>%nn;
+      %if;(ancestor.has_occupation)%ancestor.occupation;%else;&nbsp;%end;
     </td>
   %end;
 %end;
 
 %define;table_family()
-  %if;(e.marr="on" or e.marr_date="on" or e.marr_place="on")
+  %if;(famcols=1)
     %foreach;ancestor.family;
       %if;(family_cnt!=1)
         <tr>
@@ -224,7 +215,7 @@
                        %end;"%nn;
               %end;>
               %apply;image_MF("spouse")
-              %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
+              %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
             </td>
           %end;
           %if;(e.marr_date="on")
