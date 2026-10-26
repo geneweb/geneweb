@@ -363,6 +363,7 @@
           %end;
           %( m=D descendant dropdown menu %)
           %if;has_children;
+            %let;dmax;%if;(b.max_desc_level!="")%b.max_desc_level;%else;16%end;%in;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle text-secondary%if;(e.m="D") active%end;" data-bs-toggle="dropdown" role="button" href="#" aria-expanded="false" title="[*descendants]">%nn;
                 <i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>%nn;
@@ -372,11 +373,11 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=T&v=%if;(e.v!="")%e.v;%else;3%end;"%if;(not has_parents) %laY;%end;><i class="fa fa-sitemap fa-fw me-2" aria-hidden="true"></i>[*descendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=TV&v=%if;(e.v!="")%e.v;%else;3%end;"%if;(not has_parents) %laY;%end;><i class="fa fa-sitemap fa-fw me-2" aria-hidden="true"></i>[*compact descendants tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=D&v=%if;(e.v!="")%e.v;%else;%max_desc_level;%end;"><i class="fa fa-code-branch fa-rotate-90 fa-flip-vertical fa-fw me-2" aria-hidden="true"></i>[*descendant tree view]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=I&v=%max_desc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1%if;(e.im="0")&im=0%end;"><i class="fa fa-table fa-fw me-2" aria-hidden="true"></i>[*table] [descendants]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=D&v=%if;(e.v!="")%e.v;%else;%dmax;%end;"><i class="fa fa-code-branch fa-rotate-90 fa-flip-vertical fa-fw me-2" aria-hidden="true"></i>[*descendant tree view]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=I&v=%dmax;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1%if;(e.im="0")&im=0%end;"><i class="fa fa-table fa-fw me-2" aria-hidden="true"></i>[*table] [descendants]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=L&v=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><i class="fa fa-newspaper fa-fw me-2" aria-hidden="true"></i>[*long display]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=A&num=on&v=%max_desc_level;"><i class="fa fa-code-branch fa-flip-vertical fa-fw me-2" aria-hidden="true"></i>D’Aboville</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=A&num=on&v=%dmax;"><i class="fa fa-code-branch fa-flip-vertical fa-fw me-2" aria-hidden="true"></i>D’Aboville</a>
               </div>
             </li>
           %end;
