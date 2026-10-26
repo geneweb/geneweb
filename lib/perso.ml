@@ -478,12 +478,12 @@ let next_generation conf base mark gpl =
     List.fold_left
       (fun gpl gp ->
         match gp with
-        | GP_person (n, ip, _) ->
-            let m = Collection.Marker.get mark ip in
-            if Sosa.eq m Sosa.zero then (
-              Collection.Marker.set mark ip n;
-              gp :: gpl)
-            else GP_same (n, m, ip) :: gpl
+        | GP_person (n, ip, _) -> (
+            match Hashtbl.find_opt mark ip with
+            | None ->
+                Hashtbl.replace mark ip n;
+                gp :: gpl
+            | Some m -> GP_same (n, m, ip) :: gpl)
         | GP_same _ | GP_interv _ | GP_missing _ -> gp :: gpl)
       [] gpl
   in
@@ -553,9 +553,7 @@ let will_print = function
 
 let get_all_generations conf base p =
   let max_level = match p_getint conf.env "v" with Some v -> v | None -> 0 in
-  let mark =
-    Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
-  in
+  let mark = Hashtbl.create 1024 in
   let rec get_generations level gpll gpl =
     let gpll = gpl :: gpll in
     if level < max_level then
@@ -1273,7 +1271,7 @@ type 'a env =
       ref
   | Vcous_level of int ref * int ref
   | Vdesclevtab of ((Driver.ifam, int) Hashtbl.t * int array) lazy_t
-  | Vdmark of (Driver.iper, bool) Collection.Marker.t ref
+  | Vdmark of (Driver.iper, unit) Hashtbl.t
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
   | Vind of Driver.person
@@ -3840,7 +3838,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           false)
   | "is_descendant" -> (
       match get_env "desc_mark" env with
-      | Vdmark r -> Collection.Marker.get !r (Driver.get_iper p)
+      | Vdmark tab -> Hashtbl.mem tab (Driver.get_iper p)
       | _ -> raise Not_found)
   | "is_female" -> Driver.get_sex p = Female
   | "is_invisible" ->
@@ -4114,26 +4112,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         |> Util.escape_html |> safe_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
-      | Vdmark r ->
-          let tab =
-            Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) false
+      | Vdmark tab ->
+          Hashtbl.clear tab;
+          let rec mark ip =
+            if not (Hashtbl.mem tab ip) then (
+              Hashtbl.replace tab ip ();
+              Array.iter
+                (fun ifam ->
+                  Array.iter mark (Driver.get_children (Driver.foi base ifam)))
+                (Driver.get_family (pget conf base ip)))
           in
-          let rec mark_descendants len p =
-            let i = Driver.get_iper p in
-            if Collection.Marker.get tab i then ()
-            else (
-              Collection.Marker.set tab i true;
-              let u = p in
-              for i = 0 to Array.length (Driver.get_family u) - 1 do
-                let des = Driver.foi base (Driver.get_family u).(i) in
-                for i = 0 to Array.length (Driver.get_children des) - 1 do
-                  mark_descendants (len + 1)
-                    (pget conf base (Driver.get_children des).(i))
-                done
-              done)
-          in
-          mark_descendants 0 p;
-          r := tab;
+          mark (Driver.get_iper p);
           null_val
       | _ -> raise Not_found)
   | "marriage_age_years" -> (
@@ -4784,9 +4773,7 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ( match get_env "max_anc_level" env with Vint n -> n | _ -> 0)
       | _ -> raise Not_found
     in
-    let mark =
-      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
-    in
+    let mark = Hashtbl.create 1024 in
     let rec loop gpl i n =
       let prev_n = n in
       if i > max_level then ()
@@ -4819,9 +4806,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_ascendant_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level = match get_env max_lev env with Vint n -> n | _ -> 0 in
-    let mark =
-      Geneweb_db.Driver.iper_marker (Geneweb_db.Driver.ipers base) Sosa.zero
-    in
+    let mark = Hashtbl.create 1024 in
     let rec loop gpl i =
       if i > max_level then ()
       else
@@ -4829,9 +4814,7 @@ let print_foreach conf base print_ast eval_expr =
           Templ.Env.(env |> add "gpl" (Vgpl gpl) |> add "level" (Vint i))
         in
         List.iter (print_ast env ep) al;
-        Collection.iter
-          (fun i -> Collection.Marker.set mark i Sosa.zero)
-          (Geneweb_db.Driver.ipers base);
+        Hashtbl.clear mark;
         let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
     in
@@ -5878,8 +5861,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     |> Templ.Env.add "listc" (Vslist (ref SortedList.empty))
     |> Templ.Env.add "listd" (Vslist (ref SortedList.empty))
     |> Templ.Env.add "liste" (Vslist (ref SortedList.empty))
-    |> Templ.Env.add "desc_mark"
-         (Vdmark (ref @@ Collection.Marker.dummy Driver.Iper.dummy false))
+    |> Templ.Env.add "desc_mark" (Vdmark (Hashtbl.create 1))
     |> Templ.Env.add "lazy_print" (Vlazyp (ref None))
     |> Templ.Env.add "sosa" (Vsosa (ref []))
     |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref)
