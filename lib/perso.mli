@@ -58,8 +58,12 @@ val make_desc_level_table :
   Geneweb_db.Driver.base ->
   int ->
   Geneweb_db.Driver.person ->
-  (Geneweb_db.Driver.iper, int) Geneweb_db.Collection.Marker.t
-  * (Geneweb_db.Driver.ifam, int) Geneweb_db.Collection.Marker.t
+  (Geneweb_db.Driver.ifam, int) Hashtbl.t * int array
+(** [make_desc_level_table conf base max_level p] walks the descendants of [p]
+    breadth-first down to [max_level], along the male or female line only with
+    [t=M] or [t=F]. Returns the level at which each reached family was first met
+    and the number of distinct descendants at each level, [p] being alone at
+    level 0. *)
 
 type dup =
   | DupFam of Geneweb_db.Driver.ifam * Geneweb_db.Driver.ifam
