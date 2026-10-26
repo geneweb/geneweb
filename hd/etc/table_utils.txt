@@ -1,3 +1,4 @@
+%let;famcols;%if;(e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on")1%else;0%end;%in;
 %define;rm(ccc,ttt)
   %if;(e.ccc="on")<a role="button" class="stretched-link" href="%apply;url_set%with;ccc%end;"
     title="%if;("ttt"!="")ttt&#010;&#010;%end;[*remove %s column:::ccc]"></a>%end;
@@ -157,7 +158,7 @@
   %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
   %if;(e.yyy="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
     <td%sp;
-      %if;(("xxx"="ancestor" or ("xxx"!="ancestor" and e.t="H")) and xxx.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on"))rowspan="%xxx.nb_families;" %end;
+      %if;(("xxx"="ancestor" or e.t="H") and xxx.nb_families>1 and famcols=1)rowspan="%xxx.nb_families;" %end;
       class="align-middle text-end%if;not cancel_links; table_big_cell%end;
         %if;(e.hl=1)
           %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
@@ -188,7 +189,7 @@
 %define;place_popup(xxx,yyy,fff)
   %if;(e.yyy_place="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
     <td%sp;
-      %if;(("xxx"="ancestor" or ("xxx"!="ancestor" and e.t="H" and nb_families>1)) and xxx.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on" or e.child="on"))rowspan="%xxx.nb_families;" %end;
+      %if;(("xxx"="ancestor" or e.t="H") and xxx.nb_families>1 and famcols=1)rowspan="%xxx.nb_families;" %end;
       class="align-middle%nn;
         %if;(e.ns=1)
           %if;(xxx.has_yyy_note) note%if;(xxx.has_yyy_source)source%end;%elseif;(xxx.has_yyy_source) source%end;
@@ -197,17 +198,12 @@
           %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
           %elseif;(not xxx.is_dead and "yyy"="death") bg-lg%end;
         %end;"
-        %if;(e.ns=1 or e.yyy="on")title="[*click]%sp;%end;
-               %if;(e.ns=1 and (xxx.has_yyy_source or xxx.has_yyy_note))%nn;
-                 [notes sources show help]%sp;
-                 %if;(xxx.has_yyy_note or xxx.has_yyy_source)
-                   %apply;place_title("xxx","yyy",0)
-                 %end;
-                 %if;(e.yyy="on" and wizard)&#010;[or] %end;
-               %end;
-               %if;(e.yyy="on" and wizard)[notes sources edit on date]%end;
-        %if;(e.ns=1 or e.yyy="on")."%end;
-        %if;(e.ns=1 and (xxx.has_yyy_note or xxx.has_yyy_source)) tabindex="0"
+        %let;nsrc;%if;(e.ns=1 and (xxx.has_yyy_note or xxx.has_yyy_source))1%end;%in;
+        %let;edit;%if;(wizard and e.yyy="on")1%end;%in;
+        %if;(nsrc=1 or edit=1)title="[*click]%sp;
+          %if;(nsrc=1)[notes sources show help]%sp;%apply;place_title("xxx","yyy",0)%if;(edit=1)&#010;[or] %end;%end;
+          %if;(edit=1)[notes sources edit on date]%end;."%end;
+        %if;(nsrc=1) tabindex="0"
           %apply;popover_params("bottom")
           data-bs-content='%if;xxx.has_yyy_note;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_note)%end;%end;
                         %if;xxx.has_yyy_source;
