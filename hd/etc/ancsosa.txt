@@ -1,7 +1,7 @@
 <!-- $Id: ancsosa.txt v7.1 14/03/2026 12:07:19 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
-<html lang="%lang;"%if;(e.t="Z" or e.t="Y") id="scrollfix"%end;>
+<html lang="%lang;">
 <head>
 %include;perso_utils
   <title>%nn;
@@ -31,8 +31,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %permalink;
-  %permalink;
-    %include;css
+  %include;css
 </head>
 <body%body_prop; id="ancsosa">
 %include;hed
@@ -43,14 +42,14 @@
 %end;
 %include;buttons
 %define;link(aaa,xxx,nnn)
-  %if;(e.cgl="on")xxx%else;<a id="i_nnn" href="%prefix;aaa">xxx</a>%end;
+  %if;(e.cgl="on")xxx%else;<a href="%prefix;aaa">xxx</a>%end;
 %end;
 %define;link2(xxx, nnn)
   %if;(e.cgl="on")%xxx;%else;<a id="innn" href="%prefix;%xxx.access;">%xxx;</a>%end;
   %xxx.title;%xxx.dates;
 %end;
 %if;(e.templ!="templm")
-<h1 class="h3 mt-3%if;not cancel_links; ms-2%end;">%nn;
+<h1 class="h3 mt-3%if;not cancel_links; ms-2%end;%if;(e.t="Y" or e.t="X") text-center%end;">%nn;
   %apply;a_of_b%with;
     %if;(e.t="M")
       %if;(e.evt="on")[*missing events]%else;[*missing ancestors]%end;%nn;
@@ -69,7 +68,7 @@
       %sp;%if;(e.t="G")%apply;togena(l_v)%else;%apply;tothenthgen(l_v)%end;
     %end;
   %if;(e.t="D") [up to] %p_of_index.1; %if;(e_v > 4) %apply;togena(e_v)%end;%end;
-  %if;(e.t="X")<div class="ms-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
+  %if;(e.t="X") [only] [up to] %pvar.1;%pvar.1.dates;%end;
 </h1>
 %end;
 %if;(e.t="D") %( ancestors up to somebody %)
