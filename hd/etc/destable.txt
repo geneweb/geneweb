@@ -5,7 +5,8 @@
 <head>
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
-    %sp;[up to] %e.v; %if;(e.v>1)[generation/generations]1%else;[generation/generations]0%end;
+  %let;tv;%if;(e.v="")1%else;%apply;min(e.v, static_max_desc_level, bvar.max_desc_level)%end;%in;
+    %sp;[up to] %tv; %if;(tv>1)[generation/generations]1%else;[generation/generations]0%end;
 </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -46,8 +47,8 @@
     %if;(v0<l_v or desc=0)%sp;%apply;tothenthgen(l_v)%end;
   %end;%if;(static_max_desc_level=0) ([no descendants])%end;
 </h1>
-%define;link(aaa,xxx,nnn)
-  %if;(e.cgl="on")xxx%else;<a id="i_nnn" href="%prefix;aaa">xxx</a>%end;
+%define;link(p_acc,p_txt)
+  %if;cancel_links;p_txt%else;<a href="%prefix;p_acc">p_txt</a>%end;
 %end;
 %( Cells of the table rows: one_child sets %labl;, %up; and %rowspan;,
    fam_cells and spouse_row use the current family %)
@@ -82,7 +83,7 @@
     <div class="d-flex justify-content-between">
       <div class="align-self-center">%nn;
         %apply;image_MF("self")%nn;
-        %apply;link%with;%access;%and;%if;(e.fn=1)%first_name; %surname;%else;%self;%end;%and;%index;%end;
+        %apply;link%with;%access;%and;%if;(e.fn=1)%first_name; %surname;%else;%self;%end;%end;
         %if;(e.tt=1 and title!=""), %title;%end;
       </div>
       %if;(e.im="" and has_image)
@@ -126,13 +127,13 @@
       %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
         data-bs-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
                       %if;(spouse.has_psources)%if;(spouse.has_notes)<hr>%end;%apply;capitalize(spouse.psources)%end;'
-        title="%if;(spouse.has_notes)[*note/notes]1%if;(spouse.has_psources) [and] [source/sources]1%end;
+        data-bs-title="%if;(spouse.has_notes)[*note/notes]1%if;(spouse.has_psources) [and] [source/sources]1%end;
               %elseif;(spouse.has_psources)[*source/sources]1%end;"%nn;
       %end;>%nn;
       %apply;add_in_sorted_list(spouse.index)
       %if;(nb_families>1)<span class="me-1">%apply;letter(family_cnt)</span>%end;
       %apply;image_MF("spouse")
-      %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
+      %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%end;
       %if;(e.tt=1 and spouse.title!=""), %spouse.title;%end;
     </td>
   %end;
@@ -172,9 +173,10 @@
                 %end;"%nn;
       %end;>%nn;
       %let;tot;%spouse.nb_children_total;%in;
-      %if;(nb_children>0 and not cancel_links)<a href="#%labl;%if;(nb_families>1)%apply;letter(family_cnt)%end;.%expr(nb_children_before+1)" title="[*link to children]">%end;
+      %let;kids;%if;(nb_children>0 and not cancel_links and e.num="on" and only=0 and row_gen<l_v)1%end;%in;
+      %if;(kids=1)<a href="#%labl;%if;(nb_families>1)%apply;letter(family_cnt)%end;.%expr(nb_children_before+1)" title="[*link to children]">%end;
       %nb_children;%if;(nb_children!=tot)/%tot;%end;
-      %if;(nb_children>0 and not cancel_links)</a>%end;
+      %if;(kids=1)</a>%end;
     </td>
   %end;
 %end;
@@ -216,7 +218,7 @@
         %end;
         <div class="align-self-center p-1">
           %apply;image_MF("spouse")
-          %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
+          %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%end;
           %if;(e.tt=1 and spouse.title!=""), %spouse.title;%end;
         </div>
       </div>
@@ -291,44 +293,37 @@
 %end;
 
 %( d’Aboville %)
-%define;list_row(xxx, prefx, fam_cnt, ch_cnt)
-  %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
+%define;list_row(prefx)
   %if;("prefx"!="")<span class="font-monospace">prefx</span>%end;
-    %apply;image_MF("xxx")
-  %apply;link%with;%xxx.access;%and;%xxx.first_name; %xxx.surname;%and;%xxx.index;%end;%nn;
-  %if;(xxx.title!=""), %xxx.title;%end;
-  %xxx.dates;
-  %if;(has_families)
-    %foreach;family;
-      <span class="text-nowrap">
-        %if;(wizard and not cancel_links)
-          <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">%nn;
-        %end;
-        <small>&%if;(nb_families>1)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>%nn;
-        %if;(wizard and not cancel_links)</a>%end;
-        %sp;%apply;image_MF("xxx.spouse")
-        %apply;link%with;%xxx.spouse.access;%and;%xxx.spouse.first_name; %xxx.spouse.surname;%and;%xxx.spouse.index;%end;
-        %if;(xxx.spouse.title!=""), %xxx.spouse.title;%end;
-        %xxx.spouse.dates;
-      </span>
-    %end;
+  %apply;image_MF("self")
+  %apply;link%with;%access;%and;%first_name; %surname;%end;%nn;
+  %if;(title!=""), %title;%end;
+  %dates;
+  %foreach;family;
+    <span class="text-nowrap">
+      %if;(wizard and not cancel_links)
+        <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %self; [and] %spouse;">%nn;
+      %end;
+      <small>&%if;(nb_families>1)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>%nn;
+      %if;(wizard and not cancel_links)</a>%end;
+      %sp;%apply;image_MF("spouse")
+      %apply;link%with;%spouse.access;%and;%spouse.first_name; %spouse.surname;%end;
+      %if;(spouse.title!=""), %spouse.title;%end;
+      %spouse.dates;
+    </span>
   %end;
 %end;
 
 %( Parcours de l'arbre descendant, niveau par niveau %)
-%define;one_person(xxx, lv, max_l, prefx, fam_cnt, ch_cnt)
+%define;one_person(lv, max_l, prefx)
   %if;(lv<=max_l)
-    <div>
-      %apply;list_row("xxx", "prefx", fam_cnt, ch_cnt)
-    </div>
-    %if;xxx.has_families;
-      %foreach;family;
-        %let;fam;%if;(nb_families>1)%apply;letter(family_cnt)%end;%in;
-        %let;off;%nb_children_before;%in;
-        %foreach;child;
-          %let;npref;prefx%fam;.%expr(off+child_cnt)%in;
-          %apply;one_person("child", lv+1, max_l, npref, family_cnt, child_cnt)
-        %end;
+    <div>%apply;list_row("prefx")</div>
+    %foreach;family;
+      %let;fam;%if;(nb_families>1)%apply;letter(family_cnt)%end;%in;
+      %let;off;%nb_children_before;%in;
+      %foreach;child;
+        %let;npref;prefx%fam;.%expr(off+child_cnt)%in;
+        %apply;one_person(lv+1, max_l, npref)
       %end;
     %end;
   %end;
@@ -367,7 +362,7 @@
 %if;(e.t="A")
   <div class="mt-1 ms-2">
     <div class="mt-1"><b>[*d'Aboville]</b>[:]</div>
-    %apply;one_person("self", 0, l_v, 1, nb_families, 0)
+    %apply;one_person(0, l_v, 1)
   </div>
 %else;
   <table id="destable" class="table table-hover table-sm w-auto asc-desc-table mt-2">
@@ -376,29 +371,32 @@
     %empty_sorted_list; %( persons %)
     %empty_sorted_listb; %( families %)
     %empty_sorted_listc; %( descendants %)
-    %if;(only=0)
-      %if;(v0<=1)%apply;one_child("", "", 1)%end;
-      %let;min;%if;(v0>0)%expr(v0-1)%else;0%end;%in;
-      %for;lev;min;l_v;
-        %if;(e.gen=1)
-          <tr>
-            <th scope="row" colspan="%nb_col;" class="border-0 gen-row">
-              <div class="d-flex">
-                <span>[*generation/generations]0 %expr(lev+1)</span>
-                <span class="ms-auto">%apply;gen_count(lev+1)</span>
-              </div>
-            </th>
-          </tr>
+    <tbody>
+      %if;(only=0)
+        %if;(v0<=1)%let;row_gen;0%in;%apply;one_child("", "", 1)%end;
+        %let;min;%if;(v0>0)%expr(v0-1)%else;0%end;%in;
+        %for;lev;min;l_v;
+          %if;(e.gen=1)
+            <tr>
+              <th scope="row" colspan="%nb_col;" class="border-0 gen-row">
+                <div class="d-flex">
+                  <span>[*generation/generations]0 %expr(lev+1)</span>
+                  <span class="ms-auto">%apply;gen_count(lev+1)</span>
+                </div>
+              </th>
+            </tr>
+          %end;
+          %let;row_gen;%expr(lev+1)%in;
+          %apply;one_level(0, lev, "", "", 1)
         %end;
-        %apply;one_level(0, lev, "", "", 1)
-      %end;
-    %else;
-      %if;(l_v=0)
-        %apply;one_child("", "", 1)
       %else;
-        %apply;one_level(0, l_v-1, "", "", 1)
+        %if;(l_v=0)
+          %apply;one_child("", "", 1)
+        %else;
+          %apply;one_level(0, l_v-1, "", "", 1)
+        %end;
       %end;
-    %end;
+    </tbody>
   </table>
 %end;
 <div class="mt-1">[*total][:]
