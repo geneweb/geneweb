@@ -63,6 +63,8 @@
   Base parameter `notes_search_max_results` (default 500).
 - Case-insensitive text searches (notes, history) treat the apostrophes
   ' and ’ as equal (#3051).
+- The descendant counters of the templates (number_of_descendants,
+  max_desc_level…) no longer scan nor allocate per person of the base.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
