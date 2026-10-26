@@ -1,6 +1,7 @@
   <!-- $Id: css.txt v7.1 23/05/2026 18:51:27 $ -->
 <meta name="format-detection" content="telephone=no">
 %( Put here only properties that uses variables %)
+%let;fanchart;%if;(e.m="A" and e.t="FC")1%end;%in;
 %if;(e.m="MISC_NOTES")
   <style>
     li.folder { list-style-type: disc; list-style-image: url('%images_prefix;folder.png'); }
@@ -13,17 +14,19 @@
 %end;
 %if;(e.templ!="templ")
   %if;(bvar.use_cdn="yes")
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=
-                   sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB
-                   sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
-        integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=
-                   sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a
-                   sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    %if;(fanchart="")
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=
+                       sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB
+                       sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer">
+    %end;
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
+          integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=
+                     sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a
+                     sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/css/tom-select.bootstrap5.min.css"
             integrity="sha256-Re4GjTaUjj1cCjvRlSe/GXl4eWsdaw9i6rGP3dZAz0U=
@@ -32,16 +35,20 @@
             crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
   %else;
-    <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
+    %if;(fanchart="")
+      <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
+    %end;
     <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.6.0">
     %end;
   %end;
 %end;
+%if;(fanchart="")
   <link rel="stylesheet" href="%etc_prefix;css/css.css?hash=%apply;hash%with;%etc_prefix;css/css.css%end;">
-%if;(b.css_prop!="" and b.css_prop!="stylesheet")
-  <link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;?hash=%apply;hash%with;%etc_prefix;css/%bvar.css_prop;%end;">
+  %if;(b.css_prop!="" and b.css_prop!="stylesheet")
+    <link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;?hash=%apply;hash%with;%etc_prefix;css/%bvar.css_prop;%end;">
+  %end;
 %end;
 %if;(is_welcome or is_upd_ind or is_upd_fam)
   <link rel="stylesheet" href="%etc_prefix;css/autocomplete.css?hash=%apply;hash%with;%etc_prefix;css/autocomplete.css%end;">

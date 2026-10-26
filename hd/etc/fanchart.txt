@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="none">
 <link rel="icon" href="%images_prefix;favicon_gwd.png">
 <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
 <title>[*fanchart] %self; (g%e.v;)</title>
@@ -12,11 +13,7 @@
   svg { position: absolute; left: 0; top: 0; }
   .hidden { display: none; }
 </style>
-%if;(b.use_cdn="yes")
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-%else;
-  <link rel="preload" href="%etc_prefix;css/all.min.css?version=6.7.2" as="style" onload="this.onload=null;this.rel='stylesheet'">
-%end;
+%include;css
 <link rel="preload" href="%etc_prefix;css/fanchart.css?hash=%apply;hash%with;%etc_prefix;css/fanchart.css%end;" as="style" onload="this.onload=null;this.rel='stylesheet'">
 </head>
 %define;dice()
@@ -106,7 +103,6 @@
       %apply;age_li_item("age",2,"55-69")
       %apply;age_li_item("age",3,"70-84")
       %apply;age_li_item("age",4,"85+")
-      </li>
     </ul>
   </div>
   <div class="legend-section marriages-section">
@@ -207,6 +203,7 @@
 <button id="b-show-buttons" class="btn-restore-controls" style="display:none;" title="[*show controls]">
   <i class="fa fa-align-justify"></i>
 </button>
+%end;
 <div id="container" style="position: relative;">
   <svg id="fanchart" class="bi ba ma de bu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
   <div id="person-panel" class="identity-panel"></div>
