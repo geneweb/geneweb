@@ -153,13 +153,12 @@
   </tr></thead>
 %end;
 %define;popover_params(xxx)data-bs-toggle="popover"%if;("xxx"!="") data-bs-placement="xxx"%end; %end;
-%define;date_popup(xxx,yyy,fff)
-  %let;xxx;%if;(e.m="A")ancestor%elseif;(e.m="D")self%end;%in;
-  %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
-  %if;(e.yyy="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
-    <td%sp;
-      %if;(("xxx"="ancestor" or e.t="H") and xxx.nb_families>1 and famcols=1)rowspan="%xxx.nb_families;" %end;
-      class="align-middle text-end%if;not cancel_links; table_big_cell%end;
+%define;incomplete(xxx)%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn" or xxx.first_name="Ne" or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;%end;
+%( date_popup and place_popup: the caller sets %rowspan; %)
+%define;date_popup(xxx,yyy)
+  %if;(e.yyy="on")
+    %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
+    <td%rowspan; class="align-middle text-end%if;not cancel_links; table_big_cell%end;
         %if;(e.hl=1)
           %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
             and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
@@ -186,11 +185,9 @@
      %end;
    %and;[yyy]%end;
 %end;
-%define;place_popup(xxx,yyy,fff)
-  %if;(e.yyy_place="on" and ("xxx"="ancestor" or ("xxx"!="ancestor" and fff=1)))
-    <td%sp;
-      %if;(("xxx"="ancestor" or e.t="H") and xxx.nb_families>1 and famcols=1)rowspan="%xxx.nb_families;" %end;
-      class="align-middle%nn;
+%define;place_popup(xxx,yyy)
+  %if;(e.yyy_place="on")
+    <td%rowspan; class="align-middle%nn;
         %if;(e.ns=1)
           %if;(xxx.has_yyy_note) note%if;(xxx.has_yyy_source)source%end;%elseif;(xxx.has_yyy_source) source%end;
         %end;
