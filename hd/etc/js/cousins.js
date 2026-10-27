@@ -128,6 +128,7 @@ window.Cousins = (function () {
       if (n > displayLvl) {
         if (n > getMatrixMax()) await expandMatrixTo(n);
         await withOverlay(ensureLevels(n));
+        await expandMatrixTo(n);
       }
       displayLvl = n;
       applyDisplayLvl(n);
@@ -1049,11 +1050,24 @@ window.Cousins = (function () {
     }
 
     /* ---- matrix expansion by tier (matrix_v), data-driven guard ---- */
+    /* generation offset of the youngest loaded cell below the person */
+    function cellsMaxD() {
+      let m = 0;
+      for (const c of cells.values()) if (c.j - c.i > m) m = c.j - c.i;
+      return m;
+    }
+
     async function expandMatrixTo(target) {
+      const t = document.getElementById('quickrel');
+      if (!t) return;
+      const curD = t.dataset.matrixD | 0;
       const want = Math.min(target, lvlTrueMax());
-      if (want <= getMatrixMax()) return;       /* already covered */
+      const wantD = Math.max(curD, cellsMaxD());
+      if (want <= getMatrixMax() && wantD === curD) return; /* already covered */
       const u = new URL(window.location.href);
-      u.searchParams.set('matrix_v', String(want));
+      u.searchParams.set('matrix_v',
+        String(want > getMatrixMax() ? want : t.dataset.matrixV | 0));
+      u.searchParams.set('matrix_d', String(wantD));
       try {
         await withOverlay((async () => {
           const r = await fetch(u.toString(),
