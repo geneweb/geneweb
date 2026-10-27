@@ -356,14 +356,20 @@ let print_anniv conf base p dead_people level =
       set Iper.Map.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d">%s</a>|}
+    let i2, sp =
+      match spouse with
+      | Some ip ->
+          ( Util.pget conf base ip,
+            "&" ^ (Util.acces_n conf base (Adef.escaped "4") c :> string) )
+      | None -> (c, "")
+    in
+    Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
       (Util.commd conf :> string)
       (Util.acces_n conf base (Adef.escaped "1") p :> string)
       up_sosa
-      (Util.acces_n conf base (Adef.escaped "2")
-         (Option.fold ~none:c ~some:(Util.pget conf base) spouse)
-        :> string)
+      (Util.acces_n conf base (Adef.escaped "2") i2 :> string)
       (sosa_of_persons conf base down_br)
+      sp
       (Util.person_title_text conf base c :> string)
     |> Adef.safe
   in
