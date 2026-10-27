@@ -105,6 +105,7 @@ field, not `Version.src`.
 - `%empty_sorted_list;` / `%add_in_sorted_list;value` /
   `%foreach;sorted_list_item;...%end;` — Sorted list accumulator;
   `mem_sorted_list("listb", value)` is 1 when `value` is in `listb`, else 0.
+- `%apply;sorted_list_size("listc")` — Number of items of a sorted list.
 
 Operators in conditions: `=`, `!=`, `<`, `<=`, `>`, `>=`, `and`,
 `or`, `not`, `|` (integer division), `%` (modulo), `in` (substring
