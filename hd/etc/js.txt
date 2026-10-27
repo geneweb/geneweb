@@ -275,13 +275,13 @@ document.addEventListener('DOMContentLoaded', initBsValidation);
       .forEach(function(el) { el.style.backgroundColor = '#CCFFFF'; });
   }
 
-  function implexdesc(xx) {
-    document.querySelectorAll('a[data-index]').forEach(function(a) {
-      a.style.backgroundColor = '';
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('%[data-implex%]');
+    if (!btn) return;
+    document.querySelectorAll('a%[data-index%]').forEach(function(a) {
+      a.classList.toggle('bg-info-subtle', a.dataset.index === btn.dataset.implex);
     });
-    document.querySelectorAll('a[data-index="' + xx + '"]')
-      .forEach(function(a) { a.style.backgroundColor = '#CCFFFF'; });
-  }
+  });
 </script>
 %end;
 %( Toolbar (toolbar.txt) and special characters (characters.txt) of the editors. %)
