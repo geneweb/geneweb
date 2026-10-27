@@ -133,6 +133,18 @@ let advanced_search conf base max_answers =
       (fun s -> List.map Name.lower @@ Name.split_sname s)
       (getss "surname")
   in
+  let sp_fn_list =
+    List.map
+      (fun s -> List.map Name.lower @@ Name.split_fname s)
+      (getss "spouse_first_name")
+  in
+  let sp_sn_list =
+    List.map
+      (fun s -> List.map Name.lower @@ Name.split_sname s)
+      (getss "spouse_surname")
+  in
+  let exact_fn = gets "exact_first_name" = "on" in
+  let exact_sn = gets "exact_surname" = "on" in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
@@ -293,23 +305,55 @@ let advanced_search conf base max_answers =
     in
     fun x -> List.exists (eq x) search_list
   in
-  let match_first_name =
-    if fn_list = [] then fun _ -> true
+  let name_matcher n_list exact split get =
+    if n_list = [] then fun _ -> true
     else
-      let eq = match_name fn_list (gets "exact_first_name" = "on") in
-      fun p ->
-        eq
-          (List.map Name.lower @@ Name.split_fname @@ Driver.sou base
-         @@ Driver.get_first_name p)
+      let eq = match_name n_list exact in
+      fun p -> eq (List.map Name.lower @@ split @@ Driver.sou base @@ get p)
+  in
+  let match_first_name =
+    name_matcher fn_list exact_fn Name.split_fname Driver.get_first_name
   in
   let match_surname =
-    if sn_list = [] then fun _ -> true
-    else
-      let eq = match_name sn_list (gets "exact_surname" = "on") in
-      fun p ->
-        eq
-          (List.map Name.lower @@ Name.split_sname @@ Driver.sou base
-         @@ Driver.get_surname p)
+    name_matcher sn_list exact_sn Name.split_sname Driver.get_surname
+  in
+  (* Spouse criteria. They are always combined with AND, whatever the
+     search type, and they must all hold for the same spouse. *)
+  let match_spouse_first_name =
+    name_matcher sp_fn_list exact_fn Name.split_fname Driver.get_first_name
+  in
+  let match_spouse_surname =
+    name_matcher sp_sn_list exact_sn Name.split_sname Driver.get_surname
+  in
+  let date_given x =
+    let d1, d2 = getd x in
+    d1 <> None || d2 <> None
+  in
+  let spouse_names_given = sp_fn_list <> [] || sp_sn_list <> [] in
+  let spouse_dates_given =
+    date_given "spouse_birth_date" || date_given "spouse_death_date"
+  in
+  let spouse_criteria = spouse_names_given || spouse_dates_given in
+  let match_spouse_in_family p fam =
+    (not spouse_criteria)
+    ||
+    let sp = Driver.poi base @@ Gutil.spouse (Driver.get_iper p) fam in
+    ((not spouse_names_given)
+    || Util.visible_in_search conf base sp
+       && match_spouse_first_name sp && match_spouse_surname sp)
+    && ((not spouse_dates_given)
+       || match_date sp "spouse_birth_date"
+            (fun () -> Date.od_of_cdate (Driver.get_birth sp))
+            true
+          && match_date sp "spouse_death_date"
+               (fun () -> Date.date_of_death (Driver.get_death sp))
+               true)
+  in
+  let match_spouse p =
+    (not spouse_criteria)
+    || Array.exists
+         (fun ifam -> match_spouse_in_family p (Driver.foi base ifam))
+         (Driver.get_family p)
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
@@ -333,6 +377,7 @@ let advanced_search conf base max_answers =
                || do_compare fam y
                     (fun f -> Driver.sou base @@ Driver.get_marriage_place f)
                     cmp_place)
+            && match_spouse_in_family p fam
           else false)
         (Driver.get_family p)
     in
@@ -365,7 +410,7 @@ let advanced_search conf base max_answers =
     match_sex p true && match_death p true
     && (skip_fname || match_first_name p)
     && (skip_sname || match_surname p)
-    && match_married p true && match_occupation p true
+    && match_married p true && match_occupation p true && match_spouse p
   in
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
@@ -423,38 +468,70 @@ let advanced_search conf base max_answers =
             (Iper.Set.empty, ([], 0))
           |> snd
       | None -> ([], 0)
-    else if fn_list <> [] || sn_list <> [] then
-      let list_aux strings_of persons_of split n_list exact =
-        List.map
-          (List.map (fun x ->
-               let eq = match_name n_list exact in
-               let istrs = strings_of base x in
-               List.fold_left
-                 (fun acc istr ->
-                   let str = Mutil.nominative (Driver.sou base istr) in
-                   if eq (List.map Name.lower @@ split str) then istr :: acc
-                   else acc)
-                 [] istrs))
-          n_list
-        |> List.flatten |> List.flatten |> List.sort_uniq compare
-        |> List.map (Driver.spi_find @@ persons_of base)
-        |> List.flatten |> List.sort_uniq compare
+    else if fn_list <> [] || sn_list <> [] || spouse_names_given then
+      (* Persons whose surname (or first name) matches, found through the
+         name indexes. *)
+      let persons_of_name ~use_sname fn_list sn_list =
+        let strings_of, persons_of, split, n_list, exact =
+          if use_sname then
+            ( Driver.base_strings_of_surname,
+              Driver.persons_of_surname,
+              Name.split_sname,
+              sn_list,
+              exact_sn )
+          else
+            ( Driver.base_strings_of_first_name,
+              Driver.persons_of_first_name,
+              Name.split_fname,
+              fn_list,
+              exact_fn )
+        in
+        let eq = match_name n_list exact in
+        List.fold_left
+          (fun acc words ->
+            List.fold_left
+              (fun acc x ->
+                List.fold_left
+                  (fun acc istr ->
+                    let str = Mutil.nominative (Driver.sou base istr) in
+                    if eq (List.map Name.lower @@ split str) then istr :: acc
+                    else acc)
+                  acc (strings_of base x))
+              acc words)
+          [] n_list
+        |> List.sort_uniq compare
+        |> List.fold_left
+             (fun acc istr ->
+               List.rev_append (Driver.spi_find (persons_of base) istr) acc)
+             []
+        |> List.sort_uniq compare
       in
       let skip_fname, skip_sname, list =
         if sn_list <> [] then
-          ( false,
-            true,
-            list_aux Geneweb_db.Driver.base_strings_of_surname
-              Geneweb_db.Driver.persons_of_surname Name.split_sname sn_list
-              (gets "exact_surname" = "on") )
+          (false, true, persons_of_name ~use_sname:true fn_list sn_list)
+        else if fn_list <> [] then
+          (true, false, persons_of_name ~use_sname:false fn_list sn_list)
         else
-          ( true,
+          (* Only the spouse is named: look the spouse up in the indexes
+             and take the persons married to the matches. The spouse
+             criteria are checked again by [match_person]. *)
+          let spouses =
+            persons_of_name ~use_sname:(sp_sn_list <> []) sp_fn_list sp_sn_list
+          in
+          ( false,
             false,
-            list_aux Geneweb_db.Driver.base_strings_of_first_name
-              Geneweb_db.Driver.persons_of_first_name Name.split_fname fn_list
-              (gets "exact_first_name" = "on") )
+            List.fold_left
+              (fun acc ip ->
+                Array.fold_left
+                  (fun acc ifam ->
+                    Gutil.spouse ip (Driver.foi base ifam) :: acc)
+                  acc
+                  (Driver.get_family (Driver.poi base ip)))
+              [] spouses
+            |> List.sort_uniq compare )
       in
-      let rec loop ((_, len) as acc) = function
+      let rec loop ((_, len) as acc) l =
+        match l with
         | [] -> acc
         | _ when len > max_answers -> acc
         | ip :: l ->
@@ -659,4 +736,23 @@ let searching_fields conf base =
     else search
   in
   let sep = Adef.safe (if test_string "occu" then ", " else "") in
-  string_field "occu" (search ^^^ sep)
+  let search = string_field "occu" (search ^^^ sep) in
+  (* Spouse criteria, e.g. "spouse Marie Martin, born after 1800". *)
+  let spouse_search =
+    let spouse_event date_field event_name s =
+      if test_date date_field then
+        let sep = if (s : Adef.safe_string :> string) = "" then " " else ", " in
+        get_place_date_request "" date_field
+          (s ^>^ sep ^ transl_nth conf event_name 2)
+      else s
+    in
+    let s = string_field "spouse_first_name" (Adef.safe "") in
+    let s = string_field "spouse_surname" s in
+    let s = spouse_event "spouse_birth_date" "born" s in
+    spouse_event "spouse_death_date" "died" s
+  in
+  if (spouse_search :> string) = "" then search
+  else
+    let sep = if (search :> string) = "" then "" else ", " in
+    let search = search ^>^ sep ^ transl_nth conf "spouse/spouses" 0 in
+    search ^^^ spouse_search

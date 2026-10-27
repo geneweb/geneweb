@@ -184,6 +184,7 @@
     </div>
     %apply;event("marriage","marriage/marriages")
   </div>
+  %include;advanced_spouse
   <div class="row mt-2">
     %apply;event("birth","birth")
     %apply;event("bapt","baptism")
