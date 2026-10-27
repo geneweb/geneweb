@@ -721,72 +721,43 @@ let fevent_name_unique_string gen = function
       evt
   | Efam_Name n -> Efam_Name (unique_string gen n)
 
-(** Update family by looking up information inferred from family events *)
+(** Update family summary fields from its events, with the same rule as gwd
+    ([UpdateFamOk.reconstitute_from_fevents]): a marriage wins over any other
+    relation event, otherwise the latest relation event is used. When there is
+    no relation event at all, the fields given on the [fam] line are kept. *)
 let update_family_with_fevents _gen fam =
-  let found_marriage = ref false in
-  let found_divorce = ref false in
-  let found_separation = ref false in
-  let nsck_std_fields =
+  let nsck =
     match fam.relation with
     | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
     | _ -> false
   in
-  (* On veut cette fois ci que ce soit le dernier évènement *)
-  (* qui soit mis dans les évènements principaux.           *)
-  let convert relation =
-    match relation with
-    | Efam_Marriage ->
-        if nsck_std_fields then Some NoSexesCheckMarried else Some Married
-    | Efam_NoMarriage ->
-        if nsck_std_fields then Some NoSexesCheckNotMarried else Some NotMarried
-    | Efam_Engage -> Some Engaged
-    | Efam_NoMention -> Some NoMention
-    | Efam_MarriageBann -> Some MarriageBann
-    | Efam_MarriageContract -> Some MarriageContract
-    | Efam_MarriageLicense -> Some MarriageLicense
-    | Efam_PACS -> Some Pacs
-    | Efam_Residence -> Some Residence
-    | _ -> None
+  let is_relation_event evt =
+    match evt.efam_name with
+    | Efam_Marriage | Efam_NoMarriage | Efam_Engage | Efam_NoMention
+    | Efam_MarriageBann | Efam_MarriageContract | Efam_MarriageLicense
+    | Efam_PACS | Efam_Residence ->
+        true
+    | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_Name _ -> false
   in
-  let rec loop fevents fam =
-    match fevents with
-    | [] -> fam
-    | evt :: l -> (
-        match convert evt.efam_name with
-        | Some relation' ->
-            if !found_marriage then loop l fam
-            else
-              let witnesses = Array.map fst evt.efam_witnesses in
-              let fam =
-                {
-                  fam with
-                  relation = relation';
-                  marriage = evt.efam_date;
-                  marriage_place = evt.efam_place;
-                  marriage_note = evt.efam_note;
-                  marriage_src = evt.efam_src;
-                  witnesses;
-                }
-              in
-              let () = found_marriage := true in
-              loop l fam
-        | None -> (
-            match evt.efam_name with
-            | Efam_Divorce ->
-                if !found_divorce then loop l fam
-                else
-                  let fam = { fam with divorce = Divorced evt.efam_date } in
-                  let () = found_divorce := true in
-                  loop l fam
-            | Efam_Separated ->
-                if !found_separation then loop l fam
-                else
-                  let fam = { fam with divorce = Separated evt.efam_date } in
-                  let () = found_separation := true in
-                  loop l fam
-            | _ -> loop l fam))
+  let ( (relation, marriage, marriage_place, marriage_note, marriage_src),
+        divorce,
+        witnesses ) =
+    UpdateFamOk.reconstitute_from_fevents nsck 0 fam.fevents
   in
-  loop (List.rev fam.fevents) fam
+  let fam =
+    if List.exists is_relation_event fam.fevents then
+      {
+        fam with
+        relation;
+        marriage;
+        marriage_place;
+        marriage_note;
+        marriage_src;
+        witnesses = Array.map fst witnesses;
+      }
+    else fam
+  in
+  match divorce with NotDivorced -> fam | divorce -> { fam with divorce }
 
 (** Update family event list by looking up inferred family information. *)
 let update_fevents_with_family gen fam =
