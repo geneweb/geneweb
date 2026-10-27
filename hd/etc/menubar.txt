@@ -352,7 +352,7 @@
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=Y&v=6&gen=1&hl=1%if;(e.im=0)&im=0%end;"><i class="fa fa-restroom fa-fw me-2" aria-hidden="true"></i>[*table] [by couple]0</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><i class="fa fa-newspaper fa-fw me-2" aria-hidden="true"></i>[*long display]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><i class="fa fa-align-justify fa-fw me-2" aria-hidden="true"></i>[*surnames branch]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=F&tf1=sb&v=%if;(b.max_anc_level!="")%b.max_anc_level;%else;12%end;"><i class="fa fa-align-justify fa-fw me-2" aria-hidden="true"></i>[*surnames branch]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=4&tool=place"><i class="fa fa-chart-pie fa-fw me-2" aria-hidden="true"></i>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
