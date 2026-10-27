@@ -186,21 +186,23 @@ let child_marriage base child =
 let get_cousins_sparse =
   let cache = ref None in
   fun conf base p ->
+    let key = (conf.query_start, Driver.get_iper p) in
     match !cache with
-    | Some (cached_ip, sparse) when cached_ip = Driver.get_iper p -> sparse
+    | Some (k, sparse) when k = key -> sparse
     | _ ->
         let sparse = Cousins.init_cousins_cnt conf base p in
-        cache := Some (Driver.get_iper p, sparse);
+        cache := Some (key, sparse);
         sparse
 
 let get_asc_cnt =
   let cache = ref None in
   fun conf base p ->
+    let key = (conf.query_start, Driver.get_iper p) in
     match !cache with
-    | Some (cached_ip, arr) when cached_ip = Driver.get_iper p -> arr
+    | Some (k, arr) when k = key -> arr
     | _ ->
         let arr = Cousins.init_asc_cnt conf base p in
-        cache := Some (Driver.get_iper p, arr);
+        cache := Some (key, arr);
         arr
 
 let max_im_wid = 240
@@ -5793,14 +5795,10 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       | Some p -> SosaCache.init_sosa_t conf base p
       | None -> None
     in
-    let computed_mal = ref None in
-    let get_mal () =
-      match !computed_mal with
-      | Some v -> v
-      | None ->
-          let v = Cousins.max_ancestor_level conf base (Driver.get_iper p) 0 in
-          computed_mal := Some v;
-          v
+    let mal =
+      Vlazy
+        (Lazy.from_fun (fun () ->
+             Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) 0)))
     in
     let computed_mdl = ref None in
     let get_mdl () =
@@ -5830,10 +5828,6 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
         make_desc_level_table conf base limit p
       in
       Lazy.from_fun dlt
-    in
-    let mal () = Vint (get_mal ()) in
-    let smal () =
-      Vint (Cousins.max_ancestor_level conf base (Driver.get_iper p) 0)
     in
     let srmal () =
       match Util.find_sosa_ref conf base with
@@ -5870,8 +5864,8 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     |> Templ.Env.add "sosa" (Vsosa (ref []))
     |> Templ.Env.add "sosa_ref" (Vsosa_ref sosa_ref)
     |> Templ.Env.add "t_sosa" (Vt_sosa t_sosa)
-    |> Templ.Env.add "max_anc_level" (Vlazy (Lazy.from_fun mal))
-    |> Templ.Env.add "static_max_anc_level" (Vlazy (Lazy.from_fun smal))
+    |> Templ.Env.add "max_anc_level" mal
+    |> Templ.Env.add "static_max_anc_level" mal
     |> Templ.Env.add "sosa_ref_max_anc_level" (Vlazy (Lazy.from_fun srmal))
     |> Templ.Env.add "max_cous_level" (Vlazy (Lazy.from_fun mcl))
     |> Templ.Env.add "max_desc_level" (Vlazy (Lazy.from_fun mdl))

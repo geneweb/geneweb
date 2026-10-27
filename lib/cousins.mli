@@ -93,8 +93,9 @@ val init_cousins_cnt :
     depth. The ceiling, in priority order:
     - [up_to] when provided — explicit, no base-wide ancestor scan (used by the
       incremental JSON endpoint)
-    - [v] URL parameter when present and positive — effective ceiling is [v + 1]
-    - [max_ancestor_level] computed on [p] otherwise
+    - [max_ancestor_level] computed on [p], capped by the [v] URL parameter when
+      present and positive
+    - 0 otherwise
 
     Uses and populates the per-level disk cache when [cache_cousins_tool=yes] in
     the [.gwf]; cache files live in [caches/cousins_json/<key>_level_N.json]
