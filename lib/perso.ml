@@ -5746,6 +5746,10 @@ let eval_predefined_apply conf env f vl =
       match get_env name env with
       | Vslist l -> if SortedList.mem sl !l then "1" else "0"
       | _ -> raise Not_found)
+  | "sorted_list_size", [ name ] -> (
+      match get_env name env with
+      | Vslist l -> string_of_int (SortedList.cardinal !l)
+      | _ -> raise Not_found)
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
