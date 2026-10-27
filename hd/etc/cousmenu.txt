@@ -92,8 +92,10 @@
   %let;mreq;%if;(mraw<12)12%else;%expr(mraw+12)%end;%in;
   %let;matrix_max;%if;(mreq>max)%max;%else;%mreq;%end;%in;
   %let;maxa;%expr(matrix_max+1)%in;
-  %let;maxd;%expr(cousins.max_d+maxa)%in;
-  <table id="quickrel" data-matrix-max="%matrix_max;" class="table table-responsive-sm mb-0 mt-1 order-3 col-%if;(e_v=1)8%elseif;(e_v=0)4%end; pre-hydrate">
+  %let;md;%cousins.max_d;%in;
+  %let;dmax;%if;(e.matrix_d!="" and e.matrix_d>md)%e.matrix_d;%else;%md;%end;%in;
+  %let;maxd;%expr(dmax+maxa+1)%in;
+  <table id="quickrel" data-matrix-max="%matrix_max;" data-matrix-v="%mraw;" data-matrix-d="%dmax;" class="table table-responsive-sm mb-0 mt-1 order-3 col-%if;(e_v=1)8%elseif;(e_v=0)4%end; pre-hydrate">
     %for;j;1;maxd;
       <tr>%nn;
         %for;i;0;maxa;
