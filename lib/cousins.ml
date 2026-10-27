@@ -135,18 +135,20 @@ let max_ancestor_level conf base ip max_lvl =
       | _ -> 12
   in
   let x = ref 0 in
-  let mark = Driver.iper_marker (Driver.ipers base) false in
+  let mark = Hashtbl.create 1024 in
   let rec loop level ip =
-    if level >= limit then ()
-    else if not (Collection.Marker.get mark ip) then (
-      Collection.Marker.set mark ip true;
-      x := max !x level;
-      match Driver.get_parents (Util.pget conf base ip) with
-      | Some ifam ->
-          let cpl = Driver.foi base ifam in
-          loop (succ level) (Driver.get_father cpl);
-          loop (succ level) (Driver.get_mother cpl)
-      | _ -> ())
+    if level <= limit && !x < limit then
+      match Hashtbl.find_opt mark ip with
+      | Some l when l >= level -> ()
+      | Some _ | None -> (
+          Hashtbl.replace mark ip level;
+          x := max !x level;
+          match Driver.get_parents (Util.pget conf base ip) with
+          | Some ifam ->
+              let cpl = Driver.foi base ifam in
+              loop (succ level) (Driver.get_father cpl);
+              loop (succ level) (Driver.get_mother cpl)
+          | None -> ())
   in
   loop 0 ip;
   !x
@@ -433,14 +435,11 @@ let init_cousins_cnt conf base ?up_to p =
   let max_a_l =
     match up_to with
     | Some n -> n
-    | None ->
-        let v_param =
-          match Util.p_getenv conf.Config.env "v" with
-          | Some v -> ( try int_of_string v with _ -> 0)
-          | None -> 0
-        in
-        max_ancestor_level conf base (Driver.get_iper p)
-          (if v_param > 0 then v_param + 1 else 1)
+    | None -> (
+        match Util.p_getint conf.Config.env "v" with
+        | Some v when v > 0 ->
+            max_ancestor_level conf base (Driver.get_iper p) v
+        | Some _ | None -> 0)
   in
   let build_level_0 () =
     let () = Driver.load_ascends_array base in
