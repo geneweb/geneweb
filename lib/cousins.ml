@@ -163,11 +163,15 @@ let max_descendant_level conf base ip max_lvl =
       | Some v when v <> "" -> int_of_string v
       | _ -> 16
   in
-  let children_of_ip acc ip =
+  let children_of_ip seen acc ip =
     Array.fold_left
       (fun acc ifam ->
         Array.fold_left
-          (fun acc child -> child :: acc)
+          (fun acc child ->
+            if Hashtbl.mem seen child then acc
+            else (
+              Hashtbl.replace seen child ();
+              child :: acc))
           acc
           (Driver.get_children (Driver.foi base ifam)))
       acc
@@ -177,7 +181,8 @@ let max_descendant_level conf base ip max_lvl =
     if current_level = [] then lev
     else if lev >= limit then limit
     else
-      let next_level = List.fold_left children_of_ip [] current_level in
+      let seen = Hashtbl.create 64 in
+      let next_level = List.fold_left (children_of_ip seen) [] current_level in
       if next_level = [] then lev else loop next_level (lev + 1)
   in
   loop [ ip ] 0
