@@ -862,11 +862,6 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   -ms-user-select: none;
 }
 
-*/ deslist hr alternate couple color */
-.ancestor-couple-color {
-  background-color: #D2691E !important;
-}
-
 /* Affichage long deslist */
 .desc-gen > li::marker { /* Numérotation de liste en gras */
   font-weight: bold;
