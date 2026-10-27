@@ -100,11 +100,10 @@ val init_cousins_cnt :
 
     Uses and populates the per-level disk cache when [cache_cousins_tool=yes] in
     the [.gwf]; cache files live in [caches/cousins_json/<key>_level_N.json]
-    where [<key>] is [strip_lower(first_name).occ.strip_lower(surname)]. A
-    cached level is rebuilt when it was written before the last change of the
-    base and is older than [cache_cousins_ttl] hours (0 by default), or when its
-    format version differs; invalid files are deleted on the first rebuild of a
-    request. *)
+    where [<key>] is [Image.key_dir_basename] of [p]. A cached level is rebuilt
+    when it was written before the last change of the base and is older than
+    [cache_cousins_ttl] hours (0 by default), or when its format version
+    differs; invalid files are deleted on the first rebuild of a request. *)
 
 val extract_level : cousins_sparse -> int -> cousins_sparse
 (** [extract_level sparse level] returns a sub-sparse keeping only the cells of
