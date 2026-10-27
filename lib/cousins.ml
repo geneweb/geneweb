@@ -298,20 +298,26 @@ let descendants base sparse i j =
   let liste2 = if i > 0 then get_cell sparse (i - 1) (j - 1) else [] in
   descendants_aux base liste1 liste2
 
-let cleanup_old_cache_files cache_dir ttl_hours =
+let cache_version = 1
+
+let cache_ttl conf =
+  match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
+  | Some s -> ( try float_of_string s *. 3600. with Failure _ -> 0.)
+  | None -> 0.
+
+let cache_is_stale ~last_change ~ttl file =
+  let mtime = (Unix.stat file).Unix.st_mtime in
+  mtime <= last_change && Unix.time () -. mtime >= ttl
+
+let remove_stale_cache_files ~last_change ~ttl ?(prefix = "") cache_dir =
   if Sys.file_exists cache_dir then
-    let now = Unix.time () in
-    let ttl_seconds = float_of_int (ttl_hours * 3600) in
-    let files = Sys.readdir cache_dir in
     Array.iter
-      (fun filename ->
-        let filepath = Filename.concat cache_dir filename in
-        try
-          let stat = Unix.stat filepath in
-          let age = now -. stat.Unix.st_mtime in
-          if age > ttl_seconds then Sys.remove filepath
-        with _ -> ())
-      files
+      (fun f ->
+        let file = Filename.concat cache_dir f in
+        if String.starts_with ~prefix f then
+          try if cache_is_stale ~last_change ~ttl file then Sys.remove file
+          with _ -> ())
+      (Sys.readdir cache_dir)
 
 let sparse_slice_to_json key level slice =
   let path_to_cache_json (ip, ifaml, anc, lvl) =
@@ -365,9 +371,13 @@ let sparse_slice_of_json key level json =
   in
   match json with
   | `Assoc f ->
-      (match (List.assoc "key" f, List.assoc "level" f) with
-      | `String k, `Int l when k = key && l = level -> ()
-      | _ -> failwith "cousins cache: key/level mismatch");
+      (match
+         (List.assoc "version" f, List.assoc "key" f, List.assoc "level" f)
+       with
+      | `Int v, `String k, `Int l when v = cache_version && k = key && l = level
+        ->
+          ()
+      | _ -> failwith "cousins cache: version/key/level mismatch");
       let cells =
         match List.assoc "cells" f with
         | `List l -> l
@@ -392,9 +402,13 @@ let sparse_slice_of_json key level json =
         empty_sparse cells
   | _ -> failwith "cousins cache: json"
 
-let read_or_build_level_json cache_file key level build =
+let read_or_build_level_json ~last_change ~ttl ~on_miss cache_file key level
+    build =
   let from_cache () =
-    try Some (sparse_slice_of_json key level (Yojson.Safe.from_file cache_file))
+    try
+      if cache_is_stale ~last_change ~ttl cache_file then None
+      else
+        Some (sparse_slice_of_json key level (Yojson.Safe.from_file cache_file))
     with _ ->
       (if Sys.file_exists cache_file then
          try Sys.remove cache_file with _ -> ());
@@ -403,6 +417,7 @@ let read_or_build_level_json cache_file key level build =
   match from_cache () with
   | Some s -> s
   | None ->
+      Lazy.force on_miss;
       let s = build () in
       (try
          let oc = open_out cache_file in
@@ -423,18 +438,11 @@ let cousins_cache_key base p =
   Format.sprintf "%s.%d.%s" fn (Driver.get_occ p) sn
 
 let clear_cousins_cache conf base p =
-  let dir = cousins_cache_dir conf in
-  if Sys.file_exists dir then
-    let pfx = cousins_cache_key base p ^ "_level_" in
-    let n = String.length pfx in
-    Array.iter
-      (fun f ->
-        if
-          Filename.check_suffix f ".json"
-          && String.length f >= n
-          && String.sub f 0 n = pfx
-        then try Sys.remove (Filename.concat dir f) with _ -> ())
-      (Sys.readdir dir)
+  remove_stale_cache_files
+    ~last_change:(Driver.date_of_last_change base)
+    ~ttl:0.
+    ~prefix:(cousins_cache_key base p ^ "_level_")
+    (cousins_cache_dir conf)
 
 let init_cousins_cnt conf base ?up_to p =
   let max_a_l =
@@ -489,12 +497,11 @@ let init_cousins_cnt conf base ?up_to p =
     match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
     | Some "yes" ->
         Filesystem.create_dir ~parent:true cache_dir;
-        let ttl_hours =
-          match List.assoc_opt "cache_cousins_ttl" conf.Config.base_env with
-          | Some s -> ( try int_of_string s with _ -> 1)
-          | None -> 1
+        let last_change = Driver.date_of_last_change base in
+        let ttl = cache_ttl conf in
+        let on_miss =
+          lazy (remove_stale_cache_files ~last_change ~ttl cache_dir)
         in
-        if ttl_hours > 0 then cleanup_old_cache_files cache_dir ttl_hours;
         let rec load_levels acc level =
           if level > max_a_l then merge_sparse_list (List.rev acc)
           else
@@ -503,7 +510,8 @@ let init_cousins_cnt conf base ?up_to p =
                 (Printf.sprintf "%s_level_%d.json" key level)
             in
             let level_sparse =
-              read_or_build_level_json cache_file key level (fun () ->
+              read_or_build_level_json ~last_change ~ttl ~on_miss cache_file key
+                level (fun () ->
                   let cumul = merge_sparse_list (List.rev acc) in
                   let full =
                     if level = 0 then build_level_0 ()

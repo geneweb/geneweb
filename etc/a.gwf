@@ -251,9 +251,11 @@
 # Usefull when self has a lot of relationships.
 #cache_cousins_tool=yes
 
-# Cache time-to-live in hours (files older than this are auto-deleted)
-# Default: 1 hour. Set to 0 to disable auto-cleanup (permanent cache)
-#cache_cousins_ttl=1
+# Cache files are rebuilt once the base has changed since they were written.
+# Time in hours during which they are still used after a change (stale data
+# tolerated on frequently edited bases, also kept by browsers until the next
+# change). Default: 0.
+#cache_cousins_ttl=0
 
 # Number of latest events (birth, death) displayed in statistics.
 #latest_event=20
