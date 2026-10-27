@@ -545,7 +545,9 @@ let max_l1_l2 sparse _conf _base _p =
     max 0 (loop 0)
   in
   let max_d =
-    CoordMap.fold (fun (i, j) _cell acc -> max acc (j - i)) sparse.data 0
+    CoordMap.fold
+      (fun (i, j) cell acc -> if cell = [] then acc else max acc (j - i))
+      sparse.data 0
   in
   (max_a, max_d)
 
