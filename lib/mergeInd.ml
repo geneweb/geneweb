@@ -105,11 +105,19 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
   match (Driver.get_parents a1, Driver.get_parents a2) with
   | None, Some ifam ->
       let des = Driver.gen_descend_of_family (Driver.foi base ifam) in
-      let rec replace i =
-        if des.children.(i) = ip2 then des.children.(i) <- ip1
-        else replace (i + 1)
+      let des =
+        (* [ip1] may already be listed although its ascendants say
+           otherwise: drop [ip2] rather than list [ip1] twice. *)
+        if Array.mem ip1 des.children then
+          { children = Mutil.array_except ip2 des.children }
+        else
+          let rec replace i =
+            if des.children.(i) = ip2 then des.children.(i) <- ip1
+            else replace (i + 1)
+          in
+          replace 0;
+          des
       in
-      replace 0;
       let a1 = { parents = Some ifam; consang = Adef.fix (-1) } in
       Driver.patch_ascend base ip1 a1;
       Driver.patch_descend base ifam des

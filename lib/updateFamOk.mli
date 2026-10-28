@@ -130,7 +130,8 @@ val print_add_parents : config -> Driver.base -> unit
 (** [print_add_parents conf base] handles [m=ADD_PAR_OK]: when the form only
     links two parents already in a union and the child, adds the child to that
     union, with the parents' families of the [pa<k><j>] blocks; otherwise
-    {!print_add}. *)
+    {!print_add}. Refuses a linked child who already has parents, so that a
+    resubmitted form cannot list the child twice. *)
 
 val print_mod : config -> Driver.base -> unit
 (** [print_mod conf base] handles [m=MOD_FAM_OK]: updates family [i] and creates
