@@ -767,24 +767,22 @@ let print_solution conf base long n p1 p2 sol =
   else print_solution_not_ancestor conf base long p1 p2 sol;
   Output.print_sstring conf "\n"
 
-let max_br = 33
+let max_br = 100
 
 let print_dag_links conf base p1 p2 rl =
   let sps = Util.get_opt conf "sp" true in
   let img = Util.get_opt conf "im" true in
   let anc_map =
     List.fold_left
-      (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
+      (fun anc_map (pp1, pp2, (_, _, list), _) ->
         List.fold_left
           (fun anc_map (p, n) ->
-            let pp1, pp2, nn, nt, maxlev =
-              Option.value ~default:(pp1, pp2, 0, 0, 0)
+            let pp1, pp2, nn =
+              Option.value ~default:(pp1, pp2, 0)
                 (Iper.Map.find_opt (Driver.get_iper p) anc_map)
             in
             if nn >= max_br then anc_map
-            else
-              let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-              Iper.Map.add (Driver.get_iper p) v anc_map)
+            else Iper.Map.add (Driver.get_iper p) (pp1, pp2, nn + n) anc_map)
           anc_map list)
       Iper.Map.empty rl
   in
@@ -792,10 +790,7 @@ let print_dag_links conf base p1 p2 rl =
     match rl with (_, _, (x1, x2, _), _) :: _ -> x1 = 0 || x2 = 0 | _ -> false
   in
   let something =
-    Iper.Map.fold
-      (fun _ (_, _, nn, nt, _) something ->
-        something || (nt > 1 && nn > 1 && nn < max_br))
-      anc_map false
+    Iper.Map.exists (fun _ (_, _, nn) -> nn > 1 && nn < max_br) anc_map
   in
   if something then (
     let rest = ref false in
@@ -805,10 +800,10 @@ let print_dag_links conf base p1 p2 rl =
       Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|})
     else Output.print_sstring conf "<ul>";
     Iper.Map.iter
-      (fun ip (pp1, pp2, nn, nt, _) ->
+      (fun ip (pp1, pp2, nn) ->
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
-        if nt > 1 && nn > 1 && nn < max_br then (
+        if nn > 1 && nn < max_br then (
           let a = Util.pget conf base ip in
           if not is_anc then (
             Output.print_sstring conf "<li>";
