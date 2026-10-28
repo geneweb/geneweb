@@ -551,17 +551,12 @@
   %end;
 %end;
 %define;implex()
-  %if;(has_parents)
-    %reset_count;
-    %foreach;ancestor_level
-      %foreach;ancestor
-        %if;(ancestor.same != "")%incr_count;%end;
-      %end;
-    %end;
-    %if;(count != 0)
-      %if;(not cancel_links), <a href="%prefix;m=A&t=N&v=%max_anc_level;&i=%index;&same=%count;" style="float:none;padding:0px;"
-         title="[display smallest sosa number relative to ancestor]">%count; %if;(count=1)[implex/implexes]0%else;[implex/implexes]1%end;</a>
-      %else;, %count; %if;(count=1)[implex/implexes]0%else;[implex/implexes]1%end;
+  %if;has_parents;
+    %let;nb;%implex_count;%in;
+    %if;(nb != 0)
+      %if;(not cancel_links), <a href="%prefix;%access;&m=A&t=I" style="float:none;padding:0px;"
+         title="[*implex/implexes]1, [consanguinity]">%nb; %if;(nb=1)[implex/implexes]0%else;[implex/implexes]1%end;</a>
+      %else;, %nb; %if;(nb=1)[implex/implexes]0%else;[implex/implexes]1%end;
       %end;
     %end;
   %end;
