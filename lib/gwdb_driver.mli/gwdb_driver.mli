@@ -15,6 +15,8 @@ val string_of_iper : iper -> string
 val int_of_iper : iper -> int
 (** Convert [iper] to int *)
 
+val int_of_ifam : ifam -> int
+
 val string_of_ifam : ifam -> string
 (** Convert [ifam] to string *)
 

@@ -1,5 +1,3 @@
-let int_of_ifam ifam = int_of_string (Gwdb.string_of_ifam ifam)
-
 let test_children_order () =
   let db = Geneweb_test_utils.Mock_db.create () in
   let c1 = Geneweb_test_utils.Mock_db.add_person db ~first_name:"C1" () in
@@ -45,13 +43,13 @@ let test_union_registration () =
   let p_m1 = Geneweb_test_utils.Mock_db.poi base mother in
   let p_m2 = Geneweb_test_utils.Mock_db.poi base other_mother in
   let father_unions =
-    Gwdb.get_family p_f |> Array.map int_of_ifam |> Array.to_list
+    Gwdb.get_family p_f |> Array.map Gwdb.int_of_ifam |> Array.to_list
   in
   let mother1_unions =
-    Gwdb.get_family p_m1 |> Array.map int_of_ifam |> Array.to_list
+    Gwdb.get_family p_m1 |> Array.map Gwdb.int_of_ifam |> Array.to_list
   in
   let mother2_unions =
-    Gwdb.get_family p_m2 |> Array.map int_of_ifam |> Array.to_list
+    Gwdb.get_family p_m2 |> Array.map Gwdb.int_of_ifam |> Array.to_list
   in
   Geneweb_test_utils.Check.list Alcotest.int ~pos:__POS__
     ~msg:"father has both unions registered in order" [ fam1; fam2 ]
@@ -70,8 +68,8 @@ let test_parent_child_linking () =
   let p_c1 = Geneweb_test_utils.Mock_db.poi base child1 in
   let p_c2 = Geneweb_test_utils.Mock_db.poi base child2 in
   let f_fam = Geneweb_test_utils.Mock_db.foi base fam in
-  let c1_parents = Gwdb.get_parents p_c1 |> Option.map int_of_ifam in
-  let c2_parents = Gwdb.get_parents p_c2 |> Option.map int_of_ifam in
+  let c1_parents = Gwdb.get_parents p_c1 |> Option.map Gwdb.int_of_ifam in
+  let c2_parents = Gwdb.get_parents p_c2 |> Option.map Gwdb.int_of_ifam in
   let fam_children =
     Gwdb.get_children f_fam |> Array.map Gwdb.int_of_iper |> Array.to_list
   in
