@@ -1337,6 +1337,12 @@ let print_add_parents o_conf base =
             Driver.person_of_key base mf ms mo,
             Driver.person_of_key base cf cs co )
         with
+        | Some _, Some _, Some child
+          when Driver.get_parents (Driver.poi base child) <> None ->
+            (* The child already has parents: adding him to the parents'
+               union would list him twice (e.g. on a resubmitted form) or
+               leave him listed in his former family. *)
+            print_err_parents conf base (Driver.poi base child)
         | Some fath, Some moth, Some child ->
             let ffam = Driver.get_family @@ Driver.poi base fath in
             let mfam = Driver.get_family @@ Driver.poi base moth in
