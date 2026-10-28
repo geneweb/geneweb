@@ -126,6 +126,14 @@
       </div>
     </div>
   </nav>
+  %if;(e.data="place")
+    <div class="d-flex justify-content-end mx-2 mt-2">
+      <a class="btn btn-outline-primary btn-sm" role="button"
+         href="%prefix;m=PLACE_TERMS">
+        <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]
+      </a>
+    </div>
+  %end;
   <div class="d-flex flex-column justify-content-center mx-2">
     %if;(e.key!="")
       <div class="alert alert-warning w-auto text-center my-2 mx-3 mx-lg-5" role="alert">

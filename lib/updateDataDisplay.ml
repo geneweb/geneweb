@@ -39,7 +39,10 @@ let translate_title conf len =
     - base : base [Retour] :
     - unit [Rem] : Non exporté en clair hors de ce module. *)
 let print_mod_ok conf base =
-  if p_getenv conf.env "direct_istr" = Some "on" then
+  (* [direct_istr=on]: rewrite the string in place. When the new string
+     already exists [replace_string] changes nothing and returns its id; fall
+     back to the normal update, which moves the references to it. *)
+  let replaced_in_place () =
     let old_istr =
       Driver.Istr.of_string @@ (List.assoc "key" conf.env :> string)
     in
@@ -47,7 +50,10 @@ let print_mod_ok conf base =
     let new_string =
       Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
     in
-    let _ = Driver.replace_string base old_string new_string in
+    Driver.Istr.equal old_istr
+      (Driver.replace_string base old_string new_string)
+  in
+  if p_getenv conf.env "direct_istr" = Some "on" && replaced_in_place () then
     Util.commit_patches conf base
   else
     let sn = p_getenv conf.env "data" = Some "sn" in

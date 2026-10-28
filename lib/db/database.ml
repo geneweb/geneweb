@@ -663,8 +663,8 @@ end = struct
 
   let insert t s i =
     match HS.find t.tbl s with
-    | j when i <> j -> raise (Conflict (s, j, i))
-    | _ | (exception Not_found) -> HS.add t.tbl s i
+    | j when j <> -1 && i <> j -> raise (Conflict (s, j, i))
+    | _ | (exception Not_found) -> HS.replace t.tbl s i
 
   let load_inx version ~inx =
     Secure.with_open_in_bin inx @@ fun ic ->
@@ -1224,15 +1224,25 @@ let with_database ?(read_only = false) bname k =
       I.insert inv_idx s i;
       i
   in
+  (* Rewrite the string of [old_s]'s id in place, so every record pointing to
+     it sees [new_s]. If [new_s] already exists, nothing is changed and its id
+     is returned: two ids must never hold the same string (the inverted index
+     would raise [Conflict] when the patches are reloaded), so the caller has
+     to move the references itself. *)
   let replace_string old_s new_s =
-    try
-      let i = I.find inv_idx old_s in
-      I.remove inv_idx old_s;
-      Hashtbl.remove (snd pending.h_string) i;
-      Hashtbl.add (snd pending.h_string) i new_s;
-      i
-    with Not_found -> insert_string new_s
+    match I.find inv_idx new_s with
+    | j -> j
+    | exception Not_found -> (
+        match I.find inv_idx old_s with
+        | i ->
+            I.remove inv_idx old_s;
+            Hashtbl.replace (snd pending.h_string) i new_s;
+            fst pending.h_string := max !(fst pending.h_string) strings.len;
+            I.insert inv_idx new_s i;
+            i
+        | exception Not_found -> insert_string new_s)
   in
+  let find_string s = try Some (I.find inv_idx s) with Not_found -> None in
   let patch_name s ip =
     (* FIXME: pending patches? *)
     let i = Dutil.name_index s in
@@ -1353,6 +1363,7 @@ let with_database ?(read_only = false) bname k =
       patch_name;
       insert_string;
       replace_string;
+      find_string;
       commit_patches;
       commit_notes;
       commit_wiznotes;
@@ -1429,6 +1440,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       patch_name = (fun _ -> assert false);
       insert_string = (fun _ -> assert false);
       replace_string = (fun _ -> assert false);
+      find_string = (fun _ -> assert false);
       commit_patches = (fun _ -> assert false);
       commit_notes = (fun _ -> assert false);
       commit_wiznotes = (fun _ -> assert false);

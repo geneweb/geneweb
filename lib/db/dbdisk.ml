@@ -60,6 +60,7 @@ type base_func = {
   patch_name : string -> int -> unit;
   insert_string : string -> int;
   replace_string : string -> string -> int;
+  find_string : string -> int option;
   commit_patches : unit -> unit;
   commit_notes : string -> string -> unit;
   commit_wiznotes : string -> string -> unit;

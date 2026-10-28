@@ -423,8 +423,17 @@ val insert_string : base -> string -> istr
     Modification stay blocked until call of [commit_patches]. *)
 
 val replace_string : base -> string -> string -> istr
-(** replace string with a giving id. If string already exists return its id.
-    Modification stay blocked until call of [commit_patches]. *)
+(** [replace_string base old_s new_s] rewrites in place the string of the id of
+    [old_s], so every record pointing to that id now reads [new_s], and returns
+    that id. If [old_s] does not exist, [new_s] is inserted as by
+    {!insert_string}. If [new_s] already exists, nothing is changed and the id
+    of [new_s] is returned: an id different from the one of [old_s] means the
+    references to [old_s] must be moved by the caller. Modification stay blocked
+    until call of [commit_patches]. *)
+
+val find_string : base -> string -> istr option
+(** [find_string base s] is the id of [s] if it exists in [base] (pending
+    patches included), without inserting it. *)
 
 val commit_patches : base -> unit
 (** Commit blocked modifications (patches) and update database files in order to

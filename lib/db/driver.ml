@@ -92,6 +92,7 @@ let insert_string base s =
 let replace_string base old_s new_s =
   base.func.Dbdisk.replace_string old_s @@ Mutil.normalize_utf_8 new_s
 
+let find_string base s = base.func.Dbdisk.find_string @@ Mutil.normalize_utf_8 s
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
 let commit_wiznotes base s = base.func.Dbdisk.commit_wiznotes s

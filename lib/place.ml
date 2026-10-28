@@ -146,6 +146,66 @@ let fold_place_long inverted s =
       in
       ((if inverted then List.rev list else list), sub)
 
+type component = { text : string; pos : int; len : int; suburb : bool }
+
+(* Same parse as [fold_place_long], but every component keeps its byte span in
+   the raw string, so a later rewrite can replace exactly that span and leave
+   separators, parentheses and the suburb syntax untouched. The result is
+   root-first (like [fst (fold_place_long inverted s)]), with the suburb, if
+   any, appended last as the finest level. *)
+let components inverted s =
+  let slen = String.length s in
+  if slen = 0 then []
+  else
+    let sub, start =
+      suburb_aux
+        (fun _s _len i j ->
+          ( Some
+              {
+                text = String.sub s 1 (i - 1);
+                pos = 1;
+                len = i - 1;
+                suburb = true;
+              },
+            j ))
+        (fun _ -> (None, 0))
+        s
+    in
+    let mk b e =
+      { text = String.sub s b (e - b); pos = b; len = e - b; suburb = false }
+    in
+    (* mirror of the comma loop in [fold_place_long], on s.[start..iend) *)
+    let comma_split iend =
+      let rec loop list i ibeg =
+        if i = iend then if i > ibeg then mk ibeg i :: list else list
+        else
+          match String.unsafe_get s i with
+          | ',' ->
+              let list = if i > ibeg then mk ibeg i :: list else list in
+              loop list (i + 1) (i + 1)
+          | ' ' when i = ibeg -> loop list (i + 1) (i + 1)
+          | _ -> loop list (i + 1) ibeg
+      in
+      loop [] start start
+    in
+    let list =
+      if start < slen && String.unsafe_get s (slen - 1) = ')' then
+        match String.rindex_from_opt s (slen - 1) '(' with
+        | Some i when i >= start && i < slen - 2 ->
+            let j =
+              let rec loop i =
+                if i >= start && String.unsafe_get s i = ' ' then loop (i - 1)
+                else i + 1
+              in
+              loop (i - 1)
+            in
+            mk (i + 1) (slen - 1) :: comma_split j
+        | _ -> comma_split slen
+      else comma_split slen
+    in
+    let list = if inverted then List.rev list else list in
+    match sub with Some c -> list @ [ c ] | None -> list
+
 let places_to_string inverse pl =
   (* TODO reverse ??*)
   let pl = if inverse then List.rev pl else pl in
