@@ -18559,6 +18559,106 @@ de: Orte & Ereignisse
 en: places & events
 fr: lieux & événements
 
+    place term/place terms
+de: Ortsbestandteil/Ortsbestandteile
+en: place term/place terms
+fr: terme de lieu/termes de lieux
+
+    full place/full places
+de: vollständiger Ort/vollständige Orte
+en: full place/full places
+fr: lieu complet/lieux complets
+
+    contexts
+de: Kontexte
+en: contexts
+fr: contextes
+
+    spellings
+de: Schreibweisen
+en: spellings
+fr: graphies
+
+    uses
+de: Verwendungen
+en: uses
+fr: utilisations
+
+    spelling clusters
+de: zusammenzuführende Schreibweisen
+en: spellings to group
+fr: graphies à regrouper
+
+    places to complete
+de: zu vervollständigende Orte
+en: places to complete
+fr: lieux à compléter
+
+    complete the places
+de: Orte vervollständigen
+en: complete the places
+fr: compléter les lieux
+
+    in %d groups
+de: in %d Gruppen
+en: in %d groups
+fr: dans %d groupes
+
+    merge spellings
+de: Schreibweisen zusammenführen
+en: merge spellings
+fr: fusionner les graphies
+
+    keep the spelling
+de: beizubehaltende Schreibweise
+en: spelling to keep
+fr: graphie à conserver
+
+    other spelling
+de: andere Schreibweise
+en: other spelling
+fr: autre graphie
+
+    rename this term
+de: diesen Bestandteil umbenennen
+en: rename this term
+fr: renommer ce terme
+
+    preview of the changes
+de: Vorschau der Änderungen
+en: preview of the changes
+fr: aperçu des modifications
+
+    new place
+de: neuer Ort
+en: new place
+fr: nouveau lieu
+
+    merged into an existing place
+de: mit einem vorhandenen Ort zusammengeführt
+en: merged into an existing place
+fr: fusionné avec un lieu existant
+
+    merged with another renamed place
+de: mit einem anderen umbenannten Ort zusammengeführt
+en: merged with another renamed place
+fr: fusionné avec un autre lieu renommé
+
+    invalid new term
+de: ungültiger neuer Bestandteil
+en: invalid new term
+fr: nouveau terme invalide
+
+    cancel
+de: abbrechen
+en: cancel
+fr: annuler
+
+    %d places renamed (%d merged), %d records updated
+de: %d Orte umbenannt (%d zusammengeführt), %d Datensätze geändert
+en: %d places renamed (%d merged), %d records updated
+fr: %d lieux renommés (dont %d fusionnés), %d fiches modifiées
+
     place/places
 af: plek
 bg: място

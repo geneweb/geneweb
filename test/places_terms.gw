@@ -1,0 +1,36 @@
+encoding: utf-8
+gwplus
+
+fam DUPONT Jean 1820 #bp Coutances,_Manche,_France 1880 #dp St-Lô,_Manche,_France +1845 #mp St-Lô,_Manche,_France MARTIN Marie 1823 #bp Saint-Lô,_Manche,_France 1890 #dp Saint_Lo,_Manche,_France
+beg
+- m Pierre 1846 #bp Saint-Martin,_Manche,_France
+- f Anne 1848 #bp Saint-Martin,_Calvados,_France
+- m Louis 1850 #bp _[Le_Bourg]_-_Saint-Martin,_Manche,_France
+- f Jeanne 1852 #bp Paris_(75) 1920 #dp Paris,_75,_Île-de-France,_France
+end
+
+fam DURAND Paul [:comte:Valognes,_Manche,_France] 1860 #bp Paris,_Paris,_France +1885 #mp Valognes,_Manche,_France LEROY Claire 1862 #bp Valognes,_Manche,_France
+beg
+- m Henri 1886 #bp Tessy,_Manche,_France
+- f Louise 1888 #bp Tessy,_Vire,_Manche,_France
+- m Jules 1890 #bp Saint-Lô,_Manche,_Normandie,_France
+- f Marthe 1892 #bp Normandie,_France 1950 #dp Paris,_Lutèce,_France
+end
+
+fam LEFEBVRE Marc 1900 #bp Granville,_Manche,_France +1925 #mp _[Saint-Pair]_–_Granville,_Manche,_France LEGRAND Sophie 1902
+beg
+- m Yves 1926 #bp Granville,_Manche,_France
+- f Rose 1928 #bp Granville_,_Manche,_France
+end
+
+fam ROBIN Yann 1700 #bp Saint-Malo,_Ille-et-Vilaine,_France +1725 #mp St_Malo,_Ille-et-Vilaine,_France GUERIN Anne 1702 #bp Saint_Malo,_Ille-et-Vilaine,_France
+beg
+- m Malo 1726 #bp saint-malo,_Ille-et-Vilaine,_France
+- f Marie 1728 #bp Saint-Malo,_Ille-et-Vilaine,_France
+end
+
+fam HAMEL Louis 1750 #bp Avranches +1775 #mp Avranches_(Manche) LEROUX Jeanne 1752 #bp Avranches,_Manche
+beg
+- m Pierre 1776 #bp Avranches,_Manche,_France
+- f Rose 1778 #bp Saint-Martin
+end

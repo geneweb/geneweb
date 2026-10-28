@@ -46,6 +46,21 @@ val fold_place_long : bool -> string -> string list * string
     bases that record places country-first, [places_inverted=yes] in the
     [.gwf]). *)
 
+type component = {
+  text : string;  (** the component as stored, e.g. ["Paris"] *)
+  pos : int;  (** byte offset of [text] in the raw place string *)
+  len : int;  (** byte length of [text] *)
+  suburb : bool;  (** [true] for the bracketed suburb *)
+}
+(** One term of a raw place string, with its span in that string. *)
+
+val components : bool -> string -> component list
+(** [components inverted s] splits [s] exactly like {!fold_place_long}, but
+    keeps each component's span in [s]. The list is root-first (country first),
+    the same order as [fst (fold_place_long inverted s)]; the suburb, if any,
+    comes last as the finest level. Example (not inverted):
+    ["[Boileau] - Paris (75)"] gives ["75"; "Paris"; "Boileau"]. *)
+
 val places_to_string : bool -> string list -> string
 (** [places_to_string inverse pl] renders a component list back to a
     comma-separated string. When [inverse] is [true] the list is reversed before

@@ -5,6 +5,7 @@
   test
   sosa_test
   place_test
+  place_rename_test
   calendar_test
   wiki_test
   merge_test
@@ -18,7 +19,8 @@
   notes_search_test
   notes_corpus_test
   notes_rename_test
-  anomaly_test)
+  anomaly_test
+  notes_corpus_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix))
 
 (test
