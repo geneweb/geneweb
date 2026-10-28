@@ -10,6 +10,7 @@ type patch =
   | Fix_AddedChild of Driver.ifam
   | Fix_RemovedUnion of Driver.iper * Driver.ifam
   | Fix_RemovedDuplicateUnion of Driver.iper * Driver.ifam
+  | Fix_RemovedDuplicateChild of Driver.ifam * Driver.iper
   | Fix_AddedRelatedFromPevent of Driver.iper * Driver.iper
   | Fix_AddedRelatedFromFevent of Driver.iper * Driver.iper
   | Fix_MarriageDivorce of Driver.ifam
@@ -193,6 +194,27 @@ let check_families_children ?report progress base =
       let ifam = Driver.get_ifam fam in
       progress i nb_fam;
       let children = Driver.get_children fam in
+      let children =
+        let seen = Hashtbl.create (Array.length children) in
+        let uniq =
+          Array.fold_left
+            (fun acc ip ->
+              if Hashtbl.mem seen ip then (
+                (match report with
+                | Some fn -> fn (Fix_RemovedDuplicateChild (ifam, ip))
+                | None -> ());
+                acc)
+              else (
+                Hashtbl.add seen ip ();
+                ip :: acc))
+            [] children
+        in
+        if List.length uniq = Array.length children then children
+        else
+          let children = Array.of_list (List.rev uniq) in
+          Driver.patch_descend base ifam { children };
+          children
+      in
       for j = 0 to Array.length children - 1 do
         let ip = children.(j) in
         let a = Driver.poi base ip in

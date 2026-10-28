@@ -137,6 +137,7 @@ let fixbase_ok conf base =
           ipers := ip :: !ipers
       | Fix_RemovedUnion (iper, ifam)
       | Fix_RemovedDuplicateUnion (iper, ifam)
+      | Fix_RemovedDuplicateChild (ifam, iper)
       | Fix_MissingSpouse (ifam, iper) ->
           ifams := ifam :: !ifams;
           ipers := iper :: !ipers

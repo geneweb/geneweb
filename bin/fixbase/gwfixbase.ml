@@ -73,6 +73,9 @@ let aux txt
         Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
           (Driver.Ifam.to_string ifam)
           (string_of_p ip)
+    | Fix_RemovedDuplicateChild (ifam, ip) ->
+        Printf.sprintf "Removing duplicate child %s from %s" (string_of_p ip)
+          (string_of_f ifam)
     | Fix_AddedRelatedFromPevent (ip, ip2) | Fix_AddedRelatedFromFevent (ip, ip2)
       ->
         Printf.sprintf "Added related %s to %s" (string_of_p ip2)
