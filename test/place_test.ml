@@ -8,7 +8,7 @@ let normalize () =
   in
   List.iter
     (fun (input, expected) ->
-      Check.string expected (Geneweb.Place.normalize input))
+      Geneweb_test_utils.Check.string expected (Geneweb.Place.normalize input))
     cases
 
 let split_suburb () =
@@ -20,7 +20,8 @@ let split_suburb () =
   in
   List.iter
     (fun (input, expected) ->
-      Check.string_pair expected (Geneweb.Place.split_suburb input))
+      Geneweb_test_utils.Check.string_pair expected
+        (Geneweb.Place.split_suburb input))
     cases
 
 let only_suburb () =
@@ -29,7 +30,7 @@ let only_suburb () =
   in
   List.iter
     (fun (input, expected) ->
-      Check.string expected (Geneweb.Place.only_suburb input))
+      Geneweb_test_utils.Check.string expected (Geneweb.Place.only_suburb input))
     cases
 
 let without_suburb () =
@@ -41,7 +42,8 @@ let without_suburb () =
   in
   List.iter
     (fun (input, expected) ->
-      Check.string expected (Geneweb.Place.without_suburb input))
+      Geneweb_test_utils.Check.string expected
+        (Geneweb.Place.without_suburb input))
     cases
 
 let compare_places () =
@@ -60,17 +62,19 @@ let compare_places () =
   in
   List.iter
     (fun (p1, p2, expected) ->
-      Check.int expected (Geneweb.Place.compare_places p1 p2))
+      Geneweb_test_utils.Check.int expected (Geneweb.Place.compare_places p1 p2))
     cases
 
 let v =
   [
-    Check.suite "place-normalize" [ Check.case "Place normalize" normalize ];
-    Check.suite "place-split-suburb"
-      [ Check.case "Place split suburb" split_suburb ];
-    Check.suite "place-only-suburb"
-      [ Check.case "Place only suburb" only_suburb ];
-    Check.suite "place-without-suburb"
-      [ Check.case "Place without suburb" without_suburb ];
-    Check.suite "place-compare" [ Check.case "Place compare" compare_places ];
+    Geneweb_test_utils.Check.suite "place-normalize"
+      [ Geneweb_test_utils.Check.case "Place normalize" normalize ];
+    Geneweb_test_utils.Check.suite "place-split-suburb"
+      [ Geneweb_test_utils.Check.case "Place split suburb" split_suburb ];
+    Geneweb_test_utils.Check.suite "place-only-suburb"
+      [ Geneweb_test_utils.Check.case "Place only suburb" only_suburb ];
+    Geneweb_test_utils.Check.suite "place-without-suburb"
+      [ Geneweb_test_utils.Check.case "Place without suburb" without_suburb ];
+    Geneweb_test_utils.Check.suite "place-compare"
+      [ Geneweb_test_utils.Check.case "Place compare" compare_places ];
   ]

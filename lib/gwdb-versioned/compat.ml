@@ -79,6 +79,8 @@ module type Driver_S = sig
   val int_of_iper : iper -> int
   (** Convert [iper] to int *)
 
+  val int_of_ifam : ifam -> int
+
   val string_of_ifam : ifam -> string
   (** Convert [ifam] to string *)
 
@@ -831,6 +833,7 @@ struct
 
   let string_of_iper = string_of_int
   let int_of_iper = Fun.id
+  let int_of_ifam = Fun.id
   let string_of_ifam = string_of_int
   let string_of_istr = string_of_int
   let iper_of_string = int_of_string
