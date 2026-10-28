@@ -2096,6 +2096,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "implex_count" ] ->
       VVstring
         (string_of_int (Implex.loop_count base (Driver.get_iper (fst ep))))
+  | [ "has_implex" ] ->
+      VVbool (Implex.loop_count ~limit:1 base (Driver.get_iper (fst ep)) > 0)
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->

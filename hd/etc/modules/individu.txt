@@ -302,15 +302,12 @@
              title="[*link between] [the father/the mother/a parent]0 [and] [the father/the mother/a parent]1">[*consanguinity][:] %consanguinity;</a>
         %end;
       </li>%nl;
-      %if;has_parents;
-        %let;nb;%implex_count;%in;
-        %if;(nb != 0)
-          %if;(not cancel_links), <a href="%prefix;%access;&m=A&t=I" style="float:none;padding:0px;"
-             title="[*implex/implexes]1, [consanguinity]">%nb; %if;(nb=1)[implex/implexes]0%else;[implex/implexes]1%end;</a>
-          %else;, %nb; %if;(nb=1)[implex/implexes]0%else;[implex/implexes]1%end;
-          %end;
-        %end;
-      %end;
+    %end;
+    %if;has_implex;
+      <li class="mt-1">%nn;
+        %if;not roglo;<span class="fa-li"><i class="fa fa-shuffle"></i></span>%end;
+        %if;cancel_links;[*implex/implexes]1%else;<a href="%prefix;%access;&m=A&t=I">[*implex/implexes]1, [consanguinity]</a>%end;
+      </li>%nl;
     %end;
     %if;not cancel_links;
       %reset_count2;
