@@ -303,6 +303,16 @@
         %end;
       </li>%nl;
     %end;
+    %if;has_implex;
+      %let;nb;%implex_count;%in;
+      <li class="mt-1">%nn;
+        %if;not roglo;<span class="fa-li"><i class="fa fa-shuffle"></i></span>%end;
+        %if;not cancel_links;<a href="%prefix;%access;&m=A&t=I"
+          title="[*implex/implexes]1, [consanguinity]">%end;
+          %nb; %if;(nb=1)[implex/implexes]0%else;[implex/implexes]1%end;
+       %if;not cancel_links;</a>%end;
+      </li>%nl;
+    %end;
     %if;not cancel_links;
       %reset_count2;
       %if;browsing_with_sosa_ref;
