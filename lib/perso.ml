@@ -2093,6 +2093,9 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_anc_paths_cnt conf base env ep Paths true loc sl
   | [ "anc_stats_json" ] ->
       VVstring (AncStatsDisplay.compute_json conf base (fst ep))
+  | [ "implex_count" ] ->
+      VVstring
+        (string_of_int (Implex.loop_count base (Driver.get_iper (fst ep))))
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
