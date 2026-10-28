@@ -485,6 +485,10 @@ function missing_events_options() {
         <input type="radio" class="form-check-input" id="tF" name="t" value="F" onclick="no_options()">
         <label class="form-check-label" for="tF"><i class="fa fa-table fa-fw me-1"></i>[*surnames branch]</label>
       </div>
+      <div class="form-check">
+        <input type="radio" class="form-check-input" id="tI" name="t" value="I" onclick="no_options()">
+        <label class="form-check-label" for="tI"><i class="fa fa-shuffle fa-fw me-1"></i>[*implex/implexes]1, [consanguinity]</label>
+      </div>
       <hr>
       <div class="form-check">
         <input type="radio" class="form-check-input" id="tM" name="t" value="M" onclick="missing_ancestors_options()">

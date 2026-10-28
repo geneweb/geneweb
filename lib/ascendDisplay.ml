@@ -55,6 +55,7 @@ let print conf base p =
       Util.p_getint conf.env "v" )
   with
   | Some "T", Some "on", Some v -> print_ancestors_dag conf base v p
+  | Some "I", _, _ -> ImplexDisplay.print conf base p
   | _ ->
       let templ =
         match Util.p_getenv conf.env "t" with
