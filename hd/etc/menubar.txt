@@ -353,6 +353,7 @@
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><i class="fa fa-newspaper fa-fw me-2" aria-hidden="true"></i>[*long display]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=F&tf1=sb&v=%if;(b.max_anc_level!="")%b.max_anc_level;%else;12%end;"><i class="fa fa-align-justify fa-fw me-2" aria-hidden="true"></i>[*surnames branch]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=I"><i class="fa fa-shuffle fa-fw me-2" aria-hidden="true"></i>[*implex/implexes]1, [consanguinity]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=4&tool=place"><i class="fa fa-chart-pie fa-fw me-2" aria-hidden="true"></i>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
