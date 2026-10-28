@@ -90,31 +90,6 @@ let generation_label conf gen =
   let s = Printf.sprintf (Util.ftransl conf "the %s generation") nth in
   escape_json (" " ^ s)
 
-(* Extract birth/death year from person *)
-let get_years base parent_ip =
-  let p = Geneweb_db.Driver.poi base parent_ip in
-  let year_of_cdate cd =
-    match Date.od_of_cdate cd with
-    | Some (Adef.Dgreg (dg, _)) -> Some dg.Adef.year
-    | _ -> None
-  in
-  let birth = year_of_cdate (Geneweb_db.Driver.get_birth p) in
-  let baptism = year_of_cdate (Geneweb_db.Driver.get_baptism p) in
-  let death =
-    match Geneweb_db.Driver.get_death p with
-    | Def.Death (_, cd) -> year_of_cdate cd
-    | _ -> None
-  in
-  let burial =
-    match Geneweb_db.Driver.get_burial p with
-    | Def.Buried cd | Def.Cremated cd -> year_of_cdate cd
-    | Def.UnknownBurial -> None
-  in
-  let pick a b = match a with Some _ -> a | None -> b in
-  let early = pick birth baptism in
-  let late = pick death burial in
-  (early, late)
-
 (* JSON schema:
    data[] = {
      v  : generation number
@@ -129,166 +104,48 @@ let get_years base parent_ip =
 
 (* Main JSON computation for ancestor menu *)
 let compute_json conf base p =
-  let root_ip = Geneweb_db.Driver.get_iper p in
-  let buf = Buffer.create 16384 in
-  let data_buf = Buffer.create 16384 in
-
-  let seen_ever = Hashtbl.create 4096 in
-  let total_paths = ref 0 in
-  let prev_unique_cumul = ref 0 in
-
-  let curr_gen = Hashtbl.create 4096 in
-  let next_gen = Hashtbl.create 4096 in
-  Hashtbl.add curr_gen root_ip 1;
-
-  let gen = ref 0 in
-  let max_gen = ref 0 in
-  let first = ref true in
-
-  while Hashtbl.length curr_gen > 0 do
-    incr gen;
-    Hashtbl.clear next_gen;
-
-    let seen_this_gen = Hashtbl.create 128 in
-    let new_anc = ref 0 in
-    let paths_this_gen = ref 0 in
-    let min_year = ref max_int in
-    let max_year = ref min_int in
-
-    Hashtbl.iter
-      (fun child_ip path_count ->
-        let child = Geneweb_db.Driver.poi base child_ip in
-        match Geneweb_db.Driver.get_parents child with
-        | None -> ()
-        | Some ifam ->
-            let fam = Geneweb_db.Driver.foi base ifam in
-            let parents =
-              [
-                Geneweb_db.Driver.get_father fam;
-                Geneweb_db.Driver.get_mother fam;
-              ]
-            in
-            List.iter
-              (fun parent_ip ->
-                paths_this_gen := !paths_this_gen + path_count;
-
-                if not (Hashtbl.mem seen_this_gen parent_ip) then begin
-                  Hashtbl.add seen_this_gen parent_ip ();
-                  let birth, death = get_years base parent_ip in
-                  let upd = function
-                    | Some y ->
-                        if y < !min_year then min_year := y;
-                        if y > !max_year then max_year := y
-                    | None -> ()
-                  in
-                  upd birth;
-                  upd death
-                end;
-
-                if not (Hashtbl.mem seen_ever parent_ip) then begin
-                  incr new_anc;
-                  Hashtbl.add seen_ever parent_ip ()
-                end;
-
-                let prev =
-                  try Hashtbl.find next_gen parent_ip with Not_found -> 0
-                in
-                Hashtbl.replace next_gen parent_ip (prev + path_count))
-              parents)
-      curr_gen;
-
-    let unique_this_gen = Hashtbl.length seen_this_gen in
-
-    if unique_this_gen > 0 then begin
-      max_gen := !gen;
-      total_paths := !total_paths + !paths_this_gen;
-
-      let unique_cumul = Hashtbl.length seen_ever in
-      let paths_cumul = !total_paths in
-
-      let implex_cumul = paths_cumul - unique_cumul in
-      let implex_local =
-        !paths_this_gen - unique_this_gen + (unique_this_gen - !new_anc)
-      in
-
-      let theo_c = max_ancestors_cumul !gen in
-      let theo_l = max_ancestors_level !gen in
-
-      let pct_prev = percent !prev_unique_cumul theo_c in
-      let pct_uc = percent unique_cumul theo_c in
-      let pct_pc = percent paths_cumul theo_c in
-      let pct_ul = percent !new_anc theo_l in
-      let pct_pl = percent !paths_this_gen theo_l in
-
-      let gc =
-        make_gradient_cumul ~prev:pct_prev ~unique:pct_uc ~paths:pct_pc
-      in
-      let gl = make_gradient_level ~unique:pct_ul ~paths:pct_pl in
-
-      let label = generation_label conf !gen in
-      let period =
-        if !min_year = max_int then "-"
-        else Printf.sprintf "%d-%d" !min_year !max_year
-      in
-
-      if not !first then Buffer.add_char data_buf ',';
-      first := false;
-
-      Buffer.add_string data_buf "{\"v\":";
-      Buffer.add_string data_buf (string_of_int !gen);
-      Buffer.add_string data_buf ",\"t\":\"";
-      Buffer.add_string data_buf label;
-      Buffer.add_string data_buf "\",\"noa\":\"";
-      Buffer.add_string data_buf (string_of_int unique_cumul);
-      Buffer.add_string data_buf "\",\"noa_l\":\"";
-      Buffer.add_string data_buf (string_of_int !new_anc);
-      Buffer.add_string data_buf "\",\"path\":\"";
-      if implex_cumul > 0 then (
-        Buffer.add_char data_buf '+';
-        Buffer.add_string data_buf (string_of_int implex_cumul));
-      Buffer.add_string data_buf "\",\"path_l\":\"";
-      if implex_local > 0 then (
-        Buffer.add_char data_buf '+';
-        Buffer.add_string data_buf (string_of_int implex_local));
-      Buffer.add_string data_buf "\",\"per\":\"";
-      Buffer.add_string data_buf period;
-      Buffer.add_string data_buf "\"";
-
-      (* gc *)
-      Buffer.add_string data_buf ",\"gc\":{\"prev\":";
-      Buffer.add_string data_buf (string_of_int (Percent.to_int gc.gc_prev));
-      Buffer.add_string data_buf ",\"unique\":";
-      Buffer.add_string data_buf (string_of_int (Percent.to_int gc.gc_unique));
-      Buffer.add_string data_buf ",\"paths\":";
-      Buffer.add_string data_buf (string_of_int (Percent.to_int gc.gc_paths));
-      Buffer.add_string data_buf "}";
-
-      (* gl *)
-      Buffer.add_string data_buf ",\"gl\":{\"unique\":";
-      Buffer.add_string data_buf (string_of_int (Percent.to_int gl.gl_unique));
-      Buffer.add_string data_buf ",\"paths\":";
-      Buffer.add_string data_buf (string_of_int (Percent.to_int gl.gl_paths));
-      Buffer.add_string data_buf "}";
-
-      (* tooltips *)
-      Buffer.add_string data_buf ",\"pp\":\"";
-      Buffer.add_string data_buf
-        (escape_json (format_pct_tooltip theo_c pct_uc pct_pc !gen));
-      Buffer.add_string data_buf "\",\"pp_l\":\"";
-      Buffer.add_string data_buf
-        (escape_json (format_pct_tooltip theo_l pct_ul pct_pl !gen));
-      Buffer.add_string data_buf "\"}";
-
-      prev_unique_cumul := unique_cumul
-    end;
-
-    Hashtbl.reset curr_gen;
-    Hashtbl.iter (fun k v -> Hashtbl.add curr_gen k v) next_gen
-  done;
-
-  Buffer.add_string buf "{\"max\":";
-  Buffer.add_string buf (string_of_int !max_gen);
-  Buffer.add_string buf ",\"data\":[";
-  Buffer.add_buffer buf data_buf;
-  Buffer.add_string buf "]}";
-  Buffer.contents buf
+  let { Implex.generations; _ } =
+    Implex.profile base (Geneweb_db.Driver.get_iper p)
+  in
+  let data = Buffer.create 16384 in
+  let plus n = if n > 0 then "+" ^ string_of_int n else "" in
+  let max_gen, _, _ =
+    List.fold_left
+      (fun (_, unique_prev, paths_prev) g ->
+        let { Implex.gen; paths; fresh; period; _ } = g in
+        let unique = unique_prev + fresh in
+        let paths_cumul = paths_prev + paths in
+        let theo_c = max_ancestors_cumul gen in
+        let theo_l = max_ancestors_level gen in
+        let pct_uc = percent unique theo_c in
+        let pct_pc = percent paths_cumul theo_c in
+        let pct_ul = percent fresh theo_l in
+        let pct_pl = percent paths theo_l in
+        let gc =
+          make_gradient_cumul
+            ~prev:(percent unique_prev theo_c)
+            ~unique:pct_uc ~paths:pct_pc
+        in
+        let gl = make_gradient_level ~unique:pct_ul ~paths:pct_pl in
+        if gen > 1 then Buffer.add_char data ',';
+        Printf.bprintf data
+          {|{"v":%d,"t":"%s","noa":"%d","noa_l":"%d","path":"%s","path_l":"%s","per":"%s","gc":{"prev":%d,"unique":%d,"paths":%d},"gl":{"unique":%d,"paths":%d},"pp":"%s","pp_l":"%s"}|}
+          gen
+          (generation_label conf gen)
+          unique fresh
+          (plus (paths_cumul - unique))
+          (plus (paths - fresh))
+          (match period with
+          | Some (a, b) -> Printf.sprintf "%d-%d" a b
+          | None -> "-")
+          (Percent.to_int gc.gc_prev)
+          (Percent.to_int gc.gc_unique)
+          (Percent.to_int gc.gc_paths)
+          (Percent.to_int gl.gl_unique)
+          (Percent.to_int gl.gl_paths)
+          (escape_json (format_pct_tooltip theo_c pct_uc pct_pc gen))
+          (escape_json (format_pct_tooltip theo_l pct_ul pct_pl gen));
+        (gen, unique, paths_cumul))
+      (0, 0, 0) generations
+  in
+  Printf.sprintf {|{"max":%d,"data":[%s]}|} max_gen (Buffer.contents data)
