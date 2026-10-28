@@ -22,6 +22,7 @@ type patch =
   | Fix_AddedChild of Geneweb_db.Driver.ifam
   | Fix_RemovedUnion of Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam
   | Fix_RemovedDuplicateUnion of Geneweb_db.Driver.iper * Geneweb_db.Driver.ifam
+  | Fix_RemovedDuplicateChild of Geneweb_db.Driver.ifam * Geneweb_db.Driver.iper
   | Fix_AddedRelatedFromPevent of
       Geneweb_db.Driver.iper * Geneweb_db.Driver.iper
   | Fix_AddedRelatedFromFevent of
@@ -55,8 +56,9 @@ val check_families_children :
   (int -> int -> unit) ->
   Geneweb_db.Driver.base ->
   unit
-(** For every family's children in the base add current family to the children's
-    ascendants if absent. Doesn't modify consanguinity rate. *)
+(** For every family's children in the base remove the children listed more than
+    once, and add current family to the children's ascendants if absent. Doesn't
+    modify consanguinity rate. *)
 
 val check_persons_parents :
   ?report:(patch -> unit) ->
