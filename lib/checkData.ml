@@ -141,20 +141,6 @@ let nbsp_re =
             (* U+202F espace insécable fine *)
           ]))
 
-let has_any_particle base s =
-  let rec check_from pos =
-    if pos >= String.length s then false
-    else
-      let remaining = String.sub s pos (String.length s - pos) in
-      if Mutil.get_particle (Driver.base_particles base) remaining <> "" then
-        true
-      else
-        match String.index_from_opt s pos ' ' with
-        | None -> false
-        | Some space_pos -> check_from (space_pos + 1)
-  in
-  check_from 0
-
 let is_roman_numeral s =
   try
     Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
@@ -300,126 +286,124 @@ let lowercase_allowed_words =
 let is_lowercase_allowed word =
   List.mem (String.lowercase_ascii word) lowercase_allowed_words
 
-(* Detect invalid capitalization patterns:
-   - Multiple uppercase letters in sequence
-   - Lowercase followed by uppercase
-   - Uppercase, lowercase, uppercase sequence *)
 (* Bad capitalization functions *)
-let has_bad_capitalization_pattern s =
-  let len = String.length s in
-  let rec scan i =
-    if i >= len then false
-    else
-      (* Check AAz pattern: [A-Z][A-Z][a-z] *)
-      let has_aaz =
-        i + 2 < len
-        && s.[i] >= 'A'
-        && s.[i] <= 'Z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-        && s.[i + 2] >= 'a'
-        && s.[i + 2] <= 'z'
-      in
-      if has_aaz then true
-      else
-        (* Check aZ pattern: [a-z][A-Z] *)
-        let has_az =
-          i + 1 < len
-          && s.[i] >= 'a'
-          && s.[i] <= 'z'
-          && s.[i + 1] >= 'A'
-          && s.[i + 1] <= 'Z'
-        in
-        if has_az then true else scan (i + 1)
-  in
-  scan 0
 
-(* Capitalization check function
-   Examines each word for valid patterns for some books
-   For other types, just checks for invalid capitalization patterns *)
-let has_legitimate_mixed_case dict base s =
+let is_ascii_upper c = c >= 'A' && c <= 'Z'
+let is_ascii_lower c = c >= 'a' && c <= 'z'
+
+(* Byte spans [start, stop) of the space-separated words of [s]. *)
+let word_spans s =
+  let len = String.length s in
+  let rec loop i acc =
+    if i >= len then List.rev acc
+    else if s.[i] = ' ' then loop (i + 1) acc
+    else
+      let j =
+        match String.index_from_opt s i ' ' with Some j -> j | None -> len
+      in
+      loop j ((i, j) :: acc)
+  in
+  loop 0 []
+
+(* Byte spans [start, stop) of [s] covered by a particle of the base
+   particles file. Particles are looked for at the beginning of [s], after
+   a space or a hyphen, and right after a previous particle, so that
+   "de la ", "d'", "bin " are recognised wherever they appear. A segment
+   followed by a hyphen is also a particle when it is one followed by a
+   space: "al" in "Abd al-Rahman". *)
+let particle_spans particles s =
+  let len = String.length s in
+  let is_sep c = c = ' ' || c = '-' in
+  let rec next_sep j =
+    if j >= len || is_sep s.[j] then j else next_sep (j + 1)
+  in
+  let rec scan pos acc =
+    if pos >= len then List.rev acc
+    else if is_sep s.[pos] then scan (pos + 1) acc
+    else
+      let p = Mutil.get_particle particles (String.sub s pos (len - pos)) in
+      if p <> "" then
+        let stop = pos + String.length p in
+        scan stop ((pos, stop) :: acc)
+      else
+        let stop = next_sep pos in
+        let hyphen_particle =
+          stop < len
+          && s.[stop] = '-'
+          &&
+          let seg = String.sub s pos (stop - pos) ^ " " in
+          Mutil.get_particle particles seg = seg
+        in
+        if hyphen_particle then scan (stop + 1) ((pos, stop) :: acc)
+        else scan (stop + 1) acc
+  in
+  scan 0 []
+
+let in_spans spans i = List.exists (fun (a, b) -> i >= a && i < b) spans
+
+(* Roman numerals and Mac/Mc/Fitz names may legitimately mix cases. *)
+let exempts_allowed_words dict =
   match dict with
   | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
     ->
-      has_any_particle base s
-      ||
-      let words = split_words s in
-      List.for_all
-        (fun w -> (not (has_bad_capitalization_pattern w)) || is_allowed_word w)
-        words
-  | _ -> false
+      true
+  | Qualifiers | Occupation | Estates | Titles | Sources -> false
 
-let has_bad_capitalization dict base s =
+(* Every word of a first name or surname must start with a capital letter,
+   except particles and a few connecting words ("dit", "y"...). *)
+let requires_initial_capital dict =
   match dict with
-  | Sources -> false
-  | _ ->
-      let has_particles = has_any_particle base s in
-      if has_particles then false
-      else
-        let has_general =
-          has_bad_capitalization_pattern s
-          && not (has_legitimate_mixed_case dict base s)
-        in
-        let has_lowercase =
-          match dict with
-          | Fnames | Snames | Fnames_alias | Snames_alias ->
-              let words = split_words s in
-              List.exists
-                (fun w ->
-                  String.length w > 0
-                  && w.[0] >= 'a'
-                  && w.[0] <= 'z'
-                  && not (is_lowercase_allowed w))
-                words
-          | _ -> false
-        in
-        has_general || has_lowercase
+  | Fnames | Snames | Fnames_alias | Snames_alias -> true
+  | PubNames | Aliases | Places | Qualifiers | Occupation | Estates | Titles
+  | Sources ->
+      false
+
+(* Invalid patterns inside the word [ws, we) of [s]:
+   - "AAz": two capitals followed by a lowercase letter ("DUpont")
+   - "aZ": a lowercase letter followed by a capital ("LaFayette") *)
+let add_pattern_positions s ws we acc =
+  let rec scan i acc =
+    if i + 1 >= we then acc
+    else
+      let acc =
+        if
+          i + 2 < we
+          && is_ascii_upper s.[i]
+          && is_ascii_upper s.[i + 1]
+          && is_ascii_lower s.[i + 2]
+        then i :: (i + 1) :: acc
+        else if is_ascii_lower s.[i] && is_ascii_upper s.[i + 1] then
+          i :: (i + 1) :: acc
+        else acc
+      in
+      scan (i + 1) acc
+  in
+  scan ws acc
 
 let find_bad_capitalization_positions dict base s =
-  let positions = ref [] in
-  let has_particles = has_any_particle base s in
-  if not has_particles then (
-    let rec scan i =
-      if i >= String.length s - 2 then ()
-      else if
-        s.[i] >= 'A'
-        && s.[i] <= 'Z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-        && i + 2 < String.length s
-        && s.[i + 2] >= 'a'
-        && s.[i + 2] <= 'z'
-      then (
-        positions := i :: (i + 1) :: !positions;
-        scan (i + 1))
-      else if
-        i < String.length s - 1
-        && s.[i] >= 'a'
-        && s.[i] <= 'z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-      then (
-        positions := i :: (i + 1) :: !positions;
-        scan (i + 1))
-      else scan (i + 1)
-    in
-    scan 0;
-    match dict with
-    | Fnames | Snames ->
-        let words = split_words s in
-        let word_pos = ref 0 in
-        List.iter
-          (fun word ->
-            if
-              String.length word > 0
-              && word.[0] >= 'a'
-              && word.[0] <= 'z'
-              && not (is_lowercase_allowed word)
-            then positions := !word_pos :: !positions;
-            word_pos := !word_pos + String.length word + 1)
-          words
-    | _ -> ());
-  List.sort_uniq compare !positions
+  match dict with
+  | Sources -> []
+  | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
+  | Qualifiers | Occupation | Estates | Titles ->
+      let pspans = particle_spans (Driver.base_particles base) s in
+      let exempt = exempts_allowed_words dict in
+      let initial = requires_initial_capital dict in
+      List.fold_left
+        (fun acc (ws, we) ->
+          let w = String.sub s ws (we - ws) in
+          let acc =
+            if exempt && is_allowed_word w then acc
+            else add_pattern_positions s ws we acc
+          in
+          if initial && is_ascii_lower s.[ws] && not (is_lowercase_allowed w)
+          then ws :: acc
+          else acc)
+        [] (word_spans s)
+      |> List.filter (fun i -> not (in_spans pspans i))
+      |> List.sort_uniq compare
+
+let has_bad_capitalization dict base s =
+  find_bad_capitalization_positions dict base s <> []
 
 let is_zero_width hex =
   match hex with
