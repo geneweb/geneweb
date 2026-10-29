@@ -371,7 +371,7 @@ let search_by_name conf base n =
                   | Some p ->
                       let fn1_l =
                         split_normalize false
-                          (Driver.sou base (Driver.get_first_name p))
+                          (Driver.p_first_name base p)
                       in
                       let fn2_l =
                         split_normalize false
@@ -1202,7 +1202,7 @@ let group_by_surname base ipers =
   List.iter
     (fun ip ->
       let p = Driver.poi base ip in
-      let sn = Driver.sou base (Driver.get_surname p) in
+      let sn = Driver.p_surname base p in
       let current = try Hashtbl.find groups sn with Not_found -> [] in
       Hashtbl.replace groups sn (p :: current))
     ipers;
@@ -1439,7 +1439,7 @@ let search_partial_key cache conf base query =
   in
   let sn_variants = List.map Name.lower (generate_apostrophe_variants sn) in
   let strict_sn p =
-    let stored = Name.lower (Driver.sou base (Driver.get_surname p)) in
+    let stored = Name.lower (Driver.p_surname base p) in
     List.mem stored sn_variants
   in
   let pl_filtered = List.filter strict_sn pl in
@@ -2062,7 +2062,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
         match cut_words qsn with
         | [] -> false
         | q ->
-            let raw = norm_apo (Driver.sou base (Driver.get_surname p)) in
+            let raw = norm_apo (Driver.p_surname base p) in
             let words = cut_words (Name.lower raw) in
             (List.length words > List.length q && list_is_prefix q words)
             ||
@@ -2203,11 +2203,11 @@ let rec handle_search_results alias_cache conn conf base query fn_options
           let qsn_l = normalize qsn in
           let fn_exact p =
             same_fn
-              (normalize (Driver.sou base (Driver.get_first_name p)))
+              (normalize (Driver.p_first_name base p))
               qfn_l
           in
           let sn_exact p =
-            normalize (Driver.sou base (Driver.get_surname p)) = qsn_l
+            normalize (Driver.p_surname base p) = qsn_l
           in
           let spouse_sn_exact p =
             (* True if p has at least one spouse whose surname matches qsn. *)
@@ -2220,7 +2220,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
                   else Driver.get_father f
                 in
                 let sp = Driver.poi base spouse_ip in
-                normalize (Driver.sou base (Driver.get_surname sp)) = qsn_l)
+                normalize (Driver.p_surname base sp) = qsn_l)
               (Driver.get_family p)
           in
           (* Type-A perfect match: person's own fn and sn both match exactly. *)
@@ -2329,7 +2329,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
                        (fun p ->
                          fn_exact p
                          && Name.crush_lower
-                              (Driver.sou base (Driver.get_surname p))
+                              (Driver.p_surname base p)
                             = qsn_c)
                        (exact_persons @ partial_persons))
             | l -> l

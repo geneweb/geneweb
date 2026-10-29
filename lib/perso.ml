@@ -6052,8 +6052,8 @@ let print_isolated conf base =
     (fun iper ->
       let p = Driver.poi base iper in
       if
-        Driver.sou base (Driver.get_first_name p) = "?"
-        && Driver.sou base (Driver.get_surname p) = "?"
+        Driver.p_first_name base p = "?"
+        && Driver.p_surname base p = "?"
       then ()
       else
         let rp = Driver.get_rparents p in
@@ -6076,8 +6076,8 @@ let print_isolated conf base =
               by_wit.(0) <- p :: by_wit.(0))
     candidates;
   let cmp p1 p2 =
-    let sn p = Name.lower (Driver.sou base (Driver.get_surname p)) in
-    let fn p = Name.lower (Driver.sou base (Driver.get_first_name p)) in
+    let sn p = Name.lower (Driver.p_surname base p) in
+    let fn p = Name.lower (Driver.p_first_name base p) in
     match String.compare (sn p1) (sn p2) with
     | 0 -> String.compare (fn p1) (fn p2)
     | c -> c
