@@ -318,7 +318,8 @@ and eval_simple_var conf base env p = function
                   let i = i - 1 in
                   let k =
                     if i >= 0 && i < Array.length e.epers_witnesses then
-                      fst e.epers_witnesses.(i)
+                      let p, _, _ = e.epers_witnesses.(i) in
+                      p
                     else if
                       i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
                     then ("", "", 0, Update.Create (Neuter, None), "")
@@ -327,6 +328,23 @@ and eval_simple_var conf base env p = function
                   eval_person_var base k sl
               | _ -> raise Not_found)
           | None -> raise Not_found)
+      | _ -> raise Not_found)
+  | [ "witness_note" ] -> (
+      match get_env "cnt" env with
+      | Vint i -> (
+          let e =
+            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
+          in
+          match (e, get_env "wcnt" env) with
+          | Some e, Vint i ->
+              let i = i - 1 in
+              if i >= 0 && i < Array.length e.epers_witnesses then
+                let _, _, wnote = e.epers_witnesses.(i) in
+                safe_val (Util.escape_html wnote :> Adef.safe_string)
+              else if i >= 0 && i < 2 && Array.length e.epers_witnesses < 2 then
+                str_val ""
+              else raise Not_found
+          | _ -> raise Not_found)
       | _ -> raise Not_found)
   | [ "witness_kind" ] -> (
       match get_env "cnt" env with
@@ -340,7 +358,10 @@ and eval_simple_var conf base env p = function
               | Vint i ->
                   let i = i - 1 in
                   if i >= 0 && i < Array.length e.epers_witnesses then
-                    match snd e.epers_witnesses.(i) with
+                    match
+                      let _, wk, _ = e.epers_witnesses.(i) in
+                      wk
+                    with
                     | Witness_GodParent -> str_val "godp"
                     | Witness_CivilOfficer -> str_val "offi"
                     | Witness_ReligiousOfficer -> str_val "reli"

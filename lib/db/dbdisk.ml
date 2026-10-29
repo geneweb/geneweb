@@ -21,18 +21,12 @@ type string_person_index = {
   next : int -> int;
 }
 
-type visible_record_access = {
-  v_write : unit -> unit;
-  v_get : (dsk_person -> bool) -> int -> bool;
-}
-
 type perm = RDONLY | RDRW
 
 type base_data = {
   persons : dsk_person record_access;
   ascends : dsk_ascend record_access;
   unions : dsk_union record_access;
-  visible : visible_record_access;
   families : dsk_family record_access;
   couples : dsk_couple record_access;
   descends : dsk_descend record_access;
@@ -68,5 +62,12 @@ type base_func = {
   ifam_exists : int -> bool;
 }
 
-type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
+type base_version =
+  | GnWb0020
+  | GnWb0021
+  | GnWb0022
+  | GnWb0023
+  | GnWb0024
+  | GnWb0025
+
 type dsk_base = { data : base_data; func : base_func; version : base_version }

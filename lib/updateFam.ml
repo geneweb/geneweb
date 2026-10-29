@@ -81,7 +81,9 @@ let family_events_opt env fam =
 let witness_person_of_event_opt env e =
   match get_env "wcnt" env with
   | Vint i when i - 1 >= 0 && i - 1 < Array.length e.efam_witnesses ->
-      Some (fst e.efam_witnesses.(i - 1))
+      Some
+        (let p, _, _ = e.efam_witnesses.(i - 1) in
+         p)
   | Vint i when i - 1 >= 0 && i - 1 < 2 && Array.length e.efam_witnesses < 2 ->
       Some ("", "", 0, Update.Create (Neuter, None), "")
   | _ -> None
@@ -219,7 +221,7 @@ and eval_event_str conf base env fam =
         let src = Util.safe_html (Driver.sou base e.efam_src) in
         let wit =
           Array.fold_right
-            (fun (w, _) accu ->
+            (fun (w, _, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
               ^<^ Util.gen_person_text conf base (Driver.poi base w))
@@ -257,11 +259,28 @@ and eval_fwitness_kind env fam =
           | Vint i ->
               let i = i - 1 in
               if i >= 0 && i < Array.length e.efam_witnesses then
-                eval_witness_kind (snd e.efam_witnesses.(i))
+                eval_witness_kind
+                  (let _, wk, _ = e.efam_witnesses.(i) in
+                   wk)
               else if i >= 0 && i < 2 && Array.length e.efam_witnesses < 2 then
                 str_val ""
               else raise Not_found
           | _ -> raise Not_found)
+      | None -> raise Not_found)
+  | _ -> raise Not_found
+
+and eval_fwitness_note env fam =
+  match (get_env "cnt" env, get_env "wcnt" env) with
+  | Vint i, Vint j -> (
+      match List.nth_opt fam.fevents (i - 1) with
+      | Some e ->
+          let j = j - 1 in
+          if j >= 0 && j < Array.length e.efam_witnesses then
+            let _, _, wnote = e.efam_witnesses.(j) in
+            safe_val (Util.escape_html wnote :> Adef.safe_string)
+          else if j >= 0 && j < 2 && Array.length e.efam_witnesses < 2 then
+            str_val ""
+          else raise Not_found
       | None -> raise Not_found)
   | _ -> raise Not_found
 
@@ -323,6 +342,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "has_fwitness" ] -> eval_has_fwitness env fam
   | "fwitness" :: sl -> eval_fwitness conf base env fam sl
   | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
+  | [ "fwitness_note" ] -> eval_fwitness_note env fam
   | [ s ] -> eval_default_var conf s
   | _ -> raise Not_found
 

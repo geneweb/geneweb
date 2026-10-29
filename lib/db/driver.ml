@@ -5,6 +5,10 @@ let src = Logs.Src.create ~doc:"Driver" "DRV "
 module Log = (val Logs.src_log src : Logs.LOG)
 open Dbdisk
 
+exception Incompatible_format = Dutil.Incompatible_format
+
+let incompatible_format_message = Dutil.incompatible_format_message
+
 type istr = int
 type ifam = int
 type iper = int
@@ -339,6 +343,16 @@ module NLDB = struct
       Sys.rename fname_tmp fname_def
 end
 
+let current_base_format = Dutil.magic_GnWb0025
+let base_format base = Database.magic_of_version base.version
+let base_format_of_dir = Database.base_format_of_dir
+
+type base_format_status = Database.base_format_status =
+  | Current
+  | Older of string
+  | Unreadable of string
+
+let base_format_status_of_dir = Database.base_format_status_of_dir
 let check_nldb_format = NLDB.check_format
 let read_nldb = NLDB.read
 let nldb_is_empty = NLDB.is_empty
@@ -572,15 +586,13 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
-  else
-    let fname = Filename.concat base.data.bdir "restrict" in
-    match !visible_ref with
-    | Some visible ->
-        Secure.with_open_out_bin fname @@ fun oc ->
-        output_string oc Mutil.executable_magic;
-        output_value oc visible
-    | None -> ()
+  match (base.data.perm, !visible_ref) with
+  | RDRW, Some visible ->
+      let fname = Filename.concat base.data.bdir "restrict" in
+      Secure.with_open_out_bin fname @@ fun oc ->
+      output_string oc Mutil.executable_magic;
+      output_value oc visible
+  | RDRW, None | RDONLY, (Some _ | None) -> ()
 
 let base_visible_get base fct i =
   let visible =

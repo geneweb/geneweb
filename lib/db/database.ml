@@ -356,7 +356,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   { find; cursor; next }
 
 let persons_of_first_name = function
-  | GnWb0024 ->
+  | GnWb0025 | GnWb0024 ->
       new_persons_of_first_name_or_surname
         (fun _ -> Dutil.compare_fnames)
         Dutil.compare_fnames_i
@@ -366,7 +366,7 @@ let persons_of_first_name = function
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
 let persons_of_surname = function
-  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
+  | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
@@ -501,65 +501,12 @@ let new_strings_of_fname =
   new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
 
 let strings_of_sname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_sname
-  | _ -> old_strings_of_fsname
+  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_sname
+  | GnWb0022 | GnWb0021 | GnWb0020 -> old_strings_of_fsname
 
 let strings_of_fname = function
-  | GnWb0024 | GnWb0023 -> new_strings_of_fname
-  | _ -> old_strings_of_fsname
-
-(* Restrict file *)
-
-type visible_state = VsNone | VsTrue | VsFalse
-
-let verbose = Mutil.verbose
-
-let make_visible_record_access perm bname persons =
-  let visible_ref = ref None in
-  let fname = bname // "restrict" in
-  let read_or_create_visible () =
-    let visible =
-      try
-        Secure.with_open_in_text fname @@ fun ic ->
-        if Sys.unix && !verbose then (
-          Printf.eprintf "*** read restrict file\n";
-          flush stderr);
-        input_value ic
-      with Sys_error _ -> Array.make persons.len VsNone
-    in
-    visible_ref := Some visible;
-    visible
-  in
-  let v_write () =
-    match !visible_ref with
-    | Some visible ->
-        if perm = RDONLY then raise (HttpExn (Forbidden, __LOC__))
-        else
-          Secure.with_open_out_text fname @@ fun oc ->
-          if Sys.unix && !verbose then (
-            Printf.eprintf "*** write restrict file\n";
-            flush stderr);
-          output_value oc visible
-    | None -> ()
-  in
-  let v_get fct i =
-    let visible =
-      match !visible_ref with
-      | Some visible -> visible
-      | None -> read_or_create_visible ()
-    in
-    if i < Array.length visible then
-      match visible.(i) with
-      | VsNone ->
-          let status = fct (persons.get i) in
-          visible.(i) <- (if status then VsTrue else VsFalse);
-          visible_ref := Some visible;
-          status
-      | VsTrue -> true
-      | VsFalse -> false
-    else fct (persons.get i)
-  in
-  { v_write; v_get }
+  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_fname
+  | GnWb0022 | GnWb0021 | GnWb0020 -> old_strings_of_fsname
 
 (*
    Synchro:
@@ -595,6 +542,15 @@ type patches_ht = {
    (magic_patch) and a record "patch_ht" above. *)
 
 module Old = struct
+  (* Persons and families as written before GnWb0025, without witness notes.
+     They are converted when read; the empty note is the empty string, whose
+     index is 0 in every base. *)
+  type person = (int, int, int) Def_gnwb0024.gen_person
+  type family = (int, int, int) Def_gnwb0024.gen_family
+
+  let person (p : person) : Dbdisk.dsk_person = Def_gnwb0024.person ~empty:0 p
+  let family (f : family) : Dbdisk.dsk_family = Def_gnwb0024.family ~empty:0 f
+
   type patches = {
     p_person : (int * person) list ref;
     p_ascend : (int * ascend) list ref;
@@ -605,7 +561,98 @@ module Old = struct
     p_string : (int * string) list ref;
     p_name : (int * int list) list ref;
   }
+
+  (* Patches GnPa0001 written for a base without witness notes. *)
+  type patches_ht = {
+    h_person : int ref * (int, person) Hashtbl.t;
+    h_ascend : int ref * (int, ascend) Hashtbl.t;
+    h_union : int ref * (int, union) Hashtbl.t;
+    h_family : int ref * (int, family) Hashtbl.t;
+    h_couple : int ref * (int, couple) Hashtbl.t;
+    h_descend : int ref * (int, descend) Hashtbl.t;
+    h_string : int ref * (int, string) Hashtbl.t;
+    h_name : (int, int list) Hashtbl.t;
+  }
 end
+
+let has_witness_notes version =
+  match version with
+  | GnWb0025 -> true
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> false
+
+let base_version_of_magic found =
+  if found = Dutil.magic_GnWb0025 then Some GnWb0025
+  else if found = Dutil.magic_GnWb0024 then Some GnWb0024
+  else if found = Dutil.magic_GnWb0023 then Some GnWb0023
+  else if found = Dutil.magic_GnWb0022 then Some GnWb0022
+  else if found = Dutil.magic_GnWb0021 then Some GnWb0021
+  else if found = Dutil.magic_GnWb0020 then Some GnWb0020
+  else None
+
+let read_base_magic ic =
+  let len = String.length Dutil.magic_GnWb0025 in
+  if in_channel_length ic < len then "" else really_input_string ic len
+
+let read_header fname read =
+  try Secure.with_open_in_bin fname read with Sys_error _ -> ""
+
+(* GeneWeb 7 changed the person and family records (events, sources...)
+   without changing the GnWb0020 header: a base written by GeneWeb 6 or
+   earlier has the same header but shorter records. The number of fields of
+   the first person and of the first family tells them apart; it is the same
+   with or without witness notes. *)
+let person_fields =
+  Iovalue.marshaled_block_size
+    (Mutil.empty_person 0 0 : (unit, int, int) gen_person)
+
+let family_fields =
+  Iovalue.marshaled_block_size
+    (Mutil.empty_family 0 : (int, unit, int) gen_family)
+
+(* [ic] is just after the header of the base file. *)
+let records_have_current_layout ic ic_acc =
+  let persons_len = input_binary_int ic in
+  let families_len = input_binary_int ic in
+  let first_record i expected =
+    seek_in ic_acc (i * Iovalue.sizeof_long);
+    Position.seek_in ic (Position.input ic_acc);
+    match expected with
+    | None -> true
+    | Some _ -> Iovalue.block_size ic = expected
+  in
+  (persons_len = 0 || first_record 0 person_fields)
+  && (families_len = 0 || first_record (3 * persons_len) family_fields)
+
+let has_current_layout bname =
+  try
+    Secure.with_open_in_bin (Filename.concat bname "base.acc") @@ fun ic_acc ->
+    Secure.with_open_in_bin (Filename.concat bname "base") @@ fun ic ->
+    ignore (read_base_magic ic : string);
+    records_have_current_layout ic ic_acc
+  with
+  | Sys_error _ -> true
+  | End_of_file | Failure _ -> false
+
+let readable_version bname version =
+  match version with
+  | GnWb0025 -> true
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
+      has_current_layout bname
+
+let magic_of_version version =
+  match version with
+  | GnWb0025 -> Dutil.magic_GnWb0025
+  | GnWb0024 -> Dutil.magic_GnWb0024
+  | GnWb0023 -> Dutil.magic_GnWb0023
+  | GnWb0022 -> Dutil.magic_GnWb0022
+  | GnWb0021 -> Dutil.magic_GnWb0021
+  | GnWb0020 -> Dutil.magic_GnWb0020
+
+let base_format_of_dir bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  read_header (Filename.concat bname "base") read_base_magic
 
 module type X = sig
   val equal : string -> string -> bool
@@ -670,7 +717,7 @@ end = struct
     Secure.with_open_in_bin inx @@ fun ic ->
     let start =
       match version with
-      | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
+      | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
       | GnWb0021 | GnWb0020 -> 3 * int_size
     in
     let size = input_binary_int ic in
@@ -834,10 +881,13 @@ let make_record_access immut_record (plenr, patches) (_, pending) len =
   in
   r
 
+(* Patch records have the layout of their base: a base of an earlier format
+   is read-only, so its patches were written by the version that built it. *)
 let magic_patch = "GnPa0001"
 
-let check_patch_magic ic =
-  really_input_string ic (String.length magic_patch) = magic_patch
+let read_patch_magic ic =
+  let len = String.length magic_patch in
+  if in_channel_length ic < len then "" else really_input_string ic len
 
 let empty_patch_ht () =
   {
@@ -851,13 +901,35 @@ let empty_patch_ht () =
     h_name = Hashtbl.create 1;
   }
 
-let input_patches bname =
+let patches_ht_of_old (o : Old.patches_ht) =
+  let convert f (n, ht) =
+    let ht' = Hashtbl.create (Hashtbl.length ht) in
+    Hashtbl.iter (fun k v -> Hashtbl.replace ht' k (f v)) ht;
+    (n, ht')
+  in
+  {
+    h_person = convert Old.person o.h_person;
+    h_ascend = o.h_ascend;
+    h_union = o.h_union;
+    h_family = convert Old.family o.h_family;
+    h_couple = o.h_couple;
+    h_descend = o.h_descend;
+    h_string = o.h_string;
+    h_name = o.h_name;
+  }
+
+let input_patches ~witness_notes bname =
   let fname = Filename.concat bname "patches" in
   if Sys.file_exists fname then
     try
       Secure.with_open_in_bin fname @@ fun ic ->
+      let found = read_patch_magic ic in
+      if found <> magic_patch && String.starts_with ~prefix:"GnPa" found then
+        raise (Dutil.Incompatible_format (fname, found, [ magic_patch ]));
       let r =
-        if check_patch_magic ic then (input_value ic : patches_ht)
+        if found = magic_patch then
+          if witness_notes then (input_value ic : patches_ht)
+          else patches_ht_of_old (input_value ic : Old.patches_ht)
         else (
           (* old implementation of patches *)
           seek_in ic 0;
@@ -867,10 +939,15 @@ let input_patches bname =
             if k >= !ir then ir := k + 1;
             Hashtbl.add ht k v
           in
-          List.iter (add ht.h_person) !(patches.Old.p_person);
+          let old f (k, v) = (k, f v) in
+          List.iter
+            (fun kv -> add ht.h_person (old Old.person kv))
+            !(patches.Old.p_person);
           List.iter (add ht.h_ascend) !(patches.Old.p_ascend);
           List.iter (add ht.h_union) !(patches.Old.p_union);
-          List.iter (add ht.h_family) !(patches.Old.p_family);
+          List.iter
+            (fun kv -> add ht.h_family (old Old.family kv))
+            !(patches.Old.p_family);
           List.iter (add ht.h_couple) !(patches.Old.p_couple);
           List.iter (add ht.h_descend) !(patches.Old.p_descend);
           List.iter (add ht.h_string) !(patches.Old.p_string);
@@ -878,8 +955,33 @@ let input_patches bname =
           ht)
       in
       Ok r
-    with _ -> Error (Printf.sprintf "%s: corrupted file" fname)
+    with
+    | Dutil.Incompatible_format _ as exn -> raise exn
+    | _ -> Error (Printf.sprintf "%s: corrupted file" fname)
   else Ok (empty_patch_ht ())
+
+type base_format_status = Current | Older of string | Unreadable of string
+
+let base_format_status_of_dir bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let found = base_format_of_dir bname in
+  match base_version_of_magic found with
+  | None -> Unreadable found
+  | Some version when not (readable_version bname version) -> Unreadable found
+  | Some version -> (
+      let patches_magic =
+        read_header (Filename.concat bname "patches") read_patch_magic
+      in
+      if
+        patches_magic <> magic_patch
+        && String.starts_with ~prefix:"GnPa" patches_magic
+      then Unreadable patches_magic
+      else
+        match version with
+        | GnWb0025 -> Current
+        | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> Older found)
 
 let input_synchro bname =
   try
@@ -937,9 +1039,24 @@ let with_database ?(read_only = false) bname k =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let tm_fname = bname // "commit_timestamp" in
-  let patches = input_patches bname in
+  let version =
+    let fname = bname // "base" in
+    (* A missing or unreadable base file is reported like an unknown
+       format, rather than as an uncaught Sys_error. *)
+    let found = read_header fname read_base_magic in
+    match base_version_of_magic found with
+    | Some version when readable_version bname version -> version
+    | Some _ ->
+        raise
+          (Dutil.Incompatible_format
+             (fname, found ^ " (GeneWeb 6 or earlier)", Dutil.base_magics))
+    | None ->
+        raise (Dutil.Incompatible_format (fname, found, Dutil.base_magics))
+  in
+  let witness_notes = has_witness_notes version in
+  let patches = input_patches ~witness_notes bname in
   let pending : patches_ht = empty_patch_ht () in
-  let patches, perm =
+  let patches, perm, rdonly_reason =
     match patches with
     | Ok patches ->
         fst pending.h_person := !(fst patches.h_person);
@@ -949,27 +1066,43 @@ let with_database ?(read_only = false) bname k =
         fst pending.h_couple := !(fst patches.h_couple);
         fst pending.h_descend := !(fst patches.h_descend);
         fst pending.h_string := !(fst patches.h_string);
-        (patches, if Sys.file_exists tm_fname then RDONLY else RDRW)
+        if Sys.file_exists tm_fname then
+          ( patches,
+            RDONLY,
+            Printf.sprintf
+              "%s exists: a previous commit was interrupted, the base is \
+               read-only. Check %s (and %s if present), then remove %s"
+              tm_fname (bname // "patches") (bname // "1patches") tm_fname )
+        else (patches, RDRW, "")
     | Error msg ->
-        prerr_endline msg;
-        (empty_patch_ht (), RDONLY)
+        ( empty_patch_ht (),
+          RDONLY,
+          Printf.sprintf
+            "%s: the base is read-only and online changes are ignored" msg )
   in
+  if rdonly_reason <> "" then Log.err (fun k -> k "%s" rdonly_reason);
+  (* A base of an earlier format is only read: patches or history records
+     written by this version would make it unreadable for the version that
+     built it. It must be rebuilt first (gwu then gwc). Not logged, as this
+     applies to every request. *)
+  let perm, rdonly_reason =
+    match (perm, witness_notes) with
+    | RDRW, false ->
+        ( RDONLY,
+          Printf.sprintf
+            "base %s is in an earlier format, read-only until rebuilt (gwu \
+             then gwc)"
+            bname )
+    | RDRW, true | RDONLY, (true | false) -> (perm, rdonly_reason)
+  in
+  let forbidden loc = HttpExn (Forbidden, loc ^ ": " ^ rdonly_reason) in
   let fname = bname // "particles.txt" in
   let particles =
     if Sys.file_exists fname then Mutil.input_particles fname
     else Mutil.input_particles !Mutil.particles_file
   in
   Secure.with_open_in_bin (bname // "base") @@ fun ic ->
-  let version =
-    if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
-    else if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
-    else if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
-    else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
-    else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
-    else if really_input_string ic 4 = "GnWb" then
-      failwith "this is a GeneWeb base, but not compatible"
-    else failwith "this is not a GeneWeb base, or it is a very old version"
-  in
+  ignore (read_base_magic ic : string);
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
@@ -1005,10 +1138,17 @@ let with_database ?(read_only = false) bname k =
     | Some (_, records) -> records
     | None ->
         let persons =
-          make_immut_record_access ~read_only ic ic_acc shift persons_array_pos
-            persons_len "persons"
-            (input_value : _ -> person array)
-            (Iovalue.input : _ -> person)
+          if witness_notes then
+            make_immut_record_access ~read_only ic ic_acc shift
+              persons_array_pos persons_len "persons"
+              (input_value : _ -> person array)
+              (Iovalue.input : _ -> person)
+          else
+            make_immut_record_access ~read_only ic ic_acc shift
+              persons_array_pos persons_len "persons"
+              (fun ic ->
+                Array.map Old.person (input_value ic : Old.person array))
+              (fun ic -> Old.person (Iovalue.input ic : Old.person))
         in
         let shift = shift + (persons_len * Iovalue.sizeof_long) in
         let ascends =
@@ -1026,10 +1166,17 @@ let with_database ?(read_only = false) bname k =
         in
         let shift = shift + (persons_len * Iovalue.sizeof_long) in
         let families =
-          make_immut_record_access ~read_only ic ic_acc shift families_array_pos
-            families_len "families"
-            (input_value : _ -> family array)
-            (Iovalue.input : _ -> family)
+          if witness_notes then
+            make_immut_record_access ~read_only ic ic_acc shift
+              families_array_pos families_len "families"
+              (input_value : _ -> family array)
+              (Iovalue.input : _ -> family)
+          else
+            make_immut_record_access ~read_only ic ic_acc shift
+              families_array_pos families_len "families"
+              (fun ic ->
+                Array.map Old.family (input_value ic : Old.family array))
+              (fun ic -> Old.family (Iovalue.input ic : Old.family))
         in
         let shift = shift + (families_len * Iovalue.sizeof_long) in
         let couples =
@@ -1117,7 +1264,7 @@ let with_database ?(read_only = false) bname k =
     else npb_init ()
   in
   let commit_patches =
-    if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun () -> raise (forbidden __LOC__)
     else fun () ->
       let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
       (* read real person number (considering pending patches) *)
@@ -1262,7 +1409,7 @@ let with_database ?(read_only = false) bname k =
     with Sys_error _ -> ""
   in
   let commit_notes =
-    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun _ _ -> raise (forbidden __LOC__)
     else fun fnotes s ->
       let fname =
         if fnotes = "" then "notes"
@@ -1277,7 +1424,7 @@ let with_database ?(read_only = false) bname k =
         Secure.with_open_out_text fname (fun oc -> output_string oc s)
   in
   let commit_wiznotes =
-    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    if perm = RDONLY then fun _ _ -> raise (forbidden __LOC__)
     else fun fnotes s ->
       if fnotes <> "" && s <> "" then (
         let wiznotes_dir = Filename.concat bname "wiznotes" in
@@ -1311,7 +1458,6 @@ let with_database ?(read_only = false) bname k =
       persons;
       ascends;
       unions;
-      visible = make_visible_record_access perm bname persons;
       families;
       couples;
       descends;
@@ -1388,8 +1534,6 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       ascends = record_access_of ascends;
       unions = record_access_of unions;
       families = record_access_of families;
-      visible =
-        { v_write = (fun _ -> assert false); v_get = (fun _ -> assert false) };
       couples = record_access_of couples;
       descends = record_access_of descends;
       strings = record_access_of strings;
@@ -1437,4 +1581,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       ifam_exists = (fun _ -> assert false);
     }
   in
-  k { data; func; version = GnWb0024 }
+  k { data; func; version = GnWb0025 }

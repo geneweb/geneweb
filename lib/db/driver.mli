@@ -87,6 +87,14 @@ val load_database : string -> unit
 
     @raise Failwith if the base has already been loaded. *)
 
+exception Incompatible_format of string * string * string list
+(** Raised by {!with_database} when the {i base} or {i patches} file was written
+    in a format this executable cannot read:
+    [(file, found_header, readable_headers)]. *)
+
+val incompatible_format_message : string -> string -> string list -> string
+(** English message for {!Incompatible_format} (logs, command-line tools). *)
+
 val with_database : string -> (base -> 'a) -> 'a
 (** [with_database bname k] loads the database [bname] and invokes the
     continuation [k] with it.
@@ -547,7 +555,8 @@ val base_visible_get : base -> (person -> bool) -> iper -> bool
     then set it with [fct]. Used when mode `use_restrict` is ativated *)
 
 val base_visible_write : base -> unit
-(** Write updated visibility information to the {i restricted} file. *)
+(** Write updated visibility information to the {i restricted} file; nothing on
+    a read-only base, the file being a cache. *)
 
 val base_particles : base -> Re.re
 (** Return regular expression that matches all defined in the [base] particles.
@@ -658,6 +667,32 @@ val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Collection.Marker.t
 val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Collection.Marker.t
 (** [ifam_marker c v] create marker over collection of family's ids and
     initialise it for every element with [v] *)
+
+val current_base_format : string
+(** Header of the {i base} files written by this version. *)
+
+val base_format : base -> string
+(** Header of the {i base} file of an open base. A base of an earlier format
+    than {!current_base_format} is converted on every read: it works, but more
+    slowly, until it is rebuilt (gwu then gwc). *)
+
+val base_format_of_dir : string -> string
+(** Header of the {i base} file of the database [bname], read without opening
+    the database; [""] if it cannot be read. *)
+
+type base_format_status = Database.base_format_status =
+  | Current  (** Written by this version. *)
+  | Older of string
+      (** Header of an earlier format, read with conversion on every access:
+          rebuild the base (gwu then gwc). *)
+  | Unreadable of string
+      (** Header of a {i base} or {i patches} format this version cannot read
+          (written by another version), or [""] if the {i base} file cannot be
+          read at all. *)
+
+val base_format_status_of_dir : string -> base_format_status
+(** Whether the database [bname] can be read by this version, from the headers
+    of its {i base} and {i patches} files only, without opening it. *)
 
 val check_nldb_format : base -> [ `Ok | `BadFormat | `NoFile ]
 (** Check notes_links file format without reading content. *)

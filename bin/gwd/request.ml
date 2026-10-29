@@ -12,6 +12,10 @@ module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Connection = Geneweb_http.Connection
 
+let src = Logs.Src.create ~doc:"Request" "REQ "
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 
 let this_request_updates_database conf =
@@ -24,6 +28,21 @@ let this_request_updates_database conf =
       | "UNKNOWN_OK" ) ->
       true
   | _ -> false
+
+(* Wider than [this_request_updates_database]: also the forms that only
+   lead to an update and every validation ([*_OK]) but the advanced search.
+   Used for a base of an earlier format, which is read-only. *)
+let this_request_edits conf =
+  this_request_updates_database conf
+  ||
+  match p_getenv conf.env "m" with
+  | Some "AS_OK" | None -> false
+  | Some
+      ( "ADD_PAR" | "CHG_EVT_IND_ORD" | "CHG_EVT_FAM_ORD" | "MOD_GALLERY"
+      | "HIST_CLEAN" | "MRG" | "MRG_DUP" | "MRG_FAM" | "UNKNOWN" | "SND_IMAGE_C"
+      | "BLASON_MOVE_TO_ANC" | "PORTRAIT_TO_BLASON" | "IMAGE_TO_BLASON" ) ->
+      true
+  | Some m -> String.ends_with ~suffix:"_OK" m
 
 let request_issue ?(level = `Warning) ~key _conn conf base =
   let title = Util.transl conf ("NOTIF_TT " ^ key) in
@@ -235,6 +254,34 @@ let check_nldb_format conf base =
           (Util.transl conf "NOTIF incompatible notes_links")
     | `Ok | `NoFile -> ())
 
+let print_incompatible_base conf (file, found, expected) =
+  Log.err (fun k ->
+      k "%s" (Driver.incompatible_format_message file found expected));
+  Notif.error
+    ~title:(Util.transl conf "NOTIF_TT incompatible base")
+    (Printf.sprintf
+       (Util.ftransl conf "NOTIF incompatible base %s")
+       (Util.escape_html conf.bname :> string));
+  let conf = Notif.inject_pending conf in
+  try Templ.output_simple conf Templ.Env.empty "index"
+  with _ -> GWPARAM.output_error conf Code.Service_Unavailable
+
+(* A base of an earlier format is read-only. Wizards are told on the welcome
+   page, where the warning is not repeated on each page. *)
+let warn_old_base_format conf base =
+  let found = Driver.base_format base in
+  if conf.wizard && found <> Driver.current_base_format then (
+    Log.warn (fun k ->
+        k
+          "base %s is in format %s, converted on every read and read-only; \
+           rebuild it (gwu then gwc) to write format %s"
+          conf.bname found Driver.current_base_format);
+    Notif.warning ~mode:Notif.Dismissible
+      ~title:(Util.transl conf "NOTIF_TT old base format")
+      (Printf.sprintf
+         (Util.ftransl conf "NOTIF old base format %s")
+         (Util.escape_html conf.bname :> string)))
+
 let redirect_to_random_person conn conf base =
   let n = Driver.nb_of_persons base in
   let rec pick k =
@@ -322,7 +369,11 @@ let treat_request =
     in
     w_base ~none
   in
-  let print_welcome _conn = SrcfileDisplay.print_welcome in
+  let print_welcome _conn conf base =
+    warn_old_base_format conf base;
+    let conf = Notif.inject_pending conf in
+    SrcfileDisplay.print_welcome conf base
+  in
   let w_person = w_person ~none:print_welcome in
   let print_page conn conf l =
     w_base
@@ -355,6 +406,14 @@ let treat_request =
         conf.wizard || conf.friend
         || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
       then (
+        let old_format () =
+          match bfile with
+          | Some f -> (
+              match Driver.base_format_status_of_dir f with
+              | Older _ -> true
+              | Current | Unreadable _ -> false)
+          | None -> false
+        in
         if
           List.assoc_opt "wizards_cant_write" conf.base_env = Some "yes"
           && this_request_updates_database conf
@@ -363,6 +422,12 @@ let treat_request =
             (fun conn conf base ->
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
+            conn conf bfile
+        else if this_request_edits conf && old_format () then
+          w_base
+            (fun conn conf base ->
+              request_issue conn conf base ~level:`Error
+                ~key:"old base format read only")
             conn conf bfile
         else if p_getenv conf.env "rnd" = Some "1" then
           w_base redirect_to_random_person conn conf bfile
@@ -405,7 +470,9 @@ let treat_request =
                      try
                        Driver.with_database bfile ignore;
                        print_page conn
-                     with _ -> handle_no_bfile conn)
+                     with
+                     | Driver.Incompatible_format _ as exn -> raise exn
+                     | _ -> handle_no_bfile conn)
                  | None -> handle_no_bfile conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
@@ -937,4 +1004,7 @@ let treat_request conn conf =
   GWPARAM.nb_errors := 0;
   GWPARAM.errors_undef := [];
   GWPARAM.errors_other := [];
-  try treat_request conn conf with Update.ModErr _ -> Output.flush conf
+  try treat_request conn conf with
+  | Update.ModErr _ -> Output.flush conf
+  | Driver.Incompatible_format (file, found, expected) ->
+      print_incompatible_base conf (file, found, expected)
