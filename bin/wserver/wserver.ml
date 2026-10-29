@@ -111,11 +111,14 @@ let http_redirect code url =
 
 let http_redirect_temporarily url = http_redirect Def.Moved_Temporarily url
 let http_redirect_permanently url = http_redirect Def.Moved_Permanently url
-let buff = ref (Bytes.create 80)
+let buff = ref (Bytes.create 1024)
 
 let store len x =
-  if len >= Bytes.length !buff then
-    buff := Bytes.extend !buff 0 (Bytes.length !buff);
+  if len >= Bytes.length !buff then (
+    let new_size = max (Bytes.length !buff * 2) (len + 1) in
+    let new_buff = Bytes.create new_size in
+    Bytes.blit !buff 0 new_buff 0 (Bytes.length !buff);
+    buff := new_buff);
   Bytes.set !buff len x;
   succ len
 
@@ -186,15 +189,25 @@ let treat_connection tmout callback addr fd =
       get_request_and_content strm
     in
     let path, query =
-      match Mutil.extract_param "GET /" ' ' request with
-      | None -> (Mutil.extract_param "POST /" ' ' request, query)
+      let url_opt =
+        match Mutil.extract_param "GET /" ' ' request with
+        | Some _ as u -> u
+        | None -> Mutil.extract_param "POST /" ' ' request
+      in
+      match url_opt with
+      | None -> (None, query)
       | Some str -> (
           match String.index_opt str '?' with
           | Some i ->
-              ( Some (String.sub str 0 i),
-                String.sub str (i + 1) (String.length str - i - 1)
-                |> Adef.encoded )
-          | None -> (Some str, "" |> Adef.encoded))
+              let p = String.sub str 0 i in
+              let q_url = String.sub str (i + 1) (String.length str - i - 1) in
+              let combined_query =
+                if String.length (Adef.as_string query) > 0 then
+                  q_url ^ "&" ^ Adef.as_string query
+                else q_url
+              in
+              (Some p, combined_query |> Adef.encoded)
+          | None -> (Some str, query))
     in
     (request, Option.value ~default:"" path, query)
   in
