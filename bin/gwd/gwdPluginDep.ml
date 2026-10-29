@@ -27,18 +27,6 @@ let remove_dependency hash dep =
   let ids = Hashtbl.fold (fun k _ a -> k :: a) hash [] in
   List.iter (aux dep hash) ids
 
-(* Deduplicate list items. *)
-let deduplicate l =
-  let tbl = Hashtbl.create (List.length l) in
-  List.fold_left
-    (fun acc x ->
-      if Hashtbl.mem tbl x then acc
-      else (
-        Hashtbl.add tbl x ();
-        x :: acc))
-    [] l
-  |> List.rev
-
 (*
    Append missing nodes to the graph, in the order in which they were
    encountered. This particular order doesn't have to be guaranteed by the
