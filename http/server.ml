@@ -371,7 +371,9 @@ let windows_worker callback =
     with _ -> ()
   in
   Fun.protect ~finally:shutdown (fun () ->
-      ignore (treat_connection callback addr client_socket))
+      try ignore (treat_connection callback addr client_socket)
+      with Sys_error _ as e ->
+        Log.info (fun k -> k "%s" (Printexc.to_string e)))
 
 let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
   match Sys.getenv "WSERVER" with
