@@ -37,23 +37,49 @@ let history_d conf =
     Filename.concat (Util.bpath bname) path
   else path
 
-let path_in dir fname =
+(* Folder name for the character of [fname] starting at byte [i], and the
+   index of the next character. A multi-byte UTF-8 character is kept whole:
+   a lone byte of it is an invalid name, refused by some file systems
+   ("o’brien" must not give a "\xE2" folder). ASCII characters are kept as
+   they are, so that existing records are still found, except path
+   separators and control characters, which become '_', as does an invalid
+   UTF-8 sequence. *)
+let dir_char fname i =
+  let d = String.get_utf_8_uchar fname i in
+  let n = Uchar.utf_decode_length d in
+  if not (Uchar.utf_decode_is_valid d) then ("_", i + n)
+  else if n > 1 then (String.sub fname i n, i + n)
+  else
+    let c = fname.[i] in
+    let name =
+      if c >= ' ' && c <> '\x7F' && c <> '/' && c <> '\\' then String.make 1 c
+      else "_"
+    in
+    (name, i + 1)
+
+(* The two levels of folders holding [fname]: its first two characters. *)
+let history_subdirs fname =
   if String.length fname >= 6 then
-    List.fold_right Filename.concat
-      [ dir; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-      fname
-  else Filename.concat dir fname
+    let c1, i = dir_char fname 0 in
+    let c2, _ = dir_char fname i in
+    [ c1; c2 ]
+  else []
+
+let path_in dir fname =
+  Filename.concat
+    (List.fold_left Filename.concat dir (history_subdirs fname))
+    fname
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 let history_path conf fname = path_in (history_d conf) fname
 
 (* Créé tous les dossiers intermédiaires. *)
 let create_history_dirs conf fname =
-  if String.length fname >= 6 then
-    let dirs =
-      [ history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1] ]
-    in
-    Filesystem.create_dir ~parent:true (List.fold_left Filename.concat "" dirs)
+  match history_subdirs fname with
+  | [] -> ()
+  | subdirs ->
+      Filesystem.create_dir ~parent:true
+        (List.fold_left Filename.concat (history_d conf) subdirs)
 
 let archive_deleted conf (p : (_, _, string) gen_person) =
   if unique_key p.first_name p.surname then
