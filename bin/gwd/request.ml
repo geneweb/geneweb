@@ -474,6 +474,7 @@ let treat_request =
                  w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
              | "D" -> w_base @@ w_person @@ DescendDisplay.print
              | "DAG" -> w_base @@ DagDisplay.print conn
+             | "DAG2" -> w_base @@ Dag2Display.print
              | "DEL_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_del
              | "DEL_FAM_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
