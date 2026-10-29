@@ -6051,10 +6051,8 @@ let print_isolated conf base =
   List.iter
     (fun iper ->
       let p = Driver.poi base iper in
-      if
-        Driver.p_first_name base p = "?"
-        && Driver.p_surname base p = "?"
-      then ()
+      if Driver.p_first_name base p = "?" && Driver.p_surname base p = "?" then
+        ()
       else
         let rp = Driver.get_rparents p in
         let rl = Driver.get_related p in

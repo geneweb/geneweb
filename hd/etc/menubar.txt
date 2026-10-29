@@ -139,7 +139,7 @@
                 <sup><i class="fa fa-user male" aria-hidden="true"></i></sup>%nn;
                 <sub><i class="fa fa-plus %sexcolor;" aria-hidden="true"></i></sub>%nn;
                 <sup><i class="fa fa-user female" aria-hidden="true"></i></sup>%nn;
-                <span class="visually-hidden">xxx [*add::parent/parents]1 [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
+                <span class="visually-hidden">[*add::parent/parents]1 [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span></a>
             </li>
           %end;
           %( SELF button %)

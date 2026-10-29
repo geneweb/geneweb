@@ -370,8 +370,7 @@ let search_by_name conf base n =
                   | None -> pl
                   | Some p ->
                       let fn1_l =
-                        split_normalize false
-                          (Driver.p_first_name base p)
+                        split_normalize false (Driver.p_first_name base p)
                       in
                       let fn2_l =
                         split_normalize false
@@ -2202,13 +2201,9 @@ let rec handle_search_results alias_cache conn conf base query fn_options
           let qfn_l = normalize qfn in
           let qsn_l = normalize qsn in
           let fn_exact p =
-            same_fn
-              (normalize (Driver.p_first_name base p))
-              qfn_l
+            same_fn (normalize (Driver.p_first_name base p)) qfn_l
           in
-          let sn_exact p =
-            normalize (Driver.p_surname base p) = qsn_l
-          in
+          let sn_exact p = normalize (Driver.p_surname base p) = qsn_l in
           let spouse_sn_exact p =
             (* True if p has at least one spouse whose surname matches qsn. *)
             Array.exists
@@ -2328,9 +2323,7 @@ let rec handle_search_results alias_cache conn conf base query fn_options
                     (List.filter
                        (fun p ->
                          fn_exact p
-                         && Name.crush_lower
-                              (Driver.p_surname base p)
-                            = qsn_c)
+                         && Name.crush_lower (Driver.p_surname base p) = qsn_c)
                        (exact_persons @ partial_persons))
             | l -> l
           in
