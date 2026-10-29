@@ -61,15 +61,21 @@ let branches l =
 
 let dag_link conf ip sosas =
   let sosas = List.sort_uniq Sosa.compare sosas in
-  if sosas = [] || List.length sosas > max_dag_branches then ""
-  else
-    Printf.sprintf {| <a href="%sm=DAG&i1=%s%s&sp=0&im=0">DAG</a>|}
-      (Util.commd conf :> string)
-      (Driver.Iper.to_string ip)
+  let params =
+    Printf.sprintf "i1=%s%s&sp=0&im=0" (Driver.Iper.to_string ip)
       (String.concat ""
          (List.mapi
             (fun i s -> Printf.sprintf "&s%d=%s" (i + 1) (Sosa.to_string s))
             sosas))
+  in
+  let link mode limit =
+    if sosas = [] || List.length sosas > limit then ""
+    else
+      Printf.sprintf {| <a href="%sm=%s&%s">%s</a>|}
+        (Util.commd conf :> string)
+        mode params mode
+  in
+  link "DAG" max_dag_branches ^ link "DAG2" 400
 
 let parents conf base ip =
   Option.map
