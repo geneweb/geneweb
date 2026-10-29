@@ -200,10 +200,8 @@ val is_hidden : Geneweb_db.Driver.person -> bool
 
 val is_public :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
-(** Tells if person is public
-    - access = Public or
-    - IfTitle and has titles or
-    - is_old_person) *)
+(** [is_public conf base p] tells whether a visitor can see the data of [p] (see
+    {!GWPARAM.p_auth}). *)
 
 val private_txt : config -> string -> string
 

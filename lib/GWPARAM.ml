@@ -489,6 +489,65 @@ let has_date base p =
     (fun ifam -> Driver.foi base ifam |> Driver.get_marriage <> Date.cdate_None)
     families
 
+let old_enough conf base p =
+  let bound d =
+    match d with
+    | Some { Adef.prec = After; _ } -> None
+    | Some { prec = OrYear d2 | YearInt d2; _ } -> Some (Date.dmy_of_dmy2 d2)
+    | d -> d
+  in
+  let date cd = bound (Date.cdate_to_dmy_opt cd) in
+  let older lim d =
+    match d with
+    | None -> false
+    | Some d ->
+        let a = Date.time_elapsed d conf.Config.today in
+        a.Adef.year > lim || (a.year = lim && (a.month > 0 || a.day > 0))
+  in
+  let born q =
+    match date (Driver.get_birth q) with
+    | None -> date (Driver.get_baptism q)
+    | d -> d
+  in
+  let died q =
+    match bound (Date.dmy_of_death (Driver.get_death q)) with
+    | None -> (
+        match Driver.get_burial q with
+        | Buried cd | Cremated cd -> date cd
+        | UnknownBurial -> None)
+    | d -> d
+  in
+  let married lim q =
+    Array.exists
+      (fun ifam ->
+        older lim (date (Driver.get_marriage (Driver.foi base ifam))))
+      (Driver.get_family q)
+  in
+  let died_before lim ip = older lim (died (Driver.poi base ip)) in
+  let py = conf.Config.private_years in
+  let bp = born p in
+  older py bp
+  || older conf.Config.private_years_death (died p)
+  || married conf.Config.private_years_marriage p
+  || Option.is_none bp
+     && (Array.exists
+           (fun ifam ->
+             let fam = Driver.foi base ifam in
+             died_before py (Gutil.spouse (Driver.get_iper p) fam)
+             || Array.exists
+                  (fun ic ->
+                    let c = Driver.poi base ic in
+                    older py (born c) || older py (died c) || married py c)
+                  (Driver.get_children fam))
+           (Driver.get_family p)
+        ||
+        match Driver.get_parents p with
+        | Some ifam ->
+            let fam = Driver.foi base ifam in
+            died_before (py + 1) (Driver.get_father fam)
+            || died_before (py + 1) (Driver.get_mother fam)
+        | None -> false)
+
 type view = As_is | As_friend | As_visitor
 
 (* Authorization checks for person access *)
@@ -511,42 +570,9 @@ let p_auth ?(view = As_is) conf base p =
   || friend && conf.Config.consent
      && (is_semi_public p || is_related conf base p)
      && not_private
-  || ((not (has_date base p)) && conf.Config.public_if_no_date && not_private)
-  ||
-  if conf.Config.private_years <= -1 then true
-  else
-    let check_date d lim none =
-      match d with
-      | None -> none ()
-      | Some d ->
-          let a = Date.time_elapsed d conf.today in
-          if a.Adef.year > lim then true
-          else if a.Adef.year = lim && (a.month > 0 || a.day > 0) then true
-          else none ()
-    in
-    check_date
-      (Driver.get_birth p |> Date.cdate_to_dmy_opt)
-      conf.Config.private_years
-    @@ fun () ->
-    check_date
-      (Driver.get_baptism p |> Date.cdate_to_dmy_opt)
-      conf.Config.private_years
-    @@ fun () ->
-    check_date
-      (Driver.get_death p |> Date.dmy_of_death)
-      conf.Config.private_years_death
-    @@ fun () ->
-    let families = Driver.get_family p in
-    let len = Array.length families in
-    let rec loop i =
-      i < len
-      && check_date
-           (Array.get families i |> Driver.foi base |> Driver.get_marriage
-          |> Date.cdate_to_dmy_opt)
-           conf.Config.private_years_marriage
-           (fun () -> loop (i + 1))
-    in
-    loop 0
+  || (conf.Config.public_if_no_date && not_private && not (has_date base p))
+  || conf.Config.private_years <= -1
+  || old_enough conf base p
 
 (** special p_auth case for fn and sn which are always visible for consenting
     friends unless private *)
