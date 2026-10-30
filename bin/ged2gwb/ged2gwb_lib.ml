@@ -331,7 +331,7 @@ let rec get_lev n =
         if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm
         else parse_text n r1 strm
       in
-      {rlab = rlab; rval = utf8_of_string rval;
+      {rlab; rval = utf8_of_string rval;
        rcont = utf8_of_string rcont; rsons = List.rev l; rpos = !state.line_cnt;
        rused = false}
 and parse_address n r1 =
@@ -1039,7 +1039,7 @@ let get_lev0 (strm__ : _ Stream.t) =
   let (rlab, rval) = if r2 = "" then r1, "" else r2, r1 in
   let rval = utf8_of_string rval in
   let rcont = utf8_of_string r3 in
-  {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
+  {rlab; rval; rcont; rsons = List.rev l;
    rpos = !state.line_cnt; rused = false}
 
 let find_notes_record gen addr =
@@ -1276,7 +1276,7 @@ let set_adop_fam gen ip which_parent fath moth =
         | _ -> None
       in
       let r =
-        {Def.r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
+        {Def.r_type = Adoption; r_fath; r_moth;
          r_sources = string_empty}
       in
       let per = { per with rparents = r :: per.rparents } in
@@ -1630,7 +1630,7 @@ let rec build_remain_tags =
       let rest = build_remain_tags rest in
       if r.rused = true && rsons = [] then rest
       else
-        {rlab = r.rlab; rval = r.rval; rcont = r.rcont; rsons = rsons;
+        {rlab = r.rlab; rval = r.rval; rcont = r.rcont; rsons;
          rpos = r.rpos; rused = r.rused} ::
         rest
 
@@ -1917,7 +1917,7 @@ let add_indi gen r =
             r_fath, None, rl
         in
         let r =
-          {Def.r_type = GodParent; r_fath = r_fath; r_moth = r_moth;
+          {Def.r_type = GodParent; r_fath; r_moth;
            r_sources = string_empty}
         in
         r :: loop rl
@@ -2121,26 +2121,26 @@ let add_indi gen r =
   let (burial, burial_place, burial_note, burial_src) = bu in
   let person =
     {Def.first_name = add_string gen ~format:`First_name first_name;
-     surname = add_string gen ~format:`Surname surname; occ = occ;
+     surname = add_string gen ~format:`Surname surname; occ;
      public_name = add_string gen public_name; image = add_string gen image;
      qualifiers =
        if qualifier <> "" then [add_string gen qualifier] else [];
      aliases = List.map (add_string gen) aliases;
      first_names_aliases = List.map (add_string gen) first_names_aliases;
      surnames_aliases = List.map (add_string gen) surname_aliases;
-     titles = titles; rparents = rparents; related = [];
-     occupation = add_string gen occupation; sex = sex;
+     titles; rparents; related = [];
+     occupation = add_string gen occupation; sex;
      access = if !state.no_public_if_titles && titles = [] then Private else IfTitles;
-     birth = birth; birth_place = birth_place; birth_note = birth_note;
-     birth_src = birth_src; baptism = bapt; baptism_place = bapt_place;
-     baptism_note = bapt_note; baptism_src = bapt_src; death = death;
-     death_place = death_place; death_note = death_note;
-     death_src = death_src; burial = burial; burial_place = burial_place;
-     burial_note = burial_note; burial_src = burial_src; pevents = pevents;
+     birth; birth_place; birth_note;
+     birth_src; baptism = bapt; baptism_place = bapt_place;
+     baptism_note = bapt_note; baptism_src = bapt_src; death;
+     death_place; death_note;
+     death_src; burial; burial_place;
+     burial_note; burial_src; pevents;
      notes = add_string gen ~format:`Html (notes ^ ext_notes);
      psources = add_string gen ~format:`Html psources; key_index = ip}
   in
-  let ascend = {Def.parents = parents; consang = Adef.fix (-1)} in
+  let ascend = {Def.parents; consang = Adef.fix (-1)} in
   let union = {Def.family = Array.of_list family} in
   gen.g_per.arr.(ip) <- Either.Right (person, ascend, union);
   r.rused <- true
@@ -2631,8 +2631,8 @@ let add_fam_norm gen r adop_list =
   let fam =
     {Def.marriage = marr; marriage_place = marr_place;
      marriage_note = marr_note; marriage_src = marr_src;
-     witnesses = witnesses; relation = relation; divorce = div;
-     fevents = fevents; comment = add_string gen ~format:`Html comment;
+     witnesses; relation; divorce = div;
+     fevents; comment = add_string gen ~format:`Html comment;
      origin_file = string_empty; fsources = add_string gen ~format:`Html fsources;
      fam_index = i}
   and cpl = Adef.couple fath moth
