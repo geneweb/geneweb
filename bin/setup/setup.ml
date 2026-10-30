@@ -1068,6 +1068,13 @@ let cache_files ok_file conn conf =
 
 let connex_check conn conf = print_file "confirm.htm" conn conf
 
+(* anoma checks an existing base and writes its anomalies report, which gwd
+   shows with m=ANOMA (gwc and ged2gwb write it themselves while building) *)
+let anoma ok_file conn conf =
+  let rc = exec_f conf ~path:(!bin_dir // "anoma") @@ parameters conf.env in
+  if Command.is_failure rc then print_file "err_standard.htm" conn conf
+  else print_file ok_file conn conf
+
 let connex ok_file conn conf =
   let rc = exec_f conf ~path:(!bin_dir // "connex") @@ parameters conf.env in
   if Command.is_failure rc then print_file "err_standard.htm" conn conf
@@ -1430,6 +1437,7 @@ let setup_comm_ok s =
   | "cache_files" ->
       with_opt_check cache_files_check (cache_files "cache_files_ok.htm")
   | "connex" -> with_opt_check connex_check (connex "connex_ok.htm")
+  | "anoma" -> with_opt_check cache_files_check (anoma "anoma_ok.htm")
   | "gwdiff" -> with_opt_check gwdiff_check (gwdiff "gwdiff_ok.htm")
   | "gwfixbase" -> with_opt_check gwfixbase_check (gwfixbase "gwfix_ok.htm")
   | x ->

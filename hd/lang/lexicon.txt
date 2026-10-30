@@ -252,6 +252,10 @@ ru: недопустимый символ (%s) использован в име�
 sv: ogiltigt tecken (%s) i efternamn/förnamn
 tr: soyadda/adda kullanılan geçersiz karakter (%s)
 
+    %s has unions with several persons named %s
+en: %s has unions with several persons named %s
+fr: %s a des unions avec plusieurs personnes nommées %s
+
     %s modified
 co: %s mudificatu
 de: %s geändert
@@ -395,6 +399,10 @@ sk: %t zomrel pred svojim narodením/zomrela pred svojim narodením
 sl: %t je umrl pred svojim rojstvom/umrla pred svojim rojstvom
 sv: %t dog före sin egen födelse
 tr: %t doğumundan önce öldü
+
+    %t has a younger ancestor %t
+en: %t has a younger ancestor %t
+fr: %t a un ancêtre plus jeune que lui ou elle : %t
 
     %t has incorrect title dates: %t
 af: %t die datum voor sy titel is verkeerd: %t
@@ -3050,6 +3058,267 @@ it: dell’annullamento
 no: til annulleringen
 pl: unieważnienia
 ru: аннулирования брака
+
+    anomalies
+de: Anomalien
+en: anomalies
+es: anomalías
+fr: anomalies
+it: anomalie
+nl: anomalieën
+pt: anomalias
+
+    ANOMALY BigAgeBetweenSpouses
+en: large age gap between spouses
+fr: grand écart d’âge entre époux
+
+    ANOMALY BirthAfterDeath
+en: born after their death
+fr: naissance après le décès
+
+    ANOMALY ChangedOrderOfChildren
+en: changed order of children
+fr: ordre des enfants modifié
+
+    ANOMALY ChangedOrderOfFamilyEvents
+en: changed order of family events
+fr: ordre des événements familiaux modifié
+
+    ANOMALY ChangedOrderOfMarriages
+en: changed order of marriages
+fr: ordre des mariages modifié
+
+    ANOMALY ChangedOrderOfPersonEvents
+en: changed order of personal events
+fr: ordre des événements individuels modifié
+
+    ANOMALY ChildrenNotInOrder
+en: children not in birth order
+fr: enfants hors de l’ordre des naissances
+
+    ANOMALY CloseChildren
+en: children born very close
+fr: enfants nés très rapprochés
+
+    ANOMALY DeadOld
+en: died at an advanced age
+fr: décès à un âge avancé
+
+    ANOMALY DeadTooEarlyToBeFather
+en: born long after the father’s death
+fr: naissance longtemps après le décès du père
+
+    ANOMALY DistantChildren
+en: children born far apart
+fr: enfants nés très éloignés
+
+    ANOMALY FEventOrder
+en: family events out of order
+fr: événements familiaux dans le désordre
+
+    ANOMALY FWitnessEventAfterDeath
+en: witness of a family event after their death
+fr: témoin d’un événement familial après son décès
+
+    ANOMALY FWitnessEventBeforeBirth
+en: witness of a family event before their birth
+fr: témoin d’un événement familial avant sa naissance
+
+    ANOMALY IncoherentAncestorDate
+en: ancestor younger than a descendant
+fr: ancêtre plus jeune qu’un descendant
+
+    ANOMALY IncoherentSex
+en: sex not coherent with relations
+fr: sexe incohérent avec les relations
+
+    ANOMALY MarriageDateAfterDeath
+en: married after their death
+fr: mariage après le décès
+
+    ANOMALY MarriageDateBeforeBirth
+en: married before their birth
+fr: mariage avant la naissance
+
+    ANOMALY MotherDeadBeforeChildBirth
+en: born after the mother’s death
+fr: naissance après le décès de la mère
+
+    ANOMALY OldForMarriage
+en: married at a very old age
+fr: mariage à un âge très avancé
+
+    ANOMALY ParentBornAfterChild
+en: parent born after their child
+fr: parent né après son enfant
+
+    ANOMALY ParentTooOld
+en: very old parent
+fr: parent très âgé
+
+    ANOMALY ParentTooYoung
+en: very young parent
+fr: parent très jeune
+
+    ANOMALY PEventOrder
+en: personal events out of order
+fr: événements individuels dans le désordre
+
+    ANOMALY PossibleDuplicateFam
+en: possible duplicate families
+fr: familles possiblement en double
+
+    ANOMALY PossibleDuplicateFamHomonymous
+en: possible duplicate families (homonyms)
+fr: familles possiblement en double (homonymes)
+
+    ANOMALY PWitnessEventAfterDeath
+en: witness of a personal event after their death
+fr: témoin d’un événement individuel après son décès
+
+    ANOMALY PWitnessEventBeforeBirth
+en: witness of a personal event before their birth
+fr: témoin d’un événement individuel avant sa naissance
+
+    ANOMALY TitleDatesError
+en: incorrect title dates
+fr: dates de titre incorrectes
+
+    ANOMALY UndefinedSex
+en: undefined sex
+fr: sexe non défini
+
+    ANOMALY YoungForMarriage
+en: married very young
+fr: mariage très jeune
+
+    ANOMALY all ages
+en: all ages
+fr: tous les âges
+
+    ANOMALY all anomalies
+en: all anomalies
+fr: toutes les anomalies
+
+    ANOMALY analysis of %s by %s
+en: analysis of %s (%s)
+fr: analyse du %s (%s)
+
+    ANOMALY died aged 100 to 109
+en: died aged 100 to 109
+fr: décès entre 100 et 109 ans
+
+    ANOMALY died aged 110 to 119
+en: died aged 110 to 119
+fr: décès entre 110 et 119 ans
+
+    ANOMALY died aged 120 or more
+en: died aged 120 or more
+fr: décès à 120 ans ou plus
+
+    ANOMALY extreme ages
+en: extreme ages
+fr: âges extrêmes
+
+    ANOMALY failed
+en: failed
+fr: échecs
+
+    ANOMALY found
+en: found
+fr: trouvées
+
+    ANOMALY mark as verified
+en: mark as verified
+fr: marquer comme vérifiée
+
+    ANOMALY married at 11 or younger
+en: married at 11 or younger
+fr: mariage à 11 ans ou moins
+
+    ANOMALY married at 12
+en: married at 12
+fr: mariage à 12 ans
+
+    ANOMALY no report
+en: no anomalies report for this base yet: rebuild it with gwc (or gwsetup), or run anoma
+fr: pas encore de rapport d’anomalies pour cette base : reconstruisez-la avec gwc (ou gwsetup), ou lancez anoma
+
+    ANOMALY no verified anomaly yet
+en: no verified anomaly yet
+fr: aucune anomalie vérifiée pour l’instant
+
+    ANOMALY none found
+en: no anomaly found
+fr: aucune anomalie trouvée
+
+    ANOMALY other checks
+en: other checks
+fr: autres contrôles
+
+    ANOMALY persons with several anomalies
+en: persons with several kinds of anomalies
+fr: personnes ayant plusieurs types d’anomalies
+
+    ANOMALY show verified anomalies
+en: show verified anomalies too
+fr: afficher aussi les anomalies vérifiées
+
+    ANOMALY to check
+en: to check
+fr: à vérifier
+
+    ANOMALY verified
+en: verified/verified
+fr: vérifiée/vérifiées
+
+    ANOMALY verified anomalies
+en: verified anomalies
+fr: anomalies vérifiées
+
+    ANOMALY cancel verification
+en: cancel the verification
+fr: annuler la vérification
+
+    ANOMALY verified by %s on %s
+en: verified by %s on %s
+fr: vérifiée par %s le %s
+
+    ANOMALY verified on %s
+en: verified on %s
+fr: vérifiée le %s
+
+    ANOMALY %d contributions merged, %d verified anomalies
+en: verification files merged: %d; verified anomalies: %d
+fr: fichiers de vérifications fusionnés : %d ; anomalies vérifiées : %d
+
+    ANOMALY pending contributions
+en: verifications not merged yet
+fr: vérifications pas encore fusionnées
+
+    ANOMALY consolidate
+en: merge them
+fr: les fusionner
+
+    ANOMALY responsible wizard
+en: responsible wizard
+fr: magicien responsable
+
+    ANOMALY my anomalies
+en: my anomalies
+fr: mes anomalies
+
+    ANOMALY signed by %s
+en: signed by %s
+fr: signé par %s
+
+    ANOMALY signed by %s on %s
+en: signed by %s on %s
+fr: signé par %s le %s
+
+    ANOMALY in the history: %s on %s
+en: in the history: %s on %s
+fr: dans l’historique : %s le %s
 
     any individual in the base
 co: una persona di a basa

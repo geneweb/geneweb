@@ -1,6 +1,24 @@
 
 (rule
   (package geneweb)
+  (targets anomalies.js.gz anomalies.js.br)
+  (deps (:input anomalies.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets anomalies.min.js.gz anomalies.min.js.br)
+  (deps (:input anomalies.min.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets autocomplete.js.gz autocomplete.js.br)
   (deps (:input autocomplete.js))
   (action

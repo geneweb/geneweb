@@ -688,6 +688,8 @@ let templ_eval_var (conf : Config.config) = function
   | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
   | [ "reorg" ] -> VVbool !GWPARAM.reorg
+  | [ "has_anomalies" ] ->
+      VVbool (Anomaly.exists (GWPARAM.base_config_dir conf.bname))
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "is_upd_ind" ] | [ "is_upd_fam" ] -> VVbool false
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
