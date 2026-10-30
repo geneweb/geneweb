@@ -180,7 +180,7 @@ let is_any_space s pos =
   else false
 
 let char_len s i =
-  match Utf8.nbc s.[i] with
+  match Unidecode.nbc s.[i] with
   | n -> min n (String.length s - i)
   | exception Invalid_argument _ -> 1
 
