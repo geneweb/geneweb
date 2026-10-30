@@ -7,8 +7,7 @@
 
   let _container = null;
   let _okTitle = '';
-  let _errorsCache = null;
-  let _cacheInvalid = true;
+  let _errors = [];
 
   const CONFIG = {
     TEXTAREA_THRESHOLD: 115,
@@ -62,16 +61,6 @@
   const withS2 = (href, v) => href.includes('&s2=')
     ? href.replace(/(&s2=)[^&]*/, `$1${encodeURIComponent(v)}`)
     : `${href}&s2=${encodeURIComponent(v)}`;
-
-  const invalidateCache = () => { _cacheInvalid = true; };
-
-  const getAllErrors = () => {
-    if (_cacheInvalid) {
-      _errorsCache = _container ? qa(SELECTORS.err, _container) : [];
-      _cacheInvalid = false;
-    }
-    return _errorsCache;
-  };
 
   const initButtons = () => {
     if (!_container) return;
@@ -127,8 +116,7 @@
     const t = e.target;
     const err = t.closest(SELECTORS.err);
 
-    if (err?.classList.contains(CLASSES.disabled) &&
-        !t.closest(SELECTORS.s2)) {
+    if (err?.classList.contains(CLASSES.disabled)) {
       e.preventDefault();
       return;
     }
@@ -281,11 +269,7 @@
     err.classList.remove(CLASSES.editing);
 
     const cache = CACHE.get(container);
-    if (cache?.btn && container.parentNode) {
-      try {
-        container.replaceWith(cache.btn);
-      } catch {}
-    }
+    if (cache?.btn && container.parentNode) container.replaceWith(cache.btn);
 
     if (s2 && !s2.classList.contains('btn-info')) {
       s2.className = 's2 btn btn-info';
@@ -308,7 +292,7 @@
       }
     }
 
-    const all = getAllErrors();
+    const all = _errors;
     const idx = all.indexOf(current);
     const step = goUp ? -1 : 1;
 
@@ -340,40 +324,35 @@
   };
 
   const handleValidationResult = (result, errEl, s2, orig, val) => {
-    if (!result) {
-      console.error('Invalid validation result:', result);
-      notify('error', MSG.invalid);
-      return;
-    }
-    if (result.success) {
-      notify('success', `✓ ${result.message}`);
-      completeValidation(errEl, s2, result.after || val);
-
-      if (Number.isFinite(result.nb_modified) &&
-          Number.isFinite(result.elapsed_time)) {
-        const statsDiv = document.createElement('div');
-        statsDiv.className = 'small text-center me-2';
-        statsDiv.textContent = `+${result.nb_modified}`;
-        statsDiv.insertAdjacentHTML('beforeend', '<br>');
-        statsDiv.insertAdjacentText('beforeend',
-                                    `${result.elapsed_time.toFixed(1)} s`);
-
-        const s2Btn = errEl.querySelector('.s2');
-        if (s2Btn) errEl.insertBefore(statsDiv, s2Btn);
-      }
-
-      setTimeout(() => navigate(errEl), CONFIG.NAV_DELAY);
-    } else {
-      notify('error', `✗ ${result.message}`);
+    if (!result?.success) {
+      const msg = result?.message || MSG.invalid;
+      notify('error', `✗ ${msg}`);
       s2.innerHTML = '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>';
       s2.className = 's2 btn btn-danger';
-      s2.title = result.message;
+      s2.title = msg;
 
       setTimeout(() => {
         s2.innerHTML = orig;
         s2.className = 's2 btn btn-warning';
       }, 2000);
+      return;
     }
+
+    notify('success', `✓ ${result.message}`);
+    completeValidation(errEl, s2, result.after || val);
+
+    if (Number.isFinite(result.nb_modified) &&
+        Number.isFinite(result.elapsed_time)) {
+      const statsDiv = document.createElement('div');
+      statsDiv.className = 'small text-center me-2';
+      statsDiv.textContent = `+${result.nb_modified}`;
+      statsDiv.insertAdjacentHTML('beforeend', '<br>');
+      statsDiv.insertAdjacentText('beforeend',
+                                  `${result.elapsed_time.toFixed(1)} s`);
+      s2.before(statsDiv);
+    }
+
+    setTimeout(() => navigate(errEl), CONFIG.NAV_DELAY);
   };
 
   const validateEntry = async (s2, errEl) => {
@@ -484,7 +463,6 @@
 
       errEl.classList.add(CLASSES.disabled, CLASSES.validated);
       errEl.classList.remove(CLASSES.editing);
-      invalidateCache();
     });
   };
 
@@ -582,6 +560,8 @@
     if (_container.dataset.msgPopup) MSG.popup = _container.dataset.msgPopup;
 
     initButtons();
+
+    _errors = qa(SELECTORS.err, _container);
 
     _container.addEventListener('click', handleClick, { passive: false });
     _container.addEventListener('keydown', handleKeydown, { passive: false });
