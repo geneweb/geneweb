@@ -4997,6 +4997,12 @@ en: %d error(s) found
 es: %d error(es) detectado(s)
 fr: %d erreur(s) détectée(s)
 
+    chk_data bad capitalization warning
+de: Die Prüfung der Großschreibung meldet auch viele korrekte Schreibweisen (Namenspartikel, fremdsprachige Namen, Abkürzungen, römische Zahlen). Prüfen Sie jeden Eintrag, bevor Sie ihn korrigieren.
+en: The capitalization check also reports many correct spellings (particles, foreign names, acronyms, Roman numerals). Check each entry before correcting it.
+es: La comprobación de mayúsculas también señala muchas grafías correctas (partículas, nombres extranjeros, siglas, números romanos). Compruebe cada entrada antes de corregirla.
+fr: Le contrôle des majuscules signale aussi de nombreuses graphies correctes (particules, noms étrangers, sigles, chiffres romains). Vérifiez chaque entrée avant de la corriger.
+
     chk_data books to check
 de: zu prüfende Wörterbücher
 en: dictionaries to check
