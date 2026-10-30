@@ -474,29 +474,12 @@
       s2.style.visibility = 'visible';
 
       const c = q(SELECTORS.editContainer, errEl);
-      const btn = q(SELECTORS.button, errEl);
-
-      const createValidatedText = () => {
+      const btn = c ? CACHE.get(c)?.btn : q(SELECTORS.button, errEl);
+      if (btn && val) {
         const txt = document.createElement('div');
         txt.className = 'text-body-secondary';
         txt.textContent = val;
-        return txt;
-      };
-
-      if (c) {
-        const f = q(SELECTORS.inputField, c);
-        if (f && val) f.replaceWith(createValidatedText());
-      } else if (btn && val) {
-        const newC = document.createElement('div');
-        newC.className = CLASSES.editContainer;
-
-        const orig = document.createElement('div');
-        orig.className = 'original-content';
-        orig.textContent = btn.textContent;
-        newC.appendChild(orig);
-        newC.appendChild(createValidatedText());
-
-        btn.replaceWith(newC);
+        (c || btn).replaceWith(createContainer(btn, txt));
       }
 
       errEl.classList.add(CLASSES.disabled, CLASSES.validated);
