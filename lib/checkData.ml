@@ -142,9 +142,7 @@ let nbsp_re =
           ]))
 
 let is_roman_numeral s =
-  try
-    Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
-  with _ -> false
+  Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
 
 (* Multiple Spaces functions *)
 (* Check if the character following nbsp is part of a roman numeral *)
@@ -204,7 +202,7 @@ let find_multiple_spaces_positions s =
       in
       let end_pos, sequence_positions = collect_sequence byte_pos [] in
       if List.length sequence_positions >= 2 then
-        positions := sequence_positions @ !positions;
+        positions := List.rev_append sequence_positions !positions;
       find_sequences end_pos)
     else find_sequences (byte_pos + char_len s byte_pos)
   in
@@ -263,15 +261,9 @@ let find_non_breaking_space_positions s =
 
 (* Detect if a word starts with Irish name prefixes Mac/Mc/Fitz *)
 let is_irish_prefix s =
-  let len = String.length s in
-  (len >= 3 && String.sub s 0 3 = "Mac")
-  || (len >= 2 && String.sub s 0 2 = "Mc")
-  || (len >= 4 && String.sub s 0 4 = "Fitz")
-(* Ocaml 4.13+
-let is_irish_prefix s =
-  String.starts_with ~prefix:"Mac" s ||
-  String.starts_with ~prefix:"Mc" s ||
-  String.starts_with ~prefix:"Fitz" s *)
+  String.starts_with ~prefix:"Mac" s
+  || String.starts_with ~prefix:"Mc" s
+  || String.starts_with ~prefix:"Fitz" s
 
 (* Check if a word is either a Roman numeral or starts with an Irish prefix
    Examples of valid words:
@@ -420,13 +412,13 @@ let is_zero_width hex =
   | _ -> false
 
 let invisible_chars_tbl =
-  let codes =
-    Util.get_problem_chars_codes `Control
-    @ Util.get_problem_chars_codes `Invisible
-    @ Util.get_problem_chars_codes `ZeroWidth
-  in
-  let tbl = Hashtbl.create (List.length codes) in
-  List.iter (fun code -> Hashtbl.add tbl code true) codes;
+  let tbl = Hashtbl.create 128 in
+  List.iter
+    (fun cat ->
+      List.iter
+        (fun code -> Hashtbl.replace tbl code ())
+        (Util.get_problem_chars_codes cat))
+    [ `Control; `Invisible; `ZeroWidth ];
   tbl
 
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
@@ -635,7 +627,7 @@ let script_class_of_code code =
         | `Cyrl -> Some `Cyrillic
         | _ -> None
     in
-    Hashtbl.add script_cache code result;
+    Hashtbl.replace script_cache code result;
     result
 
 let has_mixed_scripts_in_word s =
@@ -801,8 +793,6 @@ let get_death_src_x p = [ Driver.get_death_src p ]
 let get_burial_src_x p = [ Driver.get_burial_src p ]
 let get_psources_x p = [ Driver.get_psources p ]
 let get_marriage_place_x fam = [ Driver.get_marriage_place fam ]
-let get_marriage_src_x fam = [ Driver.get_marriage_src fam ]
-let get_fsources_x fam = [ Driver.get_fsources fam ]
 
 (* HTML Generation *)
 let make_highlight_html s highlight_info error_type conf =
@@ -937,26 +927,19 @@ let collect_places base p =
     ~efam_attr_get:get_efam_place
 
 let collect_sources base p =
-  let sources =
-    collect_attributes base p
-      ~std_attrs:
-        [
-          get_birth_src_x;
-          get_baptism_src_x;
-          get_death_src_x;
-          get_burial_src_x;
-          get_psources_x;
-        ]
-      ~epers_attr_get:get_epers_src ~marriage_attr:get_marriage_src_x
-      ~efam_attr_get:get_efam_src
-  in
-  let sources = ref sources in
-  Array.iter
-    (fun ifam ->
-      let fam = Driver.foi base ifam in
-      List.iter (fun x -> sources := x :: !sources) (get_fsources_x fam))
-    (Driver.get_family p);
-  List.sort_uniq Driver.Istr.compare !sources
+  collect_attributes base p
+    ~std_attrs:
+      [
+        get_birth_src_x;
+        get_baptism_src_x;
+        get_death_src_x;
+        get_burial_src_x;
+        get_psources_x;
+      ]
+    ~epers_attr_get:get_epers_src
+    ~marriage_attr:(fun fam ->
+      [ Driver.get_marriage_src fam; Driver.get_fsources fam ])
+    ~efam_attr_get:get_efam_src
 
 let collect_dict_strings base = function
   | Fnames -> fun p -> [ Driver.get_first_name p ]
