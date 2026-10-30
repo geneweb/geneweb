@@ -1,6 +1,3 @@
-val nbc : char -> int
-(** Return the number of bytes composing the UTF8 character starting with [c] *)
-
 val next : string -> int -> int
 (** [Utf8.next s i] returns the index of the character comming after the one
     which starts at [i]. *)

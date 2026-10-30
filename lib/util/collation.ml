@@ -594,7 +594,7 @@ let decompose s =
 let lower u = match Uucp.Case.Map.to_lower u with `Uchars [ u ] -> u | _ -> u
 
 let next s i =
-  let n = try Utf8.nbc s.[i] with Invalid_argument _ -> 1 in
+  let n = try Unidecode.nbc s.[i] with Invalid_argument _ -> 1 in
   min (String.length s) (i + n)
 
 let rec marks s i =
