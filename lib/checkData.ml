@@ -384,23 +384,30 @@ let find_bad_capitalization_positions dict base s =
   match dict with
   | Sources -> []
   | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
-  | Qualifiers | Occupation | Estates | Titles ->
-      let pspans = particle_spans (Driver.base_particles base) s in
+  | Qualifiers | Occupation | Estates | Titles -> (
       let exempt = exempts_allowed_words dict in
       let initial = requires_initial_capital dict in
-      List.fold_left
-        (fun acc (ws, we) ->
-          let w = String.sub s ws (we - ws) in
-          let acc =
-            if exempt && is_allowed_word w then acc
-            else add_pattern_positions s ws we acc
-          in
-          if initial && is_ascii_lower s.[ws] && not (is_lowercase_allowed w)
-          then ws :: acc
-          else acc)
-        [] (word_spans s)
-      |> List.filter (fun i -> not (in_spans pspans i))
-      |> List.sort_uniq compare
+      let positions =
+        List.fold_left
+          (fun acc (ws, we) ->
+            let pats = add_pattern_positions s ws we [] in
+            let low = initial && is_ascii_lower s.[ws] in
+            if pats = [] && not low then acc
+            else
+              let w = String.sub s ws (we - ws) in
+              let acc =
+                if pats = [] || (exempt && is_allowed_word w) then acc
+                else List.rev_append pats acc
+              in
+              if low && not (is_lowercase_allowed w) then ws :: acc else acc)
+          [] (word_spans s)
+      in
+      match positions with
+      | [] -> []
+      | _ ->
+          let pspans = particle_spans (Driver.base_particles base) s in
+          List.filter (fun i -> not (in_spans pspans i)) positions
+          |> List.sort_uniq compare)
 
 let has_bad_capitalization dict base s =
   find_bad_capitalization_positions dict base s <> []
@@ -426,10 +433,8 @@ let invisible_chars_tbl =
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
 
 let is_invisible_code code =
-  (code < 0x20 && code <> 0x09 && code <> 0x0A)
-  || code = 0x7F
-  || (code >= 0x80 && code <= 0x9F)
-  || is_invisible_char code
+  if code < 0x7F then code < 0x20 && code <> 0x09 && code <> 0x0A
+  else code <= 0x9F || is_invisible_char code
 
 let has_invisible_chars s =
   let len = String.length s in
@@ -481,6 +486,7 @@ let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
 
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
+let max_misc_match_len = 6
 
 let compile_replacements l =
   List.map (fun (pat, repl) -> (Re.compile pat, repl)) l
@@ -530,7 +536,9 @@ let find_misc_typographic_positions dict_type s conf =
   let len = String.length s in
   let try_pattern re message_or_key add_positions found_match =
     if !found_match = None then
-      match Re.exec_opt ~pos:!pos re s with
+      match
+        Re.exec_opt ~pos:!pos ~len:(min max_misc_match_len (len - !pos)) re s
+      with
       | Some result ->
           let start_pos = Re.Group.start result 0 in
           let end_pos = Re.Group.stop result 0 in
@@ -655,8 +663,8 @@ let has_mixed_scripts_in_word s =
   !has_latin && (!has_greek || !has_cyrillic)
 
 let has_mixed_scripts s =
-  let words = split_words s in
-  List.exists has_mixed_scripts_in_word words
+  String.exists (fun c -> c >= '\xCD') s
+  && List.exists has_mixed_scripts_in_word (split_words s)
 
 let find_mixed_scripts_positions s =
   let positions = ref [] in
@@ -1051,64 +1059,30 @@ let collect_all_errors_from_cache conf dict_type base max_results
   List.rev (process_entries entries [] 0)
 
 let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
-  let istr_errors = Hashtbl.create 1024 in
-  let unique_istrs = ref 0 in
+  let seen = Hashtbl.create 4096 in
+  let found = ref [] in
+  let count = ref 0 in
   let collect_strings = collect_dict_strings base dict in
-  let check_error_types_set = make_error_set sel_err_types in
-  let add_error istr s err =
-    match Hashtbl.find_opt istr_errors istr with
-    | Some (stored_s, errs) ->
-        if not (List.mem err errs) then
-          Hashtbl.replace istr_errors istr (stored_s, err :: errs)
-    | None -> (
-        Hashtbl.add istr_errors istr (s, [ err ]);
-        incr unique_istrs;
-        match max_results with
-        | Some max when !unique_istrs >= max -> raise Max_results_reached
-        | _ -> ())
+  let check_errors_set = make_error_set sel_err_types in
+  let check istr =
+    if not (Driver.Istr.is_empty istr || Hashtbl.mem seen istr) then (
+      Hashtbl.replace seen istr ();
+      let s = Driver.sou base istr in
+      match analyze_string_errors dict base s check_errors_set with
+      | [] -> ()
+      | errs -> (
+          found := (istr, s, errs) :: !found;
+          incr count;
+          match max_results with
+          | Some max when !count >= max -> raise Max_results_reached
+          | _ -> ()))
   in
   (try
      Geneweb_db.Collection.iter
-       (fun i ->
-         let p = Driver.poi base i in
-         let istrs = collect_strings p in
-         List.iter
-           (fun istr ->
-             if not (Driver.Istr.is_empty istr) then
-               let s = Driver.sou base istr in
-               if s <> "" then (
-                 if
-                   ErrorSet.mem InvisibleCharacters check_error_types_set
-                   && has_invisible_chars s
-                 then add_error istr s InvisibleCharacters;
-                 if
-                   ErrorSet.mem BadCapitalization check_error_types_set
-                   && has_bad_capitalization dict base s
-                 then add_error istr s BadCapitalization;
-                 if
-                   ErrorSet.mem MultipleSpaces check_error_types_set
-                   && has_multiple_spaces s
-                 then add_error istr s MultipleSpaces;
-                 if
-                   ErrorSet.mem NonBreakingSpace check_error_types_set
-                   && has_non_breaking_space s
-                 then add_error istr s NonBreakingSpace;
-                 if
-                   ErrorSet.mem MiscTypographicErrors check_error_types_set
-                   && has_misc_typographic_errors dict s
-                 then add_error istr s MiscTypographicErrors;
-                 if
-                   ErrorSet.mem MixedScripts check_error_types_set
-                   && has_mixed_scripts s
-                 then add_error istr s MixedScripts))
-           istrs)
+       (fun i -> List.iter check (collect_strings (Driver.poi base i)))
        (Driver.ipers base)
    with Max_results_reached -> ());
-  let result = ref [] in
-  Hashtbl.iter
-    (fun istr (s, errs) -> result := (istr, s, errs) :: !result)
-    istr_errors;
-  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !result
+  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !found
 
 (* Main function *)
 let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base
