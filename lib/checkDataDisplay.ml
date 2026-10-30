@@ -577,14 +577,25 @@ let print conf base =
     (t conf "chk_data check data");
   if params.selected_dicts <> [] && params.sel_err_types <> [] then (
     let cache_index = if params.nocache_checked then 1 else 2 in
+    let warning =
+      if List.mem CheckData.BadCapitalization params.sel_err_types then
+        Printf.sprintf
+          {|
+  <div class="alert alert-warning mt-3">
+    <i class="fa fa-triangle-exclamation me-2"></i>%s
+  </div>|}
+          (t conf "chk_data bad capitalization warning")
+      else ""
+    in
     Output.printf conf
       {|
   <div class="alert alert-info mt-3">
     <i class="fa fa-database me-2"></i>%s
-  </div>
+  </div>%s
   <div id="cd" data-ok-title="%s" data-msg-invalid="%s" data-msg-timeout="%s" data-msg-popup="%s">
 |}
       (tn conf "chk_data use database/cache" cache_index)
+      warning
       (tn conf "validate/delete" 0)
       (t conf "chk_data invalid response")
       (t conf "chk_data validation timeout")
