@@ -173,14 +173,19 @@ let is_any_space s pos =
   then true
   else false
 
+let char_len s i =
+  match Utf8.nbc s.[i] with
+  | n -> min n (String.length s - i)
+  | exception Invalid_argument _ -> 1
+
 let has_multiple_spaces s =
   let len = String.length s in
   let rec loop i =
     if i >= len then false
     else if is_any_space s i then
-      let j = Utf8.next s i in
+      let j = i + char_len s i in
       (j < len && is_any_space s j) || loop j
-    else loop (Utf8.next s i)
+    else loop (i + char_len s i)
   in
   loop 0
 
@@ -193,7 +198,7 @@ let find_multiple_spaces_positions s =
       let rec collect_sequence pos acc_positions =
         if pos >= len then (pos, List.rev acc_positions)
         else if is_any_space s pos then
-          let next_pos = Utf8.next s pos in
+          let next_pos = pos + char_len s pos in
           collect_sequence next_pos (pos :: acc_positions)
         else (pos, List.rev acc_positions)
       in
@@ -201,7 +206,7 @@ let find_multiple_spaces_positions s =
       if List.length sequence_positions >= 2 then
         positions := sequence_positions @ !positions;
       find_sequences end_pos)
-    else find_sequences (Utf8.next s byte_pos)
+    else find_sequences (byte_pos + char_len s byte_pos)
   in
   find_sequences 0
 
@@ -826,13 +831,14 @@ let make_highlight_html s highlight_info error_type conf =
   let rec process_char i =
     if i >= String.length s then Buffer.contents buf
     else begin
-      let char_size = Utf8.nbc s.[i] in
+      let char_size = char_len s i in
       let escaped = (Util.escape_html (String.sub s i char_size) :> string) in
       if Hashtbl.mem pos_tbl i then
-        let code = Utf8.C.cp s i in
-        let hex = Printf.sprintf "%04X" (Uchar.to_int code) in
+        let code, _ = Util.get_unicode_point s i in
+        let code = if Uchar.is_valid code then code else 0xFFFD in
+        let hex = Printf.sprintf "%04X" code in
         let name =
-          match Util.get_problem_char_name (Uchar.to_int code) with
+          match Util.get_problem_char_name code with
           | Some n -> n
           | None -> "UNICODE CHARACTER"
         in
