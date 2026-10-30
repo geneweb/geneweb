@@ -213,25 +213,19 @@ let find_multiple_spaces_positions s =
 let fix_multiple_spaces s =
   let len = String.length s in
   let buf = Buffer.create len in
-  let rec loop i in_space =
+  let rec skip i = if is_any_space s i then skip (i + char_len s i) else i in
+  let rec loop i =
     if i >= len then Buffer.contents buf
     else
-      let is_space = is_any_space s i in
-      let char_size =
-        if
-          i + 2 < len
-          && s.[i] = '\xE2'
-          && s.[i + 1] = '\x80'
-          && s.[i + 2] = '\xAF'
-        then 3
-        else if i + 1 < len && s.[i] = '\xC2' && s.[i + 1] = '\xA0' then 2
-        else 1
-      in
-      if is_space && not in_space then Buffer.add_char buf ' '
-      else if not is_space then Buffer.add_substring buf s i char_size;
-      loop (i + char_size) is_space
+      let j = i + char_len s i in
+      if is_any_space s i && is_any_space s j then (
+        Buffer.add_char buf ' ';
+        loop (skip j))
+      else (
+        Buffer.add_substring buf s i (j - i);
+        loop j)
   in
-  loop 0 false
+  loop 0
 
 (* Non-breaking spaces functions *)
 let has_non_breaking_space s =
