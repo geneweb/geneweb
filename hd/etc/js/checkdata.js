@@ -288,7 +288,7 @@
     }
 
     if (s2 && !s2.classList.contains('btn-info')) {
-      s2.className = 's2 btn btn-success';
+      s2.className = 's2 btn btn-info';
       s2.style.visibility = wasHidden ? 'hidden' : 'visible';
       if (s2.dataset.origHref) {
         s2.href = s2.dataset.origHref;
