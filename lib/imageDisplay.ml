@@ -43,11 +43,8 @@ let print_image_file conf fname =
   let res =
     List.find_opt
       (fun (suff, _ctype) ->
-        if
-          Filename.check_suffix fname suff
-          || Filename.check_suffix fname (String.uppercase_ascii suff)
-        then true
-        else false)
+        Filename.check_suffix fname suff
+        || Filename.check_suffix fname (String.uppercase_ascii suff))
       [
         (".png", "image/png");
         (".jpg", "image/jpeg");
