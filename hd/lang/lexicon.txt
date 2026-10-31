@@ -18589,6 +18589,31 @@ de: zusammenzuführende Schreibweisen
 en: spellings to group
 fr: graphies à regrouper
 
+    new source
+de: neue Quelle
+en: new source
+fr: nouvelle source
+
+    merged into an existing source
+de: mit einer vorhandenen Quelle zusammengeführt
+en: merged into an existing source
+fr: fusionnée avec une source existante
+
+    merged with another renamed source
+de: mit einer anderen umbenannten Quelle zusammengeführt
+en: merged with another renamed source
+fr: fusionnée avec une autre source renommée
+
+    sources to group
+de: zusammenzuführende Quellen
+en: sources to group
+fr: sources à regrouper
+
+    %d sources renamed (%d merged), %d records updated
+de: %d Quellen umbenannt (%d zusammengeführt), %d Datensätze geändert
+en: %d sources renamed (%d merged), %d records updated
+fr: %d sources renommées (dont %d fusionnées), %d fiches modifiées
+
     places to complete
 de: zu vervollständigende Orte
 en: places to complete
