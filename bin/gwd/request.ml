@@ -21,14 +21,10 @@ let this_request_updates_database conf =
       | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
       | "IMAGE_TO_BLASON" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-<<<<<<< HEAD
       | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
-      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" ) ->
-=======
-      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "SND_IMAGE"
-      | "PLACE_TERMS_OK" | "UNKNOWN_OK" ) ->
->>>>>>> fb5b0df98 (place: add Place.components, place terms with their span in the raw string)
+      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
+      | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" ) ->
       true
   | _ -> false
 
@@ -589,6 +585,9 @@ let treat_request =
              | "PLACE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ PlaceTermsDisplay.print_ok
+             | "SOURCE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print_sources
+             | "SOURCE_TERMS_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ PlaceTermsDisplay.print_sources_ok
              | "MOD_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod

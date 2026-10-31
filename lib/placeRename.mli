@@ -60,11 +60,15 @@ val rewrite_with :
   string option
 (** Like {!rewrite}, each matching component [c] being replaced by [f c]. *)
 
+type field =
+  | Place  (** the place fields of persons, families and their events *)
+  | Source  (** their source fields *)
+
 type usage
 (** For every string id used as a place: the number of persons and families
     using it. *)
 
-val usage : Geneweb_db.Driver.base -> usage
+val usage : ?field:field -> Geneweb_db.Driver.base -> usage
 (** One pass over all persons and families, regardless of access rights. *)
 
 val uses : usage -> Geneweb_db.Driver.istr -> int
@@ -90,6 +94,10 @@ val plan :
     spelling or several (a cluster of spellings). Unchanged places are left out.
 *)
 
+val classify : Geneweb_db.Driver.base -> item list -> item list
+(** Sets the kind of each item (new string, existing string, shared new
+    string) and sorts them. *)
+
 val plan_places :
   Geneweb_db.Driver.base ->
   target:Geneweb_db.Driver.istr ->
@@ -112,6 +120,7 @@ type result = {
           the same plan again goes on with the remaining records *)
 }
 
-val apply : Config.config -> Geneweb_db.Driver.base -> item list -> result
+val apply :
+  ?field:field -> Config.config -> Geneweb_db.Driver.base -> item list -> result
 (** Carries out a plan like m=MOD_DATA_OK (history "mq" for each modified person
     and the spouses of each modified family) and commits the patches. *)

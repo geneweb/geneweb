@@ -126,6 +126,14 @@
       </div>
     </div>
   </nav>
+  %if;(e.data="src")
+    <div class="d-flex justify-content-end mx-2 mt-2">
+      <a class="btn btn-outline-primary btn-sm" role="button"
+         href="%prefix;m=SOURCE_TERMS">
+        <i class="fa fa-object-group fa-fw me-1"></i>[*sources to group]
+      </a>
+    </div>
+  %end;
   %if;(e.data="place")
     <div class="d-flex justify-content-end mx-2 mt-2">
       <a class="btn btn-outline-primary btn-sm" role="button"

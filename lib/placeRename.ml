@@ -92,6 +92,8 @@ let rewrite inverted ~terms ~new_term raw depths =
 
 (* ------------------------------------------------------------------------ *)
 
+type field = Place | Source
+
 type usage = int ref IT.t
 
 let uses u i = match IT.find_opt u i with Some r -> !r | None -> 0
@@ -105,7 +107,64 @@ let family_places f =
   Driver.get_marriage_place f
   :: List.map (fun e -> e.efam_place) (Driver.get_fevents f)
 
-let usage base =
+let person_sources p =
+  Driver.get_psources p :: Driver.get_birth_src p :: Driver.get_baptism_src p
+  :: Driver.get_death_src p :: Driver.get_burial_src p
+  :: List.map (fun e -> e.epers_src) (Driver.get_pevents p)
+
+let family_sources f =
+  Driver.get_fsources f :: Driver.get_marriage_src f
+  :: List.map (fun e -> e.efam_src) (Driver.get_fevents f)
+
+let person_fields = function Place -> person_places | Source -> person_sources
+let family_fields = function Place -> family_places | Source -> family_sources
+
+(* the fields of [field] of a person or family moved by [f] *)
+let map_person field f (gp : (_, _, Driver.istr) gen_person) =
+  match field with
+  | Place ->
+      {
+        gp with
+        birth_place = f gp.birth_place;
+        baptism_place = f gp.baptism_place;
+        death_place = f gp.death_place;
+        burial_place = f gp.burial_place;
+        pevents =
+          List.map (fun e -> { e with epers_place = f e.epers_place }) gp.pevents;
+      }
+  | Source ->
+      {
+        gp with
+        psources = f gp.psources;
+        birth_src = f gp.birth_src;
+        baptism_src = f gp.baptism_src;
+        death_src = f gp.death_src;
+        burial_src = f gp.burial_src;
+        pevents =
+          List.map (fun e -> { e with epers_src = f e.epers_src }) gp.pevents;
+      }
+
+let map_family field f (gf : (_, _, Driver.istr) gen_family) =
+  match field with
+  | Place ->
+      {
+        gf with
+        marriage_place = f gf.marriage_place;
+        fevents =
+          List.map (fun e -> { e with efam_place = f e.efam_place }) gf.fevents;
+      }
+  | Source ->
+      {
+        gf with
+        fsources = f gf.fsources;
+        marriage_src = f gf.marriage_src;
+        fevents =
+          List.map (fun e -> { e with efam_src = f e.efam_src }) gf.fevents;
+      }
+
+let action = function Place -> "mq" | Source -> "ms"
+
+let usage ?(field = Place) base =
   let u = IT.create 4096 in
   let count l =
     List.filter (fun i -> not (Driver.Istr.is_empty i)) l
@@ -116,10 +175,10 @@ let usage base =
         | None -> IT.add u i (ref 1))
   in
   Collection.iter
-    (fun ip -> count (person_places (Driver.poi base ip)))
+    (fun ip -> count (person_fields field (Driver.poi base ip)))
     (Driver.ipers base);
   Collection.iter
-    (fun ifam -> count (family_places (Driver.foi base ifam)))
+    (fun ifam -> count (family_fields field (Driver.foi base ifam)))
     (Driver.ifams base);
   u
 
@@ -148,7 +207,7 @@ let group_by_new_s items =
     items;
   List.rev_map (fun s -> (s, List.rev !(Hashtbl.find h s))) !order
 
-let plan conf base ~terms ~new_term occs =
+let rec plan conf base ~terms ~new_term occs =
   let inverted = Place.places_inverted conf in
   let new_term = String.trim new_term in
   (* occurrences grouped by place string *)
@@ -168,6 +227,10 @@ let plan conf base ~terms ~new_term occs =
           { istr; old_s; new_s; depths = !depths; kind = New_place } :: acc
       | _ -> acc)
     by_istr []
+  |> classify base
+
+and classify base items =
+  items
   |> List.sort (fun a b -> Place.compare_places a.old_s b.old_s)
   |> group_by_new_s
   |> List.concat_map (fun (new_s, members) ->
@@ -236,7 +299,7 @@ let max_updates conf =
    family too. Unlike MOD_DATA, all the places are done in a single pass over
    the base. At most [max_nb_update] records are modified: the rest is done by
    applying the same plan again. *)
-let apply conf base items =
+let apply ?(field = Place) conf base items =
   let remap = IT.create 64 in
   List.iter
     (fun (new_s, members) ->
@@ -259,28 +322,16 @@ let apply conf base items =
     History.record conf base
       (U_Multi
          (Util.string_gen_person base gp, Util.string_gen_person base np, false))
-      "mq"
+      (action field)
   in
   Collection.iter
     (fun ip ->
       let p = Driver.poi base ip in
-      if touched (person_places p) then (
+      if touched (person_fields field p) then (
         if full () then complete := false
         else
           let gp = Driver.gen_person_of_person p in
-          let np =
-            {
-              gp with
-              birth_place = f gp.birth_place;
-              baptism_place = f gp.baptism_place;
-              death_place = f gp.death_place;
-              burial_place = f gp.burial_place;
-              pevents =
-                List.map
-                  (fun e -> { e with epers_place = f e.epers_place })
-                  gp.pevents;
-            }
-          in
+          let np = map_person field f gp in
           Driver.patch_person base ip np;
           incr persons;
           record gp np))
@@ -288,20 +339,11 @@ let apply conf base items =
   Collection.iter
     (fun ifam ->
       let fam = Driver.foi base ifam in
-      if touched (family_places fam) then (
+      if touched (family_fields field fam) then (
         if full () then complete := false
         else
           let gf = Driver.gen_family_of_family fam in
-          let nf =
-            {
-              gf with
-              marriage_place = f gf.marriage_place;
-              fevents =
-                List.map
-                  (fun e -> { e with efam_place = f e.efam_place })
-                  gf.fevents;
-            }
-          in
+          let nf = map_family field f gf in
           Driver.patch_family base ifam nf;
           incr families;
           (* as MOD_DATA, which reaches the families through the spouses *)
@@ -313,7 +355,7 @@ let apply conf base items =
             [ Driver.get_father fam; Driver.get_mother fam ]))
     (Driver.ifams base);
   Util.commit_patches conf base;
-  History.notify conf base "mq";
+  History.notify conf base (action field);
   {
     places = List.length items;
     merged = List.length (List.filter (fun it -> it.kind <> New_place) items);
