@@ -5036,8 +5036,8 @@ es: mayúsculas erróneas
 fr: capitalisation erronée
 
     chk_data error misc typographic
-de: fehlerhfte Satzzeichen
-en: bad ponctuation
+de: fehlerhafte Satzzeichen
+en: bad punctuation
 es: puntuación errónea
 fr: ponctuation erronée
 
@@ -5125,6 +5125,12 @@ de: fehlendes Leerzeichen vor der Klammer
 en: missing space before parenthesis
 es: falta un espacio antes del paréntesis
 fr: espace manquante avant la parenthèse
+
+    chk_data ponctuation error unpaired
+de: Zeichen ohne Gegenstück
+en: unpaired character
+es: carácter sin pareja
+fr: caractère non apparié
 
     chk_data popup blocked
 de: Validierungs-Popup vom Browser blockiert

@@ -456,6 +456,14 @@ let simple_replacements =
     (Re.str "‘", "’");
     (Re.str "ʹ", "’");
     (Re.str "ʻ", "’");
+    (Re.str "\u{2010}", "-");
+    (Re.str "\u{2011}", "-");
+    (Re.str "\u{2012}", "–");
+    (Re.str "\u{2015}", "—");
+    (Re.str "\u{2212}", "-");
+    (Re.str "\u{FE58}", "—");
+    (Re.str "\u{FE63}", "-");
+    (Re.str "\u{FF0D}", "-");
   ]
 
 let char_before_parenthesis_pattern =
@@ -464,6 +472,25 @@ let char_before_parenthesis_pattern =
 let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
 
+let comma_space_pattern =
+  Re.seq
+    [
+      Re.opt (Re.char ' ');
+      Re.char ',';
+      Re.group
+        (Re.alt
+           [
+             Re.rg 'a' 'z';
+             Re.rg 'A' 'Z';
+             Re.seq
+               [
+                 Re.alt [ Re.rg '\xC3' '\xE1'; Re.rg '\xE3' '\xF4' ];
+                 Re.rep1 (Re.rg '\x80' '\xBF');
+               ];
+           ]);
+    ]
+
+let comma_space_fix g = ", " ^ Re.Group.get g 1
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
 let max_misc_match_len = 6
 
@@ -481,6 +508,7 @@ let replacements_of_dict =
 
 let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
 let breton_trigram_re = lazy (Re.compile breton_trigram_pattern)
+let comma_space_re = lazy (Re.compile comma_space_pattern)
 
 let misc_alt_of_dict =
   let build extra =
@@ -489,13 +517,53 @@ let misc_alt_of_dict =
          (List.rev_append
             (List.rev_map fst simple_replacements)
             (List.rev_append (List.rev_map fst extra)
-               [ char_before_parenthesis_pattern; breton_trigram_pattern ])))
+               [
+                 comma_space_pattern;
+                 char_before_parenthesis_pattern;
+                 breton_trigram_pattern;
+               ])))
   in
   let std = lazy (build dash_replacements) in
   let occ_src = lazy (build []) in
   function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
 
+let bracket_kind s i =
+  let len = String.length s in
+  match s.[i] with
+  | '(' -> Some (0, true)
+  | ')' -> Some (0, false)
+  | '[' -> Some (1, true)
+  | ']' -> Some (1, false)
+  | '{' -> Some (2, true)
+  | '}' -> Some (2, false)
+  | '\xC2' when i + 1 < len && s.[i + 1] = '\xAB' -> Some (3, true)
+  | '\xC2' when i + 1 < len && s.[i + 1] = '\xBB' -> Some (3, false)
+  | _ -> None
+
+let find_unpaired_positions s =
+  let len = String.length s in
+  let rec loop i stack quotes acc =
+    if i >= len then
+      let acc = List.fold_left (fun acc (_, p) -> p :: acc) acc stack in
+      match quotes with
+      | q :: _ when List.length quotes mod 2 = 1 -> q :: acc
+      | _ -> acc
+    else
+      let quotes = if s.[i] = '"' then i :: quotes else quotes in
+      match (bracket_kind s i, stack) with
+      | Some (k, true), _ -> loop (i + 1) ((k, i) :: stack) quotes acc
+      | Some (k, false), (k', _) :: rest when k = k' ->
+          loop (i + 1) rest quotes acc
+      | Some (_, false), _ -> loop (i + 1) stack quotes (i :: acc)
+      | None, _ -> loop (i + 1) stack quotes acc
+  in
+  loop 0 [] [] []
+
+let has_unpaired s = find_unpaired_positions s <> []
+
 let has_misc_typographic_errors dict_type s =
+  has_unpaired s
+  ||
   let re = misc_alt_of_dict dict_type in
   let check str = Re.execp re str in
   match dict_type with
@@ -510,57 +578,66 @@ let has_misc_typographic_errors dict_type s =
 
 let find_misc_typographic_positions dict_type s conf =
   let replacements = replacements_of_dict dict_type in
+  let len = String.length s in
   let errors = ref [] in
   let pos = ref 0 in
-  let len = String.length s in
-  let try_pattern re message_or_key add_positions found_match =
-    if !found_match = None then
-      match
-        Re.exec_opt ~pos:!pos ~len:(min max_misc_match_len (len - !pos)) re s
-      with
-      | Some result ->
-          let start_pos = Re.Group.start result 0 in
-          let end_pos = Re.Group.stop result 0 in
-          if start_pos = !pos then (
-            add_positions start_pos end_pos message_or_key;
-            found_match := Some end_pos)
-      | None -> ()
+  let prefix =
+    Util.transl conf "chk_data ponctuation error" ^ Util.transl conf ":"
   in
-  let add_single_pos start_pos _end_pos msg_key =
-    let message = Util.transl conf msg_key in
-    errors := { pos = start_pos; message } :: !errors
-  in
-  let add_range_pos start_pos end_pos msg_key =
-    let message = Util.transl conf msg_key in
+  let add_range start_pos end_pos message =
     for i = start_pos to end_pos - 1 do
       errors := { pos = i; message } :: !errors
     done
   in
+  let add_fix start_pos end_pos repl =
+    let matched = String.sub s start_pos (end_pos - start_pos) in
+    add_range start_pos end_pos
+      (Printf.sprintf "%s ‹%s› → ‹%s›" prefix matched repl)
+  in
+  let try_pattern re on_match found =
+    if !found = None then
+      match
+        Re.exec_opt ~pos:!pos ~len:(min max_misc_match_len (len - !pos)) re s
+      with
+      | Some g when Re.Group.start g 0 = !pos ->
+          let stop = Re.Group.stop g 0 in
+          on_match g !pos stop;
+          found := Some stop
+      | _ -> ()
+  in
   while !pos < len do
-    let found_match = ref None in
+    let found = ref None in
+    try_pattern
+      (Lazy.force comma_space_re)
+      (fun g start stop -> add_fix start stop (comma_space_fix g))
+      found;
     List.iter
       (fun (re, repl) ->
-        let add_pos start_pos end_pos _ =
-          let matched = String.sub s start_pos (end_pos - start_pos) in
-          let msg = Util.transl conf "chk_data ponctuation error" in
-          let col = Util.transl conf ":" in
-          let message =
-            Printf.sprintf "%s%s ‹%s› → ‹%s›" msg col matched repl
-          in
-          for i = start_pos to end_pos - 1 do
-            errors := { pos = i; message } :: !errors
-          done
-        in
-        try_pattern re "" add_pos found_match)
+        try_pattern re (fun _ start stop -> add_fix start stop repl) found)
       replacements;
     try_pattern
       (Lazy.force char_before_paren_re)
-      "chk_data ponctuation error missing space" add_single_pos found_match;
+      (fun _ start _ ->
+        errors :=
+          {
+            pos = start;
+            message =
+              Util.transl conf "chk_data ponctuation error missing space";
+          }
+          :: !errors)
+      found;
     try_pattern
       (Lazy.force breton_trigram_re)
-      "chk_data ponctuation error breton trigram help" add_range_pos found_match;
-    pos := match !found_match with Some p -> p | None -> !pos + 1
+      (fun _ start stop ->
+        add_range start stop
+          (Util.transl conf "chk_data ponctuation error breton trigram help"))
+      found;
+    pos := match !found with Some p -> p | None -> !pos + 1
   done;
+  let unpaired = Util.transl conf "chk_data ponctuation error unpaired" in
+  List.iter
+    (fun i -> errors := { pos = i; message = unpaired } :: !errors)
+    (find_unpaired_positions s);
   let errors = List.rev !errors in
   match dict_type with
   | Places -> (
@@ -574,7 +651,7 @@ let apply_misc_fixes dict_type s =
   let s =
     List.fold_left
       (fun acc (re, repl) -> Re.replace_string re ~by:repl acc)
-      s
+      (Re.replace (Lazy.force comma_space_re) ~f:comma_space_fix s)
       (replacements_of_dict dict_type)
   in
   s
