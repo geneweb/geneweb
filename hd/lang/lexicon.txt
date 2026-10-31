@@ -4997,6 +4997,12 @@ en: %d error(s) found
 es: %d error(es) detectado(s)
 fr: %d erreur(s) détectée(s)
 
+    chk_data bad capitalization warning
+de: Die Prüfung der Großschreibung meldet auch viele korrekte Schreibweisen (Namenspartikel, fremdsprachige Namen, Abkürzungen, römische Zahlen). Prüfen Sie jeden Eintrag, bevor Sie ihn korrigieren.
+en: The capitalization check also reports many correct spellings (particles, foreign names, acronyms, Roman numerals). Check each entry before correcting it.
+es: La comprobación de mayúsculas también señala muchas grafías correctas (partículas, nombres extranjeros, siglas, números romanos). Compruebe cada entrada antes de corregirla.
+fr: Le contrôle des majuscules signale aussi de nombreuses graphies correctes (particules, noms étrangers, sigles, chiffres romains). Vérifiez chaque entrée avant de la corriger.
+
     chk_data books to check
 de: zu prüfende Wörterbücher
 en: dictionaries to check
@@ -5030,8 +5036,8 @@ es: mayúsculas erróneas
 fr: capitalisation erronée
 
     chk_data error misc typographic
-de: fehlerhfte Satzzeichen
-en: bad ponctuation
+de: fehlerhafte Satzzeichen
+en: bad punctuation
 es: puntuación errónea
 fr: ponctuation erronée
 
@@ -5061,6 +5067,42 @@ de: geschützte Leerzeichen
 en: non-breaking spaces
 es: espacios de no separación
 fr: espaces insécables
+
+    chk_data error mojibake
+de: fehlerhafte Kodierung
+en: bad encoding
+es: codificación errónea
+fr: encodage erroné
+
+    chk_data error html entities
+de: HTML-Entitäten
+en: HTML entities
+es: entidades HTML
+fr: entités HTML
+
+    chk_data error suspicious characters
+de: unerwartete Zeichen
+en: unexpected characters
+es: caracteres inesperados
+fr: caractères inattendus
+
+    chk_data error french ordinals
+de: fehlerhafte Ordnungszahlen (fr)
+en: bad ordinals (fr)
+es: ordinales erróneos (fr)
+fr: ordinaux erronés (fr)
+
+    chk_data error repeated words
+de: wiederholte Wörter
+en: repeated words
+es: palabras repetidas
+fr: mots répétés
+
+    chk_data error no letters
+de: Einträge ohne Buchstaben
+en: entries without letters
+es: entradas sin letras
+fr: entrées sans lettre
 
     chk_data error types
 de: Fehlertypen
@@ -5098,10 +5140,10 @@ es: número máximo de resultados
 fr: nombre de résultats maximum
 
     chk_data mixed alphabet
-de: griechisches oder kyrillisches Zeichen
-en: greek or cyrillique character
-es: carácter griego o cirílico
-fr: caractère grec ou cyrillique
+de: Zeichen aus einem anderen Alphabet als der Rest des Wortes
+en: character from another script than the rest of the word
+es: carácter de otro alfabeto que el resto de la palabra
+fr: caractère d’un autre alphabet que le reste du mot
 
     chk_data ponctuation error
 de: Punktierungsfehler
@@ -5119,6 +5161,12 @@ de: fehlendes Leerzeichen vor der Klammer
 en: missing space before parenthesis
 es: falta un espacio antes del paréntesis
 fr: espace manquante avant la parenthèse
+
+    chk_data ponctuation error unpaired
+de: Zeichen ohne Gegenstück
+en: unpaired character
+es: carácter sin pareja
+fr: caractère non apparié
 
     chk_data popup blocked
 de: Validierungs-Popup vom Browser blockiert

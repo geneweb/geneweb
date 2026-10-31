@@ -381,7 +381,8 @@ td .rm-cell {
 }
 
 #cd .nbsp, #cd .nnbsp, #cd .ic,
-#cd .bc, #cd .zw, #cd .ms, #cd .mt {
+#cd .bc, #cd .zw, #cd .ms, #cd .mt,
+#cd .mj, #cd .he, #cd .sc, #cd .fo, #cd .rw, #cd .nl {
   background-color: #ffeb3b;
   border-bottom: 1px dashed #e65100;
   border-right: 1px dashed #e65100;
@@ -451,7 +452,7 @@ td .rm-cell {
 }
 
 #cd .edit-container .form-control {
-  flex: 1;
+  flex: none;
   margin-top: 0;
   font-size: 1rem;
 }

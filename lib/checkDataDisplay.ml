@@ -170,6 +170,42 @@ module ErrorInfo = struct
         form_param = "e_mx";
         css_class = "mx";
       };
+      {
+        error_type = CheckData.Mojibake;
+        transl_key = "chk_data error mojibake";
+        form_param = "e_mj";
+        css_class = "mj";
+      };
+      {
+        error_type = CheckData.HtmlEntities;
+        transl_key = "chk_data error html entities";
+        form_param = "e_he";
+        css_class = "he";
+      };
+      {
+        error_type = CheckData.SuspiciousCharacters;
+        transl_key = "chk_data error suspicious characters";
+        form_param = "e_sc";
+        css_class = "sc";
+      };
+      {
+        error_type = CheckData.FrenchOrdinals;
+        transl_key = "chk_data error french ordinals";
+        form_param = "e_fo";
+        css_class = "fo";
+      };
+      {
+        error_type = CheckData.RepeatedWords;
+        transl_key = "chk_data error repeated words";
+        form_param = "e_rw";
+        css_class = "rw";
+      };
+      {
+        error_type = CheckData.NoLetters;
+        transl_key = "chk_data error no letters";
+        form_param = "e_nl";
+        css_class = "nl";
+      };
     ]
 
   let find_by_type e = List.find (fun i -> i.error_type = e) all
@@ -387,22 +423,49 @@ let render_dict_checkboxes_two_columns conf selected_dicts =
   Buffer.contents buf
 
 let render_error_checkboxes conf sel_err_types =
-  let buf = Buffer.create 512 in
-  List.iter
-    (fun info ->
-      let id = "err-" ^ info.css_class in
-      let checked = List.mem info.error_type sel_err_types in
-      Printf.bprintf buf
-        {|
-            <div class="form-check form-check-inline">
+  let buf = Buffer.create 1024 in
+  let dicts_title (info : error_info) =
+    match
+      List.filter
+        (fun (d : dict_info) -> CheckData.applies info.error_type d.dict_type)
+        DictInfo.all
+    with
+    | l when List.compare_lengths l DictInfo.all = 0 -> ""
+    | l ->
+        Printf.sprintf {| title="%s%s %s"|}
+          (t conf "chk_data books to check")
+          (t conf ":")
+          (String.concat ", "
+             (List.map (fun (d : dict_info) -> tn conf ~c:0 d.transl_key 1) l))
+  in
+  let render_group infos =
+    List.iter
+      (fun (info : error_info) ->
+        let id = "err-" ^ info.css_class in
+        Printf.bprintf buf
+          {|
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" name="%s" id="%s" value="1"%s>
-              <label class="form-check-label" for="%s">%s</label>
-           </div>|}
-        info.form_param id
-        (if checked then " checked" else "")
-        id
-        (tn conf info.transl_key 1))
-    ErrorInfo.all;
+              <label class="form-check-label" for="%s"%s>%s</label>
+            </div>|}
+          info.form_param id
+          (if List.mem info.error_type sel_err_types then " checked" else "")
+          id (dicts_title info)
+          (tn conf info.transl_key 1))
+      infos
+  in
+  Buffer.add_string buf
+    {|
+          <div class="d-flex flex-row">
+            <div class="w-auto me-4">|};
+  render_group (List.filteri (fun i _ -> i < 6) ErrorInfo.all);
+  Buffer.add_string buf {|
+            </div>
+            <div class="w-auto">|};
+  render_group (List.filteri (fun i _ -> i >= 6) ErrorInfo.all);
+  Buffer.add_string buf {|
+            </div>
+          </div>|};
   Buffer.contents buf
 
 let display_results conf base dicts sel_err_types max_results =
@@ -577,14 +640,25 @@ let print conf base =
     (t conf "chk_data check data");
   if params.selected_dicts <> [] && params.sel_err_types <> [] then (
     let cache_index = if params.nocache_checked then 1 else 2 in
+    let warning =
+      if List.mem CheckData.BadCapitalization params.sel_err_types then
+        Printf.sprintf
+          {|
+  <div class="alert alert-warning mt-3">
+    <i class="fa fa-triangle-exclamation me-2"></i>%s
+  </div>|}
+          (t conf "chk_data bad capitalization warning")
+      else ""
+    in
     Output.printf conf
       {|
   <div class="alert alert-info mt-3">
     <i class="fa fa-database me-2"></i>%s
-  </div>
+  </div>%s
   <div id="cd" data-ok-title="%s" data-msg-invalid="%s" data-msg-timeout="%s" data-msg-popup="%s">
 |}
       (tn conf "chk_data use database/cache" cache_index)
+      warning
       (tn conf "validate/delete" 0)
       (t conf "chk_data invalid response")
       (t conf "chk_data validation timeout")

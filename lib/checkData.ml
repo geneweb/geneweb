@@ -23,6 +23,12 @@ type error_type =
   | NonBreakingSpace
   | MiscTypographicErrors
   | MixedScripts
+  | Mojibake
+  | HtmlEntities
+  | SuspiciousCharacters
+  | FrenchOrdinals
+  | RepeatedWords
+  | NoLetters
 
 type highlight_style = {
   make_class : string -> string;
@@ -72,21 +78,24 @@ let make_error_set = function
           NonBreakingSpace;
           MiscTypographicErrors;
           MixedScripts;
+          Mojibake;
+          HtmlEntities;
+          SuspiciousCharacters;
+          FrenchOrdinals;
+          RepeatedWords;
+          NoLetters;
         ]
   | lst -> ErrorSet.of_list lst
 
-(* Split a string into its words, filtering out empty strings *)
-let split_words s =
-  let rec collect_words acc start i =
-    if i >= String.length s then
-      if i > start then String.sub s start (i - start) :: acc else acc
-    else if s.[i] = ' ' then
-      if i > start then
-        collect_words (String.sub s start (i - start) :: acc) (i + 1) (i + 1)
-      else collect_words acc (i + 1) (i + 1)
-    else collect_words acc start (i + 1)
-  in
-  List.rev (collect_words [] 0 0)
+let applies error_type dict =
+  match (error_type, dict) with
+  | (BadCapitalization | HtmlEntities), Sources -> false
+  | ( SuspiciousCharacters,
+      (Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Qualifiers) )
+    ->
+      true
+  | SuspiciousCharacters, _ -> false
+  | _ -> true
 
 let place_suburb_sep_range s =
   let len = String.length s in
@@ -141,24 +150,8 @@ let nbsp_re =
             (* U+202F espace insécable fine *)
           ]))
 
-let has_any_particle base s =
-  let rec check_from pos =
-    if pos >= String.length s then false
-    else
-      let remaining = String.sub s pos (String.length s - pos) in
-      if Mutil.get_particle (Driver.base_particles base) remaining <> "" then
-        true
-      else
-        match String.index_from_opt s pos ' ' with
-        | None -> false
-        | Some space_pos -> check_from (space_pos + 1)
-  in
-  check_from 0
-
 let is_roman_numeral s =
-  try
-    Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
-  with _ -> false
+  Re.execp (Lazy.force roman_re) s || Re.execp (Lazy.force first_ordinal_re) s
 
 (* Multiple Spaces functions *)
 (* Check if the character following nbsp is part of a roman numeral *)
@@ -187,14 +180,19 @@ let is_any_space s pos =
   then true
   else false
 
+let char_len s i =
+  match Utf8.nbc s.[i] with
+  | n -> min n (String.length s - i)
+  | exception Invalid_argument _ -> 1
+
 let has_multiple_spaces s =
   let len = String.length s in
   let rec loop i =
     if i >= len then false
     else if is_any_space s i then
-      let j = Utf8.next s i in
+      let j = i + char_len s i in
       (j < len && is_any_space s j) || loop j
-    else loop (Utf8.next s i)
+    else loop (i + char_len s i)
   in
   loop 0
 
@@ -207,40 +205,34 @@ let find_multiple_spaces_positions s =
       let rec collect_sequence pos acc_positions =
         if pos >= len then (pos, List.rev acc_positions)
         else if is_any_space s pos then
-          let next_pos = Utf8.next s pos in
+          let next_pos = pos + char_len s pos in
           collect_sequence next_pos (pos :: acc_positions)
         else (pos, List.rev acc_positions)
       in
       let end_pos, sequence_positions = collect_sequence byte_pos [] in
       if List.length sequence_positions >= 2 then
-        positions := sequence_positions @ !positions;
+        positions := List.rev_append sequence_positions !positions;
       find_sequences end_pos)
-    else find_sequences (Utf8.next s byte_pos)
+    else find_sequences (byte_pos + char_len s byte_pos)
   in
   find_sequences 0
 
 let fix_multiple_spaces s =
   let len = String.length s in
   let buf = Buffer.create len in
-  let rec loop i in_space =
+  let rec skip i = if is_any_space s i then skip (i + char_len s i) else i in
+  let rec loop i =
     if i >= len then Buffer.contents buf
     else
-      let is_space = is_any_space s i in
-      let char_size =
-        if
-          i + 2 < len
-          && s.[i] = '\xE2'
-          && s.[i + 1] = '\x80'
-          && s.[i + 2] = '\xAF'
-        then 3
-        else if i + 1 < len && s.[i] = '\xC2' && s.[i + 1] = '\xA0' then 2
-        else 1
-      in
-      if is_space && not in_space then Buffer.add_char buf ' '
-      else if not is_space then Buffer.add_substring buf s i char_size;
-      loop (i + char_size) is_space
+      let j = i + char_len s i in
+      if is_any_space s i && is_any_space s j then (
+        Buffer.add_char buf ' ';
+        loop (skip j))
+      else (
+        Buffer.add_substring buf s i (j - i);
+        loop j)
   in
-  loop 0 false
+  loop 0
 
 (* Non-breaking spaces functions *)
 let has_non_breaking_space s =
@@ -278,15 +270,9 @@ let find_non_breaking_space_positions s =
 
 (* Detect if a word starts with Irish name prefixes Mac/Mc/Fitz *)
 let is_irish_prefix s =
-  let len = String.length s in
-  (len >= 3 && String.sub s 0 3 = "Mac")
-  || (len >= 2 && String.sub s 0 2 = "Mc")
-  || (len >= 4 && String.sub s 0 4 = "Fitz")
-(* Ocaml 4.13+
-let is_irish_prefix s =
-  String.starts_with ~prefix:"Mac" s ||
-  String.starts_with ~prefix:"Mc" s ||
-  String.starts_with ~prefix:"Fitz" s *)
+  String.starts_with ~prefix:"Mac" s
+  || String.starts_with ~prefix:"Mc" s
+  || String.starts_with ~prefix:"Fitz" s
 
 (* Check if a word is either a Roman numeral or starts with an Irish prefix
    Examples of valid words:
@@ -300,152 +286,156 @@ let lowercase_allowed_words =
 let is_lowercase_allowed word =
   List.mem (String.lowercase_ascii word) lowercase_allowed_words
 
-(* Detect invalid capitalization patterns:
-   - Multiple uppercase letters in sequence
-   - Lowercase followed by uppercase
-   - Uppercase, lowercase, uppercase sequence *)
 (* Bad capitalization functions *)
-let has_bad_capitalization_pattern s =
-  let len = String.length s in
-  let rec scan i =
-    if i >= len then false
-    else
-      (* Check AAz pattern: [A-Z][A-Z][a-z] *)
-      let has_aaz =
-        i + 2 < len
-        && s.[i] >= 'A'
-        && s.[i] <= 'Z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-        && s.[i + 2] >= 'a'
-        && s.[i + 2] <= 'z'
-      in
-      if has_aaz then true
-      else
-        (* Check aZ pattern: [a-z][A-Z] *)
-        let has_az =
-          i + 1 < len
-          && s.[i] >= 'a'
-          && s.[i] <= 'z'
-          && s.[i + 1] >= 'A'
-          && s.[i + 1] <= 'Z'
-        in
-        if has_az then true else scan (i + 1)
-  in
-  scan 0
 
-(* Capitalization check function
-   Examines each word for valid patterns for some books
-   For other types, just checks for invalid capitalization patterns *)
-let has_legitimate_mixed_case dict base s =
+let is_ascii_upper c = c >= 'A' && c <= 'Z'
+let is_ascii_lower c = c >= 'a' && c <= 'z'
+
+(* Byte spans [start, stop) of the space-separated words of [s]. *)
+let word_spans s =
+  let len = String.length s in
+  let rec loop i acc =
+    if i >= len then List.rev acc
+    else if s.[i] = ' ' then loop (i + 1) acc
+    else
+      let j =
+        match String.index_from_opt s i ' ' with Some j -> j | None -> len
+      in
+      loop j ((i, j) :: acc)
+  in
+  loop 0 []
+
+(* Byte spans [start, stop) of [s] covered by a particle of the base
+   particles file. Particles are looked for at the beginning of [s], after
+   a space or a hyphen, and right after a previous particle, so that
+   "de la ", "d'", "bin " are recognised wherever they appear. A segment
+   followed by a hyphen is also a particle when it is one followed by a
+   space: "al" in "Abd al-Rahman". *)
+let particle_spans particles s =
+  let len = String.length s in
+  let is_sep c = c = ' ' || c = '-' in
+  let rec next_sep j =
+    if j >= len || is_sep s.[j] then j else next_sep (j + 1)
+  in
+  let rec scan pos acc =
+    if pos >= len then List.rev acc
+    else if is_sep s.[pos] then scan (pos + 1) acc
+    else
+      let p = Mutil.get_particle particles (String.sub s pos (len - pos)) in
+      if p <> "" then
+        let stop = pos + String.length p in
+        scan stop ((pos, stop) :: acc)
+      else
+        let stop = next_sep pos in
+        let hyphen_particle =
+          stop < len
+          && s.[stop] = '-'
+          &&
+          let seg = String.sub s pos (stop - pos) ^ " " in
+          Mutil.get_particle particles seg = seg
+        in
+        if hyphen_particle then scan (stop + 1) ((pos, stop) :: acc)
+        else scan (stop + 1) acc
+  in
+  scan 0 []
+
+let in_spans spans i = List.exists (fun (a, b) -> i >= a && i < b) spans
+
+(* Roman numerals and Mac/Mc/Fitz names may legitimately mix cases. *)
+let exempts_allowed_words dict =
   match dict with
   | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
     ->
-      has_any_particle base s
-      ||
-      let words = split_words s in
-      List.for_all
-        (fun w -> (not (has_bad_capitalization_pattern w)) || is_allowed_word w)
-        words
-  | _ -> false
+      true
+  | Qualifiers | Occupation | Estates | Titles | Sources -> false
 
-let has_bad_capitalization dict base s =
+(* Every word of a first name or surname must start with a capital letter,
+   except particles and a few connecting words ("dit", "y"...). *)
+let requires_initial_capital dict =
   match dict with
-  | Sources -> false
-  | _ ->
-      let has_particles = has_any_particle base s in
-      if has_particles then false
-      else
-        let has_general =
-          has_bad_capitalization_pattern s
-          && not (has_legitimate_mixed_case dict base s)
-        in
-        let has_lowercase =
-          match dict with
-          | Fnames | Snames | Fnames_alias | Snames_alias ->
-              let words = split_words s in
-              List.exists
-                (fun w ->
-                  String.length w > 0
-                  && w.[0] >= 'a'
-                  && w.[0] <= 'z'
-                  && not (is_lowercase_allowed w))
-                words
-          | _ -> false
-        in
-        has_general || has_lowercase
+  | Fnames | Snames | Fnames_alias | Snames_alias -> true
+  | PubNames | Aliases | Places | Qualifiers | Occupation | Estates | Titles
+  | Sources ->
+      false
+
+(* Invalid patterns inside the word [ws, we) of [s]:
+   - "AAz": two capitals followed by a lowercase letter ("DUpont")
+   - "aZ": a lowercase letter followed by a capital ("LaFayette") *)
+let add_pattern_positions s ws we acc =
+  let rec scan i acc =
+    if i + 1 >= we then acc
+    else
+      let acc =
+        if
+          i + 2 < we
+          && is_ascii_upper s.[i]
+          && is_ascii_upper s.[i + 1]
+          && is_ascii_lower s.[i + 2]
+        then i :: (i + 1) :: acc
+        else if is_ascii_lower s.[i] && is_ascii_upper s.[i + 1] then
+          i :: (i + 1) :: acc
+        else acc
+      in
+      scan (i + 1) acc
+  in
+  scan ws acc
 
 let find_bad_capitalization_positions dict base s =
-  let positions = ref [] in
-  let has_particles = has_any_particle base s in
-  if not has_particles then (
-    let rec scan i =
-      if i >= String.length s - 2 then ()
-      else if
-        s.[i] >= 'A'
-        && s.[i] <= 'Z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-        && i + 2 < String.length s
-        && s.[i + 2] >= 'a'
-        && s.[i + 2] <= 'z'
-      then (
-        positions := i :: (i + 1) :: !positions;
-        scan (i + 1))
-      else if
-        i < String.length s - 1
-        && s.[i] >= 'a'
-        && s.[i] <= 'z'
-        && s.[i + 1] >= 'A'
-        && s.[i + 1] <= 'Z'
-      then (
-        positions := i :: (i + 1) :: !positions;
-        scan (i + 1))
-      else scan (i + 1)
-    in
-    scan 0;
-    match dict with
-    | Fnames | Snames ->
-        let words = split_words s in
-        let word_pos = ref 0 in
-        List.iter
-          (fun word ->
-            if
-              String.length word > 0
-              && word.[0] >= 'a'
-              && word.[0] <= 'z'
-              && not (is_lowercase_allowed word)
-            then positions := !word_pos :: !positions;
-            word_pos := !word_pos + String.length word + 1)
-          words
-    | _ -> ());
-  List.sort_uniq compare !positions
+  match dict with
+  | Sources -> []
+  | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Aliases | Places
+  | Qualifiers | Occupation | Estates | Titles -> (
+      let exempt = exempts_allowed_words dict in
+      let initial = requires_initial_capital dict in
+      let positions =
+        List.fold_left
+          (fun acc (ws, we) ->
+            let pats = add_pattern_positions s ws we [] in
+            let low = initial && is_ascii_lower s.[ws] in
+            if pats = [] && not low then acc
+            else
+              let w = String.sub s ws (we - ws) in
+              let acc =
+                if pats = [] || (exempt && is_allowed_word w) then acc
+                else List.rev_append pats acc
+              in
+              if low && not (is_lowercase_allowed w) then ws :: acc else acc)
+          [] (word_spans s)
+      in
+      match positions with
+      | [] -> []
+      | _ ->
+          let pspans = particle_spans (Driver.base_particles base) s in
+          List.filter (fun i -> not (in_spans pspans i)) positions
+          |> List.sort_uniq compare)
+
+let has_bad_capitalization dict base s =
+  find_bad_capitalization_positions dict base s <> []
+
+let zero_width_codes =
+  List.rev_append
+    (Util.get_problem_chars_codes `Invisible)
+    (Util.get_problem_chars_codes `ZeroWidth)
 
 let is_zero_width hex =
-  match hex with
-  | "00AD" | "034F" | "200B" | "200C" | "200D" | "200E" | "200F" | "2060"
-  | "2061" | "2062" | "2063" | "2064" | "206A" | "206B" | "206C" | "206D"
-  | "206E" | "206F" | "FEFF" ->
-      true
-  | _ -> false
+  match int_of_string_opt ("0x" ^ hex) with
+  | Some code -> List.mem code zero_width_codes
+  | None -> false
 
 let invisible_chars_tbl =
-  let codes =
-    Util.get_problem_chars_codes `Control
-    @ Util.get_problem_chars_codes `Invisible
-    @ Util.get_problem_chars_codes `ZeroWidth
-  in
-  let tbl = Hashtbl.create (List.length codes) in
-  List.iter (fun code -> Hashtbl.add tbl code true) codes;
+  let tbl = Hashtbl.create 128 in
+  List.iter
+    (fun cat ->
+      List.iter
+        (fun code -> Hashtbl.replace tbl code ())
+        (Util.get_problem_chars_codes cat))
+    [ `Control; `Invisible; `Space; `ZeroWidth ];
   tbl
 
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
 
 let is_invisible_code code =
-  (code < 0x20 && code <> 0x09 && code <> 0x0A)
-  || code = 0x7F
-  || (code >= 0x80 && code <= 0x9F)
-  || is_invisible_char code
+  if code < 0x80 then code < 0x20 || code = 0x7F else is_invisible_char code
 
 let has_invisible_chars s =
   let len = String.length s in
@@ -488,6 +478,14 @@ let simple_replacements =
     (Re.str "‘", "’");
     (Re.str "ʹ", "’");
     (Re.str "ʻ", "’");
+    (Re.str "\u{2010}", "-");
+    (Re.str "\u{2011}", "-");
+    (Re.str "\u{2012}", "–");
+    (Re.str "\u{2015}", "—");
+    (Re.str "\u{2212}", "-");
+    (Re.str "\u{FE58}", "—");
+    (Re.str "\u{FE63}", "-");
+    (Re.str "\u{FF0D}", "-");
   ]
 
 let char_before_parenthesis_pattern =
@@ -496,7 +494,27 @@ let char_before_parenthesis_pattern =
 let breton_trigram_pattern =
   Re.seq [ Re.group (Re.set "cC"); Re.set "’'"; Re.group (Re.set "hH") ]
 
+let comma_space_pattern =
+  Re.seq
+    [
+      Re.opt (Re.char ' ');
+      Re.char ',';
+      Re.group
+        (Re.alt
+           [
+             Re.rg 'a' 'z';
+             Re.rg 'A' 'Z';
+             Re.seq
+               [
+                 Re.alt [ Re.rg '\xC3' '\xE1'; Re.rg '\xE3' '\xF4' ];
+                 Re.rep1 (Re.rg '\x80' '\xBF');
+               ];
+           ]);
+    ]
+
+let comma_space_fix g = ", " ^ Re.Group.get g 1
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
+let max_misc_match_len = 6
 
 let compile_replacements l =
   List.map (fun (pat, repl) -> (Re.compile pat, repl)) l
@@ -512,6 +530,7 @@ let replacements_of_dict =
 
 let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
 let breton_trigram_re = lazy (Re.compile breton_trigram_pattern)
+let comma_space_re = lazy (Re.compile comma_space_pattern)
 
 let misc_alt_of_dict =
   let build extra =
@@ -520,13 +539,53 @@ let misc_alt_of_dict =
          (List.rev_append
             (List.rev_map fst simple_replacements)
             (List.rev_append (List.rev_map fst extra)
-               [ char_before_parenthesis_pattern; breton_trigram_pattern ])))
+               [
+                 comma_space_pattern;
+                 char_before_parenthesis_pattern;
+                 breton_trigram_pattern;
+               ])))
   in
   let std = lazy (build dash_replacements) in
   let occ_src = lazy (build []) in
   function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
 
+let bracket_kind s i =
+  let len = String.length s in
+  match s.[i] with
+  | '(' -> Some (0, true)
+  | ')' -> Some (0, false)
+  | '[' -> Some (1, true)
+  | ']' -> Some (1, false)
+  | '{' -> Some (2, true)
+  | '}' -> Some (2, false)
+  | '\xC2' when i + 1 < len && s.[i + 1] = '\xAB' -> Some (3, true)
+  | '\xC2' when i + 1 < len && s.[i + 1] = '\xBB' -> Some (3, false)
+  | _ -> None
+
+let find_unpaired_positions s =
+  let len = String.length s in
+  let rec loop i stack quotes acc =
+    if i >= len then
+      let acc = List.fold_left (fun acc (_, p) -> p :: acc) acc stack in
+      match quotes with
+      | q :: _ when List.length quotes mod 2 = 1 -> q :: acc
+      | _ -> acc
+    else
+      let quotes = if s.[i] = '"' then i :: quotes else quotes in
+      match (bracket_kind s i, stack) with
+      | Some (k, true), _ -> loop (i + 1) ((k, i) :: stack) quotes acc
+      | Some (k, false), (k', _) :: rest when k = k' ->
+          loop (i + 1) rest quotes acc
+      | Some (_, false), _ -> loop (i + 1) stack quotes (i :: acc)
+      | None, _ -> loop (i + 1) stack quotes acc
+  in
+  loop 0 [] [] []
+
+let has_unpaired s = find_unpaired_positions s <> []
+
 let has_misc_typographic_errors dict_type s =
+  has_unpaired s
+  ||
   let re = misc_alt_of_dict dict_type in
   let check str = Re.execp re str in
   match dict_type with
@@ -541,55 +600,66 @@ let has_misc_typographic_errors dict_type s =
 
 let find_misc_typographic_positions dict_type s conf =
   let replacements = replacements_of_dict dict_type in
+  let len = String.length s in
   let errors = ref [] in
   let pos = ref 0 in
-  let len = String.length s in
-  let try_pattern re message_or_key add_positions found_match =
-    if !found_match = None then
-      match Re.exec_opt ~pos:!pos re s with
-      | Some result ->
-          let start_pos = Re.Group.start result 0 in
-          let end_pos = Re.Group.stop result 0 in
-          if start_pos = !pos then (
-            add_positions start_pos end_pos message_or_key;
-            found_match := Some end_pos)
-      | None -> ()
+  let prefix =
+    Util.transl conf "chk_data ponctuation error" ^ Util.transl conf ":"
   in
-  let add_single_pos start_pos _end_pos msg_key =
-    let message = Util.transl conf msg_key in
-    errors := { pos = start_pos; message } :: !errors
-  in
-  let add_range_pos start_pos end_pos msg_key =
-    let message = Util.transl conf msg_key in
+  let add_range start_pos end_pos message =
     for i = start_pos to end_pos - 1 do
       errors := { pos = i; message } :: !errors
     done
   in
+  let add_fix start_pos end_pos repl =
+    let matched = String.sub s start_pos (end_pos - start_pos) in
+    add_range start_pos end_pos
+      (Printf.sprintf "%s ‹%s› → ‹%s›" prefix matched repl)
+  in
+  let try_pattern re on_match found =
+    if !found = None then
+      match
+        Re.exec_opt ~pos:!pos ~len:(min max_misc_match_len (len - !pos)) re s
+      with
+      | Some g when Re.Group.start g 0 = !pos ->
+          let stop = Re.Group.stop g 0 in
+          on_match g !pos stop;
+          found := Some stop
+      | _ -> ()
+  in
   while !pos < len do
-    let found_match = ref None in
+    let found = ref None in
+    try_pattern
+      (Lazy.force comma_space_re)
+      (fun g start stop -> add_fix start stop (comma_space_fix g))
+      found;
     List.iter
       (fun (re, repl) ->
-        let add_pos start_pos end_pos _ =
-          let matched = String.sub s start_pos (end_pos - start_pos) in
-          let msg = Util.transl conf "chk_data ponctuation error" in
-          let col = Util.transl conf ":" in
-          let message =
-            Printf.sprintf "%s%s ‹%s› → ‹%s›" msg col matched repl
-          in
-          for i = start_pos to end_pos - 1 do
-            errors := { pos = i; message } :: !errors
-          done
-        in
-        try_pattern re "" add_pos found_match)
+        try_pattern re (fun _ start stop -> add_fix start stop repl) found)
       replacements;
     try_pattern
       (Lazy.force char_before_paren_re)
-      "chk_data ponctuation error missing space" add_single_pos found_match;
+      (fun _ start _ ->
+        errors :=
+          {
+            pos = start;
+            message =
+              Util.transl conf "chk_data ponctuation error missing space";
+          }
+          :: !errors)
+      found;
     try_pattern
       (Lazy.force breton_trigram_re)
-      "chk_data ponctuation error breton trigram help" add_range_pos found_match;
-    pos := match !found_match with Some p -> p | None -> !pos + 1
+      (fun _ start stop ->
+        add_range start stop
+          (Util.transl conf "chk_data ponctuation error breton trigram help"))
+      found;
+    pos := match !found with Some p -> p | None -> !pos + 1
   done;
+  let unpaired = Util.transl conf "chk_data ponctuation error unpaired" in
+  List.iter
+    (fun i -> errors := { pos = i; message = unpaired } :: !errors)
+    (find_unpaired_positions s);
   let errors = List.rev !errors in
   match dict_type with
   | Places -> (
@@ -603,7 +673,7 @@ let apply_misc_fixes dict_type s =
   let s =
     List.fold_left
       (fun acc (re, repl) -> Re.replace_string re ~by:repl acc)
-      s
+      (Re.replace (Lazy.force comma_space_re) ~f:comma_space_fix s)
       (replacements_of_dict dict_type)
   in
   s
@@ -627,92 +697,547 @@ let fix_misc_typographic_errors dict_type s =
       | None -> apply_misc_fixes dict_type s)
   | _ -> apply_misc_fixes dict_type s
 
-(* Détermine si un caractère est latin, grec ou cyrillique *)
 let script_cache = Hashtbl.create 256
 
-let script_class_of_code code =
-  try Hashtbl.find script_cache code
-  with Not_found ->
-    let result =
-      if (code >= 0x0041 && code <= 0x005A) || (code >= 0x0061 && code <= 0x007A)
-      then Some `Latin
-      else
-        let u = Uchar.of_int code in
-        match Uucp.Script.script u with
-        | `Latn -> Some `Latin
-        | `Grek -> Some `Greek
-        | `Cyrl -> Some `Cyrillic
-        | _ -> None
-    in
-    Hashtbl.add script_cache code result;
-    result
+let script_of_code code =
+  if code < 0x80 then
+    if (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A) then
+      Some `Latn
+    else None
+  else
+    match Hashtbl.find_opt script_cache code with
+    | Some r -> r
+    | None ->
+        let r =
+          if not (Uchar.is_valid code) then None
+          else
+            match Uucp.Script.script (Uchar.of_int code) with
+            | `Zyyy | `Zzzz -> None
+            | `Hira | `Kana | `Hang | `Bopo -> Some `Hani
+            | sc -> Some sc
+        in
+        Hashtbl.replace script_cache code r;
+        r
 
-let has_mixed_scripts_in_word s =
-  let has_latin = ref false in
-  let has_greek = ref false in
-  let has_cyrillic = ref false in
-  let len = String.length s in
-  let i = ref 0 in
-  while !i < len do
-    let c = Char.code s.[!i] in
-    if c < 0x80 then (
-      if (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) then
-        has_latin := true;
-      incr i)
+let word_script_counts s ws we =
+  let rec loop i acc =
+    if i >= we then acc
     else
-      let code, size = Util.get_unicode_point s !i in
-      (match script_class_of_code code with
-      | Some `Latin -> has_latin := true
-      | Some `Greek -> has_greek := true
-      | Some `Cyrillic -> has_cyrillic := true
-      | None -> ());
-      i := !i + size
-  done;
-  !has_latin && (!has_greek || !has_cyrillic)
+      let code, size = Util.get_unicode_point s i in
+      let acc =
+        match script_of_code code with
+        | None | Some `Zinh -> acc
+        | Some sc ->
+            let n = Option.value ~default:0 (List.assoc_opt sc acc) in
+            (sc, n + 1) :: List.remove_assoc sc acc
+      in
+      loop (i + size) acc
+  in
+  loop ws []
+
+let script_runs s =
+  let len = String.length s in
+  let close start i acc = if i > start then (start, i) :: acc else acc in
+  let rec loop i start acc =
+    if i >= len then close start i acc
+    else
+      let code, size = Util.get_unicode_point s i in
+      match script_of_code code with
+      | None -> loop (i + size) (i + size) (close start i acc)
+      | Some _ -> loop (i + size) start acc
+  in
+  loop 0 0 []
 
 let has_mixed_scripts s =
-  let words = split_words s in
-  List.exists has_mixed_scripts_in_word words
+  String.exists (fun c -> c >= '\xCD') s
+  && List.exists
+       (fun (ws, we) ->
+         match word_script_counts s ws we with
+         | _ :: _ :: _ -> true
+         | _ -> false)
+       (script_runs s)
 
 let find_mixed_scripts_positions s =
-  let positions = ref [] in
-  let words_with_pos = ref [] in
-  let pos = ref 0 in
-  let len = String.length s in
-  while !pos < len do
-    while !pos < len && s.[!pos] = ' ' do
-      incr pos
-    done;
-    if !pos < len then (
-      let start = !pos in
-      while !pos < len && s.[!pos] <> ' ' do
-        incr pos
-      done;
-      let word = String.sub s start (!pos - start) in
-      words_with_pos := (word, start, !pos) :: !words_with_pos)
-  done;
-  List.iter
-    (fun (word, start_pos, end_pos) ->
-      if has_mixed_scripts_in_word word then
-        let byte_pos = ref start_pos in
-        while !byte_pos < end_pos do
-          let c = Char.code s.[!byte_pos] in
-          let char_size, code =
-            if c < 0x80 then (1, c)
-            else
-              let code, size = Util.get_unicode_point s !byte_pos in
-              (size, code)
+  List.fold_left
+    (fun acc (ws, we) ->
+      match word_script_counts s ws we with
+      | _ :: _ :: _ as counts ->
+          let major, _ =
+            List.fold_left
+              (fun (bs, bn) (sc, n) ->
+                if n > bn || (n = bn && sc = `Latn) then (sc, n) else (bs, bn))
+              (`Zzzz, 0) counts
           in
-          (match script_class_of_code code with
-          | Some `Greek | Some `Cyrillic ->
-              for i = 0 to char_size - 1 do
-                positions := (!byte_pos + i) :: !positions
-              done
-          | _ -> ());
-          byte_pos := !byte_pos + char_size
-        done)
-    (List.rev !words_with_pos);
-  List.sort_uniq compare !positions
+          let rec mark i acc =
+            if i >= we then acc
+            else
+              let code, size = Util.get_unicode_point s i in
+              let acc =
+                match script_of_code code with
+                | Some sc when sc <> major && sc <> `Zinh -> i :: acc
+                | _ -> acc
+              in
+              mark (i + size) acc
+          in
+          mark ws acc
+      | _ -> acc)
+    [] (script_runs s)
+
+let span_positions a b acc =
+  let rec loop i acc = if i < a then acc else loop (i - 1) (i :: acc) in
+  loop (b - 1) acc
+
+let span_messages a b message acc =
+  List.fold_left
+    (fun acc pos -> { pos; message } :: acc)
+    acc (span_positions a b [])
+
+let utf8_of_code code =
+  let b = Buffer.create 4 in
+  Buffer.add_utf_8_uchar b (Uchar.of_int code);
+  Buffer.contents b
+
+let fix_message matched fixed =
+  if matched = fixed then Printf.sprintf "‹%s›" matched
+  else Printf.sprintf "‹%s› → ‹%s›" matched fixed
+
+let cp1252_byte code =
+  if code >= 0x80 && code <= 0xBF then Some code
+  else
+    match code with
+    | 0x20AC -> Some 0x80
+    | 0x201A -> Some 0x82
+    | 0x0192 -> Some 0x83
+    | 0x201E -> Some 0x84
+    | 0x2026 -> Some 0x85
+    | 0x2020 -> Some 0x86
+    | 0x2021 -> Some 0x87
+    | 0x02C6 -> Some 0x88
+    | 0x2030 -> Some 0x89
+    | 0x0160 -> Some 0x8A
+    | 0x2039 -> Some 0x8B
+    | 0x0152 -> Some 0x8C
+    | 0x017D -> Some 0x8E
+    | 0x2018 -> Some 0x91
+    | 0x2019 -> Some 0x92
+    | 0x201C -> Some 0x93
+    | 0x201D -> Some 0x94
+    | 0x2022 -> Some 0x95
+    | 0x2013 -> Some 0x96
+    | 0x2014 -> Some 0x97
+    | 0x02DC -> Some 0x98
+    | 0x2122 -> Some 0x99
+    | 0x0161 -> Some 0x9A
+    | 0x203A -> Some 0x9B
+    | 0x0153 -> Some 0x9C
+    | 0x017E -> Some 0x9E
+    | 0x0178 -> Some 0x9F
+    | _ -> None
+
+let mojibake_at s i =
+  let cont j =
+    if j >= String.length s then None
+    else
+      let code, size = Util.get_unicode_point s j in
+      Option.map (fun b -> (b, j + size)) (cp1252_byte code)
+  in
+  let code, size = Util.get_unicode_point s i in
+  match code with
+  | 0xC2 | 0xC3 | 0xC4 | 0xC5 | 0xD0 | 0xD1 -> (
+      match cont (i + size) with
+      | Some (b, j) ->
+          let u = ((code land 0x1F) lsl 6) lor (b land 0x3F) in
+          if u >= 0xA0 then Some (j, u) else None
+      | None -> None)
+  | 0xE2 -> (
+      match cont (i + size) with
+      | Some (b1, j) ->
+          Option.map
+            (fun (b2, k) ->
+              (k, 0x2000 lor ((b1 land 0x3F) lsl 6) lor (b2 land 0x3F)))
+            (cont j)
+      | None -> None)
+  | _ -> None
+
+let mojibake_at_byte s i = if s.[i] = '\xC3' then mojibake_at s i else None
+
+let is_replacement_char s i =
+  i + 2 < String.length s
+  && s.[i] = '\xEF'
+  && s.[i + 1] = '\xBF'
+  && s.[i + 2] = '\xBD'
+
+let has_mojibake s =
+  let len = String.length s in
+  let rec loop i =
+    i < len
+    && (mojibake_at_byte s i <> None || is_replacement_char s i || loop (i + 1))
+  in
+  loop 0
+
+let find_mojibake_positions s =
+  let len = String.length s in
+  let rec loop i acc =
+    if i >= len then acc
+    else if is_replacement_char s i then
+      loop (i + 3) (span_messages i (i + 3) "U+FFFD REPLACEMENT CHARACTER" acc)
+    else
+      match mojibake_at_byte s i with
+      | Some (j, code) ->
+          let message =
+            fix_message (String.sub s i (j - i)) (utf8_of_code code)
+          in
+          loop j (span_messages i j message acc)
+      | None -> loop (i + 1) acc
+  in
+  loop 0 []
+
+let fix_mojibake s =
+  let fix_once s =
+    let len = String.length s in
+    let buf = Buffer.create len in
+    let rec loop i =
+      if i >= len then Buffer.contents buf
+      else
+        match mojibake_at_byte s i with
+        | Some (j, code) ->
+            Buffer.add_utf_8_uchar buf (Uchar.of_int code);
+            loop j
+        | None ->
+            Buffer.add_char buf s.[i];
+            loop (i + 1)
+    in
+    loop 0
+  in
+  let rec repeat n s =
+    let s' = fix_once s in
+    if n = 0 || s' = s then s' else repeat (n - 1) s'
+  in
+  repeat 2 s
+
+let html_entity_re =
+  lazy
+    (let letter = Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z' ] in
+     Re.compile
+       (Re.seq
+          [
+            Re.char '&';
+            Re.group
+              (Re.alt
+                 [
+                   Re.seq [ Re.char '#'; Re.repn Re.digit 1 (Some 7) ];
+                   Re.seq
+                     [ Re.char '#'; Re.set "xX"; Re.repn Re.xdigit 1 (Some 6) ];
+                   Re.seq
+                     [
+                       letter; Re.repn (Re.alt [ letter; Re.digit ]) 1 (Some 31);
+                     ];
+                 ]);
+            Re.char ';';
+          ]))
+
+let html_entities =
+  lazy
+    (let tbl = Hashtbl.create 128 in
+     List.iteri
+       (fun i name -> Hashtbl.replace tbl name (0xA0 + i))
+       [
+         "nbsp";
+         "iexcl";
+         "cent";
+         "pound";
+         "curren";
+         "yen";
+         "brvbar";
+         "sect";
+         "uml";
+         "copy";
+         "ordf";
+         "laquo";
+         "not";
+         "shy";
+         "reg";
+         "macr";
+         "deg";
+         "plusmn";
+         "sup2";
+         "sup3";
+         "acute";
+         "micro";
+         "para";
+         "middot";
+         "cedil";
+         "sup1";
+         "ordm";
+         "raquo";
+         "frac14";
+         "frac12";
+         "frac34";
+         "iquest";
+         "Agrave";
+         "Aacute";
+         "Acirc";
+         "Atilde";
+         "Auml";
+         "Aring";
+         "AElig";
+         "Ccedil";
+         "Egrave";
+         "Eacute";
+         "Ecirc";
+         "Euml";
+         "Igrave";
+         "Iacute";
+         "Icirc";
+         "Iuml";
+         "ETH";
+         "Ntilde";
+         "Ograve";
+         "Oacute";
+         "Ocirc";
+         "Otilde";
+         "Ouml";
+         "times";
+         "Oslash";
+         "Ugrave";
+         "Uacute";
+         "Ucirc";
+         "Uuml";
+         "Yacute";
+         "THORN";
+         "szlig";
+         "agrave";
+         "aacute";
+         "acirc";
+         "atilde";
+         "auml";
+         "aring";
+         "aelig";
+         "ccedil";
+         "egrave";
+         "eacute";
+         "ecirc";
+         "euml";
+         "igrave";
+         "iacute";
+         "icirc";
+         "iuml";
+         "eth";
+         "ntilde";
+         "ograve";
+         "oacute";
+         "ocirc";
+         "otilde";
+         "ouml";
+         "divide";
+         "oslash";
+         "ugrave";
+         "uacute";
+         "ucirc";
+         "uuml";
+         "yacute";
+         "thorn";
+         "yuml";
+       ];
+     List.iter
+       (fun (name, code) -> Hashtbl.replace tbl name code)
+       [
+         ("quot", 0x22);
+         ("amp", 0x26);
+         ("apos", 0x27);
+         ("OElig", 0x152);
+         ("oelig", 0x153);
+         ("Scaron", 0x160);
+         ("scaron", 0x161);
+         ("Yuml", 0x178);
+         ("ndash", 0x2013);
+         ("mdash", 0x2014);
+         ("lsquo", 0x2018);
+         ("rsquo", 0x2019);
+         ("sbquo", 0x201A);
+         ("ldquo", 0x201C);
+         ("rdquo", 0x201D);
+         ("bdquo", 0x201E);
+         ("hellip", 0x2026);
+         ("euro", 0x20AC);
+       ];
+     tbl)
+
+let html_entity_code name =
+  let n = String.length name in
+  let code =
+    if name.[0] <> '#' then Hashtbl.find_opt (Lazy.force html_entities) name
+    else if name.[1] = 'x' || name.[1] = 'X' then
+      int_of_string_opt ("0x" ^ String.sub name 2 (n - 2))
+    else int_of_string_opt (String.sub name 1 (n - 1))
+  in
+  match code with Some c when c > 0 && Uchar.is_valid c -> Some c | _ -> None
+
+let html_entity_fix g =
+  match html_entity_code (Re.Group.get g 1) with
+  | Some code -> utf8_of_code code
+  | None -> Re.Group.get g 0
+
+let has_html_entities s =
+  String.contains s '&' && Re.execp (Lazy.force html_entity_re) s
+
+let find_html_entity_positions s =
+  List.fold_left
+    (fun acc g ->
+      span_messages (Re.Group.start g 0) (Re.Group.stop g 0)
+        (fix_message (Re.Group.get g 0) (html_entity_fix g))
+        acc)
+    []
+    (Re.all (Lazy.force html_entity_re) s)
+
+let fix_html_entities s =
+  Re.replace (Lazy.force html_entity_re) ~f:html_entity_fix s
+
+let is_suspicious_name_char = function
+  | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' | '*' | '_' | '!' | ';' | ':'
+  | '@' | '#' | '$' | '%' | '&' | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '"'
+    ->
+      true
+  | _ -> false
+
+let is_digit c = c >= '0' && c <= '9'
+
+let find_suspicious_characters_positions dict s =
+  let len = String.length s in
+  let comma = match dict with Fnames | Fnames_alias -> false | _ -> true in
+  let is_ordinal_end j =
+    dict = PubNames && j < len && (is_ascii_lower s.[j] || s.[j] >= '\x80')
+  in
+  let rec digits_end j =
+    if j < len && is_digit s.[j] then digits_end (j + 1) else j
+  in
+  let rec loop i acc =
+    if i >= len then acc
+    else if is_digit s.[i] then
+      let j = digits_end (i + 1) in
+      loop j (if is_ordinal_end j then acc else span_positions i j acc)
+    else if is_suspicious_name_char s.[i] || (comma && s.[i] = ',') then
+      loop (i + 1) (i :: acc)
+    else loop (i + 1) acc
+  in
+  loop 0 []
+
+let has_suspicious_characters dict s =
+  find_suspicious_characters_positions dict s <> []
+
+let french_ordinal_re =
+  lazy
+    (Re.compile
+       (Re.seq
+          [
+            Re.bow;
+            Re.group (Re.alt [ Re.rep1 Re.digit; Re.rep1 (Re.set "IVX") ]);
+            Re.opt (Re.char ' ');
+            Re.group
+              (Re.alt
+                 (List.map Re.str
+                    [
+                      "ième";
+                      "ieme";
+                      "ème";
+                      "eme";
+                      "ière";
+                      "iere";
+                      "ère";
+                      "ere";
+                      "ier";
+                      "nde";
+                    ]));
+            Re.group (Re.opt (Re.char 's'));
+            Re.eow;
+          ]))
+
+let french_ordinal_fix g =
+  let num = Re.Group.get g 1 in
+  let fixed suffix = Some (num ^ suffix ^ Re.Group.get g 3) in
+  let first = num = "1" || num = "I" in
+  match Re.Group.get g 2 with
+  | "ième" | "ieme" | "ème" | "eme" ->
+      if first then Some (Re.Group.get g 0) else fixed "e"
+  | "ière" | "iere" | "ère" | "ere" -> if first then fixed "re" else None
+  | "ier" -> if first then fixed "er" else None
+  | _ -> if num = "2" || num = "II" then fixed "de" else None
+
+let french_ordinal_matches s =
+  List.filter_map
+    (fun g -> Option.map (fun r -> (g, r)) (french_ordinal_fix g))
+    (Re.all (Lazy.force french_ordinal_re) s)
+
+let has_french_ordinals s =
+  Re.execp (Lazy.force french_ordinal_re) s && french_ordinal_matches s <> []
+
+let find_french_ordinal_positions s =
+  List.fold_left
+    (fun acc (g, r) ->
+      span_messages (Re.Group.start g 0) (Re.Group.stop g 0)
+        (fix_message (Re.Group.get g 0) r)
+        acc)
+    [] (french_ordinal_matches s)
+
+let fix_french_ordinals s =
+  Re.replace
+    (Lazy.force french_ordinal_re)
+    ~f:(fun g ->
+      Option.value ~default:(Re.Group.get g 0) (french_ordinal_fix g))
+    s
+
+let is_word_letter c =
+  is_ascii_upper c || is_ascii_lower c || (c >= '\xC3' && c <> '\xE2')
+
+let rec span_has_letter s a b =
+  a < b && (is_word_letter s.[a] || span_has_letter s (a + 1) b)
+
+let same_word s (a1, b1) (a2, b2) =
+  let n = b1 - a1 in
+  n = b2 - a2
+  &&
+  let rec eq i =
+    i >= n
+    || Char.lowercase_ascii s.[a1 + i] = Char.lowercase_ascii s.[a2 + i]
+       && eq (i + 1)
+  in
+  eq 0
+
+let find_repeated_words_positions s =
+  let rec loop acc = function
+    | ((a, b) as w1) :: (((a2, b2) as w2) :: _ as rest) ->
+        let acc =
+          if
+            b - a >= 2
+            && s.[b - 1] <> ','
+            && span_has_letter s a b && same_word s w1 w2
+          then span_positions a2 b2 acc
+          else acc
+        in
+        loop acc rest
+    | _ -> acc
+  in
+  loop [] (word_spans s)
+
+let has_repeated_words s = find_repeated_words_positions s <> []
+
+let has_letter s =
+  let len = String.length s in
+  let rec loop i =
+    i < len
+    &&
+    let c = s.[i] in
+    if c < '\x80' then is_ascii_upper c || is_ascii_lower c || loop (i + 1)
+    else
+      let code, size = Util.get_unicode_point s i in
+      (Uchar.is_valid code && Uucp.Alpha.is_alphabetic (Uchar.of_int code))
+      || loop (i + size)
+  in
+  loop 0
+
+let has_no_letter dict s =
+  (match dict with Fnames | Snames -> s <> "?" | _ -> true)
+  && not (has_letter s)
 
 (* Generic error handling *)
 let find_error_positions error_type data base s =
@@ -722,14 +1247,20 @@ let find_error_positions error_type data base s =
   | BadCapitalization -> find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
-  | MiscTypographicErrors -> []
   | MixedScripts -> find_mixed_scripts_positions s
+  | SuspiciousCharacters -> find_suspicious_characters_positions dict_type s
+  | RepeatedWords -> find_repeated_words_positions s
+  | NoLetters -> span_positions 0 (String.length s) []
+  | MiscTypographicErrors | Mojibake | HtmlEntities | FrenchOrdinals -> []
 
 let find_error_highlight_info error_type data base s conf =
   let dict_type = data_to_dict_type data in
   match error_type with
   | MiscTypographicErrors ->
       WithMessages (find_misc_typographic_positions dict_type s conf)
+  | Mojibake -> WithMessages (find_mojibake_positions s)
+  | HtmlEntities -> WithMessages (find_html_entity_positions s)
+  | FrenchOrdinals -> WithMessages (find_french_ordinal_positions s)
   | _ -> SimplePositions (find_error_positions error_type data base s)
 
 let fix_error error_type dict_type s =
@@ -739,10 +1270,25 @@ let fix_error error_type dict_type s =
   | MultipleSpaces -> fix_multiple_spaces s
   | NonBreakingSpace -> s
   | MiscTypographicErrors -> fix_misc_typographic_errors dict_type s
-  | MixedScripts -> s
+  | Mojibake -> fix_mojibake s
+  | HtmlEntities -> fix_html_entities s
+  | FrenchOrdinals -> fix_french_ordinals s
+  | MixedScripts | SuspiciousCharacters | RepeatedWords | NoLetters -> s
 
 (* Define style and tooltip of error types *)
 let get_highlight_style error_type conf =
+  let plain cls =
+    {
+      make_class = (fun _ -> cls);
+      make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
+    }
+  in
+  let with_message cls =
+    {
+      make_class = (fun _ -> cls);
+      make_title = (fun ?code:_ ?name:_ ?misc_msg _ -> misc_msg);
+    }
+  in
   match error_type with
   | NonBreakingSpace ->
       {
@@ -753,11 +1299,6 @@ let get_highlight_style error_type conf =
             | Some "00A0" -> Some "U+00A0 NON-BREAKING SPACE"
             | Some "202F" -> Some "U+202F NARROW NON-BREAKING SPACE"
             | _ -> None);
-      }
-  | MultipleSpaces ->
-      {
-        make_class = (fun _ -> "ms");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
       }
   | InvisibleCharacters ->
       {
@@ -775,16 +1316,6 @@ let get_highlight_style error_type conf =
                    (Util.transl conf "zero-width character"))
             else Some base);
       }
-  | BadCapitalization ->
-      {
-        make_class = (fun _ -> "bc");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
-      }
-  | MiscTypographicErrors ->
-      {
-        make_class = (fun _ -> "mt");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg _ -> misc_msg);
-      }
   | MixedScripts ->
       {
         make_class = (fun _ -> "mx");
@@ -792,6 +1323,15 @@ let get_highlight_style error_type conf =
           (fun ?code:_ ?name:_ ?misc_msg:_ _ ->
             Some (Util.transl conf "chk_data mixed alphabet"));
       }
+  | MultipleSpaces -> plain "ms"
+  | BadCapitalization -> plain "bc"
+  | SuspiciousCharacters -> plain "sc"
+  | RepeatedWords -> plain "rw"
+  | NoLetters -> plain "nl"
+  | MiscTypographicErrors -> with_message "mt"
+  | Mojibake -> with_message "mj"
+  | HtmlEntities -> with_message "he"
+  | FrenchOrdinals -> with_message "fo"
 
 (* Event accessors *)
 let get_epers_place evt = evt.epers_place
@@ -810,20 +1350,18 @@ let get_death_src_x p = [ Driver.get_death_src p ]
 let get_burial_src_x p = [ Driver.get_burial_src p ]
 let get_psources_x p = [ Driver.get_psources p ]
 let get_marriage_place_x fam = [ Driver.get_marriage_place fam ]
-let get_marriage_src_x fam = [ Driver.get_marriage_src fam ]
-let get_fsources_x fam = [ Driver.get_fsources fam ]
 
 (* HTML Generation *)
 let make_highlight_html s highlight_info error_type conf =
   let buf = Buffer.create (String.length s * 2) in
   let style = get_highlight_style error_type conf in
   let pos_to_message =
-    match (error_type, highlight_info) with
-    | MiscTypographicErrors, WithMessages infos ->
+    match highlight_info with
+    | WithMessages infos ->
         let map = Hashtbl.create (List.length infos) in
         List.iter (fun info -> Hashtbl.replace map info.pos info.message) infos;
         Some map
-    | _ -> None
+    | SimplePositions _ -> None
   in
   let pos_tbl = Hashtbl.create 16 in
   (match highlight_info with
@@ -834,13 +1372,14 @@ let make_highlight_html s highlight_info error_type conf =
   let rec process_char i =
     if i >= String.length s then Buffer.contents buf
     else begin
-      let char_size = Utf8.nbc s.[i] in
+      let char_size = char_len s i in
       let escaped = (Util.escape_html (String.sub s i char_size) :> string) in
       if Hashtbl.mem pos_tbl i then
-        let code = Utf8.C.cp s i in
-        let hex = Printf.sprintf "%04X" (Uchar.to_int code) in
+        let code, _ = Util.get_unicode_point s i in
+        let code = if Uchar.is_valid code then code else 0xFFFD in
+        let hex = Printf.sprintf "%04X" code in
         let name =
-          match Util.get_problem_char_name (Uchar.to_int code) with
+          match Util.get_problem_char_name code with
           | Some n -> n
           | None -> "UNICODE CHARACTER"
         in
@@ -945,26 +1484,19 @@ let collect_places base p =
     ~efam_attr_get:get_efam_place
 
 let collect_sources base p =
-  let sources =
-    collect_attributes base p
-      ~std_attrs:
-        [
-          get_birth_src_x;
-          get_baptism_src_x;
-          get_death_src_x;
-          get_burial_src_x;
-          get_psources_x;
-        ]
-      ~epers_attr_get:get_epers_src ~marriage_attr:get_marriage_src_x
-      ~efam_attr_get:get_efam_src
-  in
-  let sources = ref sources in
-  Array.iter
-    (fun ifam ->
-      let fam = Driver.foi base ifam in
-      List.iter (fun x -> sources := x :: !sources) (get_fsources_x fam))
-    (Driver.get_family p);
-  List.sort_uniq Driver.Istr.compare !sources
+  collect_attributes base p
+    ~std_attrs:
+      [
+        get_birth_src_x;
+        get_baptism_src_x;
+        get_death_src_x;
+        get_burial_src_x;
+        get_psources_x;
+      ]
+    ~epers_attr_get:get_epers_src
+    ~marriage_attr:(fun fam ->
+      [ Driver.get_marriage_src fam; Driver.get_fsources fam ])
+    ~efam_attr_get:get_efam_src
 
 let collect_dict_strings base = function
   | Fnames -> fun p -> [ Driver.get_first_name p ]
@@ -985,7 +1517,9 @@ exception Max_results_reached
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
 let analyze_string_errors dict_type base s check_errors_set =
   let add_if test error acc =
-    if ErrorSet.mem error check_errors_set && test () then error :: acc else acc
+    if ErrorSet.mem error check_errors_set && applies error dict_type && test ()
+    then error :: acc
+    else acc
   in
   []
   |> add_if (fun () -> has_non_breaking_space s) NonBreakingSpace
@@ -998,6 +1532,14 @@ let analyze_string_errors dict_type base s check_errors_set =
        (fun () -> has_misc_typographic_errors dict_type s)
        MiscTypographicErrors
   |> add_if (fun () -> has_mixed_scripts s) MixedScripts
+  |> add_if (fun () -> has_mojibake s) Mojibake
+  |> add_if (fun () -> has_html_entities s) HtmlEntities
+  |> add_if
+       (fun () -> has_suspicious_characters dict_type s)
+       SuspiciousCharacters
+  |> add_if (fun () -> has_french_ordinals s) FrenchOrdinals
+  |> add_if (fun () -> has_repeated_words s) RepeatedWords
+  |> add_if (fun () -> has_no_letter dict_type s) NoLetters
 
 let dict_to_cache_name dict_type =
   match dict_type with
@@ -1067,64 +1609,30 @@ let collect_all_errors_from_cache conf dict_type base max_results
   List.rev (process_entries entries [] 0)
 
 let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
-  let istr_errors = Hashtbl.create 1024 in
-  let unique_istrs = ref 0 in
+  let seen = Hashtbl.create 4096 in
+  let found = ref [] in
+  let count = ref 0 in
   let collect_strings = collect_dict_strings base dict in
-  let check_error_types_set = make_error_set sel_err_types in
-  let add_error istr s err =
-    match Hashtbl.find_opt istr_errors istr with
-    | Some (stored_s, errs) ->
-        if not (List.mem err errs) then
-          Hashtbl.replace istr_errors istr (stored_s, err :: errs)
-    | None -> (
-        Hashtbl.add istr_errors istr (s, [ err ]);
-        incr unique_istrs;
-        match max_results with
-        | Some max when !unique_istrs >= max -> raise Max_results_reached
-        | _ -> ())
+  let check_errors_set = make_error_set sel_err_types in
+  let check istr =
+    if not (Driver.Istr.is_empty istr || Hashtbl.mem seen istr) then (
+      Hashtbl.replace seen istr ();
+      let s = Driver.sou base istr in
+      match analyze_string_errors dict base s check_errors_set with
+      | [] -> ()
+      | errs -> (
+          found := (istr, s, errs) :: !found;
+          incr count;
+          match max_results with
+          | Some max when !count >= max -> raise Max_results_reached
+          | _ -> ()))
   in
   (try
      Geneweb_db.Collection.iter
-       (fun i ->
-         let p = Driver.poi base i in
-         let istrs = collect_strings p in
-         List.iter
-           (fun istr ->
-             if not (Driver.Istr.is_empty istr) then
-               let s = Driver.sou base istr in
-               if s <> "" then (
-                 if
-                   ErrorSet.mem InvisibleCharacters check_error_types_set
-                   && has_invisible_chars s
-                 then add_error istr s InvisibleCharacters;
-                 if
-                   ErrorSet.mem BadCapitalization check_error_types_set
-                   && has_bad_capitalization dict base s
-                 then add_error istr s BadCapitalization;
-                 if
-                   ErrorSet.mem MultipleSpaces check_error_types_set
-                   && has_multiple_spaces s
-                 then add_error istr s MultipleSpaces;
-                 if
-                   ErrorSet.mem NonBreakingSpace check_error_types_set
-                   && has_non_breaking_space s
-                 then add_error istr s NonBreakingSpace;
-                 if
-                   ErrorSet.mem MiscTypographicErrors check_error_types_set
-                   && has_misc_typographic_errors dict s
-                 then add_error istr s MiscTypographicErrors;
-                 if
-                   ErrorSet.mem MixedScripts check_error_types_set
-                   && has_mixed_scripts s
-                 then add_error istr s MixedScripts))
-           istrs)
+       (fun i -> List.iter check (collect_strings (Driver.poi base i)))
        (Driver.ipers base)
    with Max_results_reached -> ());
-  let result = ref [] in
-  Hashtbl.iter
-    (fun istr (s, errs) -> result := (istr, s, errs) :: !result)
-    istr_errors;
-  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !result
+  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !found
 
 (* Main function *)
 let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base

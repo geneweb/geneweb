@@ -19,6 +19,16 @@ type error_type =
   | NonBreakingSpace
   | MiscTypographicErrors
   | MixedScripts
+  | Mojibake
+  | HtmlEntities
+  | SuspiciousCharacters
+  | FrenchOrdinals
+  | RepeatedWords
+  | NoLetters
+
+val applies : error_type -> dict_type -> bool
+(** [applies error_type dict] tells whether [error_type] is checked in the
+    entries of [dict]. *)
 
 val update_cache_entry :
   Config.config ->
