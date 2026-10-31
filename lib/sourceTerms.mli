@@ -4,7 +4,7 @@
     signature being
 
     {[
-    wizard (source) date
+    wizard source date
     ]}
 
     where the wizard is written [[[w:ident]]] or as plain text, the source may
@@ -32,11 +32,10 @@ type known
 (** The known wizards. *)
 
 val known_of_strings : ?threshold:int -> string list -> known
-(** The idents of the [[[w:ident]]] of the strings, and the texts found at
-    least [threshold] times (default 20) before a [(] at their start. *)
+(** The idents of the [[[w:ident]]] of the strings, and the texts found at least
+    [threshold] times (default 20) before a [(] at their start. *)
 
 val known_names : known -> string list
-
 val parse : known -> string -> segment list
 
 type part = Wizard | Source
@@ -78,8 +77,7 @@ type data = {
 }
 
 val load : Config.config -> Geneweb_db.Driver.base -> data
-(** One pass over the persons and families, then the analysis of the
-    strings. *)
+(** One pass over the persons and families, then the analysis of the strings. *)
 
 val of_strings : (Geneweb_db.Driver.istr * string * int) list -> data
 
@@ -87,7 +85,11 @@ val clusters : data -> part -> cluster list
 (** The clusters of two spellings or more, by decreasing uses. *)
 
 val samples :
-  data -> part -> string list -> int -> (string * (string * span list) list) list
+  data ->
+  part ->
+  string list ->
+  int ->
+  (string * (string * span list) list) list
 (** [samples d part spellings n]: for each spelling, up to [n] strings
     containing it, with its spans. *)
 
@@ -98,5 +100,5 @@ val plan :
   terms:string list ->
   new_term:string ->
   (PlaceRename.item * span list) list
-(** Replacing the spellings [terms] by [new_term] in every source string,
-    with the replaced spans of each old string. *)
+(** Replacing the spellings [terms] by [new_term] in every source string, with
+    the replaced spans of each old string. *)
