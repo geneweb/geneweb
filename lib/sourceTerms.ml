@@ -2,19 +2,30 @@ module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 
 type span = { text : string; pos : int; len : int }
-type segment = { wizard : span option; source : span option; date : span option }
+
+type segment = {
+  wizard : span option;
+  source : span option;
+  date : span option;
+}
+
 type known = { names : (string, unit) Hashtbl.t; lengths : int list }
 
 let known_names k = Hashtbl.fold (fun n () acc -> n :: acc) k.names []
 let is_space c = c = ' ' || c = '\t'
+
 let starts_at s i p =
   let n = String.length p in
   i + n <= String.length s && String.sub s i n = p
 
 let trim_span s a b =
   let a = ref a and b = ref b in
-  while !a < !b && is_space s.[!a] do incr a done;
-  while !b > !a && is_space s.[!b - 1] do decr b done;
+  while !a < !b && is_space s.[!a] do
+    incr a
+  done;
+  while !b > !a && is_space s.[!b - 1] do
+    decr b
+  done;
   (!a, !b)
 
 let span s a b = { text = String.sub s a (b - a); pos = a; len = b - a }
@@ -31,17 +42,53 @@ let date =
     no_case
       (alt
          (List.map str
-            [ "viii"; "vii"; "iii"; "xii"; "ii"; "iv"; "vi"; "ix"; "xi"; "i"; "v"; "x" ]))
+            [
+              "viii";
+              "vii";
+              "iii";
+              "xii";
+              "ii";
+              "iv";
+              "vi";
+              "ix";
+              "xi";
+              "i";
+              "v";
+              "x";
+            ]))
   in
   let month =
     no_case
       (alt
          (List.map str
             [
-              "janvier"; "janv"; "février"; "fevrier"; "févr"; "fevr"; "fév";
-              "fev"; "mars"; "avril"; "avr"; "mai"; "juin"; "juillet"; "juil";
-              "août"; "aout"; "septembre"; "sept"; "octobre"; "oct";
-              "novembre"; "nov"; "décembre"; "decembre"; "déc"; "dec";
+              "janvier";
+              "janv";
+              "février";
+              "fevrier";
+              "févr";
+              "fevr";
+              "fév";
+              "fev";
+              "mars";
+              "avril";
+              "avr";
+              "mai";
+              "juin";
+              "juillet";
+              "juil";
+              "août";
+              "aout";
+              "septembre";
+              "sept";
+              "octobre";
+              "oct";
+              "novembre";
+              "nov";
+              "décembre";
+              "decembre";
+              "déc";
+              "dec";
             ]))
   in
   let ds = set "./-" in
@@ -50,10 +97,26 @@ let date =
       [
         seq [ d12; sep; roman; sep; year ];
         seq [ d12; sp; ds; sp; d12; sp; ds; sp; year ];
-        seq [ d12; opt (str "er"); rep1 (set " \t"); month; opt (char '.'); rep1 (set " \t"); year ];
+        seq
+          [
+            d12;
+            opt (str "er");
+            rep1 (set " \t");
+            month;
+            opt (char '.');
+            rep1 (set " \t");
+            year;
+          ];
         seq [ roman; rep1 (set " \t"); year ];
         seq [ month; opt (char '.'); rep1 (set " \t"); year ];
-        seq [ repn digit 4 (Some 4); char '-'; repn digit 2 (Some 2); char '-'; repn digit 2 (Some 2) ];
+        seq
+          [
+            repn digit 4 (Some 4);
+            char '-';
+            repn digit 2 (Some 2);
+            char '-';
+            repn digit 2 (Some 2);
+          ];
       ]
   in
   date
@@ -144,7 +207,9 @@ let known_of_strings ?(threshold = 20) strings =
               (1 + Option.value ~default:0 (Hashtbl.find_opt prefixes p)))
           (plain_prefix s))
     strings;
-  Hashtbl.iter (fun p n -> if n >= threshold then Hashtbl.replace names p ()) prefixes;
+  Hashtbl.iter
+    (fun p n -> if n >= threshold then Hashtbl.replace names p ())
+    prefixes;
   let lengths =
     Hashtbl.fold (fun n () acc -> String.length n :: acc) names []
     |> List.sort_uniq (fun a b -> compare b a)
@@ -179,13 +244,17 @@ let cuts k s =
       match s.[i] with
       | '(' -> loop (i + 1) (depth + 1) start acc
       | ')' -> loop (i + 1) (max 0 (depth - 1)) start acc
-      | '[' when i + 1 < n && s.[i + 1] = '[' -> loop (i + 2) (depth + 1) start acc
+      | '[' when i + 1 < n && s.[i + 1] = '[' ->
+          loop (i + 2) (depth + 1) start acc
       | ']' when i + 1 < n && s.[i + 1] = ']' ->
           loop (i + 2) (max 0 (depth - 1)) start acc
       | ',' when depth = 0 ->
           let j = ref (i + 1) in
-          while !j < n && is_space s.[!j] do incr j done;
-          if wizard_at k s !j <> None then loop (i + 1) depth (i + 1) ((start, i) :: acc)
+          while !j < n && is_space s.[!j] do
+            incr j
+          done;
+          if wizard_at k s !j <> None then
+            loop (i + 1) depth (i + 1) ((start, i) :: acc)
           else loop (i + 1) depth start acc
       | _ -> loop (i + 1) depth start acc
   in
@@ -214,7 +283,9 @@ let parse_segment k s (a, b) =
     in
     let i =
       let i = ref i in
-      while !i < b && (is_space s.[!i] || s.[!i] = ',' || s.[!i] = ':') do incr i done;
+      while !i < b && (is_space s.[!i] || s.[!i] = ',' || s.[!i] = ':') do
+        incr i
+      done;
       !i
     in
     (* "wizard date (source)" or "wizard (source) date" *)
@@ -233,7 +304,9 @@ let parse_segment k s (a, b) =
       match lead with
       | Some (d1, d2) ->
           let i = ref d2 in
-          while !i < b && is_space s.[!i] do incr i done;
+          while !i < b && is_space s.[!i] do
+            incr i
+          done;
           (Some (span s d1 d2), !i, b)
       | None -> (
           match if i < b then date_at s i b else None with
@@ -243,7 +316,9 @@ let parse_segment k s (a, b) =
     let i, e =
       let i, e = trim_span s i e in
       let e = ref e in
-      while !e > i && (s.[!e - 1] = ',' || is_space s.[!e - 1]) do decr e done;
+      while !e > i && (s.[!e - 1] = ',' || is_space s.[!e - 1]) do
+        decr e
+      done;
       (i, !e)
     in
     let source =
@@ -262,7 +337,11 @@ let parse k s = List.filter_map (parse_segment k s) (cuts k s)
 
 type part = Wizard | Source
 
-let part_of_string = function "w" -> Some Wizard | "s" -> Some Source | _ -> None
+let part_of_string = function
+  | "w" -> Some Wizard
+  | "s" -> Some Source
+  | _ -> None
+
 let string_of_part = function Wizard -> "w" | Source -> "s"
 
 let spans part segs =
@@ -290,12 +369,15 @@ let source_key s = String.concat "" (words s)
 let key = function Wizard -> wizard_key | Source -> source_key
 
 type spelling = { text : string; strings : int; uses : int }
-type cluster = { part : part; ckey : string; spellings : spelling list; total : int }
 
-type data = {
-  known : known;
-  strings : (Driver.istr * string * int) list;
+type cluster = {
+  part : part;
+  ckey : string;
+  spellings : spelling list;
+  total : int;
 }
+
+type data = { known : known; strings : (Driver.istr * string * int) list }
 
 let of_strings strings =
   { known = known_of_strings (List.map (fun (_, s, _) -> s) strings); strings }
@@ -315,8 +397,8 @@ let load conf base =
       let p = Driver.poi base ip in
       List.iter add
         (Driver.get_psources p :: Driver.get_birth_src p
-         :: Driver.get_baptism_src p :: Driver.get_death_src p
-         :: Driver.get_burial_src p
+       :: Driver.get_baptism_src p :: Driver.get_death_src p
+       :: Driver.get_burial_src p
         :: List.map (fun e -> e.Def.epers_src) (Driver.get_pevents p)))
     (Driver.ipers base);
   Collection.iter
@@ -342,7 +424,7 @@ let clusters d part =
   let h = Hashtbl.create 4096 in
   iter_spellings d part (fun (_, _, uses) t ->
       let k = key part t in
-      if k <> "" then (
+      if k <> "" then
         let sp =
           match Hashtbl.find_opt h k with
           | Some sp -> sp
@@ -352,13 +434,15 @@ let clusters d part =
               sp
         in
         let n, u = Option.value ~default:(0, 0) (Hashtbl.find_opt sp t) in
-        Hashtbl.replace sp t (n + 1, u + uses)));
+        Hashtbl.replace sp t (n + 1, u + uses));
   Hashtbl.fold
     (fun ckey sp acc ->
       if Hashtbl.length sp < 2 then acc
       else
         let spellings =
-          Hashtbl.fold (fun text (strings, uses) l -> { text; strings; uses } :: l) sp []
+          Hashtbl.fold
+            (fun text (strings, uses) l -> { text; strings; uses } :: l)
+            sp []
           |> List.sort (fun a b -> compare (b.uses, a.text) (a.uses, b.text))
         in
         let total = List.fold_left (fun n sp -> n + sp.uses) 0 spellings in
@@ -403,7 +487,9 @@ let plan base d part ~terms ~new_term =
         with
         | [] -> None
         | sps ->
-            let new_s = Mutil.normalize_utf_8 (replace_spans raw sps new_term) in
+            let new_s =
+              Mutil.normalize_utf_8 (replace_spans raw sps new_term)
+            in
             if new_s = raw then None
             else
               Some
@@ -418,7 +504,9 @@ let plan base d part ~terms ~new_term =
       d.strings
   in
   let spans_of = Hashtbl.create 64 in
-  List.iter (fun ((it : PlaceRename.item), sps) -> Hashtbl.replace spans_of it.istr sps) items;
+  List.iter
+    (fun ((it : PlaceRename.item), sps) -> Hashtbl.replace spans_of it.istr sps)
+    items;
   PlaceRename.classify base (List.map fst items)
   |> List.map (fun (it : PlaceRename.item) ->
       (it, Option.value ~default:[] (Hashtbl.find_opt spans_of it.istr)))

@@ -6,14 +6,14 @@ open Geneweb
 
 let raws =
   [
-    "[[w:P.Colin]] (AD Vosges, RP paroisse Sainte-Croix, Saint-Di\195\169) 7 \
-     v 2013, [[w:P.Colin]] (AD Vosges, RP Paroisse Saint-Croix, \
+    "[[w:P.Colin]] (AD Vosges, RP paroisse Sainte-Croix, Saint-Di\195\169) 7 v \
+     2013, [[w:P.Colin]] (AD Vosges, RP Paroisse Saint-Croix, \
      Saint-Di\195\169) 8 v 2013";
     "BdeRauglaudre, RP Stainville 1717-1788 28/403, 4xii2018";
     "BdeRauglaudre (EC Chalon-sur-Sa\195\180ne) 17v2021";
     "D.Gaultier (Le Matin du 2/10/1933) 7/8/11";
-    "E.Polti ( Bottin Mondain ) 20.12.2005, [[w:J-N.Pommier]] (Archives de \
-     la Corr\195\168ze) 19 iii 2012, R.de Tessieres (\195\169tat civil) 7 iii \
+    "E.Polti ( Bottin Mondain ) 20.12.2005, [[w:J-N.Pommier]] (Archives de la \
+     Corr\195\168ze) 19 iii 2012, R.de Tessieres (\195\169tat civil) 7 iii \
      2020";
     "R.de Tessieres (RP) 16 xi 2016";
     "AD 87, f\194\176 109/180";
@@ -57,8 +57,7 @@ let test_parse () =
         Some "RP Stainville 1717-1788 28/403",
         Some "4xii2018" );
     ];
-  chk 3
-    [ (Some "D.Gaultier", Some "Le Matin du 2/10/1933", Some "7/8/11") ];
+  chk 3 [ (Some "D.Gaultier", Some "Le Matin du 2/10/1933", Some "7/8/11") ];
   chk 4
     [
       (Some "E.Polti", Some "Bottin Mondain", Some "20.12.2005");
@@ -107,7 +106,9 @@ let test_keys () =
   (check bool) "P.Colin / Y.Colin" false (w "P.Colin" = w "Y.Colin");
   List.iter
     (fun (a, b) -> (check string) (a ^ " ~ " ^ b) (s a) (s b))
-    [ ("AD 75", "AD75"); ("AD75", "ad-75"); ("\195\169tat civil", "Etat-Civil") ]
+    [
+      ("AD 75", "AD75"); ("AD75", "ad-75"); ("\195\169tat civil", "Etat-Civil");
+    ]
 
 let test_clusters () =
   let strings =

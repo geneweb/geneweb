@@ -585,9 +585,11 @@ let treat_request =
              | "PLACE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ PlaceTermsDisplay.print_ok
-             | "SOURCE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print_sources
+             | "SOURCE_TERMS" ->
+                 w_wizard @@ w_base @@ PlaceTermsDisplay.print_sources
              | "SOURCE_TERMS_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ PlaceTermsDisplay.print_sources_ok
+                 w_wizard @@ w_lock @@ w_base
+                 @@ PlaceTermsDisplay.print_sources_ok
              | "MOD_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod

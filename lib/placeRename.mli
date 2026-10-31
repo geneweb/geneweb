@@ -95,8 +95,8 @@ val plan :
 *)
 
 val classify : Geneweb_db.Driver.base -> item list -> item list
-(** Sets the kind of each item (new string, existing string, shared new
-    string) and sorts them. *)
+(** Sets the kind of each item (new string, existing string, shared new string)
+    and sorts them. *)
 
 val plan_places :
   Geneweb_db.Driver.base ->

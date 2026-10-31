@@ -369,7 +369,8 @@ let kind_html ?(sources = false) conf base (k : PlaceRename.kind) =
   in
   match k with
   | New_place ->
-      badge "bg-success" (transl conf (if sources then "new source" else "new place"))
+      badge "bg-success"
+        (transl conf (if sources then "new source" else "new place"))
   | Merge_existing j ->
       badge "bg-warning text-dark"
         (transl conf
@@ -646,8 +647,7 @@ let mark_spans raw (spans : SourceTerms.span list) =
   Buffer.contents buf
 
 let spelling_html (sp : SourceTerms.spelling) =
-  Printf.sprintf
-    "<code>%s</code> <span class=\"text-muted\">(%d · %d)</span>"
+  Printf.sprintf "<code>%s</code> <span class=\"text-muted\">(%d · %d)</span>"
     (esc sp.text) sp.strings sp.uses
 
 let src_cluster_href conf (c : SourceTerms.cluster) =
@@ -660,10 +660,12 @@ let print_src_clusters conf base =
   let tab p label =
     Printf.sprintf "<a class=\"nav-link%s\" href=\"%s\">%s</a>"
       (if p = part then " active" else "")
-      (src_href conf p) (esc (Utf8.capitalize_fst label))
+      (src_href conf p)
+      (esc (Utf8.capitalize_fst label))
   in
   Output.printf conf "<nav class=\"nav nav-tabs mb-2\">%s%s</nav>\n"
-    (tab SourceTerms.Wizard (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
+    (tab SourceTerms.Wizard
+       (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
     (tab SourceTerms.Source (transl_nth conf "source/sources" 1));
   (* the sources are many: chosen by the beginning of their key *)
   let s = Option.value ~default:"" (p_getenv conf.env "s") in
@@ -678,7 +680,8 @@ let print_src_clusters conf base =
       let n = String.length s + 1 in
       List.filter_map
         (fun (c : SourceTerms.cluster) ->
-          if String.length c.ckey >= n then Some (String.sub c.ckey 0 n) else None)
+          if String.length c.ckey >= n then Some (String.sub c.ckey 0 n)
+          else None)
         selected
       |> List.sort_uniq compare
     in
@@ -686,8 +689,8 @@ let print_src_clusters conf base =
     List.iter
       (fun ini ->
         Output.printf conf
-          "<a class=\"btn btn-sm btn-outline-primary font-monospace me-1 mb-1\" \
-           href=\"%s&s=%s\">%s</a>\n"
+          "<a class=\"btn btn-sm btn-outline-primary font-monospace me-1 \
+           mb-1\" href=\"%s&s=%s\">%s</a>\n"
           (src_href conf part) (enc ini) (esc ini))
       inis;
     Output.print_sstring conf "</div>\n");
@@ -697,7 +700,8 @@ let print_src_clusters conf base =
   else if selected <> [] then (
     Output.printf conf
       "<table class=\"table table-sm table-hover w-auto\">\n\
-       <thead><tr><th>%s</th><th class=\"text-end\">%s</th><th></th></tr></thead>\n\
+       <thead><tr><th>%s</th><th \
+       class=\"text-end\">%s</th><th></th></tr></thead>\n\
        <tbody>\n"
       (Utf8.capitalize_fst (transl conf "spellings"))
       (Utf8.capitalize_fst (transl conf "uses"));
@@ -752,9 +756,9 @@ let print_src_cluster conf base key =
       Output.printf conf
         "<div class=\"form-check d-flex align-items-center gap-2\"><input \
          class=\"form-check-input\" type=\"radio\" name=\"ntc\" id=\"ntco\" \
-         value=\"%s\"><label class=\"form-check-label\" for=\"ntco\">%s</label> \
-         <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
-         size=\"30\" name=\"nto\" \
+         value=\"%s\"><label class=\"form-check-label\" \
+         for=\"ntco\">%s</label> <input type=\"text\" class=\"form-control \
+         form-control-sm w-auto\" size=\"30\" name=\"nto\" \
          onfocus=\"document.getElementById('ntco').checked=true\"></div>\n\
          </fieldset>\n"
         (esc other_choice)
@@ -801,7 +805,8 @@ let print_src_preview conf base terms nt =
       "<h2 class=\"h3\">%s</h2>\n<p>%s → <code>%s</code></p>\n<p>%d %s</p>\n"
       (Utf8.capitalize_fst (transl conf "preview of the changes"))
       (terms_html terms) (esc nt) (List.length items)
-      (transl_nth conf "source/sources" (if List.length items > 1 then 1 else 0));
+      (transl_nth conf "source/sources"
+         (if List.length items > 1 then 1 else 0));
     if items = [] then
       Output.printf conf "<p>%s</p>\n"
         (Utf8.capitalize_fst (transl conf "no modification"))
@@ -825,14 +830,16 @@ let print_src_preview conf base terms nt =
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
         (src_href conf (src_part conf))
         (Utf8.capitalize_fst (transl conf "cancel"));
-      Output.print_sstring conf "<table class=\"table table-sm small mt-3\"><tbody>\n";
+      Output.print_sstring conf
+        "<table class=\"table table-sm small mt-3\"><tbody>\n";
       List.iteri
         (fun i ((it : PlaceRename.item), spans) ->
           if i < 200 then
             Output.printf conf
               "<tr><td>%s</td><td>→</td><td>%s</td><td class=\"text-end \
                text-muted\">%d</td><td>%s</td></tr>\n"
-              (mark_spans it.old_s spans) (esc it.new_s)
+              (mark_spans it.old_s spans)
+              (esc it.new_s)
               (PlaceRename.uses u it.istr)
               (kind_html ~sources:true conf base it.kind))
         items;
@@ -858,7 +865,8 @@ let header ?(sources = false) conf =
   let title _ =
     Output.print_sstring conf
       (Utf8.capitalize_fst
-         (transl conf (if sources then "sources to group" else "spelling clusters")))
+         (transl conf
+            (if sources then "sources to group" else "spelling clusters")))
   in
   Hutil.header conf title;
   let book data plural =
@@ -871,19 +879,24 @@ let header ?(sources = false) conf =
   in
   let link href icon label =
     Printf.sprintf "<a href=\"%s\"><i class=\"fa fa-%s me-1\"></i>%s</a>" href
-      icon (Utf8.capitalize_fst (transl conf label))
+      icon
+      (Utf8.capitalize_fst (transl conf label))
   in
   Output.printf conf "<p>%s</p>\n"
     (String.concat " · "
        (if sources then
           [
             book "src" "source/sources";
-            link (prefix conf ^ "m=SOURCE_TERMS") "object-group" "sources to group";
+            link
+              (prefix conf ^ "m=SOURCE_TERMS")
+              "object-group" "sources to group";
           ]
         else
           [
             book "place" "place/places";
-            link (prefix conf ^ "m=PLACE_TERMS") "object-group" "spelling clusters";
+            link
+              (prefix conf ^ "m=PLACE_TERMS")
+              "object-group" "spelling clusters";
             link (groups_href conf) "up-right-and-down-left-from-center"
               "places to complete";
           ]))
@@ -949,7 +962,8 @@ let print_result ?(sources = false) conf (r : PlaceRename.result) =
          (ftransl conf "%d places renamed (%d merged), %d records updated")
          r.places r.merged (r.persons + r.families));
   if not r.complete then
-    continue_form conf ~m:(if sources then "SOURCE_TERMS_OK" else "PLACE_TERMS_OK");
+    continue_form conf
+      ~m:(if sources then "SOURCE_TERMS_OK" else "PLACE_TERMS_OK");
   if List.assoc_opt "history" conf.base_env = Some "yes" then
     Output.printf conf "<p><a href=\"%sm=HIST&k=20\">%s</a></p>\n" (prefix conf)
       (Utf8.capitalize_fst (transl_nth conf "modification/modifications" 1))
@@ -995,13 +1009,13 @@ let print_sources_ok conf base =
   | (_ :: _ as terms), Some nt ->
       let nt = String.trim nt in
       if nt = "" then invalid_src_term conf
-      else (
+      else
         (* recomputed: the base may have changed since the preview *)
         let items = List.map fst (src_items conf base terms nt) in
         print_result ~sources:true conf
           (PlaceRename.apply ~field:PlaceRename.Source conf base items);
         Output.printf conf "<p><a href=\"%s\">%s</a></p>\n"
           (src_href conf (src_part conf))
-          (Utf8.capitalize_fst (transl conf "sources to group")))
+          (Utf8.capitalize_fst (transl conf "sources to group"))
   | _ -> ());
   Hutil.trailer conf

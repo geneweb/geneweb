@@ -93,7 +93,6 @@ let rewrite inverted ~terms ~new_term raw depths =
 (* ------------------------------------------------------------------------ *)
 
 type field = Place | Source
-
 type usage = int ref IT.t
 
 let uses u i = match IT.find_opt u i with Some r -> !r | None -> 0
@@ -130,7 +129,9 @@ let map_person field f (gp : (_, _, Driver.istr) gen_person) =
         death_place = f gp.death_place;
         burial_place = f gp.burial_place;
         pevents =
-          List.map (fun e -> { e with epers_place = f e.epers_place }) gp.pevents;
+          List.map
+            (fun e -> { e with epers_place = f e.epers_place })
+            gp.pevents;
       }
   | Source ->
       {
