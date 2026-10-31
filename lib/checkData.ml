@@ -75,19 +75,6 @@ let make_error_set = function
         ]
   | lst -> ErrorSet.of_list lst
 
-(* Split a string into its words, filtering out empty strings *)
-let split_words s =
-  let rec collect_words acc start i =
-    if i >= String.length s then
-      if i > start then String.sub s start (i - start) :: acc else acc
-    else if s.[i] = ' ' then
-      if i > start then
-        collect_words (String.sub s start (i - start) :: acc) (i + 1) (i + 1)
-      else collect_words acc (i + 1) (i + 1)
-    else collect_words acc start (i + 1)
-  in
-  List.rev (collect_words [] 0 0)
-
 let place_suburb_sep_range s =
   let len = String.length s in
   if len > 0 && s.[0] = '[' then
@@ -611,92 +598,91 @@ let fix_misc_typographic_errors dict_type s =
       | None -> apply_misc_fixes dict_type s)
   | _ -> apply_misc_fixes dict_type s
 
-(* Détermine si un caractère est latin, grec ou cyrillique *)
 let script_cache = Hashtbl.create 256
 
-let script_class_of_code code =
-  try Hashtbl.find script_cache code
-  with Not_found ->
-    let result =
-      if (code >= 0x0041 && code <= 0x005A) || (code >= 0x0061 && code <= 0x007A)
-      then Some `Latin
-      else
-        let u = Uchar.of_int code in
-        match Uucp.Script.script u with
-        | `Latn -> Some `Latin
-        | `Grek -> Some `Greek
-        | `Cyrl -> Some `Cyrillic
-        | _ -> None
-    in
-    Hashtbl.replace script_cache code result;
-    result
+let script_of_code code =
+  if code < 0x80 then
+    if (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A) then
+      Some `Latn
+    else None
+  else
+    match Hashtbl.find_opt script_cache code with
+    | Some r -> r
+    | None ->
+        let r =
+          if not (Uchar.is_valid code) then None
+          else
+            match Uucp.Script.script (Uchar.of_int code) with
+            | `Zyyy | `Zzzz -> None
+            | `Hira | `Kana | `Hang | `Bopo -> Some `Hani
+            | sc -> Some sc
+        in
+        Hashtbl.replace script_cache code r;
+        r
 
-let has_mixed_scripts_in_word s =
-  let has_latin = ref false in
-  let has_greek = ref false in
-  let has_cyrillic = ref false in
-  let len = String.length s in
-  let i = ref 0 in
-  while !i < len do
-    let c = Char.code s.[!i] in
-    if c < 0x80 then (
-      if (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) then
-        has_latin := true;
-      incr i)
+let word_script_counts s ws we =
+  let rec loop i acc =
+    if i >= we then acc
     else
-      let code, size = Util.get_unicode_point s !i in
-      (match script_class_of_code code with
-      | Some `Latin -> has_latin := true
-      | Some `Greek -> has_greek := true
-      | Some `Cyrillic -> has_cyrillic := true
-      | None -> ());
-      i := !i + size
-  done;
-  !has_latin && (!has_greek || !has_cyrillic)
+      let code, size = Util.get_unicode_point s i in
+      let acc =
+        match script_of_code code with
+        | None | Some `Zinh -> acc
+        | Some sc ->
+            let n = Option.value ~default:0 (List.assoc_opt sc acc) in
+            (sc, n + 1) :: List.remove_assoc sc acc
+      in
+      loop (i + size) acc
+  in
+  loop ws []
+
+let script_runs s =
+  let len = String.length s in
+  let close start i acc = if i > start then (start, i) :: acc else acc in
+  let rec loop i start acc =
+    if i >= len then close start i acc
+    else
+      let code, size = Util.get_unicode_point s i in
+      match script_of_code code with
+      | None -> loop (i + size) (i + size) (close start i acc)
+      | Some _ -> loop (i + size) start acc
+  in
+  loop 0 0 []
 
 let has_mixed_scripts s =
   String.exists (fun c -> c >= '\xCD') s
-  && List.exists has_mixed_scripts_in_word (split_words s)
+  && List.exists
+       (fun (ws, we) ->
+         match word_script_counts s ws we with
+         | _ :: _ :: _ -> true
+         | _ -> false)
+       (script_runs s)
 
 let find_mixed_scripts_positions s =
-  let positions = ref [] in
-  let words_with_pos = ref [] in
-  let pos = ref 0 in
-  let len = String.length s in
-  while !pos < len do
-    while !pos < len && s.[!pos] = ' ' do
-      incr pos
-    done;
-    if !pos < len then (
-      let start = !pos in
-      while !pos < len && s.[!pos] <> ' ' do
-        incr pos
-      done;
-      let word = String.sub s start (!pos - start) in
-      words_with_pos := (word, start, !pos) :: !words_with_pos)
-  done;
-  List.iter
-    (fun (word, start_pos, end_pos) ->
-      if has_mixed_scripts_in_word word then
-        let byte_pos = ref start_pos in
-        while !byte_pos < end_pos do
-          let c = Char.code s.[!byte_pos] in
-          let char_size, code =
-            if c < 0x80 then (1, c)
-            else
-              let code, size = Util.get_unicode_point s !byte_pos in
-              (size, code)
+  List.fold_left
+    (fun acc (ws, we) ->
+      match word_script_counts s ws we with
+      | _ :: _ :: _ as counts ->
+          let major, _ =
+            List.fold_left
+              (fun (bs, bn) (sc, n) ->
+                if n > bn || (n = bn && sc = `Latn) then (sc, n) else (bs, bn))
+              (`Zzzz, 0) counts
           in
-          (match script_class_of_code code with
-          | Some `Greek | Some `Cyrillic ->
-              for i = 0 to char_size - 1 do
-                positions := (!byte_pos + i) :: !positions
-              done
-          | _ -> ());
-          byte_pos := !byte_pos + char_size
-        done)
-    (List.rev !words_with_pos);
-  List.sort_uniq compare !positions
+          let rec mark i acc =
+            if i >= we then acc
+            else
+              let code, size = Util.get_unicode_point s i in
+              let acc =
+                match script_of_code code with
+                | Some sc when sc <> major && sc <> `Zinh -> i :: acc
+                | _ -> acc
+              in
+              mark (i + size) acc
+          in
+          mark ws acc
+      | _ -> acc)
+    [] (script_runs s)
 
 (* Generic error handling *)
 let find_error_positions error_type data base s =

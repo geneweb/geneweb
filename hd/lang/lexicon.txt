@@ -5104,10 +5104,10 @@ es: número máximo de resultados
 fr: nombre de résultats maximum
 
     chk_data mixed alphabet
-de: griechisches oder kyrillisches Zeichen
-en: greek or cyrillique character
-es: carácter griego o cirílico
-fr: caractère grec ou cyrillique
+de: Zeichen aus einem anderen Alphabet als der Rest des Wortes
+en: character from another script than the rest of the word
+es: carácter de otro alfabeto que el resto de la palabra
+fr: caractère d’un autre alphabet que le reste du mot
 
     chk_data ponctuation error
 de: Punktierungsfehler
