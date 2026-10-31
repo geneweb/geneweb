@@ -5068,6 +5068,42 @@ en: non-breaking spaces
 es: espacios de no separación
 fr: espaces insécables
 
+    chk_data error mojibake
+de: fehlerhafte Kodierung
+en: bad encoding
+es: codificación errónea
+fr: encodage erroné
+
+    chk_data error html entities
+de: HTML-Entitäten
+en: HTML entities
+es: entidades HTML
+fr: entités HTML
+
+    chk_data error suspicious characters
+de: unerwartete Zeichen
+en: unexpected characters
+es: caracteres inesperados
+fr: caractères inattendus
+
+    chk_data error french ordinals
+de: fehlerhafte Ordnungszahlen (fr)
+en: bad ordinals (fr)
+es: ordinales erróneos (fr)
+fr: ordinaux erronés (fr)
+
+    chk_data error repeated words
+de: wiederholte Wörter
+en: repeated words
+es: palabras repetidas
+fr: mots répétés
+
+    chk_data error no letters
+de: Einträge ohne Buchstaben
+en: entries without letters
+es: entradas sin letras
+fr: entrées sans lettre
+
     chk_data error types
 de: Fehlertypen
 en: error types
