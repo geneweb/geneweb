@@ -23,6 +23,12 @@ type error_type =
   | NonBreakingSpace
   | MiscTypographicErrors
   | MixedScripts
+  | Mojibake
+  | HtmlEntities
+  | SuspiciousCharacters
+  | FrenchOrdinals
+  | RepeatedWords
+  | NoLetters
 
 type highlight_style = {
   make_class : string -> string;
@@ -72,8 +78,24 @@ let make_error_set = function
           NonBreakingSpace;
           MiscTypographicErrors;
           MixedScripts;
+          Mojibake;
+          HtmlEntities;
+          SuspiciousCharacters;
+          FrenchOrdinals;
+          RepeatedWords;
+          NoLetters;
         ]
   | lst -> ErrorSet.of_list lst
+
+let applies error_type dict =
+  match (error_type, dict) with
+  | (BadCapitalization | HtmlEntities), Sources -> false
+  | ( SuspiciousCharacters,
+      (Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Qualifiers) )
+    ->
+      true
+  | SuspiciousCharacters, _ -> false
+  | _ -> true
 
 let place_suburb_sep_range s =
   let len = String.length s in
@@ -761,6 +783,462 @@ let find_mixed_scripts_positions s =
       | _ -> acc)
     [] (script_runs s)
 
+let span_positions a b acc =
+  let rec loop i acc = if i < a then acc else loop (i - 1) (i :: acc) in
+  loop (b - 1) acc
+
+let span_messages a b message acc =
+  List.fold_left
+    (fun acc pos -> { pos; message } :: acc)
+    acc (span_positions a b [])
+
+let utf8_of_code code =
+  let b = Buffer.create 4 in
+  Buffer.add_utf_8_uchar b (Uchar.of_int code);
+  Buffer.contents b
+
+let fix_message matched fixed =
+  if matched = fixed then Printf.sprintf "‹%s›" matched
+  else Printf.sprintf "‹%s› → ‹%s›" matched fixed
+
+let cp1252_byte code =
+  if code >= 0x80 && code <= 0xBF then Some code
+  else
+    match code with
+    | 0x20AC -> Some 0x80
+    | 0x201A -> Some 0x82
+    | 0x0192 -> Some 0x83
+    | 0x201E -> Some 0x84
+    | 0x2026 -> Some 0x85
+    | 0x2020 -> Some 0x86
+    | 0x2021 -> Some 0x87
+    | 0x02C6 -> Some 0x88
+    | 0x2030 -> Some 0x89
+    | 0x0160 -> Some 0x8A
+    | 0x2039 -> Some 0x8B
+    | 0x0152 -> Some 0x8C
+    | 0x017D -> Some 0x8E
+    | 0x2018 -> Some 0x91
+    | 0x2019 -> Some 0x92
+    | 0x201C -> Some 0x93
+    | 0x201D -> Some 0x94
+    | 0x2022 -> Some 0x95
+    | 0x2013 -> Some 0x96
+    | 0x2014 -> Some 0x97
+    | 0x02DC -> Some 0x98
+    | 0x2122 -> Some 0x99
+    | 0x0161 -> Some 0x9A
+    | 0x203A -> Some 0x9B
+    | 0x0153 -> Some 0x9C
+    | 0x017E -> Some 0x9E
+    | 0x0178 -> Some 0x9F
+    | _ -> None
+
+let mojibake_at s i =
+  let cont j =
+    if j >= String.length s then None
+    else
+      let code, size = Util.get_unicode_point s j in
+      Option.map (fun b -> (b, j + size)) (cp1252_byte code)
+  in
+  let code, size = Util.get_unicode_point s i in
+  match code with
+  | 0xC2 | 0xC3 | 0xC4 | 0xC5 | 0xD0 | 0xD1 -> (
+      match cont (i + size) with
+      | Some (b, j) ->
+          let u = ((code land 0x1F) lsl 6) lor (b land 0x3F) in
+          if u >= 0xA0 then Some (j, u) else None
+      | None -> None)
+  | 0xE2 -> (
+      match cont (i + size) with
+      | Some (b1, j) ->
+          Option.map
+            (fun (b2, k) ->
+              (k, 0x2000 lor ((b1 land 0x3F) lsl 6) lor (b2 land 0x3F)))
+            (cont j)
+      | None -> None)
+  | _ -> None
+
+let mojibake_at_byte s i = if s.[i] = '\xC3' then mojibake_at s i else None
+
+let is_replacement_char s i =
+  i + 2 < String.length s
+  && s.[i] = '\xEF'
+  && s.[i + 1] = '\xBF'
+  && s.[i + 2] = '\xBD'
+
+let has_mojibake s =
+  let len = String.length s in
+  let rec loop i =
+    i < len
+    && (mojibake_at_byte s i <> None || is_replacement_char s i || loop (i + 1))
+  in
+  loop 0
+
+let find_mojibake_positions s =
+  let len = String.length s in
+  let rec loop i acc =
+    if i >= len then acc
+    else if is_replacement_char s i then
+      loop (i + 3) (span_messages i (i + 3) "U+FFFD REPLACEMENT CHARACTER" acc)
+    else
+      match mojibake_at_byte s i with
+      | Some (j, code) ->
+          let message =
+            fix_message (String.sub s i (j - i)) (utf8_of_code code)
+          in
+          loop j (span_messages i j message acc)
+      | None -> loop (i + 1) acc
+  in
+  loop 0 []
+
+let fix_mojibake s =
+  let fix_once s =
+    let len = String.length s in
+    let buf = Buffer.create len in
+    let rec loop i =
+      if i >= len then Buffer.contents buf
+      else
+        match mojibake_at_byte s i with
+        | Some (j, code) ->
+            Buffer.add_utf_8_uchar buf (Uchar.of_int code);
+            loop j
+        | None ->
+            Buffer.add_char buf s.[i];
+            loop (i + 1)
+    in
+    loop 0
+  in
+  let rec repeat n s =
+    let s' = fix_once s in
+    if n = 0 || s' = s then s' else repeat (n - 1) s'
+  in
+  repeat 2 s
+
+let html_entity_re =
+  lazy
+    (let letter = Re.alt [ Re.rg 'a' 'z'; Re.rg 'A' 'Z' ] in
+     Re.compile
+       (Re.seq
+          [
+            Re.char '&';
+            Re.group
+              (Re.alt
+                 [
+                   Re.seq [ Re.char '#'; Re.repn Re.digit 1 (Some 7) ];
+                   Re.seq
+                     [ Re.char '#'; Re.set "xX"; Re.repn Re.xdigit 1 (Some 6) ];
+                   Re.seq
+                     [
+                       letter; Re.repn (Re.alt [ letter; Re.digit ]) 1 (Some 31);
+                     ];
+                 ]);
+            Re.char ';';
+          ]))
+
+let html_entities =
+  lazy
+    (let tbl = Hashtbl.create 128 in
+     List.iteri
+       (fun i name -> Hashtbl.replace tbl name (0xA0 + i))
+       [
+         "nbsp";
+         "iexcl";
+         "cent";
+         "pound";
+         "curren";
+         "yen";
+         "brvbar";
+         "sect";
+         "uml";
+         "copy";
+         "ordf";
+         "laquo";
+         "not";
+         "shy";
+         "reg";
+         "macr";
+         "deg";
+         "plusmn";
+         "sup2";
+         "sup3";
+         "acute";
+         "micro";
+         "para";
+         "middot";
+         "cedil";
+         "sup1";
+         "ordm";
+         "raquo";
+         "frac14";
+         "frac12";
+         "frac34";
+         "iquest";
+         "Agrave";
+         "Aacute";
+         "Acirc";
+         "Atilde";
+         "Auml";
+         "Aring";
+         "AElig";
+         "Ccedil";
+         "Egrave";
+         "Eacute";
+         "Ecirc";
+         "Euml";
+         "Igrave";
+         "Iacute";
+         "Icirc";
+         "Iuml";
+         "ETH";
+         "Ntilde";
+         "Ograve";
+         "Oacute";
+         "Ocirc";
+         "Otilde";
+         "Ouml";
+         "times";
+         "Oslash";
+         "Ugrave";
+         "Uacute";
+         "Ucirc";
+         "Uuml";
+         "Yacute";
+         "THORN";
+         "szlig";
+         "agrave";
+         "aacute";
+         "acirc";
+         "atilde";
+         "auml";
+         "aring";
+         "aelig";
+         "ccedil";
+         "egrave";
+         "eacute";
+         "ecirc";
+         "euml";
+         "igrave";
+         "iacute";
+         "icirc";
+         "iuml";
+         "eth";
+         "ntilde";
+         "ograve";
+         "oacute";
+         "ocirc";
+         "otilde";
+         "ouml";
+         "divide";
+         "oslash";
+         "ugrave";
+         "uacute";
+         "ucirc";
+         "uuml";
+         "yacute";
+         "thorn";
+         "yuml";
+       ];
+     List.iter
+       (fun (name, code) -> Hashtbl.replace tbl name code)
+       [
+         ("quot", 0x22);
+         ("amp", 0x26);
+         ("apos", 0x27);
+         ("OElig", 0x152);
+         ("oelig", 0x153);
+         ("Scaron", 0x160);
+         ("scaron", 0x161);
+         ("Yuml", 0x178);
+         ("ndash", 0x2013);
+         ("mdash", 0x2014);
+         ("lsquo", 0x2018);
+         ("rsquo", 0x2019);
+         ("sbquo", 0x201A);
+         ("ldquo", 0x201C);
+         ("rdquo", 0x201D);
+         ("bdquo", 0x201E);
+         ("hellip", 0x2026);
+         ("euro", 0x20AC);
+       ];
+     tbl)
+
+let html_entity_code name =
+  let n = String.length name in
+  let code =
+    if name.[0] <> '#' then Hashtbl.find_opt (Lazy.force html_entities) name
+    else if name.[1] = 'x' || name.[1] = 'X' then
+      int_of_string_opt ("0x" ^ String.sub name 2 (n - 2))
+    else int_of_string_opt (String.sub name 1 (n - 1))
+  in
+  match code with Some c when c > 0 && Uchar.is_valid c -> Some c | _ -> None
+
+let html_entity_fix g =
+  match html_entity_code (Re.Group.get g 1) with
+  | Some code -> utf8_of_code code
+  | None -> Re.Group.get g 0
+
+let has_html_entities s =
+  String.contains s '&' && Re.execp (Lazy.force html_entity_re) s
+
+let find_html_entity_positions s =
+  List.fold_left
+    (fun acc g ->
+      span_messages (Re.Group.start g 0) (Re.Group.stop g 0)
+        (fix_message (Re.Group.get g 0) (html_entity_fix g))
+        acc)
+    []
+    (Re.all (Lazy.force html_entity_re) s)
+
+let fix_html_entities s =
+  Re.replace (Lazy.force html_entity_re) ~f:html_entity_fix s
+
+let is_suspicious_name_char = function
+  | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' | '*' | '_' | '!' | ';' | ':'
+  | '@' | '#' | '$' | '%' | '&' | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '"'
+    ->
+      true
+  | _ -> false
+
+let is_digit c = c >= '0' && c <= '9'
+
+let find_suspicious_characters_positions dict s =
+  let len = String.length s in
+  let comma = match dict with Fnames | Fnames_alias -> false | _ -> true in
+  let is_ordinal_end j =
+    dict = PubNames && j < len && (is_ascii_lower s.[j] || s.[j] >= '\x80')
+  in
+  let rec digits_end j =
+    if j < len && is_digit s.[j] then digits_end (j + 1) else j
+  in
+  let rec loop i acc =
+    if i >= len then acc
+    else if is_digit s.[i] then
+      let j = digits_end (i + 1) in
+      loop j (if is_ordinal_end j then acc else span_positions i j acc)
+    else if is_suspicious_name_char s.[i] || (comma && s.[i] = ',') then
+      loop (i + 1) (i :: acc)
+    else loop (i + 1) acc
+  in
+  loop 0 []
+
+let has_suspicious_characters dict s =
+  find_suspicious_characters_positions dict s <> []
+
+let french_ordinal_re =
+  lazy
+    (Re.compile
+       (Re.seq
+          [
+            Re.bow;
+            Re.group (Re.alt [ Re.rep1 Re.digit; Re.rep1 (Re.set "IVX") ]);
+            Re.opt (Re.char ' ');
+            Re.group
+              (Re.alt
+                 (List.map Re.str
+                    [
+                      "ième";
+                      "ieme";
+                      "ème";
+                      "eme";
+                      "ière";
+                      "iere";
+                      "ère";
+                      "ere";
+                      "ier";
+                      "nde";
+                    ]));
+            Re.group (Re.opt (Re.char 's'));
+            Re.eow;
+          ]))
+
+let french_ordinal_fix g =
+  let num = Re.Group.get g 1 in
+  let fixed suffix = Some (num ^ suffix ^ Re.Group.get g 3) in
+  let first = num = "1" || num = "I" in
+  match Re.Group.get g 2 with
+  | "ième" | "ieme" | "ème" | "eme" ->
+      if first then Some (Re.Group.get g 0) else fixed "e"
+  | "ière" | "iere" | "ère" | "ere" -> if first then fixed "re" else None
+  | "ier" -> if first then fixed "er" else None
+  | _ -> if num = "2" || num = "II" then fixed "de" else None
+
+let french_ordinal_matches s =
+  List.filter_map
+    (fun g -> Option.map (fun r -> (g, r)) (french_ordinal_fix g))
+    (Re.all (Lazy.force french_ordinal_re) s)
+
+let has_french_ordinals s =
+  Re.execp (Lazy.force french_ordinal_re) s && french_ordinal_matches s <> []
+
+let find_french_ordinal_positions s =
+  List.fold_left
+    (fun acc (g, r) ->
+      span_messages (Re.Group.start g 0) (Re.Group.stop g 0)
+        (fix_message (Re.Group.get g 0) r)
+        acc)
+    [] (french_ordinal_matches s)
+
+let fix_french_ordinals s =
+  Re.replace
+    (Lazy.force french_ordinal_re)
+    ~f:(fun g ->
+      Option.value ~default:(Re.Group.get g 0) (french_ordinal_fix g))
+    s
+
+let is_word_letter c =
+  is_ascii_upper c || is_ascii_lower c || (c >= '\xC3' && c <> '\xE2')
+
+let rec span_has_letter s a b =
+  a < b && (is_word_letter s.[a] || span_has_letter s (a + 1) b)
+
+let same_word s (a1, b1) (a2, b2) =
+  let n = b1 - a1 in
+  n = b2 - a2
+  &&
+  let rec eq i =
+    i >= n
+    || Char.lowercase_ascii s.[a1 + i] = Char.lowercase_ascii s.[a2 + i]
+       && eq (i + 1)
+  in
+  eq 0
+
+let find_repeated_words_positions s =
+  let rec loop acc = function
+    | ((a, b) as w1) :: (((a2, b2) as w2) :: _ as rest) ->
+        let acc =
+          if
+            b - a >= 2
+            && s.[b - 1] <> ','
+            && span_has_letter s a b && same_word s w1 w2
+          then span_positions a2 b2 acc
+          else acc
+        in
+        loop acc rest
+    | _ -> acc
+  in
+  loop [] (word_spans s)
+
+let has_repeated_words s = find_repeated_words_positions s <> []
+
+let has_letter s =
+  let len = String.length s in
+  let rec loop i =
+    i < len
+    &&
+    let c = s.[i] in
+    if c < '\x80' then is_ascii_upper c || is_ascii_lower c || loop (i + 1)
+    else
+      let code, size = Util.get_unicode_point s i in
+      (Uchar.is_valid code && Uucp.Alpha.is_alphabetic (Uchar.of_int code))
+      || loop (i + size)
+  in
+  loop 0
+
+let has_no_letter dict s =
+  (match dict with Fnames | Snames -> s <> "?" | _ -> true)
+  && not (has_letter s)
+
 (* Generic error handling *)
 let find_error_positions error_type data base s =
   let dict_type = data_to_dict_type data in
@@ -769,14 +1247,20 @@ let find_error_positions error_type data base s =
   | BadCapitalization -> find_bad_capitalization_positions dict_type base s
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
-  | MiscTypographicErrors -> []
   | MixedScripts -> find_mixed_scripts_positions s
+  | SuspiciousCharacters -> find_suspicious_characters_positions dict_type s
+  | RepeatedWords -> find_repeated_words_positions s
+  | NoLetters -> span_positions 0 (String.length s) []
+  | MiscTypographicErrors | Mojibake | HtmlEntities | FrenchOrdinals -> []
 
 let find_error_highlight_info error_type data base s conf =
   let dict_type = data_to_dict_type data in
   match error_type with
   | MiscTypographicErrors ->
       WithMessages (find_misc_typographic_positions dict_type s conf)
+  | Mojibake -> WithMessages (find_mojibake_positions s)
+  | HtmlEntities -> WithMessages (find_html_entity_positions s)
+  | FrenchOrdinals -> WithMessages (find_french_ordinal_positions s)
   | _ -> SimplePositions (find_error_positions error_type data base s)
 
 let fix_error error_type dict_type s =
@@ -786,10 +1270,25 @@ let fix_error error_type dict_type s =
   | MultipleSpaces -> fix_multiple_spaces s
   | NonBreakingSpace -> s
   | MiscTypographicErrors -> fix_misc_typographic_errors dict_type s
-  | MixedScripts -> s
+  | Mojibake -> fix_mojibake s
+  | HtmlEntities -> fix_html_entities s
+  | FrenchOrdinals -> fix_french_ordinals s
+  | MixedScripts | SuspiciousCharacters | RepeatedWords | NoLetters -> s
 
 (* Define style and tooltip of error types *)
 let get_highlight_style error_type conf =
+  let plain cls =
+    {
+      make_class = (fun _ -> cls);
+      make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
+    }
+  in
+  let with_message cls =
+    {
+      make_class = (fun _ -> cls);
+      make_title = (fun ?code:_ ?name:_ ?misc_msg _ -> misc_msg);
+    }
+  in
   match error_type with
   | NonBreakingSpace ->
       {
@@ -800,11 +1299,6 @@ let get_highlight_style error_type conf =
             | Some "00A0" -> Some "U+00A0 NON-BREAKING SPACE"
             | Some "202F" -> Some "U+202F NARROW NON-BREAKING SPACE"
             | _ -> None);
-      }
-  | MultipleSpaces ->
-      {
-        make_class = (fun _ -> "ms");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
       }
   | InvisibleCharacters ->
       {
@@ -822,16 +1316,6 @@ let get_highlight_style error_type conf =
                    (Util.transl conf "zero-width character"))
             else Some base);
       }
-  | BadCapitalization ->
-      {
-        make_class = (fun _ -> "bc");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg:_ _ -> None);
-      }
-  | MiscTypographicErrors ->
-      {
-        make_class = (fun _ -> "mt");
-        make_title = (fun ?code:_ ?name:_ ?misc_msg _ -> misc_msg);
-      }
   | MixedScripts ->
       {
         make_class = (fun _ -> "mx");
@@ -839,6 +1323,15 @@ let get_highlight_style error_type conf =
           (fun ?code:_ ?name:_ ?misc_msg:_ _ ->
             Some (Util.transl conf "chk_data mixed alphabet"));
       }
+  | MultipleSpaces -> plain "ms"
+  | BadCapitalization -> plain "bc"
+  | SuspiciousCharacters -> plain "sc"
+  | RepeatedWords -> plain "rw"
+  | NoLetters -> plain "nl"
+  | MiscTypographicErrors -> with_message "mt"
+  | Mojibake -> with_message "mj"
+  | HtmlEntities -> with_message "he"
+  | FrenchOrdinals -> with_message "fo"
 
 (* Event accessors *)
 let get_epers_place evt = evt.epers_place
@@ -863,12 +1356,12 @@ let make_highlight_html s highlight_info error_type conf =
   let buf = Buffer.create (String.length s * 2) in
   let style = get_highlight_style error_type conf in
   let pos_to_message =
-    match (error_type, highlight_info) with
-    | MiscTypographicErrors, WithMessages infos ->
+    match highlight_info with
+    | WithMessages infos ->
         let map = Hashtbl.create (List.length infos) in
         List.iter (fun info -> Hashtbl.replace map info.pos info.message) infos;
         Some map
-    | _ -> None
+    | SimplePositions _ -> None
   in
   let pos_tbl = Hashtbl.create 16 in
   (match highlight_info with
@@ -1024,7 +1517,9 @@ exception Max_results_reached
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
 let analyze_string_errors dict_type base s check_errors_set =
   let add_if test error acc =
-    if ErrorSet.mem error check_errors_set && test () then error :: acc else acc
+    if ErrorSet.mem error check_errors_set && applies error dict_type && test ()
+    then error :: acc
+    else acc
   in
   []
   |> add_if (fun () -> has_non_breaking_space s) NonBreakingSpace
@@ -1037,6 +1532,14 @@ let analyze_string_errors dict_type base s check_errors_set =
        (fun () -> has_misc_typographic_errors dict_type s)
        MiscTypographicErrors
   |> add_if (fun () -> has_mixed_scripts s) MixedScripts
+  |> add_if (fun () -> has_mojibake s) Mojibake
+  |> add_if (fun () -> has_html_entities s) HtmlEntities
+  |> add_if
+       (fun () -> has_suspicious_characters dict_type s)
+       SuspiciousCharacters
+  |> add_if (fun () -> has_french_ordinals s) FrenchOrdinals
+  |> add_if (fun () -> has_repeated_words s) RepeatedWords
+  |> add_if (fun () -> has_no_letter dict_type s) NoLetters
 
 let dict_to_cache_name dict_type =
   match dict_type with
