@@ -403,13 +403,15 @@ let find_bad_capitalization_positions dict base s =
 let has_bad_capitalization dict base s =
   find_bad_capitalization_positions dict base s <> []
 
+let zero_width_codes =
+  List.rev_append
+    (Util.get_problem_chars_codes `Invisible)
+    (Util.get_problem_chars_codes `ZeroWidth)
+
 let is_zero_width hex =
-  match hex with
-  | "00AD" | "034F" | "200B" | "200C" | "200D" | "200E" | "200F" | "2060"
-  | "2061" | "2062" | "2063" | "2064" | "206A" | "206B" | "206C" | "206D"
-  | "206E" | "206F" | "FEFF" ->
-      true
-  | _ -> false
+  match int_of_string_opt ("0x" ^ hex) with
+  | Some code -> List.mem code zero_width_codes
+  | None -> false
 
 let invisible_chars_tbl =
   let tbl = Hashtbl.create 128 in
@@ -418,14 +420,13 @@ let invisible_chars_tbl =
       List.iter
         (fun code -> Hashtbl.replace tbl code ())
         (Util.get_problem_chars_codes cat))
-    [ `Control; `Invisible; `ZeroWidth ];
+    [ `Control; `Invisible; `Space; `ZeroWidth ];
   tbl
 
 let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
 
 let is_invisible_code code =
-  if code < 0x7F then code < 0x20 && code <> 0x09 && code <> 0x0A
-  else code <= 0x9F || is_invisible_char code
+  if code < 0x80 then code < 0x20 || code = 0x7F else is_invisible_char code
 
 let has_invisible_chars s =
   let len = String.length s in
