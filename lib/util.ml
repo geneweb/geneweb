@@ -2439,8 +2439,8 @@ let problem_chars =
     (0x0006, "ACKNOWLEDGE", `Control);
     (0x0007, "BELL", `Control);
     (0x0008, "BACKSPACE", `Control);
-    (* 0x0009 = TAB - on peut le garder *)
-    (* 0x000A = LF - on peut le garder *)
+    (0x0009, "CHARACTER TABULATION", `Control);
+    (0x000A, "LINE FEED", `Control);
     (0x000B, "VERTICAL TAB", `Control);
     (0x000C, "FORM FEED", `Control);
     (0x000D, "CARRIAGE RETURN", `Control);
@@ -2499,18 +2499,17 @@ let problem_chars =
     (* Caractères invisibles Unicode *)
     (0x00AD, "SOFT HYPHEN", `Invisible);
     (0x034F, "COMBINING GRAPHEME JOINER", `Invisible);
-    (0x0600, "ARABIC NUMBER SIGN", `Invisible);
-    (0x0601, "ARABIC SIGN SANAH", `Invisible);
-    (0x0602, "ARABIC FOOTNOTE MARKER", `Invisible);
-    (0x0603, "ARABIC SIGN SAFHA", `Invisible);
-    (0x06DD, "ARABIC END OF AYAH", `Invisible);
-    (0x070F, "SYRIAC ABBREVIATION MARK", `Invisible);
-    (0x0F0C, "TIBETAN MARK DELIMITER", `Invisible);
     (0x115F, "HANGUL CHOSEONG FILLER", `Invisible);
     (0x1160, "HANGUL JUNGSEONG FILLER", `Invisible);
-    (0x1680, "OGHAM SPACE MARK", `Invisible);
     (0x180E, "MONGOLIAN VOWEL SEPARATOR", `Invisible);
+    (0x3164, "HANGUL FILLER", `Invisible);
+    (0xFFA0, "HALFWIDTH HANGUL FILLER", `Invisible);
+    (0xFFF9, "INTERLINEAR ANNOTATION ANCHOR", `Invisible);
+    (0xFFFA, "INTERLINEAR ANNOTATION SEPARATOR", `Invisible);
+    (0xFFFB, "INTERLINEAR ANNOTATION TERMINATOR", `Invisible);
+    (0xFFFC, "OBJECT REPLACEMENT CHARACTER", `Invisible);
     (* Espaces Unicode variés *)
+    (0x1680, "OGHAM SPACE MARK", `Space);
     (0x2000, "EN QUAD", `Space);
     (0x2001, "EM QUAD", `Space);
     (0x2002, "EN SPACE", `Space);
@@ -2522,19 +2521,31 @@ let problem_chars =
     (0x2008, "PUNCTUATION SPACE", `Space);
     (0x2009, "THIN SPACE", `Space);
     (0x200A, "HAIR SPACE", `Space);
+    (0x2028, "LINE SEPARATOR", `Space);
+    (0x2029, "PARAGRAPH SEPARATOR", `Space);
     (0x205F, "MEDIUM MATHEMATICAL SPACE", `Space);
     (0x3000, "IDEOGRAPHIC SPACE", `Space);
     (* Zero-width *)
+    (0x061C, "ARABIC LETTER MARK", `ZeroWidth);
     (0x200B, "ZERO WIDTH SPACE", `ZeroWidth);
     (0x200C, "ZERO WIDTH NON-JOINER", `ZeroWidth);
     (0x200D, "ZERO WIDTH JOINER", `ZeroWidth);
     (0x200E, "LEFT-TO-RIGHT MARK", `ZeroWidth);
     (0x200F, "RIGHT-TO-LEFT MARK", `ZeroWidth);
+    (0x202A, "LEFT-TO-RIGHT EMBEDDING", `ZeroWidth);
+    (0x202B, "RIGHT-TO-LEFT EMBEDDING", `ZeroWidth);
+    (0x202C, "POP DIRECTIONAL FORMATTING", `ZeroWidth);
+    (0x202D, "LEFT-TO-RIGHT OVERRIDE", `ZeroWidth);
+    (0x202E, "RIGHT-TO-LEFT OVERRIDE", `ZeroWidth);
     (0x2060, "WORD JOINER", `ZeroWidth);
     (0x2061, "FUNCTION APPLICATION", `ZeroWidth);
     (0x2062, "INVISIBLE TIMES", `ZeroWidth);
     (0x2063, "INVISIBLE SEPARATOR", `ZeroWidth);
     (0x2064, "INVISIBLE PLUS", `ZeroWidth);
+    (0x2066, "LEFT-TO-RIGHT ISOLATE", `ZeroWidth);
+    (0x2067, "RIGHT-TO-LEFT ISOLATE", `ZeroWidth);
+    (0x2068, "FIRST STRONG ISOLATE", `ZeroWidth);
+    (0x2069, "POP DIRECTIONAL ISOLATE", `ZeroWidth);
     (0x206A, "INHIBIT SYMMETRIC SWAPPING", `ZeroWidth);
     (0x206B, "ACTIVATE SYMMETRIC SWAPPING", `ZeroWidth);
     (0x206C, "INHIBIT ARABIC FORM SHAPING", `ZeroWidth);
@@ -2545,9 +2556,9 @@ let problem_chars =
   ]
 
 let problem_chars_tbl =
-  let tbl = Hashtbl.create 100 in
+  let tbl = Hashtbl.create 128 in
   List.iter
-    (fun (code, name, cat) -> Hashtbl.add tbl code (name, cat))
+    (fun (code, name, cat) -> Hashtbl.replace tbl code (name, cat))
     problem_chars;
   tbl
 
