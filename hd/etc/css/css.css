@@ -452,7 +452,7 @@ td .rm-cell {
 }
 
 #cd .edit-container .form-control {
-  flex: 1;
+  flex: none;
   margin-top: 0;
   font-size: 1rem;
 }
