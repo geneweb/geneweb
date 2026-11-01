@@ -90,8 +90,8 @@
         <option value="yearint"%if;(xdt.prec = "yearint") selected%end;>…[between (date)]…</option>
       </select>
       <label for="xvar_cal" class="visually-hidden col-form-label">[calendar/calendars]0</label>
-      <select class="form-select ps-lg-1 pe-lg-0 px-xl-2 ms-sm-1 ms-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
-                                        changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)" xcond>
+      <select class="form-select ps-lg-1 pe-lg-0 px-xl-2 ms-sm-1 ms-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm',this),%nn;
+                                        changeCalendar('xvar_ormonth_sel','xvar_ormonth',this)" xcond>
         <option value=""%if;(xdt.calendar = "") selected%end;>-</option>
         <option value="G"%if;(xdt.calendar = "gregorian") selected%end;>[*gregorian/julian/french/hebrew]0</option>
         <option value="J"%if;(xdt.calendar = "julian") selected%end;>[*gregorian/julian/french/hebrew]1</option>
