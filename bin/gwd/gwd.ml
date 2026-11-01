@@ -664,50 +664,42 @@ let http_preferred_language request =
     in
     loop list
 
-let allowed_denied_titles key extra_line env base_env () =
-  if p_getenv env "all_titles" = Some "on" then []
-  else
-    try
-      let fname = List.assoc key base_env in
-      if fname = "" then []
-      else
-        let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
-        let rec loop set =
-          let line, eof =
-            try (input_line ic, false) with End_of_file -> ("", true)
-          in
-          let set =
-            let line = if eof then extra_line |> Mutil.decode else line in
-            if line = "" || line.[0] = ' ' || line.[0] = '#' then set
-            else
-              let line =
-                match String.index_opt line '/' with
-                | Some i ->
-                    let len = String.length line in
-                    let tit = String.sub line 0 i in
-                    let pla = String.sub line (i + 1) (len - i - 1) in
-                    (if tit = "*" then tit else Name.lower tit)
-                    ^ "/"
-                    ^ if pla = "*" then pla else Name.lower pla
-                | None -> Name.lower line
-              in
-              StrSet.add line set
-          in
-          if eof then (
-            close_in ic;
-            StrSet.elements set)
-          else loop set
+let allowed_denied_titles key base_env () =
+  try
+    let fname = List.assoc key base_env in
+    if fname = "" then []
+    else
+      let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
+      let rec loop set =
+        let line, eof =
+          try (input_line ic, false) with End_of_file -> ("", true)
         in
-        loop StrSet.empty
-    with Not_found | Sys_error _ -> []
+        let set =
+          if line = "" || line.[0] = ' ' || line.[0] = '#' then set
+          else
+            let line =
+              match String.index_opt line '/' with
+              | Some i ->
+                  let len = String.length line in
+                  let tit = String.sub line 0 i in
+                  let pla = String.sub line (i + 1) (len - i - 1) in
+                  (if tit = "*" then tit else Name.lower tit)
+                  ^ "/"
+                  ^ if pla = "*" then pla else Name.lower pla
+              | None -> Name.lower line
+            in
+            StrSet.add line set
+        in
+        if eof then (
+          close_in ic;
+          StrSet.elements set)
+        else loop set
+      in
+      loop StrSet.empty
+  with Not_found | Sys_error _ -> []
 
-let allowed_titles env =
-  let extra_line =
-    try List.assoc "extra_title" env with Not_found -> Adef.encoded ""
-  in
-  allowed_denied_titles "allowed_titles_file" extra_line env
-
-let denied_titles = allowed_denied_titles "denied_titles_file" (Adef.encoded "")
+let allowed_titles = allowed_denied_titles "allowed_titles_file"
+let denied_titles = allowed_denied_titles "denied_titles_file"
 
 let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
@@ -1443,8 +1435,8 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
         @ (if lang = "" then [] else [ ("lang", Mutil.encode lang) ])
         @ if from = "" then [] else [ ("opt", Mutil.encode from) ]);
       base_env;
-      allowed_titles = Lazy.from_fun (allowed_titles env base_env);
-      denied_titles = Lazy.from_fun (denied_titles env base_env);
+      allowed_titles = Lazy.from_fun (allowed_titles base_env);
+      denied_titles = Lazy.from_fun (denied_titles base_env);
       request;
       lexicon;
       charset = "UTF-8";
