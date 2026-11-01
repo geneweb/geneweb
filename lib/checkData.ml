@@ -483,7 +483,6 @@ let simple_replacements =
     (Re.str " .", ".");
     (Re.str "....", "…");
     (Re.str "...", "…");
-    (Re.str "..", ".");
     (Re.str "\"\"", "\"");
     (Re.str "’’", "’");
     (Re.str "`", "’");
@@ -527,40 +526,53 @@ let comma_space_pattern =
 
 let comma_space_fix g = ", " ^ Re.Group.get g 1
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
+let dots_replacement = (Re.str "..", ".")
+
+let is_name_dict = function
+  | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Qualifiers
+  | Aliases ->
+      true
+  | Places | Occupation | Estates | Titles | Sources -> false
+
+let pick_punctuation dict ~names ~no_dash ~std =
+  if is_name_dict dict then names
+  else match dict with Places | Occupation | Sources -> no_dash | _ -> std
+
 let max_misc_match_len = 6
 
 let compile_replacements l =
   List.map (fun (pat, repl) -> (Re.compile pat, repl)) l
 
 let replacements_of_dict =
-  let occ_src = lazy (compile_replacements simple_replacements) in
-  let std =
+  let build extra =
     lazy
       (compile_replacements
-         (List.rev_append (List.rev simple_replacements) dash_replacements))
+         (List.rev_append (List.rev simple_replacements) extra))
   in
-  function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
+  let names = build dash_replacements in
+  let no_dash = build [ dots_replacement ] in
+  let std = build (dots_replacement :: dash_replacements) in
+  fun dict -> Lazy.force (pick_punctuation dict ~names ~no_dash ~std)
 
 let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
 let breton_trigram_re = lazy (Re.compile breton_trigram_pattern)
 let comma_space_re = lazy (Re.compile comma_space_pattern)
 
 let misc_alt_of_dict =
-  let build extra =
-    Re.compile
-      (Re.alt
-         (List.rev_append
-            (List.rev_map fst simple_replacements)
-            (List.rev_append (List.rev_map fst extra)
-               [
-                 comma_space_pattern;
-                 char_before_parenthesis_pattern;
-                 breton_trigram_pattern;
-               ])))
+  let build extra patterns =
+    lazy
+      (Re.compile
+         (Re.alt
+            (List.rev_append
+               (List.rev_map fst simple_replacements)
+               (List.rev_append (List.rev_map fst extra) patterns))))
   in
-  let std = lazy (build dash_replacements) in
-  let occ_src = lazy (build []) in
-  function Occupation | Sources -> Lazy.force occ_src | _ -> Lazy.force std
+  let patterns = [ comma_space_pattern; breton_trigram_pattern ] in
+  let with_paren = char_before_parenthesis_pattern :: patterns in
+  let names = build dash_replacements patterns in
+  let no_dash = build [ dots_replacement ] with_paren in
+  let std = build (dots_replacement :: dash_replacements) with_paren in
+  fun dict -> Lazy.force (pick_punctuation dict ~names ~no_dash ~std)
 
 let bracket_kind s i =
   let len = String.length s in
@@ -650,17 +662,18 @@ let find_misc_typographic_positions dict_type s conf =
       (fun (re, repl) ->
         try_pattern re (fun _ start stop -> add_fix start stop repl) found)
       replacements;
-    try_pattern
-      (Lazy.force char_before_paren_re)
-      (fun _ start _ ->
-        errors :=
-          {
-            pos = start;
-            message =
-              Util.transl conf "chk_data ponctuation error missing space";
-          }
-          :: !errors)
-      found;
+    if not (is_name_dict dict_type) then
+      try_pattern
+        (Lazy.force char_before_paren_re)
+        (fun _ start _ ->
+          errors :=
+            {
+              pos = start;
+              message =
+                Util.transl conf "chk_data ponctuation error missing space";
+            }
+            :: !errors)
+        found;
     try_pattern
       (Lazy.force breton_trigram_re)
       (fun _ start stop ->
@@ -689,11 +702,18 @@ let apply_misc_fixes dict_type s =
       (Re.replace (Lazy.force comma_space_re) ~f:comma_space_fix s)
       (replacements_of_dict dict_type)
   in
-  s
-  |> Re.replace (Lazy.force char_before_paren_re) ~f:(fun groups ->
-      Re.Group.get groups 1 ^ " (")
-  |> Re.replace (Lazy.force breton_trigram_re) ~f:(fun groups ->
-      Re.Group.get groups 1 ^ "ʼ" ^ Re.Group.get groups 2)
+  let s =
+    if is_name_dict dict_type then s
+    else
+      Re.replace
+        (Lazy.force char_before_paren_re)
+        ~f:(fun groups -> Re.Group.get groups 1 ^ " (")
+        s
+  in
+  Re.replace
+    (Lazy.force breton_trigram_re)
+    ~f:(fun groups -> Re.Group.get groups 1 ^ "ʼ" ^ Re.Group.get groups 2)
+    s
 
 let fix_misc_typographic_errors dict_type s =
   match dict_type with
