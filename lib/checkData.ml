@@ -1151,6 +1151,17 @@ let is_suspicious_name_char = function
 
 let is_digit c = c >= '0' && c <= '9'
 
+let is_suspicious_name_code code =
+  match code with
+  | 0xA7 | 0xB5 | 0x2013 | 0x2014 | 0x2018 | 0x2026 -> true
+  | 0xB4 | 0x2212 -> false
+  | _ -> (
+      Uchar.is_valid code
+      &&
+      match Uucp.Gc.general_category (Uchar.of_int code) with
+      | `Sc | `Sk | `Sm | `So | `No -> true
+      | _ -> false)
+
 let find_suspicious_characters_positions dict s =
   let len = String.length s in
   let comma = match dict with Fnames | Fnames_alias -> false | _ -> true in
@@ -1167,12 +1178,9 @@ let find_suspicious_characters_positions dict s =
       loop j (if is_ordinal_end j then acc else span_positions i j acc)
     else if is_suspicious_name_char s.[i] || (comma && s.[i] = ',') then
       loop (i + 1) (i :: acc)
-    else if
-      s.[i] = '\xE2'
-      && i + 2 < len
-      && s.[i + 1] = '\x80'
-      && (s.[i + 2] = '\x93' || s.[i + 2] = '\x94' || s.[i + 2] = '\x98')
-    then loop (i + 3) (i :: acc)
+    else if s.[i] >= '\x80' then
+      let code, size = Util.get_unicode_point s i in
+      loop (i + size) (if is_suspicious_name_code code then i :: acc else acc)
     else loop (i + 1) acc
   in
   loop 0 []
