@@ -686,7 +686,7 @@ let perform_check_modification conf base =
     let k =
       Geneweb_db.Driver.Istr.of_string (List.assoc "k" conf.env :> string)
     in
-    let s = Option.value ~default:"" (Util.p_getenv conf.env "s") in
+    let s = Option.value ~default:"" (Util.p_getenv_notrim conf.env "s") in
     let s2 =
       Option.value ~default:""
         (Option.map Util.only_printable (Util.p_getenv conf.env "s2"))
@@ -839,8 +839,8 @@ let send_validation_result_to_opener conf result =
       (String.split_on_char '<' (Yojson.Basic.to_string j))
   in
   let k = (List.assoc "k" conf.env :> string) in
-  let s = Option.value ~default:"" (Util.p_getenv conf.env "s") in
-  let s2 = Option.value ~default:"" (Util.p_getenv conf.env "s2") in
+  let s = Option.value ~default:"" (Util.p_getenv_notrim conf.env "s") in
+  let s2 = Option.value ~default:"" (Util.p_getenv_notrim conf.env "s2") in
   let validation_key = Printf.sprintf "chk_validation_%s_%s_%s" k s s2 in
   let json_data =
     match result with

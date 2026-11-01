@@ -437,26 +437,39 @@ let is_invisible_char code = Hashtbl.mem invisible_chars_tbl code
 let is_invisible_code code =
   if code < 0x80 then code < 0x20 || code = 0x7F else is_invisible_char code
 
+let has_edge_space s =
+  let len = String.length s in
+  len > 0 && (s.[0] = ' ' || s.[len - 1] = ' ')
+
+let edge_space_positions s =
+  let len = String.length s in
+  let rec lead i acc =
+    if i < len && s.[i] = ' ' then lead (i + 1) (i :: acc) else acc
+  in
+  let rec trail i acc =
+    if i >= 0 && s.[i] = ' ' then trail (i - 1) (i :: acc) else acc
+  in
+  trail (len - 1) (lead 0 [])
+
 let has_invisible_chars s =
   let len = String.length s in
   let rec aux i =
-    if i >= len then false
-    else
-      let code, size = Util.get_unicode_point s i in
-      if is_invisible_code code then true else aux (i + size)
+    i < len
+    &&
+    let code, size = Util.get_unicode_point s i in
+    is_invisible_code code || aux (i + size)
   in
-  aux 0
+  has_edge_space s || aux 0
 
 let find_invisible_positions s =
   let len = String.length s in
   let rec aux acc i =
-    if i >= len then List.rev acc
+    if i >= len then acc
     else
       let code, size = Util.get_unicode_point s i in
-      if is_invisible_code code then aux (i :: acc) (i + size)
-      else aux acc (i + size)
+      aux (if is_invisible_code code then i :: acc else acc) (i + size)
   in
-  aux [] 0
+  aux (edge_space_positions s) 0
 
 let simple_replacements =
   [
@@ -1387,6 +1400,7 @@ let make_highlight_html s highlight_info error_type conf =
         let name =
           match Util.get_problem_char_name code with
           | Some n -> n
+          | None when code = 0x20 -> "SPACE"
           | None -> "UNICODE CHARACTER"
         in
         let misc_msg =
@@ -1409,7 +1423,11 @@ let make_highlight_html s highlight_info error_type conf =
   process_char 0
 
 let first_word s =
-  match String.index_opt s ' ' with Some i -> String.sub s 0 i | None -> s
+  let len = String.length s in
+  let rec skip i = if i < len && s.[i] = ' ' then skip (i + 1) else i in
+  match String.index_from_opt s (skip 0) ' ' with
+  | Some i -> String.sub s 0 i
+  | None -> s
 
 let simple_prefix s =
   let len = String.length s in
