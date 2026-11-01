@@ -927,13 +927,46 @@ let is_replacement_char s i =
   && s.[i + 1] = '\xBF'
   && s.[i + 2] = '\xBD'
 
+let is_combining_mark s i =
+  i + 1 < String.length s
+  && (s.[i] = '\xCC' || (s.[i] = '\xCD' && s.[i + 1] <= '\xAF'))
+
+let decomposed_spans s =
+  let len = String.length s in
+  let rec marks_end j =
+    if is_combining_mark s j then marks_end (j + 2) else j
+  in
+  let rec loop prev i acc =
+    if i >= len then acc
+    else if is_combining_mark s i then
+      let j = marks_end i in
+      let cluster = String.sub s prev (j - prev) in
+      let nfc =
+        if String.is_valid_utf_8 cluster then Mutil.normalize_utf_8 cluster
+        else cluster
+      in
+      loop j j (if nfc <> cluster then (prev, j, nfc) :: acc else acc)
+    else loop i (i + char_len s i) acc
+  in
+  if String.contains s '\xCC' || String.contains s '\xCD' then loop 0 0 []
+  else []
+
+let code_points s a b =
+  let rec loop i acc =
+    if i >= b then String.concat " " (List.rev acc)
+    else
+      let code, size = Util.get_unicode_point s i in
+      loop (i + size) (Printf.sprintf "U+%04X" code :: acc)
+  in
+  loop a []
+
 let has_mojibake s =
   let len = String.length s in
   let rec loop i =
     i < len
     && (mojibake_at_byte s i <> None || is_replacement_char s i || loop (i + 1))
   in
-  loop 0
+  loop 0 || decomposed_spans s <> []
 
 let find_mojibake_positions s =
   let len = String.length s in
@@ -950,7 +983,11 @@ let find_mojibake_positions s =
           loop j (span_messages i j message acc)
       | None -> loop (i + 1) acc
   in
-  loop 0 []
+  loop 0
+    (List.fold_left
+       (fun acc (a, b, nfc) ->
+         span_messages a b (fix_message (code_points s a b) nfc) acc)
+       [] (decomposed_spans s))
 
 let fix_mojibake s =
   let fix_once s =
@@ -973,7 +1010,8 @@ let fix_mojibake s =
     let s' = fix_once s in
     if n = 0 || s' = s then s' else repeat (n - 1) s'
   in
-  repeat 2 s
+  let s = repeat 2 s in
+  if String.is_valid_utf_8 s then Mutil.normalize_utf_8 s else s
 
 let html_entity_re =
   lazy
