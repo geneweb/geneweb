@@ -24083,36 +24083,36 @@ es: restaurar el Sosa 1 por defecto
 fr: restorer Sosa 1 par défault
 
     use "link" instead of "create"
-af: gebruik “koppel” eerder as “skep”
-bg: използвайте „да се свърже“ вместо „да се създаде“
-br: implijit « liammañ » kentocʼh eget « sevel »
-ca: utilitzeu «reunir» en lloc de «crear»
-co: impiegà « unisce » invece di « creà »
-cs: použij „svázat“ namísto „vytvořit“
-da: anvend »forbind« i stedet for »opret«
-de: benutze „verbinden“ an Stelle von „erzeugen”
-en: use “link” instead of “create”
-eo: uzu “bindi” anstataù ol “krei”
-es: utilise «reunir» en lugar de «crear»
-et: vali „loo“ asemel „viita“
-fi: käytä toimintoa ”linkitä” toiminnon ”luo” sijaan
-fr: utilisez « relier » au lieu de « créer »
+af: gebruik “Koppel” eerder as “Skep”
+bg: използвайте „Да се свърже“ вместо „Да се създаде“
+br: implijit « Liammañ » kentocʼh eget « Sevel »
+ca: utilitzeu «Reunir» en lloc de «Crear»
+co: impiegà « Unisce » invece di « Creà »
+cs: použij „Svázat“ namísto „Vytvořit“
+da: anvend »Forbind« i stedet for »Opret«
+de: benutze „Verbinden“ an Stelle von „Erzeugen”
+en: use “Link” instead of “Create”
+eo: uzu “Bindi” anstataù ol “Krei”
+es: utilise «Reunir» en lugar de «Crear»
+et: kasuta „Viita“ „Loo“ asemel
+fi: käytä toimintoa ”Linkitä” toiminnon ”Luo” sijaan
+fr: utilisez « Relier » au lieu de « Créer »
 he: להשתמש ב-"קשר" במקום "עשה"
-is: notaðu „tengja“ í stað „búa til“
-it: usare «link» invece di «create»
-lt: naudokite „susieti“ vietoj „sukurti“
-lv: „izveidot“ vietā lietojiet „saite“
-nl: gebruik “connectie” inplaats van “creëren”
-no: bruk «koble» istedet for «opprett»
-oc: utilizatz «religar» al lòc de «crear»
-pl: użyj „link” zamiast „utwórz”
-pt: use «ligar» em lugar de «criar»
-ro: utilizeaza „reuneste” in loc de „creaza”
-ru: используйте «связать» вместо «создать»
-sk: použi „spojenie“ namiesto „vytvorenia“
-sl: uporabite „povezava“ namesto „ustvari“
-sv: använd ”länk” istället för ”skapa”
-tr: “oluştur” yerine “bağlantı” kullanın
+is: notaðu „Tengja“ í stað „Búa til“
+it: usare «Link» invece di «Create»
+lt: naudokite „Susieti“ vietoj „Sukurti“
+lv: „Izveidot“ vietā lietojiet „Saite“
+nl: gebruik “Connectie” inplaats van “Creëren”
+no: bruk «Koble» istedet for «Opprett»
+oc: utilizatz «Religar» al lòc de «Crear»
+pl: użyj „Link” zamiast „Utwórz”
+pt: use «Ligar» em lugar de «Criar»
+ro: utilizeaza „Reuneste” in loc de „Creaza”
+ru: используйте «Связать» вместо «Создать»
+sk: použi „Spojenie“ namiesto „Vytvorenia“
+sl: uporabite „Povezava“ namesto „Ustvari“
+sv: använd ”Länk” istället för ”Skapa”
+tr: “Oluştur” yerine “Bağlantı” kullanın
 
     use coat of arms of
 co: impiegà l’armuratura di
