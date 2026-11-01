@@ -490,6 +490,11 @@ let same_parents conf base p1 p2 =
 let cousin_label conf is half a b =
   let key = Printf.sprintf "cousin.%d.%d" a b in
   let pfx = if half then Util.transl_nth conf "half-relationship" is else "" in
+  let nth_generation w n =
+    (with_generation conf (Util.transl_nth conf w is) n
+      : Adef.safe_string
+      :> string)
+  in
   if Hashtbl.mem conf.Config.lexicon key then
     Templ.apply_format conf (Some is) key pfx
   else if a = b then
@@ -497,6 +502,8 @@ let cousin_label conf is half a b =
       (Util.ftransl_nth conf "a %s%s cousin" is)
       pfx
       (Util.transl_nth conf "nth (cousin)" (a - 1))
+  else if b = 0 then nth_generation "an ancestor" a
+  else if a = 0 then nth_generation "a descendant" b
   else Templ.apply_format conf (Some is) key pfx
 
 let print_link_name conf base n p1 p2 sol =
