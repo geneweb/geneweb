@@ -29,17 +29,21 @@ let min_age_marriage = 12
 let max_age_marriage = 100
 let max_siblings_gap = 50
 
-(* Check if d1 < d2 *)
+(* Dates are compared as SDN intervals so that a partial date is only
+   strictly before/after another one when every day it may denote is.
+   Partial non-Gregorian dates (e.g. « an X ») are normalized beforehand
+   by [Date.gregorian_bounds], see [od_of_cdate] below. *)
 let strictly_before_dmy d1 d2 =
-  match Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
+  let _, hi1 = Date.gregorian_interval d1 in
+  let lo2, _ = Date.gregorian_interval d2 in
+  hi1 < lo2
 
 let strictly_before d1 d2 =
   match (d1, d2) with
   | Adef.Dgreg (d1, _), Adef.Dgreg (d2, _) -> strictly_before_dmy d1 d2
   | _ -> false
 
-let strictly_after_dmy d1 d2 =
-  match Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
+let strictly_after_dmy d1 d2 = strictly_before_dmy d2 d1
 
 let strictly_after d1 d2 =
   match (d1, d2) with
@@ -56,21 +60,36 @@ let strictly_older age year =
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
 
+(* Complete dates are stored converted to Gregorian, but partial dates of
+   other calendars are stored in their own calendar: normalize every date
+   before comparing it. *)
+let od_of_cdate cd =
+  Option.map Date.date_to_gregorian_bounds (Date.od_of_cdate cd)
+
+let cdate_to_dmy_opt cd =
+  match od_of_cdate cd with Some (Adef.Dgreg (d, _)) -> Some d | _ -> None
+
+let date_of_death d =
+  Option.map Date.date_to_gregorian_bounds (Date.date_of_death d)
+
+let dmy_of_death d =
+  match date_of_death d with Some (Adef.Dgreg (d, _)) -> Some d | _ -> None
+
 let odate = function
   | Some (Adef.Dgreg (d, _)) -> Some d
   | Some (Dtext _) | None -> None
 
-let obirth x = Driver.get_birth x |> Date.cdate_to_dmy_opt
+let obirth x = Driver.get_birth x |> cdate_to_dmy_opt
 
 let title_dates warning p t =
-  let t_date_start = Date.od_of_cdate t.t_date_start in
-  let t_date_end = Date.od_of_cdate t.t_date_end in
+  let t_date_start = od_of_cdate t.t_date_start in
+  let t_date_end = od_of_cdate t.t_date_end in
   match (t_date_start, t_date_end) with
   | None, None -> ()
   | Some d1, Some d2 when strictly_after d1 d2 ->
       warning (TitleDatesError (p, t))
   | _ -> (
-      match Date.od_of_cdate (Driver.get_birth p) with
+      match od_of_cdate (Driver.get_birth p) with
       | None -> ()
       | Some d1 -> (
           match t_date_start with
@@ -86,7 +105,7 @@ let check_person_age warning p =
   let aux d1 d2 =
     Date.time_elapsed_opt d1 d2
     |> Option.iter @@ fun a ->
-       if a.Adef.year < 0 then warning (BirthAfterDeath p)
+       if strictly_after_dmy d1 d2 then warning (BirthAfterDeath p)
        else if d2.Adef.year > lim_date_death then (
          if strictly_older a max_death_after_lim_date_death then
            warning (DeadOld (p, a)))
@@ -96,13 +115,13 @@ let check_person_age warning p =
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
   (* juste pour un warning ?                                            *)
-  match Date.dmy_of_death (Driver.get_death p) with
+  match dmy_of_death (Driver.get_death p) with
   | None -> ()
   | Some d2 -> (
-      match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+      match cdate_to_dmy_opt (Driver.get_birth p) with
       | Some d -> aux d d2
       | None -> (
-          match Date.cdate_to_dmy_opt (Driver.get_baptism p) with
+          match cdate_to_dmy_opt (Driver.get_baptism p) with
           | Some d -> aux d d2
           | None -> ()))
 
@@ -205,10 +224,10 @@ let related_sex_is_coherent base warning p_ref =
 
 let check_difference_age_between_cpl warning fath moth =
   let find_date p =
-    match Date.cdate_to_dmy_opt (Driver.get_birth p) with
+    match cdate_to_dmy_opt (Driver.get_birth p) with
     | Some d -> Some d
     | None -> (
-        match Date.cdate_to_dmy_opt (Driver.get_baptism p) with
+        match cdate_to_dmy_opt (Driver.get_baptism p) with
         | None -> None
         | Some d -> Some d)
   in
@@ -242,9 +261,9 @@ let semi_sort base a before comp di =
     else
       let p1 = Driver.poi base a.(i) in
       let d1 =
-        match Date.od_of_cdate (Driver.get_birth p1) with
+        match od_of_cdate (Driver.get_birth p1) with
         | Some d1 -> Some d1
-        | None -> Date.od_of_cdate (Driver.get_baptism p1)
+        | None -> od_of_cdate (Driver.get_baptism p1)
       in
       match d1 with
       | Some d1 ->
@@ -253,9 +272,9 @@ let semi_sort base a before comp di =
             else
               let p2 = Driver.poi base a.(j) in
               let d2 =
-                match Date.od_of_cdate (Driver.get_birth p2) with
+                match od_of_cdate (Driver.get_birth p2) with
                 | Some d2 -> Some d2
-                | None -> Date.od_of_cdate (Driver.get_baptism p2)
+                | None -> od_of_cdate (Driver.get_baptism p2)
               in
               match d2 with
               | Some d2 ->
@@ -276,12 +295,9 @@ let semi_sort base a before comp di =
                             else
                               let p3 = Driver.poi base a.(k) in
                               let d3 =
-                                match
-                                  Date.od_of_cdate (Driver.get_birth p3)
-                                with
+                                match od_of_cdate (Driver.get_birth p3) with
                                 | Some d3 -> Some d3
-                                | None ->
-                                    Date.od_of_cdate (Driver.get_baptism p3)
+                                | None -> od_of_cdate (Driver.get_baptism p3)
                               in
                               match d3 with
                               | Some d3 ->
@@ -337,7 +353,7 @@ let changed_marriages_order base warning p =
       (fun (max_date, tab) ifam ->
         let fam = Driver.foi base ifam in
         let date =
-          match Date.od_of_cdate (Driver.get_marriage fam) with
+          match od_of_cdate (Driver.get_marriage fam) with
           | Some d -> Some d
           | None -> max_date
         in
@@ -371,7 +387,7 @@ let changed_marriages_order base warning p =
 let close_siblings warning x np ifam =
   match np with
   | Some (elder, d1) -> (
-      match odate @@ Date.od_of_cdate (Driver.get_birth x) with
+      match odate @@ od_of_cdate (Driver.get_birth x) with
       | None -> ()
       | Some d2 ->
           Date.time_elapsed_opt d1 d2
@@ -393,7 +409,7 @@ let born_after_his_elder_sibling warning x b np ifam des =
           if strictly_after_dmy d1 d2 then
             warning (ChildrenNotInOrder (ifam, des, elder, x))
       | None -> (
-          match Date.dmy_of_death (Driver.get_death x) with
+          match dmy_of_death (Driver.get_death x) with
           | None -> ()
           | Some d2 ->
               if strictly_after_dmy d1 d2 then
@@ -410,12 +426,12 @@ let siblings_gap gap child = function
               if strictly_after_dmy b max then (b, child) else (max, maxp) ))
 
 let child_born_after_his_parent warning x parent =
-  match Date.cdate_to_dmy_opt (Driver.get_birth parent) with
+  match cdate_to_dmy_opt (Driver.get_birth parent) with
   | None -> ()
   | Some g1 -> (
-      match Date.cdate_to_dmy_opt (Driver.get_birth x) with
+      match cdate_to_dmy_opt (Driver.get_birth x) with
       | None -> (
-          match Date.dmy_of_death (Driver.get_death x) with
+          match dmy_of_death (Driver.get_death x) with
           | None -> ()
           | Some g2 ->
               if strictly_after_dmy g1 g2 then
@@ -441,19 +457,19 @@ let child_born_after_his_parent warning x parent =
                then warning (ParentTooOld (parent, a, x)))
 
 let child_born_before_mother_death warning x mother =
-  match Date.cdate_to_dmy_opt (Driver.get_birth x) with
+  match cdate_to_dmy_opt (Driver.get_birth x) with
   | None -> ()
   | Some d1 -> (
-      match Date.dmy_of_death @@ Driver.get_death mother with
+      match dmy_of_death @@ Driver.get_death mother with
       | None -> ()
       | Some d2 ->
           if strictly_after_dmy d1 d2 then
             warning (MotherDeadBeforeChildBirth (mother, x)))
 
 let possible_father warning x father =
-  match Date.cdate_to_dmy_opt (Driver.get_birth x) with
+  match cdate_to_dmy_opt (Driver.get_birth x) with
   | Some d1 when d1.prec <> Before -> (
-      match Date.dmy_of_death (Driver.get_death father) with
+      match dmy_of_death (Driver.get_death father) with
       | Some d2 when d2.prec <> After ->
           let a2 =
             match d2 with
@@ -523,15 +539,15 @@ let check_witness_pevents_aux warning origin evt date b d p witness_kind =
 let check_witness_pevents base warning origin =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt evt.epers_date with
+      match cdate_to_dmy_opt evt.epers_date with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
               let p = Driver.poi base iw in
               check_witness_pevents_aux warning origin evt d2
-                (Date.od_of_cdate @@ Driver.get_birth p)
-                (Date.date_of_death @@ Driver.get_death p)
+                (od_of_cdate @@ Driver.get_birth p)
+                (date_of_death @@ Driver.get_death p)
                 p witness_kind)
             evt.epers_witnesses)
     (Driver.get_pevents origin)
@@ -566,12 +582,12 @@ let witness_kind_of_witness_array iper witnesses =
 let check_person_dates_as_witness base warning p =
   let ip = Driver.get_iper p in
   let aux date w1 w2 evt =
-    match Date.od_of_cdate (date evt) with
+    match od_of_cdate (date evt) with
     | Some (Dgreg (_, _) as d) -> (
-        (match Date.od_of_cdate (Driver.get_birth p) with
+        (match od_of_cdate (Driver.get_birth p) with
         | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
         | _ -> ());
-        match Date.date_of_death (Driver.get_death p) with
+        match date_of_death (Driver.get_death p) with
         | Some d' -> if strictly_after d d' then w2 evt
         | None -> ())
     | Some (Dtext _) | None -> ()
@@ -745,15 +761,15 @@ let check_witness_fevents_aux warning fam evt date b d p witness_kind =
 let check_witness_fevents base warning fam =
   List.iter
     (fun evt ->
-      match Date.cdate_to_dmy_opt evt.efam_date with
+      match cdate_to_dmy_opt evt.efam_date with
       | None -> ()
       | Some d2 ->
           Array.iter
             (fun (iw, witness_kind) ->
               let p = Driver.poi base iw in
               check_witness_fevents_aux warning fam evt d2
-                (Date.od_of_cdate @@ Driver.get_birth p)
-                (Date.date_of_death @@ Driver.get_death p)
+                (od_of_cdate @@ Driver.get_birth p)
+                (date_of_death @@ Driver.get_death p)
                 p witness_kind)
             evt.efam_witnesses)
     (Driver.get_fevents fam)
@@ -762,13 +778,13 @@ let check_parent_marriage_age warning fam p =
   let rec loop = function
     | [] -> ()
     | { efam_name = Efam_Marriage | Efam_PACS; efam_date; _ } :: list -> (
-        match Date.od_of_cdate efam_date with
+        match od_of_cdate efam_date with
         | Some (Dgreg (g2, _) as d2) -> (
-            match Date.date_of_death (Driver.get_death p) with
+            match date_of_death (Driver.get_death p) with
             | Some d1 when strictly_after d2 d1 ->
                 warning (MarriageDateAfterDeath p)
             | _ -> (
-                match Date.od_of_cdate (Driver.get_birth p) with
+                match od_of_cdate (Driver.get_birth p) with
                 | Some (Dgreg (g1, _) as d1) ->
                     if strictly_before d2 d1 then
                       warning (MarriageDateBeforeBirth p)
@@ -903,7 +919,7 @@ let check_related_person_pevents warning birth_date death_date p iper related_p
     =
   List.iter
     (fun e ->
-      match Date.cdate_to_dmy_opt e.epers_date with
+      match cdate_to_dmy_opt e.epers_date with
       | None -> ()
       | Some date ->
           let is_witness, only_mentioned =
@@ -924,7 +940,7 @@ let check_related_person_fevents warning base birth_date death_date p iper
       let f = Driver.foi base i in
       List.iter
         (fun e ->
-          match Date.cdate_to_dmy_opt e.efam_date with
+          match cdate_to_dmy_opt e.efam_date with
           | None -> ()
           | Some date ->
               let is_witness, only_mentioned =
@@ -956,8 +972,8 @@ let on_person_update base warning p =
       child_born_after_his_parent warning p moth;
       check_siblings base warning (i, fam) ignore
   | None -> ());
-  let b = Date.od_of_cdate (Driver.get_birth p) in
-  let d = Date.date_of_death @@ Driver.get_death p in
+  let b = od_of_cdate (Driver.get_birth p) in
+  let d = date_of_death @@ Driver.get_death p in
   let iper = Driver.get_iper p in
   if b <> None || d <> None then
     List.iter

@@ -279,6 +279,53 @@ let approx_gregorian ~from d =
       month = (if d.month = 0 then 0 else g.month);
     }
 
+let is_complete d = d.Adef.day > 0 && d.Adef.month > 0
+
+let sdn_bounds ~from d =
+  if is_complete d then
+    let sdn = to_sdn ~from d in
+    (sdn, sdn)
+  else (to_sdn ~from ~lower:true d, to_sdn ~from ~lower:false d - 1)
+
+let gregorian_bounds ~from d =
+  (* Complete dates are already Gregorian (converted at import); partial
+     ones are still in their own calendar. *)
+  let from = if is_complete d then Adef.Dgregorian else from in
+  if from = Adef.Dgregorian then d
+  else
+    let lo, hi =
+      match d.Adef.prec with
+      | OrYear d2 | YearInt d2 ->
+          let lo, _ = sdn_bounds ~from d in
+          let d2 = dmy_of_dmy2 d2 in
+          let from2 = if is_complete d2 then Adef.Dgregorian else from in
+          let _, hi = sdn_bounds ~from:from2 d2 in
+          (lo, hi)
+      | Sure | About | Maybe | Before | After -> sdn_bounds ~from d
+    in
+    let g_lo = Calendar.gregorian_of_sdn Adef.Sure lo in
+    let g_hi = Calendar.gregorian_of_sdn Adef.Sure hi in
+    match d.prec with
+    | Before -> { g_lo with prec = Before }
+    | After -> { g_hi with prec = After }
+    | Sure | About | Maybe | OrYear _ | YearInt _ ->
+        { g_lo with prec = YearInt (Calendar.dmy2_of_dmy g_hi) }
+
+let gregorian_interval d =
+  let lo, hi = sdn_bounds ~from:Adef.Dgregorian d in
+  match d.Adef.prec with
+  | Before -> (min_int, lo - 1)
+  | After -> (hi + 1, max_int)
+  | OrYear d2 | YearInt d2 ->
+      let lo2, hi2 = sdn_bounds ~from:Adef.Dgregorian (dmy_of_dmy2 d2) in
+      (min lo lo2, max hi hi2)
+  | Sure | About | Maybe -> (lo, hi)
+
+let date_to_gregorian_bounds = function
+  | Adef.Dgreg (d, cal) ->
+      Adef.Dgreg (gregorian_bounds ~from:cal d, Adef.Dgregorian)
+  | Dtext _ as d -> d
+
 let cdate_to_gregorian_dmy_opt cdate =
   match od_of_cdate cdate with
   | Some (Dgreg (d, cal)) -> Some (approx_gregorian ~from:cal d)
