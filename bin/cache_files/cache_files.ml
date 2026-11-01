@@ -1,5 +1,6 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Dutil = Geneweb_db.Dutil
 module Dirs = Geneweb_dirs
 
 let bname = ref ""
@@ -17,6 +18,7 @@ let occupations = ref false
 let qualifiers = ref false
 let sources = ref false
 let notes = ref false
+let ngrams = ref false
 let all = ref false
 let prog = ref false
 let binary = ref false
@@ -235,6 +237,120 @@ let gen_notes_corpus bname base =
     n "notes" duration;
   duration
 
+type first_name = { name : string; mutable persons : int }
+
+let ngram_thresholds =
+  [ 1; 2; 3; 5; 10; 20; 50; 100; 200; 500; 1000; 2000; 5000; 10000 ]
+
+let ngrams_of n words =
+  let a = Array.of_list words in
+  List.init
+    (max 0 (Array.length a - n + 1))
+    (fun j -> String.concat "" (Array.to_list (Array.sub a j n)))
+
+let hyphens_to_spaces = String.map (fun c -> if c = '-' then ' ' else c)
+
+let gen_ngram_stats base =
+  let names = Driver.Istr.Table.create 4096 in
+  let nb_pers = Driver.nb_of_persons base in
+  let (counts, added, index_entries), duration =
+    with_timer @@ fun () ->
+    ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
+        iteri_pers
+          (fun i p ->
+            if !prog then ProgrBar.progress bar i nb_pers;
+            let istr = Driver.get_first_name p in
+            if not (Driver.Istr.is_empty istr || Driver.Istr.is_quest istr) then
+              match Driver.Istr.Table.find_opt names istr with
+              | Some f -> f.persons <- f.persons + 1
+              | None ->
+                  Driver.Istr.Table.replace names istr
+                    {
+                      name = hyphens_to_spaces (Driver.sou base istr);
+                      persons = 1;
+                    })
+          base);
+    let counts = Array.init 3 (fun _ -> Hashtbl.create 100_000) in
+    Driver.Istr.Table.iter
+      (fun _ f ->
+        let words = Name.split_fname f.name in
+        Array.iteri
+          (fun k tbl ->
+            List.iter
+              (fun g ->
+                Hashtbl.replace tbl g
+                  (f.persons + Option.value ~default:0 (Hashtbl.find_opt tbl g)))
+              (ngrams_of (k + 2) words))
+          counts)
+      names;
+    let added = Array.make 3 [] in
+    let index_entries = ref 0 in
+    Driver.Istr.Table.iter
+      (fun _ f ->
+        let words = Name.split_fname f.name in
+        let keys =
+          List.sort_uniq Int.compare
+            (List.map Dutil.name_index (f.name :: words))
+        in
+        index_entries := !index_entries + List.length keys;
+        Array.iteri
+          (fun k tbl ->
+            List.fold_left
+              (fun acc g ->
+                let b = Dutil.name_index g in
+                let c = Hashtbl.find tbl g in
+                if List.mem b keys then acc
+                else
+                  match List.assoc_opt b acc with
+                  | Some c' when c' >= c -> acc
+                  | _ -> (b, c) :: List.remove_assoc b acc)
+              []
+              (ngrams_of (k + 2) words)
+            |> List.iter (fun (_, c) -> added.(k) <- c :: added.(k)))
+          counts)
+      names;
+    (counts, added, !index_entries)
+  in
+  let kb n = ((5 * n) + 512) / 1024 in
+  Printf.printf
+    "First name n-grams, counted on persons as gwc -ngrams does\n\
+    \  %d distinct first names on %d persons\n\
+    \  first name index without n-grams: %d entries, about %d kB\n"
+    (Driver.Istr.Table.length names)
+    (Driver.Istr.Table.fold (fun _ f n -> n + f.persons) names 0)
+    index_entries (kb index_entries);
+  Array.iteri
+    (fun k tbl ->
+      Printf.printf
+        "  %s: %d distinct\n    threshold      kept   entries  growth\n"
+        [| "bigrams"; "trigrams"; "quadrigrams" |].(k)
+        (Hashtbl.length tbl);
+      List.iter
+        (fun t ->
+          let kept =
+            Hashtbl.fold (fun _ c n -> if c >= t then n + 1 else n) tbl 0
+          in
+          let entries =
+            List.fold_left (fun n c -> if c >= t then n + 1 else n) 0 added.(k)
+          in
+          if kept > 0 then
+            Printf.printf "    %9d %9d %9d %+6.1f%% (+%d kB)\n" t kept entries
+              (100. *. float entries /. float (max 1 index_entries))
+              (kb entries))
+        ngram_thresholds;
+      Hashtbl.fold (fun g c acc -> (g, c) :: acc) tbl []
+      |> List.sort (fun (_, a) (_, b) -> Int.compare b a)
+      |> List.filteri (fun i _ -> i < 10)
+      |> List.map (fun (g, c) -> Printf.sprintf "%s %d" g c)
+      |> String.concat ", "
+      |> Printf.printf "    most frequent: %s\n")
+    counts;
+  print_endline
+    "  entries: (first name, crushed key) pairs added to the index, about 5 \
+     bytes each; a key shared by n-grams of different lengths of a same first \
+     name is counted once per length";
+  duration
+
 let validate_options () =
   if !bname = "" then (
     Printf.eprintf "Error: missing database name, see cache_files -help\n";
@@ -274,6 +390,10 @@ let speclist =
       Arg.Set notes,
       " person, family and event notes, for m=NOTES_SEARCH (rebuild after gwc)"
     );
+    ( "-ngrams",
+      Arg.Set ngrams,
+      " first name n-gram statistics, to choose the thresholds of gwc -ngrams"
+    );
     ("", Arg.Unit (fun () -> ()), "");
     ("-all", Arg.Set all, " build all type of cache files");
     ("", Arg.Unit (fun () -> ()), "");
@@ -308,14 +428,14 @@ let () =
 
   width := String.length (Geneweb.GWPARAM.cache_d bname // bname) + 30;
 
-  let only_notes =
-    !notes
+  let no_dict_cache =
+    (!notes || !ngrams)
     && not
          (!all || !fnames || !snames || !aliases || !pub_names || !fname_aliases
         || !sname_aliases || !places || !estates || !titles || !occupations
         || !qualifiers || !sources)
   in
-  (if not only_notes then
+  (if not no_dict_cache then
      match (gen_dl, gen_cd) with
      | true, true ->
          Printf.printf
@@ -430,6 +550,7 @@ let () =
     fields;
 
   if !all || !notes then total := !total +. gen_notes_corpus bname base;
+  if !ngrams then total := !total +. gen_ngram_stats base;
 
   let min, sec = (Float.to_int !total / 60, mod_float !total 60.) in
   Format.printf "Total duration: %d min %6.2f s@." min sec
