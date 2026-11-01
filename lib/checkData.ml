@@ -635,8 +635,16 @@ let find_unpaired_positions s =
 
 let has_unpaired s = find_unpaired_positions s <> []
 
+let trailing_comma_start s =
+  let rec back i =
+    if i > 0 && (s.[i - 1] = ',' || s.[i - 1] = ' ') then back (i - 1) else i
+  in
+  let i = back (String.length s) in
+  if i > 0 && String.contains_from s i ',' then Some i else None
+
 let has_misc_typographic_errors dict_type s =
   has_unpaired s
+  || trailing_comma_start s <> None
   ||
   let re = misc_alt_of_dict dict_type in
   let check str = Re.execp re str in
@@ -709,6 +717,7 @@ let find_misc_typographic_positions dict_type s conf =
       found;
     pos := match !found with Some p -> p | None -> !pos + 1
   done;
+  Option.iter (fun i -> add_fix i len "") (trailing_comma_start s);
   let unpaired = Util.transl conf "chk_data ponctuation error unpaired" in
   List.iter
     (fun i -> errors := { pos = i; message = unpaired } :: !errors)
@@ -743,19 +752,22 @@ let apply_misc_fixes dict_type s =
     s
 
 let fix_misc_typographic_errors dict_type s =
-  match dict_type with
-  | Places -> (
-      match place_suburb_sep_range s with
-      | Some (brk, main_s) ->
-          let sub = String.sub s 1 (brk - 1) in
-          let sep = String.sub s brk (main_s - brk) in
-          let main = String.sub s main_s (String.length s - main_s) in
-          "["
-          ^ apply_misc_fixes dict_type sub
-          ^ sep
-          ^ apply_misc_fixes dict_type main
-      | None -> apply_misc_fixes dict_type s)
-  | _ -> apply_misc_fixes dict_type s
+  let s =
+    match dict_type with
+    | Places -> (
+        match place_suburb_sep_range s with
+        | Some (brk, main_s) ->
+            let sub = String.sub s 1 (brk - 1) in
+            let sep = String.sub s brk (main_s - brk) in
+            let main = String.sub s main_s (String.length s - main_s) in
+            "["
+            ^ apply_misc_fixes dict_type sub
+            ^ sep
+            ^ apply_misc_fixes dict_type main
+        | None -> apply_misc_fixes dict_type s)
+    | _ -> apply_misc_fixes dict_type s
+  in
+  match trailing_comma_start s with Some i -> String.sub s 0 i | None -> s
 
 let script_cache = Hashtbl.create 256
 
