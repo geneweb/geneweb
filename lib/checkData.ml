@@ -485,9 +485,7 @@ let simple_replacements =
     (Re.str "...", "…");
     (Re.str "\"\"", "\"");
     (Re.str "’’", "’");
-    (Re.str "`", "’");
     (Re.str "´", "’");
-    (Re.str "‘", "’");
     (Re.str "\u{2010}", "-");
     (Re.str "\u{2011}", "-");
     (Re.str "\u{2012}", "–");
@@ -524,7 +522,9 @@ let comma_space_pattern =
 
 let comma_space_fix g = ", " ^ Re.Group.get g 1
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
-let dots_replacement = (Re.str "..", ".")
+
+let text_replacements =
+  [ (Re.str "..", "."); (Re.str "`", "’"); (Re.str "‘", "’") ]
 
 let modifier_replacements =
   [
@@ -558,9 +558,11 @@ let replacements_of_dict =
          (List.rev_append (List.rev simple_replacements) extra))
   in
   let names = build dash_replacements in
-  let places = build [ dots_replacement ] in
-  let free_text = build (dots_replacement :: modifier_replacements) in
-  let std = build (dots_replacement :: dash_replacements) in
+  let places = build text_replacements in
+  let free_text =
+    build (List.rev_append text_replacements modifier_replacements)
+  in
+  let std = build (List.rev_append text_replacements dash_replacements) in
   fun dict -> Lazy.force (pick_punctuation dict ~names ~places ~free_text ~std)
 
 let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
@@ -579,11 +581,13 @@ let misc_alt_of_dict =
   let patterns = [ comma_space_pattern; breton_trigram_pattern ] in
   let with_paren = char_before_parenthesis_pattern :: patterns in
   let names = build dash_replacements patterns in
-  let places = build [ dots_replacement ] with_paren in
+  let places = build text_replacements with_paren in
   let free_text =
-    build (dots_replacement :: modifier_replacements) with_paren
+    build (List.rev_append text_replacements modifier_replacements) with_paren
   in
-  let std = build (dots_replacement :: dash_replacements) with_paren in
+  let std =
+    build (List.rev_append text_replacements dash_replacements) with_paren
+  in
   fun dict -> Lazy.force (pick_punctuation dict ~names ~places ~free_text ~std)
 
 let bracket_kind s i =
@@ -1140,8 +1144,8 @@ let fix_html_entities s =
 
 let is_suspicious_name_char = function
   | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' | '*' | '_' | '!' | ';' | ':'
-  | '@' | '#' | '$' | '%' | '&' | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '"'
-    ->
+  | '@' | '#' | '$' | '%' | '&' | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '`'
+  | '"' ->
       true
   | _ -> false
 
@@ -1167,7 +1171,7 @@ let find_suspicious_characters_positions dict s =
       s.[i] = '\xE2'
       && i + 2 < len
       && s.[i + 1] = '\x80'
-      && (s.[i + 2] = '\x93' || s.[i + 2] = '\x94')
+      && (s.[i + 2] = '\x93' || s.[i + 2] = '\x94' || s.[i + 2] = '\x98')
     then loop (i + 3) (i :: acc)
     else loop (i + 1) acc
   in
