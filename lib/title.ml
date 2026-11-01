@@ -8,6 +8,13 @@ module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 module T = Driver.Istr.Table
 
+let listed_titles conf base p =
+  match Driver.get_titles p with
+  | [] -> []
+  | l when conf.wizard -> l
+  | _ when authorized_age conf base p -> nobtit conf base p
+  | _ -> []
+
 type date_search = JustSelf | AddSpouse | AddChildren
 
 let date_interval conf base t x =
@@ -32,7 +39,7 @@ let date_interval conf base t x =
       (fun t ->
         Option.iter set (Date.cdate_to_dmy_opt t.t_date_start);
         Option.iter set (Date.cdate_to_dmy_opt t.t_date_end))
-      (Util.nobtit conf base x);
+      (listed_titles conf base x);
     match t with
     | JustSelf -> ()
     | AddSpouse | AddChildren ->
@@ -145,7 +152,7 @@ let select_title_place conf base ~absolute title place =
     Collection.fold
       (fun acc i ->
         let x = pget conf base i in
-        let titles = nobtit conf base x in
+        let titles = listed_titles conf base x in
         List.fold_left
           (fun acc t ->
             if select t then (
@@ -167,7 +174,7 @@ let select_all_with_place conf base place =
   Collection.fold
     (fun acc i ->
       let x = pget conf base i in
-      let titles = nobtit conf base x in
+      let titles = listed_titles conf base x in
       List.fold_left
         (fun acc t -> if select t then (x, t) :: acc else acc)
         acc titles)
@@ -192,7 +199,7 @@ let select_title conf base ~absolute title =
           if select t then (
             T.replace names t.t_ident ();
             T.replace places t.t_place ()))
-        (nobtit conf base x))
+        (listed_titles conf base x))
     (Geneweb_db.Driver.ipers base);
   let places = to_string_list base places in
   let names = to_string_list base names in
@@ -209,7 +216,7 @@ let select_place conf base place =
   Collection.iter
     (fun i ->
       let x = pget conf base i in
-      let titles = nobtit conf base x in
+      let titles = listed_titles conf base x in
       List.iter (fun t -> if select t then T.replace names t.t_ident ()) titles)
     (Geneweb_db.Driver.ipers base);
   to_string_list base names
@@ -219,7 +226,7 @@ let select_all proj conf base =
   Collection.iter
     (fun i ->
       let x = pget conf base i in
-      let titles = nobtit conf base x in
+      let titles = listed_titles conf base x in
       List.iter (fun t -> T.add ht (proj t) ()) titles)
     (Geneweb_db.Driver.ipers base);
   to_string_list base ht
@@ -229,7 +236,7 @@ let select_all_with_counter proj conf base =
   Collection.iter
     (fun i ->
       let x = pget conf base i in
-      let titles = nobtit conf base x in
+      let titles = listed_titles conf base x in
       List.iter
         (fun t ->
           let y = proj t in

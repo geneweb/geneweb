@@ -65,6 +65,13 @@
   ' and ’ as equal (#3051).
 - The descendant counters of the templates (number_of_descendants,
   max_desc_level…) no longer scan nor allocate per person of the base.
+- The `all_titles` and `extra_title` URL parameters are removed: they let
+  any visitor bypass `allowed_titles_file` and `denied_titles_file`,
+  including for the "if titles" access.
+- The titles lists (`m=TT`) show wizards every title, ignoring
+  `allowed_titles_file` and `denied_titles_file`, and show visitors only
+  the persons visible to them. Merged spellings are labeled with the most
+  frequent one, as stored.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
