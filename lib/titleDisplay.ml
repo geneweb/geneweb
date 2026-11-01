@@ -17,16 +17,14 @@ let sort_uniq_by_key cmp key l =
 let my_alphabetic n1 n2 = compare (Name.lower n1) (Name.lower n2)
 
 let string_cnt_list_uniq l =
-  let l =
-    List.fold_left
-      (fun l (e, c) ->
-        match l with
-        | [] -> [ (e, c) ]
-        | (x, d) :: l1 ->
-            if my_alphabetic e x = 0 then (x, c + d) :: l1 else (e, c) :: l)
-      [] l
-  in
-  List.rev l
+  List.fold_left
+    (fun acc (e, c) ->
+      match acc with
+      | (x, m, d) :: tl when my_alphabetic e x = 0 ->
+          (if c > m then (e, c, c + d) else (x, m, c + d)) :: tl
+      | _ -> (e, c, c) :: acc)
+    [] l
+  |> List.rev_map (fun (x, _, d) -> (x, d))
 
 let compare_titles2 (t1, _) (t2, _) = my_alphabetic t1 t2
 
@@ -98,12 +96,12 @@ let give_access_title_aux conf xhref content =
 let give_access_title conf t p =
   give_access_title_aux conf
     ("&t=" ^<^ Mutil.encode t ^^^ "&p=" ^<^ Mutil.encode p)
-    (escape_html @@ Utf8.capitalize_fst t)
+    (escape_html t)
 
 let give_access_all_titles conf t absolute =
   give_access_title_aux conf
     ("&t=" ^<^ Mutil.encode t ^>^ if absolute then "&a=A" else "")
-    (escape_html @@ if absolute then t else Utf8.capitalize_fst t)
+    (escape_html t)
 
 let give_access_all_places conf t =
   give_access_title_aux conf
