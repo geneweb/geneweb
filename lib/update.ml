@@ -226,7 +226,7 @@ let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     Buffer.add_char buf '.';
     Output.print_sstring conf (Buffer.contents buf)
 
-let form_dates_from_env conf =
+let form_dates_from_env conf var =
   let prec_str = function
     | "about" -> "ca "
     | "maybe" -> "?"
@@ -236,7 +236,7 @@ let form_dates_from_env conf =
   in
   let get_year prefix =
     match Util.p_getenv conf.env (prefix ^ "_yyyy") with
-    | Some y when y <> "" ->
+    | Some y when y <> "" && y.[0] >= '0' && y.[0] <= '9' ->
         let prec =
           Util.p_getenv conf.env (prefix ^ "_prec") |> Option.value ~default:""
         in
@@ -287,6 +287,9 @@ let form_dates_from_env conf =
                 match get_year "death" with
                 | Some y -> Some y
                 | None -> get_year "burial")))
+  in
+  let by, dy =
+    if var = "" then (by, dy) else (get_year (var ^ "b"), get_year (var ^ "d"))
   in
   match (by, dy) with
   | Some b, Some d -> " " ^ b ^ "–" ^ d
@@ -444,7 +447,7 @@ let string_of_error conf =
         else fn ^ "." ^ string_of_int occ ^ " " ^ sn
       in
       let dates = (DateDisplay.short_dates_text conf base p :> string) in
-      let form_dates = form_dates_from_env conf in
+      let form_dates = form_dates_from_env conf var in
       let name_quoted = "\"" ^ (fso_p base p :> string) ^ form_dates ^ "\"" in
       let person_link =
         Printf.sprintf "<a href=\"%s%s\">%s</a>%s"
@@ -458,14 +461,7 @@ let string_of_error conf =
           (fcapitale (ftransl conf "name %s already used by %s"))
           name_quoted person_link
       in
-      let msg =
-        if var = "" then base_msg ^ "."
-        else
-          base_msg ^ " <span class=\"UERR_already_defined_var\">("
-          ^ (Util.escape_html var :> string)
-          ^ ")</span>."
-      in
-      Adef.safe msg
+      Adef.safe (base_msg ^ ".")
   | UERR_own_ancestor (base, p) ->
       strong (fso_p base p)
       ^>^ " "
