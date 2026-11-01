@@ -654,7 +654,9 @@ type clean_options = {
 }
 
 val clean_string : ?options:clean_options -> string -> string
-(** Generic string cleaning with configurable options. *)
+(** Generic string cleaning with configurable options. With [remove_control], C0
+    controls and DEL become spaces and C1 controls, which stand for a character
+    lost in a wrong decoding, are dropped. *)
 
 val get_problem_char_name : int -> string option
 (** Get Unicode character name for a problematic character code. *)

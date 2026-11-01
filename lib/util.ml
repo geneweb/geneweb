@@ -2628,7 +2628,7 @@ let clean_string ?(options = default_clean_options) s =
       else
         match Hashtbl.find_opt problem_chars_tbl code with
         | Some (_, `Control) when options.remove_control ->
-            Buffer.add_char buf ' ';
+            if code < 0x80 then Buffer.add_char buf ' ';
             process (i + nb_bytes)
         | Some (_, `Invisible) when options.remove_invisible ->
             process (i + nb_bytes)
