@@ -358,27 +358,38 @@ let requires_initial_capital dict =
   | Sources ->
       false
 
+let case_at s i =
+  let c = s.[i] in
+  if c < '\x80' then
+    ( (if is_ascii_upper c then `Upper
+       else if is_ascii_lower c then `Lower
+       else `Other),
+      1 )
+  else
+    let code, size = Util.get_unicode_point s i in
+    let u = if Uchar.is_valid code then Uchar.of_int code else Uchar.rep in
+    ( (if Uucp.Case.is_upper u then `Upper
+       else if Uucp.Case.is_lower u && Uucp.Script.script u <> `Geor then `Lower
+       else `Other),
+      size )
+
 (* Invalid patterns inside the word [ws, we) of [s]:
    - "AAz": two capitals followed by a lowercase letter ("DUpont")
    - "aZ": a lowercase letter followed by a capital ("LaFayette") *)
 let add_pattern_positions s ws we acc =
-  let rec scan i acc =
-    if i + 1 >= we then acc
+  let rec scan i c2 p2 c1 p1 acc =
+    if i >= we then acc
     else
+      let c, size = case_at s i in
       let acc =
-        if
-          i + 2 < we
-          && is_ascii_upper s.[i]
-          && is_ascii_upper s.[i + 1]
-          && is_ascii_lower s.[i + 2]
-        then i :: (i + 1) :: acc
-        else if is_ascii_lower s.[i] && is_ascii_upper s.[i + 1] then
-          i :: (i + 1) :: acc
-        else acc
+        match (c2, c1, c) with
+        | `Upper, `Upper, `Lower -> p2 :: p1 :: acc
+        | _, `Lower, `Upper -> p1 :: i :: acc
+        | _ -> acc
       in
-      scan (i + 1) acc
+      scan (i + size) c1 p1 c i acc
   in
-  scan ws acc
+  scan ws `Other ws `Other ws acc
 
 let find_bad_capitalization_positions dict base s =
   match dict with
@@ -391,7 +402,7 @@ let find_bad_capitalization_positions dict base s =
         List.fold_left
           (fun acc (ws, we) ->
             let pats = add_pattern_positions s ws we [] in
-            let low = initial && is_ascii_lower s.[ws] in
+            let low = initial && fst (case_at s ws) = `Lower in
             if pats = [] && not low then acc
             else
               let w = String.sub s ws (we - ws) in
