@@ -213,6 +213,45 @@ function initCalendarMonthSelects() {
     }
   });
 }
+%( A Tab right after an automatic move to the next date field is ignored,
+   so dates typed with Tab between fields land in the right fields. %)
+const DATE_FIELD = /^(.+)_(dd|mm|yyyy|orday|ormonth|oryear)$/;
+let dateAutoFocus = null;
+
+function dateSibling(el, step) {
+  if (!el.form || !DATE_FIELD.test(el.name)) return null;
+  const group = el.name.replace(DATE_FIELD, '$1');
+  const fields = Array.from(el.form.elements).filter(f =>
+    DATE_FIELD.test(f.name) && f.name.replace(DATE_FIELD, '$1') === group);
+  const i = fields.indexOf(el) + step;
+  return i < 0 ? null : fields.at(i) ?? null;
+}
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.maxLength !== 2 || el.value.length !== 2
+      || !e.inputType?.startsWith('insert')) return;
+  const next = dateSibling(el, 1);
+  if (!next) return;
+  next.focus();
+  next.select?.();
+  dateAutoFocus = next;
+});
+
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  const auto = el === dateAutoFocus;
+  dateAutoFocus = null;
+  if (e.key === 'Tab' && auto && !e.shiftKey) {
+    e.preventDefault();
+  } else if (e.key === 'Backspace' && el.tagName === 'INPUT' && el.value === '') {
+    const prev = dateSibling(el, -1);
+    if (!prev) return;
+    e.preventDefault();
+    prev.focus();
+    prev.setSelectionRange?.(prev.value.length, prev.value.length);
+  }
+});
 %( Bootstrap, clearinput.js and autosize are loaded after this file by js.txt. %)
 document.addEventListener('DOMContentLoaded', () => {
   addClearButtonToInputs();
