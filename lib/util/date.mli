@@ -129,6 +129,25 @@ val approx_gregorian : from:Adef.calendar -> Adef.dmy -> Adef.dmy
     at import). For partial non-Gregorian dates (day=0 or month=0), converts via
     SDN midpoint of the period preserving partial fields. *)
 
+val sdn_bounds : from:Adef.calendar -> Adef.dmy -> int * int
+(** [sdn_bounds ~from d] is the inclusive SDN interval covered by the
+    day/month/year of [d] read in calendar [from] (precision ignored). *)
+
+val gregorian_bounds : from:Adef.calendar -> Adef.dmy -> Adef.dmy
+(** [gregorian_bounds ~from d] returns [d] unchanged when it is complete or
+    Gregorian. A partial non-Gregorian date (e.g. « an X », « brumaire an X »)
+    is turned into complete Gregorian bounds: [YearInt] between its first and
+    last day, [Before] its first day, or [After] its last day. Meant for strict
+    comparisons ([gregorian_interval]), not for display. *)
+
+val gregorian_interval : Adef.dmy -> int * int
+(** [gregorian_interval d] is the inclusive SDN interval in which a Gregorian
+    date [d] may lie, taking its precision into account ([Before]/[After] are
+    open-ended, [OrYear]/[YearInt] cover both dates). *)
+
+val date_to_gregorian_bounds : Adef.date -> Adef.date
+(** [gregorian_bounds] applied to a [Dgreg] date, tagged [Dgregorian]. *)
+
 val cdate_to_gregorian_dmy_opt : Adef.cdate -> Adef.dmy option
 (** Like [cdate_to_dmy_opt] but ensures the returned [dmy] contains Gregorian
     values even for partial non-Gregorian dates. *)
