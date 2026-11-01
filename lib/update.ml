@@ -311,12 +311,12 @@ let print_same_name conf base p =
         | None -> None
       in
       let original_i = Util.p_getenv conf.env "i" in
-      Output.print_sstring conf "<p class=\"mt-2 mb-0\">";
+      Output.print_sstring conf {|<div class="mt-2">|};
       Output.print_sstring conf
       @@ Utf8.capitalize_fst (transl conf "persons having the same name");
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf
-        {|<table class="table table-sm table-borderless my-1"><tbody>|};
+        {|<table class="table table-sm table-borderless w-auto my-1"><tbody>|};
       List.iter
         (fun p ->
           let is_original =
@@ -328,34 +328,28 @@ let print_same_name conf base p =
           if is_original then
             Output.print_sstring conf {| class="fst-italic text-info"|};
           Output.print_sstring conf ">";
-          Output.print_sstring conf
-            {|<td class="text-end align-middle text-body-secondary p-0 pr-2" style="width:2em">|};
-          Output.print_sstring conf (string_of_int (Driver.get_occ p));
-          Output.print_sstring conf "</td>";
+          Output.printf conf
+            {|<td class="text-end align-middle text-body-secondary p-0 pe-2">%d</td>|}
+            (Driver.get_occ p);
           (match occu_opt with
           | None -> ()
           | Some max_len_opt ->
-              (match max_len_opt with
-              | Some n ->
-                  Output.printf conf
-                    {|<td class="text-body-secondary align-middle p-0 pr-1" style="width:%dem">|}
-                    ((n / 2) + 1)
-              | None ->
-                  Output.print_sstring conf
-                    {|<td class="text-body-secondary p-0 pr-1">|});
               let occu = Driver.sou base (Driver.get_occupation p) in
+              Output.print_sstring conf
+                {|<td class="text-body-secondary align-middle p-0 pe-2">|};
               (match max_len_opt with
-              | Some n when occu <> "" && String.length occu > n ->
-                  Output.print_string conf (escape_html (String.sub occu 0 n));
-                  Output.print_sstring conf "…"
-              | _ when occu <> "" -> Output.print_string conf (escape_html occu)
-              | _ -> ());
+              | Some n when Utf8.length occu > n ->
+                  Output.printf conf
+                    {|<span class="text-nowrap" title="%s">%s…</span>|}
+                    (escape_html occu :> string)
+                    (escape_html (Utf8.sub occu 0 n) :> string)
+              | _ -> Output.print_string conf (escape_html occu));
               Output.print_sstring conf "</td>");
           Output.print_sstring conf {|<td class="p-0">|};
           print_person_parents_and_spouses conf base p;
           Output.print_sstring conf "</td></tr>")
         pl;
-      Output.print_sstring conf "</tbody></table></p>"
+      Output.print_sstring conf "</tbody></table></div>"
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
@@ -1293,9 +1287,8 @@ let print_create_conflict conf base p var =
     | Some o -> int_of_string_opt o
     | None -> Some 0
   in
-  let click_on s =
-    Printf.sprintf (fcapitale (ftransl conf {|click on "%s"|})) (transl conf s)
-  in
+  let button s = Utf8.capitalize_fst (transl conf s) in
+  let click_on s = Printf.sprintf (ftransl conf {|click on "%s"|}) (button s) in
   Output.printf conf {|<form method="post" action="%s">|} conf.command;
   List.iter
     (fun (x, v) ->
@@ -1306,29 +1299,27 @@ let print_create_conflict conf base p var =
   Util.hidden_input conf "free_occ" (Mutil.encode @@ string_of_int free_n);
   Output.printf conf "<ul><li>%s%s %d. %s %s.</li>"
     (Utf8.capitalize_fst (transl conf "first free number"))
-    (transl conf ":") free_n (click_on "create")
+    (transl conf ":") free_n
+    (Utf8.capitalize_fst (click_on "create"))
     (transl conf "to try again with this number");
   (match (original_occ, attempted_occ) with
   | Some orig, Some att when orig <> att ->
       Output.printf conf "<li>%s%s %d. %s %s.</li>"
         (Utf8.capitalize_fst (transl conf "previous occurrence number"))
-        (transl conf ":") orig (click_on "back")
+        (transl conf ":") orig
+        (Utf8.capitalize_fst (click_on "back"))
         (transl conf "to restore this value")
   | _ -> ());
   Output.printf conf "<li>%s %s %s %s.</li>"
     (Utf8.capitalize_fst (transl conf "or"))
-    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
-    (transl_nth conf "and" 0)
+    (click_on "back") (transl_nth conf "and" 0)
     (transl conf "change it (the number) yourself");
   Output.printf conf "<li>%s %s %s %s.</li></ul>"
     (Utf8.capitalize_fst (transl conf "or"))
-    (Printf.sprintf (ftransl conf {|click on "%s"|}) (transl conf "back"))
-    (transl_nth conf "and" 0)
+    (click_on "back") (transl_nth conf "and" 0)
     (transl conf {|use "link" instead of "create"|});
-  Util.submit_input conf "create"
-    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "create"));
-  Util.submit_input conf "return"
-    (Adef.encoded @@ Utf8.capitalize_fst (transl conf "back"));
+  Util.submit_input conf "create" (Adef.encoded @@ button "create");
+  Util.submit_input conf "return" (Adef.encoded @@ button "back");
   Output.print_sstring conf "</form>";
   print_same_name conf base p
 
