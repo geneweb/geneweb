@@ -220,7 +220,7 @@
                           <input type="hidden" name="m" value="MOD_DATA_OK">
                           <input type="hidden" name="data" value="%e.data;">
                           <input type="hidden" name="key" value="%entry_key;">
-                          <input type="hidden" name="s" value="%e.s;">
+                          <input type="hidden" name="s" value="%escape.current_s;">
                           %let;val;%if;(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
                           <div class="flex-grow-1">
                             <div class="ps-2 me-2 pe-sm-2 text-body-secondary book-input-text" data-v="%val;">%nn;
@@ -262,7 +262,7 @@
                       %else;
                         <a role="button" class="btn-link ms-1 me-3"
                            title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
-                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;"
+                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;"
                            data-entry="%escape.printable.entry_value;">%nn;
                            %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
                            %if;(e.data="place" and suburb!="")

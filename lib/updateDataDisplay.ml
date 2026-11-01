@@ -68,7 +68,7 @@ let print_mod_ok conf base =
       String.sub new_input 0 j
     in
     let data = Option.value ~default:"" (p_getenv conf.env "data") in
-    let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+    let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
     let new_input =
       Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
     in
