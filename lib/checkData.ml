@@ -488,8 +488,6 @@ let simple_replacements =
     (Re.str "`", "’");
     (Re.str "´", "’");
     (Re.str "‘", "’");
-    (Re.str "ʹ", "’");
-    (Re.str "ʻ", "’");
     (Re.str "\u{2010}", "-");
     (Re.str "\u{2011}", "-");
     (Re.str "\u{2012}", "–");
@@ -528,15 +526,25 @@ let comma_space_fix g = ", " ^ Re.Group.get g 1
 let dash_replacements = [ (Re.str " -", "-"); (Re.str "- ", "-") ]
 let dots_replacement = (Re.str "..", ".")
 
+let modifier_replacements =
+  [
+    (Re.str "ʹ", "’");
+    (Re.str "ʻ", "’");
+    (Re.str "n˚", "nº");
+    (Re.str "N˚", "Nº");
+  ]
+
 let is_name_dict = function
   | Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Qualifiers
   | Aliases ->
       true
   | Places | Occupation | Estates | Titles | Sources -> false
 
-let pick_punctuation dict ~names ~no_dash ~std =
-  if is_name_dict dict then names
-  else match dict with Places | Occupation | Sources -> no_dash | _ -> std
+let pick_punctuation dict ~names ~places ~free_text ~std =
+  match dict with
+  | Places -> places
+  | Occupation | Sources -> free_text
+  | _ -> if is_name_dict dict then names else std
 
 let max_misc_match_len = 6
 
@@ -550,9 +558,10 @@ let replacements_of_dict =
          (List.rev_append (List.rev simple_replacements) extra))
   in
   let names = build dash_replacements in
-  let no_dash = build [ dots_replacement ] in
+  let places = build [ dots_replacement ] in
+  let free_text = build (dots_replacement :: modifier_replacements) in
   let std = build (dots_replacement :: dash_replacements) in
-  fun dict -> Lazy.force (pick_punctuation dict ~names ~no_dash ~std)
+  fun dict -> Lazy.force (pick_punctuation dict ~names ~places ~free_text ~std)
 
 let char_before_paren_re = lazy (Re.compile char_before_parenthesis_pattern)
 let breton_trigram_re = lazy (Re.compile breton_trigram_pattern)
@@ -570,9 +579,12 @@ let misc_alt_of_dict =
   let patterns = [ comma_space_pattern; breton_trigram_pattern ] in
   let with_paren = char_before_parenthesis_pattern :: patterns in
   let names = build dash_replacements patterns in
-  let no_dash = build [ dots_replacement ] with_paren in
+  let places = build [ dots_replacement ] with_paren in
+  let free_text =
+    build (dots_replacement :: modifier_replacements) with_paren
+  in
   let std = build (dots_replacement :: dash_replacements) with_paren in
-  fun dict -> Lazy.force (pick_punctuation dict ~names ~no_dash ~std)
+  fun dict -> Lazy.force (pick_punctuation dict ~names ~places ~free_text ~std)
 
 let bracket_kind s i =
   let len = String.length s in
