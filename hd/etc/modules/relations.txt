@@ -41,7 +41,7 @@
     %if;browsing_with_sosa_ref;
       %incr_count;i%count;=%sosa_ref.index;&%nn;
       t%count;=sosa_1&%nn;
-    %end;" title="[*relations tree] ([and] [witnesses at his events])"
+    %end;" title="[*relations and witnesses tree]"
   %reset_count;
 %end;
 
@@ -76,7 +76,7 @@
   <h2 class="h3">[*relation/relations]1%nn;
     %if;(cnt>0)
       %if;(not cancel_links)
-        <a %apply;relations_tree(l_ref)>%nn;
+        <a data-dup="rlm" %apply;relations_tree(l_ref)>%nn;
           <img class="ms-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree">%nn;
         </a>%nn;
       %end;
@@ -130,7 +130,7 @@
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <h2  class="h3" id="relations" >[*relation/relations]1
   %if;(not cancel_links)
-    <a %apply;relations_tree(l_ref)>
+    <a data-dup="rlm" %apply;relations_tree(l_ref)>%nn;
     <img src="%images_prefix;gui_create.png" height="20" alt="Tree">
     </a>
   %end;
