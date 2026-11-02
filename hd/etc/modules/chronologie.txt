@@ -139,10 +139,14 @@
   %end;
 %end;
 
-%define;sort_key(xx)
-  %if;(xx.year!="")%xx.year;%else;0000%end;
+%define;date_key(xx)
+  %if;(xx.year!="")%if;(xx.year<1000)0%end;%if;(xx.year<100)0%end;%if;(xx.year<10)0%end;%xx.year;%else;0000%end;
   %if;(xx.month!="")%if;(xx.month<10)0%end;%xx.month;%else;00%end;
   %if;(xx.day!="")%if;(xx.day<10)0%end;%xx.day;%else;00%end;
+%end;
+
+%define;sort_key(xx)
+  %apply;date_key("xx")
   %if;(xx.prec="&#60;")1%elseif;(xx.prec="&#62;")3%else;2%end;
 %end;
 
@@ -239,18 +243,24 @@
   %let;has_known_death;%if;(my_death_date_year!="0000" and my_death_date_year!="9999")1%else;0%end;%in;
   %empty_sorted_list;
   %reset_count2;
+  %let;after_birth;%apply;date_key("birth_date")4%in;
+  %let;after_death;%apply;date_key("death_date")4%in;
   %( événements self %)
   %foreach;event;
     %incr_count2;
-    %apply;add_in_sorted_list%with;%apply;sort_key("event.date")%nn;
+    %let;ek;%apply;sort_key("event.date")%in;
+    %apply;add_in_sorted_list%with;%nn;
+      %if;(event.name=[baptism] and ek<after_birth)%after_birth;%nn;
+      %elseif;((event.name=[burial/burials]0 or event.name=[incineration/incinerations]0)
+        and ek<after_death)%after_death;%nn;
+      %else;%ek;%end;%nn;
       %and;%count2;%nn;
       %and;%if;event.has_date;%event.date;%else;([missing date]0)%end;%nn;
       %and;self_evt%nn;
       %and;%event.place;%nn;
       %and;%event.note;%nn;
-      %and;%if;(event.name=[birth/births]0
-             or event.name=[burial/burials]0
-             or event.name=[incineration/incinerations]0)  %nn;
+      %and;%if;(event.name=[birth/births]0)<span class="age-years">0</span>%nn;
+           %elseif;(event.name=[burial/burials]0 or event.name=[incineration/incinerations]0)%nn;
            %else;%apply;age_marker("event.age")%end;
       %and;%if;event.has_spouse;f%event.spouse.index;%end;
     %end;
