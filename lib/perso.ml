@@ -2911,6 +2911,15 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
             (Date.cdate_to_dmy_opt (Driver.get_birth self))
             target sl
       | _ -> Templ.VVstring "")
+  | ([ "age_at_witnessed_event" ] | "age_at_witnessed_event" :: _) as sl -> (
+      match (get_env "p" env, get_env "event_witness_relation" env) with
+      | Vind self, Vevent (_, (_, date, _, _, _, _, _)) ->
+          compute_age_at_event conf
+            (authorized_age conf base self)
+            (Date.cdate_to_dmy_opt (Driver.get_birth self))
+            (Date.cdate_to_dmy_opt date)
+            sl
+      | _ -> Templ.VVstring "")
   | "anc1" :: sl -> (
       match get_env "anc1" env with
       | Vind pa ->
@@ -3723,7 +3732,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                       | Efam_Engage | Efam_Marriage | Efam_NoMention
                       | Efam_NoMarriage ->
                           let nb_marr = succ nb_marr in
-                          if nb_marr > nb_fam then true
+                          if nb_marr > nb_fam || Array.length wl > 0 then true
                           else
                             loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
                       | Efam_Divorce | Efam_Separated ->

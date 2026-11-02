@@ -191,7 +191,9 @@
   %end;
 %end;
 
-%if;has_event;
+%reset_count;
+%foreach;event_witness_relation;%incr_count;%end;
+%if;(has_event or (count>0 and b.has_events!="never"))
   %let;evarmac;%if;(e.allmar!="" and e.allmar="on")1%else;0%end;%in; %(marriage child %)
   %let;evarmas;%if;(e.ma_s!="" and e.ma_s="on")1%else;0%end;%in; %(marriage siblings %)
   %let;evarevp;%if;(e.allevt!="" and e.allevt="on")1%else;0%end;%in; %(events parents %)
@@ -255,35 +257,14 @@
 
   %foreach;related;
     %incr_count2;
-    %apply;add_in_sorted_list%with;%apply;sort_key("related.baptism_date")
-      %and;%count2;%nn;
-      %and;%if;(related.baptism_date!="")%related.baptism_date;%else;([missing date]0)%end;%nn;
-      %and;%related_type;[:]%sp;%apply;short_display_person("related")%nn;
-      %and;%related.baptism_place;%nn;
-      %and;%related.baptism_note;%nn;
-      %and;%apply;age_marker("age_at_related_baptism")
-    %end;
-  %end;
-
-  %foreach;relation;
-    %incr_count2;
-    %if;(has_relation_him and has_relation_her and relation_type!=[godfather/godmother/godparents]2)
-      %apply;add_in_sorted_list%with;000000002%nn;
-        %and;%count2;
-        %and;([missing date]0)%nn;
-        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_him")%sp;%apply;short_display_person("relation_her")
-      %end;
-    %elseif;(has_relation_him and not has_relation_her and relation_type!=[godfather/godmother/godparents]0)
-      %apply;add_in_sorted_list%with;000000002%nn;
-        %and;%count2;
-        %and;([missing date]0)
-        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_him")
-      %end;
-    %elseif;(not has_relation_him and has_relation_her and relation_type!=[godfather/godmother/godparents]1)
-      %apply;add_in_sorted_list%with;000000002%nn;
-        %and;%count2;
-        %and;([missing date]0)
-        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_her")
+    %if;(related.baptism_date!="")
+      %apply;add_in_sorted_list%with;%apply;sort_key("related.baptism_date")
+        %and;%count2;%nn;
+        %and;%related.baptism_date;%nn;
+        %and;%related_type;[:]%sp;%apply;short_display_person("related")%nn;
+        %and;%related.baptism_place;%nn;
+        %and;%nn;
+        %and;%apply;age_marker("age_at_related_baptism")
       %end;
     %end;
   %end;
@@ -304,6 +285,9 @@
               %sp;[and]%sp;%apply;short_display_person("event_witness_relation.event.spouse")
             %end;
         %end;
+      %and;%event_witness_relation.event.place;
+      %and;%event_witness_relation_note;
+      %and;%apply;age_marker("age_at_witnessed_event")
     %end;
   %end;
 
@@ -443,6 +427,7 @@
           %else;
             %apply;capitalize(item.4)
             %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
+            %if;(item.6!="")<div class="small text-body-secondary">%item.6;</div>%end;
           %end;
         </td>
       </tr>
