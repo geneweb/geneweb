@@ -102,12 +102,16 @@ let test_keys () =
       ("C.Denanc\195\169", "[[w: C.Denance]]");
       ("N de Meyrignac", "[[w:N.de Meyrignac]]");
       ("Beno\195\174t Ravinet", "B.Ravinet");
+      ("G.Francez", " G.Francez\u{200B} ");
     ];
   (check bool) "P.Colin / Y.Colin" false (w "P.Colin" = w "Y.Colin");
   List.iter
     (fun (a, b) -> (check string) (a ^ " ~ " ^ b) (s a) (s b))
     [
-      ("AD 75", "AD75"); ("AD75", "ad-75"); ("\195\169tat civil", "Etat-Civil");
+      ("AD 75", "AD75");
+      ("AD75", "ad-75");
+      ("\195\169tat civil", "Etat-Civil");
+      ("AD75", "\u{FEFF}AD 75 ");
     ]
 
 let test_clusters () =

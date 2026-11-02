@@ -222,6 +222,7 @@ let clusters () =
       ("Saint-L\195\180", "Saint Lo");
       ("Sainte-M\195\168re-\195\137glise", "Ste M\195\168re Eglise");
       ("Granville", "Granville ");
+      ("Granville", "\u{200B}Granville\u{00A0}");
     ];
   (check bool) "Saint-Martin / Saint-Malo" false
     (k "Saint-Martin" = k "Saint-Malo");

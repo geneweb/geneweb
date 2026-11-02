@@ -20,7 +20,45 @@ type entry = {
   uses : int;
 }
 
-let cluster_key term = Name.abbrev (Name.lower term)
+(* The non-breaking spaces are not touched by [Util.only_printable]: check_data
+   keeps them inside a text (before a roman numeral, "Louis XIV"). *)
+let nbsps = [ "\xC2\xA0"; "\xE2\x80\xAF" ]
+
+let rec strip_nbsp s =
+  let s = String.trim s in
+  match
+    List.find_map
+      (fun p ->
+        let n = String.length p and l = String.length s in
+        if String.starts_with ~prefix:p s then Some (String.sub s n (l - n))
+        else if String.ends_with ~suffix:p s then Some (String.sub s 0 (l - n))
+        else None)
+      nbsps
+  with
+  | Some s -> strip_nbsp s
+  | None -> s
+
+let clean_term s = strip_nbsp (Util.only_printable s)
+
+(* [s] with every [p] replaced by a space *)
+let space_for p s =
+  let n = String.length p and l = String.length s in
+  let b = Buffer.create l in
+  let rec loop i =
+    if i >= l then Buffer.contents b
+    else if i + n <= l && String.sub s i n = p then (
+      Buffer.add_char b ' ';
+      loop (i + n))
+    else (
+      Buffer.add_char b s.[i];
+      loop (i + 1))
+  in
+  loop 0
+
+let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
+
+(* as check_data: spaces at both ends and invisible characters ignored *)
+let cluster_key term = Name.abbrev (Name.lower (key_text term))
 
 let place_uses conf base =
   let counts : (Driver.istr, int ref) Hashtbl.t = Hashtbl.create 4096 in
