@@ -19756,6 +19756,23 @@ sl: razmerje/razmerja
 sv: relation/relationer
 tr: ilişki/ilişkiler
 
+    relations and witnesses tree
+af: boom van verwantskappe en getuies
+ca: arbre de les relacions i dels testimonis
+da: træ over relationer og vidner
+de: Baum der Beziehungen und Zeugen
+en: tree of relations and witnesses
+es: árbol de relaciones y testigos
+fr: arbre des relations et des témoins
+it: albero delle relazioni e dei testimoni
+nl: boom van relaties en getuigen
+no: tre over relasjoner og vitner
+pl: drzewo relacji i świadków
+pt: árvore das relações e testemunhas
+ru: дерево связей и свидетелей
+sv: träd över relationer och vittnen
+tr: ilişkiler ve tanıklar ağacı
+
     relations of
 co: rilazioni di
 de: Beziehungen von

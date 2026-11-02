@@ -68,7 +68,7 @@
     %incr_count;i%count;=%sosa_ref.index;&%nn;
     t%count;=sosa_1;%nn;
   %end;
-  "%if;(count < 3) style="display:none;"%end; title="[*witness tree] ([witnesses to my events and godparents])"%nn;
+  "%if;(count < 3) style="display:none;"%end; title="[*witness tree]"%nn;
   %reset_count;
 %end;
 
@@ -105,11 +105,11 @@
       %end;
     %end;
     %incr_count;i%count;=%index;&%nn;
-    t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+    t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;&%nn;
     %if;browsing_with_sosa_ref;
       %incr_count;i%count;=%sosa_ref.index;&t%count;=sosa_1;%nn;
     %end;
-  " class="ms-2" title="[*relations tree]"
+  " class="ms-2" title="[*relations and witnesses tree]"
    %reset_count;
 %end;
 
@@ -217,10 +217,11 @@
 %if;(has_event or (count>0 and b.has_events!="never"))
   %let;evarmas;%if;(e.ma_s!="" and e.ma_s="on")1%else;0%end;%in; %(marriage siblings %)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
+  <div id="timeline">
   <div class="d-flex justify-content-between">
     <h2 class="h3 my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
-        <a %apply;relations_tree(l_ref)>%nn;
+        <a data-dup="rlm" %apply;relations_tree(l_ref)>%nn;
           <img src="%images_prefix;gui_create.png" class="ms-1 mb-1" height="18" alt="Tree">
         </a>%nn;
       %else;
@@ -401,7 +402,7 @@
     %end;
   %end;
 
-  <table id="timeline" class="table table-sm table-hover w-100">
+  <table class="table table-sm table-hover w-100">
     <thead>
       %(<td> </td>%)
       <tr>
@@ -467,4 +468,5 @@
       </tr>
     %end;
   </table>
+  </div> %( closing id="timeline" %)
 %end;
