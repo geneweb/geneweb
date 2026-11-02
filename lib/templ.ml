@@ -1375,18 +1375,16 @@ and print_simple_variable conf = function
   | "number_of_bases" ->
       Output.print_sstring conf
         (string_of_int (List.length (Util.get_bases_list ())))
-  | "bases_list" ->
-      Output.print_sstring conf (String.concat ", " (Util.get_bases_list ()))
   | "bases_list_links" ->
       let format_link bname =
-        Format.sprintf {|<a href="%s%s">%s</a>|}
+        Format.sprintf {|<a class="btn btn-outline-primary" href="%s%s">%s</a>|}
           ((if conf.cgi then "?b=" else "") ^ bname)
           (if conf.lang = conf.default_lang then ""
            else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
           bname
       in
       Output.print_sstring conf
-        (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
+        (String.concat "" (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "hidden_no_senv" -> Util.hidden_env ~senv:false conf
   | "message_to_wizard" -> Util.message_to_wizard conf
