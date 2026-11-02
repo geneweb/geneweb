@@ -385,19 +385,23 @@ let changed_marriages_order base warning p =
     loop 0 (Driver.get_family p))
 
 let close_siblings warning x np ifam =
+  let is_interval d =
+    match d.Adef.prec with
+    | OrYear _ | YearInt _ -> true
+    | Sure | About | Maybe | Before | After -> false
+  in
   match np with
   | Some (elder, d1) -> (
       match odate @@ od_of_cdate (Driver.get_birth x) with
-      | None -> ()
-      | Some d2 ->
+      | Some d2 when not (is_interval d1 || is_interval d2) ->
           Date.time_elapsed_opt d1 d2
           |> Option.iter @@ fun d ->
-             (* On vérifie les jumeaux ou naissances proches. *)
              if
                d.Adef.year = 0
                && d.month < max_month_btw_sibl
                && (d.month <> 0 || d.day >= max_days_btw_sibl)
-             then warning (CloseChildren (ifam, elder, x)))
+             then warning (CloseChildren (ifam, elder, x))
+      | Some _ | None -> ())
   | None -> ()
 
 let born_after_his_elder_sibling warning x b np ifam des =

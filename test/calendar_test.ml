@@ -302,6 +302,18 @@ let round_trip of_ to_ l () =
 let sdn_round_trip name of_sdn sdn_of =
   test_case name `Quick (round_trip (of_sdn Adef.Sure) sdn_of data_complete)
 
+let french_partial_bounds () =
+  let greg d m y = Date.to_sdn ~from:Adef.Dgregorian (mk d m y) in
+  let bounds m y =
+    Date.gregorian_interval
+      (Date.gregorian_bounds ~from:Adef.Dfrench (mk 0 m y))
+  in
+  (check (pair int int)) "an X" (greg 23 9 1801, greg 22 9 1802) (bounds 0 10);
+  (check (pair int int))
+    "brumaire an X"
+    (greg 23 10 1801, greg 21 11 1801)
+    (bounds 2 10)
+
 let v =
   [
     ( "calendar-sdn",
@@ -373,6 +385,7 @@ let v =
       [
         test_case "day=0" `Quick partial_day_zero;
         test_case "month=0" `Quick partial_month_zero;
+        test_case "french partial bounds" `Quick french_partial_bounds;
       ] );
     ( "calendar-properties",
       [
