@@ -39,9 +39,14 @@ input[list]:placeholder-shown {
   cursor: not-allowed;
 }
 
-#timeline .tl-self { --bs-table-bg: var(--bs-primary-bg-subtle); }
-#timeline .tl-kin > td { opacity: .6; }
-#timeline .tl-kin:hover > td { opacity: 1; }
+#timeline .tl-role > td:nth-child(2) { --bs-table-bg: var(--bs-secondary-bg); }
+#timeline .tl-kin > td:last-child {
+  padding-left: .5rem;
+  background-image: linear-gradient(var(--bs-gray-400), var(--bs-gray-400));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: .1875rem calc(100% - .2rem);
+}
 
 /* Notifications */
 .notif-ctr {

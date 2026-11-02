@@ -4213,6 +4213,68 @@ ru: дата и место рождения
 sv: födelsedatum och -plats
 tr: doğum tarihi ve yeri
 
+    birth of the father/birth of the mother
+af: geboorte van die vader/geboorte van die moeder
+bg: раждане на бащата/раждане на майката
+ca: naixement del pare/naixement de la mare
+cs: narození otce/narození matky
+da: faderens fødsel/moderens fødsel
+de: Geburt des Vaters/Geburt der Mutter
+en: birth of the father/birth of the mother
+eo: naskiĝo de la patro/naskiĝo de la patrino
+es: nacimiento del padre/nacimiento de la madre
+et: isa sünd/ema sünd
+fi: isän syntymä/äidin syntymä
+fr: naissance du père/naissance de la mère
+he: לידת האב/לידת האם
+is: fæðing föður/fæðing móður
+it: nascita del padre/nascita della madre
+lt: tėvo gimimas/motinos gimimas
+lv: tēva dzimšana/mātes dzimšana
+nl: geboorte van de vader/geboorte van de moeder
+no: farens fødsel/morens fødsel
+oc: naissença del paire/naissença de la maire
+pl: urodzenie ojca/urodzenie matki
+pt: nascimento do pai/nascimento da mãe
+ro: nașterea tatălui/nașterea mamei
+ru: рождение отца/рождение матери
+sk: narodenie otca/narodenie matky
+sl: rojstvo očeta/rojstvo matere
+sv: faderns födelse/moderns födelse
+tr: babanın doğumu/annenin doğumu
+zh: 父亲出生/母亲出生
+
+    birth of the husband/birth of the wife
+af: geboorte van die eggenoot/geboorte van die eggenote
+bg: раждане на съпруга/раждане на съпругата
+ca: naixement de l’espòs/naixement de l’esposa
+cs: narození manžela/narození manželky
+da: ægtemandens fødsel/hustruens fødsel
+de: Geburt des Ehemanns/Geburt der Ehefrau
+en: birth of the husband/birth of the wife
+eo: naskiĝo de la edzo/naskiĝo de la edzino
+es: nacimiento del esposo/nacimiento de la esposa
+et: abikaasa sünd/abikaasa sünd
+fi: puolison syntymä/puolison syntymä
+fr: naissance de l’époux/naissance de l’épouse
+he: לידת הבעל/לידת האישה
+is: fæðing eiginmanns/fæðing eiginkonu
+it: nascita del marito/nascita della moglie
+lt: vyro gimimas/žmonos gimimas
+lv: vīra dzimšana/sievas dzimšana
+nl: geboorte van de echtgenoot/geboorte van de echtgenote
+no: ektemannens fødsel/hustruens fødsel
+oc: naissença de l’espós/naissença de l’esposa
+pl: urodzenie męża/urodzenie żony
+pt: nascimento do esposo/nascimento da esposa
+ro: nașterea soțului/nașterea soției
+ru: рождение мужа/рождение жены
+sk: narodenie manžela/narodenie manželky
+sl: rojstvo moža/rojstvo žene
+sv: makens födelse/makans födelse
+tr: eşin doğumu/eşin doğumu
+zh: 丈夫出生/妻子出生
+
     birth place
 co: locu di nascita
 de: Ort der Geburt
@@ -8644,6 +8706,37 @@ ru: смерти
 de: Sterbealter und Ehedauer
 en: death ages and marriage duration
 fr: âges décès et durées mariage
+
+    death of the father/death of the mother
+af: dood van die vader/dood van die moeder
+bg: смърт на бащата/смърт на майката
+ca: defunció del pare/defunció de la mare
+cs: úmrtí otce/úmrtí matky
+da: faderens død/moderens død
+de: Tod des Vaters/Tod der Mutter
+en: death of the father/death of the mother
+eo: morto de la patro/morto de la patrino
+es: muerte del padre/muerte de la madre
+et: isa surm/ema surm
+fi: isän kuolema/äidin kuolema
+fr: décès du père/décès de la mère
+he: מות האב/מות האם
+is: andlát föður/andlát móður
+it: morte del padre/morte della madre
+lt: tėvo mirtis/motinos mirtis
+lv: tēva nāve/mātes nāve
+nl: overlijden van de vader/overlijden van de moeder
+no: farens død/morens død
+oc: decès del paire/decès de la maire
+pl: zgon ojca/zgon matki
+pt: morte do pai/morte da mãe
+ro: decesul tatălui/decesul mamei
+ru: смерть отца/смерть матери
+sk: úmrtie otca/úmrtie matky
+sl: smrt očeta/smrt matere
+sv: faderns död/moderns död
+tr: babanın ölümü/annenin ölümü
+zh: 父亲去世/母亲去世
 
     death/deaths
 af: dood/dooie
@@ -14654,6 +14747,37 @@ en: marriage of %t before his/her birth
 es: casamiento de %t antes de su nacimiento
 fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
+
+    marriage of the parents
+af: huwelik van die ouers
+bg: брак на родителите
+ca: casament dels pares
+cs: sňatek rodičů
+da: forældrenes vielse
+de: Heirat der Eltern
+en: marriage of the parents
+eo: geedziĝo de la gepatroj
+es: matrimonio de los padres
+et: vanemate abielu
+fi: vanhempien avioliitto
+fr: mariage des parents
+he: נישואי ההורים
+is: hjónaband foreldra
+it: matrimonio dei genitori
+lt: tėvų santuoka
+lv: vecāku laulība
+nl: huwelijk van de ouders
+no: foreldrenes vielse
+oc: maridatge dels parents
+pl: ślub rodziców
+pt: casamento dos pais
+ro: căsătoria părinților
+ru: брак родителей
+sk: sobáš rodičov
+sl: poroka staršev
+sv: föräldrarnas vigsel
+tr: ebeveynlerin evliliği
+zh: 父母结婚
 
     marriage place
 co: locu di l’unione

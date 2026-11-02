@@ -304,7 +304,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("father.birth_date")
       %and;%count2;
       %and;%if;(father.birth_date!="")%father.birth_date;%else;([missing date]0)%end;%nn;
-      %and;%apply;a_of_b%with;[birth]%and;%apply;short_display_person("father") ([father/mother]0)%end;
+      %and;[birth of the father/birth of the mother]0 %apply;short_display_person("father")
       %and;
       %and;
       %and;%apply;age_marker("age_at_father_birth")
@@ -313,7 +313,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("mother.birth_date")
       %and;%count2;
       %and;%if;(mother.birth_date!="")%mother.birth_date;%else;([missing date]0)%end;%nn;
-      %and;%apply;a_of_b%with;[birth]%and;%apply;short_display_person("mother") ([father/mother]1)%end;
+      %and;[birth of the father/birth of the mother]1 %apply;short_display_person("mother")
       %and;
       %and;
       %and;%apply;age_marker("age_at_mother_birth")
@@ -323,7 +323,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("parent_marriage_date")
         %and;%count2;
         %and;%parent_marriage_date;
-        %and;[marriage/marriages]0 [parents] %apply;short_display_person("father") & %apply;short_display_person("mother")
+        %and;[marriage of the parents] %apply;short_display_person("father") [and] %apply;short_display_person("mother")
         %and;
         %and;
         %and;%apply;age_marker("age_at_parent_marriage")
@@ -334,7 +334,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("father.death_date")
         %and;%count2;
         %and;%if;(father.death_date!="")%father.death_date;%else;([missing date]0)%end;%nn;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end; %apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age.short;)%end;
+        %and;[death of the father/death of the mother]0 %apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age.short;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_father_death")
@@ -345,7 +345,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("mother.death_date")
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;([missing date]0)%end;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end; %apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age.short;)%end;
+        %and;[death of the father/death of the mother]1 %apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age.short;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_mother_death")
@@ -366,6 +366,16 @@
 
   %if;has_families;
     %foreach;family;
+      %if;(spouse.birth_date!="")
+        %apply;add_in_sorted_list%with;%apply;sort_key("spouse.birth_date")
+          %and;%count2;
+          %and;%spouse.birth_date;
+          %and;%if;spouse.is_male;[birth of the husband/birth of the wife]0%else;[birth of the husband/birth of the wife]1%end; %apply;short_display_person("spouse")
+          %and;
+          %and;
+          %and;%apply;age_marker("age_at_spouse_birth")
+        %end;
+      %end;
       %if;(spouse.is_dead)
         %apply;add_in_sorted_list%with;%apply;sort_key("spouse.death_date")
           %and;%count2;
