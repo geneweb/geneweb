@@ -130,11 +130,11 @@
         <span>[*relationship computing mode][:]</span>
         <div class="ms-2 mt-1">
           <div class="form-check" id="rel_shortest_path">
-            <input type="radio" class="form-check-input" id="etS" name="et" value="S" checked>
+            <input type="radio" class="form-check-input" id="etS" name="et" value="S">
             <label class="form-check-label" for="etS">[*shortest path]</label>
           </div>
           <div class="form-check" id="rel_ancestors">
-            <input type="radio" class="form-check-input" id="etA" name="et" value="A">
+            <input type="radio" class="form-check-input" id="etA" name="et" value="A" checked>
             <label class="form-check-label" for="etA">[*relationship by ancestors]</label>
           </div>
           <div class="form-check" id="rel_by_marriage">

@@ -10139,6 +10139,10 @@ fr: se souvenir de la source
 en: further updates will automatically insert this source
 fr: les mises à jour qui suivent inséreront automatiquement cette source
 
+    relation with me
+en: relation with me
+fr: parenté avec moi
+
     family source
 co: fonte di famiglia
 de: Quellenangabe-Familie

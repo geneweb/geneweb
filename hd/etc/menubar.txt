@@ -402,7 +402,10 @@
                 %if;(user.index!="" and user.index!=self.index and user.index!=sosa_ref.index)
                   <a class="dropdown-item" title="[*path to me]"
                     href="%prefix;&em=R&t=PN&et=S&ei=%index;&i=%user.index;&spouse=on&long=on">
-                    <i class="fas fa-person-arrow-down-to-line fa-fw me-2" aria-hidden="true"></i>[*path to]0</a>
+                    <i class="fas fa-people-arrows-left-right fa-fw me-2" aria-hidden="true"></i>[*path to]0</a>
+                  <a class="dropdown-item" title="[*relation with me]"
+                    href="%prefix;&em=R&t=PN&et=A&ei=%index;&i=%user.index;&spouse=on&long=on">
+                    <i class="fas fa-person-arrow-up-from-line fa-fw me-2" aria-hidden="true"></i>[*relation with me]0</a>
                 %end;
                 <div class="dropdown-divider"></div>
               %end;
