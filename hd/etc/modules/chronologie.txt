@@ -44,7 +44,7 @@
           %end;
         %elseif;has_relation_her;
           %if;(relation_type=[godfather/godmother/godparents]1 and event.name=[baptism])
-            %incr_count;i%count;=%relation_him.index;&%nn;
+            %incr_count;i%count;=%relation_her.index;&%nn;
             t%count;=[godfather/godmother/godparents]1;%nn;
             %incr_count;i%count;=z1;%nn;
           %end;
@@ -112,20 +112,21 @@
   %end;
   %let;k_cnt;%count;%in;
   %reset_count;
-  %if;(k_cnt>=1)
-    %if;("kindx"="")[*witness/witness/witnesses]2[:]
-    %elseif;("kindx"="offi")[*civil registrar/civil registrar/civil registrar]2[:]
-    %elseif;("kindx"="reli")[*parrish registrar/parrish registrar/parrish registrar]2[:]
-    %elseif;("kindx"="info")[*informant/informant/informant]2[:]
-    %elseif;("kindx"="pres")[*present/present/present]2[:]
-    %elseif;("kindx"="ment")[*mentioned/mentioned/mentioned]2[:]
-    %elseif;("kindx"="othe")[*other/other/other]2[:]
-    %end;
-  %end;
-  %reset_count;
   %foreach;event_witness;
     %if;(witness_kind="kindx")
       %incr_count;
+      %if;(count=1)
+        %if;(k_cnt=1)%apply;capitalize(event_witness_kind)[:]
+        %elseif;("kindx"="")[*witness/witness/witnesses]2[:]
+        %elseif;("kindx"="godp")[*godfather/godmother/godparents]2[:]
+        %elseif;("kindx"="offi")[*civil registrar/civil registrar/civil registrar]2[:]
+        %elseif;("kindx"="reli")[*parrish registrar/parrish registrar/parrish registrar]2[:]
+        %elseif;("kindx"="info")[*informant/informant/informant]2[:]
+        %elseif;("kindx"="atte")[*present/present/present]2[:]
+        %elseif;("kindx"="ment")[*mentioned/mentioned/mentioned]2[:]
+        %elseif;("kindx"="othe")[*other/other/other]2[:]
+        %end;
+      %end;
       <span class="text-nowrap">%nn;
       %apply;short_display_person("event_witness")%nn;
       </span>%nn;
@@ -387,9 +388,9 @@
     <thead>
       %(<td> </td>%)
       <tr>
-      <th class="text-end">[*date/dates]0</tf>
-      <th>[*age]</th>
-      <th> </th>
+      <th class="text-end">[*date/dates]0</th>
+      <th class="text-center">[*age]</th>
+      <th>[*event/events]0</th>
       </tr>
     </thead>
     %foreach;sorted_list_item;
@@ -428,6 +429,7 @@
                   <div class="small text-body-secondary">
                     %apply;list_witness_of_kind("offi")
                     %apply;list_witness_of_kind("reli")
+                    %apply;list_witness_of_kind("godp")
                     %apply;list_witness_of_kind("")
                     %apply;list_witness_of_kind("ment")
                     %apply;list_witness_of_kind("atte")
