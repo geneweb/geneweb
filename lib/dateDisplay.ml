@@ -435,20 +435,40 @@ let calendar_gregorian_precision conf ~from d =
     ^ " " ^ s1 ^ " " ^ transl_nth conf "and" 0 ^ " "
     ^ (string_of_on_dmy conf d2 :> string)
 
+let find_sub s sub =
+  let n = String.length sub and len = String.length s in
+  let rec loop i =
+    if i + n > len then None
+    else if String.sub s i n = sub then Some i
+    else loop (i + 1)
+  in
+  if n = 0 then None else loop 0
+
 let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
     ?(sep = Adef.safe " ") conf =
-  let mk_link c d (s : Adef.safe_string) =
+  let mk_link c d sy (s : Adef.safe_string) =
+    let s = (s :> string) in
+    let pos =
+      match find_sub s sy with
+      | Some _ as r -> r
+      | None -> find_sub s (replace_spaces_by_nbsp sy)
+    in
+    let pre, body =
+      match pos with
+      | Some i -> (String.sub s 0 i, String.sub s i (String.length s - i))
+      | None -> ("", s)
+    in
     Adef.safe
     @@ Printf.sprintf
-         {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
+         {|%s<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
+         pre
          (commd conf :> string)
-         c d.Adef.year c d.month c d.day c
-         (s :> string)
+         c d.Adef.year c d.month c d.day c body
   in
   function
   | Adef.Dgreg (d, Dgregorian) ->
       let s = dmy conf d in
-      if link && d.day > 0 then mk_link 'g' d s else s
+      if link && d.day > 0 then mk_link 'g' d (code_dmy conf d) s else s
   | Dgreg (d, Djulian) ->
       let cal_prec =
         if d.year < 1582 then Adef.safe ""
@@ -467,13 +487,17 @@ let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
         ^^^ transl_nth conf "gregorian/julian/french/hebrew" 1
         ^<^ cal_prec
       in
-      if link && d1.day > 0 then mk_link 'j' d1 s else s
+      if link && d1.day > 0 then mk_link 'j' d1 (code_dmy conf d1) s else s
   | Dgreg (d, Dfrench) -> (
       let d1 = Calendar.french_of_gregorian d in
       let s =
         (if on then string_of_on_french_dmy else string_of_french_dmy) conf d1
       in
-      let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
+      let s =
+        if link && d1.day > 0 then
+          mk_link 'f' d1 (code_french_date conf d1.day d1.month d1.year) s
+        else s
+      in
       match d.prec with
       | Sure | About | Before | After | Maybe ->
           let greg =
