@@ -432,7 +432,13 @@ let notes_bearing_text_of_person base (p : _ Def.gen_person) =
     let rec loop l accu =
       match l with
       | [] -> accu
-      | evt :: l -> loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
+      | evt :: l ->
+          let accu =
+            Array.fold_left
+              (fun accu (_, _, wnote) -> wnote :: accu)
+              accu evt.Def.epers_witnesses
+          in
+          loop l (evt.Def.epers_note :: evt.Def.epers_src :: accu)
     in
     loop p.pevents sl
   in
@@ -444,7 +450,13 @@ let notes_bearing_text_of_family base (f : _ Def.gen_family) =
     let rec loop l accu =
       match l with
       | [] -> accu
-      | evt :: l -> loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
+      | evt :: l ->
+          let accu =
+            Array.fold_left
+              (fun accu (_, _, wnote) -> wnote :: accu)
+              accu evt.Def.efam_witnesses
+          in
+          loop l (evt.Def.efam_note :: evt.Def.efam_src :: accu)
     in
     loop f.fevents sl
   in
@@ -830,6 +842,10 @@ let update_ind_key_pgind conf base p oldk newk =
           ev with
           epers_note = replace ev.epers_note;
           epers_src = replace ev.epers_src;
+          epers_witnesses =
+            Array.map
+              (fun (ip, wk, wnote) -> (ip, wk, replace wnote))
+              ev.epers_witnesses;
         })
       oldp.pevents
   in
@@ -879,6 +895,10 @@ let update_ind_key_pgfam conf base f oldk newk =
           ev with
           efam_note = replace ev.efam_note;
           efam_src = replace ev.efam_src;
+          efam_witnesses =
+            Array.map
+              (fun (ip, wk, wnote) -> (ip, wk, replace wnote))
+              ev.efam_witnesses;
         })
       oldf.fevents
   in
