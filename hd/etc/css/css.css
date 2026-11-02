@@ -39,6 +39,10 @@ input[list]:placeholder-shown {
   cursor: not-allowed;
 }
 
+#timeline .tl-self { --bs-table-bg: var(--bs-primary-bg-subtle); }
+#timeline .tl-kin > td { opacity: .6; }
+#timeline .tl-kin:hover > td { opacity: 1; }
+
 /* Notifications */
 .notif-ctr {
   position: fixed;

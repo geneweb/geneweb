@@ -392,7 +392,7 @@
       </tr>
     </thead>
     %foreach;sorted_list_item;
-      <tr class="align-top%if;(item.4="self_evt") table-light%end;"%if;(item.8!="") data-dup="%item.8;"%end;%nn;
+      <tr class="align-top%if;(item.4!="self_evt")%if;(item.8!="") tl-role%else; tl-kin%end;%end;"%if;(item.8!="") data-dup="%item.8;"%end;%nn;
         %if;(item.9!="") data-tl="%item.9;"%if;((item.9="allmar" and e.allmar!="on") or (item.9="allevt" and e.allevt!="on")) hidden%end;%end;>
       %(<td class="align-middle">%item.1;</td>%)
         <td class="align-middle text-end text-nowrap">%item.3;</td>
