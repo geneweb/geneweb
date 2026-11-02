@@ -349,8 +349,9 @@ let spans part segs =
     (fun seg -> match part with Wizard -> seg.wizard | Source -> seg.source)
     segs
 
+(* as check_data: spaces at both ends and invisible characters ignored *)
 let words s =
-  String.split_on_char ' ' (Name.lower s)
+  String.split_on_char ' ' (Name.lower (PlaceTerms.key_text s))
   |> List.concat_map (String.split_on_char '.')
   |> List.filter (( <> ) "")
 
@@ -477,7 +478,7 @@ let replace_spans raw (spans : span list) new_term =
        raw
 
 let plan base d part ~terms ~new_term =
-  let new_term = String.trim new_term in
+  let new_term = PlaceTerms.clean_term new_term in
   let items =
     List.filter_map
       (fun (istr, raw, _) ->

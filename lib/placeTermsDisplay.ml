@@ -444,7 +444,7 @@ let print_plan conf base u items ~hidden ~back ~old_html ~new_html =
   Output.print_sstring conf toggle_script
 
 let print_preview conf base terms nt =
-  let nt = String.trim nt in
+  let nt = PlaceTerms.clean_term nt in
   if not (PlaceRename.valid_new_term nt) then invalid_new_term conf terms nt
   else
     let u = PlaceRename.usage base in
@@ -796,7 +796,7 @@ let src_items conf base terms nt =
   SourceTerms.plan base d (src_part conf) ~terms ~new_term:nt
 
 let print_src_preview conf base terms nt =
-  let nt = String.trim nt in
+  let nt = PlaceTerms.clean_term nt in
   if nt = "" then invalid_src_term conf
   else
     let items = src_items conf base terms nt in
@@ -982,7 +982,7 @@ let print_ok conf base =
           Output.printf conf "<p><a href=\"%s\">%s</a></p>\n" (groups_href conf)
             (Utf8.capitalize_fst (transl conf "places to complete")))
   | (_ :: _ as terms), Some nt ->
-      let nt = String.trim nt in
+      let nt = PlaceTerms.clean_term nt in
       if not (PlaceRename.valid_new_term nt) then invalid_new_term conf terms nt
       else
         (* recomputed: the base may have changed since the preview *)
@@ -1007,7 +1007,7 @@ let print_sources_ok conf base =
   header ~sources:true conf;
   (match (PlaceRename.terms_of_env conf, p_getenv_notrim conf.env "nt") with
   | (_ :: _ as terms), Some nt ->
-      let nt = String.trim nt in
+      let nt = PlaceTerms.clean_term nt in
       if nt = "" then invalid_src_term conf
       else
         (* recomputed: the base may have changed since the preview *)

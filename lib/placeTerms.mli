@@ -44,6 +44,15 @@ val of_places :
 (** [of_places inverted places] is the pure core of {!build}: it explodes the
     given [(istr, raw place, uses)] triples into sorted entries. *)
 
+val clean_term : string -> string
+(** A term as written by a merging of spellings: [Util.only_printable] (as the
+    check_data fix of invisible characters), and no space or non-breaking space
+    at both ends. *)
+
+val key_text : string -> string
+(** [clean_term], the non-breaking spaces inside replaced by spaces: the text
+    the cluster keys are computed from. *)
+
 val cluster_key : string -> string
 (** [cluster_key t] is [Name.abbrev (Name.lower t)]: case, accents, hyphens and
     spaces are ignored, and "Saint"/"Sainte" are read as "St"/"Ste", so

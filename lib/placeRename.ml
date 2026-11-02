@@ -57,7 +57,8 @@ let terms_of_env conf =
   |> List.sort_uniq compare
 
 let valid_new_term s =
-  String.trim s <> ""
+  let s = PlaceTerms.clean_term s in
+  s <> ""
   && not (String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s)
 
 let rewrite_with inverted ~terms f raw depths =
@@ -210,7 +211,7 @@ let group_by_new_s items =
 
 let rec plan conf base ~terms ~new_term occs =
   let inverted = Place.places_inverted conf in
-  let new_term = String.trim new_term in
+  let new_term = PlaceTerms.clean_term new_term in
   (* occurrences grouped by place string *)
   let by_istr = IT.create 64 in
   List.iter

@@ -23,8 +23,8 @@ let this_request_updates_database conf =
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
       | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
-      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
-      | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" ) ->
+      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" | "PLACE_TERMS_OK"
+      | "SOURCE_TERMS_OK" ) ->
       true
   | _ -> false
 

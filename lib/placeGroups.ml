@@ -20,7 +20,8 @@ let terms inverted raw =
   let main =
     List.filter_map
       (fun (c : Place.component) ->
-        if c.suburb || c.text = "" then None else Some c.text)
+        let t = PlaceTerms.key_text c.text in
+        if c.suburb || t = "" then None else Some t)
       comps
   in
   (sub, List.rev main)
