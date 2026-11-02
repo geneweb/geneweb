@@ -1163,6 +1163,7 @@ let rec eval conf ifun env =
     | None -> (
         match (f, vl) with
         | "capitalize", [ (None, VVstring s) ] -> Utf8.capitalize_fst s
+        | "sentence", [ (None, VVstring s) ] -> Utf8.to_sentence s
         | "capitalize_words", [ (None, VVstring s) ] ->
             let wl = String.split_on_char ' ' s in
             (* TODO handle particles !

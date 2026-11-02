@@ -90,6 +90,62 @@ let capitalize_fst s =
   let tail = cmap_utf_8 cmap tail in
   head ^ tail
 
+let to_sentence s =
+  let s = capitalize_fst s in
+  let len = String.length s in
+  let rec last_visible i =
+    if i < 0 then i
+    else
+      match s.[i] with
+      | ' ' | '\t' | '\n' | '\r' -> last_visible (i - 1)
+      | '>' -> (
+          match String.rindex_from_opt s i '<' with
+          | Some j -> last_visible (j - 1)
+          | None -> i)
+      | _ -> i
+  in
+  let is_inline tag =
+    List.mem tag
+      [
+        "a";
+        "b";
+        "cite";
+        "em";
+        "font";
+        "i";
+        "mark";
+        "s";
+        "small";
+        "span";
+        "strike";
+        "strong";
+        "sub";
+        "sup";
+        "tt";
+        "u";
+      ]
+  in
+  let rec after_inline_closings j =
+    if j + 1 < len && s.[j] = '<' && s.[j + 1] = '/' then
+      match String.index_from_opt s j '>' with
+      | Some k
+        when is_inline
+               (String.lowercase_ascii
+                  (String.trim (String.sub s (j + 2) (k - j - 2)))) ->
+          after_inline_closings (k + 1)
+      | Some _ | None -> j
+    else j
+  in
+  let i = last_visible (len - 1) in
+  if
+    i < 0
+    || String.contains ".!?" s.[i]
+    || (i >= 2 && String.sub s (i - 2) 3 = "\xE2\x80\xA6")
+  then s
+  else
+    let j = after_inline_closings (i + 1) in
+    String.sub s 0 j ^ "." ^ String.sub s j (len - j)
+
 let capitalize s =
   let first = ref true in
   let cmap u =
