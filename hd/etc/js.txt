@@ -893,5 +893,26 @@ function hideTimelineDuplicates() {
   });
 }
 hideTimelineDuplicates();
+%( The time line toggles show or hide their rows in place and keep the
+   state in the URL, so that a reload gives the same rows. %)
+function setupTimelineToggles() {
+  document.querySelectorAll('%[data-tl-toggle%]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.tlToggle;
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', on);
+      btn.classList.toggle('text-body-secondary', !on);
+      btn.title = on ? btn.dataset.hide : btn.dataset.show;
+      document.querySelectorAll(`#timeline tr%[data-tl="${key}"%]`).forEach(tr => {
+        tr.hidden = !on;
+      });
+      const url = new URL(location.href);
+      if (on) url.searchParams.set(key, 'on');
+      else url.searchParams.delete(key);
+      history.replaceState(null, '', url);
+    });
+  });
+}
+setupTimelineToggles();
 </script>
 %end;
