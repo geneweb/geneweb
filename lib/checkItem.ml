@@ -850,16 +850,18 @@ let can_have_unnamed_spouse_duplicate base p families =
   Array.length families = 2 && Array.fold_left count_unnamed 0 families = 1
 
 let has_named_homonymous_spouses base p families =
-  let iper = Gwdb.get_iper p in
-  let spouse_name ifam =
-    let sp = Gwdb.poi base (Gutil.spouse iper (Gwdb.foi base ifam)) in
-    if Person.is_empty_name sp then None
-    else
-      let fn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_first_name sp) in
-      let sn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_surname sp) in
-      Some (Gwdb.get_iper sp, fn, sn)
+  let spouses =
+    let iper = Gwdb.get_iper p in
+    let spouse_name ifam =
+      let sp = Gwdb.poi base (Gutil.spouse iper (Gwdb.foi base ifam)) in
+      if Person.is_empty_name sp then None
+      else
+        let fn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_first_name sp) in
+        let sn = Name.strip_lower @@ Gwdb.sou base (Gwdb.get_surname sp) in
+        Some (Gwdb.get_iper sp, fn, sn)
+    in
+    List.filter_map spouse_name (Array.to_list families)
   in
-  let spouses = List.filter_map spouse_name (Array.to_list families) in
   let rec has_dup = function
     | [] -> false
     | (sp_iper, fn, sn) :: rest ->
