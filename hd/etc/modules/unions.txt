@@ -214,7 +214,7 @@
   %reset_count;%reset_count2;
   %foreach;family;
     %incr_count;
-    %let;marr_note;%if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)<div class="border-start border-3 ps-2 mt-3 mb-2">[*notes on the marriage/notes on the marriages]0[:] %marriage_note;</div>%end;%in;
+    %let;marr_note;%if;((wizard or friend or bvar.no_note_for_visitor!="yes")and has_marriage_note)<div class="border-start border-3 ps-2 mt-3 mb-2" data-dup="f%spouse.index;">[*notes on the marriage/notes on the marriages]0[:] %marriage_note;</div>%end;%in;
     %if;(spouse.has_image)%incr_count2;%end;
     %foreach;child;
       %if;(child.has_image)%incr_count2;%end;
@@ -243,12 +243,12 @@
         %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
       %end;
       %if;has_witnesses;
-          %sp;(<span>%apply;a_of_b%with;[witness/witnesses]w%and;[marriage event]0%end;[:]
+        <span data-dup="f%spouse.index;">%sp;(%apply;a_of_b%with;[witness/witnesses]w%and;[marriage event]0%end;[:]
           %foreach;witness;
             %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
-          %end;</span>)%nn;
+          %end;)</span>%nn;
       %end;
-      %if;(marr_note!="").%marr_note;%end;
+      %if;(marr_note!="").%sp;%marr_note;%end;
       %if;(has_children)%nn;
         %if;(marr_note=""), %apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]
         %foreach;child;
@@ -347,7 +347,9 @@
           %end;
         </div>
         %if;has_witnesses;
-          <div class="d-flex flex-column flex-wrap mt-1 ms-auto me-3 small">
+          %reset_count1;
+          %foreach;witness;%if;witness.has_image;%incr_count1;%end;%end;
+          <div class="d-flex flex-column flex-wrap mt-1 ms-auto me-3 small"%if;(count1=0) data-dup="f%spouse.index;"%end;>
             <span class="ms-1">%apply;a_of_b%with;[*witness/witnesses]w%and;[marriage event]0%end;[:]</span>
             %foreach;witness;
               <div class="d-inline-flex flex-row ms-1%if;(not is_first) mt-1%end;">
