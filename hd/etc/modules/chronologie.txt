@@ -434,13 +434,13 @@
                     %apply;list_witness_of_kind("othe")
                   </div>
                 %end;
-                %if;(item.6!="")<div class="small text-body-secondary">%item.6;</div>%end;
+                %if;(item.6!="")<div class="small text-body-secondary">%apply;sentence(item.6)</div>%end;
               %end;
             %end;
           %else;
             %apply;capitalize(item.4)
             %if;(item.5!="")<div class="text-body-secondary">%item.5;</div>%end;
-            %if;(item.6!="")<div class="small text-body-secondary">%item.6;</div>%end;
+            %if;(item.6!="")<div class="small text-body-secondary">%apply;sentence(item.6)</div>%end;
           %end;
         </td>
       </tr>

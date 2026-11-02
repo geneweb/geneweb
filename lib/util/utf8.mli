@@ -30,6 +30,12 @@ val uppercase : string -> string
 val capitalize_fst : string -> string
 (** Returns UTF-8 encoded string where the first letter is capitalised *)
 
+val to_sentence : string -> string
+(** [to_sentence s] capitalises the first letter of [s], skipping leading HTML
+    tags, and, when its last visible character is not ".", "!", "?" or "…", adds
+    a full stop after the closing inline tags that follow this character
+    (outside a link or an emphasis), and before any other closing tag. *)
+
 val capitalize : string -> string
 (** Returns UTF-8 encoded string where the first letter is capitalised and
     others minimalised *)
