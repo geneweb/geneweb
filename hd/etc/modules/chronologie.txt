@@ -252,6 +252,7 @@
              or event.name=[burial/burials]0
              or event.name=[incineration/incinerations]0)  %nn;
            %else;%apply;age_marker("event.age")%end;
+      %and;%if;event.has_spouse;f%event.spouse.index;%end;
     %end;
   %end;
 
@@ -265,6 +266,7 @@
         %and;%related.baptism_place;%nn;
         %and;%nn;
         %and;%apply;age_marker("age_at_related_baptism")
+        %and;c%related.index;
       %end;
     %end;
   %end;
@@ -288,6 +290,7 @@
       %and;%event_witness_relation.event.place;
       %and;%event_witness_relation_note;
       %and;%apply;age_marker("age_at_witnessed_event")
+      %and;w%event_witness_relation.person.index;
     %end;
   %end;
 
@@ -368,7 +371,7 @@
     %end;
   %end;
 
-  <table class="table table-sm table-hover w-100">
+  <table id="timeline" class="table table-sm table-hover w-100">
     <thead>
       %(<td> </td>%)
       <tr>
@@ -378,7 +381,7 @@
       </tr>
     </thead>
     %foreach;sorted_list_item;
-      <tr class="align-top%if;(item.4="self_evt") table-light%end;">
+      <tr class="align-top%if;(item.4="self_evt") table-light%end;"%if;(item.8!="") data-dup="%item.8;"%end;>
       %(<td class="align-middle">%item.1;</td>%)
         <td class="align-middle text-end text-nowrap">%item.3;</td>
         <td class="align-middle text-center text-nowrap px-2%nn;
@@ -399,12 +402,12 @@
                   <div class="small text-body-secondary">
                   %foreach;relation;
                     %if;(has_relation_him and has_relation_her and relation_type=[godfather/godmother/godparents]2)
-                      <span class="text-nowrap">[*godfather/godmother/godparents]0[:] %apply;short_display_person("relation_him").</span>
-                      <span class="text-nowrap">[*godfather/godmother/godparents]1[:] %apply;short_display_person("relation_her").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]0[:] %apply;short_display_person("relation_him").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]1[:] %apply;short_display_person("relation_her").</span>
                     %elseif;(has_relation_him and relation_type=[godfather/godmother/godparents]0)
-                      <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_him").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_him").</span>
                     %elseif;(has_relation_her and relation_type=[godfather/godmother/godparents]1)
-                      <span class="text-nowrap">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_her").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_her").</span>
                     %end;
                   %end;
                   </div>

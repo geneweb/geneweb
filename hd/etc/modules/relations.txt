@@ -72,6 +72,7 @@
   %foreach;event_witness_relation;%incr_count;%end;
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
+  <div class="dup-box">
   <h2 class="h3">[*relation/relations]1%nn;
     %if;(cnt>0)
       %if;(not cancel_links)
@@ -84,7 +85,7 @@
   <ul class="ps-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
-      <li>%apply;capitalize(relation_type)[:]%nl;
+      <li data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%nl;
         <ul class="ps-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
@@ -95,22 +96,22 @@
         </ul>
       </li>
     %elseif;has_relation_him;
-      %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
-        %apply;short_display_person("relation_him")
+      %apply;li_SDC("relation_him")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
+        %apply;short_display_person("relation_him")</span>
       </li>
     %elseif;has_relation_her;
-      %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
-        %apply;short_display_person("relation_her")
+      %apply;li_SDC("relation_her")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
+        %apply;short_display_person("relation_her")</span>
       </li>
     %end;
   %end;
   %foreach;related;
-    %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;short_display_person("related")
+    %apply;li_SDC("related")<span data-dup="c%related.index;">%apply;capitalize(related_type)[:]%sp;
+      %apply;short_display_person("related")</span>
     </li>
   %end;
   %foreach;event_witness_relation;
-    %apply;li_SDC("event_witness_relation.person")
+    %apply;li_SDC("event_witness_relation.person")<span data-dup="w%event_witness_relation.person.index;">%nn;
       %let;str;%if;(event_witness_relation.event.name_at!="")%event_witness_relation.event.name_at;%else;%event_witness_relation.event.name;%end;
       %if;(event_witness_relation.event.date.year!="") [in (year)] %event_witness_relation.event.date.year;%end;%in;
       %if;(event_witness_relation.event.name_at!="")%apply;witness_at_event(event_witness_relation_kind,str)%sp;%else;%apply;witness_at(event_witness_relation_kind,str)%end;
@@ -118,10 +119,11 @@
       %if;(event_witness_relation.event.spouse!="")
       %sp;[and]
       %apply;short_display_person("event_witness_relation.event.spouse")
-      %end;.
+      %end;.</span>
     </li>
   %end;
   </ul>
+  </div>
 
 %( relation_complete includes witness of his events and witness at other's events %)
 %elseif;(op_m=2 and rel_nbr>0)

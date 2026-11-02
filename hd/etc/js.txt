@@ -872,3 +872,26 @@ function reducePlaces() {
 reducePlaces();
 </script>
 %end;
+%if;(e.m="" and not is_welcome)
+<script>
+%( Hide what the time line already shows: an element whose data-dup key is
+   also found in #timeline is hidden (its whole list item inside a .dup-box),
+   then any .dup-box left without a visible item. %)
+function hideTimelineDuplicates() {
+  const timeline = document.getElementById('timeline');
+  if (!timeline) return;
+  const keys = new Set();
+  timeline.querySelectorAll('%[data-dup%]').forEach(el => keys.add(el.dataset.dup));
+  document.querySelectorAll('%[data-dup%]').forEach(el => {
+    if (timeline.contains(el) || !keys.has(el.dataset.dup)) return;
+    const target = el.closest('.dup-box li') || el;
+    target.hidden = true;
+  });
+  document.querySelectorAll('.dup-box').forEach(box => {
+    const items = Array.from(box.querySelectorAll(':scope > ul > li'));
+    if (items.every(li => li.hidden)) box.hidden = true;
+  });
+}
+hideTimelineDuplicates();
+</script>
+%end;
