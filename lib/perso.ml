@@ -2878,6 +2878,14 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) (loc : Loc.t) =
             (Date.cdate_to_dmy_opt (Driver.get_birth p))
             target sl
       | None -> Templ.VVstring "")
+  | ([ "age_at_spouse_birth" ] | "age_at_spouse_birth" :: _) as sl -> (
+      match get_env "fam" env with
+      | Vfam (_, _, (_, _, ispouse), m_auth) ->
+          let spouse = pget conf base ispouse in
+          compute_age_at_event conf (p_auth && m_auth)
+            (Date.cdate_to_dmy_opt (Driver.get_birth p))
+            (p_birth spouse) sl
+      | _ -> null_val)
   | ([ "age_at_spouse_death" ] | "age_at_spouse_death" :: _) as sl -> (
       match get_env "fam" env with
       | Vfam (_, _, (_, _, ispouse), m_auth) ->
