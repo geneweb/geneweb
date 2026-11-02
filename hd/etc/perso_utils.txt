@@ -38,13 +38,13 @@
 
 %define;li_SDC(xx)
   %if;xx.has_families;
-    %reset_count;
+    %reset_count3;
     %foreach;family;
-      %if;(nb_children>0)%incr_count;%end;
+      %if;(nb_children>0)%incr_count3;%end;
     %end;
   %end;
   <li style="vertical-align: middle;list-style-type: %nn;
-    %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
+    %if;xx.has_families;%if;(count3!=0)square%else;disc%end;%else;circle%end;;">%nn;
 %end;
 
 %let;in_place;%if;roglo;-%else;[in (place)]%end;%in;

@@ -435,7 +435,7 @@ fr: Autour de l’arbre
       Association Roglo
     </h2>
     <div class="d-flex flex-wrap justify-content-md-center">
-      %if;(false and b.alt_serv_base!="" and not cgi) %(tomporarily suppressed %)
+      %if;((wizard or friend) and b.alt_serv_base!="" and not cgi)
         <a class="btn btn-outline-primary"%sp;
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
             %if;wizard;w%elseif;friend;f%else;%end;%foreach;env_binding;%if;(env.key!="" and env.key!="w")&%env.key;=%env.val;%end;%end;"%sp;

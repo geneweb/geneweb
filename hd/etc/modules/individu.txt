@@ -91,7 +91,7 @@
         %end;
       %end;%)
     %end;
-    %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;%end;
+    %if;(has_linked_page.HEAD and linked_page.HEAD!="") %linked_page.HEAD;%end;
     %if;has_first_names_aliases;
       <div>%reset_count;
         %apply;link(first_name,"P")/%sq;
