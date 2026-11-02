@@ -1,4 +1,4 @@
-<!-- $Id: modules/chronologie.txt v7.1 04/04/2026 06:50:49 $ -->
+<!-- $Id: modules/chronologie.txt v7.1 02/11/2026 10:26:58 $ -->
 %define;age_marker(xx)
   %if;(xx.years!="")
     <span%if;(xx.months>0 or xx.days>0) title="%xx;"%end;
@@ -7,6 +7,15 @@
        %elseif;(xx.months>0)months">%if;(xx.months<10 and xx.sign="") %end;%xx.sign;%xx.months;%nn;
        %else;days">%if;(xx.days<10 and xx.sign="") %end;%xx.sign;%xx.days;%end;</span>
   %end;
+%end;
+
+%define;tl_toggle(p_key,p_icon,p_lbl)
+  <button type="button" class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.p_key!="on") text-body-secondary%end;"
+    data-tl-toggle="p_key" aria-pressed="%if;(e.p_key="on")true%else;false%end;"
+    data-show="[*visualize/show/hide/summary]1 p_lbl" data-hide="[*visualize/show/hide/summary]2 p_lbl"
+    title="%if;(e.p_key="on")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; p_lbl">%nn;
+    <i class="fa p_icon fa-fw"></i>%nn;
+  </button>
 %end;
 
 %define;event_tree(z1)
@@ -150,7 +159,7 @@
   %if;(xx.prec="&#60;")1%elseif;(xx.prec="&#62;")3%else;2%end;
 %end;
 
-%define;one_child(ccc,evm,labl)
+%define;one_child(ccc,evm,labl,p_cat)
   %( no test for his_birth_date <= my_death_date here %)
   %apply;add_in_sorted_list%with;%apply;sort_key("ccc.birth_date")
     %and;%count2;
@@ -159,6 +168,7 @@
     %and;
     %and;
     %and;%apply;age_marker("age_at_child_birth")
+    %and;%and;p_cat%nn;
   %end;
   %let;his_death_date_year;%if;(ccc.death_date.year!="")%ccc.death_date.year;%else;0%end;%in;
   %let;his_death_date_month;%if;(ccc.death_date.month!="")%if;(ccc.death_date.month<=9)0%end;%ccc.death_date.month;%else;00%end;%in;
@@ -173,6 +183,7 @@
       %and;
       %and;
       %and;%apply;age_marker("age_at_child_death")
+      %and;%and;p_cat%nn;
     %end;
   %end;
   %if;(ccc.has_families and evm=1)
@@ -189,6 +200,7 @@
           %and;
           %and;
           %and;%apply;age_marker("age_at_child_marriage")
+          %and;%and;%if;("p_cat"="")allmar%else;p_cat%end;
         %end;
       %end;
     %end;
@@ -198,9 +210,7 @@
 %reset_count;
 %foreach;event_witness_relation;%incr_count;%end;
 %if;(has_event or (count>0 and b.has_events!="never"))
-  %let;evarmac;%if;(e.allmar!="" and e.allmar="on")1%else;0%end;%in; %(marriage child %)
   %let;evarmas;%if;(e.ma_s!="" and e.ma_s="on")1%else;0%end;%in; %(marriage siblings %)
-  %let;evarevp;%if;(e.allevt!="" and e.allevt="on")1%else;0%end;%in; %(events parents %)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <div class="d-flex justify-content-between">
     <h2 class="h3 my-1" id="c">[*time line]%nn;
@@ -213,23 +223,9 @@
       %end;%nn;
     </h2>%nn;
     %if;not cancel_links;
-      <div class="d-inline-flex align-items-center">
-        <div>
-          <a href="%if;(e.allmar!="on")%url_set.allmar.on;%else;%url_set.allmar;%end;"
-            class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.allmar!="on") text-body-secondary%end;" role="button"
-            title="%if;(e.allmar!="on")[*visualize/show/hide/summary]1%else;%nn;
-              [*visualize/show/hide/summary]2%end; [marriage/marriages]1 [spouse/spouses]1 & [child/children]1">
-            <i class="fa fa-shuffle fa-fw fa-sm me-1"></i>
-          </a>
-        </div>
-        <div class="ms-1">
-          <a href="%if;(e.allevt!="on")%url_set.allevt.on;%else;%url_set.allevt;%end;"
-            class="btn btn-outline-primary btn-sm border-0 px-0%if;(e.allevt!="on") text-body-secondary%end;" role="button"
-            title="%if;(e.allevt!="on")[*visualize/show/hide/summary]1%else;%nn;
-              [*visualize/show/hide/summary]2%end; [event/events]1 [parents] & [siblings]">
-            <i class="fa fa-graduation-cap fa-fw"></i>
-          </a>
-        </div>
+      <div class="d-inline-flex align-items-center gap-1">
+        %apply;tl_toggle%with;allmar%and;fa-shuffle%and;[marriage/marriages]1 [spouse/spouses]1 & [child/children]1%end;
+        %apply;tl_toggle%with;allevt%and;fa-graduation-cap%and;[event/events]1 [parents] & [siblings]%end;
       </div>
     %end;
   </div>
@@ -304,7 +300,7 @@
     %end;
   %end;
 
-  %if;(has_parents and evarevp=1)
+  %if;has_parents;
     %apply;add_in_sorted_list%with;%apply;sort_key("father.birth_date")
       %and;%count2;
       %and;%if;(father.birth_date!="")%father.birth_date;%else;([missing date]0)%end;%nn;
@@ -312,6 +308,7 @@
       %and;
       %and;
       %and;%apply;age_marker("age_at_father_birth")
+      %and;%and;allevt%nn;
     %end;
     %apply;add_in_sorted_list%with;%apply;sort_key("mother.birth_date")
       %and;%count2;
@@ -320,6 +317,7 @@
       %and;
       %and;
       %and;%apply;age_marker("age_at_mother_birth")
+      %and;%and;allevt%nn;
     %end;
     %if;(parent_marriage_date!="")
       %apply;add_in_sorted_list%with;%apply;sort_key("parent_marriage_date")
@@ -329,6 +327,7 @@
         %and;
         %and;
         %and;%apply;age_marker("age_at_parent_marriage")
+        %and;%and;allevt%nn;
       %end;
     %end;
     %if;father.is_dead;
@@ -339,6 +338,7 @@
         %and;
         %and;
         %and;%apply;age_marker("age_at_father_death")
+        %and;%and;allevt%nn;
       %end;
     %end;
     %if;mother.is_dead;
@@ -349,15 +349,16 @@
         %and;
         %and;
         %and;%apply;age_marker("age_at_mother_death")
+        %and;%and;allevt%nn;
       %end;
     %end;
   %end;
 
-  %if;(has_siblings and evarevp=1)
+  %if;has_siblings;
     %foreach;mother.family;
       %foreach;child;
         %if;(child!=self)
-          %apply;one_child("child","evarmas","a brother/a sister/a sibling")
+          %apply;one_child("child","evarmas","a brother/a sister/a sibling","allevt")
         %end;
       %end;
     %end;
@@ -376,7 +377,7 @@
         %end;
       %end;
       %foreach;child;
-        %apply;one_child("child","evarmac","a son/a daughter/a child")
+        %apply;one_child("child","1","a son/a daughter/a child","")
       %end;
     %end;
   %end;
@@ -391,7 +392,8 @@
       </tr>
     </thead>
     %foreach;sorted_list_item;
-      <tr class="align-top%if;(item.4="self_evt") table-light%end;"%if;(item.8!="") data-dup="%item.8;"%end;>
+      <tr class="align-top%if;(item.4="self_evt") table-light%end;"%if;(item.8!="") data-dup="%item.8;"%end;%nn;
+        %if;(item.9!="") data-tl="%item.9;"%if;((item.9="allmar" and e.allmar!="on") or (item.9="allevt" and e.allevt!="on")) hidden%end;%end;>
       %(<td class="align-middle">%item.1;</td>%)
         <td class="align-middle text-end text-nowrap">%item.3;</td>
         <td class="align-middle text-center text-nowrap px-2%nn;
