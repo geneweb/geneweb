@@ -9,6 +9,7 @@ module type S = sig
   val mem : word -> t -> bool
   val search : word list -> t -> entry Seq.t
   val search_prefix : word list -> t -> entry Seq.t
+  val search_prefix_spread : word list -> t -> entry Seq.t
   val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
 end
 
@@ -144,6 +145,57 @@ module Make (W : Word.S) (E : Entry) = struct
         | l -> Some (Iterator.union (module Flatset.Comparator) l :: acc))
       [] ps
     |> Option.value ~default:[] |> intersection
+
+  (* Round-robin interleaving of the sequences [l]: one element of each
+     sequence in turn, until all of them are exhausted. *)
+  let interleave l =
+    let rec next front back () =
+      match front with
+      | [] -> (
+          match back with [] -> Seq.Nil | _ :: _ -> next (List.rev back) [] ())
+      | s :: front -> (
+          match s () with
+          | Seq.Nil -> next front back ()
+          | Seq.Cons (x, s) -> Seq.Cons (x, next front (s :: back)))
+    in
+    next l []
+
+  let search_prefix_spread ps t =
+    let rec subtrie pfx i t =
+      if i = W.length pfx then Some t
+      else
+        match Trie.step (W.get pfx i) t with
+        | exception Not_found -> None
+        | t -> subtrie pfx (i + 1) t
+    in
+    let union pfx =
+      let* t = subtrie pfx 0 t in
+      match Trie.fold (fun _ se acc -> Flatset.iterator se :: acc) t [] with
+      | [] -> None
+      | l -> Some (Iterator.union (module Flatset.Comparator) l)
+    in
+    match List.rev ps with
+    | [] -> Seq.empty
+    | last :: others -> (
+        match subtrie last 0 t with
+        | None -> Seq.empty
+        | Some sub ->
+            (* Iterators are consumed by the join, so the unions of the
+               other prefixes are rebuilt for each key of [last]. *)
+            let others () =
+              try_fold
+                (fun acc p ->
+                  let* u = union p in
+                  Some (u :: acc))
+                [] others
+            in
+            let per_key se () =
+              match others () with
+              | None -> Seq.Nil
+              | Some l -> intersection (Flatset.iterator se :: l) ()
+            in
+            Trie.fold (fun _ se acc -> per_key se :: acc) sub []
+            |> List.rev |> interleave)
 
   type automaton =
     | A :

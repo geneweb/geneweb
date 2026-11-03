@@ -25,6 +25,14 @@ module type S = sig
   (** [search_prefix ps t] returns the sequence of entries in the index [t]
       which are associated with all the prefix [ps]. *)
 
+  val search_prefix_spread : word list -> t -> entry Seq.t
+  (** [search_prefix_spread ps t] returns the same entries as
+      [search_prefix ps t], but grouped by the words of [t] that complete the
+      last prefix of [ps]: these words are taken in lexicographic order and
+      their entries are interleaved in round-robin. A truncated result thus
+      shows as many distinct completions as possible. Entries matching several
+      completions may be returned several times. *)
+
   val fuzzy_search : max_dist:int -> word list -> t -> entry Seq.t
   (** [fuzzy_search ~max_dist ps t] returns the sequence of entries in the index
       [t] which are associated with all the words matching each pattern of [ps]
