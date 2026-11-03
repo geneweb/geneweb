@@ -43,6 +43,16 @@
   Fatal error: exception Stdlib.Arg.Bad("You must specify at least one input file or a base name for a fresh database.")
   [2]
 
+  $ gwc -bd . -o foo_bar
+  gwc: the database name "foo_bar" contains a forbidden character.
+  Allowed characters: a..z, A..Z, 0..9, -
+  [2]
+
+  $ gwc -bd . foo_bar.gw
+  gwc: the database name "foo_bar" contains a forbidden character.
+  Allowed characters: a..z, A..Z, 0..9, -
+  [2]
+
   $ gwc -bd . -o bar
   Compilation: 0 min 0 sec
   Migration check for bar:
