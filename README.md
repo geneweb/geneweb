@@ -9,11 +9,13 @@
 
 ---
 
-> [!NOTE]
-> **Version 7.1 is currently in beta.**
-> The software is stable and thoroughly tested. The "beta" label exists only
-> because the internal database format is not yet compatible with Geneanet’s
-> infrastructure. This will be resolved for the final 7.1.0 release.
+> [!IMPORTANT]
+> **GeneWeb 7.1 writes a new database format, shared with Geneanet.**
+> A base built by GeneWeb 7.0 or a 7.1 beta is still displayed, but it is
+> read-only: the edit forms are refused until the base is rebuilt. Keep a
+> copy of the base, export it with the `gwu` of the new version, then
+> rebuild it with its `gwc`. A rebuilt base cannot be read by an older
+> version. See [CHANGES.md](CHANGES.md) for details.
 
 ---
 
