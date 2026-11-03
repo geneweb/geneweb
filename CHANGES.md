@@ -18,6 +18,10 @@
 > text instead.
 
 ## Gwd
+- Event witnesses carry a note, as on Geneanet. It is entered next to
+  each witness in the person and family forms and rendered like the
+  other notes: wiki syntax, allowed tags, and links indexed in the notes
+  database.
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
@@ -144,6 +148,14 @@
   instead of the shared temporary directory (#3033).
 - New page to run `anoma` on an existing base; the page after a base
   creation links to its anomalies report.
+
+## Gwc, gwu and GEDCOM
+- In a `.gw` file, a witness line (`wit`) may be followed by `wnote`
+  lines holding the witness note, one line of text each. `gwu` writes
+  them, or with `-old_gw` writes the note as a plain text paragraph that
+  older `gwc` accept.
+- `gwb2ged` exports the witness note as a `NOTE` of the witness `ASSO`,
+  and `ged2gwb` reads it back.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person
