@@ -202,11 +202,19 @@ td .rm-cell {
   border-left: 1px solid #dee2e6;
 }
 
-/* Wrapper principal avec scroll */
-.rm-modal-wrapper {
-  padding: 10px;
-  max-height: 70vh;
-  overflow-y: auto;
+/* Width fitted to content up to the viewport; column-reverse puts the
+   scroll origin at the bottom, so the modal opens on the two persons */
+#rmModal .modal-dialog {
+  width: max-content;
+  min-width: min(var(--bs-modal-width), 100% - 2 * var(--bs-modal-margin));
+  max-width: calc(100% - 2 * var(--bs-modal-margin));
+}
+#rmModal .modal-body {
+  display: flex;
+  flex-direction: column-reverse;
+}
+#rmModal .rm-sums {
+  contain: inline-size;
 }
 
 /* Section debug */
@@ -2503,6 +2511,17 @@ span.notesourcecolor {
 .rm-empty {
   --bs-table-bg: transparent;
   border: none !important;
+  text-align: center;
+}
+.rm-legend,
+.rm-sample {
+  --bs-table-color: var(--bs-secondary-color);
+  line-height: 1rem;
+  vertical-align: middle;
+}
+.rm-sample {
+  --bs-table-bg: transparent;
+  border: 1px dashed var(--bs-border-color) !important;
   text-align: center;
 }
 .rm-hl0 {

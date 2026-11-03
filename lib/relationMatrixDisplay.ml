@@ -41,21 +41,12 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
         match find_shortest_path cell_data.paths with
         | None -> Output.print_sstring conf {|<td class="rm-cell">—</td>|}
         | Some shortest ->
-            let notation =
-              Printf.sprintf "%d/%d" shortest.Relation.l1 shortest.Relation.l2
-            in
-            let links_count =
-              Sosa.to_string_sep
-                (Util.transl conf "(thousand separator)" :> string)
-                cell_data.total
-            in
-            let coeff_str =
-              let pct = format_percentage_for_cell conf cell_data.coeff in
-              if pct = "" then "" else "<small>" ^ pct ^ "</small>"
-            in
             let cell_content =
-              Printf.sprintf "<small>%s</small><br><b>%s</b><br>%s" notation
-                links_count coeff_str
+              let pct = format_percentage_for_cell conf cell_data.coeff in
+              Printf.sprintf "<small>%d/%d</small><br><b>%s</b>%s"
+                shortest.Relation.l1 shortest.Relation.l2
+                (links_count conf cell_data.total)
+                (if pct = "" then "" else "<br><small>" ^ pct ^ "</small>")
             in
             let relationship_url =
               make_relationship_link conf base (MatrixLink (person_i, person_j))
@@ -116,18 +107,32 @@ let print_matrix_table conf base persons =
   let n = Array.length persons in
   let tstab = Util.create_topological_sort conf base in
   let cell_storage = RelationMatrix.create_triangular_matrix n in
-  Output.printf conf
+  Output.print_sstring conf
     {|<div class="d-flex justify-content-center">
-      <table class="table table-sm w-auto" id="rm-table"
-             data-links-label="%s" data-coeff-label="%s">
-        <tbody>|}
-    (Util.transl_nth conf "relationship link/relationship links" 1)
-    (Util.transl_nth conf "relationship coefficient/percentage" 1);
+      <table class="table table-sm w-auto" id="rm-table">
+        <tbody>|};
   print_matrix_headers conf persons;
   for i = 0 to n - 1 do
     print_matrix_row conf base tstab persons i cell_storage n
   done;
-  Output.print_sstring conf {|</tbody></table></div>|};
+  Output.printf conf
+    {|<tr><td class="rm-empty" colspan="%d"></td></tr>
+<tr>
+  <td class="rm-empty rm-legend text-end text-nowrap">
+    <small>%s</small><br><b>%s</b><br><small>%s</small>
+  </td>
+  <td class="rm-sample">
+    <small>3/3</small><br><b>6</b><br><small>%s</small>
+  </td>
+  <td class="rm-empty" colspan="%d"></td>
+</tr>
+</tbody></table></div>|}
+    (n + 1)
+    (Util.transl_nth conf "relationship table" 3)
+    (Util.transl_nth conf "relationship link/relationship links" 1)
+    (Util.transl_nth conf "relationship coefficient/percentage" 1)
+    (format_percentage_for_cell conf 0.09375)
+    (n - 1);
   let json_data =
     RelationMatrix.matrix_to_json conf base persons cell_storage n
   in
@@ -136,7 +141,7 @@ let print_matrix_table conf base persons =
     {|
 <div class="modal fade" id="rmModal" tabindex="-1" role="dialog"
      aria-labelledby="rmModalBody" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-body" id="rmModalBody"></div>
     </div>
@@ -185,12 +190,10 @@ let print conn conf base =
       base_url ^ "m=TP&v=updRLM&" ^ String.concat "&" other_params
     in
     Output.printf conf
-      {|<div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="h3">%s</h2>|}
-      (Util.transl_nth conf "relationship table" 3 |> Utf8.capitalize_fst);
-    Output.printf conf
-      {|<a href="%s" class="btn btn-outline-primary">
-          <i class="fas fa-edit me-1"></i>%s</a></div>|}
+      {|<div class="d-flex justify-content-end mb-3">
+          <a href="%s" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-1"></i>%s</a>
+        </div>|}
       (tp_link conf)
       (Util.transl_nth conf "add/clear/show/edit the graph" 3
       |> Utf8.capitalize_fst);
