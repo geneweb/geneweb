@@ -887,6 +887,9 @@ function hideTimelineDuplicates() {
     const target = el.closest('.dup-box li') || el;
     target.hidden = true;
   });
+  document.querySelectorAll('%[data-dup-alt%]').forEach(el => {
+    if (keys.has(el.dataset.dupAlt)) el.hidden = false;
+  });
   document.querySelectorAll('.dup-box').forEach(box => {
     const items = Array.from(box.querySelectorAll(':scope > ul > li'));
     if (items.every(li => li.hidden)) box.hidden = true;
