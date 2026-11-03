@@ -5924,6 +5924,40 @@ pt: comentário sobre a família dos pais
 ru: комментарий о семье родителей
 sv: kommentar om föräldrarnas familj
 
+    common ancestor
+af: gemeenskaplike voorouer/gemeenskaplike voorouers
+ar: سلف مشترك/أسلاف مشتركون
+bg: общ прародител/общи прародители
+br: hendad boutin/hendadoù boutin
+ca: avantpassat comú/avantpassats comuns
+co: antenatu cumunu/antenati cumuni
+cs: společný předek/společní předkové
+da: fælles forfader/fælles forfædre
+de: gemeinsamer Vorfahre/gemeinsame Vorfahren
+en: common ancestor/common ancestors
+eo: komuna praulo/komunaj prauloj
+es: antepasado común/antepasados comunes
+et: ühine esivanem/ühised esivanemad
+fi: yhteinen esivanhempi/yhteiset esivanhemmat
+fr: ancêtre commun/ancêtres communs
+he: אב קדמון משותף/אבות קדמונים משותפים
+is: sameiginlegur forfaðir/sameiginlegir forfeður
+it: antenato comune/antenati comuni
+lt: bendras protėvis/bendri protėviai
+lv: kopīgais sencis/kopīgie senči
+nl: gemeenschappelijke voorouder/gemeenschappelijke voorouders
+no: felles ane/felles aner
+oc: aujòl comun/aujòls comuns
+pl: wspólny przodek/wspólni przodkowie
+pt: antepassado comum/antepassados comuns
+ro: strămoș comun/strămoși comuni
+ru: общий предок/общие предки
+sk: spoločný predok/spoloční predkovia
+sl: skupni prednik/skupni predniki
+sv: gemensam förfader/gemensamma förfäder
+tr: ortak ata/ortak atalar
+zh: 共同祖先/共同祖先
+
     compact descendants tree
 co: arburu cumpattu di discendenza
 de: kompakter Nachkommenbaum
@@ -19777,38 +19811,38 @@ tr: akrabalık bağı/akrabalık bağları
 zh: 亲属关系/亲属关系
 
     relationship table
-af: wys verwantskaptabel/wys die tabel van verwantskappe vir al hierdie individue/verwantskaptabel/aantal bekende skakels en kortste stygende&#047;dalende grade
-ar: عرض جدول القرابة/عرض جدول علاقات القرابة لجميع هؤلاء الأفراد/جدول القرابة/عدد الروابط المعروفة والدرجات الصاعدة&#047;النازلة الأقصر
-bg: покажи таблица на родството/покажи таблицата на родствените връзки за всички тези индивиди/таблица на родството/брой известни връзки и най-кратки възходящи&#047;низходящи степени
-br: diskouez taolenn ar cʼheneliezh/diskouez taolenn liammoù ar cʼheneliezh evit an holl dud-se/taolenn ar cʼheneliezh/niver a liammoù anavezet ha dereioù pignat&#047;diskenn berrana
-ca: mostrar taula de parentiu/mostrar la taula de relacions de parentiu per a tots aquests individus/taula de parentiu/nombre d’enllaços coneguts i graus ascendent&#047;descendent més curts
-co: affissà tavula di parentela/affissà a tavula di relazioni di parentela per tutti questi individui/tavula di parentela/numeru di ligami cunnisciuti è gradi ascendente&#047;discendente più corti
-cs: zobrazit tabulku příbuzenství/zobrazit tabulku příbuzenských vztahů pro všechny tyto jedince/tabulka příbuzenství/počet známých vazeb a nejkratší vzestupné&#047;sestupné stupně
-da: vis slægtskabstabel/vis tabellen over slægtskabsforhold for alle disse individer/slægtskabstabel/antal kendte forbindelser og korteste stigende&#047;faldende grader
-de: Verwandtschaftstabelle anzeigen/die Tabelle der Verwandtschaftsbeziehungen für alle diese Personen anzeigen/Verwandtschaftstabelle/Anzahl bekannter Verbindungen und kürzeste aufsteigende&#047;absteigende Grade
-en: show relationship table/show the table of relationships for these individuals/relationship table/number of known links and shortest ascending&#047;descending degrees
-eo: montri tabelon de parenceco/montri la tabelon de parencaj rilatoj por ĉiuj ĉi individuoj/tabelo de parenceco/nombro de konataj ligoj kaj plej mallongaj supreniraj&#047;malsuprenaj gradoj
-es: mostrar tabla de parentesco/mostrar la tabla de relaciones de parentesco para todos estos individuos/tabla de parentesco/número de enlaces conocidos y grados ascendente&#047;descendente más cortos
-et: näita sugulustabelit/näita kõigi nende isikute sugulussidemete tabelit/sugulustabel/teadaolevate sidemete arv ja lühimad tõusvad&#047;laskuvad astmed
-fi: näytä sukulaisuustaulukko/näytä kaikkien näiden henkilöiden sukulaisuussuhteiden taulukko/sukulaisuustaulukko/tunnettujen linkkien määrä ja lyhimmät nousevat&#047;laskevat asteet
-fr: afficher tableau de parentés/afficher le tableau des relations de parenté pour tous ces individus/tableau de parentés/nombre de liens connus et degrés ascendant&#047;descendant le plus court
-he: הצג טבלת קרבה/הצג את טבלת יחסי הקרבה עבור כל הפרטים הללו/טבלת קרבה/מספר קישורים ידועים ודרגות עולות&#047;יורדות הקצרות ביותר
-is: sýna ættartöflu/sýna töflu ættartengla fyrir alla þessa einstaklinga/ættartafla/fjöldi þekktra tengla og stystu hækkandi&#047;lækkandi stig
-it: mostra tabella di parentela/mostra la tabella delle relazioni di parentela per tutti questi individui/tabella di parentela/numero di legami conosciuti e gradi ascendente&#047;discendente più brevi
-lt: rodyti giminystės lentelę/rodyti visų šių asmenų giminystės ryšių lentelę/giminystės lentelė/žinomų ryšių skaičius ir trumpiausi kylantys&#047;besileidžiantys laipsniai
-lv: rādīt radniecības tabulu/rādīt visu šo personu radniecības attiecību tabulu/radniecības tabula/zināmo saišu skaits un īsākie kāpjoši&#047;krītoši grādi
-nl: toon verwantschapstabel/toon de tabel van verwantschapsrelaties voor al deze personen/verwantschapstabel/aantal bekende verbindingen en kortste stijgende&#047;dalende graden
-no: vis slektskaptabell/vis tabellen over slektskapsforbindelser for alle disse individene/slektskaptabell/antall kjente koblinger og korteste stigende&#047;synkende grader
-oc: afichar taula de parentat/afichar la taula de relacions de parentat per totes aquelas personas/taula de parentat/nombre de ligams coneguts e grases montants&#047;descendents mai còrts
-pl: pokaż tabelę pokrewieństwa/pokaż tabelę związków pokrewieństwa dla wszystkich tych osób/tabela pokrewieństwa/liczba znanych powiązań i najkrótsze stopnie wstępujące&#047;zstępujące
-pt: mostrar tabela de parentesco/mostrar a tabela de relações de parentesco para todos estes indivíduos/tabela de parentesco/número de ligações conhecidas e graus ascendente&#047;descendente mais curtos
-ro: arată tabelul de rudenie/arată tabelul relațiilor de rudenie pentru toți acești indivizi/tabel de rudenie/numărul de legături cunoscute și gradele ascendente&#047;descendente cele mai scurte
-ru: показать таблицу родства/показать таблицу родственных связей для всех этих лиц/таблица родства/количество известных связей и кратчайшие восходящие&#047;нисходящие степени
-sk: zobraziť tabuľku príbuzenstva/zobraziť tabuľku príbuzenských vzťahov pre všetkých týchto jedincov/tabuľka príbuzenstva/počet známych väzieb a najkratšie stúpajúce&#047;klesajúce stupne
-sl: prikaži tabelo sorodstva/prikaži tabelo sorodstvenih povezav za vse te posameznike/tabela sorodstva/število znanih povezav in najkrajše naraščajoče&#047;padajoče stopnje
-sv: visa släktskaptabell/visa tabellen över släktskapsförhållanden för alla dessa individer/släktskaptabell/antal kända förbindelser och kortaste stigande&#047;fallande grader
-tr: akrabalık tablosunu göster/tüm bu bireyler için akrabalık ilişkileri tablosunu göster/akrabalık tablosu/bilinen bağlantı sayısı ve en kısa yükselen&#047;alçalan dereceler
-zh: 显示亲属关系表/显示所有这些个人的亲属关系表/亲属关系表/已知链接数量和最短上行&#047;下行度数
+af: wys verwantskaptabel/wys die tabel van verwantskappe vir al hierdie individue/verwantskaptabel/stygende&#047;dalende grade van die kortste pad
+ar: عرض جدول القرابة/عرض جدول علاقات القرابة لجميع هؤلاء الأفراد/جدول القرابة/الدرجات الصاعدة&#047;النازلة لأقصر مسار
+bg: покажи таблица на родството/покажи таблицата на родствените връзки за всички тези индивиди/таблица на родството/възходящи&#047;низходящи степени на най-краткия път
+br: diskouez taolenn ar cʼheneliezh/diskouez taolenn liammoù ar cʼheneliezh evit an holl dud-se/taolenn ar cʼheneliezh/dereioù pignat&#047;diskenn an hent berrañ
+ca: mostrar taula de parentiu/mostrar la taula de relacions de parentiu per a tots aquests individus/taula de parentiu/graus ascendent&#047;descendent del camí més curt
+co: affissà tavula di parentela/affissà a tavula di relazioni di parentela per tutti questi individui/tavula di parentela/gradi ascendente&#047;discendente di u caminu più cortu
+cs: zobrazit tabulku příbuzenství/zobrazit tabulku příbuzenských vztahů pro všechny tyto jedince/tabulka příbuzenství/vzestupné&#047;sestupné stupně nejkratší cesty
+da: vis slægtskabstabel/vis tabellen over slægtskabsforhold for alle disse individer/slægtskabstabel/stigende&#047;faldende grader for den korteste vej
+de: Verwandtschaftstabelle anzeigen/die Tabelle der Verwandtschaftsbeziehungen für alle diese Personen anzeigen/Verwandtschaftstabelle/aufsteigende&#047;absteigende Grade des kürzesten Weges
+en: show relationship table/show the table of relationships for these individuals/relationship table/ascending&#047;descending degrees of the shortest path
+eo: montri tabelon de parenceco/montri la tabelon de parencaj rilatoj por ĉiuj ĉi individuoj/tabelo de parenceco/supreniraj&#047;malsuprenaj gradoj de la plej mallonga vojo
+es: mostrar tabla de parentesco/mostrar la tabla de relaciones de parentesco para todos estos individuos/tabla de parentesco/grados ascendente&#047;descendente del camino más corto
+et: näita sugulustabelit/näita kõigi nende isikute sugulussidemete tabelit/sugulustabel/lühima tee tõusvad&#047;laskuvad astmed
+fi: näytä sukulaisuustaulukko/näytä kaikkien näiden henkilöiden sukulaisuussuhteiden taulukko/sukulaisuustaulukko/lyhimmän polun nousevat&#047;laskevat asteet
+fr: afficher tableau de parentés/afficher le tableau des relations de parenté pour tous ces individus/tableau de parentés/degrés ascendant&#047;descendant du plus court chemin
+he: הצג טבלת קרבה/הצג את טבלת יחסי הקרבה עבור כל הפרטים הללו/טבלת קרבה/הדרגות העולות&#047;היורדות של המסלול הקצר ביותר
+is: sýna ættartöflu/sýna töflu ættartengla fyrir alla þessa einstaklinga/ættartafla/hækkandi&#047;lækkandi stig stystu leiðar
+it: mostra tabella di parentela/mostra la tabella delle relazioni di parentela per tutti questi individui/tabella di parentela/gradi ascendente&#047;discendente del percorso più breve
+lt: rodyti giminystės lentelę/rodyti visų šių asmenų giminystės ryšių lentelę/giminystės lentelė/trumpiausio kelio kylantys&#047;besileidžiantys laipsniai
+lv: rādīt radniecības tabulu/rādīt visu šo personu radniecības attiecību tabulu/radniecības tabula/īsākā ceļa kāpjošie&#047;krītošie grādi
+nl: toon verwantschapstabel/toon de tabel van verwantschapsrelaties voor al deze personen/verwantschapstabel/stijgende&#047;dalende graden van het kortste pad
+no: vis slektskaptabell/vis tabellen over slektskapsforbindelser for alle disse individene/slektskaptabell/stigende&#047;synkende grader for den korteste veien
+oc: afichar taula de parentat/afichar la taula de relacions de parentat per totes aquelas personas/taula de parentat/grases montants&#047;descendents del camin mai cort
+pl: pokaż tabelę pokrewieństwa/pokaż tabelę związków pokrewieństwa dla wszystkich tych osób/tabela pokrewieństwa/stopnie wstępujące&#047;zstępujące najkrótszej ścieżki
+pt: mostrar tabela de parentesco/mostrar a tabela de relações de parentesco para todos estes indivíduos/tabela de parentesco/graus ascendente&#047;descendente do caminho mais curto
+ro: arată tabelul de rudenie/arată tabelul relațiilor de rudenie pentru toți acești indivizi/tabel de rudenie/gradele ascendente&#047;descendente ale celui mai scurt drum
+ru: показать таблицу родства/показать таблицу родственных связей для всех этих лиц/таблица родства/восходящие&#047;нисходящие степени кратчайшего пути
+sk: zobraziť tabuľku príbuzenstva/zobraziť tabuľku príbuzenských vzťahov pre všetkých týchto jedincov/tabuľka príbuzenstva/stúpajúce&#047;klesajúce stupne najkratšej cesty
+sl: prikaži tabelo sorodstva/prikaži tabelo sorodstvenih povezav za vse te posameznike/tabela sorodstva/naraščajoče&#047;padajoče stopnje najkrajše poti
+sv: visa släktskaptabell/visa tabellen över släktskapsförhållanden för alla dessa individer/släktskaptabell/stigande&#047;fallande grader för den kortaste vägen
+tr: akrabalık tablosunu göster/tüm bu bireyler için akrabalık ilişkileri tablosunu göster/akrabalık tablosu/en kısa yolun yükselen&#047;alçalan dereceleri
+zh: 显示亲属关系表/显示所有这些个人的亲属关系表/亲属关系表/最短路径的上行&#047;下行度数
 
     relationship shortcut
 co: accurtatoghji

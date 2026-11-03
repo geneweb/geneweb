@@ -11,7 +11,6 @@ const RelationMatrix = (() => {
   /* Détection du mode CGI et stockage du paramètre base */
   const urlParams = new URLSearchParams(window.location.search);
   const baseParam = urlParams.get('b');
-  const labels = {};
 
   function getPersonName(iper) {
     if (!iper) return 'N/A';
@@ -73,29 +72,17 @@ const RelationMatrix = (() => {
     return groups;
   }
 
-  /*Formate un groupe d'ancêtres (couple ou isolé) en HTML */
+  /* Formats an ancestor group (couple or single) as HTML. An entry built by
+     generateSumLinks carries its own l1/l2 lists, overriding the row ones. */
   function formatAncestorGroup(group, l1, p1Iper, l2, p2Iper) {
-    if (group.type === 'couple') {
-      const name1 = getPersonName(group.anc1.p);
-      const url1 = makePersonUrl(group.anc1.p);
-      const rlUrl1 = makeRelationLinkUrl(group.anc1.p, l1, p1Iper, l2, p2Iper);
-
-      const name2 = getPersonName(group.anc2.p);
-      const url2 = makePersonUrl(group.anc2.p);
-      const rlUrl2 = makeRelationLinkUrl(group.anc2.p, l1, p1Iper, l2, p2Iper);
-
-      return '<span class="text-nowrap"><a href="' + url1 + '">' + esc(name1) + '</a>' +
-             ' [<a href="' + rlUrl1 + '">' + group.anc1.c + '</a>]</span>' +
-             ' <span class="text-nowrap">&amp; <a href="' + url2 + '">' + esc(name2) + '</a>' +
-             ' [<a href="' + rlUrl2 + '">' + group.anc2.c + '</a>]</span>';
-    } else {
-      const name = getPersonName(group.anc.p);
-      const url = makePersonUrl(group.anc.p);
-      const rlUrl = makeRelationLinkUrl(group.anc.p, l1, p1Iper, l2, p2Iper);
-
-      return '<span class="text-nowrap"><a href="' + url + '">' + esc(name) + '</a>' +
-             ' [<a href="' + rlUrl + '">' + group.anc.c + '</a>]</span>';
-    }
+    const link = anc => '<a href="' + makePersonUrl(anc.p) + '">' +
+      esc(getPersonName(anc.p)) + '</a> [<a href="' +
+      makeRelationLinkUrl(anc.p, anc.l1 ?? l1, p1Iper, anc.l2 ?? l2, p2Iper) +
+      '">' + anc.c + '</a>]';
+    if (group.type === 'couple')
+      return '<span class="text-nowrap">' + link(group.anc1) + '</span>' +
+             ' <span class="text-nowrap">&amp; ' + link(group.anc2) + '</span>';
+    return '<span class="text-nowrap">' + link(group.anc) + '</span>';
   }
 
   /* Génère les liens somme pour ancêtres multi-niveaux */
@@ -217,8 +204,9 @@ const RelationMatrix = (() => {
     html += '</tr></tfoot>';
     html += '</table>';
     html += '<div class="text-center">';
-    html += '<strong><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + cellData.data.total + ' ' + labels.links + '</a></strong>';
-    html += '<br><span class="text-body-secondary">' + labels.coeff + ' : ' + cellData.data.coeff + '</span>';
+    html += cellData.data.ancestors + '<br>';
+    html += '<strong><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + cellData.data.links + '</a></strong>';
+    html += '<br><span class="text-body-secondary">' + cellData.data.coeff + '</span>';
     html += '</div>';
 
     // Ajouter les liens somme
@@ -303,9 +291,6 @@ const RelationMatrix = (() => {
 
     htmlContent += '</div>';
 
-    modalEl.addEventListener('shown.bs.modal', () => {
-      modalBody.scrollTop = modalBody.scrollHeight;
-    }, { once: true });
     modalBody.innerHTML = htmlContent;
     modal.show();
   }
@@ -314,8 +299,6 @@ const RelationMatrix = (() => {
     init: function() {
       const rmTable = document.getElementById('rm-table');
       if (!rmTable) return;
-      labels.links = rmTable.dataset.linksLabel;
-      labels.coeff = rmTable.dataset.coeffLabel;
       initTooltips(rmTable);
       initHover(rmTable);
       if (!window.rmData?.cells) {

@@ -60,6 +60,18 @@ let compute_cell_data base tstab p1 p2 =
   | None -> None
   | Some (paths, total, coeff, _, _) -> Some { paths; total; coeff }
 
+let count_common_ancestors paths =
+  List.fold_left
+    (fun set path ->
+      List.fold_left
+        (fun set anc -> IperSet.add anc.Relation.p set)
+        set path.Relation.anc)
+    IperSet.empty paths
+  |> IperSet.cardinal
+
+let links_count conf total =
+  Sosa.to_string_sep (Util.transl conf "(thousand separator)") total
+
 (* Fonction utilitaire pour obtenir le nom simple d'une personne *)
 let get_person_simple_name base person =
   let first_name = Driver.sou base (Driver.get_first_name person) in
@@ -296,12 +308,27 @@ let path_to_json path =
     ]
 
 let cell_data_to_json conf cell =
-  let coeff = Util.string_of_decimal_num conf (cell.coeff *. 100.0) ^ " %" in
+  let nanc = count_common_ancestors cell.paths in
   `Assoc
     [
       ("paths", `List (List.map path_to_json cell.paths));
-      ("total", `String (Sosa.to_string cell.total));
-      ("coeff", `String coeff);
+      ( "links",
+        `String
+          (links_count conf cell.total
+          ^ " "
+          ^ Util.transl_nth conf "relationship link/relationship links"
+              (if Sosa.eq cell.total Sosa.one then 0 else 1)) );
+      ( "ancestors",
+        `String
+          (string_of_int nanc ^ " "
+          ^ Util.transl_nth conf "common ancestor" (if nanc = 1 then 0 else 1))
+      );
+      ( "coeff",
+        `String
+          (Util.transl_nth conf "relationship coefficient/percentage" 1
+          ^ Util.transl conf ":" ^ " "
+          ^ Util.string_of_decimal_num conf (cell.coeff *. 100.0)
+          ^ "&nbsp;%") );
     ]
 
 (* Générer le JSON pour la partie supérieure de la matrice uniquement *)
