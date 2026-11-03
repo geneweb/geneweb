@@ -30,15 +30,23 @@ let index_from_gzip path =
         let line = Bigstringaf.substring content ~off:pos ~len:(eol - pos) in
         split (line :: acc) (eol + 1)
   in
-  split [] 0
-  |> List.fold_left
-       (fun acc line ->
-         let words = Analyze.preprocess line in
-         List.fold_left
-           (fun acc w -> (w.Analyze.content, line) :: acc)
-           acc words)
-       []
-  |> List.to_seq |> Index.of_seq
+  (* Searches in the index return entries in their insertion order, so the
+     entries are inserted by decreasing relevance: entries with fewer words
+     first, then in alphabetical order of their normal form. A truncated
+     answer thus keeps the most relevant entries. *)
+  let ranked =
+    split [] 0
+    |> List.sort_uniq String.compare
+    |> List.rev_map (fun line ->
+        let words = Analyze.preprocess line in
+        ((List.length words, Analyze.normalize line, line), words))
+    |> Array.of_list
+  in
+  Array.sort (fun (k1, _) (k2, _) -> compare k1 k2) ranked;
+  Array.to_seq ranked
+  |> Seq.flat_map (fun ((_, _, line), words) ->
+      Seq.map (fun w -> (w.Analyze.content, line)) (List.to_seq words))
+  |> Index.of_seq
 
 let load_dictionaries path =
   Filesystem.walk_folder ~recursive:true
