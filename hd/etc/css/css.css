@@ -675,6 +675,12 @@ td .rm-cell {
   color: rgb(255,255,255);
 }
 
+.ancmenu-legend {
+  padding: 3px .75rem;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
 html {
@@ -1288,8 +1294,13 @@ div.anchor_upd {
 }
 
 /* Tom select */
+#v + .ts-wrapper .ts-dropdown {
+  font-variant-numeric: tabular-nums;
+}
+
 #v + .ts-wrapper .ts-dropdown-content {
   max-height: calc(100vh - 220px);
+  scrollbar-gutter: stable;
 }
 
 #fname + .ts-wrapper .ts-dropdown-content {
