@@ -22,6 +22,7 @@
     ports_test
     merge_ind_test
     notes_test
+    http_test
   )
   (deps assets/royal92.ged assets/abc.ged)
 )
