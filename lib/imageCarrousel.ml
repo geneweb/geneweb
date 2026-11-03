@@ -118,6 +118,18 @@ let create_blason_stop conf base p =
     "xb";
   blason_stop
 
+(* A new blason of his own replaces the inherited one: the .stop marker,
+   which Image.find_img_opt looks up before the image files, must go. *)
+let remove_blason_stop conf base p =
+  let blason_stop =
+    String.concat Filename.dir_sep
+      [
+        !GWPARAM.portraits_d conf.bname;
+        Image.default_image_filename "blasons" base p ^ ".stop";
+      ]
+  in
+  if Sys.file_exists blason_stop then Mutil.rm blason_stop
+
 let move_blason_file conf base src dst =
   let blason_dir = !GWPARAM.portraits_d conf.bname in
   let blason_src =
@@ -408,6 +420,7 @@ let effective_send_c_ok conf base p file file_name =
          keydir ^ extension_of_type typ
        else file_name)
   in
+  if mode = "blasons" then remove_blason_stop conf base p;
   (* move pre-existing file to saved *)
   if mode = "portraits" || mode = "blasons" then
     match
@@ -617,27 +630,16 @@ let effective_copy_portrait_to_blason conf base p =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
   let keydir = Image.default_image_filename "portraits" base p in
-  let create_url_file keydir url =
-    let fname =
-      Filename.concat (!GWPARAM.images_d conf.bname) (keydir ^ ".url")
-    in
-    let oc = Secure.open_out_bin fname in
-    output_string oc url;
-    flush oc;
-    close_out oc;
-    fname
-  in
   let dir = !GWPARAM.portraits_d conf.bname in
-  let fname, url =
+  let field_url =
     match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
-    | `Url u -> (create_url_file keydir u, true)
-    | _ -> (Image.default_image_filename "portraits" base p, false)
+    | `Url u -> Some u
+    | `Empty | `Path _ | `Src_with_size_info _ -> None
   in
   let ext =
-    if url then ".url" else get_extension conf keydir mode false fname
-  in
-  let portrait_filename =
-    String.concat Filename.dir_sep [ dir; keydir ^ ext ]
+    match field_url with
+    | Some _ -> ".url"
+    | None -> get_extension conf keydir mode false keydir
   in
   let blason_filename =
     String.concat Filename.dir_sep
@@ -653,11 +655,40 @@ let effective_copy_portrait_to_blason conf base p =
      else "OK")
     <> ""
   in
-  cp portrait_filename blason_filename;
+  remove_blason_stop conf base p;
+  (match field_url with
+  | Some u -> write_file blason_filename u
+  | None ->
+      cp (String.concat Filename.dir_sep [ dir; keydir ^ ext ]) blason_filename);
   History.record conf base
     (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
     "cb";
   blason_filename
+
+(* The portrait becomes the blason: copy it, move the portrait to saved
+   (unless it is an url of the image field, which only MOD_IND can clear) and
+   point the blason notes to the blason (m=FIM, or the url itself for an url
+   portrait). Returns the blason file name and the names of the updated
+   notes. *)
+let effective_move_portrait_to_blason conf base p =
+  let image_field_is_url =
+    match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
+    | `Url _ -> true
+    | `Empty | `Path _ | `Src_with_size_info _ -> false
+  in
+  let target =
+    match Image.get_portrait conf base p with
+    | Some (`Url u) -> BlasonNotes.Url u
+    | Some (`Path _) | None -> BlasonNotes.Fim
+  in
+  let blason_filename = effective_copy_portrait_to_blason conf base p in
+  (if not image_field_is_url then
+     let portrait =
+       Image.default_image_filename "portraits" base p
+       ^ Filename.extension blason_filename
+     in
+     ignore (effective_delete_c_ok conf base ~f_name:portrait p));
+  (blason_filename, BlasonNotes.redirect_portrait_refs conf base p target)
 
 let effective_copy_image_to_blason conf base p =
   let fname =
@@ -686,6 +717,7 @@ let effective_copy_image_to_blason conf base p =
     String.concat Filename.dir_sep
       [ Image.carrousel_folder conf; keydir; fname ]
   in
+  remove_blason_stop conf base p;
   cp fname blason_filename;
   History.record conf base
     (U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p)))
@@ -768,6 +800,7 @@ let print_main_c conf base =
             match Util.p_getenv conf.env "i" with
             | Some ip -> (
                 let p = Driver.poi base (Driver.Iper.of_string ip) in
+                let updated_notes = ref [] in
                 let processed_filename =
                   match m with
                   | "SND_IMAGE_OK" ->
@@ -812,6 +845,12 @@ let print_main_c conf base =
                   | "PORTRAIT_TO_BLASON" ->
                       Filename.basename
                         (effective_copy_portrait_to_blason conf base p)
+                  | "PORTRAIT_MOVE_TO_BLASON" ->
+                      let blason, notes =
+                        effective_move_portrait_to_blason conf base p
+                      in
+                      updated_notes := notes;
+                      Filename.basename blason
                   | "IMAGE_TO_BLASON" ->
                       Filename.basename
                         (effective_copy_image_to_blason conf base p)
@@ -873,6 +912,9 @@ let print_main_c conf base =
                        let ext = Filename.extension processed_filename in
                        if ext <> "" then
                          url_params := ("ext", ext) :: !url_params);
+                    if !updated_notes <> [] then
+                      url_params :=
+                        ("bn", String.concat " " !updated_notes) :: !url_params;
                     let params_string =
                       List.fold_left
                         (fun acc (key, value) ->

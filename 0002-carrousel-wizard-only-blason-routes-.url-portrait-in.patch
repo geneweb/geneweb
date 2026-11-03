@@ -1,0 +1,111 @@
+From 01b8a0f81b8be029b058625d1df7e6b1d4fbb0c9 Mon Sep 17 00:00:00 2001
+From: hgouraud <gouraud.henri@gmail.com>
+Date: Sun, 1 Nov 2026 14:08:52 +0100
+Subject: [PATCH 2/2] carrousel: wizard-only blason routes, .url portrait in
+ portraits_d
+
+PORTRAIT_TO_BLASON, IMAGE_TO_BLASON, BLASON_MOVE_TO_ANC, BLASON_STOP and
+RESET_IMAGE_C_OK modify files: route them through w_wizard and w_lock,
+and list them in this_request_updates_database.
+
+effective_copy_portrait_to_blason wrote the .url file of an url portrait
+in images_d but copied it from portraits_d.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011mHfVhTFVxSeUnkepSDrsm
+---
+ bin/gwd/request.ml    | 23 +++++++++++++++--------
+ lib/imageCarrousel.ml |  6 ++----
+ 2 files changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/bin/gwd/request.ml b/bin/gwd/request.ml
+index 4aca33c..2ae68dc 100644
+--- a/bin/gwd/request.ml
++++ b/bin/gwd/request.ml
+@@ -17,11 +17,13 @@ type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
+ let this_request_updates_database conf =
+   match p_getenv conf.env "m" with
+   | Some
+-      ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
+-      | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
++      ( "ADD_FAM" | "BLASON_MOVE_TO_ANC" | "BLASON_STOP" | "CHANGE_WIZ_VIS"
++      | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
++      | "IMAGE_TO_BLASON" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
+       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
+       | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA"
+-      | "PORTRAIT_MOVE_TO_BLASON" | "SND_IMAGE" | "UNKNOWN_OK" ) ->
++      | "PORTRAIT_MOVE_TO_BLASON" | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
++      | "SND_IMAGE" | "UNKNOWN_OK" ) ->
+       true
+   | _ -> false
+ 
+@@ -438,8 +440,10 @@ let treat_request =
+                  w_base @@ fun conf base ->
+                  SrcfileDisplay.print conf base "advanced"
+              | "AS_OK" -> w_base @@ AdvSearchOkDisplay.print
+-             | "BLASON_MOVE_TO_ANC" -> w_base @@ ImageCarrousel.print_main_c
+-             | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
++             | "BLASON_MOVE_TO_ANC" ->
++                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
++             | "BLASON_STOP" ->
++                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+              | "C" -> w_base @@ w_person @@ CousinsDisplay.print
+              | "CAL" -> w_base @@ CalendarDisplay.print_calendar
+              | "CHANGE_WIZ_VIS" ->
+@@ -551,7 +555,8 @@ let treat_request =
+              | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false
+              | "IM_C_S" -> w_base @@ ImageCarrousel.print_c ~saved:true
+              | "IM" -> w_base @@ ImageDisplay.print
+-             | "IMAGE_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
++             | "IMAGE_TO_BLASON" ->
++                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+              | "IMH" -> w_base @@ fun conf _ -> ImageDisplay.print_html conf
+              | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
+              | "INV_FAM_OK" ->
+@@ -723,7 +728,8 @@ let treat_request =
+              | "POP_PYR" -> w_base @@ BirthDeathDisplay.print_population_pyramid
+              | "PORTRAIT_MOVE_TO_BLASON" ->
+                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+-             | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
++             | "PORTRAIT_TO_BLASON" ->
++                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
+              | "R" -> (
+                  w_base @@ fun conf base ->
+@@ -790,7 +796,8 @@ let treat_request =
+                      Output.print_sstring conf s;
+                      Output.print_sstring conf "\n")
+                    conf.Config.request
+-             | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
++             | "RESET_IMAGE_C_OK" ->
++                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+              | "RL" -> w_base @@ RelationLink.print
+              | "RM" -> w_base @@ RelationMatrixDisplay.print conn
+              | "RLM" -> w_base @@ RelationDisplay.print_multi conn
+diff --git a/lib/imageCarrousel.ml b/lib/imageCarrousel.ml
+index 7d4753f..bbfea2e 100644
+--- a/lib/imageCarrousel.ml
++++ b/lib/imageCarrousel.ml
+@@ -617,17 +617,15 @@ let effective_copy_portrait_to_blason conf base p =
+     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+   in
+   let keydir = Image.default_image_filename "portraits" base p in
++  let dir = !GWPARAM.portraits_d conf.bname in
+   let create_url_file keydir url =
+-    let fname =
+-      Filename.concat (!GWPARAM.images_d conf.bname) (keydir ^ ".url")
+-    in
++    let fname = Filename.concat dir (keydir ^ ".url") in
+     let oc = Secure.open_out_bin fname in
+     output_string oc url;
+     flush oc;
+     close_out oc;
+     fname
+   in
+-  let dir = !GWPARAM.portraits_d conf.bname in
+   let fname, url =
+     match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
+     | `Url u -> (create_url_file keydir u, true)
+-- 
+2.43.0
+

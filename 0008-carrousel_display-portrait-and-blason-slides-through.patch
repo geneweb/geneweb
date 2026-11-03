@@ -1,0 +1,65 @@
+From 778c9eecf4086e2ad20af01229e07cf9187ba6ba Mon Sep 17 00:00:00 2001
+From: hgouraud <gouraud.henri@gmail.com>
+Date: Sun, 1 Nov 2026 15:38:10 +0100
+Subject: [PATCH] carrousel_display: portrait and blason slides through their
+ url
+
+The portrait slide used m=IM&i=, which renders an html page for an url
+portrait. Portrait and blason now use portrait_url and blason_url, which
+give the url itself or the m=IM / m=FIM link. The blason slide also
+shows an inherited blason, its owner in the caption.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011mHfVhTFVxSeUnkepSDrsm
+---
+ hd/etc/carrousel_display.txt | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/hd/etc/carrousel_display.txt b/hd/etc/carrousel_display.txt
+index da9c6e0..448d616 100644
+--- a/hd/etc/carrousel_display.txt
++++ b/hd/etc/carrousel_display.txt
+@@ -22,29 +22,25 @@
+         <div id="carousel_gw" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+           <div class="carousel-inner">
+             %reset_count;
++            %( portrait_url and blason_url give the url itself for an url image,
++               m=IM / m=FIM otherwise %)
+             %if;has_portrait;
+-              <div class="carousel-item active" data-caption="[portrait]">
+-                <a href="%prefix;m=IM&i=%index;" target="_blank" rel="noopener">
+-                  <img class="img-fluid d-block mx-auto" src="%prefix;m=IM&i=%index;" alt="[*portrait]">
++              <div class="carousel-item active" data-caption="[*portrait]">
++                <a href="%portrait_url;" target="_blank" rel="noopener">
++                  <img class="img-fluid d-block mx-auto" src="%portrait_url;" alt="[*portrait]">
+                 </a>
+               </div>
+             %end;
+-            %if;has_blason_self;
+-              <div class="carousel-item%if;(not has_portrait) active%end;" data-caption="[blason/blasons]0">
+-                %if;("http" in blason_self)
+-                  <a href="%blason;" target="_blank" rel="noopener">
+-                    <img class="img-fluid d-block mx-auto" src="%blason;" alt="[*blason/blasons]0">
+-                  </a>
+-                %else;
+-                  <a href="%prefix;m=FIM&i=%index;" target="_blank" rel="noopener">
+-                    <img class="img-fluid d-block mx-auto" src="%prefix;m=FIM&i=%index;" alt="[*blason/blasons]0">
+-                  </a>
+-                %end;
++            %if;has_blason;
++              <div class="carousel-item%if;(not has_portrait) active%end;" data-caption="[*blason/blasons]0%if;(not has_blason_self) — %blason_owner;%end;">
++                <a href="%blason_url;" target="_blank" rel="noopener">
++                  <img class="img-fluid d-block mx-auto" src="%blason_url;" alt="[*blason/blasons]0">
++                </a>
+               </div>
+             %end;
+             %if;(carrousel_img_nbr>0)
+               %foreach;img_in_carrousel;%incr_count;
+-                <div class="carousel-item%if;(not has_portrait and not has_blason_self and is_first) active%end;"
++                <div class="carousel-item%if;(not has_portrait and not has_blason and is_first) active%end;"
+                   data-caption="[image/images]0 %count;/%carrousel_img_nbr; — %carrousel_img;%if;(carrousel_img_src!="") — [*source/sources]0[:] %carrousel_img_src;%end;%if;(carrousel_img_note!="") — [*note/notes]0[:] %carrousel_img_note;%end;">
+                   %if;("http" in url_in_env)
+                     <a href="%url_in_env;" target="_blank" rel="noopener">
+-- 
+2.43.0
+

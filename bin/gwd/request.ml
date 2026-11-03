@@ -17,11 +17,13 @@ type ('b, 'a) handler = Geneweb_http.Connection.t -> Config.config -> 'b -> 'a
 let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
-      ( "ADD_FAM" | "CHANGE_WIZ_VIS" | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM"
-      | "DEL_IMAGE" | "DEL_IND" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
+      ( "ADD_FAM" | "BLASON_MOVE_TO_ANC" | "BLASON_STOP" | "CHANGE_WIZ_VIS"
+      | "CHG_CHN" | "CHG_FAM_ORD" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
+      | "IMAGE_TO_BLASON" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "MRG_IND" | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "OK_ADD"
-      | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" ) ->
+      | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
+      | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
+      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" ) ->
       true
   | _ -> false
 
@@ -439,8 +441,10 @@ let treat_request =
                  w_base @@ fun conf base ->
                  SrcfileDisplay.print conf base "advanced"
              | "AS_OK" -> w_base @@ AdvSearchOkDisplay.print
-             | "BLASON_MOVE_TO_ANC" -> w_base @@ ImageCarrousel.print_main_c
-             | "BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
+             | "BLASON_MOVE_TO_ANC" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+             | "BLASON_STOP" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "C" -> w_base @@ w_person @@ CousinsDisplay.print
              | "CAL" -> w_base @@ CalendarDisplay.print_calendar
              | "CHANGE_WIZ_VIS" ->
@@ -552,7 +556,8 @@ let treat_request =
              | "IM_C" -> w_base @@ ImageCarrousel.print_c ~saved:false
              | "IM_C_S" -> w_base @@ ImageCarrousel.print_c ~saved:true
              | "IM" -> w_base @@ ImageDisplay.print
-             | "IMAGE_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
+             | "IMAGE_TO_BLASON" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "IMH" -> w_base @@ fun conf _ -> ImageDisplay.print_html conf
              | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
              | "INV_FAM_OK" ->
@@ -726,7 +731,10 @@ let treat_request =
              | "PNOC_LOOKUP" ->
                  w_base @@ fun conf base -> PersonPicker.lookup_print conf base
              | "POP_PYR" -> w_base @@ BirthDeathDisplay.print_population_pyramid
-             | "PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
+             | "PORTRAIT_MOVE_TO_BLASON" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+             | "PORTRAIT_TO_BLASON" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "PS" -> w_base @@ PlaceDisplay.print_all_places_surnames
              | "R" -> (
                  w_base @@ fun conf base ->
@@ -793,7 +801,8 @@ let treat_request =
                      Output.print_sstring conf s;
                      Output.print_sstring conf "\n")
                    conf.Config.request
-             | "RESET_IMAGE_C_OK" -> w_base @@ ImageCarrousel.print_main_c
+             | "RESET_IMAGE_C_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "RL" -> w_base @@ RelationLink.print
              | "RM" -> w_base @@ RelationMatrixDisplay.print conn
              | "RLM" -> w_base @@ RelationDisplay.print_multi conn

@@ -1,0 +1,65 @@
+From d7cce0d6acc9fe4ae7e6e52a7703b722bdb772dd Mon Sep 17 00:00:00 2001
+From: hgouraud <gouraud.henri@gmail.com>
+Date: Mon, 2 Nov 2026 19:17:08 +0100
+Subject: [PATCH] image: inherited blasons visible to visitors
+
+get_blason_aux, get_blason_owner and get_blason_with_size checked
+has_access_to_image "blasons", which for a visitor requires the person
+to own an image field or a blason file: a descendant without his own
+blason never got the blason of his paternal line. They now use
+has_access_to_blason, which only checks no_image and authorized_age.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011mHfVhTFVxSeUnkepSDrsm
+---
+ lib/image.ml | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/lib/image.ml b/lib/image.ml
+index 856064d..9d1982a 100644
+--- a/lib/image.ml
++++ b/lib/image.ml
+@@ -212,6 +212,13 @@ let has_access_to_image mode conf base p =
+         || full_image_path mode conf base p false <> None)
+      && is_not_private_img conf (Driver.sou base img)
+ 
++(* A blason may be inherited from the paternal line: unlike
++   [has_access_to_image], do not require [p] to own an image or a blason
++   file, nor look at the privacy of his image field. *)
++let has_access_to_blason conf base p =
++  (conf.wizard || conf.friend)
++  || ((not conf.no_image) && Util.authorized_age conf base p)
++
+ (* TODO: privacy settings should be in db not in url *)
+ 
+ (** [has_access_to_carrousel conf base p] is true iif ???. *)
+@@ -319,7 +326,7 @@ let get_old_portrait_name conf base p = get_portrait_name_aux conf base p true
+ 
+ (* if self = true, then do not loop for fathers *)
+ let get_blason_aux conf base p self saved =
+-  if has_access_to_image "blasons" conf base p then
++  if has_access_to_blason conf base p then
+     let rec loop p =
+       match full_image_path "blasons" conf base p saved with
+       | Some (`Path p) when Filename.extension p = ".stop" -> None
+@@ -364,7 +371,7 @@ let has_blason_stop conf base p =
+   | _ -> false
+ 
+ let get_blason_owner conf base p =
+-  if has_access_to_image "blasons" conf base p then
++  if has_access_to_blason conf base p then
+     let rec loop p =
+       match Driver.get_parents p with
+       | Some ifam ->
+@@ -445,7 +452,7 @@ let get_portrait_with_size conf base p =
+   else None
+ 
+ let get_blason_with_size conf base p self =
+-  if has_access_to_image "blasons" conf base p then
++  if has_access_to_blason conf base p then
+     let rec loop p =
+       match
+         src_of_string conf
+-- 
+2.43.0
+

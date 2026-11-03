@@ -40,6 +40,7 @@
     %if;(e.em="SND_IMAGE_OK")%if;(e.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
     %elseif;(e.em="DEL_IMAGE_C_OK")[*portrait] [deleted]0%if;(e.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK")[*portrait] [restored]0%nn;
+    %elseif;(e.em="PORTRAIT_MOVE_TO_BLASON")[*portrait moved to blason]%nn;
     %end;%nn;
   %elseif;(e.mode="note")
     %if;(e.em="SND_IMAGE_OK")[*note/notes]0 [update::]%nn;
@@ -72,6 +73,8 @@
         %portraits_store;%X;%e.file_name; <strong>></strong> %old_portraits_store;%X;%e.file_name;%nn;
       %end;%nn;
     %elseif;(e.em="RESET_IMAGE_C_OK")%portraits_store;%X;%carrousel;%X;saved%X;%e.file_name; <strong><></strong> %portraits_store;%X;%carrousel;%X;%e.file_name;%nn;
+    %elseif;(e.em="PORTRAIT_MOVE_TO_BLASON")%portraits_store;%X;%e.file_name;%nn;
+      %if;(e.bn!="")<br>[*blason notes updated]%sp;%e.bn;%end;%nn;
     %else;bad command %e.em; (%e.mode;)%end;
     </samp>
   %elseif;(e.mode="blasons")<samp>
@@ -229,14 +232,23 @@
             <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" class="mx-1"
                title="[*copy portrait to blason]">
               <i class="fa fa-user-shield"></i></a>
-            %if;has_portrait_url;%portrait_name;%else;
-            <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;</samp>%end;
-            <a role="button" class="ms-auto"
-              href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait_name;"
-              data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
-              title="<i class='far fa-trash-can text-warning me-1'></i><strong>[*delete portrait]</strong><br><span class='small'>%portrait;</span><br>
-                <img class='rounded my-1' src='%portrait_url;' width='185px'>">
-              <i class="far fa-trash-can text-warning me-1"></i>%nn;</a>
+            <a href="%prefix;m=PORTRAIT_MOVE_TO_BLASON&i=%index;" class="mx-1"
+               title="[*move portrait to blason]">
+              <i class="fa fa-shield-halved"></i></a>
+            %if;(portrait_name="")
+              %( url of the image field: no file, MOD_IND changes it %)
+              <samp class="text-truncate">%portrait;</samp>
+              <a role="button" class="ms-auto" href="%prefix;m=MOD_IND&i=%index;"
+                title="[*modify]"><i class="far fa-pen-to-square text-primary me-1"></i>%nn;</a>
+            %else;
+              <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;</samp>
+              <a role="button" class="ms-auto"
+                href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait_name;"
+                data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
+                title="<i class='far fa-trash-can text-warning me-1'></i><strong>[*delete portrait]</strong><br><span class='small'>%portrait;</span><br>
+                  <img class='rounded my-1' src='%portrait_url;' width='185px'>">
+                <i class="far fa-trash-can text-warning me-1"></i>%nn;</a>
+            %end;
           </div>
         %end;
         %if;has_old_portrait;
@@ -250,8 +262,7 @@
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait;"
               title="[*restore portrait saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
-            %if;has_old_portrait_url;<strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong>%old_portrait_name;%else;
-            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_portrait_name;</samp>%end;
+            <strong><samp class="text-truncate">%old_portraits_store;%X;</samp></strong><samp>%old_portrait_name;</samp>
             <a role="button" class="ms-auto"
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=portraits&delete=on&file_name=%old_portrait_name;"
               data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"

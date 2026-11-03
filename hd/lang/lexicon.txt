@@ -15629,6 +15629,24 @@ en: use portrait as coats of arme
 es: usar el retrato como blasón
 fr: utiliser le portrait comme blason
 
+    move portrait to blason
+de: das Portrait zum Wappen machen (Portrait wird gesichert)
+en: turn portrait into blason (portrait is saved)
+es: convertir el retrato en blasón (se guarda el retrato)
+fr: transformer le portrait en blason (le portrait est sauvegardé)
+
+    portrait moved to blason
+de: Portrait zum Wappen gemacht
+en: portrait turned into blason
+es: retrato convertido en blasón
+fr: portrait transformé en blason
+
+    blason notes updated
+de: aktualisierte Wappennotizen:
+en: updated blason notes:
+es: notas de blasón actualizadas:
+fr: notes de blasons mises à jour :
+
     copy image to blason
 co: impiegà a fiura cum’è armuratura
 de: das Bild als Wappen verwenden

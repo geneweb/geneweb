@@ -433,7 +433,7 @@
     <div class="card-body">
       <h5 class="card-title"><b>[*other action][:] </b>
         %if;(first_name!="?" and surname!="?")
-          <a href="%prefix;m=SND_IMAGE&i=%index;">%if;has_image;[*modify::]/[delete::]/[add picture]%else;[*add picture]%end;</a>%nn;
+          <a href="%prefix;m=SND_IMAGE_C&i=%index;">%if;has_image;[*modify::]/[delete::]/[add picture]%else;[*add picture]%end;</a>%nn;
         %end; | <a href="%prefix;m=MRG&i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND&i=%index;">[*delete::]</a>
       </h5>
       <div class="mb-3 mt-4">
