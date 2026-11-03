@@ -40,20 +40,6 @@ let wizard_just_friend = ref false
 let wizard_passwd = ref ""
 let notify_change = ref None
 
-let is_multipart_form =
-  let s = "multipart/form-data" in
-  fun content_type ->
-    let rec loop i =
-      if i >= String.length content_type then false
-      else if i >= String.length s then true
-      else if content_type.[i] = Char.lowercase_ascii s.[i] then loop (i + 1)
-      else false
-    in
-    loop 0
-
-let extract_boundary content_type =
-  List.assoc "boundary" (Geneweb.Util.create_env content_type)
-
 let print_and_cut_if_too_big oc str =
   let rec loop i =
     if i < String.length str then (
@@ -1628,104 +1614,60 @@ let misc_request conf fname =
     print_misc_file conf misc_fname
   else false
 
-let strip_quotes s =
-  let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
-  let i1 =
-    if String.length s > 0 && s.[String.length s - 1] = '"' then
-      String.length s - 1
-    else String.length s
-  in
-  String.sub s i0 (i1 - i0)
+let parse_body_by_content_type parsed_content_type
+    (contents : Adef.encoded_string) :
+    Adef.encoded_string * (string * Adef.encoded_string) list =
+  match parsed_content_type with
+  | Some (Http.MultipartForm { boundary }) ->
+      Http.extract_multipart boundary contents
+  | None | Some Http.UrlEncoded -> (contents, Http.create_env contents)
+  | Some (Http.Other _) -> (contents, [])
 
-let extract_multipart boundary str =
-  let str = (str : Adef.encoded_string :> string) in
-  let rec skip_nl i =
-    if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
-    else if i < String.length str && str.[i] = '\n' then i + 1
-    else i
+let combine_query_and_contents parsed_content_type url_query
+    (contents : Adef.encoded_string) : Adef.encoded_string =
+  let is_other_body =
+    match parsed_content_type with Some (Http.Other _) -> true | _ -> false
   in
-  let next_line i =
-    let i = skip_nl i in
-    let rec loop s i =
-      if i = String.length str || str.[i] = '\n' || str.[i] = '\r' then (s, i)
-      else loop (s ^ String.make 1 str.[i]) (i + 1)
+  if is_other_body || url_query = "" then contents
+  else if (contents :> string) = "" || (contents :> string) = url_query then
+    Adef.encoded url_query
+  else
+    let body_str = (contents :> string) in
+    let body_clean =
+      if body_str.[0] = '?' || body_str.[0] = '&' then
+        String.sub body_str 1 (String.length body_str - 1)
+      else body_str
     in
-    loop "" i
-  in
-  let boundary = "--" ^ boundary in
-  let rec loop i =
-    if i = String.length str then []
-    else
-      let s, i = next_line i in
-      if s = boundary then
-        let s, i = next_line i in
-        let s = String.lowercase_ascii s |> Adef.encoded in
-        let env = Geneweb.Util.create_env s in
-        match
-          ( Geneweb.Util.p_getenv env "name",
-            Geneweb.Util.p_getenv env "filename" )
-        with
-        | Some var, Some filename ->
-            let var = strip_quotes var in
-            let filename = strip_quotes filename in
-            let i = skip_nl i in
-            let i1 =
-              let rec loop i =
-                if i < String.length str then
-                  if
-                    i > String.length boundary
-                    && String.sub str
-                         (i - String.length boundary)
-                         (String.length boundary)
-                       = boundary
-                  then i - String.length boundary
-                  else loop (i + 1)
-                else i
-              in
-              loop i
-            in
-            let v = String.sub str i (i1 - i) in
-            (var ^ "_name", Mutil.encode filename)
-            :: (var, Adef.encoded v)
-            :: loop i1
-        | Some var, None ->
-            let var = strip_quotes var in
-            let s, i = next_line i in
-            if s = "" then
-              let s, i = next_line i in
-              (var, Adef.encoded s) :: loop i
-            else loop i
-        | None, (Some _ | None) -> loop i
-      else if s = boundary ^ "--" then []
-      else loop i
-  in
-  let env = loop 0 in
-  let str, _ =
-    List.fold_left
-      (fun (str, sep) (v, x) ->
-        if v = "file" then (str, sep)
-        else
-          let open Def in
-          (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
-      (Adef.encoded "", "")
-      env
-  in
-  (str, env)
+    if body_clean = "" then Adef.encoded url_query
+    else Adef.encoded (url_query ^ "&" ^ body_clean)
 
 let build_env request (contents : Adef.encoded_string) :
     Adef.encoded_string * (string * Adef.encoded_string) list =
-  let content_type = Mutil.extract_param "content-type: " '\n' request in
-  Option.fold content_type
-    ~none:(contents, Geneweb.Util.create_env contents)
-    ~some:(fun content_type ->
-      if is_multipart_form content_type then
-        let boundary =
-          (extract_boundary (Adef.encoded content_type)
-            : Adef.encoded_string
-            :> string)
-        in
-        extract_multipart boundary contents
-      else (contents, Geneweb.Util.create_env contents))
+  let req_line = Http.parse_request_line request in
+  let url_params =
+    match req_line with
+    | Some { query = Some q; _ } -> Http.parse_query_params q
+    | _ -> []
+  in
+  let url_query =
+    match req_line with Some { query = Some q; _ } -> q | _ -> ""
+  in
+  let content_type = Http.Header.get ~request "content-type" in
+  let parsed_content_type = Option.map Http.parse_content_type content_type in
+  let contents, body_env =
+    match req_line with
+    | Some { meth = Http.POST | Http.PUT | Http.PATCH; _ } ->
+        parse_body_by_content_type parsed_content_type contents
+    | Some _ when url_params = [] && (contents :> string) <> "" ->
+        (contents, Http.create_env contents)
+    | Some _ -> (contents, [])
+    | None -> parse_body_by_content_type parsed_content_type contents
+  in
+  let contents =
+    combine_query_and_contents parsed_content_type url_query contents
+  in
+  let env = Http.merge_env url_params body_env in
+  (contents, env)
 
 let connection (addr, request) script_name contents0 =
   let from =
@@ -1824,6 +1766,17 @@ let geneweb_cgi addr script_name contents =
   let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
+  let meth = Option.value ~default:"GET" (Sys.getenv_opt "REQUEST_METHOD") in
+  let qs =
+    match Sys.getenv_opt "QUERY_STRING" with
+    | Some q when q <> "" -> "?" ^ q
+    | _ -> ""
+  in
+  let proto =
+    Option.value ~default:"HTTP/1.1" (Sys.getenv_opt "SERVER_PROTOCOL")
+  in
+  let req_line = Printf.sprintf "%s /%s%s %s" meth script_name qs proto in
+  let request = req_line :: request in
   connection (Unix.ADDR_UNIX addr, request) script_name contents
 
 let read_input len =
