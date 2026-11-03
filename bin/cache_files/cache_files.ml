@@ -19,6 +19,8 @@ let qualifiers = ref false
 let sources = ref false
 let notes = ref false
 let ngrams = ref false
+let ngram_queries = ref ""
+let queries_seed = ref None
 let all = ref false
 let prog = ref false
 let binary = ref false
@@ -242,34 +244,39 @@ type first_name = { name : string; mutable persons : int }
 let ngram_thresholds =
   [ 1; 2; 3; 5; 10; 20; 50; 100; 200; 500; 1000; 2000; 5000; 10000 ]
 
-let ngrams_of n words =
+let windows n words =
   let a = Array.of_list words in
   List.init
     (max 0 (Array.length a - n + 1))
-    (fun j -> String.concat "" (Array.to_list (Array.sub a j n)))
+    (fun j -> Array.to_list (Array.sub a j n))
 
+let ngrams_of n words = List.map (String.concat "") (windows n words)
 let hyphens_to_spaces = String.map (fun c -> if c = '-' then ' ' else c)
 
-let gen_ngram_stats base =
+let collect_first_names base =
   let names = Driver.Istr.Table.create 4096 in
   let nb_pers = Driver.nb_of_persons base in
-  let (counts, added, index_entries), duration =
+  ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
+      iteri_pers
+        (fun i p ->
+          if !prog then ProgrBar.progress bar i nb_pers;
+          let istr = Driver.get_first_name p in
+          if not (Driver.Istr.is_empty istr || Driver.Istr.is_quest istr) then
+            match Driver.Istr.Table.find_opt names istr with
+            | Some f -> f.persons <- f.persons + 1
+            | None ->
+                Driver.Istr.Table.replace names istr
+                  {
+                    name = hyphens_to_spaces (Driver.sou base istr);
+                    persons = 1;
+                  })
+        base);
+  names
+
+let gen_ngram_stats base =
+  let (names, counts, added, index_entries), duration =
     with_timer @@ fun () ->
-    ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter (fun bar ->
-        iteri_pers
-          (fun i p ->
-            if !prog then ProgrBar.progress bar i nb_pers;
-            let istr = Driver.get_first_name p in
-            if not (Driver.Istr.is_empty istr || Driver.Istr.is_quest istr) then
-              match Driver.Istr.Table.find_opt names istr with
-              | Some f -> f.persons <- f.persons + 1
-              | None ->
-                  Driver.Istr.Table.replace names istr
-                    {
-                      name = hyphens_to_spaces (Driver.sou base istr);
-                      persons = 1;
-                    })
-          base);
+    let names = collect_first_names base in
     let counts = Array.init 3 (fun _ -> Hashtbl.create 100_000) in
     Driver.Istr.Table.iter
       (fun _ f ->
@@ -309,7 +316,7 @@ let gen_ngram_stats base =
             |> List.iter (fun (_, c) -> added.(k) <- c :: added.(k)))
           counts)
       names;
-    (counts, added, !index_entries)
+    (names, counts, added, !index_entries)
   in
   let kb n = ((5 * n) + 512) / 1024 in
   Printf.printf
@@ -349,6 +356,130 @@ let gen_ngram_stats base =
     "  entries: (first name, crushed key) pairs added to the index, about 5 \
      bytes each; a key shared by n-grams of different lengths of a same first \
      name is counted once per length";
+  duration
+
+type sequence = {
+  words : string list;
+  mutable count : int;
+  mutable inside : bool;
+}
+
+let query_groups =
+  [
+    ("Cf", 1, 1000, max_int, 20);
+    ("Cm", 1, 10, 100, 20);
+    ("Cs", 1, 1, 2, 20);
+    ("B2f", 2, 50, max_int, 100);
+    ("B2m", 2, 2, 5, 100);
+    ("B2s", 2, 1, 1, 100);
+    ("B3f", 3, 50, max_int, 100);
+    ("B3m", 3, 2, 5, 100);
+    ("B3s", 3, 1, 1, 100);
+    ("B4f", 4, 20, max_int, 60);
+    ("B4m", 4, 2, 5, 60);
+    ("B4s", 4, 1, 1, 60);
+  ]
+
+let is_name_word w =
+  w <> ""
+  && Utf8.capitalize_fst w = w
+  && not (String.exists (fun c -> c >= '0' && c <= '9') w)
+
+let shuffled rng l =
+  let a = Array.of_list l in
+  for i = Array.length a - 1 downto 1 do
+    let j = Random.State.int rng (i + 1) in
+    let x = a.(i) in
+    a.(i) <- a.(j);
+    a.(j) <- x
+  done;
+  Array.to_list a
+
+let rec reordered rng words =
+  let w = shuffled rng words in
+  if w <> words then w else reordered rng words
+
+let query_text rng words =
+  String.concat " "
+    (if List.compare_length_with words 1 = 0 then words else reordered rng words)
+
+let gen_ngram_queries base file =
+  let (seed, filled), duration =
+    with_timer @@ fun () ->
+    let seed =
+      match !queries_seed with
+      | Some s -> s
+      | None -> Random.State.bits (Random.State.make_self_init ())
+    in
+    let rng = Random.State.make [| seed |] in
+    let seqs = Hashtbl.create 500_000 in
+    Driver.Istr.Table.iter
+      (fun _ f ->
+        let words = Name.split_fname f.name in
+        let len = List.length words in
+        List.iter
+          (fun n ->
+            if n > 1 || len = 1 then
+              List.iter
+                (fun w ->
+                  let key = String.concat " " w in
+                  let s =
+                    match Hashtbl.find_opt seqs key with
+                    | Some s -> s
+                    | None ->
+                        let s = { words = w; count = 0; inside = n = 1 } in
+                        Hashtbl.replace seqs key s;
+                        s
+                  in
+                  s.count <- s.count + f.persons;
+                  if n < len then s.inside <- true)
+                (windows n words))
+          [ 1; 2; 3; 4 ])
+      (collect_first_names base);
+    let picked =
+      List.map
+        (fun (_, _, _, _, size) -> (Array.make size [], ref 0))
+        query_groups
+    in
+    Hashtbl.iter
+      (fun _ s ->
+        let n = List.length s.words in
+        if
+          s.inside
+          && List.for_all is_name_word s.words
+          && (n = 1 || List.length (List.sort_uniq String.compare s.words) > 1)
+        then
+          List.iter2
+            (fun (_, gn, low, high, _) (a, seen) ->
+              if gn = n && s.count >= low && s.count <= high then (
+                incr seen;
+                let k =
+                  if !seen <= Array.length a then !seen - 1
+                  else Random.State.int rng !seen
+                in
+                if k < Array.length a then a.(k) <- s.words))
+            query_groups picked)
+      seqs;
+    Out_channel.with_open_bin file (fun oc ->
+        Printf.fprintf oc "# cache_files -ngram_queries %s -seed %d\n" file seed;
+        List.iter2
+          (fun (g, _, _, _, _) (a, _) ->
+            Array.iter
+              (fun words ->
+                if words <> [] then
+                  Printf.fprintf oc "%s\t%s\n" g (query_text rng words))
+              a)
+          query_groups picked);
+    ( seed,
+      List.map2
+        (fun (g, _, _, _, size) (_, seen) -> (g, min size !seen, size))
+        query_groups picked )
+  in
+  Format.printf "@[<h>%-*s@ seed %d@ %6.2f s@]@." !width file seed duration;
+  List.iter
+    (fun (g, n, size) ->
+      if n < size then Format.printf "  %s: %d of %d queries@." g n size)
+    filled;
   duration
 
 let validate_options () =
@@ -394,6 +525,13 @@ let speclist =
       Arg.Set ngrams,
       " first name n-gram statistics, to choose the thresholds of gwc -ngrams"
     );
+    ( "-ngram_queries",
+      Arg.Set_string ngram_queries,
+      "<FILE> random first name queries for the n-gram benchmark (ngbench.py)"
+    );
+    ( "-seed",
+      Arg.Int (fun n -> queries_seed := Some n),
+      "<N> seed of -ngram_queries (default random, written in FILE)" );
     ("", Arg.Unit (fun () -> ()), "");
     ("-all", Arg.Set all, " build all type of cache files");
     ("", Arg.Unit (fun () -> ()), "");
@@ -429,7 +567,7 @@ let () =
   width := String.length (Geneweb.GWPARAM.cache_d bname // bname) + 30;
 
   let no_dict_cache =
-    (!notes || !ngrams)
+    (!notes || !ngrams || !ngram_queries <> "")
     && not
          (!all || !fnames || !snames || !aliases || !pub_names || !fname_aliases
         || !sname_aliases || !places || !estates || !titles || !occupations
@@ -551,6 +689,8 @@ let () =
 
   if !all || !notes then total := !total +. gen_notes_corpus bname base;
   if !ngrams then total := !total +. gen_ngram_stats base;
+  if !ngram_queries <> "" then
+    total := !total +. gen_ngram_queries base !ngram_queries;
 
   let min, sec = (Float.to_int !total / 60, mod_float !total 60.) in
   Format.printf "Total duration: %d min %6.2f s@." min sec
