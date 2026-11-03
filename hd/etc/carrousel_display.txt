@@ -10,7 +10,8 @@
             title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
           %end;
             %if;has_portrait;<i class="fas fa-image-portrait ms-1 me-2" aria-hidden="true"></i>%end;
-            %carrousel_img_nbr;<i class="far fa-image fa-fw ms-1" aria-hidden="true"></i>
+            %if;has_blason;<i class="fa fa-shield-halved ms-1 me-2" aria-hidden="true"></i>%end;
+            %if;(carrousel_img_nbr>0)%carrousel_img_nbr;<i class="far fa-image fa-fw ms-1" aria-hidden="true"></i>%end;
             %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
           %if;wizard;
           </a>
@@ -22,29 +23,25 @@
         <div id="carousel_gw" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
           <div class="carousel-inner">
             %reset_count;
+            %( portrait_url and blason_url give the url itself for an url image,
+               m=IM / m=FIM otherwise %)
             %if;has_portrait;
-              <div class="carousel-item active" data-caption="[portrait]">
-                <a href="%prefix;m=IM&i=%index;" target="_blank" rel="noopener">
-                  <img class="img-fluid d-block mx-auto" src="%prefix;m=IM&i=%index;" alt="[*portrait]">
+              <div class="carousel-item active" data-caption="[*portrait]">
+                <a href="%portrait_url;" target="_blank" rel="noopener">
+                  <img class="img-fluid d-block mx-auto" src="%portrait_url;" alt="[*portrait]">
                 </a>
               </div>
             %end;
-            %if;has_blason_self;
-              <div class="carousel-item%if;(not has_portrait) active%end;" data-caption="[blason/blasons]0">
-                %if;("http" in blason_self)
-                  <a href="%blason;" target="_blank" rel="noopener">
-                    <img class="img-fluid d-block mx-auto" src="%blason;" alt="[*blason/blasons]0">
-                  </a>
-                %else;
-                  <a href="%prefix;m=FIM&i=%index;" target="_blank" rel="noopener">
-                    <img class="img-fluid d-block mx-auto" src="%prefix;m=FIM&i=%index;" alt="[*blason/blasons]0">
-                  </a>
-                %end;
+            %if;has_blason;
+              <div class="carousel-item%if;(not has_portrait) active%end;" data-caption="[*blason/blasons]0%if;(not has_blason_self) — %blason_owner;%end;">
+                <a href="%blason_url;" target="_blank" rel="noopener">
+                  <img class="img-fluid d-block mx-auto" src="%blason_url;" alt="[*blason/blasons]0">
+                </a>
               </div>
             %end;
             %if;(carrousel_img_nbr>0)
               %foreach;img_in_carrousel;%incr_count;
-                <div class="carousel-item%if;(not has_portrait and not has_blason_self and is_first) active%end;"
+                <div class="carousel-item%if;(not has_portrait and not has_blason and is_first) active%end;"
                   data-caption="[image/images]0 %count;/%carrousel_img_nbr; — %carrousel_img;%if;(carrousel_img_src!="") — [*source/sources]0[:] %carrousel_img_src;%end;%if;(carrousel_img_note!="") — [*note/notes]0[:] %carrousel_img_note;%end;">
                   %if;("http" in url_in_env)
                     <a href="%url_in_env;" target="_blank" rel="noopener">

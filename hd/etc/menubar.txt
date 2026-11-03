@@ -210,7 +210,7 @@
                   <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
                 %end;
                 %if;(first_name!="?" and surname!="?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;">
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&i=%index;">
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
@@ -451,17 +451,17 @@
               </div>
             </div>
           </li>
-          %( SND_IMAGE_C carrousel button %)
-          %if;(carrousel_img_nbr>0)
+          %( SND_IMAGE_C carrousel button: portrait, blason and images %)
+          %if;(has_portrait or has_blason or carrousel_img_nbr>0)
             <li class="nav-item">
               <a class="nav-link text-secondary" href="#" role="button" data-bs-toggle="modal" data-bs-target="#carousel_modal"
                 title="[*display carrousel]">%nn;
                 <i class="far fa-image fa-fw me-1" aria-hidden="true"></i>%nn;
-                <sup class="small">%carrousel_img_nbr;</sup>%nn;
+                %if;(carrousel_img_nbr>0)<sup class="small">%carrousel_img_nbr;</sup>%end;%nn;
                 <span class="visually-hidden">[*image/images]1</span></a>
             </li>
           %end;
-          %if;(wizard and carrousel_img_nbr=0)
+          %if;(wizard and not has_portrait and not has_blason and carrousel_img_nbr=0)
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>%nn;
                 <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
@@ -496,7 +496,7 @@
     %include;buttons_cousins
   %end;
 %end;
-%if;(carrousel_img_nbr>0)
+%if;(has_portrait or has_blason or carrousel_img_nbr>0)
 %include;carrousel_display
 %end;
 %if;(e.lexcheck=1)

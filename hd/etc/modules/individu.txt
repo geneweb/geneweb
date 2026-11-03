@@ -219,7 +219,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or b.default_image="yes")) ps-0%end; mb-0">
+  <ul class="%if;not roglo;fa-ul%end;%if;(not (has_image or has_blason or b.default_image="yes")) ps-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
       <li %apply;getvar%with;ns[birth]%end;>
         %if;(not roglo)<span class="fa-li"><i class="fas fa-baby"></i></span>%end;

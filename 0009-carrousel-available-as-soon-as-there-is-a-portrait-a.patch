@@ -1,0 +1,124 @@
+From d3d5a5d2d2faeb672e761001dc8b3854e6419c64 Mon Sep 17 00:00:00 2001
+From: hgouraud <gouraud.henri@gmail.com>
+Date: Sun, 1 Nov 2026 15:40:37 +0100
+Subject: [PATCH] carrousel: available as soon as there is a portrait, a blason
+ or an image
+
+The carrousel becomes the place where portraits, blasons and images are
+managed:
+- the menubar button and the carrousel modal appear with a portrait or a
+  blason, not only with carrousel images;
+- the person menu, the update form and the family/descendant tree
+  modules link to SND_IMAGE_C instead of the single portrait form
+  SND_IMAGE (kept for templm and existing links).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011mHfVhTFVxSeUnkepSDrsm
+---
+ hd/etc/carrousel_display.txt         |  3 ++-
+ hd/etc/menubar.txt                   | 12 ++++++------
+ hd/etc/modules/arbre_descendants.txt |  2 +-
+ hd/etc/modules/arbre_famille.txt     |  2 +-
+ hd/etc/updind.txt                    |  2 +-
+ 5 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/hd/etc/carrousel_display.txt b/hd/etc/carrousel_display.txt
+index 448d616..f29e736 100644
+--- a/hd/etc/carrousel_display.txt
++++ b/hd/etc/carrousel_display.txt
+@@ -10,7 +10,8 @@
+             title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+           %end;
+             %if;has_portrait;<i class="fas fa-image-portrait ms-1 me-2" aria-hidden="true"></i>%end;
+-            %carrousel_img_nbr;<i class="far fa-image fa-fw ms-1" aria-hidden="true"></i>
++            %if;has_blason;<i class="fa fa-shield-halved ms-1 me-2" aria-hidden="true"></i>%end;
++            %if;(carrousel_img_nbr>0)%carrousel_img_nbr;<i class="far fa-image fa-fw ms-1" aria-hidden="true"></i>%end;
+             %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
+           %if;wizard;
+           </a>
+diff --git a/hd/etc/menubar.txt b/hd/etc/menubar.txt
+index 96a5de2..c607ba4 100644
+--- a/hd/etc/menubar.txt
++++ b/hd/etc/menubar.txt
+@@ -210,7 +210,7 @@
+                   <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
+                 %end;
+                 %if;(first_name!="?" and surname!="?")
+-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;">
++                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&i=%index;">
+                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                 %end;
+                 <div class="dropdown-divider"></div>
+@@ -446,17 +446,17 @@
+               </div>
+             </div>
+           </li>
+-          %( SND_IMAGE_C carrousel button %)
+-          %if;(carrousel_img_nbr>0)
++          %( SND_IMAGE_C carrousel button: portrait, blason and images %)
++          %if;(has_portrait or has_blason or carrousel_img_nbr>0)
+             <li class="nav-item">
+               <a class="nav-link text-secondary" href="#" role="button" data-bs-toggle="modal" data-bs-target="#carousel_modal"
+                 title="[*display carrousel]">%nn;
+                 <i class="far fa-image fa-fw me-1" aria-hidden="true"></i>%nn;
+-                <sup class="small">%carrousel_img_nbr;</sup>%nn;
++                %if;(carrousel_img_nbr>0)<sup class="small">%carrousel_img_nbr;</sup>%end;%nn;
+                 <span class="visually-hidden">[*image/images]1</span></a>
+             </li>
+           %end;
+-          %if;(wizard and carrousel_img_nbr=0)
++          %if;(wizard and not has_portrait and not has_blason and carrousel_img_nbr=0)
+             <li class="nav-item">
+               <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>%nn;
+                 <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
+@@ -491,7 +491,7 @@
+     %include;buttons_cousins
+   %end;
+ %end;
+-%if;(carrousel_img_nbr>0)
++%if;(has_portrait or has_blason or carrousel_img_nbr>0)
+ %include;carrousel_display
+ %end;
+ %if;(e.lexcheck=1)
+diff --git a/hd/etc/modules/arbre_descendants.txt b/hd/etc/modules/arbre_descendants.txt
+index e699a6f..8c4e0be 100644
+--- a/hd/etc/modules/arbre_descendants.txt
++++ b/hd/etc/modules/arbre_descendants.txt
+@@ -46,7 +46,7 @@
+       %if;not cancel_links;</a>%end;
+     %elseif;(bvar.default_image="yes")
+       %if;(wizard and not cancel_links)
+-        <a href="%prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
++        <a href="%prefix;m=SND_IMAGE_C;i=%xxx.index;" %nn;
+           class="normal_anchor" target="_blank" %nn;
+           title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
+       %end;
+diff --git a/hd/etc/modules/arbre_famille.txt b/hd/etc/modules/arbre_famille.txt
+index ead2324..83e6a0d 100644
+--- a/hd/etc/modules/arbre_famille.txt
++++ b/hd/etc/modules/arbre_famille.txt
+@@ -60,7 +60,7 @@
+         %if;not cancel_links;</a>%end;
+       %elseif;(b.default_image="yes")
+         %if;(wizard and not cancel_links)
+-          <a href="%prefix;m=SND_IMAGE;i=%xxx.index;"
++          <a href="%prefix;m=SND_IMAGE_C;i=%xxx.index;"
+             class="normal_anchor" target="_blank"
+             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
+         %end;
+diff --git a/hd/etc/updind.txt b/hd/etc/updind.txt
+index abe7dc6..afc5677 100644
+--- a/hd/etc/updind.txt
++++ b/hd/etc/updind.txt
+@@ -433,7 +433,7 @@
+     <div class="card-body">
+       <h5 class="card-title"><b>[*other action][:] </b>
+         %if;(first_name!="?" and surname!="?")
+-          <a href="%prefix;m=SND_IMAGE&i=%index;">%if;has_image;[*modify::]/[delete::]/[add picture]%else;[*add picture]%end;</a>%nn;
++          <a href="%prefix;m=SND_IMAGE_C&i=%index;">%if;has_image;[*modify::]/[delete::]/[add picture]%else;[*add picture]%end;</a>%nn;
+         %end; | <a href="%prefix;m=MRG&i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND&i=%index;">[*delete::]</a>
+       </h5>
+       <div class="mb-3 mt-4">
+-- 
+2.43.0
+

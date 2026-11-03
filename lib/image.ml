@@ -212,6 +212,13 @@ let has_access_to_image mode conf base p =
         || full_image_path mode conf base p false <> None)
      && is_not_private_img conf (Driver.sou base img)
 
+(* A blason may be inherited from the paternal line: unlike
+   [has_access_to_image], do not require [p] to own an image or a blason
+   file, nor look at the privacy of his image field. *)
+let has_access_to_blason conf base p =
+  (conf.wizard || conf.friend)
+  || ((not conf.no_image) && Util.authorized_age conf base p)
+
 (* TODO: privacy settings should be in db not in url *)
 
 (** [has_access_to_carrousel conf base p] is true iif ???. *)
@@ -319,7 +326,7 @@ let get_old_portrait_name conf base p = get_portrait_name_aux conf base p true
 
 (* if self = true, then do not loop for fathers *)
 let get_blason_aux conf base p self saved =
-  if has_access_to_image "blasons" conf base p then
+  if has_access_to_blason conf base p then
     let rec loop p =
       match full_image_path "blasons" conf base p saved with
       | Some (`Path p) when Filename.extension p = ".stop" -> None
@@ -343,7 +350,7 @@ let get_blason_name_aux conf base p saved =
   let f = Filename.concat (portrait_folder conf) name in
   match find_img_opt f with
   | Some (`Path p) -> Filename.basename p
-  | Some (`Url _u) -> name ^ ".url"
+  | Some (`Url _u) -> Filename.basename name ^ ".url"
   | None -> ""
 
 let get_blason_name conf base p = get_blason_name_aux conf base p false
@@ -364,7 +371,7 @@ let has_blason_stop conf base p =
   | _ -> false
 
 let get_blason_owner conf base p =
-  if has_access_to_image "blasons" conf base p then
+  if has_access_to_blason conf base p then
     let rec loop p =
       match Driver.get_parents p with
       | Some ifam ->
@@ -445,7 +452,7 @@ let get_portrait_with_size conf base p =
   else None
 
 let get_blason_with_size conf base p self =
-  if has_access_to_image "blasons" conf base p then
+  if has_access_to_blason conf base p then
     let rec loop p =
       match
         src_of_string conf
