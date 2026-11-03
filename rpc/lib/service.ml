@@ -79,6 +79,32 @@ module Search = struct
       (Lwt_result.return
       @@ List.map (fun (name, idx) -> (name, Index.cardinal idx)) indexes)
 
+  (* [balance size stages] keeps at most [size] elements of [stages],
+     preserving their order. Each stage gets an equal share of the slots;
+     the slots a short stage does not use are redistributed to the
+     others. *)
+  let balance size stages =
+    let n = Array.length stages in
+    let quota = Array.make n 0 in
+    let by_length = Array.init n Fun.id in
+    Array.sort
+      (fun i j -> compare (Array.length stages.(i)) (Array.length stages.(j)))
+      by_length;
+    let _ =
+      Array.fold_left
+        (fun (remaining, left) i ->
+          let q = min (Array.length stages.(i)) (remaining / left) in
+          quota.(i) <- q;
+          (remaining - q, left - 1))
+        (size, n) by_length
+    in
+    Array.fold_right
+      (fun (s, q) acc ->
+        let rec add k acc = if k < 0 then acc else add (k - 1) (s.(k) :: acc) in
+        add (q - 1) acc)
+      (Array.map2 (fun s q -> (s, q)) stages quota)
+      []
+
   let lookup ~fuel indexes =
     decl "lookup"
       Desc.Syntax.(string @-> string @-> int @-> ret (list string))
@@ -94,26 +120,58 @@ module Search = struct
                 (fun Analyze.{ content; _ } -> content)
                 (Analyze.preprocess s)
             in
-            (* We look up for entries in the following order of priority:
+            (* We look up for entries in three disjoint stages, listed by
+               decreasing priority:
                 1. Entries that exactly match all the [words].
-                2. Entries that match prefixes of all the [words].
+                2. Entries that match prefixes of all the [words], but not
+                   exactly.
                 3. Entries that match prefixes of all the [words] up to
-                   Levenshtein distance of 1. *)
+                   Levenshtein distance of 1, but not plain prefixes.
+               The [size] slots are shared between the stages, so that a
+               frequent word (e.g. "laure") cannot fill the whole answer
+               with exact matches and hide its extensions ("laurent",
+               "laurence", ...). *)
             let size = min size fuel in
-            let r =
+            let toks e =
+              List.map
+                (fun Analyze.{ content; _ } -> content)
+                (Analyze.preprocess e)
+            in
+            let exact e =
+              let t = toks e in
+              List.for_all (fun w -> List.mem w t) words
+            in
+            let prefix e =
+              let t = toks e in
+              List.for_all
+                (fun w -> List.exists (String.starts_with ~prefix:w) t)
+                words
+            in
+            let seen = Hashtbl.create (3 * size) in
+            let stage keep s =
               (* TODO: There is no guarantee that bounding the size of forced
                  elements in the sequence will limit the running time. We
                  should find a solution to limit the running time itself. *)
-              List.of_seq @@ Seq.take size @@ Seq.concat
-              (* BUG: We can introduce duplicate in the output here. *)
-              @@ List.to_seq
-                   [
-                     Index.search words idx;
-                     Index.search_prefix words idx;
-                     Index.fuzzy_search ~max_dist:1 words idx;
-                   ]
+              Seq.filter
+                (fun e ->
+                  keep e
+                  && (not (Hashtbl.mem seen e))
+                  &&
+                  (Hashtbl.add seen e ();
+                   true))
+                s
+              |> Seq.take size |> Array.of_seq
             in
-            Lwt_result.return r)
+            let stages =
+              [|
+                stage (fun _ -> true) (Index.search words idx);
+                stage (fun e -> not (exact e)) (Index.search_prefix words idx);
+                stage
+                  (fun e -> not (prefix e))
+                  (Index.fuzzy_search ~max_dist:1 words idx);
+              |]
+            in
+            Lwt_result.return (balance size stages))
 
   let make ~fuel idx = empty |> add (info idx) |> add (lookup ~fuel idx)
 end
