@@ -215,7 +215,14 @@
   %foreach;family;
     %incr_count;
     %let;marr_note;%if;((wizard or friend or bvar.no_note_for_visitor!="yes")and has_marriage_note)<div class="border-start border-3 ps-2 mt-3 mb-2" data-dup="f%spouse.index;">[*notes on the marriage/notes on the marriages]0[:] %marriage_note;</div>%end;%in;
-    %if;(spouse.has_image)%incr_count2;%end;
+    %reset_count1;
+    %if;(spouse.has_image or spouse.has_blason)%incr_count1;%end;
+    %foreach;spouse.parent;%if;(parent.has_image or parent.has_blason)%incr_count1;%end;%end;
+    %let;sp_img;%if;(count1>0)1%end;%in;
+    %reset_count1;
+    %foreach;witness;%if;witness.has_image;%incr_count1;%end;%end;
+    %let;w_img;%if;(count1>0)1%end;%in;
+    %if;(sp_img!="" or w_img!="")%incr_count2;%end;
     %foreach;child;
       %if;(child.has_image)%incr_count2;%end;
     %end;
@@ -237,36 +244,36 @@
          <sup>%count;</sup>%nn;
       %end;
     %end;
+    %if;(sp_img="" and spouse.has_parents)
+      <span>%apply;a_of_b%with;, %if;spouse.is_male;[son/daughter/child]0%else;[son/daughter/child]1%end;
+      %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
+    %end;
+    %if;(w_img="" and has_witnesses)
+      <span data-dup="f%spouse.index;">%sp;([witness/witnesses]w[:]
+        %foreach;witness;
+          %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+        %end;)</span>%nn;
+    %end;
+    %if;(sp_img="" and has_children)<span%if;(marr_note!="") data-dup-alt="f%spouse.index;" hidden%end;>, %apply;havingchildren(nb_children)[:]</span>%end;
     %if;(count2=0)
-      %if;(spouse.has_parents)
-        <span>%apply;a_of_b%with;, %if;spouse.is_male;[son/daughter/child]0%else;[son/daughter/child]1%end;
-        %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
-      %end;
-      %if;has_witnesses;
-        <span data-dup="f%spouse.index;">%sp;(%apply;a_of_b%with;[witness/witnesses]w%and;[marriage event]0%end;[:]
-          %foreach;witness;
-            %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
-          %end;)</span>%nn;
-      %end;
-      %if;(marr_note!="").%sp;%marr_note;%end;
-      %if;(has_children)%nn;
-        %if;(marr_note=""), %apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]
-        %foreach;child;
-          <ul>
-            %apply;li_SDC("child")%nn;
-            %if;(bvar.always_surname="yes")
-              %apply;short_display_person("child")
-            %else;
-              %apply;short_display_person_noname("child")
-            %end;
-            </li>
-          </ul>
-        %end;
+      %marr_note;
+      %if;(marr_note!="" and has_children)<span data-dup="f%spouse.index;">%apply;capitalize%with;%apply;havingchildren(nb_children)%end;[:]</span>%end;
+      %foreach;child;
+        <ul>
+          %apply;li_SDC("child")%nn;
+          %if;(bvar.always_surname="yes")
+            %apply;short_display_person("child")
+          %else;
+            %apply;short_display_person_noname("child")
+          %end;
+          </li>
+        </ul>
       %end;
     %end;
     %if;(count2>0)
       <div class="d-flex">
         <div class="">
+          %if;(sp_img!="")
           <div class="d-flex flex-column mt-1">
               <div class="d-inline-flex">
                 <div class="align-self-center">
@@ -307,11 +314,12 @@
               </div>
             </div>
           </div>
+          %end;
         %marr_note;
         %if;has_children;
           %let;prev_count;%count;%in;%( on garde la précédente valeur de count %)
             <div class="d-flex flex-column align-content-start ms-2 mt-1">
-              <div class="w-100">%if;(marr_note="")%apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]</div>
+              %if;(sp_img!="" or marr_note!="")<div class="w-100"%if;(sp_img="") data-dup="f%spouse.index;"%end;>%if;(marr_note="")%apply;havingchildren(nb_children)%else;%apply;capitalize%with;%apply;havingchildren(nb_children)%end;%end;[:]</div>%end;
               %reset_count1;
               %foreach;child;
                 %incr_count1;
@@ -346,10 +354,8 @@
             %apply;init_count(prev_count)%( on rétablie l'ancienne valeur de count %)
           %end;
         </div>
-        %if;has_witnesses;
-          %reset_count1;
-          %foreach;witness;%if;witness.has_image;%incr_count1;%end;%end;
-          <div class="d-flex flex-column flex-wrap mt-1 ms-auto me-3 small"%if;(count1=0) data-dup="f%spouse.index;"%end;>
+        %if;(w_img!="")
+          <div class="d-flex flex-column flex-wrap mt-1 ms-auto me-3 small">
             <span class="ms-1">%apply;a_of_b%with;[*witness/witnesses]w%and;[marriage event]0%end;[:]</span>
             %foreach;witness;
               <div class="d-inline-flex flex-row ms-1%if;(not is_first) mt-1%end;">
