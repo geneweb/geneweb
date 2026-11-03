@@ -280,6 +280,12 @@ let parse_cmd () =
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
   let bname = parse_output inputs !output in
+  if not (Mutil.good_name bname) then (
+    Fmt.epr
+      "gwc: the database name %S contains a forbidden character.@.Allowed \
+       characters: a..z, A..Z, 0..9, -@."
+      bname;
+    exit 2);
   (* derive only now, once all options (incl. -bd) are known *)
   (if !bases_dir = None then
      match inputs with
