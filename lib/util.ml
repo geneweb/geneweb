@@ -545,7 +545,7 @@ let hidden_env conf =
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
 
-let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
+let p_getenv = Http.p_getenv
 
 let p_getint env label =
   try
@@ -859,28 +859,7 @@ let surname_without_particle base s =
   in
   String.sub s part_len (String.length s - part_len)
 
-let rec skip_spaces s i =
-  if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
-
-let create_env s =
-  let s = (s : Adef.encoded_string :> string) in
-  let rec get_assoc beg i =
-    if i = String.length s then
-      if i = beg then [] else [ String.sub s beg (i - beg) ]
-    else if s.[i] = ';' || s.[i] = '&' then
-      let next_i = skip_spaces s (succ i) in
-      String.sub s beg (i - beg) :: get_assoc next_i next_i
-    else get_assoc beg (succ i)
-  in
-  let rec separate i s =
-    if i = String.length s then (s, Adef.encoded "")
-    else if s.[i] = '=' then
-      ( String.sub s 0 i,
-        Adef.encoded (String.sub s (succ i) (String.length s - succ i)) )
-    else separate (succ i) s
-  in
-  List.map (separate 0) (get_assoc 0 0)
-
+let create_env = Http.create_env
 let index_of_sex = function Def.Male -> 0 | Def.Female -> 1 | Def.Neuter -> 2
 
 let string_of_pevent_name_without_base conf = function
