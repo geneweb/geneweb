@@ -18149,6 +18149,10 @@ pt: pacto civil de solidariedade%t com
 sv: sambo%t med
 tr: sivil dayanışma paktı%t ile
 
+    sparents
+en: spouse parents
+fr: les parents du conjoint
+
     parents
 af: ouers
 ar: والد

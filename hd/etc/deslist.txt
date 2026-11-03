@@ -59,7 +59,7 @@
 </h1>
 
 %define;link(xx)
-  %if;(e.cgl="on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  <strong>%if;(e.cgl="on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;</strong>
   %xx.title;%xx.dates;
 %end;
 
@@ -207,6 +207,56 @@
   %end;
 %end;
 
+%define;somebody_spouse_parent1(xx)
+  %apply;link("spouse.xx")%nn;
+%end;
+
+%define;somebody_spouse_parent()
+    %if;(evar.parents = "on" and spouse.has_parents)%sp;
+    <br>...
+      <small>
+      %apply;a_of_b%with;
+        %if;(spouse.is_male)[son/daughter/child]0
+        %else;[son/daughter/child]1%end;
+      %and;
+        %apply;somebody_spouse_parent1("father") [and]
+        %apply;somebody_spouse_parent1("mother")
+      %end;
+      </small>
+    %end;
+    %if;(wizard or not is_invisible)
+      %if;are_divorced; ... [divorced]0%divorce_date;.%nl;
+      %elseif;are_separated; ... [separated]0.%nl;
+      %end;
+    %end;
+%end;
+
+%define;symbol2(xx)
+    %if;(xx.has_siblings)
+      &diams;%nn;
+    %elseif;(xx.has_parents)
+      &loz;%nn;
+    %else;
+      -%nn;
+    %end;
+%end;
+
+%define;symbol1(xx)
+  %if;(evar.v < 5 and xx.has_sosa)
+    <span class="color_sosa">%apply;symbol2("xx")</span>%nn;
+  %else;
+    %apply;symbol2("xx")
+  %end;
+%end;
+
+%define;symbol(xx)
+  %if;(wizard and evar.upd="on" and not cancel_links)
+    &nbsp;<a target="_blank" href="%prefix;m=MOD_IND;i=%xx.index;" title="[modify] [person/persons]0" >%apply;symbol1("xx")</a>%nn;
+  %elseif(evar.t="N")
+    %apply;symbol1("xx")
+  %end;
+%end;
+
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev, ctr)
   <b class="person-entry" id="person-%ctr;">%nn;
     %if;(e.cgl="on" or xx.is_restricted)%yy;
@@ -218,7 +268,7 @@
   %foreach;xx.family;
     <div class="d-flex">
       <div class="flex-shrink-0 align-self-center">
-        …%apply;married_to%with;
+        <strong>&%if;(nb_families>1)%family_cnt;%end;</strong> %apply;married_to%with;
            %if;(on_marriage_date!="") %on_marriage_date;%end;
            %if;(marriage_place!="") [in (place)] %marriage_place;%end;
          %end;…
@@ -238,6 +288,7 @@
       %else;<a href="%prefix;%spouse.access;">%spouse;</a>%end;
     </b>%nn;
     %apply;somebody_long_info("spouse")
+    %apply;somebody_spouse_parent()
     %apply;render_notes_sources_inline%with;spouse%and;ctr%end;
     %if;are_divorced;, <em>[divorced]</em>%end;
     %if;are_separated;, <em>[separated]</em>%end;
