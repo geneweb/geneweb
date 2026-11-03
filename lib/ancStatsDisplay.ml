@@ -15,16 +15,21 @@ end
 type gradient_cumul = {
   gc_prev : Percent.t;
   gc_unique : Percent.t;
+  gc_implex : Percent.t;
   gc_paths : Percent.t;
 }
 
 type gradient_level = { gl_unique : Percent.t; gl_paths : Percent.t }
 
-let make_gradient_cumul ~prev ~unique ~paths =
-  let p = Percent.of_int prev in
-  let u = Percent.of_int (max prev unique) in
-  let s = Percent.of_int (max (max prev unique) paths) in
-  { gc_prev = p; gc_unique = u; gc_paths = s }
+let make_gradient_cumul ~prev ~unique ~implex ~paths =
+  let unique = max prev unique in
+  let implex = max unique implex in
+  {
+    gc_prev = Percent.of_int prev;
+    gc_unique = Percent.of_int unique;
+    gc_implex = Percent.of_int implex;
+    gc_paths = Percent.of_int (max implex paths);
+  }
 
 let make_gradient_level ~unique ~paths =
   let u = Percent.of_int unique in
@@ -97,7 +102,7 @@ let generation_label conf gen =
      noa: unique cumulative ancestors
      path: implex
      per: year range
-     gc : { prev; unique; paths }  (* cumulative percentages *)
+     gc : { prev; unique; implex; paths }
      gl : { unique; paths }        (* level percentages *)
      pp : tooltip cumul
      pp_l : tooltip level }*)
@@ -108,7 +113,7 @@ let compute_json conf base p =
     Implex.profile base (Geneweb_db.Driver.get_iper p)
   in
   let data = Buffer.create 16384 in
-  let plus n = if n > 0 then "+" ^ string_of_int n else "" in
+  let count n = if n > 0 then string_of_int n else "" in
   let max_gen, _, _ =
     List.fold_left
       (fun (_, unique_prev, paths_prev) g ->
@@ -124,22 +129,25 @@ let compute_json conf base p =
         let gc =
           make_gradient_cumul
             ~prev:(percent unique_prev theo_c)
-            ~unique:pct_uc ~paths:pct_pc
+            ~unique:pct_uc
+            ~implex:(percent (unique_prev + paths) theo_c)
+            ~paths:pct_pc
         in
         let gl = make_gradient_level ~unique:pct_ul ~paths:pct_pl in
         if gen > 1 then Buffer.add_char data ',';
         Printf.bprintf data
-          {|{"v":%d,"t":"%s","noa":"%d","noa_l":"%d","path":"%s","path_l":"%s","per":"%s","gc":{"prev":%d,"unique":%d,"paths":%d},"gl":{"unique":%d,"paths":%d},"pp":"%s","pp_l":"%s"}|}
+          {|{"v":%d,"t":"%s","noa":"%d","noa_l":"%d","path":"%s","path_l":"%s","per":"%s","gc":{"prev":%d,"unique":%d,"implex":%d,"paths":%d},"gl":{"unique":%d,"paths":%d},"pp":"%s","pp_l":"%s"}|}
           gen
           (generation_label conf gen)
           unique fresh
-          (plus (paths_cumul - unique))
-          (plus (paths - fresh))
+          (count (paths_cumul - unique))
+          (count (paths - fresh))
           (match period with
           | Some (a, b) -> Printf.sprintf "%d-%d" a b
           | None -> "-")
           (Percent.to_int gc.gc_prev)
           (Percent.to_int gc.gc_unique)
+          (Percent.to_int gc.gc_implex)
           (Percent.to_int gc.gc_paths)
           (Percent.to_int gl.gl_unique)
           (Percent.to_int gl.gl_paths)

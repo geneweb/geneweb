@@ -1,8 +1,8 @@
+<!-- $Id: ancmenu.txt v7.1 03/11/2026 15:35:31 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancmenu.txt v7.1 05/04/2026 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestor/ancestors]1%nn;
@@ -546,34 +546,34 @@ function missing_events_options() {
 <script>
 const ancStats = %anc_stats_json;;
 const maxAncLevel = %max_anc_level;;
-
 const ANC_COLORS = {
-  prev:  'rgba(155,200,255,.5)',
-  uniq:  'rgba(210,230,255,.5)',
-  path:  'rgba(255,210,180,.5)',
-  empty: 'rgba(255,255,255,0)',
-  level: 'rgba(180,200,220,.5)'
+  prev:   'rgba(155,200,255,.5)',
+  uniq:   'rgba(210,230,255,.5)',
+  implex: 'rgba(255,190,150,.5)',
+  path:   'rgba(255,210,180,.5)',
+  empty:  'rgba(255,255,255,0)',
+  level:  'rgba(180,200,220,.5)'
 };
-
-// I18N : strings injectées par Geneweb (placeholders à brancher sur le système de trad)
 const I18N = {
-  only:           "[only]",
-  upTo:           "[up to]",
+  only:            "[only]",
+  upTo:            "[up to]",
+  dates:           "[date/dates]1",
   placeholderOnly: "… [specify::generation/generations]0 ([only], max " + maxAncLevel + ")",
   placeholderUpTo: "… [specify::generation/generations]0 ([up to], max " + maxAncLevel + ")"
 };
 
-// Gradients : retournent UNIQUEMENT la valeur CSS, pas l'attribut entier
 function gradientCumul(gc) {
   if (!gc) return '';
-  const { prev, unique, paths } = gc;
+  const { prev, unique, implex, paths } = gc;
   return 'linear-gradient(90deg,'
-    + ANC_COLORS.prev  + ' ' + prev   + '%,'
-    + ANC_COLORS.uniq  + ' ' + prev   + '%,'
-    + ANC_COLORS.uniq  + ' ' + unique + '%,'
-    + ANC_COLORS.path  + ' ' + unique + '%,'
-    + ANC_COLORS.path  + ' ' + paths  + '%,'
-    + ANC_COLORS.empty + ' ' + paths  + '%)';
+    + ANC_COLORS.prev   + ' ' + prev   + '%,'
+    + ANC_COLORS.uniq   + ' ' + prev   + '%,'
+    + ANC_COLORS.uniq   + ' ' + unique + '%,'
+    + ANC_COLORS.path   + ' ' + unique + '%,'
+    + ANC_COLORS.path   + ' ' + implex + '%,'
+    + ANC_COLORS.implex + ' ' + implex + '%,'
+    + ANC_COLORS.implex + ' ' + paths  + '%,'
+    + ANC_COLORS.empty  + ' ' + paths  + '%)';
 }
 
 function gradientLevel(gl) {
@@ -586,8 +586,22 @@ function gradientLevel(gl) {
     + ANC_COLORS.empty + ' ' + paths  + '%)';
 }
 
-// Injection des <option> natives dans le <select id="v"> pour le fallback no-JS
-// (Tom Select recevra les données complètes via `options:` ci-dessous)
+const ANC_COLS = %[
+  { label: "+[ancestor/ancestors]1", color: ANC_COLORS.uniq, level: ANC_COLORS.level,
+    text: d => '+' + d.noa_l },
+  { label: "+[implex/implexes]1", color: ANC_COLORS.path, level: ANC_COLORS.path,
+    text: d => d.path_l && '+' + d.path_l, implex: true },
+  { label: "[ancestor/ancestors]1",
+    color: 'linear-gradient(90deg,' + ANC_COLORS.prev + ' 50%,' + ANC_COLORS.uniq + ' 50%)',
+    text: d => d.noa },
+  { label: "[implex/implexes]1",
+    color: 'linear-gradient(90deg,' + ANC_COLORS.path + ' 50%,' + ANC_COLORS.implex + ' 50%)',
+    text: d => d.path, implex: true }
+%];
+ANC_COLS.forEach(c => {
+  c.width = 1 + ancStats.data.reduce((w, d) => Math.max(w, c.text(d).length), c.label.length);
+});
+
 const selectEl = document.getElementById('v');
 ancStats.data.forEach(function(d) {
   const opt = document.createElement('option');
@@ -600,65 +614,52 @@ ancStats.data.forEach(function(d) {
   selectEl.appendChild(opt);
 });
 
-// État du mode capturé en closure — relu par render via refreshOptions/refreshItems
 let onlyMode = document.getElementById('only').checked;
+
+function ancRow(cls, attrs, label, period, cell) {
+  return '<div class="d-flex justify-content-center ' + cls + '"' + attrs + '>'
+    + '<span class="text-end" style="width:14rem">' + label + '</span>'
+    + '<span class="text-center" style="width:' + (onlyMode ? 12 : 8) + 'rem">' + period + '</span>'
+    + ANC_COLS.filter(c => !onlyMode || c.level).map(c =>
+        '<span class="text-end text-nowrap' + (c.implex ? ' ancmenu-implex' : '')
+        + '" style="width:' + c.width + 'ch">' + cell(c) + '</span>').join('')
+    + '</div>';
+}
+
+function ancLegend() {
+  return ancRow('ancmenu-legend border-bottom', '', '', '<small>' + I18N.dates + '</small>',
+    c => '<small class="rounded px-1" style="background:' + (onlyMode ? c.level : c.color) + '">'
+      + c.label + '</small>');
+}
 
 const tsAnc = new TomSelect('#v', {
   valueField:  'v',
   labelField:  't',
   searchField: 't',
   options:     ancStats.data,
-  maxOptions:  100,
+  maxOptions:  null,
   placeholder: onlyMode ? I18N.placeholderOnly : I18N.placeholderUpTo,
   controlInput: null,
+  plugins:     { dropdown_header: { html: ancLegend } },
 
   render: {
     option: function(data, escape) {
-      const isDisabled = data.v > maxAncLevel;
-      const bg     = onlyMode ? gradientLevel(data.gl) : gradientCumul(data.gc);
-      const prefix = onlyMode ? I18N.only : I18N.upTo;
-      const cls    = isDisabled ? 'text-body-secondary' : '';
-      const colDate = 'width:' + (onlyMode ? '12' : '8') + 'rem';
-
-      // Champs numériques contrôlés serveur — laissés bruts (cf. §5)
-      const noa_l  = data.noa_l  || 0;
-      const path_l = data.path_l || 0;
-      const noa    = data.noa    || 0;
-      const path   = data.path   || 0;
-      const implexL = path_l ? '<span class="ancmenu-implex">' + path_l + '</span>' : '';
-      const implexC = path   ? '<span class="ancmenu-implex">' + path   + '</span>' : '';
-
-      // Composition du title : tout vient de la base → tout est échappé
-      const titleNum = (onlyMode ? (noa_l + path_l) : (noa + path)) + '';
-      const titleStr = escape(titleNum + (data.pp || ''));
-
-      const colCumul = onlyMode
-        ? ''
-        : '<span class="text-end" style="width:12rem">'
-            + noa + implexC
-          + '</span>';
-
-      return '<div class="d-flex justify-content-center ' + cls + '"'
-        + (bg ? ' style="background:' + bg + '"' : '')
-        + ' title="' + titleStr + '">'
-          + '<span class="text-end" style="width:14rem">'
-            + escape(prefix) + ' ' + escape(data.t || '')
-          + '</span>'
-          + '<span class="text-center" style="' + colDate + '">'
-            + escape(data.per || '')
-          + '</span>'
-          + '<span class="text-end" style="width:10rem">+'
-            + noa_l + implexL
-          + '</span>'
-          + colCumul
-        + '</div>';
+      const bg   = onlyMode ? gradientLevel(data.gl) : gradientCumul(data.gc);
+      const noa  = onlyMode ? data.noa_l : data.noa;
+      const path = onlyMode ? data.path_l : data.path;
+      const title = noa + (path ? '+' + path : '') + ((onlyMode ? data.pp_l : data.pp) || '');
+      return ancRow(data.v > maxAncLevel ? 'text-body-secondary' : '',
+        (bg ? ' style="background:' + bg + '"' : '') + ' title="' + escape(title) + '"',
+        escape((onlyMode ? I18N.only : I18N.upTo) + ' ' + (data.t || '')),
+        escape(data.per || ''),
+        c => c.text(data));
     },
 
     item: function(data, escape) {
       const prefix = onlyMode ? I18N.only : I18N.upTo;
       const noa    = onlyMode ? (data.noa_l  || 0) : (data.noa  || 0);
       const path   = onlyMode ? (data.path_l || 0) : (data.path || 0);
-      const implex = path ? '<span class="ancmenu-implex">' + path + '</span>' : '';
+      const implex = path ? '<span class="ancmenu-implex">+' + path + '</span>' : '';
       const noaHtml = noa ? ' (' + noa + implex + ')' : '';
 
       return '<div class="d-flex align-items-center">'
@@ -680,6 +681,7 @@ setAncPlaceholder();
 document.getElementById('only').addEventListener('change', function(e) {
   onlyMode = e.target.checked;
   setAncPlaceholder();
+  tsAnc.dropdown.querySelector('.ancmenu-legend').outerHTML = ancLegend();
   tsAnc.clearCache();
   tsAnc.refreshOptions(false);
   const cur = tsAnc.getValue();
