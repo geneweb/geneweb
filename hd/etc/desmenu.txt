@@ -80,11 +80,14 @@
           <i class="fa fa-person-dress fa-fw me-1"></i>[*male line/female line]1
         </label>
       </div>
-      <div class="ms-4">
         <div class="form-check">
           <input type="checkbox" class="form-check-input" id="ld_alwsurn" name="alwsurn" value="yes"%nn;
             %if;(b.always_surname="yes") checked%end;>
           <label class="form-check-label" for="ld_alwsurn">[*with::surname/surnames]1</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="ld_parents" name="parents">
+          <label class="form-check-label" for="ld_parents">[*with::sparents]</label>
         </div>
         <div class="form-check">
           <input type="checkbox" class="form-check-input" id="ld_rel" name="rel">
@@ -114,7 +117,6 @@
           <input type="checkbox" class="form-check-input" id="ld_inline" name="inline">
           <label class="form-check-label" for="ld_inline">[*display notes and sources inline]</label>
         </div>
-      </div>
       <hr>
       <div class="form-check">
         <input type="radio" class="form-check-input" id="tN" name="t" value="N"
@@ -373,7 +375,7 @@ function table_options() {
   if (tmarr) { tmarr.disabled = false; tmarr.checked = true; }
   ['t_num_table','t_birth_date','t_birth_place',
    't_marr_place','t_marr_date','t_child',
-   't_death_date','t_death_place','t_occu','t_gen'
+   't_death_date','t_death_place','t_occu','t_gen', 't_hl'
   ].forEach(function(id) {
     const el = document.getElementById(id);
     if (el) el.checked = true;
