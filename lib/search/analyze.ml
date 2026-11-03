@@ -1,4 +1,10 @@
-let is_separator c = c = ' ' || c = ',' || c = '-'
+(* Every ASCII character that is not a letter or a digit separates tokens.
+   Bytes of non-ASCII characters that [normalize] could not transliterate are
+   kept inside tokens. *)
+let is_separator c =
+  match c with
+  | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> false
+  | c -> Char.code c < 0x80
 
 type 'a loc = { content : 'a; offset : int; len : int }
 
@@ -24,11 +30,37 @@ let tokenize s =
   in
   loop [] [] 0 0 |> List.rev
 
-let normalize = String.lowercase_ascii
+(* Characters unknown to Unidecode that separate words: no-break space
+   (U+00A0), modifier letter apostrophe (U+02BC) and the General Punctuation
+   block (U+2000-U+206F: typographic quotes and dashes, special spaces...). *)
+let is_unicode_separator u =
+  match u with
+  | "\xC2\xA0" | "\xCA\xBC" -> true
+  | u ->
+      String.length u = 3 && u.[0] = '\xE2' && (u.[1] = '\x80' || u.[1] = '\x81')
 
-let preprocess s =
-  List.map
-    (fun t ->
-      let content = normalize t.content in
-      { t with content })
-    (tokenize s)
+let normalize s =
+  let len = String.length s in
+  let b = Buffer.create len in
+  let rec loop i =
+    if i < len then (
+      if Char.code s.[i] < 0x80 then (
+        Buffer.add_char b (Char.lowercase_ascii s.[i]);
+        loop (i + 1))
+      else
+        let t, j =
+          Unidecode.decode
+            (fun n t -> (t, n))
+            (fun n c -> (String.make 1 c, n))
+            (fun n ->
+              let u = String.sub s i (n - i) in
+              ((if is_unicode_separator u then " " else u), n))
+            s i len
+        in
+        Buffer.add_string b (String.lowercase_ascii t);
+        loop (if j > i then j else i + 1))
+  in
+  loop 0;
+  Buffer.contents b
+
+let preprocess s = tokenize (normalize s)
