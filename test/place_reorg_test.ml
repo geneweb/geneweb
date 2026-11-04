@@ -26,6 +26,11 @@ let test_reorganize () =
       ("Nantes (44) (Loire-Atlantique)", Some "Nantes, Loire-Atlantique");
       ("Nantes (44), France", Some "Nantes, Loire-Atlantique, France");
       ("Nantes (Loire-Inférieure)", Some "Nantes, Loire-Inférieure");
+      ( "Nantes (44), 4e canton, acte 180",
+        Some "4e canton, acte 180, Nantes, Loire-Atlantique" );
+      ("Nantes,44,Loire-Atlantique", Some "Nantes, Loire-Atlantique");
+      ( "Nantes (2ème canton), 44, France",
+        Some "2ème canton, Nantes, Loire-Atlantique, France" );
       (* left out *)
       ("Nantes, Loire-Atlantique", None);
       ("Nantes (Fraternité-Agriculture)", None);
