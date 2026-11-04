@@ -1619,7 +1619,8 @@ let parse_body_by_content_type parsed_content_type
     Adef.encoded_string * (string * Adef.encoded_string) list =
   match parsed_content_type with
   | Some (Http.MultipartForm { boundary }) ->
-      Http.extract_multipart boundary contents
+      let str, env = Http.extract_multipart boundary contents in
+      (str, Http.Env.to_list env)
   | None | Some Http.UrlEncoded -> (contents, Http.create_env contents)
   | Some (Http.Other _) -> (contents, [])
 
@@ -1628,6 +1629,7 @@ let combine_query_and_contents parsed_content_type url_query
   let is_other_body =
     match parsed_content_type with Some (Http.Other _) -> true | _ -> false
   in
+  let url_query = Http.string_of_query url_query in
   if is_other_body || url_query = "" then contents
   else if (contents :> string) = "" || (contents :> string) = url_query then
     Adef.encoded url_query
@@ -1646,11 +1648,13 @@ let build_env request (contents : Adef.encoded_string) :
   let req_line = Http.parse_request_line request in
   let url_params =
     match req_line with
-    | Some { query = Some q; _ } -> Http.parse_query_params q
+    | Some { query = Some q; _ } -> Http.Env.to_list (Http.parse_query_params q)
     | _ -> []
   in
   let url_query =
-    match req_line with Some { query = Some q; _ } -> q | _ -> ""
+    match req_line with
+    | Some { query = Some q; _ } -> q
+    | _ -> Http.query_of_string ""
   in
   let content_type = Http.Header.get ~request "content-type" in
   let parsed_content_type = Option.map Http.parse_content_type content_type in

@@ -1,7 +1,23 @@
-module Header = struct
-  let get ~request header =
+module Boundary = struct
+  type t = string
+
+  let of_string = Fun.id
+  let to_string = Fun.id
+end
+
+module Headers = struct
+  type t = string list
+
+  let of_lines = Fun.id
+  let to_lines = Fun.id
+
+  let get t header =
     Option.map String.trim
-      (Mutil.extract_param (Printf.sprintf "%s:" header) '\n' request)
+      (Mutil.extract_param (Printf.sprintf "%s:" header) '\n' t)
+end
+
+module Header = struct
+  let get ~request header = Headers.get (Headers.of_lines request) header
 end
 
 type meth =
@@ -51,12 +67,36 @@ let string_of_meth = function
   | PATCH -> "PATCH"
   | OTHER s -> s
 
+type http_version = Http_1_0 | Http_1_1 | Http_2_0 | Unknown_version of string
+
+let http_version_of_string = function
+  | "HTTP/1.0" -> Http_1_0
+  | "HTTP/1.1" -> Http_1_1
+  | "HTTP/2.0" | "HTTP/2" -> Http_2_0
+  | s -> Unknown_version s
+
+let string_of_http_version = function
+  | Http_1_0 -> "HTTP/1.0"
+  | Http_1_1 -> "HTTP/1.1"
+  | Http_2_0 -> "HTTP/2.0"
+  | Unknown_version s -> s
+
+type path = string
+
+let path_of_string = Fun.id
+let string_of_path = Fun.id
+
+type query_string = string
+
+let query_of_string = Fun.id
+let string_of_query = Fun.id
+
 type request_line = {
   meth : meth;
   raw_target : string;
-  path : string;
-  query : string option;
-  version : string option;
+  path : path;
+  query : query_string option;
+  version : http_version option;
 }
 
 let is_valid_method_token s =
@@ -89,7 +129,9 @@ let parse_request_line_content line =
         | None -> (target_no_slash, None)
       in
       let version =
-        match rest with [ v ] when v <> "" -> Some v | _ -> None
+        match rest with
+        | [ v ] when v <> "" -> Some (http_version_of_string v)
+        | _ -> None
       in
       Some { meth; raw_target = target; path; query; version }
   | _ -> None
@@ -123,6 +165,22 @@ let create_env s =
 
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
+let merge_env url_params body_params =
+  url_params
+  @ List.filter (fun (k, _) -> not (List.mem_assoc k url_params)) body_params
+
+module Env = struct
+  type t = (string * Adef.encoded_string) list
+
+  let empty = []
+  let of_encoded_string s = create_env s
+  let of_query_string q = if q = "" then [] else create_env (Adef.encoded q)
+  let get t label = p_getenv t label
+  let merge ~url_env ~body_env = merge_env url_env body_env
+  let to_list = Fun.id
+  let of_list = Fun.id
+end
+
 let start_with_case_insensitive ~prefix s =
   let len_p = String.length prefix in
   let len_s = String.length s in
@@ -146,7 +204,7 @@ let strip_quotes s =
 
 type content_type =
   | UrlEncoded
-  | MultipartForm of { boundary : string }
+  | MultipartForm of { boundary : Boundary.t }
   | Other of string
 
 let parse_content_type header =
@@ -158,7 +216,11 @@ let parse_content_type header =
     with
     | Some (_, b) ->
         MultipartForm
-          { boundary = strip_quotes (b : Adef.encoded_string :> string) }
+          {
+            boundary =
+              Boundary.of_string
+                (strip_quotes (b : Adef.encoded_string :> string));
+          }
     | None -> Other header
   else if
     start_with_case_insensitive ~prefix:"application/x-www-form-urlencoded"
@@ -240,7 +302,7 @@ let parse_part_content str boundary body_i env loop =
 
 let extract_multipart boundary str =
   let str = (str : Adef.encoded_string :> string) in
-  let boundary = "--" ^ boundary in
+  let boundary = "--" ^ Boundary.to_string boundary in
   let rec loop i =
     if i = String.length str then []
     else
@@ -264,8 +326,4 @@ let extract_multipart boundary str =
   in
   (str, env)
 
-let parse_query_params q = if q = "" then [] else create_env (Adef.encoded q)
-
-let merge_env url_params body_params =
-  url_params
-  @ List.filter (fun (k, _) -> not (List.mem_assoc k url_params)) body_params
+let parse_query_params q = Env.of_query_string q

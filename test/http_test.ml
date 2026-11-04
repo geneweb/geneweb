@@ -26,11 +26,14 @@ let test_parse_request_line_get () =
         ~msg:"Http.parse_request_line method" "GET"
         (Http.string_of_meth parsed.meth);
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "base" parsed.path;
+        ~msg:"Http.parse_request_line path" "base"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line query" (Some "m=NG&b=mybase") parsed.query;
+        ~msg:"Http.parse_request_line query" (Some "m=NG&b=mybase")
+        (Option.map Http.string_of_query parsed.query);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1") parsed.version
+        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1")
+        (Option.map Http.string_of_http_version parsed.version)
 
 let test_parse_request_line_post () =
   let req = [ "POST /base HTTP/1.0"; "Content-Length: 4" ] in
@@ -43,11 +46,14 @@ let test_parse_request_line_post () =
         ~msg:"Http.parse_request_line method" "POST"
         (Http.string_of_meth parsed.meth);
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "base" parsed.path;
+        ~msg:"Http.parse_request_line path" "base"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line query" None parsed.query;
+        ~msg:"Http.parse_request_line query" None
+        (Option.map Http.string_of_query parsed.query);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line version" (Some "HTTP/1.0") parsed.version
+        ~msg:"Http.parse_request_line version" (Some "HTTP/1.0")
+        (Option.map Http.string_of_http_version parsed.version)
 
 let test_parse_request_line_crlf () =
   let req = [ "GET /base HTTP/1.1\r" ] in
@@ -60,9 +66,11 @@ let test_parse_request_line_crlf () =
         ~msg:"Http.parse_request_line method" "GET"
         (Http.string_of_meth parsed.meth);
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "base" parsed.path;
+        ~msg:"Http.parse_request_line path" "base"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1") parsed.version
+        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1")
+        (Option.map Http.string_of_http_version parsed.version)
 
 let test_parse_request_line_empty_query () =
   let req = [ "POST /base? HTTP/1.1" ] in
@@ -72,9 +80,11 @@ let test_parse_request_line_empty_query () =
         "Http.parse_request_line failed on trailing question mark"
   | Some parsed ->
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "base" parsed.path;
+        ~msg:"Http.parse_request_line path" "base"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line query should be None" None parsed.query
+        ~msg:"Http.parse_request_line query should be None" None
+        (Option.map Http.string_of_query parsed.query)
 
 let test_parse_request_line_wizard_mode () =
   let req =
@@ -87,10 +97,11 @@ let test_parse_request_line_wizard_mode () =
   | Some parsed ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_request_line path retains _w suffix" "base_w"
-        parsed.path;
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
         ~msg:"Http.parse_request_line query preserves mode with underscore"
-        (Some "m=SOME_MODE&param=value") parsed.query
+        (Some "m=SOME_MODE&param=value")
+        (Option.map Http.string_of_query parsed.query)
 
 let test_parse_request_line_post_long_query () =
   let long_q = "m=UPDATE&" ^ String.make 1000 'a' ^ "=b" in
@@ -102,10 +113,11 @@ let test_parse_request_line_post_long_query () =
   | Some parsed ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_request_line path retains _w suffix" "base_w"
-        parsed.path;
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
         ~msg:"Http.parse_request_line query preserves long strings"
-        (Some long_q) parsed.query
+        (Some long_q)
+        (Option.map Http.string_of_query parsed.query)
 
 let test_parse_request_line_asterisk () =
   let req = [ "OPTIONS * HTTP/1.1" ] in
@@ -118,11 +130,14 @@ let test_parse_request_line_asterisk () =
         ~msg:"Http.parse_request_line method" "OPTIONS"
         (Http.string_of_meth parsed.meth);
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "*" parsed.path;
+        ~msg:"Http.parse_request_line path" "*"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line query should be None" None parsed.query;
+        ~msg:"Http.parse_request_line query should be None" None
+        (Option.map Http.string_of_query parsed.query);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1") parsed.version
+        ~msg:"Http.parse_request_line version" (Some "HTTP/1.1")
+        (Option.map Http.string_of_http_version parsed.version)
 
 let test_parse_request_line_no_version () =
   let req = [ "GET /base?m=NG" ] in
@@ -135,11 +150,14 @@ let test_parse_request_line_no_version () =
         ~msg:"Http.parse_request_line method" "GET"
         (Http.string_of_meth parsed.meth);
       Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_request_line path" "base" parsed.path;
+        ~msg:"Http.parse_request_line path" "base"
+        (Http.string_of_path parsed.path);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line query" (Some "m=NG") parsed.query;
+        ~msg:"Http.parse_request_line query" (Some "m=NG")
+        (Option.map Http.string_of_query parsed.query);
       Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-        ~msg:"Http.parse_request_line version is None" None parsed.version
+        ~msg:"Http.parse_request_line version is None" None
+        (Option.map Http.string_of_http_version parsed.version)
 
 let test_parse_request_line_invalid () =
   let check_none msg req =
@@ -183,7 +201,7 @@ let test_parse_content_type () =
   | Http.MultipartForm { boundary } ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_content_type boundary" "----WebKitFormBoundaryXYZ"
-        boundary
+        (Http.Boundary.to_string boundary)
   | _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse multipart");
@@ -194,7 +212,8 @@ let test_parse_content_type () =
   | Http.MultipartForm { boundary } ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_content_type quoted boundary"
-        "----WebKitFormBoundaryQuoted" boundary
+        "----WebKitFormBoundaryQuoted"
+        (Http.Boundary.to_string boundary)
   | _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse quoted boundary");
@@ -203,7 +222,7 @@ let test_parse_content_type () =
   | Http.MultipartForm { boundary } ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_content_type uppercase boundary" "BOUNDARY_UPPER"
-        boundary
+        (Http.Boundary.to_string boundary)
   | _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse uppercase multipart");
@@ -212,7 +231,7 @@ let test_parse_content_type () =
   | Http.MultipartForm { boundary } ->
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.parse_content_type uppercase boundary attribute" "foo"
-        boundary
+        (Http.Boundary.to_string boundary)
   | _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse uppercase boundary attribute");
@@ -251,8 +270,14 @@ let test_parse_content_type () =
         "Http.parse_content_type failed to parse other"
 
 let test_parse_query_and_merge () =
-  let url_params = Http.parse_query_params "m=NG&b=base" in
-  let body_params = Http.parse_query_params "foo=bar&m=OVERRIDDEN" in
+  let url_params =
+    Http.Env.to_list
+      (Http.parse_query_params (Http.query_of_string "m=NG&b=base"))
+  in
+  let body_params =
+    Http.Env.to_list
+      (Http.parse_query_params (Http.query_of_string "foo=bar&m=OVERRIDDEN"))
+  in
   let merged = Http.merge_env url_params body_params in
   let get_val k env = (List.assoc k env : Adef.encoded_string :> string) in
   Geneweb_test_utils.Check.string ~pos:__POS__
@@ -266,7 +291,7 @@ let test_parse_query_and_merge () =
     ~msg:"Http.merge_env deduplicates shadowed keys" 1 m_count
 
 let test_extract_multipart () =
-  let boundary = "AaB03x" in
+  let boundary = Http.Boundary.of_string "AaB03x" in
   let payload =
     "--AaB03x\r\n\
      content-disposition: form-data; name=\"field1\"\r\n\
@@ -279,14 +304,14 @@ let test_extract_multipart () =
      --AaB03x--\r\n"
   in
   let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-  let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+  let get_val k = Option.value ~default:"" (Http.Env.get env k) in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart field1" "value1" (get_val "field1");
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart field2" "value2" (get_val "field2")
 
 let test_extract_multipart_file () =
-  let boundary = "boundary123" in
+  let boundary = Http.Boundary.of_string "boundary123" in
   let payload =
     "--boundary123\r\n\
      content-disposition: form-data; name=\"upload\"; filename=\"test.ged\"\r\n\
@@ -297,7 +322,7 @@ let test_extract_multipart_file () =
      --boundary123--\r\n"
   in
   let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-  let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+  let get_val k = Option.value ~default:"" (Http.Env.get env k) in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart file name" "test.ged" (get_val "upload_name");
   Geneweb_test_utils.Check.string ~pos:__POS__
@@ -316,7 +341,7 @@ let test_extract_multipart_quoted_boundary () =
          --my_boundary--\r\n"
       in
       let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-      let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+      let get_val k = Option.value ~default:"" (Http.Env.get env k) in
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.extract_multipart with quoted boundary" "val"
         (get_val "field")
@@ -328,55 +353,61 @@ let test_extract_boundary_quotes () =
   let ct = Adef.encoded "multipart/form-data; boundary=\"xyz\"" in
   let boundary = Http.extract_boundary ct in
   Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.extract_boundary strips quotes" "xyz" boundary
+    ~msg:"Http.extract_boundary strips quotes" "xyz"
+    (Http.Boundary.to_string boundary)
 
 let test_extract_boundary_case_insensitive () =
   let ct_upper = Adef.encoded "multipart/form-data; BOUNDARY=xyz" in
   let boundary_upper = Http.extract_boundary ct_upper in
   Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.extract_boundary uppercase attribute" "xyz" boundary_upper;
+    ~msg:"Http.extract_boundary uppercase attribute" "xyz"
+    (Http.Boundary.to_string boundary_upper);
   let ct_mixed = Adef.encoded "multipart/form-data; Boundary=abc" in
   let boundary_mixed = Http.extract_boundary ct_mixed in
   Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.extract_boundary mixed-case attribute" "abc" boundary_mixed
+    ~msg:"Http.extract_boundary mixed-case attribute" "abc"
+    (Http.Boundary.to_string boundary_mixed)
 
 let test_extract_boundary_opt () =
   let ct_multipart = Adef.encoded "multipart/form-data; boundary=xyz123" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt multipart" (Some "xyz123")
-    (Http.extract_boundary_opt ct_multipart);
+    (Option.map Http.Boundary.to_string
+       (Http.extract_boundary_opt ct_multipart));
   let ct_quoted =
     Adef.encoded "multipart/form-data; boundary=\"quoted_boundary\""
   in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt quoted boundary" (Some "quoted_boundary")
-    (Http.extract_boundary_opt ct_quoted);
+    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_quoted));
   let ct_case = Adef.encoded "multipart/form-data; BOUNDARY=xyz" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt case-insensitive" (Some "xyz")
-    (Http.extract_boundary_opt ct_case);
+    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_case));
   let ct_urlencoded = Adef.encoded "application/x-www-form-urlencoded" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt urlencoded" None
-    (Http.extract_boundary_opt ct_urlencoded);
+    (Option.map Http.Boundary.to_string
+       (Http.extract_boundary_opt ct_urlencoded));
   let ct_other = Adef.encoded "text/plain" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt text/plain" None
-    (Http.extract_boundary_opt ct_other);
+    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_other));
   let ct_no_boundary = Adef.encoded "multipart/form-data" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt multipart without boundary" None
-    (Http.extract_boundary_opt ct_no_boundary);
+    (Option.map Http.Boundary.to_string
+       (Http.extract_boundary_opt ct_no_boundary));
   let ct_empty = Adef.encoded "" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt empty" None
-    (Http.extract_boundary_opt ct_empty)
+    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_empty))
 
 let test_extract_boundary_backward_compat () =
   let ct_multipart = Adef.encoded "multipart/form-data; boundary=xyz123" in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_boundary backward compat success" "xyz123"
-    (Http.extract_boundary ct_multipart);
+    (Http.Boundary.to_string (Http.extract_boundary ct_multipart));
   let ct_non_multipart = Adef.encoded "application/x-www-form-urlencoded" in
   match Http.extract_boundary ct_non_multipart with
   | _ ->
@@ -385,7 +416,7 @@ let test_extract_boundary_backward_compat () =
   | exception Not_found -> ()
 
 let test_extract_multipart_empty_field () =
-  let boundary = "boundary_empty" in
+  let boundary = Http.Boundary.of_string "boundary_empty" in
   let payload =
     "--boundary_empty\r\n\
      content-disposition: form-data; name=\"notes\"\r\n\
@@ -397,14 +428,14 @@ let test_extract_multipart_empty_field () =
      --boundary_empty--\r\n"
   in
   let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-  let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+  let get_val k = Option.value ~default:"" (Http.Env.get env k) in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart empty field" "" (get_val "notes");
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart subsequent field" "John" (get_val "name")
 
 let test_extract_multipart_multi_headers () =
-  let boundary = "boundary_multi" in
+  let boundary = Http.Boundary.of_string "boundary_multi" in
   let payload =
     "--boundary_multi\r\n\
      content-disposition: form-data; name=\"notes\"\r\n\
@@ -414,13 +445,13 @@ let test_extract_multipart_multi_headers () =
      --boundary_multi--\r\n"
   in
   let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-  let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+  let get_val k = Option.value ~default:"" (Http.Env.get env k) in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart multi-header field" "My multi-header note"
     (get_val "notes")
 
 let test_extract_multipart_file_with_content_type () =
-  let boundary = "boundary_file_ct" in
+  let boundary = Http.Boundary.of_string "boundary_file_ct" in
   let payload =
     "--boundary_file_ct\r\n\
      content-disposition: form-data; name=\"upload\"; filename=\"test.ged\"\r\n\
@@ -432,7 +463,7 @@ let test_extract_multipart_file_with_content_type () =
      --boundary_file_ct--\r\n"
   in
   let _, env = Http.extract_multipart boundary (Adef.encoded payload) in
-  let get_val k = (List.assoc k env : Adef.encoded_string :> string) in
+  let get_val k = Option.value ~default:"" (Http.Env.get env k) in
   Geneweb_test_utils.Check.string ~pos:__POS__
     ~msg:"Http.extract_multipart file name with content-type" "test.ged"
     (get_val "upload_name");
