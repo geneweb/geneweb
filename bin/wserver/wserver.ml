@@ -143,10 +143,11 @@ let get_request strm =
 
 let get_request_and_content strm =
   let request = get_request strm in
+  let headers = Http.Headers.of_lines request in
   let max_allowed_content_length = 64 * 1024 * 1024 in
   let content =
     match
-      Option.bind (Http.Header.get ~request "content-length") int_of_string_opt
+      Option.bind (Http.Headers.get headers "content-length") int_of_string_opt
     with
     | None -> ""
     | Some len when len <= 0 || len > max_allowed_content_length -> ""
