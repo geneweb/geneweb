@@ -151,6 +151,39 @@ document.querySelectorAll('.ctx-all').forEach(function (b) {
 </script>
 |}
 
+(* On a cluster page, the row of the spelling [i] to keep, with a checkbox
+   leaving that spelling unchanged ("Loiré" beside "Loire"): it is the
+   inverse of the checkbox [spt<i>] in front of the occurrences of the
+   spelling, kept in sync by [exclude_script]. *)
+let keep_row conf i ~value ~checked label =
+  Printf.sprintf
+    "<div class=\"d-flex align-items-center gap-4\"><div \
+     class=\"form-check\"><input class=\"form-check-input\" type=\"radio\" \
+     name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
+     class=\"form-check-label\" for=\"ntc%d\">%s</label></div><div \
+     class=\"form-check\"><input class=\"form-check-input sp-excl\" \
+     type=\"checkbox\" id=\"spx%d\" data-sp=\"spt%d\"><label \
+     class=\"form-check-label small text-muted\" \
+     for=\"spx%d\">%s</label></div></div>\n"
+    i (esc value)
+    (if checked then " checked" else "")
+    i label i i i
+    (esc (transl conf "do not modify"))
+
+let exclude_script =
+  {|<script>
+document.querySelectorAll('.sp-excl').forEach(function (x) {
+  var h = document.getElementById(x.dataset.sp);
+  if (!h) return;
+  x.addEventListener('change', function () {
+    h.checked = !x.checked;
+    h.dispatchEvent(new Event('change'));
+  });
+  h.addEventListener('change', function () { x.checked = !h.checked; });
+});
+</script>
+|}
+
 let cluster_link conf key =
   Printf.sprintf "%sm=PLACE_TERMS&c=%s" (prefix conf) (enc key)
 
@@ -295,14 +328,11 @@ let print_cluster conf entries key =
         (Utf8.capitalize_fst (transl conf "keep the spelling"));
       List.iteri
         (fun i (e : PlaceTerms.entry) ->
-          Output.printf conf
-            "<div class=\"form-check\"><input class=\"form-check-input\" \
-             type=\"radio\" name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
-             class=\"form-check-label\" for=\"ntc%d\"><code>%s</code> <span \
-             class=\"text-muted\">(%d)</span></label></div>\n"
-            i (esc e.term)
-            (if i = 0 then " checked" else "")
-            i (esc e.term) e.uses)
+          Output.print_sstring conf
+            (keep_row conf i ~value:e.term ~checked:(i = 0)
+               (Printf.sprintf
+                  "<code>%s</code> <span class=\"text-muted\">(%d)</span>"
+                  (esc e.term) e.uses)))
         l;
       Output.printf conf
         "<div class=\"form-check d-flex align-items-center gap-2\"><input \
@@ -322,15 +352,17 @@ let print_cluster conf entries key =
            (fun (i, first) (e : PlaceTerms.entry) ->
              Output.printf conf
                "<h3 class=\"h5 mt-4\"><input type=\"checkbox\" \
-                class=\"form-check-input ctx-all me-2\" data-ctx=\"t%d\" \
-                checked>%s <span class=\"text-muted small\">%s</span></h3>\n"
-               i (term_link conf e.term) (counts_html conf e);
+                class=\"form-check-input ctx-all me-2\" id=\"spt%d\" \
+                data-ctx=\"t%d\" checked>%s <span class=\"text-muted \
+                small\">%s</span></h3>\n"
+               i i (term_link conf e.term) (counts_html conf e);
              ( i + 1,
                print_contexts conf e ~first ~cls:(Printf.sprintf " ctxt%d" i) ))
            (0, 0) l
           : int * int);
       Output.print_sstring conf "</form>\n";
-      Output.print_sstring conf toggle_script
+      Output.print_sstring conf toggle_script;
+      Output.print_sstring conf exclude_script
 
 (* the new term: [nt] on a term page, the [ntc] radio button (or [nto] for
    another spelling) on a cluster page *)
@@ -737,13 +769,8 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
     (Utf8.capitalize_fst (transl conf "keep the spelling"));
   List.iteri
     (fun i (sp : SourceTerms.spelling) ->
-      Output.printf conf
-        "<div class=\"form-check\"><input class=\"form-check-input\" \
-         type=\"radio\" name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
-         class=\"form-check-label\" for=\"ntc%d\">%s</label></div>\n"
-        i (esc sp.text)
-        (if i = 0 then " checked" else "")
-        i (spelling_html sp))
+      Output.print_sstring conf
+        (keep_row conf i ~value:sp.text ~checked:(i = 0) (spelling_html sp)))
     spellings;
   Output.printf conf
     "<div class=\"form-check d-flex align-items-center gap-2\"><input \
@@ -760,10 +787,10 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
     (fun i (sp : SourceTerms.spelling) ->
       Output.printf conf
         "<h3 class=\"h6 mt-3\"><input type=\"checkbox\" \
-         class=\"form-check-input me-2\" name=\"t%d\" value=\"%s\" \
-         checked>%s</h3>\n\
+         class=\"form-check-input me-2\" id=\"spt%d\" name=\"t%d\" \
+         value=\"%s\" checked>%s</h3>\n\
          <ul class=\"small ms-3\">\n"
-        (i + 1) (esc sp.text) (spelling_html sp);
+        i (i + 1) (esc sp.text) (spelling_html sp);
       List.iter
         (fun (raw, spans) ->
           Output.printf conf "<li>%s</li>\n" (mark_spans raw spans))
@@ -772,7 +799,8 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
     spellings;
   Output.printf conf
     "<button type=\"submit\" class=\"btn btn-primary\">%s</button>\n</form>\n"
-    (Utf8.capitalize_fst (transl conf "preview of the changes"))
+    (Utf8.capitalize_fst (transl conf "preview of the changes"));
+  Output.print_sstring conf exclude_script
 
 let print_src_cluster conf base key =
   let part = src_part conf in
