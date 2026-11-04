@@ -28,6 +28,8 @@ let test_proposals () =
       (istr "3", "Paris, 1er, Seine", 2);
       (istr "4", "Paris XIVe, Seine", 1);
       (istr "5", "Paris (1er)", 1);
+      (istr "6", "Bordeaux Gironde), France", 9);
+      (istr "7", "Bordeaux, Gironde, France", 1);
     ]
   in
   let entries = PlaceTerms.of_places false places in
@@ -37,7 +39,9 @@ let test_proposals () =
         (p.written, p.target, List.length p.places))
       (PlaceJoin.proposals ~min_uses:5 false entries places)
   in
-  (* "Paris (1er)": the two terms are not separated by a comma *)
+  (* "Paris (1er)": the two terms are not separated by a comma; "Bordeaux,
+     Gironde": not numbered, not joined into the erroneous "Bordeaux
+     Gironde)" *)
   (check (list (triple string string int)))
     "proposals"
     [ ("Paris, 1er", "Paris 1er", 1); ("Paris XIVe", "Paris 14e", 1) ]

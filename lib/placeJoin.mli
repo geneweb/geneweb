@@ -6,9 +6,13 @@
     The terms are compared by {!key}: their cluster key
     ({!PlaceTerms.cluster_key}) with every ordinal number, in arabic or roman
     figures, written ["<n>e"]: ["1er"], ["1re"], ["Ier"] give ["1e"], ["XIVe"],
-    ["14ème"], ["14"] give ["14e"]. A term of two words or more is frequent when
-    the terms of its key have at least [min_uses] uses; the most used clean
-    spelling is the one written. *)
+    ["14ème"], ["14"] give ["14e"]. Only the numbered terms are considered
+    (arrondissements, cantons, numbered quarters): the base has too many
+    erroneous terms for the others (["Bordeaux, Gironde"] would be joined into
+    ["Bordeaux Gironde)"]). A numbered term of two words or more is frequent
+    when the terms of its key have at least [min_uses] uses; the most used clean
+    spelling is the one written; two terms are joined only when the second one
+    is numbered. *)
 
 val key : string -> string
 (** ["Paris XIVe"] and ["Paris 14e"] give ["paris 14e"]. *)
