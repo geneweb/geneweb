@@ -220,7 +220,7 @@ let print_term conf entries t =
       (* the occurrences to rename are chosen with the checkboxes, all
          checked by default; the form leads to the preview *)
       open_form conf;
-      Util.hidden_input conf "t" (Mutil.encode e.term);
+      Util.hidden_input_s conf "t" e.term;
       Output.printf conf
         "<div class=\"d-flex align-items-center gap-2 my-3\">\n\
          <label for=\"nt\" class=\"text-nowrap\">%s</label>\n\
@@ -283,9 +283,7 @@ let print_cluster conf entries key =
       open_form conf;
       List.iteri
         (fun i (e : PlaceTerms.entry) ->
-          Util.hidden_input conf
-            (Printf.sprintf "t%d" (i + 1))
-            (Mutil.encode e.term))
+          Util.hidden_input_s conf (Printf.sprintf "t%d" (i + 1)) e.term)
         l;
       (* the spelling to keep: one of the cluster (the most used by default)
          or another one *)
@@ -464,11 +462,9 @@ let print_preview conf base terms nt =
         ~hidden:(fun () ->
           List.iteri
             (fun i t ->
-              Util.hidden_input conf
-                (Printf.sprintf "t%d" (i + 1))
-                (Mutil.encode t))
+              Util.hidden_input_s conf (Printf.sprintf "t%d" (i + 1)) t)
             terms;
-          Util.hidden_input conf "nt" (Mutil.encode nt))
+          Util.hidden_input_s conf "nt" nt)
         ~back:(back_href conf terms)
         ~old_html:(fun (it : PlaceRename.item) ->
           mark_terms conf terms it.depths it.old_s)
@@ -820,9 +816,9 @@ let print_src_preview conf base terms nt =
         (Adef.encoded (SourceTerms.string_of_part (src_part conf)));
       List.iteri
         (fun i t ->
-          Util.hidden_input conf (Printf.sprintf "t%d" (i + 1)) (Mutil.encode t))
+          Util.hidden_input_s conf (Printf.sprintf "t%d" (i + 1)) t)
         terms;
-      Util.hidden_input conf "nt" (Mutil.encode nt);
+      Util.hidden_input_s conf "nt" nt;
       Output.printf conf
         "<button type=\"submit\" class=\"btn btn-primary\">%s</button> <a \
          class=\"btn btn-outline-secondary\" href=\"%s\">%s</a>\n\
@@ -933,7 +929,8 @@ let continue_form ~m conf =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded m);
   List.iter
-    (fun (k, v) -> if k <> "m" then Util.hidden_input conf k v)
+    (fun (k, v) ->
+      if k <> "m" then Util.hidden_input_s conf k (Mutil.gen_decode false v))
     (List.filter
        (fun (k, _) ->
          k = "nt" || k = "t" || k = "g" || k = "gt" || k = "part"
