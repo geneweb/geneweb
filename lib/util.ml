@@ -1352,6 +1352,10 @@ let dir_listing dir =
   | _ -> recompute ()
   | exception Not_found -> recompute ()
 
+let clear_asset_caches () =
+  Hashtbl.reset dir_listing_cache;
+  Hashtbl.reset hash_cache
+
 let parse_file_cached fl = Geneweb_templ.Parser.parse_file ~src:(`File fl) fl
 let dir_exists_cached dir = dir_listing dir <> None
 
