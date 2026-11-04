@@ -28,7 +28,8 @@ val print_sources : Config.config -> Geneweb_db.Driver.base -> unit
     - [t1=...&nt=...]: preview, with the form leading to [m=SOURCE_TERMS_OK]. *)
 
 val print_sources_ok : Config.config -> Geneweb_db.Driver.base -> unit
-(** placeholder *)
+(** [m=SOURCE_TERMS_OK]: replaces the spellings in the source strings (see
+    {!PlaceRename.apply}, history "ms") and commits. *)
 
 val print_occupations : Config.config -> Geneweb_db.Driver.base -> unit
 (** [m=OCCU_TERMS]: occupations to group, same layout as [m=SOURCE_TERMS]. Each
@@ -42,5 +43,3 @@ val print_occupations : Config.config -> Geneweb_db.Driver.base -> unit
 val print_occupations_ok : Config.config -> Geneweb_db.Driver.base -> unit
 (** [m=OCCU_TERMS_OK]: replaces the spellings in the occupation strings (see
     {!PlaceRename.apply}, history "mo") and commits. *)
-(** [m=SOURCE_TERMS_OK]: replaces the spellings in the source strings (see
-    {!PlaceRename.apply}) and commits. *)
