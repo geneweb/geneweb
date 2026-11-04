@@ -63,6 +63,7 @@ val rewrite_with :
 type field =
   | Place  (** the place fields of persons, families and their events *)
   | Source  (** their source fields *)
+  | Occupation  (** the occupation of the persons *)
 
 type usage
 (** For every string id used as a place: the number of persons and families
@@ -122,5 +123,6 @@ type result = {
 
 val apply :
   ?field:field -> Config.config -> Geneweb_db.Driver.base -> item list -> result
-(** Carries out a plan like m=MOD_DATA_OK (history "mq" for each modified person
-    and the spouses of each modified family) and commits the patches. *)
+(** Carries out a plan like m=MOD_DATA_OK (history "mq", "ms" or "mo" for each
+    modified person and the spouses of each modified family) and commits the
+    patches. *)

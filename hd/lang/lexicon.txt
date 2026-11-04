@@ -18609,6 +18609,31 @@ de: zusammenzuführende Quellen
 en: sources to group
 fr: sources à regrouper
 
+    new occupation
+de: neuer Beruf
+en: new occupation
+fr: nouvelle profession
+
+    merged into an existing occupation
+de: mit einem vorhandenen Beruf zusammengeführt
+en: merged into an existing occupation
+fr: fusionnée avec une profession existante
+
+    merged with another renamed occupation
+de: mit einem anderen umbenannten Beruf zusammengeführt
+en: merged with another renamed occupation
+fr: fusionnée avec une autre profession renommée
+
+    occupations to group
+de: zusammenzuführende Berufe
+en: occupations to group
+fr: professions à regrouper
+
+    %d occupations renamed (%d merged), %d records updated
+de: %d Berufe umbenannt (%d zusammengeführt), %d Datensätze geändert
+en: %d occupations renamed (%d merged), %d records updated
+fr: %d professions renommées (dont %d fusionnées), %d fiches modifiées
+
     %d sources renamed (%d merged), %d records updated
 de: %d Quellen umbenannt (%d zusammengeführt), %d Datensätze geändert
 en: %d sources renamed (%d merged), %d records updated

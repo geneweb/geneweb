@@ -6,6 +6,9 @@ let esc s = (Util.escape_html s :> string)
 let enc s = (Mutil.encode s :> string)
 let prefix conf = (commd conf :> string)
 
+(* the three families of pages: same layout, their own strings *)
+type section = Places | Sources | Occupations
+
 let nb_max conf =
   match List.assoc_opt "book_max_results" conf.base_env with
   | Some n -> (
@@ -360,7 +363,7 @@ let mark_terms conf terms depths raw =
   | Some s -> marked s
   | None -> esc raw
 
-let kind_html ?(sources = false) conf base (k : PlaceRename.kind) =
+let kind_html section conf base (k : PlaceRename.kind) =
   let badge cls txt =
     Printf.sprintf "<span class=\"badge %s\">%s</span>" cls
       (esc (Utf8.capitalize_fst txt))
@@ -368,19 +371,27 @@ let kind_html ?(sources = false) conf base (k : PlaceRename.kind) =
   match k with
   | New_place ->
       badge "bg-success"
-        (transl conf (if sources then "new source" else "new place"))
+        (transl conf
+           (match section with
+           | Places -> "new place"
+           | Sources -> "new source"
+           | Occupations -> "new occupation"))
   | Merge_existing j ->
       badge "bg-warning text-dark"
         (transl conf
-           (if sources then "merged into an existing source"
-            else "merged into an existing place"))
+           (match section with
+           | Places -> "merged into an existing place"
+           | Sources -> "merged into an existing source"
+           | Occupations -> "merged into an existing occupation"))
       ^ " "
       ^ esc (Driver.sou base j)
   | Merge_batch ->
       badge "bg-warning text-dark"
         (transl conf
-           (if sources then "merged with another renamed source"
-            else "merged with another renamed place"))
+           (match section with
+           | Places -> "merged with another renamed place"
+           | Sources -> "merged with another renamed source"
+           | Occupations -> "merged with another renamed occupation"))
 
 (* back to the term page, or to the cluster page for several terms *)
 let back_href conf terms =
@@ -429,7 +440,7 @@ let print_plan conf base u items ~hidden ~back ~old_html ~new_html =
         (PlaceRename.place_key it.istr)
         (old_html it) (new_html it)
         (PlaceRename.uses u it.istr)
-        (kind_html conf base it.kind))
+        (kind_html Places conf base it.kind))
     items;
   Output.print_sstring conf "</tbody></table>\n";
   Output.printf conf
@@ -712,8 +723,57 @@ let print_src_clusters conf base =
       selected;
     Output.print_sstring conf "</tbody></table>\n")
 
-(* the spelling to keep and the spellings to replace by it, each with a few
-   examples *)
+(* The spelling to keep and the spellings to replace by it, each with a few
+   examples: the form of a cluster of sources or of occupations. [hidden]
+   emits the fields of the section. *)
+let print_spellings_form conf ~m ~hidden
+    (spellings : SourceTerms.spelling list) samples =
+  Output.printf conf "<h2 class=\"h3\">%s</h2>\n"
+    (Utf8.capitalize_fst (transl conf "merge spellings"));
+  open_form ~m conf;
+  hidden ();
+  Output.printf conf
+    "<fieldset class=\"my-3\"><legend class=\"h5\">%s</legend>\n"
+    (Utf8.capitalize_fst (transl conf "keep the spelling"));
+  List.iteri
+    (fun i (sp : SourceTerms.spelling) ->
+      Output.printf conf
+        "<div class=\"form-check\"><input class=\"form-check-input\" \
+         type=\"radio\" name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
+         class=\"form-check-label\" for=\"ntc%d\">%s</label></div>\n"
+        i (esc sp.text)
+        (if i = 0 then " checked" else "")
+        i (spelling_html sp))
+    spellings;
+  Output.printf conf
+    "<div class=\"form-check d-flex align-items-center gap-2\"><input \
+     class=\"form-check-input\" type=\"radio\" name=\"ntc\" id=\"ntco\" \
+     value=\"%s\"><label class=\"form-check-label\" for=\"ntco\">%s</label> \
+     <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
+     size=\"30\" name=\"nto\" \
+     onfocus=\"document.getElementById('ntco').checked=true\"></div>\n\
+     </fieldset>\n"
+    (esc other_choice)
+    (Utf8.capitalize_fst (transl conf "other spelling"));
+  (* every spelling, with all its occurrences; the one kept is left as it is *)
+  List.iteri
+    (fun i (sp : SourceTerms.spelling) ->
+      Output.printf conf
+        "<h3 class=\"h6 mt-3\"><input type=\"checkbox\" \
+         class=\"form-check-input me-2\" name=\"t%d\" value=\"%s\" \
+         checked>%s</h3>\n\
+         <ul class=\"small ms-3\">\n"
+        (i + 1) (esc sp.text) (spelling_html sp);
+      List.iter
+        (fun (raw, spans) ->
+          Output.printf conf "<li>%s</li>\n" (mark_spans raw spans))
+        (Option.value ~default:[] (List.assoc_opt sp.text samples));
+      Output.print_sstring conf "</ul>\n")
+    spellings;
+  Output.printf conf
+    "<button type=\"submit\" class=\"btn btn-primary\">%s</button>\n</form>\n"
+    (Utf8.capitalize_fst (transl conf "preview of the changes"))
+
 let print_src_cluster conf base key =
   let part = src_part conf in
   let d = SourceTerms.load conf base in
@@ -731,54 +791,11 @@ let print_src_cluster conf base key =
           (List.map (fun (sp : SourceTerms.spelling) -> sp.text) c.spellings)
           5
       in
-      Output.printf conf "<h2 class=\"h3\">%s</h2>\n"
-        (Utf8.capitalize_fst (transl conf "merge spellings"));
-      open_form ~m:"SOURCE_TERMS" conf;
-      Util.hidden_input conf "part"
-        (Adef.encoded (SourceTerms.string_of_part part));
-      Output.printf conf
-        "<fieldset class=\"my-3\"><legend class=\"h5\">%s</legend>\n"
-        (Utf8.capitalize_fst (transl conf "keep the spelling"));
-      List.iteri
-        (fun i (sp : SourceTerms.spelling) ->
-          Output.printf conf
-            "<div class=\"form-check\"><input class=\"form-check-input\" \
-             type=\"radio\" name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
-             class=\"form-check-label\" for=\"ntc%d\">%s</label></div>\n"
-            i (esc sp.text)
-            (if i = 0 then " checked" else "")
-            i (spelling_html sp))
-        c.spellings;
-      Output.printf conf
-        "<div class=\"form-check d-flex align-items-center gap-2\"><input \
-         class=\"form-check-input\" type=\"radio\" name=\"ntc\" id=\"ntco\" \
-         value=\"%s\"><label class=\"form-check-label\" \
-         for=\"ntco\">%s</label> <input type=\"text\" class=\"form-control \
-         form-control-sm w-auto\" size=\"30\" name=\"nto\" \
-         onfocus=\"document.getElementById('ntco').checked=true\"></div>\n\
-         </fieldset>\n"
-        (esc other_choice)
-        (Utf8.capitalize_fst (transl conf "other spelling"));
-      (* every spelling, with all its occurrences; the one kept is left as
-         it is *)
-      List.iteri
-        (fun i (sp : SourceTerms.spelling) ->
-          Output.printf conf
-            "<h3 class=\"h6 mt-3\"><input type=\"checkbox\" \
-             class=\"form-check-input me-2\" name=\"t%d\" value=\"%s\" \
-             checked>%s</h3>\n\
-             <ul class=\"small ms-3\">\n"
-            (i + 1) (esc sp.text) (spelling_html sp);
-          List.iter
-            (fun (raw, spans) ->
-              Output.printf conf "<li>%s</li>\n" (mark_spans raw spans))
-            (Option.value ~default:[] (List.assoc_opt sp.text samples));
-          Output.print_sstring conf "</ul>\n")
-        c.spellings;
-      Output.printf conf
-        "<button type=\"submit\" class=\"btn btn-primary\">%s</button>\n\
-         </form>\n"
-        (Utf8.capitalize_fst (transl conf "preview of the changes"))
+      print_spellings_form conf ~m:"SOURCE_TERMS"
+        ~hidden:(fun () ->
+          Util.hidden_input conf "part"
+            (Adef.encoded (SourceTerms.string_of_part part)))
+        c.spellings samples
 
 let invalid_src_term conf =
   Output.printf conf
@@ -791,56 +808,64 @@ let src_items conf base terms nt =
   let d = SourceTerms.load conf base in
   SourceTerms.plan base d (src_part conf) ~terms ~new_term:nt
 
+(* The preview of a renaming of sources or occupations: they are many, so the
+   whole selection is confirmed at once, the first ones shown. [hidden] emits
+   the fields of the section; [plural] is the lexicon entry of the strings. *)
+let print_spans_preview conf base section ~m ~hidden ~back ~plural u terms nt
+    items =
+  Output.printf conf
+    "<h2 class=\"h3\">%s</h2>\n<p>%s → <code>%s</code></p>\n<p>%d %s</p>\n"
+    (Utf8.capitalize_fst (transl conf "preview of the changes"))
+    (terms_html terms) (esc nt) (List.length items)
+    (transl_nth conf plural (if List.length items > 1 then 1 else 0));
+  if items = [] then
+    Output.printf conf "<p>%s</p>\n"
+      (Utf8.capitalize_fst (transl conf "no modification"))
+  else (
+    Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded m);
+    hidden ();
+    List.iteri
+      (fun i t -> Util.hidden_input_s conf (Printf.sprintf "t%d" (i + 1)) t)
+      terms;
+    Util.hidden_input_s conf "nt" nt;
+    Output.printf conf
+      "<button type=\"submit\" class=\"btn btn-primary\">%s</button> <a \
+       class=\"btn btn-outline-secondary\" href=\"%s\">%s</a>\n\
+       </form>\n"
+      (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
+      back
+      (Utf8.capitalize_fst (transl conf "cancel"));
+    Output.print_sstring conf
+      "<table class=\"table table-sm small mt-3\"><tbody>\n";
+    List.iteri
+      (fun i ((it : PlaceRename.item), spans) ->
+        if i < 200 then
+          Output.printf conf
+            "<tr><td>%s</td><td>→</td><td>%s</td><td class=\"text-end \
+             text-muted\">%d</td><td>%s</td></tr>\n"
+            (mark_spans it.old_s spans)
+            (esc it.new_s)
+            (PlaceRename.uses u it.istr)
+            (kind_html section conf base it.kind))
+      items;
+    Output.print_sstring conf "</tbody></table>\n";
+    if List.length items > 200 then Output.print_sstring conf "<p>…</p>\n")
+
 let print_src_preview conf base terms nt =
   let nt = PlaceTerms.clean_term nt in
   if nt = "" then invalid_src_term conf
   else
-    let items = src_items conf base terms nt in
-    let u = PlaceRename.usage ~field:PlaceRename.Source base in
-    Output.printf conf
-      "<h2 class=\"h3\">%s</h2>\n<p>%s → <code>%s</code></p>\n<p>%d %s</p>\n"
-      (Utf8.capitalize_fst (transl conf "preview of the changes"))
-      (terms_html terms) (esc nt) (List.length items)
-      (transl_nth conf "source/sources"
-         (if List.length items > 1 then 1 else 0));
-    if items = [] then
-      Output.printf conf "<p>%s</p>\n"
-        (Utf8.capitalize_fst (transl conf "no modification"))
-    else (
-      (* the sources are many: the whole selection is confirmed at once, the
-         first ones shown *)
-      Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Util.hidden_env conf;
-      Util.hidden_input conf "m" (Adef.encoded "SOURCE_TERMS_OK");
-      Util.hidden_input conf "part"
-        (Adef.encoded (SourceTerms.string_of_part (src_part conf)));
-      List.iteri
-        (fun i t ->
-          Util.hidden_input_s conf (Printf.sprintf "t%d" (i + 1)) t)
-        terms;
-      Util.hidden_input_s conf "nt" nt;
-      Output.printf conf
-        "<button type=\"submit\" class=\"btn btn-primary\">%s</button> <a \
-         class=\"btn btn-outline-secondary\" href=\"%s\">%s</a>\n\
-         </form>\n"
-        (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
-        (src_href conf (src_part conf))
-        (Utf8.capitalize_fst (transl conf "cancel"));
-      Output.print_sstring conf
-        "<table class=\"table table-sm small mt-3\"><tbody>\n";
-      List.iteri
-        (fun i ((it : PlaceRename.item), spans) ->
-          if i < 200 then
-            Output.printf conf
-              "<tr><td>%s</td><td>→</td><td>%s</td><td class=\"text-end \
-               text-muted\">%d</td><td>%s</td></tr>\n"
-              (mark_spans it.old_s spans)
-              (esc it.new_s)
-              (PlaceRename.uses u it.istr)
-              (kind_html ~sources:true conf base it.kind))
-        items;
-      Output.print_sstring conf "</tbody></table>\n";
-      if List.length items > 200 then Output.print_sstring conf "<p>…</p>\n")
+    let part = src_part conf in
+    print_spans_preview conf base Sources ~m:"SOURCE_TERMS_OK"
+      ~hidden:(fun () ->
+        Util.hidden_input conf "part"
+          (Adef.encoded (SourceTerms.string_of_part part)))
+      ~back:(src_href conf part) ~plural:"source/sources"
+      (PlaceRename.usage ~field:PlaceRename.Source base)
+      terms nt
+      (src_items conf base terms nt)
 
 let print_src conf base =
   let nonempty k =
@@ -855,21 +880,131 @@ let print_src conf base =
       | Some key -> print_src_cluster conf base key
       | None -> print_src_clusters conf base)
 
-(* the places and the sources have their own pages, with the same layout:
-   the dictionary, then the pages of grouping *)
-let header ?(sources = false) conf =
+(* ---- occupations ---- *)
+
+let occu_href conf = prefix conf ^ "m=OCCU_TERMS"
+
+(* the clusters of spellings, chosen by the beginning of their key when they
+   are too many *)
+let print_occu_clusters conf base =
+  let clusters = OccuTerms.clusters (OccuTerms.load base) in
+  let s = Option.value ~default:"" (p_getenv conf.env "s") in
+  let selected =
+    List.filter
+      (fun (c : OccuTerms.cluster) -> String.starts_with ~prefix:s c.ckey)
+      clusters
+  in
+  Output.printf conf "<p>%d</p>\n" (List.length selected);
+  let too_long = List.length selected > nb_max conf in
+  if too_long || s <> "" then (
+    let inis =
+      let n = String.length s + 1 in
+      List.filter_map
+        (fun (c : OccuTerms.cluster) ->
+          if String.length c.ckey >= n then Some (String.sub c.ckey 0 n)
+          else None)
+        selected
+      |> List.sort_uniq compare
+    in
+    Output.print_sstring conf "<div class=\"d-flex flex-wrap my-2\">\n";
+    List.iter
+      (fun ini ->
+        Output.printf conf
+          "<a class=\"btn btn-sm btn-outline-primary font-monospace me-1 \
+           mb-1\" href=\"%s&s=%s\">%s</a>\n"
+          (occu_href conf) (enc ini) (esc ini))
+      inis;
+    Output.print_sstring conf "</div>\n");
+  if too_long then
+    Output.printf conf "<p>%s</p>\n"
+      (Utf8.capitalize_fst (transl conf "v7 list too long"))
+  else if selected <> [] then (
+    Output.printf conf
+      "<table class=\"table table-sm table-hover w-auto\">\n\
+       <thead><tr><th>%s</th><th \
+       class=\"text-end\">%s</th><th></th></tr></thead>\n\
+       <tbody>\n"
+      (Utf8.capitalize_fst (transl conf "spellings"))
+      (Utf8.capitalize_fst (transl conf "uses"));
+    List.iter
+      (fun (c : OccuTerms.cluster) ->
+        Output.printf conf
+          "<tr><td>%s</td><td class=\"text-end\">%d</td><td><a \
+           href=\"%s&c=%s\">%s</a></td></tr>\n"
+          (String.concat "<br>" (List.map spelling_html c.spellings))
+          c.total (occu_href conf) (enc c.ckey)
+          (esc (Utf8.capitalize_fst (transl conf "merge spellings"))))
+      selected;
+    Output.print_sstring conf "</tbody></table>\n")
+
+let print_occu_cluster conf base key =
+  let d = OccuTerms.load base in
+  match
+    List.find_opt
+      (fun (c : OccuTerms.cluster) -> c.ckey = key)
+      (OccuTerms.clusters d)
+  with
+  | None ->
+      Output.printf conf "<p>%s</p>\n"
+        (Utf8.capitalize_fst (transl conf "not found"))
+  | Some c ->
+      let samples =
+        OccuTerms.samples d
+          (List.map (fun (sp : SourceTerms.spelling) -> sp.text) c.spellings)
+          5
+      in
+      print_spellings_form conf ~m:"OCCU_TERMS"
+        ~hidden:(fun () -> ())
+        c.spellings samples
+
+let invalid_occu_term conf =
+  Output.printf conf
+    "<div class=\"alert alert-danger\">%s</div>\n<p><a href=\"%s\">%s</a></p>\n"
+    (Utf8.capitalize_fst (transl conf "invalid new term"))
+    (occu_href conf)
+    (Utf8.capitalize_fst (transl conf "occupations to group"))
+
+let occu_items base terms nt =
+  OccuTerms.plan base (OccuTerms.load base) ~terms ~new_term:nt
+
+let print_occu conf base =
+  let nonempty k =
+    match p_getenv_notrim conf.env k with
+    | Some s when s <> "" -> Some s
+    | _ -> None
+  in
+  match (PlaceRename.terms_of_env conf, new_term_of_env conf) with
+  | (_ :: _ as terms), Some nt ->
+      let nt = PlaceTerms.clean_term nt in
+      if nt = "" then invalid_occu_term conf
+      else
+        print_spans_preview conf base Occupations ~m:"OCCU_TERMS_OK"
+          ~hidden:(fun () -> ())
+          ~back:(occu_href conf) ~plural:"occupation/occupations"
+          (PlaceRename.usage ~field:PlaceRename.Occupation base)
+          terms nt (occu_items base terms nt)
+  | _ -> (
+      match nonempty "c" with
+      | Some key -> print_occu_cluster conf base key
+      | None -> print_occu_clusters conf base)
+
+(* the places, the sources and the occupations have their own pages, with the
+   same layout: the book, then the pages of grouping *)
+let header section conf =
   let title _ =
     Output.print_sstring conf
       (Utf8.capitalize_fst
          (transl conf
-            (if sources then "sources to group" else "spelling clusters")))
+            (match section with
+            | Places -> "spelling clusters"
+            | Sources -> "sources to group"
+            | Occupations -> "occupations to group")))
   in
   Hutil.header conf title;
-  let book data plural =
+  let book data icon plural =
     Printf.sprintf
       "<a href=\"%sm=MOD_DATA&data=%s\"><i class=\"fa fa-%s me-1\"></i>%s</a>"
-      (prefix conf) data
-      (if data = "src" then "box-archive" else "location-dot")
+      (prefix conf) data icon
       (Utf8.capitalize_fst
          (Printf.sprintf (ftransl conf "book of %s") (transl_nth conf plural 1)))
   in
@@ -880,25 +1015,31 @@ let header ?(sources = false) conf =
   in
   Output.printf conf "<p>%s</p>\n"
     (String.concat " · "
-       (if sources then
-          [
-            book "src" "source/sources";
-            link
-              (prefix conf ^ "m=SOURCE_TERMS")
-              "object-group" "sources to group";
-          ]
-        else
-          [
-            book "place" "place/places";
-            link
-              (prefix conf ^ "m=PLACE_TERMS")
-              "object-group" "spelling clusters";
-            link (groups_href conf) "up-right-and-down-left-from-center"
-              "places to complete";
-          ]))
+       (match section with
+       | Sources ->
+           [
+             book "src" "box-archive" "source/sources";
+             link
+               (prefix conf ^ "m=SOURCE_TERMS")
+               "object-group" "sources to group";
+           ]
+       | Occupations ->
+           [
+             book "occu" "briefcase" "occupation/occupations";
+             link (occu_href conf) "object-group" "occupations to group";
+           ]
+       | Places ->
+           [
+             book "place" "location-dot" "place/places";
+             link
+               (prefix conf ^ "m=PLACE_TERMS")
+               "object-group" "spelling clusters";
+             link (groups_href conf) "up-right-and-down-left-from-center"
+               "places to complete";
+           ]))
 
 let print conf base =
-  header conf;
+  header Places conf;
   let nonempty k =
     match p_getenv_notrim conf.env k with
     | Some s when s <> "" -> Some s
@@ -947,26 +1088,31 @@ let continue_form ~m conf =
     (Utf8.capitalize_fst (transl conf "continue correcting"))
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
 
-let print_result ?(sources = false) conf (r : PlaceRename.result) =
+let print_result section conf (r : PlaceRename.result) =
   Output.printf conf "<div class=\"alert alert-success\">%s: %s</div>\n"
     (Utf8.capitalize_fst (transl conf "modification successful"))
-    (if sources then
-       Printf.sprintf
-         (ftransl conf "%d sources renamed (%d merged), %d records updated")
-         r.places r.merged (r.persons + r.families)
-     else
-       Printf.sprintf
-         (ftransl conf "%d places renamed (%d merged), %d records updated")
-         r.places r.merged (r.persons + r.families));
+    (Printf.sprintf
+       (match section with
+       | Places ->
+           ftransl conf "%d places renamed (%d merged), %d records updated"
+       | Sources ->
+           ftransl conf "%d sources renamed (%d merged), %d records updated"
+       | Occupations ->
+           ftransl conf "%d occupations renamed (%d merged), %d records updated")
+       r.places r.merged (r.persons + r.families));
   if not r.complete then
     continue_form conf
-      ~m:(if sources then "SOURCE_TERMS_OK" else "PLACE_TERMS_OK");
+      ~m:
+        (match section with
+        | Places -> "PLACE_TERMS_OK"
+        | Sources -> "SOURCE_TERMS_OK"
+        | Occupations -> "OCCU_TERMS_OK");
   if List.assoc_opt "history" conf.base_env = Some "yes" then
     Output.printf conf "<p><a href=\"%sm=HIST&k=20\">%s</a></p>\n" (prefix conf)
       (Utf8.capitalize_fst (transl_nth conf "modification/modifications" 1))
 
 let print_ok conf base =
-  header conf;
+  header Places conf;
   (match (PlaceRename.terms_of_env conf, p_getenv_notrim conf.env "nt") with
   | _ when p_getenv conf.env "gt" <> None -> (
       (* recomputed: the base may have changed since the preview *)
@@ -975,7 +1121,7 @@ let print_ok conf base =
           Output.printf conf "<p>%s</p>\n"
             (Utf8.capitalize_fst (transl conf "not found"))
       | Some (_, items) ->
-          print_result conf (PlaceRename.apply conf base items);
+          print_result Places conf (PlaceRename.apply conf base items);
           Output.printf conf "<p><a href=\"%s\">%s</a></p>\n" (groups_href conf)
             (Utf8.capitalize_fst (transl conf "places to complete")))
   | (_ :: _ as terms), Some nt ->
@@ -989,19 +1135,19 @@ let print_ok conf base =
             |> List.filter (fun (istr, _) ->
                 p_getenv conf.env (PlaceRename.place_key istr) = Some "on"))
         in
-        print_result conf (PlaceRename.apply conf base items);
+        print_result Places conf (PlaceRename.apply conf base items);
         Output.printf conf "<p><a href=\"%sm=PLACE_TERMS&t=%s\">%s</a></p>\n"
           (prefix conf) (enc nt) (esc nt)
   | _ -> ());
   Hutil.trailer conf
 
 let print_sources conf base =
-  header ~sources:true conf;
+  header Sources conf;
   print_src conf base;
   Hutil.trailer conf
 
 let print_sources_ok conf base =
-  header ~sources:true conf;
+  header Sources conf;
   (match (PlaceRename.terms_of_env conf, p_getenv_notrim conf.env "nt") with
   | (_ :: _ as terms), Some nt ->
       let nt = PlaceTerms.clean_term nt in
@@ -1009,10 +1155,31 @@ let print_sources_ok conf base =
       else
         (* recomputed: the base may have changed since the preview *)
         let items = List.map fst (src_items conf base terms nt) in
-        print_result ~sources:true conf
+        print_result Sources conf
           (PlaceRename.apply ~field:PlaceRename.Source conf base items);
         Output.printf conf "<p><a href=\"%s\">%s</a></p>\n"
           (src_href conf (src_part conf))
           (Utf8.capitalize_fst (transl conf "sources to group"))
+  | _ -> ());
+  Hutil.trailer conf
+
+let print_occupations conf base =
+  header Occupations conf;
+  print_occu conf base;
+  Hutil.trailer conf
+
+let print_occupations_ok conf base =
+  header Occupations conf;
+  (match (PlaceRename.terms_of_env conf, p_getenv_notrim conf.env "nt") with
+  | (_ :: _ as terms), Some nt ->
+      let nt = PlaceTerms.clean_term nt in
+      if nt = "" then invalid_occu_term conf
+      else
+        (* recomputed: the base may have changed since the preview *)
+        let items = List.map fst (occu_items base terms nt) in
+        print_result Occupations conf
+          (PlaceRename.apply ~field:PlaceRename.Occupation conf base items);
+        Output.printf conf "<p><a href=\"%s\">%s</a></p>\n" (occu_href conf)
+          (Utf8.capitalize_fst (transl conf "occupations to group"))
   | _ -> ());
   Hutil.trailer conf
