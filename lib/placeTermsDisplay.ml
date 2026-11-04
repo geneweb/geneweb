@@ -546,6 +546,152 @@ let print_preview conf base terms nt =
         ~new_html:(fun (it : PlaceRename.item) ->
           mark_terms conf [ nt ] it.depths it.new_s)
 
+(* ---- terms to split ---- *)
+
+let split_href conf = Printf.sprintf "%sm=PLACE_TERMS&split=on" (prefix conf)
+
+let split_min_uses conf =
+  match p_getint conf.env "n" with
+  | Some n when n > 0 -> n
+  | Some _ | None -> PlaceSplit.default_min_uses
+
+(* the terms checked on the list of proposals: fields [st1], [st2]... *)
+let split_terms_of_env conf =
+  List.filter_map
+    (fun (k, _) ->
+      let n = String.length k in
+      if
+        n > 2
+        && String.starts_with ~prefix:"st" k
+        && String.for_all
+             (fun c -> c >= '0' && c <= '9')
+             (String.sub k 2 (n - 2))
+      then
+        match p_getenv_notrim conf.env k with
+        | Some t when t <> "" -> Some t
+        | Some _ | None -> None
+      else None)
+    conf.env
+  |> List.sort_uniq compare
+
+let split_selected conf base =
+  let terms = split_terms_of_env conf in
+  PlaceSplit.proposals ~min_uses:(split_min_uses conf)
+    (PlaceTerms.build conf base)
+  |> List.filter (fun (p : PlaceSplit.proposal) -> List.mem p.entry.term terms)
+
+let split_hidden conf terms =
+  Util.hidden_input conf "split" (Adef.encoded "on");
+  Util.hidden_input conf "n"
+    (Adef.encoded (string_of_int (split_min_uses conf)));
+  List.iteri
+    (fun i t -> Util.hidden_input_s conf (Printf.sprintf "st%d" (i + 1)) t)
+    terms
+
+let print_split_list conf base =
+  let min_uses = split_min_uses conf in
+  let proposals = PlaceSplit.proposals ~min_uses (PlaceTerms.build conf base) in
+  Output.printf conf "<p>%s</p>\n"
+    (Utf8.capitalize_fst (transl conf "terms to split help"));
+  (* the threshold of the frequent terms *)
+  Output.printf conf
+    "<form method=\"get\" action=\"%s\" class=\"d-flex align-items-center \
+     gap-2 my-2\">\n"
+    conf.command;
+  Util.hidden_env conf;
+  Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+  Util.hidden_input conf "split" (Adef.encoded "on");
+  Output.printf conf
+    "<label for=\"n\" class=\"text-nowrap\">%s</label>\n\
+     <input type=\"number\" class=\"form-control form-control-sm w-auto\" \
+     min=\"1\" id=\"n\" name=\"n\" value=\"%d\">\n\
+     <button type=\"submit\" class=\"btn btn-sm \
+     btn-outline-primary\">%s</button>\n\
+     </form>\n\
+     <p>%d</p>\n"
+    (Utf8.capitalize_fst (transl conf "frequent terms: minimum uses"))
+    min_uses
+    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
+    (List.length proposals);
+  if proposals <> [] then (
+    let max = nb_max conf in
+    if List.length proposals > max then
+      Output.printf conf "<p>%s (%d)</p>\n"
+        (Utf8.capitalize_fst (transl conf "v7 list too long"))
+        max;
+    Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+    Util.hidden_input conf "split" (Adef.encoded "on");
+    Util.hidden_input conf "n" (Adef.encoded (string_of_int min_uses));
+    Output.printf conf
+      "<button type=\"submit\" class=\"btn btn-primary my-2\">%s</button>\n"
+      (Utf8.capitalize_fst (transl conf "preview of the changes"));
+    (* one group per frequent term, with a checkbox checking the group; a
+       proposal is checked when its first part is a known term *)
+    ignore
+      (List.fold_left
+         (fun (i, group) (p : PlaceSplit.proposal) ->
+           if i >= max then (i + 1, group)
+           else
+             (* [g]: the number of the group, the index of its first
+                proposal *)
+             let g =
+               match group with
+               | Some (right, g) when right = p.right -> g
+               | Some _ | None ->
+                   if group <> None then Output.print_sstring conf "</ul>\n";
+                   Output.printf conf
+                     "<h3 class=\"h5 mt-3\"><input type=\"checkbox\" \
+                      class=\"form-check-input ctx-all me-2\" \
+                      data-ctx=\"g%d\">%s</h3>\n\
+                      <ul class=\"list-unstyled ms-3\">\n"
+                     i (vis conf p.right);
+                   i
+             in
+             Output.printf conf
+               "<li><input type=\"checkbox\" class=\"form-check-input ctxg%d \
+                me-2\" name=\"st%d\" value=\"%s\"%s>%s <span \
+                class=\"text-muted\">(%d)</span> → <code>%s</code>%s</li>\n"
+               g (i + 1) (esc p.entry.term)
+               (if p.known then " checked" else "")
+               (term_link conf p.entry.term)
+               p.entry.uses
+               (vis conf (PlaceSplit.new_term p))
+               (if p.known then
+                  " <span class=\"badge bg-success\">"
+                  ^ esc (transl conf "known term")
+                  ^ "</span>"
+                else "");
+             (i + 1, Some (p.right, g)))
+         (0, None) proposals
+        : int * (string * int) option);
+    Output.print_sstring conf "</ul>\n</form>\n";
+    Output.print_sstring conf toggle_script)
+
+let print_split_preview conf base =
+  let selected = split_selected conf base in
+  let items = PlaceSplit.plan conf base selected in
+  let terms =
+    List.map (fun (p : PlaceSplit.proposal) -> p.entry.term) selected
+  in
+  Output.printf conf "<h2 class=\"h3\">%s</h2>\n<p>%d %s</p>\n"
+    (Utf8.capitalize_fst (transl conf "preview of the changes"))
+    (List.length items)
+    (transl_nth conf "place/places" (if List.length items > 1 then 1 else 0));
+  if items = [] then
+    Output.printf conf "<p>%s</p>\n<p><a href=\"%s\">%s</a></p>\n"
+      (Utf8.capitalize_fst (transl conf "no modification"))
+      (split_href conf)
+      (Utf8.capitalize_fst (transl conf "terms to split"))
+  else
+    print_plan conf base (PlaceRename.usage base) items
+      ~hidden:(fun () -> split_hidden conf terms)
+      ~back:(split_href conf)
+      ~old_html:(fun (it : PlaceRename.item) ->
+        mark_terms conf terms it.depths it.old_s)
+      ~new_html:(fun (it : PlaceRename.item) -> vis conf it.new_s)
+
 (* ---- places to complete ---- *)
 
 let groups_href conf = Printf.sprintf "%sm=PLACE_TERMS&groups=on" (prefix conf)
@@ -1097,6 +1243,7 @@ let header section conf =
                "object-group" "spelling clusters";
              link (groups_href conf) "up-right-and-down-left-from-center"
                "places to complete";
+             link (split_href conf) "scissors" "terms to split";
            ]))
 
 let print conf base =
@@ -1109,6 +1256,9 @@ let print conf base =
   (match (PlaceRename.terms_of_env conf, new_term_of_env conf) with
   | (_ :: _ as terms), Some nt -> print_preview conf base terms nt
   | _ when p_getenv conf.env "gt" <> None -> print_group_preview conf base
+  | _ when p_getenv conf.env "split" = Some "on" ->
+      if split_terms_of_env conf <> [] then print_split_preview conf base
+      else print_split_list conf base
   | _ when nonempty "g" <> None ->
       print_group conf
         (PlaceGroups.build conf base)
@@ -1135,8 +1285,14 @@ let continue_form ~m conf =
       if k <> "m" then Util.hidden_input_s conf k (Mutil.gen_decode false v))
     (List.filter
        (fun (k, _) ->
-         k = "nt" || k = "t" || k = "g" || k = "gt" || k = "part"
+         k = "nt" || k = "t" || k = "g" || k = "gt" || k = "part" || k = "split"
+         || k = "n"
          || PlaceRename.occurrence_of_key k <> None
+         || String.length k > 2
+            && String.starts_with ~prefix:"st" k
+            && String.for_all
+                 (fun c -> c >= '0' && c <= '9')
+                 (String.sub k 2 (String.length k - 2))
          || String.length k > 1
             && (k.[0] = 't' || k.[0] = 'p')
             && String.for_all
@@ -1185,6 +1341,17 @@ let print_ok conf base =
           print_result Places conf (PlaceRename.apply conf base items);
           Output.printf conf "<p><a href=\"%s\">%s</a></p>\n" (groups_href conf)
             (Utf8.capitalize_fst (transl conf "places to complete")))
+  | _ when p_getenv conf.env "split" = Some "on" ->
+      (* recomputed: the base may have changed since the preview *)
+      let items =
+        PlaceSplit.plan conf base (split_selected conf base)
+        |> List.filter (fun (it : PlaceRename.item) ->
+            p_getenv conf.env (PlaceRename.place_key it.istr) = Some "on")
+      in
+      print_result Places conf (PlaceRename.apply conf base items);
+      Output.printf conf "<p><a href=\"%s&n=%d\">%s</a></p>\n" (split_href conf)
+        (split_min_uses conf)
+        (Utf8.capitalize_fst (transl conf "terms to split"))
   | (_ :: _ as terms), Some nt ->
       let nt = PlaceTerms.clean_term nt in
       if not (PlaceRename.valid_new_term nt) then invalid_new_term conf terms nt

@@ -18614,6 +18614,26 @@ de: nicht ändern
 en: do not modify
 fr: ne pas modifier
 
+    terms to split
+de: zu trennende Begriffe
+en: terms to split
+fr: termes à séparer
+
+    terms to split help
+de: Begriffe, die mit einem häufigen Begriff enden, ohne Komma: „Montréal Canada“ → „Montréal, Canada“. Die Vorschläge, deren erster Teil bereits ein Begriff der Datenbank ist, sind angekreuzt.
+en: Terms ending with a frequent term, without a comma: “Montréal Canada” → “Montréal, Canada”. The proposals whose first part is already a term of the base are checked.
+fr: Termes se terminant par un terme fréquent, sans virgule : « Montréal Canada » → « Montréal, Canada ». Les propositions dont la première partie est déjà un terme de la base sont cochées.
+
+    frequent terms: minimum uses
+de: häufige Begriffe: Mindestanzahl der Verwendungen
+en: frequent terms: minimum uses
+fr: termes fréquents : nombre minimal d'utilisations
+
+    known term
+de: bekannter Begriff
+en: known term
+fr: terme connu
+
     new occupation
 de: neuer Beruf
 en: new occupation

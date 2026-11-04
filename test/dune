@@ -8,6 +8,7 @@
   place_rename_test
   source_test
   occu_test
+  place_split_test
   calendar_test
   wiki_test
   merge_test
