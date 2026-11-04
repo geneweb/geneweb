@@ -143,12 +143,13 @@ let get_request strm =
 
 let get_request_and_content strm =
   let request = get_request strm in
+  let max_allowed_content_length = 64 * 1024 * 1024 in
   let content =
     match
       Option.bind (Http.Header.get ~request "content-length") int_of_string_opt
     with
     | None -> ""
-    | Some len when len <= 0 || len > Sys.max_string_length -> ""
+    | Some len when len <= 0 || len > max_allowed_content_length -> ""
     | Some len -> (
         try String.init len (fun _ -> Stream.next strm)
         with Stream.Failure -> "")
