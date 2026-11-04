@@ -55,11 +55,29 @@ let test_clusters () =
        (fun (t, l) -> (t, List.map fst l))
        (OccuTerms.samples d [ "laboureur " ] 5))
 
+(* a single spelling is a cluster when it has spaces at both ends or
+   invisible characters, to clean it *)
+let test_unclean () =
+  let d =
+    List.mapi
+      (fun i raw ->
+        (Geneweb_db.Driver.Istr.of_string (string_of_int i), raw, 1))
+      [ "notaire "; "cur\u{200B}\u{e9}"; "meunier" ]
+  in
+  (check (list (list string)))
+    "unclean singles"
+    [ [ "cur\u{200B}\u{e9}" ]; [ "notaire " ] ]
+    (List.map
+       (fun (c : OccuTerms.cluster) ->
+         List.map (fun (sp : SourceTerms.spelling) -> sp.text) c.spellings)
+       (OccuTerms.clusters d))
+
 let v =
   [
     ( "occu-terms",
       [
         test_case "spans" `Quick test_spans;
         test_case "clusters" `Quick test_clusters;
+        test_case "unclean singles" `Quick test_unclean;
       ] );
   ]

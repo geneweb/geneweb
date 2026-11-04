@@ -1527,6 +1527,15 @@ let make_highlight_html s highlight_info error_type conf =
   in
   process_char 0
 
+let invisible_html conf s =
+  let pos =
+    List.sort_uniq compare
+      (List.rev_append
+         (find_invisible_positions s)
+         (find_non_breaking_space_positions s))
+  in
+  make_highlight_html s (SimplePositions pos) InvisibleCharacters conf
+
 let first_word s =
   let len = String.length s in
   let rec skip i = if i < len && s.[i] = ' ' then skip (i + 1) else i in

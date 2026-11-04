@@ -15,11 +15,16 @@ let nb_max conf =
       match int_of_string_opt n with Some n when n > 0 -> n | _ -> 1000)
   | None -> 1000
 
+(* [s] escaped, its invisible characters and the spaces at both ends marked as
+   in m=CHK_DATA, so that "Canada", " Canada" and "Canada " can be told apart *)
+let vis conf s =
+  "<span class=\"inv-hl\">" ^ CheckData.invisible_html conf s ^ "</span>"
+
 let utf8_prefix n s = if Utf8.length s <= n then s else Utf8.sub s 0 n
 
 let term_link conf t =
   Printf.sprintf "<a href=\"%sm=PLACE_TERMS&t=%s\">%s</a>" (prefix conf) (enc t)
-    (esc t)
+    (vis conf t)
 
 let place_edit_link conf raw =
   Printf.sprintf
@@ -32,16 +37,17 @@ let place_edit_link conf raw =
 
 (* [term] rendered inside its context, child first: "Term, Parent, Root" or
    "[Term] – Parent, Root" for a suburb. *)
-let context_html (e : PlaceTerms.entry) (c : PlaceTerms.context) =
-  let parents = String.concat ", " (List.rev_map esc c.parents) in
-  let t = "<strong>" ^ esc e.term ^ "</strong>" in
+let context_html conf (e : PlaceTerms.entry) (c : PlaceTerms.context) =
+  let parents = String.concat ", " (List.rev_map (vis conf) c.parents) in
+  let t = "<strong>" ^ vis conf e.term ^ "</strong>" in
   if c.suburb then
     Printf.sprintf "[%s]%s" t (if parents = "" then "" else " – " ^ parents)
   else if parents = "" then t
   else t ^ ", " ^ parents
 
 (* the raw place with the occurrence of the term in this context marked *)
-let mark_html inverted (e : PlaceTerms.entry) (c : PlaceTerms.context) raw =
+let mark_html conf inverted (e : PlaceTerms.entry) (c : PlaceTerms.context) raw
+    =
   let comps = Place.components inverted raw in
   let target =
     if c.suburb then List.find_opt (fun (x : Place.component) -> x.suburb) comps
@@ -52,10 +58,10 @@ let mark_html inverted (e : PlaceTerms.entry) (c : PlaceTerms.context) raw =
   match target with
   | Some x when x.text = e.term ->
       let n = String.length raw in
-      esc (String.sub raw 0 x.pos)
-      ^ "<mark>" ^ esc x.text ^ "</mark>"
-      ^ esc (String.sub raw (x.pos + x.len) (n - x.pos - x.len))
-  | _ -> esc raw
+      vis conf (String.sub raw 0 x.pos)
+      ^ "<mark>" ^ vis conf x.text ^ "</mark>"
+      ^ vis conf (String.sub raw (x.pos + x.len) (n - x.pos - x.len))
+  | Some _ | None -> vis conf raw
 
 let variants_of entries =
   let h = Hashtbl.create 1024 in
@@ -209,7 +215,7 @@ let print_contexts conf (e : PlaceTerms.entry) ~first ~cls =
          class=\"form-check-input ctx-all%s me-2\" data-ctx=\"%d\" checked>%s \
          <span class=\"badge bg-secondary\">%d · %d</span>%s</div>\n\
          <ul class=\"list-unstyled ms-3\">\n"
-        cls ci (context_html e c) (List.length c.places) c.c_uses
+        cls ci (context_html conf e c) (List.length c.places) c.c_uses
         (if c.suburb then
            " <span class=\"badge bg-info\">"
            ^ esc (transl conf "subdivision")
@@ -223,7 +229,7 @@ let print_contexts conf (e : PlaceTerms.entry) ~first ~cls =
              class=\"text-muted\">(%d)</span>%s</li>\n"
             ci cls
             (PlaceRename.occurrence_key (p.istr, depth))
-            (mark_html inverted e c p.raw)
+            (mark_html conf inverted e c p.raw)
             p.uses
             (place_edit_link conf p.raw))
         c.places;
@@ -243,8 +249,8 @@ let print_term conf entries t =
         (Utf8.capitalize_fst (transl conf "not found"))
         (esc t)
   | Some e ->
-      Output.printf conf "<h2 class=\"h3\">%s</h2>\n<p>%s</p>\n" (esc e.term)
-        (counts_html conf e);
+      Output.printf conf "<h2 class=\"h3\">%s</h2>\n<p>%s</p>\n"
+        (vis conf e.term) (counts_html conf e);
       (match variants_of entries e with
       | [] -> ()
       | l ->
@@ -332,7 +338,7 @@ let print_cluster conf entries key =
             (keep_row conf i ~value:e.term ~checked:(i = 0)
                (Printf.sprintf
                   "<code>%s</code> <span class=\"text-muted\">(%d)</span>"
-                  (esc e.term) e.uses)))
+                  (vis conf e.term) e.uses)))
         l;
       Output.printf conf
         "<div class=\"form-check d-flex align-items-center gap-2\"><input \
@@ -377,13 +383,26 @@ let new_term_of_env conf =
 
 (* ---- rename: preview and apply ---- *)
 
-(* [s] escaped, with the parts between \001 and \002 marked *)
-let marked s =
-  esc s
-  |> String.split_on_char '\001'
-  |> String.concat "<mark>"
-  |> String.split_on_char '\002'
-  |> String.concat "</mark>"
+(* [s] rendered with [vis], the parts between \001 and \002 marked; the
+   markers are cut before [vis], which would show them as invisible
+   characters *)
+let marked conf s =
+  match String.split_on_char '\001' s with
+  | [] -> ""
+  | first :: rest ->
+      vis conf first
+      ^ String.concat ""
+          (List.map
+             (fun part ->
+               match String.index_opt part '\002' with
+               | Some j ->
+                   "<mark>"
+                   ^ vis conf (String.sub part 0 j)
+                   ^ "</mark>"
+                   ^ vis conf
+                       (String.sub part (j + 1) (String.length part - j - 1))
+               | None -> vis conf part)
+             rest)
 
 let mark_terms conf terms depths raw =
   let inverted = Place.places_inverted conf in
@@ -392,8 +411,8 @@ let mark_terms conf terms depths raw =
       (fun t -> "\001" ^ t ^ "\002")
       raw depths
   with
-  | Some s -> marked s
-  | None -> esc raw
+  | Some s -> marked conf s
+  | None -> vis conf raw
 
 let kind_html section conf base (k : PlaceRename.kind) =
   let badge cls txt =
@@ -667,7 +686,7 @@ let src_part conf =
     (Option.bind (p_getenv conf.env "part") SourceTerms.part_of_string)
 
 (* [raw] escaped, with [spans] marked *)
-let mark_spans raw (spans : SourceTerms.span list) =
+let mark_spans conf raw (spans : SourceTerms.span list) =
   let spans =
     List.sort (fun (a : SourceTerms.span) b -> compare a.pos b.pos) spans
   in
@@ -677,17 +696,18 @@ let mark_spans raw (spans : SourceTerms.span list) =
       (fun i (sp : SourceTerms.span) ->
         if sp.pos < i then i
         else (
-          Buffer.add_string buf (esc (String.sub raw i (sp.pos - i)));
-          Buffer.add_string buf ("<mark>" ^ esc sp.text ^ "</mark>");
+          Buffer.add_string buf (vis conf (String.sub raw i (sp.pos - i)));
+          Buffer.add_string buf ("<mark>" ^ vis conf sp.text ^ "</mark>");
           sp.pos + sp.len))
       0 spans
   in
-  Buffer.add_string buf (esc (String.sub raw last (String.length raw - last)));
+  Buffer.add_string buf
+    (vis conf (String.sub raw last (String.length raw - last)));
   Buffer.contents buf
 
-let spelling_html (sp : SourceTerms.spelling) =
+let spelling_html conf (sp : SourceTerms.spelling) =
   Printf.sprintf "<code>%s</code> <span class=\"text-muted\">(%d · %d)</span>"
-    (esc sp.text) sp.strings sp.uses
+    (vis conf sp.text) sp.strings sp.uses
 
 let src_cluster_href conf (c : SourceTerms.cluster) =
   Printf.sprintf "%s&c=%s" (src_href conf c.part) (enc c.ckey)
@@ -749,7 +769,7 @@ let print_src_clusters conf base =
         Output.printf conf
           "<tr><td>%s</td><td class=\"text-end\">%d</td><td><a \
            href=\"%s\">%s</a></td></tr>\n"
-          (String.concat "<br>" (List.map spelling_html c.spellings))
+          (String.concat "<br>" (List.map (spelling_html conf) c.spellings))
           c.total (src_cluster_href conf c)
           (esc (Utf8.capitalize_fst (transl conf "merge spellings"))))
       selected;
@@ -770,7 +790,7 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
   List.iteri
     (fun i (sp : SourceTerms.spelling) ->
       Output.print_sstring conf
-        (keep_row conf i ~value:sp.text ~checked:(i = 0) (spelling_html sp)))
+        (keep_row conf i ~value:sp.text ~checked:(i = 0) (spelling_html conf sp)))
     spellings;
   Output.printf conf
     "<div class=\"form-check d-flex align-items-center gap-2\"><input \
@@ -790,10 +810,10 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
          class=\"form-check-input me-2\" id=\"spt%d\" name=\"t%d\" \
          value=\"%s\" checked>%s</h3>\n\
          <ul class=\"small ms-3\">\n"
-        i (i + 1) (esc sp.text) (spelling_html sp);
+        i (i + 1) (esc sp.text) (spelling_html conf sp);
       List.iter
         (fun (raw, spans) ->
-          Output.printf conf "<li>%s</li>\n" (mark_spans raw spans))
+          Output.printf conf "<li>%s</li>\n" (mark_spans conf raw spans))
         (Option.value ~default:[] (List.assoc_opt sp.text samples));
       Output.print_sstring conf "</ul>\n")
     spellings;
@@ -873,7 +893,7 @@ let print_spans_preview conf base section ~m ~hidden ~back ~plural u terms nt
           Output.printf conf
             "<tr><td>%s</td><td>→</td><td>%s</td><td class=\"text-end \
              text-muted\">%d</td><td>%s</td></tr>\n"
-            (mark_spans it.old_s spans)
+            (mark_spans conf it.old_s spans)
             (esc it.new_s)
             (PlaceRename.uses u it.istr)
             (kind_html section conf base it.kind))
@@ -959,7 +979,7 @@ let print_occu_clusters conf base =
         Output.printf conf
           "<tr><td>%s</td><td class=\"text-end\">%d</td><td><a \
            href=\"%s&c=%s\">%s</a></td></tr>\n"
-          (String.concat "<br>" (List.map spelling_html c.spellings))
+          (String.concat "<br>" (List.map (spelling_html conf) c.spellings))
           c.total (occu_href conf) (enc c.ckey)
           (esc (Utf8.capitalize_fst (transl conf "merge spellings"))))
       selected;

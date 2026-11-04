@@ -82,7 +82,8 @@ val load : Config.config -> Geneweb_db.Driver.base -> data
 val of_strings : (Geneweb_db.Driver.istr * string * int) list -> data
 
 val clusters : data -> part -> cluster list
-(** The clusters of two spellings or more, by decreasing uses. *)
+(** The clusters of two spellings or more, and the single spellings that are not
+    {!PlaceTerms.is_clean}, by decreasing uses. *)
 
 val samples :
   data ->

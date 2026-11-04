@@ -445,6 +445,24 @@ td .rm-cell {
   max-height: 1.4em;
 }
 
+/* invisible characters shown as in CHK_DATA (places, sources, occupations to
+   group) */
+.inv-hl {
+  white-space: pre-wrap;
+}
+
+.inv-hl .ic, .inv-hl .zw {
+  background-color: #ffeb3b;
+  border-bottom: 1px dashed #e65100;
+  border-right: 1px dashed #e65100;
+}
+
+.inv-hl .zw {
+  display: inline-block;
+  min-width: 0.5em;
+  max-height: 1.4em;
+}
+
 #cd .err {
   display: flex;
   align-items: center;
