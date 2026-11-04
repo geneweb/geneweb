@@ -18654,6 +18654,16 @@ de: Orte anzeigen
 en: show the places
 fr: afficher les lieux
 
+    places to reorganize
+de: neu zu ordnende Orte
+en: places to reorganize
+fr: lieux à réorganiser
+
+    places to reorganize help
+de: Ein Ort gefolgt von seinen anderen Teilen in Klammern, darunter das Département, als Name oder Nummer: „Nantes (44) (Rue du Bocage)“ → „Rue du Bocage, Nantes, Loire-Atlantique“. Die Vorschläge, deren Ort bereits unter dem Département bekannt ist, sind angekreuzt.
+en: A town followed by its other parts in parentheses, the department among them, by its name or its code: “Nantes (44) (Rue du Bocage)” → “Rue du Bocage, Nantes, Loire-Atlantique”. The proposals whose town is already known under the department are checked.
+fr: Une ville suivie de ses autres parties entre parenthèses, dont le département, en nom ou en code : « Nantes (44) (Rue du Bocage) » → « Rue du Bocage, Nantes, Loire-Atlantique ». Les propositions dont la ville est déjà connue sous ce département sont cochées.
+
     known term
 de: bekannter Begriff
 en: known term

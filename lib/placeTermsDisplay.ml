@@ -375,6 +375,43 @@ let print_term conf entries t =
 
 (* ---- clusters of spellings ---- *)
 
+(* ---- the places of a page of the book of places ---- *)
+
+(* [ps]: the beginning of the places of a page of m=MOD_DATA&data=place (its
+   [s]), selected as that page does *)
+let page_prefix conf =
+  match p_getenv_notrim conf.env "ps" with
+  | Some s when s <> "" -> Some s
+  | Some _ | None -> None
+
+let page_param conf =
+  match page_prefix conf with Some s -> "&ps=" ^ enc s | None -> ""
+
+let hidden_page conf =
+  match page_prefix conf with
+  | Some s -> Util.hidden_input_s conf "ps" s
+  | None -> ()
+
+(* the places used, those of the page only when [ps] is given *)
+let page_places conf base =
+  let places =
+    PlaceTerms.place_uses conf base
+    |> List.map (fun (istr, uses) -> (istr, Driver.sou base istr, uses))
+  in
+  match page_prefix conf with
+  | None -> places
+  | Some s ->
+      List.filter
+        (fun (_, raw, _) ->
+          String.starts_with ~prefix:s (Place.without_suburb raw))
+        places
+
+let page_entries conf base =
+  match page_prefix conf with
+  | None -> PlaceTerms.build conf base
+  | Some _ ->
+      PlaceTerms.of_places (Place.places_inverted conf) (page_places conf base)
+
 (* the slice of a long list shown: rows [from] to [upto] (1-based), from the
    fields [from] and [to], 100 rows by default *)
 let page_size = 100
@@ -434,9 +471,10 @@ let print_clusters conf entries =
   if total = 0 then Output.print_sstring conf "<p>0</p>\n"
   else
     print_slice conf
-      ~href:(prefix conf ^ "m=PLACE_TERMS")
+      ~href:(prefix conf ^ "m=PLACE_TERMS" ^ page_param conf)
       ~hidden:(fun () ->
-        Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS"))
+        Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+        hidden_page conf)
       total (from, upto);
   if clusters <> [] then (
     Output.printf conf
@@ -773,7 +811,8 @@ let print_preview conf base terms nt =
 
 (* ---- terms to split ---- *)
 
-let split_href conf = Printf.sprintf "%sm=PLACE_TERMS&split=on" (prefix conf)
+let split_href conf =
+  Printf.sprintf "%sm=PLACE_TERMS&split=on%s" (prefix conf) (page_param conf)
 
 let split_min_uses conf =
   match p_getint conf.env "n" with
@@ -801,12 +840,12 @@ let split_terms_of_env conf =
 
 let split_selected conf base =
   let terms = split_terms_of_env conf in
-  PlaceSplit.proposals ~min_uses:(split_min_uses conf)
-    (PlaceTerms.build conf base)
+  PlaceSplit.proposals ~min_uses:(split_min_uses conf) (page_entries conf base)
   |> List.filter (fun (p : PlaceSplit.proposal) -> List.mem p.entry.term terms)
 
 let split_hidden conf terms =
   Util.hidden_input conf "split" (Adef.encoded "on");
+  hidden_page conf;
   Util.hidden_input conf "n"
     (Adef.encoded (string_of_int (split_min_uses conf)));
   List.iteri
@@ -815,7 +854,7 @@ let split_hidden conf terms =
 
 let print_split_list conf base =
   let min_uses = split_min_uses conf in
-  let proposals = PlaceSplit.proposals ~min_uses (PlaceTerms.build conf base) in
+  let proposals = PlaceSplit.proposals ~min_uses (page_entries conf base) in
   Output.printf conf "<p>%s</p>\n"
     (Utf8.capitalize_fst (transl conf "terms to split help"));
   (* the threshold of the frequent terms *)
@@ -826,6 +865,7 @@ let print_split_list conf base =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
   Util.hidden_input conf "split" (Adef.encoded "on");
+  hidden_page conf;
   Output.printf conf
     "<label for=\"n\" class=\"text-nowrap\">%s</label>\n\
      <input type=\"number\" class=\"form-control form-control-sm w-auto\" \
@@ -848,6 +888,7 @@ let print_split_list conf base =
     Util.hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
     Util.hidden_input conf "split" (Adef.encoded "on");
+    hidden_page conf;
     Util.hidden_input conf "n" (Adef.encoded (string_of_int min_uses));
     Output.printf conf
       "<button type=\"submit\" class=\"btn btn-primary my-2\">%s</button>\n"
@@ -922,7 +963,8 @@ let print_split_preview conf base =
 
 (* ---- terms to join ---- *)
 
-let join_href conf = Printf.sprintf "%sm=PLACE_TERMS&join=on" (prefix conf)
+let join_href conf =
+  Printf.sprintf "%sm=PLACE_TERMS&join=on%s" (prefix conf) (page_param conf)
 
 let join_min_uses conf =
   match p_getint conf.env "n" with
@@ -952,9 +994,7 @@ let numbered_values conf prefix =
 let join_all conf base =
   PlaceJoin.proposals ~min_uses:(join_min_uses conf)
     (Place.places_inverted conf)
-    (PlaceTerms.build conf base)
-    (PlaceTerms.place_uses conf base
-    |> List.map (fun (istr, uses) -> (istr, Driver.sou base istr, uses)))
+    (page_entries conf base) (page_places conf base)
 
 let join_selected conf base =
   let keys = numbered_values conf "jt" in
@@ -973,6 +1013,7 @@ let print_join_list conf base =
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
   Util.hidden_input conf "join" (Adef.encoded "on");
+  hidden_page conf;
   Output.printf conf
     "<label for=\"n\" class=\"text-nowrap\">%s</label>\n\
      <input type=\"number\" class=\"form-control form-control-sm w-auto\" \
@@ -995,6 +1036,7 @@ let print_join_list conf base =
     Util.hidden_env conf;
     Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
     Util.hidden_input conf "join" (Adef.encoded "on");
+    hidden_page conf;
     Util.hidden_input conf "n" (Adef.encoded (string_of_int min_uses));
     let button () =
       Output.printf conf
@@ -1052,6 +1094,7 @@ let print_join_preview conf base =
     print_plan conf base (PlaceRename.usage base) items
       ~hidden:(fun () ->
         Util.hidden_input conf "join" (Adef.encoded "on");
+        hidden_page conf;
         Util.hidden_input conf "n"
           (Adef.encoded (string_of_int (join_min_uses conf)));
         List.iteri
@@ -1059,6 +1102,135 @@ let print_join_preview conf base =
             Util.hidden_input_s conf (Printf.sprintf "jt%d" (i + 1)) p.pkey)
           selected)
       ~back:(join_href conf)
+      ~old_html:(fun (it : PlaceRename.item) -> vis conf it.old_s)
+
+(* ---- places to reorganize ---- *)
+
+let reorg_href conf =
+  Printf.sprintf "%sm=PLACE_TERMS&reorg=on%s" (prefix conf) (page_param conf)
+
+let reorg_format conf =
+  match p_getenv conf.env "fmt" with
+  | Some "p" -> PlaceReorg.Parens
+  | Some _ | None -> PlaceReorg.Commas
+
+let reorg_all conf base =
+  let places = page_places conf base in
+  PlaceReorg.proposals (reorg_format conf)
+    (PlaceTerms.of_places (Place.places_inverted conf) places)
+    places
+
+let reorg_key istr = "ro" ^ Driver.Istr.to_string istr
+
+let reorg_selected conf base =
+  reorg_all conf base
+  |> List.filter (fun (p : PlaceReorg.proposal) ->
+      p_getenv conf.env (reorg_key p.istr) = Some "on")
+
+let reorg_hidden conf =
+  Util.hidden_input conf "reorg" (Adef.encoded "on");
+  Util.hidden_input conf "fmt"
+    (Adef.encoded
+       (match reorg_format conf with
+       | PlaceReorg.Parens -> "p"
+       | PlaceReorg.Commas -> "c"));
+  hidden_page conf
+
+let print_reorg_list conf base =
+  let all = reorg_all conf base in
+  let total = List.length all in
+  Output.printf conf "<p>%s</p>\n"
+    (Utf8.capitalize_fst (transl conf "places to reorganize help"));
+  (* the format of the new places *)
+  Output.printf conf
+    "<form method=\"get\" action=\"%s\" class=\"d-flex flex-wrap \
+     align-items-center gap-3 my-2\">\n"
+    conf.command;
+  Util.hidden_env conf;
+  Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+  Util.hidden_input conf "reorg" (Adef.encoded "on");
+  hidden_page conf;
+  let radio v label checked =
+    Output.printf conf
+      "<div class=\"form-check\"><input class=\"form-check-input\" \
+       type=\"radio\" name=\"fmt\" id=\"fmt%s\" value=\"%s\"%s><label \
+       class=\"form-check-label\" for=\"fmt%s\"><code>%s</code></label></div>\n"
+      v v
+      (if checked then " checked" else "")
+      v label
+  in
+  let parens = reorg_format conf = PlaceReorg.Parens in
+  radio "c" "2ème canton, Nantes, Loire-Atlantique" (not parens);
+  radio "p" "2ème canton, Nantes (Loire-Atlantique)" parens;
+  Output.print_sstring conf
+    "<button type=\"submit\" class=\"btn btn-sm btn-outline-secondary\"><i \
+     class=\"fa fa-arrows-rotate\"></i></button>\n\
+     </form>\n";
+  if total = 0 then Output.print_sstring conf "<p>0</p>\n"
+  else
+    let from, upto = slice conf total in
+    print_slice conf
+      ~href:(reorg_href conf ^ "&fmt=" ^ if parens then "p" else "c")
+      ~hidden:(fun () ->
+        Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+        reorg_hidden conf)
+      total (from, upto);
+    Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+    reorg_hidden conf;
+    let button () =
+      Output.printf conf
+        "<button type=\"submit\" class=\"btn btn-primary my-2\">%s</button>\n"
+        (Utf8.capitalize_fst (transl conf "preview of the changes"))
+    in
+    button ();
+    (* a proposal is checked when its town is known under its department *)
+    Output.print_sstring conf
+      "<table class=\"table table-sm\">\n\
+       <thead><tr><th><input type=\"checkbox\" class=\"form-check-input \
+       ctx-all\" data-ctx=\"r\"></th><th colspan=\"4\"></th></tr></thead>\n\
+       <tbody>\n";
+    List.iteri
+      (fun i (p : PlaceReorg.proposal) ->
+        if i >= from - 1 && i < upto then
+          Output.printf conf
+            "<tr><td><input type=\"checkbox\" class=\"form-check-input ctxr\" \
+             name=\"%s\" value=\"on\"%s></td><td>%s <span \
+             class=\"text-muted\">(%d)</span></td><td>→</td><td>%s</td><td>%s</td></tr>\n"
+            (reorg_key p.istr)
+            (if p.known then " checked" else "")
+            (vis conf p.raw) p.uses (vis conf p.new_s)
+            (if p.known then
+               "<span class=\"badge bg-success\">"
+               ^ esc (transl conf "known term")
+               ^ "</span>"
+             else ""))
+      all;
+    Output.print_sstring conf "</tbody></table>\n";
+    button ();
+    Output.print_sstring conf "</form>\n";
+    Output.print_sstring conf toggle_script
+
+let print_reorg_preview conf base =
+  let selected = reorg_selected conf base in
+  let items = PlaceReorg.plan base selected in
+  Output.printf conf "<h2 class=\"h3\">%s</h2>\n"
+    (Utf8.capitalize_fst (transl conf "preview of the changes"));
+  if items = [] then
+    Output.printf conf "<p>%s</p>\n<p><a href=\"%s\">%s</a></p>\n"
+      (Utf8.capitalize_fst (transl conf "no modification"))
+      (reorg_href conf)
+      (Utf8.capitalize_fst (transl conf "places to reorganize"))
+  else
+    print_plan conf base (PlaceRename.usage base) items
+      ~hidden:(fun () ->
+        reorg_hidden conf;
+        List.iter
+          (fun (p : PlaceReorg.proposal) ->
+            Util.hidden_input conf (reorg_key p.istr) (Adef.encoded "on"))
+          selected)
+      ~back:(reorg_href conf)
       ~old_html:(fun (it : PlaceRename.item) -> vis conf it.old_s)
 
 (* ---- places to complete ---- *)
@@ -1613,6 +1785,7 @@ let header section conf =
                "places to complete";
              link (split_href conf) "scissors" "terms to split";
              link (join_href conf) "link" "terms to join";
+             link (reorg_href conf) "shuffle" "places to reorganize";
            ]))
 
 let print conf base =
@@ -1631,6 +1804,16 @@ let print conf base =
   | _ when p_getenv conf.env "join" = Some "on" ->
       if numbered_values conf "jt" <> [] then print_join_preview conf base
       else print_join_list conf base
+  | _ when p_getenv conf.env "reorg" = Some "on" ->
+      if
+        List.exists
+          (fun (k, v) ->
+            String.length k > 2
+            && String.starts_with ~prefix:"ro" k
+            && (v : Adef.encoded_string :> string) = "on")
+          conf.env
+      then print_reorg_preview conf base
+      else print_reorg_list conf base
   | _ when nonempty "g" <> None ->
       print_group conf
         (PlaceGroups.build conf base)
@@ -1644,7 +1827,7 @@ let print conf base =
       | Some key, _, _ -> print_cluster conf (PlaceTerms.build conf base) key
       | None, Some t, _ -> print_term conf (PlaceTerms.build conf base) t
       | None, None, Some s -> print_list conf (PlaceTerms.build conf base) s
-      | None, None, None -> print_clusters conf (PlaceTerms.build conf base)));
+      | None, None, None -> print_clusters conf (page_entries conf base)));
   Hutil.trailer conf
 
 (* the fields of the confirmed form, to apply it again *)
@@ -1658,7 +1841,12 @@ let continue_form ~m conf =
     (List.filter
        (fun (k, _) ->
          k = "nt" || k = "t" || k = "g" || k = "gt" || k = "part" || k = "split"
-         || k = "join" || k = "n"
+         || k = "join" || k = "n" || k = "reorg" || k = "fmt" || k = "ps"
+         || String.length k > 2
+            && String.starts_with ~prefix:"ro" k
+            && String.for_all
+                 (fun c -> c >= '0' && c <= '9')
+                 (String.sub k 2 (String.length k - 2))
          || String.length k > 2
             && String.starts_with ~prefix:"jt" k
             && String.for_all
@@ -1736,6 +1924,17 @@ let print_ok conf base =
       Output.printf conf "<p><a href=\"%s&n=%d\">%s</a></p>\n" (split_href conf)
         (split_min_uses conf)
         (Utf8.capitalize_fst (transl conf "terms to split"))
+  | _ when p_getenv conf.env "reorg" = Some "on" ->
+      (* recomputed: the base may have changed since the preview *)
+      let items =
+        PlaceReorg.plan base (reorg_selected conf base)
+        |> List.filter (fun (it : PlaceRename.item) ->
+            p_getenv conf.env (PlaceRename.place_key it.istr) = Some "on")
+        |> apply_edits conf base
+      in
+      print_result Places conf (PlaceRename.apply conf base items);
+      Output.printf conf "<p><a href=\"%s\">%s</a></p>\n" (reorg_href conf)
+        (Utf8.capitalize_fst (transl conf "places to reorganize"))
   | _ when p_getenv conf.env "join" = Some "on" ->
       (* recomputed: the base may have changed since the preview *)
       let items =

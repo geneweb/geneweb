@@ -10,6 +10,7 @@
   occu_test
   place_split_test
   place_join_test
+  place_reorg_test
   calendar_test
   wiki_test
   merge_test
