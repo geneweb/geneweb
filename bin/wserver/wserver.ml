@@ -198,10 +198,10 @@ let treat_connection tmout callback addr fd =
             | Http.POST | Http.PUT | Http.PATCH -> raw_content
             | _ -> (
                 match req_line.query with
-                | Some q_str -> Adef.encoded q_str
+                | Some q_str -> Adef.encoded (Http.string_of_query q_str)
                 | None -> Adef.encoded "")
           in
-          (Some req_line.path, q)
+          (Some (Http.string_of_path req_line.path), q)
       | None -> (None, raw_content)
     in
     (raw_request, Option.value ~default:"" parsed_path, query_str)
