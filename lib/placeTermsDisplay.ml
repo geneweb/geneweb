@@ -217,38 +217,119 @@ let counts_html conf (e : PlaceTerms.entry) =
    with one checkbox per occurrence. Context checkboxes are numbered from
    [first]; [cls] is added to every checkbox (to check a whole term). Returns
    the next number. *)
-let print_contexts conf (e : PlaceTerms.entry) ~first ~cls =
+(* the field of the context [ci] of the term of the form field [t<ti>] ([t]
+   for [ti = 0]), when its places are not listed *)
+let context_key ti ci = Printf.sprintf "cx%d.%d" ti ci
+
+let context_of_key k =
+  let n = String.length k in
+  if n < 5 || not (String.starts_with ~prefix:"cx" k) then None
+  else
+    match String.index_opt k '.' with
+    | None -> None
+    | Some i -> (
+        match
+          ( int_of_string_opt (String.sub k 2 (i - 2)),
+            int_of_string_opt (String.sub k (i + 1) (n - i - 1)) )
+        with
+        | Some ti, Some ci when ti >= 0 && ci >= 0 -> Some (ti, ci)
+        | Some _, Some _ | Some _, None | None, Some _ | None, None -> None)
+
+(* the occurrences of the contexts checked without their places: every place
+   of each of them *)
+let context_occurrences conf base =
+  match
+    List.filter_map
+      (fun (k, v) ->
+        if (v : Adef.encoded_string :> string) = "on" then context_of_key k
+        else None)
+      conf.env
+  with
+  | [] -> []
+  | cxs ->
+      let entries = PlaceTerms.build conf base in
+      List.concat_map
+        (fun (ti, ci) ->
+          let t =
+            p_getenv_notrim conf.env
+              (if ti = 0 then "t" else "t" ^ string_of_int ti)
+          in
+          match
+            Option.bind t (fun t ->
+                List.find_opt (fun (e : PlaceTerms.entry) -> e.term = t) entries)
+          with
+          | None -> []
+          | Some e ->
+              let contexts = Array.of_list e.contexts in
+              if ci >= Array.length contexts then []
+              else
+                let c = contexts.(ci) in
+                let d =
+                  if c.suburb then None else Some (List.length c.parents)
+                in
+                List.map (fun (p : PlaceTerms.place) -> (p.istr, d)) c.places)
+        cxs
+
+(* the occurrences of a submitted term or cluster form *)
+let occurrences_of_form conf base =
+  List.sort_uniq compare
+    (List.rev_append
+       (PlaceRename.occurrences_of_env conf)
+       (context_occurrences conf base))
+
+(* The contexts of [e], each with a checkbox checking its places, the places
+   with one checkbox per occurrence. The places are only listed on request
+   ([detail=on]: they may be many, Roglo): otherwise the checkbox of a context
+   is a field of its own ([context_key]), the term being the form field
+   [t<ti>]. Context checkboxes are numbered from [first]; [cls] is added to
+   every checkbox (to check a whole term). Returns the next number. *)
+let print_contexts conf (e : PlaceTerms.entry) ~ti ~first ~cls =
   let inverted = Place.places_inverted conf in
+  let detail = p_getenv conf.env "detail" = Some "on" in
   List.iteri
-    (fun ci (c : PlaceTerms.context) ->
-      let ci = first + ci in
+    (fun lci (c : PlaceTerms.context) ->
+      let ci = first + lci in
       let depth = if c.suburb then None else Some (List.length c.parents) in
       Output.printf conf
         "<div class=\"h6 mt-3\"><input type=\"checkbox\" \
-         class=\"form-check-input ctx-all%s me-2\" data-ctx=\"%d\" checked>%s \
-         <span class=\"badge bg-secondary\">%d · %d</span>%s</div>\n\
-         <ul class=\"list-unstyled ms-3\">\n"
-        cls ci (context_html conf e c) (List.length c.places) c.c_uses
+         class=\"form-check-input ctx-all%s me-2\" data-ctx=\"%d\"%s \
+         checked>%s <span class=\"badge bg-secondary\">%d · %d</span>%s</div>\n"
+        cls ci
+        (if detail then ""
+         else Printf.sprintf " name=\"%s\" value=\"on\"" (context_key ti lci))
+        (context_html conf e c) (List.length c.places) c.c_uses
         (if c.suburb then
            " <span class=\"badge bg-info\">"
            ^ esc (transl conf "subdivision")
            ^ "</span>"
          else "");
-      List.iter
-        (fun (p : PlaceTerms.place) ->
-          Output.printf conf
-            "<li><input type=\"checkbox\" class=\"form-check-input ctx%d%s \
-             me-2\" name=\"%s\" value=\"on\" checked>%s <span \
-             class=\"text-muted\">(%d)</span>%s</li>\n"
-            ci cls
-            (PlaceRename.occurrence_key (p.istr, depth))
-            (mark_html conf inverted e c p.raw)
-            p.uses
-            (place_edit_link conf p.raw))
-        c.places;
-      Output.print_sstring conf "</ul>\n")
+      if detail then (
+        Output.print_sstring conf "<ul class=\"list-unstyled ms-3\">\n";
+        List.iter
+          (fun (p : PlaceTerms.place) ->
+            Output.printf conf
+              "<li><input type=\"checkbox\" class=\"form-check-input ctx%d%s \
+               me-2\" name=\"%s\" value=\"on\" checked>%s <span \
+               class=\"text-muted\">(%d)</span>%s</li>\n"
+              ci cls
+              (PlaceRename.occurrence_key (p.istr, depth))
+              (mark_html conf inverted e c p.raw)
+              p.uses
+              (place_edit_link conf p.raw))
+          c.places;
+        Output.print_sstring conf "</ul>\n"))
     e.contexts;
   first + List.length e.contexts
+
+(* the link to the same page with the places listed *)
+let detail_link conf href =
+  if p_getenv conf.env "detail" = Some "on" then ()
+  else
+    Output.printf conf
+      "<p><a class=\"btn btn-sm btn-outline-secondary\" \
+       href=\"%s&detail=on\">%s</a></p>\n"
+      href
+      (esc (Utf8.capitalize_fst (transl conf "show the places")))
 
 let open_form ?(m = "PLACE_TERMS") conf =
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
@@ -286,15 +367,77 @@ let print_term conf entries t =
         (Utf8.capitalize_fst (transl conf "rename this term"))
         (esc e.term)
         (Utf8.capitalize_fst (transl conf "preview of the changes"));
-      ignore (print_contexts conf e ~first:0 ~cls:"" : int);
+      detail_link conf
+        (Printf.sprintf "%sm=PLACE_TERMS&t=%s" (prefix conf) (enc e.term));
+      ignore (print_contexts conf e ~ti:0 ~first:0 ~cls:"" : int);
       Output.print_sstring conf "</form>\n";
       Output.print_sstring conf toggle_script
 
 (* ---- clusters of spellings ---- *)
 
+(* the slice of a long list shown: rows [from] to [upto] (1-based), from the
+   fields [from] and [to], 100 rows by default *)
+let page_size = 100
+
+let slice conf total =
+  let from =
+    match p_getint conf.env "from" with
+    | Some n when n >= 1 -> n
+    | Some _ | None -> 1
+  in
+  let upto =
+    match p_getint conf.env "to" with
+    | Some n when n >= from -> n
+    | Some _ | None -> from + page_size - 1
+  in
+  (from, min upto total)
+
+(* the form choosing the rows [from] to [upto] of [total], with the links to
+   the previous and next slices; [href] is the page without the slice *)
+let print_slice conf ~href ~hidden total (from, upto) =
+  let n = upto - from + 1 in
+  let link label f =
+    Printf.sprintf
+      "<a class=\"btn btn-sm btn-outline-primary\" \
+       href=\"%s&from=%d&to=%d\">%s</a>"
+      href f
+      (min total (f + n - 1))
+      (esc (Utf8.capitalize_fst label))
+  in
+  Output.printf conf
+    "<form method=\"get\" action=\"%s\" class=\"d-flex flex-wrap \
+     align-items-center gap-2 my-2\">\n"
+    conf.command;
+  Util.hidden_env conf;
+  hidden ();
+  if from > 1 then
+    Output.print_sstring conf (link (transl conf "previous") (max 1 (from - n)));
+  Output.printf conf
+    "<input type=\"number\" class=\"form-control form-control-sm w-auto\" \
+     min=\"1\" name=\"from\" value=\"%d\"> %s <input type=\"number\" \
+     class=\"form-control form-control-sm w-auto\" min=\"1\" name=\"to\" \
+     value=\"%d\"> / %d <button type=\"submit\" class=\"btn btn-sm \
+     btn-outline-secondary\"><i class=\"fa fa-arrows-rotate\"></i></button>\n"
+    from
+    (esc (transl conf "to"))
+    upto total;
+  if upto < total then
+    Output.print_sstring conf (link (transl conf "next") (upto + 1));
+  Output.print_sstring conf "</form>\n"
+
 let print_clusters conf entries =
-  let clusters = PlaceTerms.clusters entries in
-  Output.printf conf "<p>%d</p>\n" (List.length clusters);
+  let all = PlaceTerms.clusters entries in
+  let total = List.length all in
+  let from, upto = slice conf total in
+  (* the list is long on a large base (Roglo): only a slice is sent *)
+  let clusters = List.filteri (fun i _ -> i >= from - 1 && i < upto) all in
+  if total = 0 then Output.print_sstring conf "<p>0</p>\n"
+  else
+    print_slice conf
+      ~href:(prefix conf ^ "m=PLACE_TERMS")
+      ~hidden:(fun () ->
+        Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS"))
+      total (from, upto);
   if clusters <> [] then (
     Output.printf conf
       "<table class=\"table table-sm table-hover w-auto\">\n\
@@ -366,6 +509,7 @@ let print_cluster conf entries key =
         (Utf8.capitalize_fst (transl conf "other spelling"))
         (Utf8.capitalize_fst (transl conf "preview of the changes"));
       (* the spellings to merge: every occurrence of each spelling *)
+      detail_link conf (cluster_link conf key);
       ignore
         (List.fold_left
            (fun (i, first) (e : PlaceTerms.entry) ->
@@ -376,7 +520,8 @@ let print_cluster conf entries key =
                 small\">%s</span></h3>\n"
                i i (term_link conf e.term) (counts_html conf e);
              ( i + 1,
-               print_contexts conf e ~first ~cls:(Printf.sprintf " ctxt%d" i) ))
+               print_contexts conf e ~ti:(i + 1) ~first
+                 ~cls:(Printf.sprintf " ctxt%d" i) ))
            (0, 0) l
           : int * int);
       Output.print_sstring conf "</form>\n";
@@ -496,41 +641,79 @@ let apply_edits conf base items =
       { it with kind = PlaceRename.New_place })
   |> PlaceRename.classify base
 
-(* The preview of a plan: one checkbox per place, all checked; only the
-   checked places are changed by [m=PLACE_TERMS_OK]. The new place of each
-   item is an editable field, for a last correction ([apply_edits]). [hidden]
-   emits the fields describing the change, [old_html] renders the old place
-   of an item. *)
+(* The preview of a plan: a summary, and on request ([detail=on]) the list,
+   one checkbox per place, all checked; only the checked places are changed
+   by [m=PLACE_TERMS_OK]. In the list, the new place of each item is an
+   editable field, for a last correction ([apply_edits]). [hidden] emits the
+   fields describing the change, [old_html] renders the old place of an
+   item. *)
 let print_plan conf base u items ~hidden ~back ~old_html =
+  (* the list of the changes may be huge (Roglo): shown only when asked
+     ([detail=on]); otherwise a summary, the checked places carried by hidden
+     fields *)
+  let detail = p_getenv conf.env "detail" = Some "on" in
+  let merged =
+    List.length
+      (List.filter
+         (fun (it : PlaceRename.item) ->
+           match it.kind with
+           | PlaceRename.New_place -> false
+           | PlaceRename.Merge_existing _ | PlaceRename.Merge_batch -> true)
+         items)
+  in
+  let uses =
+    List.fold_left
+      (fun n (it : PlaceRename.item) -> n + PlaceRename.uses u it.istr)
+      0 items
+  in
+  Output.printf conf "<p>%s</p>\n"
+    (Utf8.capitalize_fst
+       (Printf.sprintf
+          (ftransl conf "%d places to change (%d merged), %d uses")
+          (List.length items) merged uses));
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS_OK");
   hidden ();
-  Output.print_sstring conf
-    "<table class=\"table table-sm\">\n\
-     <thead><tr><th><input type=\"checkbox\" class=\"form-check-input \
-     ctx-all\" data-ctx=\"0\" checked></th><th colspan=\"4\"></th></tr></thead>\n\
-     <tbody>\n";
-  List.iter
-    (fun (it : PlaceRename.item) ->
-      List.iter
-        (fun d ->
-          Util.hidden_input conf
-            (PlaceRename.occurrence_key (it.istr, d))
-            (Adef.encoded "on"))
-        it.depths;
-      Output.printf conf
-        "<tr><td><input type=\"checkbox\" class=\"form-check-input ctx0\" \
-         name=\"%s\" value=\"on\" checked></td><td>%s</td><td>→</td><td><input \
-         type=\"text\" class=\"form-control form-control-sm\" size=\"40\" \
-         name=\"%s\" value=\"%s\"></td><td class=\"text-end \
-         text-muted\">%d</td><td>%s</td></tr>\n"
-        (PlaceRename.place_key it.istr)
-        (old_html it) (edit_key it.istr) (esc it.new_s)
-        (PlaceRename.uses u it.istr)
-        (kind_html Places conf base it.kind))
-    items;
-  Output.print_sstring conf "</tbody></table>\n";
+  let occurrences (it : PlaceRename.item) =
+    List.iter
+      (fun d ->
+        Util.hidden_input conf
+          (PlaceRename.occurrence_key (it.istr, d))
+          (Adef.encoded "on"))
+      it.depths
+  in
+  if detail then (
+    Output.print_sstring conf
+      "<table class=\"table table-sm\">\n\
+       <thead><tr><th><input type=\"checkbox\" class=\"form-check-input \
+       ctx-all\" data-ctx=\"0\" checked></th><th \
+       colspan=\"4\"></th></tr></thead>\n\
+       <tbody>\n";
+    List.iter
+      (fun (it : PlaceRename.item) ->
+        occurrences it;
+        Output.printf conf
+          "<tr><td><input type=\"checkbox\" class=\"form-check-input ctx0\" \
+           name=\"%s\" value=\"on\" \
+           checked></td><td>%s</td><td>→</td><td><input type=\"text\" \
+           class=\"form-control form-control-sm\" size=\"40\" name=\"%s\" \
+           value=\"%s\"></td><td class=\"text-end \
+           text-muted\">%d</td><td>%s</td></tr>\n"
+          (PlaceRename.place_key it.istr)
+          (old_html it) (edit_key it.istr) (esc it.new_s)
+          (PlaceRename.uses u it.istr)
+          (kind_html Places conf base it.kind))
+      items;
+    Output.print_sstring conf "</tbody></table>\n")
+  else
+    List.iter
+      (fun (it : PlaceRename.item) ->
+        occurrences it;
+        Util.hidden_input conf
+          (PlaceRename.place_key it.istr)
+          (Adef.encoded "on"))
+      items;
   Output.printf conf
     "<button type=\"submit\" class=\"btn btn-primary\">%s</button> <a \
      class=\"btn btn-outline-secondary\" href=\"%s\">%s</a>\n\
@@ -538,7 +721,27 @@ let print_plan conf base u items ~hidden ~back ~old_html =
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
     back
     (Utf8.capitalize_fst (transl conf "cancel"));
-  Output.print_sstring conf toggle_script
+  if detail then Output.print_sstring conf toggle_script
+  else (
+    (* the same request again, with the list *)
+    Output.printf conf "<form method=\"post\" action=\"%s\" class=\"mt-3\">\n"
+      conf.command;
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+    List.iter
+      (fun (k, v) ->
+        if
+          k <> "m" && k <> "detail"
+          && (not (List.mem_assoc k conf.henv))
+          && not (List.mem_assoc k conf.senv)
+        then Util.hidden_input_s conf k (Mutil.gen_decode false v))
+      conf.env;
+    Util.hidden_input conf "detail" (Adef.encoded "on");
+    Output.printf conf
+      "<button type=\"submit\" class=\"btn btn-sm \
+       btn-outline-secondary\">%s</button>\n\
+       </form>\n"
+      (Utf8.capitalize_fst (transl conf "show the list of the changes")))
 
 let print_preview conf base terms nt =
   let nt = PlaceTerms.clean_term nt in
@@ -547,7 +750,7 @@ let print_preview conf base terms nt =
     let u = PlaceRename.usage base in
     let items =
       PlaceRename.plan conf base ~terms ~new_term:nt
-        (PlaceRename.occurrences_of_env conf)
+        (occurrences_of_form conf base)
     in
     Output.printf conf "<h2 class=\"h3\">%s</h2>\n<p>%s → <code>%s</code></p>\n"
       (Utf8.capitalize_fst (transl conf "preview of the changes"))

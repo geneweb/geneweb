@@ -41,6 +41,12 @@ let key t =
       match ordinal w with Some n -> string_of_int n ^ "e" | None -> w)
   |> String.concat " " |> Name.abbrev
 
+(* a word of [t] is an ordinal: "Paris 16e", "1er", "Paris XIVe" *)
+let has_ordinal t =
+  Name.lower (PlaceTerms.key_text t)
+  |> String.split_on_char ' '
+  |> List.exists (fun w -> w <> "" && ordinal w <> None)
+
 type place = {
   istr : Geneweb_db.Driver.istr;
   raw : string;
@@ -57,19 +63,23 @@ type proposal = {
 }
 
 (* key -> (uses of its terms, most used clean spelling, its uses), for the
-   terms of two words or more *)
+   numbered terms of two words or more; the base has too many erroneous terms
+   to take the others ("Bordeaux Gironde)" beside "Bordeaux, Gironde") *)
 let frequent_terms ~min_uses entries =
   let h = Hashtbl.create 1024 in
   List.iter
     (fun (e : PlaceTerms.entry) ->
       let k = key e.term in
-      if String.contains k ' ' then
+      if String.contains k ' ' && has_ordinal e.term then
         let total, best, best_uses =
           Option.value ~default:(0, "", -1) (Hashtbl.find_opt h k)
         in
         let best, best_uses =
-          if PlaceTerms.is_clean e.term && e.uses > best_uses then
-            (e.term, e.uses)
+          if
+            PlaceTerms.is_clean e.term
+            && PlaceRename.valid_new_term e.term
+            && e.uses > best_uses
+          then (e.term, e.uses)
           else (best, best_uses)
         in
         Hashtbl.replace h k (total + e.uses, best, best_uses))
@@ -105,7 +115,7 @@ let proposals ?(min_uses = default_min_uses) inverted entries places =
       let rec loop = function
         | (a : Place.component) :: (b :: rest' as rest) -> (
             match
-              if comma_between raw a b then
+              if comma_between raw a b && has_ordinal b.text then
                 Hashtbl.find_opt frequent (key (a.text ^ " " ^ b.text))
               else None
             with

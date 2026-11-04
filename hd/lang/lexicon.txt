@@ -19030,6 +19030,21 @@ de: Zwei aufeinanderfolgende Begriffe, die einen häufigen Begriff bilden: „Pa
 en: Two consecutive terms forming a frequent term: “Paris, 1er” → “Paris 1er”; or a term written with another numbering: “Paris XIVe” → “Paris 14e”.
 fr: Deux termes consécutifs formant un terme fréquent : « Paris, 1er » → « Paris 1er » ; ou un terme écrit avec une autre numérotation : « Paris XIVe » → « Paris 14e ».
 
+    %d places to change (%d merged), %d uses
+de: %d zu ändernde Orte (davon %d zusammengeführt), %d Verwendungen
+en: %d places to change (%d merged), %d uses
+fr: %d lieux à modifier (dont %d fusionnés), %d utilisations
+
+    show the list of the changes
+de: Liste der Änderungen anzeigen
+en: show the list of the changes
+fr: afficher la liste des modifications
+
+    show the places
+de: Orte anzeigen
+en: show the places
+fr: afficher les lieux
+
     known term
 de: bekannter Begriff
 en: known term
