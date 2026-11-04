@@ -192,6 +192,66 @@ let test_header_get () =
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.Header.get missing header" None
     (Http.Header.get ~request:req "Authorization")
+  [@@warning "-3"]
+
+let test_headers () =
+  let req =
+    [
+      "GET /base HTTP/1.1";
+      "Host: localhost:2317";
+      "Content-Type: application/x-www-form-urlencoded";
+      "User-Agent: Mozilla/5.0";
+    ]
+  in
+  let headers = Http.Headers.of_lines req in
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Headers.get content-type trimmed"
+    (Some "application/x-www-form-urlencoded")
+    (Http.Headers.get headers "content-type");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Headers.get case-insensitive" (Some "localhost:2317")
+    (Http.Headers.get headers "HOST");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Headers.get missing header" None
+    (Http.Headers.get headers "Authorization");
+  Geneweb_test_utils.Check.int ~pos:__POS__
+    ~msg:"Http.Headers.to_lines preserves count" (List.length req)
+    (List.length (Http.Headers.to_lines headers))
+
+let test_env () =
+  let empty = Http.Env.empty in
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.get empty" None (Http.Env.get empty "key");
+  Geneweb_test_utils.Check.int ~pos:__POS__ ~msg:"Http.Env.to_list empty" 0
+    (List.length (Http.Env.to_list empty));
+  let env =
+    Http.Env.of_list
+      [ ("k1", Adef.encoded "val1"); ("k2", Adef.encoded "val2") ]
+  in
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.get k1" (Some "val1") (Http.Env.get env "k1");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.get k2" (Some "val2") (Http.Env.get env "k2");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.get missing" None (Http.Env.get env "k3");
+  let url_env =
+    Http.Env.of_list
+      [ ("k1", Adef.encoded "url_v1"); ("k2", Adef.encoded "url_v2") ]
+  in
+  let body_env =
+    Http.Env.of_list
+      [ ("k2", Adef.encoded "body_v2"); ("k3", Adef.encoded "body_v3") ]
+  in
+  let merged = Http.Env.merge ~url_env ~body_env in
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.merge url priority" (Some "url_v1")
+    (Http.Env.get merged "k1");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.merge url overrides body" (Some "url_v2")
+    (Http.Env.get merged "k2");
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.Env.merge body retained" (Some "body_v3")
+    (Http.Env.get merged "k3")
 
 let test_parse_content_type () =
   let ct_multipart =
@@ -476,7 +536,13 @@ let v =
     ( "http-request-methods",
       [ Alcotest.test_case "method conversions" `Quick test_meth_conversion ] );
     ( "http-headers",
-      [ Alcotest.test_case "header extraction" `Quick test_header_get ] );
+      [
+        Alcotest.test_case "legacy header extraction" `Quick test_header_get;
+        Alcotest.test_case "typed headers extraction" `Quick test_headers;
+      ] );
+    ( "http-env",
+      [ Alcotest.test_case "env constructors and operations" `Quick test_env ]
+    );
     ( "http-request-line",
       [
         Alcotest.test_case "parse GET" `Quick test_parse_request_line_get;
