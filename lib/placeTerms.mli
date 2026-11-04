@@ -49,6 +49,10 @@ val clean_term : string -> string
     check_data fix of invisible characters), and no space or non-breaking space
     at both ends. *)
 
+val is_clean : string -> bool
+(** [is_clean s] is [clean_term s = s]: no invisible character, no space or
+    non-breaking space at both ends. *)
+
 val key_text : string -> string
 (** [clean_term], the non-breaking spaces inside replaced by spaces: the text
     the cluster keys are computed from. *)
@@ -61,5 +65,6 @@ val cluster_key : string -> string
 
 val clusters : entry list -> (string * entry list) list
 (** The clusters of spellings: entries grouped by [cluster], keeping the groups
-    of two terms or more. Each group is sorted by decreasing uses, the groups by
-    decreasing total uses. *)
+    of two terms or more, and the single terms that are not {!is_clean} (to
+    remove their invisible characters and spaces). Each group is sorted by
+    decreasing uses, the groups by decreasing total uses. *)

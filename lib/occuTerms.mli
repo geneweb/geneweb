@@ -34,7 +34,8 @@ val load : Geneweb_db.Driver.base -> data
 (** One pass over the persons, regardless of access rights (as m=MOD_DATA). *)
 
 val clusters : data -> cluster list
-(** The clusters of two spellings or more, by decreasing uses. *)
+(** The clusters of two spellings or more, and the single spellings that are not
+    {!PlaceTerms.is_clean}, by decreasing uses. *)
 
 val samples :
   data -> string list -> int -> (string * (string * span list) list) list
