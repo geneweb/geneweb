@@ -32,9 +32,12 @@ end
 (** Legacy HTTP header extraction utilities. *)
 module Header : sig
   val get : request:string list -> string -> string option
+    [@@ocaml.deprecated "Use Headers instead"]
   (** [get ~request name] looks up the first header value matching [name]
-      case-insensitively in the provided raw HTTP [request] headers. *)
+      case-insensitively in the provided raw HTTP [request] headers.
+      @deprecated Use {!Headers} instead. *)
 end
+[@@ocaml.deprecated "Use Headers instead"]
 
 (** Supported HTTP request methods. *)
 type meth =

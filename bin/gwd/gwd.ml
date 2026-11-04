@@ -1079,8 +1079,9 @@ let get_client_preferences request =
     |> Ext_string.split_on_char ','
     |> List.filter_map parse_client_preference
   in
+  let headers = Http.Headers.of_lines request in
   Option.fold ~none:[] ~some:parse_client_preferences
-    (Http.Header.get ~request "Prefer")
+    (Http.Headers.get headers "Prefer")
 
 let make_conf from_addr request script_name env =
   let utm = Unix.time () in
@@ -1293,10 +1294,11 @@ let log tm conf from gauth request script_name contents =
   let referer = Mutil.extract_param "referer: " '\n' request in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in
+  let headers = Http.Headers.of_lines request in
   let print_header_if_any header =
     Option.iter
       (Printf.fprintf oc "  %s: %s\n" header)
-      (Http.Header.get ~request header)
+      (Http.Headers.get headers header)
   in
   Printf.fprintf oc "%s (%d) %s?" (Ext_unix.sprintf_date tm) (Unix.getpid ())
     script_name;
@@ -1656,7 +1658,8 @@ let build_env request (contents : Adef.encoded_string) :
     | Some { query = Some q; _ } -> q
     | _ -> Http.query_of_string ""
   in
-  let content_type = Http.Header.get ~request "content-type" in
+  let headers = Http.Headers.of_lines request in
+  let content_type = Http.Headers.get headers "content-type" in
   let parsed_content_type = Option.map Http.parse_content_type content_type in
   let contents, body_env =
     match req_line with
