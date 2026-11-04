@@ -192,10 +192,33 @@ let proposals format entries places =
             c.parents)
         e.contexts)
     entries;
-  (* the ancestors of the department in the base stay above it *)
+  (* a term stays above the department when it is above it in most of its
+     uses ("France"); erroneous places ("Nantes, Loire-Atlantique, 3e
+     canton") are not enough *)
+  let above_uses = Hashtbl.create 4096 and dept_uses = Hashtbl.create 1024 in
+  let add h k n =
+    Hashtbl.replace h k (n + Option.value ~default:0 (Hashtbl.find_opt h k))
+  in
+  List.iter
+    (fun (e : PlaceTerms.entry) ->
+      add dept_uses e.cluster e.uses;
+      List.iter
+        (fun (c : PlaceTerms.context) ->
+          List.iter
+            (fun p ->
+              add above_uses (e.cluster, PlaceTerms.cluster_key p) c.c_uses)
+            c.parents)
+        e.contexts)
+    entries;
   let above dept t =
     default_above dept t
-    || Hashtbl.mem under (PlaceTerms.cluster_key dept, PlaceTerms.cluster_key t)
+    ||
+    let d = PlaceTerms.cluster_key dept in
+    let n =
+      Option.value ~default:0
+        (Hashtbl.find_opt above_uses (d, PlaceTerms.cluster_key t))
+    in
+    n > 0 && 2 * n >= Option.value ~default:0 (Hashtbl.find_opt dept_uses d)
   in
   List.filter_map
     (fun (istr, raw, uses) ->
