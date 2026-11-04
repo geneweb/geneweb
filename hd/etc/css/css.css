@@ -445,6 +445,15 @@ td .rm-cell {
   max-height: 1.4em;
 }
 
+/* places, sources, occupations to group: the spellings to keep, with the
+   "do not modify" checkboxes in a column */
+.keep-grid {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 1.5rem;
+  align-items: center;
+}
+
 /* invisible characters shown as in CHK_DATA (places, sources, occupations to
    group) */
 .inv-hl {

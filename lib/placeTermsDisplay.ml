@@ -157,24 +157,37 @@ document.querySelectorAll('.ctx-all').forEach(function (b) {
 </script>
 |}
 
-(* On a cluster page, the row of the spelling [i] to keep, with a checkbox
+(* On a cluster page, the row of the spelling [i] to keep (two cells of the
+   [keep-grid] opened by [keep_rows]), with a checkbox
    leaving that spelling unchanged ("Loiré" beside "Loire"): it is the
    inverse of the checkbox [spt<i>] in front of the occurrences of the
    spelling, kept in sync by [exclude_script]. *)
 let keep_row conf i ~value ~checked label =
+  let dnm = esc (transl conf "do not modify") in
   Printf.sprintf
-    "<div class=\"d-flex align-items-center gap-4\"><div \
-     class=\"form-check\"><input class=\"form-check-input\" type=\"radio\" \
-     name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
+    "<div class=\"form-check\"><input class=\"form-check-input\" \
+     type=\"radio\" name=\"ntc\" id=\"ntc%d\" value=\"%s\"%s><label \
      class=\"form-check-label\" for=\"ntc%d\">%s</label></div><div \
      class=\"form-check\"><input class=\"form-check-input sp-excl\" \
-     type=\"checkbox\" id=\"spx%d\" data-sp=\"spt%d\"><label \
-     class=\"form-check-label small text-muted\" \
-     for=\"spx%d\">%s</label></div></div>\n"
+     type=\"checkbox\" id=\"spx%d\" data-sp=\"spt%d\" \
+     aria-label=\"%s\">%s</div>\n"
     i (esc value)
     (if checked then " checked" else "")
-    i label i i i
-    (esc (transl conf "do not modify"))
+    i label i i dnm
+    (* the label only on the first row: the column is enough below *)
+    (if i = 0 then
+       Printf.sprintf
+         "<label class=\"form-check-label small text-muted\" \
+          for=\"spx%d\">%s</label>"
+         i dnm
+     else "")
+
+(* the rows of the spellings to keep, in a grid so that the checkboxes are in
+   a column *)
+let keep_rows conf rows =
+  Output.print_sstring conf "<div class=\"keep-grid\">\n";
+  List.iter (Output.print_sstring conf) rows;
+  Output.print_sstring conf "</div>\n"
 
 let exclude_script =
   {|<script>
@@ -332,14 +345,14 @@ let print_cluster conf entries key =
       Output.printf conf
         "<fieldset class=\"my-3\"><legend class=\"h5\">%s</legend>\n"
         (Utf8.capitalize_fst (transl conf "keep the spelling"));
-      List.iteri
-        (fun i (e : PlaceTerms.entry) ->
-          Output.print_sstring conf
-            (keep_row conf i ~value:e.term ~checked:(i = 0)
+      keep_rows conf
+        (List.mapi
+           (fun i (e : PlaceTerms.entry) ->
+             keep_row conf i ~value:e.term ~checked:(i = 0)
                (Printf.sprintf
                   "<code>%s</code> <span class=\"text-muted\">(%d)</span>"
-                  (vis conf e.term) e.uses)))
-        l;
+                  (vis conf e.term) e.uses))
+           l);
       Output.printf conf
         "<div class=\"form-check d-flex align-items-center gap-2\"><input \
          class=\"form-check-input\" type=\"radio\" name=\"ntc\" id=\"ntco\" \
@@ -787,11 +800,11 @@ let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
   Output.printf conf
     "<fieldset class=\"my-3\"><legend class=\"h5\">%s</legend>\n"
     (Utf8.capitalize_fst (transl conf "keep the spelling"));
-  List.iteri
-    (fun i (sp : SourceTerms.spelling) ->
-      Output.print_sstring conf
-        (keep_row conf i ~value:sp.text ~checked:(i = 0) (spelling_html conf sp)))
-    spellings;
+  keep_rows conf
+    (List.mapi
+       (fun i (sp : SourceTerms.spelling) ->
+         keep_row conf i ~value:sp.text ~checked:(i = 0) (spelling_html conf sp))
+       spellings);
   Output.printf conf
     "<div class=\"form-check d-flex align-items-center gap-2\"><input \
      class=\"form-check-input\" type=\"radio\" name=\"ntc\" id=\"ntco\" \
