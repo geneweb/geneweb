@@ -54,6 +54,7 @@ val proposals :
   proposal list
 (** The proposals for the [(istr, raw, uses)] places, [entries] being their
     terms (to know which towns are known under their department, and which terms
-    are above a department: they stay after it); sorted as the places. *)
+    are above a department in most of its uses: they stay after it); sorted as
+    the places. *)
 
 val plan : Geneweb_db.Driver.base -> proposal list -> PlaceRename.item list
