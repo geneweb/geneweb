@@ -71,8 +71,15 @@ let department s =
 let dept_name d = match d with Code n | Name n -> n
 let piece_text p = match p with Text t | Group t -> PlaceTerms.clean_term t
 
-(* the rest, the town, the department and the terms after it *)
-let analyse raw =
+(* above a department by default: the country *)
+let default_above _dept t = PlaceTerms.cluster_key t = "france"
+
+(* the rest, the town, the department and the terms above it. The department
+   may be written several times, as a code or a name ("Nantes, 44,
+   Loire-Atlantique"): once only. The other terms after the town are the rest
+   too ("Nantes (44), 4e canton, acte 180"), except those [above] the
+   department ("France"), kept after it. *)
+let analyse ?(above = default_above) raw =
   if String.contains raw '[' || String.contains raw ']' then None
   else
     match parse raw with
@@ -81,81 +88,74 @@ let analyse raw =
         match p0 with
         | Text head :: cands when PlaceTerms.clean_term head <> "" -> (
             let head = PlaceTerms.clean_term head in
-            let cands =
+            let texts l =
               List.filter_map
-                (fun p -> match piece_text p with "" -> None | t -> Some t)
-                cands
+                (fun t -> match t with "" -> None | t -> Some t)
+                l
             in
-            let depts = List.filter_map department cands in
-            let rest =
-              List.filter_map
-                (fun t ->
-                  match department t with
-                  | Some _ -> None
-                  | None -> (
-                      match clean_rest t with "" -> None | r -> Some r))
-                cands
-            in
+            let cands = texts (List.map piece_text cands) in
             let others =
-              List.filter_map
-                (fun part ->
-                  match
-                    PlaceTerms.clean_term
-                      (String.concat ""
-                         (List.map
-                            (fun p ->
-                              match p with
-                              | Text t -> t
-                              | Group g -> "(" ^ g ^ ")")
-                            part))
-                  with
-                  | "" -> None
-                  | t -> Some t)
-                others
+              texts
+                (List.map
+                   (fun part ->
+                     PlaceTerms.clean_term
+                       (String.concat ""
+                          (List.map
+                             (fun p ->
+                               match p with
+                               | Text t -> t
+                               | Group g -> "(" ^ g ^ ")")
+                             part)))
+                   others)
+            in
+            let depts =
+              List.filter_map department cands
+              |> List.rev_append (List.rev (List.filter_map department others))
             in
             let key d = PlaceTerms.cluster_key (dept_name d) in
             (* the name as written rather than the name of a code *)
-            let chosen ds =
+            let chosen =
               match
                 List.find_opt
                   (fun d -> match d with Name _ -> true | Code _ -> false)
-                  ds
+                  depts
               with
               | Some d -> Some d
-              | None -> ( match ds with d :: _ -> Some d | [] -> None)
+              | None -> ( match depts with d :: _ -> Some d | [] -> None)
             in
-            let same ds =
-              match ds with
-              | [] -> true
-              | d :: l -> List.for_all (fun d' -> key d' = key d) l
-            in
-            let next, tail =
-              match others with
-              | o :: os -> (department o, os)
-              | [] -> (None, [])
-            in
-            let dept, tail =
-              match (chosen depts, next) with
-              | Some d, Some n when key d = key n -> (Some d, tail)
-              | Some _, Some _ -> (None, tail)
-              | Some d, None -> (Some d, others)
-              | None, Some n -> (Some n, tail)
-              | None, None -> (None, tail)
-            in
-            match dept with
+            match chosen with
             | Some d
-              when same depts
+              when List.for_all (fun d' -> key d' = key d) depts
                    && PlaceTerms.cluster_key head <> key d
                    && not (FrDepartments.is_name head) ->
-                Some (rest, head, dept_name d, tail)
+                let dept = dept_name d in
+                let not_dept t = department t = None in
+                let rest_parens =
+                  List.filter_map
+                    (fun t ->
+                      if not_dept t then
+                        match clean_rest t with "" -> None | r -> Some r
+                      else None)
+                    cands
+                in
+                let rest_terms, tail =
+                  List.partition
+                    (fun t -> not (above dept t))
+                    (List.filter not_dept others)
+                in
+                Some
+                  ( List.rev_append (List.rev rest_parens) rest_terms,
+                    head,
+                    dept,
+                    tail )
             | Some _ | None -> None)
         | Text _ :: _ | Group _ :: _ | [] -> None)
 
-let town_and_department raw =
-  Option.map (fun (_, head, dept, _) -> (head, dept)) (analyse raw)
+let town_and_department ?above raw =
+  Option.map (fun (_, head, dept, _) -> (head, dept)) (analyse ?above raw)
 
-let reorganize format raw =
-  match analyse raw with
+let reorganize ?above format raw =
+  match analyse ?above raw with
   | None -> None
   | Some (rest, head, dept, tail) ->
       let town =
@@ -192,13 +192,18 @@ let proposals format entries places =
             c.parents)
         e.contexts)
     entries;
+  (* the ancestors of the department in the base stay above it *)
+  let above dept t =
+    default_above dept t
+    || Hashtbl.mem under (PlaceTerms.cluster_key dept, PlaceTerms.cluster_key t)
+  in
   List.filter_map
     (fun (istr, raw, uses) ->
-      match reorganize format raw with
+      match reorganize ~above format raw with
       | None -> None
       | Some new_s ->
           let known =
-            match town_and_department raw with
+            match town_and_department ~above raw with
             | Some (town, dept) ->
                 Hashtbl.mem under
                   (PlaceTerms.cluster_key town, PlaceTerms.cluster_key dept)
