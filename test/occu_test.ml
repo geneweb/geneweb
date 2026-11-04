@@ -5,9 +5,7 @@ open Alcotest
 open Geneweb
 
 let spans s =
-  List.map
-    (fun (sp : OccuTerms.span) -> (sp.text, sp.pos))
-    (OccuTerms.spans s)
+  List.map (fun (sp : OccuTerms.span) -> (sp.text, sp.pos)) (OccuTerms.spans s)
 
 let test_spans () =
   let t = list (pair string int) in
@@ -47,9 +45,7 @@ let test_clusters () =
   (check (list (triple string (list (pair string int)) int)))
     "clusters"
     [
-      ( "laboureur",
-        [ ("laboureur", 3); ("Laboureur", 2); ("laboureur ", 1) ],
-        6 );
+      ("laboureur", [ ("laboureur", 3); ("Laboureur", 2); ("laboureur ", 1) ], 6);
     ]
     show;
   (check (list (pair string (list string))))

@@ -1,5 +1,4 @@
-(** Analysis of the occupation strings, to group the spellings of an
-    occupation.
+(** Analysis of the occupation strings, to group the spellings of an occupation.
 
     An occupation string is a list of occupations separated by commas:
     ["laboureur, marchand"]. A comma between parentheses or brackets does not
@@ -39,8 +38,8 @@ val clusters : data -> cluster list
 
 val samples :
   data -> string list -> int -> (string * (string * span list) list) list
-(** [samples d spellings n]: for each spelling, up to [n] strings containing
-    it, with its spans. *)
+(** [samples d spellings n]: for each spelling, up to [n] strings containing it,
+    with its spans. *)
 
 val plan :
   Geneweb_db.Driver.base ->

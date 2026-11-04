@@ -79,7 +79,7 @@ let clusters d =
             sp []
           |> List.sort
                (fun (a : SourceTerms.spelling) (b : SourceTerms.spelling) ->
-              compare (b.uses, a.text) (a.uses, b.text))
+                 compare (b.uses, a.text) (a.uses, b.text))
         in
         let total =
           List.fold_left

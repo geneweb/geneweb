@@ -726,8 +726,8 @@ let print_src_clusters conf base =
 (* The spelling to keep and the spellings to replace by it, each with a few
    examples: the form of a cluster of sources or of occupations. [hidden]
    emits the fields of the section. *)
-let print_spellings_form conf ~m ~hidden
-    (spellings : SourceTerms.spelling list) samples =
+let print_spellings_form conf ~m ~hidden (spellings : SourceTerms.spelling list)
+    samples =
   Output.printf conf "<h2 class=\"h3\">%s</h2>\n"
     (Utf8.capitalize_fst (transl conf "merge spellings"));
   open_form ~m conf;
