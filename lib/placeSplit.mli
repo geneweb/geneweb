@@ -33,7 +33,9 @@ val split_at :
   (string, string) Hashtbl.t -> string -> (string * string * string) option
 (** [split_at frequent t]: [Some (left, right_text, key)] for the longest end of
     [t] after a space whose cluster key is in [frequent] (key -> spelling),
-    [left] trimmed and not ending with a particle. Exposed for the tests. *)
+    [left] trimmed, without the separators at its end (["Vallières – Metz"]
+    gives ["Vallières"]), and not ending with a particle. Exposed for the tests.
+*)
 
 val new_term : proposal -> string
 (** ["left, right"] *)

@@ -23,6 +23,14 @@ let test_split_at () =
     (PlaceSplit.split_at frequent "Pont of Canada");
   (check t) "elided particle" None
     (PlaceSplit.split_at frequent "Port d' Canada");
+  (check t) "separator instead of a comma"
+    (Some ("Valli\195\168res", "Canada", "canada"))
+    (PlaceSplit.split_at frequent "Valli\195\168res \226\128\147 Canada");
+  (* ASCII separators are ignored by the key: the end begins at the first
+     space, the new term is the same *)
+  (check t) "several separators"
+    (Some ("Gaspe", "- / Canada", "canada"))
+    (PlaceSplit.split_at frequent "Gaspe - / Canada");
   (check t) "no space" None (PlaceSplit.split_at frequent "Canada");
   (check t) "no frequent end" None
     (PlaceSplit.split_at frequent "Montreal Quebec")

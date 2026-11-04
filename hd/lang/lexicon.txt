@@ -19020,6 +19020,16 @@ de: häufige Begriffe: Mindestanzahl der Verwendungen
 en: frequent terms: minimum uses
 fr: termes fréquents : nombre minimal d'utilisations
 
+    terms to join
+de: zusammenzufügende Begriffe
+en: terms to join
+fr: termes à regrouper
+
+    terms to join help
+de: Zwei aufeinanderfolgende Begriffe, die einen häufigen Begriff bilden: „Paris, 1er“ → „Paris 1er“; oder ein Begriff mit einer anderen Nummerierung: „Paris XIVe“ → „Paris 14e“.
+en: Two consecutive terms forming a frequent term: “Paris, 1er” → “Paris 1er”; or a term written with another numbering: “Paris XIVe” → “Paris 14e”.
+fr: Deux termes consécutifs formant un terme fréquent : « Paris, 1er » → « Paris 1er » ; ou un terme écrit avec une autre numérotation : « Paris XIVe » → « Paris 14e ».
+
     known term
 de: bekannter Begriff
 en: known term

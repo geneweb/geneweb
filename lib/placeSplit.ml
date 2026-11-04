@@ -66,6 +66,21 @@ let starts_with_particle right =
   | w :: _ :: _ -> is_particle w
   | [ _ ] | [] -> false
 
+(* the separators written instead of a comma: "Vallières – Metz" *)
+let separators =
+  [ "-"; "\xE2\x80\x93" (* – *); "\xE2\x80\x94" (* — *); "/"; ";"; ":"; "," ]
+
+(* [left] without the separators and spaces at its end *)
+let rec strip_separators left =
+  let left = PlaceTerms.clean_term left in
+  match
+    List.find_opt (fun sep -> String.ends_with ~suffix:sep left) separators
+  with
+  | Some sep ->
+      strip_separators
+        (String.sub left 0 (String.length left - String.length sep))
+  | None -> left
+
 let split_at frequent t =
   let n = String.length t in
   (* the spaces from the left: the longest end first *)
@@ -74,7 +89,7 @@ let split_at frequent t =
     | None -> None
     | Some j -> (
         let right = String.sub t (j + 1) (n - j - 1) in
-        let left = PlaceTerms.clean_term (String.sub t 0 j) in
+        let left = strip_separators (String.sub t 0 j) in
         let k = PlaceTerms.cluster_key right in
         match Hashtbl.find_opt frequent k with
         | Some _
