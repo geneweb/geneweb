@@ -721,10 +721,22 @@ val find_in_text : bool -> string -> string -> int -> (int * int) option
 
 val html_highlight : bool -> string -> string -> string
 
-(* Print list in columns with Gutil.alphabetic order *)
+val columns_attrs : ?wide:bool -> 'a list -> string
+(** [columns_attrs ?wide l] returns the attributes laying out a list of the
+    length of [l] in as many columns as the page width allows, with at least 15
+    elements per column, centered; [""] for a list fitting one column. [wide]
+    (default [false]) widens the columns for longer elements such as persons. *)
+
+val wide_list : 'a list -> bool
+(** [wide_list l] tells whether a list of the length of [l] needs more columns
+    than a [container] holds, that is a [container-fluid] page. *)
 
 val wprint_in_columns :
   config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
+(** [wprint_in_columns conf order wprint_elem list] prints the sorted [list]
+    with [wprint_elem]. A list longer than one column is grouped under the first
+    character of [order], each heading counting as three elements, and laid out
+    in columns (see {!columns_attrs}). *)
 
 val is_hide_names : config -> Geneweb_db.Driver.person -> bool
 (** Tells if person's names are hiden (if person's access is [Private] or if
