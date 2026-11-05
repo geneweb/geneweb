@@ -412,10 +412,11 @@ let treat_request =
                  | None -> handle_no_bfile conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
-             | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
+             | "ADD_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
              | "ADD_PAR_OK" ->
-                 w_wizard @@ w_base @@ UpdateFamOk.print_add_parents
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
              | "ANOMA" -> w_wizard @@ w_base @@ AnomalyDisplay.print
              | "ANM" ->
                  w_base @@ fun conf _ ->
@@ -593,9 +594,11 @@ let treat_request =
              | "MOD_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod
-             | "MOD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_mod
+             | "MOD_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
              | "MOD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_mod
-             | "MOD_IND_OK" -> w_wizard @@ w_base @@ UpdateIndOk.print_mod
+             | "MOD_IND_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
              | "MOD_NOTES" -> w_wizard @@ w_base @@ NotesDisplay.print_mod
              | "MOD_NOTES_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
