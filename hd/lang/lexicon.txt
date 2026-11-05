@@ -24149,18 +24149,18 @@ sk: skús znovu
 sv: försök igen
 tr: yeniden dene
 
-    try another/relationship computing
-co: cliccà quì/per pruvà un modu di calculu sfarente
-de: klicken Sie hier/um eine andere Berechnungsmethode zu versuchen
+    try another relationship computing
+co: pruvà un modu di calculu sfarente
+de: eine andere Berechnungsmethode versuchen
 en: try another computing option
-es: pulse aquí/para intentar un modo de cálculo diferente
-fi: napsauta tästä kokeillaksesi toista laskentavaihtoehtoa
-fr: cliquez ici/pour essayer un mode de calcul différent
-it: Clicca qui/per provare un altro modo di calcolo
-nl: hier klikken om een andere berekeningswijze te proberen
+es: intentar un modo de cálculo diferente
+fi: kokeile toista laskentavaihtoehtoa
+fr: essayer un autre mode de calcul
+it: provare un altro modo di calcolo
+nl: een andere berekeningswijze proberen
 no: forsøk en annen kalkuleringsmulighet
-oc: clicatz aicí/per ensajar un autre mòde de calcul
-pt: clique aqui/para tentar um modo de cálculo diferente
+oc: ensajar un autre mòde de calcul
+pt: tentar um modo de cálculo diferente
 ru: попытайтесь изменить тип связи
 sv: försök ett annat beräkningssätt
 tr: başka bir hesaplama seçeneği deneyin
