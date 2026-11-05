@@ -192,6 +192,12 @@ val error_locked : config -> 'exn
     resubmitting the current request and a form cancelling it, then raises
     [ModErr UERR_locked_base]. *)
 
+val error_bulk : config -> BulkStatus.t -> 'exn
+(** [error_bulk conf st] prints the page telling that the bulk task [st] holds
+    the lock of the base: the request has not been applied, and is resubmitted
+    automatically after a few seconds (or with the "try again" button). Raises
+    [ModErr UERR_locked_base]. *)
+
 val error_digest : config -> 'exn
 (** [error_digest conf] reports that the base changed since the form was
     displayed (see {!digest_person}), then raises [ModErr UERR_digest]. *)

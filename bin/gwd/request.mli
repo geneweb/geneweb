@@ -22,10 +22,19 @@ val print_incompatible_base :
 
 val w_lock :
   onerror:(string option, 'a) handler ->
+  ?onbulk:(string option, BulkStatus.t -> 'a) handler ->
   (string option, 'a) handler ->
   (string option, 'a) handler
-(** [w_lock ~onerror callback conf base] Acquire a write lock on the base and
-    call the callback, or fail with [onerror]. *)
+(** [w_lock ~onerror ?onbulk callback conf base] Acquire a write lock on the
+    base and call the callback, or fail with [onerror]. With [onbulk], the lock
+    is first tried without waiting: if a bulk task holds it (see {!w_bulk}),
+    [onbulk] is called with its status instead of waiting for its end. *)
+
+val w_bulk :
+  command:string -> (string option, 'a) handler -> (string option, 'a) handler
+(** [w_bulk ~command callback conf base] calls the callback with the base marked
+    as held by the bulk task [command] (see {!BulkStatus}). To be used inside
+    {!w_lock}. *)
 
 val w_wizard :
   (Geneweb_db.Driver.base, unit) handler ->
