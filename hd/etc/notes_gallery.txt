@@ -17,9 +17,8 @@
 <div class="container-fluid">
   %include;home
   <div class="d-flex small float-end me-2 mt-2 gap-2">
-    %if;((e.p!="" and e.n!="") or e.i!="")
-      %let;acc;%if;(b.access_by_key="yes")p=%e.p;&n=%e.n;%if;(e.oc!="" or e.oc!=0)&oc=%e.oc;%end;%else;i=%e.i;%end;%in;
-      <div>(<a href="%prefix;m=LINKED&type=gallery&%acc;"
+    %if;(access!="")
+      <div>(<a href="%prefix;m=LINKED&type=gallery&%access;"
         title="[*linked galleries help]"><i class="fa-solid fa-images"></i></a>)</div>
     %end;
     <div>(<a href="%url;&ref=on" title="[*gallery backlinks]">&lt;-</a>)</div>
