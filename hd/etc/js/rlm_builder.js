@@ -20,9 +20,13 @@ if (RLM) {
 
   saveBtn.addEventListener('click', () => {
     const t = descInput.value;
-    const ind = { i, p, n, oc, t, self };
     const storedInds = JSON.parse(localStorage.getItem('inds')) || [];
-    storedInds.push(ind);
+    const last = storedInds.at(-1);
+    if (last?.i === i) {
+      if (t) last.t = t;
+    } else {
+      storedInds.push({ i, p, n, oc, t, self });
+    }
     localStorage.setItem('inds', JSON.stringify(storedInds));
     descInput.value = '';
     updateUI();
