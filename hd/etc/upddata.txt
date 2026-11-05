@@ -230,6 +230,7 @@
         <li class="list-unstyled mt-1 ps-0">
           <ul class="list-group src-list-bg my-1">
             %foreach;value;
+              %if;new_head;<li class="list-unstyled book-head">%escape.rev_head;</li>%end;
               <li class="list-unstyled ms-sm-1 ps-0" id="k%entry_key;">
                 %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                   <div class="alert alert-warning mx-2 mt-2">[*book blank name]</div>

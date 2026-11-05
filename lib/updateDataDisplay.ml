@@ -297,6 +297,8 @@ and eval_simple_bool_var _conf _base env _xx = function
       | Vstring _ as x -> get_env "entry_key" env = x
       | _ -> false)
   | "first" -> ( match get_env "first" env with Vbool x -> x | _ -> false)
+  | "new_head" -> (
+      match get_env "new_head" env with Vbool x -> x | _ -> false)
   | "script" -> ( match get_env "script" env with Vbool x -> x | _ -> false)
   | "entry_blank" -> Name.lower (eval_string_env "entry_value" env) = ""
   | _ -> raise Not_found
@@ -311,6 +313,7 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_nb" -> eval_string_env "entry_nb" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
+  | "rev_head" -> eval_string_env "rev_head" env
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
   | "incr_count" -> (
@@ -415,6 +418,9 @@ and eval_string_env s env =
 
 and eval_int_env s env =
   match get_env s env with Vint i -> string_of_int i | _ -> raise Not_found
+
+(* Heading of a place in the order from the last term: that last term. *)
+let rev_head terms = match terms with [] -> "" | t :: _ -> t
 
 let print_foreach conf print_ast _eval_expr =
   let rec print_foreach env xx _loc s sl el al =
@@ -527,7 +533,7 @@ let print_foreach conf print_ast _eval_expr =
                 let rss2 = Place.without_suburb s2 in
                 if rss1 = rss2 then Gutil.alphabetic_order s1 s2
                 else Gutil.alphabetic_order rss1 rss2)
-          |> List.map snd
+          |> List.map (fun (t, (k, s)) -> (k, s, rev_head t))
       | Vlist_value l ->
           List.sort
             (fun (_, s1) (_, s2) ->
@@ -536,25 +542,28 @@ let print_foreach conf print_ast _eval_expr =
               if rss1 = rss2 then Gutil.alphabetic_order s1 s2
               else Gutil.alphabetic_order rss1 rss2)
             l
+          |> List.map (fun (k, s) -> (k, s, ""))
       | _ -> []
     in
     let max = List.length l in
-    let rec loop i l prev =
+    let rec loop i l prev prev_head =
       match l with
       | [] -> ()
-      | (k, s) :: l ->
+      | (k, s, head) :: l ->
           let env =
             Templ.Env.(
               env |> add "cnt" (Vint i) |> add "max" (Vint max)
               |> add "entry_value" (Vstring s)
               |> add "entry_value_rev" (Vstring (unfold_place_long false s))
               |> add "entry_key" (Vstring (Driver.Istr.to_string k))
-              |> add "first" (Vbool (Place.without_suburb s <> prev)))
+              |> add "first" (Vbool (Place.without_suburb s <> prev))
+              |> add "rev_head" (Vstring head)
+              |> add "new_head" (Vbool (head <> "" && head <> prev_head)))
           in
           List.iter (print_ast env xx) al;
-          loop (i + 1) l (Place.without_suburb s)
+          loop (i + 1) l (Place.without_suburb s) head
     in
-    loop 0 l ""
+    loop 0 l "" ""
   and print_foreach_initial env xx al =
     let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
     let ini_l = build_list_short conf l in
