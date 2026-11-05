@@ -2,6 +2,24 @@
 
 open Config
 open Util
+open Def
+module Driver = Geneweb_db.Driver
+
+let acces_with_occ conf base p =
+  let acc = acces conf base p in
+  let occ = Driver.get_occ p in
+  if occ = 0 || not (String.starts_with ~prefix:"i=" (acc :> string)) then acc
+  else acc ^>^ "&oc=" ^ string_of_int occ
+
+let reference_with_occ conf base p (s : Adef.safe_string) =
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
+  if (not (GWPARAM.p_auth conf base p)) || cgl then s
+  else
+    "<a href=\""
+    ^<^ (commd conf ^^^ acces_with_occ conf base p :> Adef.safe_string)
+    ^^^ "\" id=\"i"
+    ^<^ Driver.Iper.to_string (Driver.get_iper p)
+    ^<^ "\">" ^<^ s ^>^ "</a>"
 
 let print_result conf base max_answers (list, len) =
   let list =
@@ -18,7 +36,8 @@ let print_result conf base max_answers (list, len) =
         Output.print_sstring conf "<li>";
         SosaCache.print_sosa conf base p true;
         Output.print_sstring conf " ";
-        Output.print_string conf (referenced_person_text conf base p);
+        Output.print_string conf
+          (reference_with_occ conf base p (gen_person_text conf base p));
         Output.print_string conf
           (mod_ind_link conf p (DateDisplay.short_dates_text conf base p));
         Output.print_sstring conf "<em>";
