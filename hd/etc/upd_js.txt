@@ -191,8 +191,10 @@ const CALENDAR_MONTHS = {
 const FRENCH_MONTH_CODES = { VD:1, BR:2, FM:3, NI:4, PL:5, VT:6, GE:7, FL:8, PR:9, ME:10, TH:11, FT:12, JC:13 };
 
 function changeCalendar(e, v, c) {
-  const m = document.getElementById(e).firstElementChild.value.toUpperCase();
+  const field = document.getElementById(e).querySelector('[name="' + v + '"]');
+  const m = (field?.value ?? '').toUpperCase();
   const calType = c.options[c.selectedIndex].value;
+  const months = CALENDAR_MONTHS[calType] || CALENDAR_MONTHS['G'];
   const mv = calType === 'F' && FRENCH_MONTH_CODES[m] || m;
   
   let options = '';
