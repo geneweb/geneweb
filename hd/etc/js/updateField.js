@@ -450,6 +450,10 @@
         let shown = false;
         for (const li of ul.children) {
           const a = li.querySelector('a[data-entry]');
+          if (!a) {
+            li.hidden = n !== base;
+            continue;
+          }
           li.hidden = n !== base && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
           shown ||= !li.hidden;
         }

@@ -165,6 +165,7 @@
         </h3>
         <ul class="list-unstyled src-list-bg">
           %foreach;value;
+            %if;new_head;<li class="book-head">%escape.rev_head;</li>%end;
             <li class="%if;(e.data="src")px-2%else;pe-2%end;" id="k%entry_key;">
               %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                 <div class="alert alert-warning mt-2">[*book blank name]</div>
