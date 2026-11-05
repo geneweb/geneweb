@@ -1213,28 +1213,18 @@ let print conf base p p1 =
           | Right p -> print_base_loop conf base p))
   | None -> Perso.interp_templ "relmenu" conf base p
 
-let print_multi conn conf base =
+let print_multi _conn conf base =
   let assoc_txt : (Geneweb_db.Driver.iper, string) Hashtbl.t =
     Hashtbl.create 53
   in
-  if Util.url_has_pnoc_params conf.env then
-    let clean_url =
-      Util.normalize_person_pool_url conf base "RLM" (Some assoc_txt)
-    in
-    Connection.http_redirect_temporarily conn clean_url
-  else
-    let pl =
-      let rec loop pl i =
-        let k = string_of_int i in
-        match Util.find_person_in_env conf base k with
-        | Some p ->
-            (match Util.p_getenv conf.env ("t" ^ k) with
-            | Some x -> Hashtbl.add assoc_txt (Driver.get_iper p) x
-            | None -> ());
-            loop (p :: pl) (i + 1)
-        | None -> List.rev pl
-      in
-      loop [] 1
-    in
-    let lim = Option.value ~default:0 (Util.p_getint conf.env "lim") in
-    print_multi_relation conf base pl lim assoc_txt
+  let pl =
+    List.map
+      (fun (k, p) ->
+        (match Util.p_getenv conf.env ("t" ^ k) with
+        | Some x -> Hashtbl.replace assoc_txt (Driver.get_iper p) x
+        | None -> ());
+        p)
+      (Util.find_persons_in_env conf base)
+  in
+  let lim = Option.value ~default:0 (Util.p_getint conf.env "lim") in
+  print_multi_relation conf base pl lim assoc_txt
