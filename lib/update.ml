@@ -960,15 +960,19 @@ let def_error conf base x =
   | OwnAncestor p -> UERR_own_ancestor (base, p)
   | BadSexOfMarriedPerson p -> UERR_sex_married p
 
-let error_locked conf =
-  let err = UERR_locked_base in
-  prerr conf err @@ fun () ->
-  Output.print_sstring conf "<p>\n";
-  transl conf "the file is temporarily locked: please try again"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|.</p><table><tr><td><form method="post" action="|};
+(* The "try again" form, resubmitting the current request, and the "cancel"
+   form of a page telling that the base is locked. *)
+let print_retry_forms ?form_id conf =
+  Output.print_sstring conf {|<table><tr><td><form method="post" action="|};
   Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
+  Output.print_sstring conf {|"|};
+  Option.iter
+    (fun id ->
+      Output.print_sstring conf {| id="|};
+      Output.print_sstring conf id;
+      Output.print_sstring conf {|"|})
+    form_id;
+  Output.print_sstring conf ">";
   let aux env =
     List.iter
       (fun (x, v) ->
@@ -982,7 +986,7 @@ let error_locked conf =
   aux conf.env;
   (* just to see in the traces... *)
   Util.hidden_input conf "retry" (Mutil.encode conf.user);
-  Util.hidden_input conf "submit"
+  Util.submit_input conf "submit"
     (transl conf "try again" |> Utf8.capitalize_fst |> Mutil.encode);
   Output.print_sstring conf {|</form></td><td><form method="get" action="|};
   Output.print_sstring conf conf.command;
@@ -997,8 +1001,65 @@ let error_locked conf =
   | None -> ());
   transl_nth conf "user/password/cancel" 2
   |> Utf8.capitalize_fst |> Mutil.encode
-  |> Util.hidden_input conf "submit";
+  |> Util.submit_input conf "submit";
   Output.print_sstring conf "</form></td></tr></table>"
+
+let error_locked conf =
+  let err = UERR_locked_base in
+  prerr conf err @@ fun () ->
+  Output.print_sstring conf "<p>\n";
+  transl conf "the file is temporarily locked: please try again"
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf ".</p>";
+  print_retry_forms conf
+
+let bulk_retry_delay = 15
+
+let error_bulk conf (st : BulkStatus.t) =
+  let err = UERR_locked_base in
+  prerr conf err @@ fun () ->
+  let tm = Unix.localtime st.started in
+  let at = Printf.sprintf "%02d:%02d" tm.Unix.tm_hour tm.Unix.tm_min in
+  let user = if st.user = "" then "?" else st.user in
+  Output.print_sstring conf {|<div class="alert alert-warning"><p>|};
+  Output.print_string conf
+    (Printf.sprintf
+       (ftransl conf "a large update started by %s at %s is in progress")
+       (Util.escape_html user :> string)
+       at
+    |> Utf8.capitalize_fst |> Adef.safe);
+  Output.print_sstring conf {| <small class="text-muted">(|};
+  Output.print_string conf (Util.escape_html st.command);
+  Output.print_sstring conf {|)</small>.<br>|};
+  Output.print_sstring conf
+    (transl conf "your request has not been applied yet" |> Utf8.capitalize_fst);
+  Output.print_sstring conf ". ";
+  Output.print_sstring conf
+    (Printf.sprintf
+       (ftransl conf "it will be resubmitted automatically in %s seconds")
+       (Printf.sprintf {|<span id="bulk-retry-delay">%d</span>|}
+          bulk_retry_delay)
+    |> Utf8.capitalize_fst);
+  Output.print_sstring conf "</p></div>";
+  print_retry_forms ~form_id:"bulk-retry" conf;
+  Output.printf conf
+    {|<script>
+(function () {
+  var n = %d, span = document.getElementById("bulk-retry-delay");
+  span.textContent = n;
+  var t = setInterval(function () {
+    n -= 1;
+    span.textContent = n;
+    if (n <= 0) {
+      clearInterval(t);
+      /* the form has an input named "submit", which hides form.submit */
+      HTMLFormElement.prototype.submit.call(
+        document.getElementById("bulk-retry"));
+    }
+  }, 1000);
+})();
+</script>|}
+    bulk_retry_delay
 
 let error_digest conf =
   let err = UERR_digest in
