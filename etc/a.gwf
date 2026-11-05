@@ -216,6 +216,13 @@
 # by Places/surname.
 #places_inverted=yes
 
+# Order of the place dictionary (book of places, m=MOD_DATA&data=place).
+# By default places are sorted alphabetically as written. With "yes" they are
+# sorted from their last term, e.g. country, county, town for places written
+# "[suburb] - town, county, country"; a term "town (county)" counts as
+# "town, county". A button on the page switches to the other order.
+#dico_inverted=yes
+
 # In the Places/surname page,
 # the surname string may be a link to list all individuals of that surname,
 # not only those in related place.

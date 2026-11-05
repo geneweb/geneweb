@@ -173,11 +173,39 @@ let get_person_from_data conf base =
     (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
     acc []
 
-let combine_by_ini ini list =
+(* Place dictionary ordered from the last term: the navigation by 1, 2, ...
+   characters runs on [Place.rev_key] instead of the place itself. The default
+   order is set by [dico_inverted=yes] in the .gwf; [o=r] / [o=a] (from the
+   last term / alphabetic) asks for one or the other. *)
+let order_param conf =
+  match p_getenv conf.env "o" with
+  | Some ("r" | "a") as o -> o
+  | Some _ | None -> None
+
+let rev_order conf =
+  p_getenv conf.env "data" = Some "place"
+  &&
+  match order_param conf with
+  | Some o -> o = "r"
+  | None -> List.assoc_opt "dico_inverted" conf.base_env = Some "yes"
+
+let nav_key conf =
+  if rev_order conf then Place.rev_key else Place.without_suburb
+
+let rec compare_terms l1 l2 =
+  match (l1, l2) with
+  | [], [] -> 0
+  | [], _ :: _ -> -1
+  | _ :: _, [] -> 1
+  | t1 :: l1, t2 :: l2 ->
+      let c = Gutil.alphabetic_order t1 t2 in
+      if c <> 0 then c else compare_terms l1 l2
+
+let combine_by_ini key ini list =
   let len = Utf8.length ini + 1 in
   Mutil.groupby
     ~key:(fun (_, s) ->
-      let s = Place.without_suburb s in
+      let s = key s in
       if Utf8.length s >= len then Utf8.sub s 0 len else s)
     ~value:(fun x -> x)
     list
@@ -569,6 +597,7 @@ let build_list conf base =
   let data_type = p_getenv conf.env "data" in
   let has_particle = data_type = Some "sn" || data_type = Some "domain" in
   let is_name_type = data_type = Some "fn" || data_type = Some "sn" in
+  let key = nav_key conf in
   if ini <> "" then
     Mutil.filter_map
       (fun istr ->
@@ -576,8 +605,7 @@ let build_list conf base =
         if is_name_type && str = "?" then None
         else
           let str = if has_particle then move_particle base str else str in
-          if String.starts_with ~prefix:ini @@ Place.without_suburb str then
-            Some (istr, str)
+          if String.starts_with ~prefix:ini (key str) then Some (istr, str)
           else None)
       list
   else
@@ -592,6 +620,7 @@ let build_list conf base =
 
 let build_list_short conf list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+  let key = nav_key conf in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -602,7 +631,7 @@ let build_list_short conf list =
     let inis =
       List.rev_map
         (fun (_, s) ->
-          let s = Place.without_suburb s in
+          let s = key s in
           if String.length s > i then String.sub s 0 (Utf8.next s i) else s)
         l
     in
@@ -624,5 +653,5 @@ let build_list_short conf list =
 
 let build_list_long conf list : (string * (Driver.istr * string) list) list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
-  let list = combine_by_ini ini list in
+  let list = combine_by_ini (nav_key conf) ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list

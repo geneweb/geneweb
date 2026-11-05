@@ -146,6 +146,36 @@ let fold_place_long inverted s =
       in
       ((if inverted then List.rev list else list), sub)
 
+(* A term "aaaa (bbbb)" counts as the two terms "aaaa, bbbb", wherever it
+   sits in the place. *)
+let split_paren_term t =
+  let len = String.length t in
+  if len > 2 && String.unsafe_get t (len - 1) = ')' then
+    match String.rindex_opt t '(' with
+    | Some i when i > 0 ->
+        let host = String.trim (String.sub t 0 i) in
+        let parent = String.trim (String.sub t (i + 1) (len - i - 2)) in
+        if host = "" || parent = "" then [ t ] else [ host; parent ]
+    | Some _ | None -> [ t ]
+  else [ t ]
+
+let rev_terms s =
+  let terms =
+    String.split_on_char ',' (without_suburb s)
+    |> List.filter_map (fun t ->
+        let t = String.trim t in
+        if t = "" then None else Some t)
+  in
+  let rec loop acc l =
+    match l with
+    | [] -> acc
+    | t :: l -> loop (List.rev_append (split_paren_term t) acc) l
+  in
+  loop [] terms
+
+let rev_terms_sep = ", "
+let rev_key s = String.concat rev_terms_sep (rev_terms s)
+
 type component = { text : string; pos : int; len : int; suburb : bool }
 
 (* Same parse as [fold_place_long], but every component keeps its byte span in

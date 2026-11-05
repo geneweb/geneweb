@@ -46,6 +46,19 @@ val fold_place_long : bool -> string -> string list * string
     bases that record places country-first, [places_inverted=yes] in the
     [.gwf]). *)
 
+val rev_terms : string -> string list
+(** [rev_terms s] lists the terms of [s] read from its end, the suburb dropped;
+    a term ["aaaa (bbbb)"], wherever it sits, counts as ["aaaa, bbbb"]. Example:
+    ["[Boileau] - Granville (Manche), France"] gives
+    [["France"; "Manche"; "Granville"]]. The order of the place dictionary when
+    [dico_inverted=yes] in the .gwf. *)
+
+val rev_terms_sep : string
+(** [", "], the separator joining the terms of {!rev_key}. *)
+
+val rev_key : string -> string
+(** [rev_key s] is [String.concat rev_terms_sep (rev_terms s)]. *)
+
 type component = {
   text : string;  (** the component as stored, e.g. ["Paris"] *)
   pos : int;  (** byte offset of [text] in the raw place string *)
