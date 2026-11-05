@@ -165,7 +165,7 @@
           %elseif;(not xxx.is_dead and "yyy"="death") bg-lg%end;
         %end;">
       %if;(wizard and not cancel_links)
-        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;#yyy"
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&%xxx.access;#yyy"
           title="%if;(xxx.has_yyy_date)[*update::yyy]%else;[*add::yyy]%end;&#010;
            %xxx.first_name; %xxx.surname; %if;(xxx.occ>0)(%xxx.occ;)%end;&#010;
            %if;(xxx.has_yyy_date and xxx.yyy_date.prec="" or xxx.yyy_date.prec="?")%symb; %xxx.yyy_date;%end;">%nn;

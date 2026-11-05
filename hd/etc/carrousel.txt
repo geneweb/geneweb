@@ -50,7 +50,7 @@
 
 %define;alert_content()
   %if;("http" in portrait or "http" in old_portrait)
-    Update image field with <a href="%prefix;m=MOD_IND;i=%index;">MOD_IND</a>
+    Update image field with <a href="%prefix;m=MOD_IND&%access;">MOD_IND</a>
   %elseif;(e.mode="note")
     <strong>></strong> %images_store;%X;%e.file_name_2;
   %elseif;(e.mode="carrousel")<samp>
@@ -238,7 +238,7 @@
             %if;(portrait_name="")
               %( url of the image field: no file, MOD_IND changes it %)
               <samp class="text-truncate">%portrait;</samp>
-              <a role="button" class="ms-auto" href="%prefix;m=MOD_IND&i=%index;"
+              <a role="button" class="ms-auto" href="%prefix;m=MOD_IND&%access;"
                 title="[*modify]"><i class="far fa-pen-to-square text-primary me-1"></i>%nn;</a>
             %else;
               <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;</samp>

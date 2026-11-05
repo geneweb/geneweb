@@ -34,7 +34,7 @@
 <tr>
   <td>
     <br>
-    <a href="%prefix;m=MOD_IND;i=%index;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
+    <a href="%prefix;m=MOD_IND&%access;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
     <br>
     %if;(bvar.can_send_image != "no" and not has_portrait_url
       and first_name != "?" and surname != "?")
@@ -46,7 +46,7 @@
       %end;
     %end;
     <br>
-    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
+    <a href="%prefix;m=DEL_IND&%access;">[*delete::]</a>
     <br>
     <br>
     <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>

@@ -113,10 +113,10 @@ let linked_page_rows conf base ?person pg pgl =
           (Format.sprintf
              {|
 <td class="text-center">
-  <a href="%sm=MOD_IND&i=%s#notes" title="%s">
+  <a href="%sm=MOD_IND&%s#notes" title="%s">
     <i class="fa fa-user"></i></a></td>|}
              (commd conf :> string)
-             (Driver.Iper.to_string ip)
+             (acces conf base p :> string)
              (Utf8.capitalize_fst (transl conf "modify note")));
       Output.print_sstring conf
         (Format.sprintf {|

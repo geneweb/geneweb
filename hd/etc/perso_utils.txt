@@ -71,7 +71,7 @@
 %define;image_MF(xxx)
   %if;not cancel_links;
     %if;wizard;%nn;
-      <a href="%prefix;m=MOD_IND&i=%xxx.index;"%sp;
+      <a href="%prefix;m=MOD_IND&%xxx.access;"%sp;
         title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">%nn;
     %end;<i%sp;
   %end;
@@ -288,7 +288,7 @@
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
-  %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&i=%xx.index;"%end;%sp;
+  %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&%xx.access;"%end;%sp;
     title="%if;not (cancel_links or not wizard)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end; %if;xx.computable_age;(%xx.age;)%elseif;xx.computable_death_age;(%xx.death_age;)%end;" class="text-nowrap fst-italic">%if;(xx.dates!="")%xx.dates;%end;
   %if;(cancel_links or not wizard)</span>%else;</a>%end;
   %if;(xx.title!=""), %xx.title;%end;%nn;
@@ -302,7 +302,7 @@
     %else;<a href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;">%frst_name;<br><span>%xx.surname;</span></a>%nn;
     %end;
     %if;(wizard and not cancel_links)
-      <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+      <a href="%prefix;m=MOD_IND&%xx.access;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
     %end;
     <div class="text-nowrap fst-italic%nn;
         %(%if;(e.m="A" and xx.index!=index)
@@ -332,7 +332,7 @@
     %end;
   %end;
   %if;(wizard and not cancel_links)
-  <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
+  <a href="%prefix;m=MOD_IND&%xx.access;">%end;
   <span class="text-nowrap fst-italic"
     title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
            %if;(xx.computable_age) (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;">%nn;

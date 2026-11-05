@@ -339,10 +339,15 @@ val child_of_parent :
     [p]'s. With [link], the parents are links to their pages. *)
 
 val mod_ind_link :
-  config -> Geneweb_db.Driver.person -> Adef.safe_string -> Adef.safe_string
-(** [mod_ind_link conf base p s] creates a hyperlink with the URL
-    "?m=MOD_IND&i=\{iper\}" where '\{iper\}' is the index of the person [p], and
-    the text [s]. If [s] is empty, it defaults to print a wrench icon. *)
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.person ->
+  Adef.safe_string ->
+  Adef.safe_string
+(** [mod_ind_link conf base p s] creates a hyperlink to the form modifying the
+    person [p], given by key or by index as {!acces} does, with the text [s]. If
+    [s] is empty, it defaults to print a wrench icon. Returns [s] alone for a
+    hidden person, with [cgl=on], or when not a wizard. *)
 
 val reference :
   config ->

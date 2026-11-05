@@ -113,7 +113,7 @@
     <div>
       %( ⚠ BUG : "#label" est l'ancre littérale, pas la valeur du paramètre.
          Devrait être "#%label;" pour pointer vers "birth" ou "death" selon l'appel. %)
-      <a href="%prefix;m=MOD_IND&i=%ancestor.index;#label" title="[modify::person/persons]0">
+      <a href="%prefix;m=MOD_IND&%ancestor.access;#label" title="[modify::person/persons]0">
         <i class="fa fa-wrench fa-lg"></i>
       </a>
     </div>

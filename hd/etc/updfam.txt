@@ -364,7 +364,7 @@
     </div>
     <div id="chxcnt_p_selct_mod" class="col-auto col-form-label">
       %if;(child.index!="-1")
-        <a href="%prefix_base_password;m=MOD_IND&i=%child.index;" title="[*modify::person/persons]0
+        <a href="%prefix_base_password;m=MOD_IND&%child.access;" title="[*modify::person/persons]0
           %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;"
           aria-hidden="true" aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;">
           <i class="fa fa-user-pen fa-fw %if;(child.sex=1)fe%end;male ms-2 me-1"></i>

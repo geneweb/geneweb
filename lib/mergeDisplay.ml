@@ -26,7 +26,7 @@ let print_person_info conf base p =
   Output.print_sstring conf "</a>";
   let dates = DateDisplay.short_dates_text conf base p in
   if (dates :> string) <> "" then
-    Output.print_string conf (mod_ind_link conf p dates);
+    Output.print_string conf (mod_ind_link conf base p dates);
   let cop = (child_of_parent conf base p :> string) in
   if cop <> "" then (
     Output.print_sstring conf ", ";

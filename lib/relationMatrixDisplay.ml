@@ -94,7 +94,7 @@ let print_matrix_row conf base tstab persons i cell_storage n =
     (Driver.Iper.to_string iper_i)
     (i + 1)
     (Util.referenced_person_text conf base person :> string)
-    (Util.mod_ind_link conf person
+    (Util.mod_ind_link conf base person
        (DateDisplay.short_dates_text conf base person)
       :> string);
   for j = 0 to n - 1 do
