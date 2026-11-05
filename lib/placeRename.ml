@@ -56,12 +56,32 @@ let terms_of_env conf =
     conf.env
   |> List.sort_uniq compare
 
+let has_delimiter s =
+  String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s
+
+(* ["aaaa (bbbb)"] is [Some ("aaaa", "bbbb")]: one trailing parenthesised
+   part, both parts non empty and free of brackets and parentheses *)
+let paren_form s =
+  let n = String.length s in
+  if n > 0 && s.[n - 1] = ')' then
+    match String.index_opt s '(' with
+    | Some i when i > 0 ->
+        let host = String.trim (String.sub s 0 i) in
+        let parent = String.trim (String.sub s (i + 1) (n - i - 2)) in
+        if
+          host <> "" && parent <> ""
+          && (not (has_delimiter host))
+          && not (has_delimiter parent)
+        then Some (host, parent)
+        else None
+    | Some _ | None -> None
+  else None
+
 let valid_new_term s =
   let s = PlaceTerms.clean_term s in
-  s <> ""
-  && not (String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s)
+  s <> "" && ((not (has_delimiter s)) || paren_form s <> None)
 
-let rewrite_with inverted ~terms f raw depths =
+let rewrite_spans inverted ~terms f raw depths =
   let comps = Place.components inverted raw in
   let main = List.filter (fun (c : Place.component) -> not c.suburb) comps in
   let pick = function
@@ -84,12 +104,38 @@ let rewrite_with inverted ~terms f raw depths =
     Some
       (List.fold_left
          (fun s (c : Place.component) ->
-           String.sub s 0 c.pos ^ f c.text
+           String.sub s 0 c.pos ^ f c
            ^ String.sub s (c.pos + c.len) (String.length s - c.pos - c.len))
          raw spans)
 
+let rewrite_with inverted ~terms f raw depths =
+  rewrite_spans inverted ~terms
+    (fun (c : Place.component) -> f c.text)
+    raw depths
+
+(* A new term "aaaa (bbbb)" is written as is, except next to the parentheses
+   of the place, inside them ("Nantes (44)" for "44") or before them ("Nantes"
+   in "Nantes (44)"), where it would give two parenthesised parts: there it is
+   written "aaaa, bbbb", which has the same meaning. *)
 let rewrite inverted ~terms ~new_term raw depths =
-  rewrite_with inverted ~terms (Fun.const new_term) raw depths
+  let n = String.length raw in
+  let in_parens (c : Place.component) =
+    (c.pos > 0 && String.unsafe_get raw (c.pos - 1) = '(')
+    ||
+    let rec next i =
+      if i < n && String.unsafe_get raw i = ' ' then next (i + 1) else i
+    in
+    let i = next (c.pos + c.len) in
+    i < n && String.unsafe_get raw i = '('
+  in
+  let nested =
+    match paren_form new_term with
+    | Some (host, parent) -> host ^ ", " ^ parent
+    | None -> new_term
+  in
+  rewrite_spans inverted ~terms
+    (fun c -> if in_parens c then nested else new_term)
+    raw depths
 
 (* ------------------------------------------------------------------------ *)
 
