@@ -462,7 +462,7 @@ let subject_html conf base hl subject =
       person_link conf base hl p
       ^ (if dates = "" then "" else " ")
       ^ edit_dates conf
-          ("m=MOD_IND&i=" ^ Driver.Iper.to_string (Driver.get_iper p))
+          ("m=MOD_IND&" ^ (Util.acces conf base p :> string))
           (Utf8.capitalize_fst (Util.transl conf "modify")
           ^ " " ^ key_text base p)
           dates

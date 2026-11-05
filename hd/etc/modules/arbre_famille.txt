@@ -90,7 +90,7 @@
         </a>
       %end;
       %if;(wizard and not cancel_links)
-        <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;"
+        <a class="normal_anchor" href="%prefix;m=MOD_IND&%xxx.access;"
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">%nn;
       %end;
       <span class="text-body-secondary">%nn;

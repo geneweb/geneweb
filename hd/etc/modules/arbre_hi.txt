@@ -117,7 +117,7 @@
           %end;
         </a>
         <a class="big_anchor_1m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaindex;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
+          href="%prefix;m=MOD_IND&i=%aaaaccess;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
       %else;
         <a class="big_anchor_him list-group-item-action"
           href="%prefix;%aaaaccess;" title="%aaafirst_name; %aaasurname; (%aaaocc;)">%nn;
@@ -134,10 +134,10 @@
         </a>
         %end;
         <a class="big_anchor_him_m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaindex;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
+          href="%prefix;m=MOD_IND&i=%aaaaccess;" title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)"></a>
         %if;(aaasame="")
         <a class="big_anchor_her_m list-group-item-action"
-          href="%prefix;m=MOD_IND&i=%aaaspouse.index;" title="Modifier %aaaspouse;"></a>
+          href="%prefix;m=MOD_IND&%aaaspouse.access;" title="Modifier %aaaspouse;"></a>
         %end;
       %end;
     %else;

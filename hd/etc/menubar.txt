@@ -152,7 +152,7 @@
           %( WIZARD | MOD_IND button %)
           %if;(iswiz=1)
             <li class="nav-item">
-              <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active" aria-current="page%end;" id="mod_ind" href="%prefix;m=MOD_IND&i=%index;" %laP;>%nn;
+              <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active" aria-current="page%end;" id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP;>%nn;
                 <i class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></i>
                 <span class="visually-hidden">[*modify::person/persons]0 (P)</span></a>
             </li>
@@ -215,7 +215,7 @@
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=MRG&i=%index;" title="[*merge] %first_name;%if;(occ!=0).%occ;%end; %surname; [with]…"><i class="fa fa-compress fa-fw text-danger me-2" aria-hidden="true"></i>[*merge::person/persons]1</a>
-                <a class="dropdown-item" href="%prefix;m=DEL_IND&i=%index;" title="[*delete] %self;"><i class="fa fa-trash-can fa-fw text-danger me-2" aria-hidden="true"></i>[*delete::person/persons]0</a>
+                <a class="dropdown-item" href="%prefix;m=DEL_IND&%access;" title="[*delete] %self;"><i class="fa fa-trash-can fa-fw text-danger me-2" aria-hidden="true"></i>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
                   <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">
                     <i class="fa fa-wrench fa-fw me-2" aria-hidden="true"></i>%nn;

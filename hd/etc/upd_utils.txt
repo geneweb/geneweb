@@ -271,7 +271,7 @@
       </div>
       <div id="excnt_witnwcnt_p_selct_mod" class="col-auto col-form-label">
         %if;(ww.index!="-1")
-          <a href="%prefix_base_password;m=MOD_IND&i=%ww.index;" title="[*modify::person/persons]0
+          <a href="%prefix_base_password;m=MOD_IND&%ww.access;" title="[*modify::person/persons]0
             %ww.first_name;%if;(ww.occ!="").%ww.occ%end; %ww.surname;">
             <i class="fa fa-user-pen fa-fw %if;(ww.sex=1)fe%end;male ms-2 me-1" aria-hidden="true"></i>
             [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>

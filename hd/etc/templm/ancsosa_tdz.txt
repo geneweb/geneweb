@@ -13,7 +13,7 @@
   %sp;
   %if;(wizard and not cancel_links)
     <a id="mi%xx.index;" class="date" href="#mi%xx.index;" %ltmp;
-       onclick="window.open('%prefix;m=MOD_IND;i=%xx.index;');">%nn;
+       onclick="window.open('%prefix;m=MOD_IND&%xx.access;');">%nn;
   %end;
   %apply;lazy_print(birth_symbol)
   %if;(xx.has_birth_date or xx.has_baptism_date)

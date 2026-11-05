@@ -60,7 +60,7 @@
 %define;link_dates(z1)
   %if;(lupd = "1")
     <a id="m%count;" class="date" href="#m%count;" %ltmp;
-      onclick="window.open('%prefix;m=MOD_IND;i=%z1.index;');"
+      onclick="window.open('%prefix;m=MOD_IND&%z1.access;');"
     >%z1.dates;%nn;%if;(z1.dates = "") - %end;</a>%nn;
     %if;("z1" = "ancestor" or "z1" = "child" or "z1" = "self")
       %sp;<a style="color:#FF0000;" href="#m%count;" %ltaf;

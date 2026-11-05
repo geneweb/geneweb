@@ -22,7 +22,7 @@
   %end;%nn;
   %if;(wizard and not cancel_links)
     <a class="normal_anchor"
-      href="%prefix;m=MOD_IND;i=%xxx.index;"
+      href="%prefix;m=MOD_IND&%xxx.access;"
       title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
   %end;
     <span class="fst-italic">%nn;

@@ -75,7 +75,7 @@
     or (not xx.has_death_date and (xx.burial_date.prec!="" or xx.burial_date.day="" or xx.burial_date.month=""))))1%end;%in;
   <td class="align-middle text-start table_big_cell">
     %if;(wizard and not cancel_links)
-      <a class="date table_big_anchor" href="%prefix;m=MOD_IND&i=%xx.index;" target="_blank"
+      <a class="date table_big_anchor" href="%prefix;m=MOD_IND&%xx.access;" target="_blank"
         title="[*modify::person/persons]0">%nn;
     %end;
     %if;(bd!="" or bp!="")

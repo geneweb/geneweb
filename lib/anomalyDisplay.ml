@@ -274,14 +274,12 @@ let print_message conf base resolve a =
 
 let wrench = {|<i class="fa fa-wrench fa-xs" aria-hidden="true"></i>|}
 
-let edit_person conf resolve p =
+let edit_person conf base resolve p =
   match resolve p with
   | Some dp ->
-      Printf.sprintf {|<a class="ms-2" href="%s" title="%s">%s</a>|}
-        (url conf
-           [
-             ("m", "MOD_IND"); ("i", Driver.Iper.to_string (Driver.get_iper dp));
-           ])
+      Printf.sprintf {|<a class="ms-2" href="%sm=MOD_IND&%s" title="%s">%s</a>|}
+        (Util.commd conf :> string)
+        (Util.acces conf base dp :> string)
         (esc (ctr conf "modify" ^ " " ^ person_key p))
         wrench
   | None -> ""
@@ -552,7 +550,7 @@ let print_several conf base st resolve todo =
       (fun i (p, kinds) ->
         if i < page_size then
           Output.printf conf "<li>%s%s — %s</li>\n" (who conf base resolve p)
-            (edit_person conf resolve p)
+            (edit_person conf base resolve p)
             (String.concat ", "
                (List.map
                   (fun k ->
@@ -702,7 +700,7 @@ let print_item ?(with_kind = false) conf base resolve ~entry ~resp a =
     (fun s ->
       Output.print_sstring conf
         (match s with
-        | Person p -> edit_person conf resolve p
+        | Person p -> edit_person conf base resolve p
         | Couple c -> edit_couple conf base resolve c))
     (subjects a);
   (match entry with

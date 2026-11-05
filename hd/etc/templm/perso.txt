@@ -52,9 +52,9 @@
   %if;wizard;
     %if;(evar.del="on")
       class="nobr del" target="ifr" onclick="javascript:deleted(this);"
-      href="%prefix;m=DEL_IND_OK;i=%nn;
+      href="%prefix;m=DEL_IND_OK&%nn;
     %else;
-      class="nobr" %l_on1 href="%prefix;m=MOD_IND;i=%nn;
+      class="nobr" %l_on1 href="%prefix;m=MOD_IND&%nn;
     %end;
   %else;
     href="#%nn;
@@ -97,7 +97,7 @@
     %if;wizard;
       <span style="width:270px">⟔%(⇱%)
         <span class="s_menu">
-          <a id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP; %l_on1;>↺ [*modify::person/persons]0</a>%nn;
+          <a id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP; %l_on1;>↺ [*modify::person/persons]0</a>%nn;
           <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %l_on1;>⇳ [*invert::event/events]1%(<br>[*modify person event order]0%)</a>
           %if;(is_male or is_female)
             <a id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
@@ -292,7 +292,7 @@
 %end;
 %define;link_dates(xx)
   %if;(not cancel_links)
-    %sp;<a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.index;">%nn;
+    %sp;<a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.access;">%nn;
     %if;(xx.dates!="")%xx.dates;%else;-%end;</a>%else;%xx.dates;%end;
 %end;
 %define;link_marriage(xx)

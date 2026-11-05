@@ -251,7 +251,7 @@
 
 %define;symbol(xx)
   %if;(wizard and evar.upd="on" and not cancel_links)
-    &nbsp;<a target="_blank" href="%prefix;m=MOD_IND;i=%xx.index;" title="[modify] [person/persons]0" >%apply;symbol1("xx")</a>%nn;
+    &nbsp;<a target="_blank" href="%prefix;m=MOD_IND&%xx.access;" title="[modify] [person/persons]0" >%apply;symbol1("xx")</a>%nn;
   %elseif(evar.t="N")
     %apply;symbol1("xx")
   %end;

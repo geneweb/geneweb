@@ -47,7 +47,7 @@
     %self; %dates_notag;%if;(title!=""), %title;%end;%nn;
   %else;
     <a href="%prefix;%access;" data-index="%index;">%self;</a>
-    %if;wizard;<a href="%prefix;m=MOD_IND&i=%index;" title="[modify::person/persons]0">%dates_notag;</a>%else;%dates_notag;%end;
+    %if;wizard;<a href="%prefix;m=MOD_IND&%access;" title="[modify::person/persons]0">%dates_notag;</a>%else;%dates_notag;%end;
     %if;(title!=""), %title;%end;
   %end;%sp;
   %if;(wizard and not cancel_links)
@@ -61,7 +61,7 @@
   %if;cancel_links;%spouse; %spouse.dates_notag;%if;(spouse.title!=""), %spouse.title;%end;%nn;
   %else;
     <a href="%prefix;%spouse.access;">%spouse;</a>
-    %if;wizard;<a href="%prefix;m=MOD_IND&i=%spouse.index;" title="[modify::person/persons]0">%spouse.dates_notag;</a>%else;%spouse.dates_notag;%end;
+    %if;wizard;<a href="%prefix;m=MOD_IND&%spouse.access;" title="[modify::person/persons]0">%spouse.dates_notag;</a>%else;%spouse.dates_notag;%end;
     %if;(spouse.title!=""), %spouse.title;%end;%nn;
   %end;
   %if;spouse.is_descendant;

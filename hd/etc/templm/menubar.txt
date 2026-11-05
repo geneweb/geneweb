@@ -44,7 +44,7 @@
   %if;wizard;
     <span><a id="upd" href="%prefix;m=U;%access;" %laU;>[*update]</a>
       <span class="s_menu">
-        <a id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>[modify::person/persons]0</a>%nn;
+        <a id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP;>[modify::person/persons]0</a>%nn;
         %foreach;family;
           %if;(family_cnt < 4)
             %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%end;%in;
@@ -64,7 +64,7 @@
         %end;
         <a id="snd_image" href="%prefix;m=SND_IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
         <a href="%prefix;m=MRG;i=%index;">[merge::]0 (oc=%occ;)</a>%nn;
-        <a href="%prefix;%access;&i=%index;&m=DEL_IND;">[delete::person/persons]0</a>%nn;
+        <a href="%prefix;m=DEL_IND&%access;">[delete::person/persons]0</a>%nn;
       </span>
     </span>
     %if;(bvar.setup_link != "no")
