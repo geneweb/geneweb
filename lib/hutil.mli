@@ -2,7 +2,11 @@
 
 open Config
 
-val header_without_http_nor_home : config -> (bool -> unit) -> unit
+val header_without_http_nor_home :
+  ?query:Adef.encoded_string -> config -> (bool -> unit) -> unit
+(** [header_without_http_nor_home ?query conf title] prints the page <head> and
+    opens <body>. [query] is the query of the permalink, by default the current
+    query without key conversion (see {!Permalink.query_aux}). *)
 
 val include_home_template : config -> unit
 (** [include_home_template conf] prints [home.txt]: the floating home, search
@@ -12,6 +16,7 @@ val header_with_title :
   ?error:bool ->
   ?fluid:bool ->
   ?h1_class:string ->
+  ?query:Adef.encoded_string ->
   config ->
   (bool -> unit) ->
   unit
@@ -19,7 +24,8 @@ val header_with_title :
     template, container <div>, and <h1> title.
     @param error red title if [true]
     @param fluid container-fluid if [true]
-    @param h1_class extra classes on the <h1> (e.g. ["h2"] for long titles) *)
+    @param h1_class extra classes on the <h1> (e.g. ["h2"] for long titles)
+    @param query permalink query, see {!header_without_http_nor_home} *)
 
 val header_without_title : ?title:(bool -> unit) -> config -> unit
 (** Similar to [header] but without any <h1> title element. [title true] prints
@@ -29,6 +35,7 @@ val header :
   ?error:bool ->
   ?fluid:bool ->
   ?h1_class:string ->
+  ?query:Adef.encoded_string ->
   config ->
   (bool -> unit) ->
   unit

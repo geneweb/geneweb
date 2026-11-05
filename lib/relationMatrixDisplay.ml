@@ -178,7 +178,7 @@ let print conn conf base =
       Util.transl_nth conf "relationship table" 2
       |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
-    Hutil.header conf title;
+    Hutil.header ~query:(Permalink.query conf base) conf title;
     let tp_link conf =
       let base_url = (Util.commd conf :> string) in
       let other_params =
