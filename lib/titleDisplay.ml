@@ -162,7 +162,7 @@ let print_title_place_list conf base t p t_equiv list =
         t_equiv
   in
   Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
-  Output.printf conf "<ul%s>" (columns_attrs list);
+  Output.printf conf "<ul%s>" (columns_attrs ~wide:true list);
   ignore
   @@ List.fold_left
        (fun list x ->
@@ -181,7 +181,7 @@ let print_all_with_place_list conf base p list =
     Output.print_string conf (escape_html p)
   in
   Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
-  Output.printf conf "<ul%s>" (columns_attrs list);
+  Output.printf conf "<ul%s>" (columns_attrs ~wide:true list);
   List.iter
     (fun ((_, t) as x) ->
       Output.print_sstring conf "<li>";
