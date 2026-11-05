@@ -759,7 +759,8 @@ let print_plan conf base u items ~hidden ~back ~old_html =
        (Printf.sprintf
           (ftransl conf "%d places to change (%d merged), %d uses")
           (List.length items) merged uses));
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.printf conf "<form method=\"post\" action=\"%s\" class=\"no-enter\">\n"
+    conf.command;
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS_OK");
   hidden ();
@@ -809,7 +810,19 @@ let print_plan conf base u items ~hidden ~back ~old_html =
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0))
     back
     (Utf8.capitalize_fst (transl conf "cancel"));
-  if detail then Output.print_sstring conf toggle_script
+  if detail then (
+    Output.print_sstring conf toggle_script;
+    (* Return in an edited place does not validate the whole form: only the
+       button does *)
+    Output.print_sstring conf
+      {|<script>
+document.querySelectorAll('form.no-enter input[type=text]').forEach(function (x) {
+  x.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter') ev.preventDefault();
+  });
+});
+</script>
+|})
   else (
     (* the same request again, with the list *)
     Output.printf conf "<form method=\"post\" action=\"%s\" class=\"mt-3\">\n"
