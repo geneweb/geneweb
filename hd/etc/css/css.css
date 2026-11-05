@@ -693,6 +693,15 @@ html {
   z-index: 1000;
 }
 
+.book-nb {
+  display: block;
+  font-size: 0.65em;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  color: var(--bs-secondary-color);
+}
+
 .sp-ul {
   display: inline-block;
   width: 0.75ch;

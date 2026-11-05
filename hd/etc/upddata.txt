@@ -77,6 +77,7 @@
                      href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;">%nn;
                      %visual_spaces.escape.entry_ini_display;%nn;
                   </a>
+                  <span class="book-nb">%entry_nb;</span>
                   %if;(max>0 and nb_results<nb_max)%nn;
                     <span class="bottom-book-arrow">
                       <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"

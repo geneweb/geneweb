@@ -308,6 +308,7 @@ and eval_simple_str_var conf _base env _xx = function
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
   | "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_ini_display" -> eval_string_env "entry_ini_display" env
+  | "entry_nb" -> eval_string_env "entry_nb" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_key" -> eval_string_env "entry_key" env
@@ -473,6 +474,11 @@ let print_foreach conf print_ast _eval_expr =
             |> add "key" (Vstring k)
             |> add "entry_ini" (Vstring ini_k)
             |> add "entry_ini_display" (Vstring display_ini)
+            |> add "entry_nb"
+                 (Vstring
+                    (Sosa.to_string_sep
+                       (transl conf "(thousand separator)")
+                       (Sosa.of_int (List.length list_v))))
             |> add "script" (Vbool (Option.is_some script_info))
             |> add "script_class"
                  (Vstring (Option.fold ~none:"" ~some:fst script_info))
