@@ -462,19 +462,68 @@ let print_slice conf ~href ~hidden total (from, upto) =
     Output.print_sstring conf (link (transl conf "next") (upto + 1));
   Output.print_sstring conf "</form>\n"
 
+(* [b]: the clusters having a spelling that begins with it, case and
+   accents ignored *)
+let begins_with conf =
+  match p_getenv conf.env "b" with
+  | Some b when b <> "" -> Some b
+  | Some _ | None -> None
+
 let print_clusters conf entries =
-  let all = PlaceTerms.clusters entries in
+  let begins = begins_with conf in
+  let all =
+    let all = PlaceTerms.clusters entries in
+    match begins with
+    | None -> all
+    | Some b ->
+        let b = Name.lower b in
+        List.filter
+          (fun (_, (l : PlaceTerms.entry list)) ->
+            List.exists
+              (fun (e : PlaceTerms.entry) ->
+                String.starts_with ~prefix:b (Name.lower e.term))
+              l)
+          all
+  in
   let total = List.length all in
   let from, upto = slice conf total in
   (* the list is long on a large base (Roglo): only a slice is sent *)
   let clusters = List.filteri (fun i _ -> i >= from - 1 && i < upto) all in
+  (* the beginning of the spellings shown *)
+  Output.printf conf
+    "<form method=\"get\" action=\"%s\" class=\"d-flex flex-wrap \
+     align-items-center gap-2 my-2\">\n"
+    conf.command;
+  Util.hidden_env conf;
+  Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
+  hidden_page conf;
+  Output.printf conf
+    "<label for=\"b\" class=\"text-nowrap\">%s</label>\n\
+     <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
+     id=\"b\" name=\"b\" value=\"%s\" size=\"20\">\n\
+     <button type=\"submit\" class=\"btn btn-sm btn-outline-secondary\"><i \
+     class=\"fa fa-magnifying-glass\"></i></button>%s\n\
+     </form>\n"
+    (esc (Utf8.capitalize_fst (transl conf "starting with")))
+    (esc (Option.value ~default:"" begins))
+    (match begins with
+    | Some _ ->
+        Printf.sprintf
+          " <a class=\"btn btn-sm btn-outline-secondary\" href=\"%s\"><i \
+           class=\"fa fa-xmark\"></i></a>"
+          (prefix conf ^ "m=PLACE_TERMS" ^ page_param conf)
+    | None -> "");
+  let begins_param = match begins with Some b -> "&b=" ^ enc b | None -> "" in
   if total = 0 then Output.print_sstring conf "<p>0</p>\n"
   else
     print_slice conf
-      ~href:(prefix conf ^ "m=PLACE_TERMS" ^ page_param conf)
+      ~href:(prefix conf ^ "m=PLACE_TERMS" ^ page_param conf ^ begins_param)
       ~hidden:(fun () ->
         Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
-        hidden_page conf)
+        hidden_page conf;
+        match begins with
+        | Some b -> Util.hidden_input_s conf "b" b
+        | None -> ())
       total (from, upto);
   if clusters <> [] then (
     Output.printf conf
