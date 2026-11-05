@@ -159,45 +159,32 @@ console.log('Matrix data loaded:', Object.keys(window.rmData.cells).length, 'cel
 </script>|}
     json_string
 
-(* Point d'entrée principal du module *)
-let print conn conf base =
-  if Util.url_has_pnoc_params conf.env then
-    let clean_url = Util.normalize_person_pool_url conf base "RM" None in
-    Connection.http_redirect_temporarily conn clean_url
-  else
-    let pl =
-      let rec loop pl i =
-        let k = string_of_int i in
-        match Util.find_person_in_env conf base k with
-        | Some p -> loop (p :: pl) (i + 1)
-        | None -> List.rev pl
-      in
-      loop [] 1
+let print _conn conf base =
+  let pl = List.map snd (Util.find_persons_in_env conf base) in
+  let title _ =
+    Util.transl_nth conf "relationship table" 2
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
+  in
+  Hutil.header ~query:(Permalink.query conf base) conf title;
+  let tp_link conf =
+    let base_url = (Util.commd conf :> string) in
+    let other_params =
+      List.filter_map
+        (fun (k, v) ->
+          if k <> "m" then Some (k ^ "=" ^ Adef.as_string v) else None)
+        conf.env
     in
-    let title _ =
-      Util.transl_nth conf "relationship table" 2
-      |> Utf8.capitalize_fst |> Output.print_sstring conf
-    in
-    Hutil.header ~query:(Permalink.query conf base) conf title;
-    let tp_link conf =
-      let base_url = (Util.commd conf :> string) in
-      let other_params =
-        List.filter_map
-          (fun (k, v) ->
-            if k <> "m" then Some (k ^ "=" ^ Adef.as_string v) else None)
-          conf.env
-      in
-      base_url ^ "m=TP&v=updRLM&" ^ String.concat "&" other_params
-    in
-    Output.printf conf
-      {|<div class="d-flex justify-content-end mb-3">
+    base_url ^ "m=TP&v=updRLM&" ^ String.concat "&" other_params
+  in
+  Output.printf conf
+    {|<div class="d-flex justify-content-end mb-3">
           <a href="%s" class="btn btn-outline-primary">
             <i class="fas fa-edit me-1"></i>%s</a>
         </div>|}
-      (tp_link conf)
-      (Util.transl_nth conf "add/clear/show/edit the graph" 3
-      |> Utf8.capitalize_fst);
-    (if List.length pl >= 2 then
-       let persons = Array.of_list pl in
-       print_matrix_table conf base persons);
-    Hutil.trailer conf
+    (tp_link conf)
+    (Util.transl_nth conf "add/clear/show/edit the graph" 3
+    |> Utf8.capitalize_fst);
+  (if List.length pl >= 2 then
+     let persons = Array.of_list pl in
+     print_matrix_table conf base persons);
+  Hutil.trailer conf
