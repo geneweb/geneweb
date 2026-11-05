@@ -1038,10 +1038,8 @@ let print_change_event_order_ok conf base wl p =
   Hutil.trailer conf
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
-  | Some i ->
-      let ip = Driver.Iper.of_string i in
-      let p = Driver.poi base ip in
+  match Util.find_person_in_env conf base "" with
+  | Some p ->
       effective_del conf base p;
       print_del_ok conf
   | None -> Hutil.incorrect_request conf
