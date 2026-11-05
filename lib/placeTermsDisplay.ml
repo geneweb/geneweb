@@ -28,7 +28,7 @@ let term_link conf t =
 
 let place_edit_link conf raw =
   Printf.sprintf
-    "<a href=\"%sm=MOD_DATA&data=place&s=%s\" class=\"ms-2\" title=\"%s\" \
+    "<a href=\"%sm=MOD_DATA&data=place&o=a&s=%s\" class=\"ms-2\" title=\"%s\" \
      data-bs-toggle=\"tooltip\"><i class=\"fa fa-pen-to-square \
      fa-sm\"></i></a>"
     (prefix conf)
@@ -378,18 +378,25 @@ let print_term conf entries t =
 (* ---- the places of a page of the book of places ---- *)
 
 (* [ps]: the beginning of the places of a page of m=MOD_DATA&data=place (its
-   [s]), selected as that page does *)
+   [s]), selected as that page does; [po=r] when that page is in the order
+   from the last term, [ps] being then a prefix of [Place.rev_key] *)
 let page_prefix conf =
   match p_getenv_notrim conf.env "ps" with
   | Some s when s <> "" -> Some s
   | Some _ | None -> None
 
+let page_rev_order conf = p_getenv conf.env "po" = Some "r"
+
 let page_param conf =
-  match page_prefix conf with Some s -> "&ps=" ^ enc s | None -> ""
+  match page_prefix conf with
+  | Some s -> "&ps=" ^ enc s ^ if page_rev_order conf then "&po=r" else ""
+  | None -> ""
 
 let hidden_page conf =
   match page_prefix conf with
-  | Some s -> Util.hidden_input_s conf "ps" s
+  | Some s ->
+      Util.hidden_input_s conf "ps" s;
+      if page_rev_order conf then Util.hidden_input_s conf "po" "r"
   | None -> ()
 
 (* the places used, those of the page only when [ps] is given *)
@@ -401,9 +408,11 @@ let page_places conf base =
   match page_prefix conf with
   | None -> places
   | Some s ->
+      let key =
+        if page_rev_order conf then Place.rev_key else Place.without_suburb
+      in
       List.filter
-        (fun (_, raw, _) ->
-          String.starts_with ~prefix:s (Place.without_suburb raw))
+        (fun (_, raw, _) -> String.starts_with ~prefix:s (key raw))
         places
 
 let page_entries conf base =
@@ -1907,6 +1916,7 @@ let continue_form ~m conf =
        (fun (k, _) ->
          k = "nt" || k = "t" || k = "g" || k = "gt" || k = "part" || k = "split"
          || k = "join" || k = "n" || k = "reorg" || k = "fmt" || k = "ps"
+         || k = "po"
          || String.length k > 2
             && String.starts_with ~prefix:"ro" k
             && String.for_all
