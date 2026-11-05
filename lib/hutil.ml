@@ -84,7 +84,7 @@ let header_without_title ?(title = fun _ -> ()) conf =
   header_without_http_nor_home conf title;
   include_home_template conf;
   Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid mx-3\">\n"
+    (if fluid then "<div class=\"container-fluid px-4\">\n"
      else "<div class=\"container\">\n")
 
 let header_with_title ?(error = false) ?(fluid = false) ?(h1_class = "") conf
@@ -94,7 +94,7 @@ let header_with_title ?(error = false) ?(fluid = false) ?(h1_class = "") conf
   header_without_http_nor_home conf title;
   include_home_template conf;
   Output.print_sstring conf
-    (if fluid then "<div class=\"container-fluid mx-3\">\n"
+    (if fluid then "<div class=\"container-fluid px-4\">\n"
      else "<div class=\"container\">\n");
   let cls = String.trim ((if error then "error " else "") ^ h1_class) in
   Output.print_sstring conf
