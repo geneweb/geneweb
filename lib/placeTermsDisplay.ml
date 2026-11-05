@@ -462,10 +462,10 @@ let print_slice conf ~href ~hidden total (from, upto) =
     Output.print_sstring conf (link (transl conf "next") (upto + 1));
   Output.print_sstring conf "</form>\n"
 
-(* [b]: the clusters having a spelling that begins with it, case and
-   accents ignored *)
+(* [bw]: the clusters whose first spelling (the most used) begins with it,
+   case and accents ignored; not [b], the name of the base in some URLs *)
 let begins_with conf =
-  match p_getenv conf.env "b" with
+  match p_getenv conf.env "bw" with
   | Some b when b <> "" -> Some b
   | Some _ | None -> None
 
@@ -479,10 +479,9 @@ let print_clusters conf entries =
         let b = Name.lower b in
         List.filter
           (fun (_, (l : PlaceTerms.entry list)) ->
-            List.exists
-              (fun (e : PlaceTerms.entry) ->
-                String.starts_with ~prefix:b (Name.lower e.term))
-              l)
+            match l with
+            | e :: _ -> String.starts_with ~prefix:b (Name.lower e.term)
+            | [] -> false)
           all
   in
   let total = List.length all in
@@ -498,9 +497,9 @@ let print_clusters conf entries =
   Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
   hidden_page conf;
   Output.printf conf
-    "<label for=\"b\" class=\"text-nowrap\">%s</label>\n\
+    "<label for=\"bw\" class=\"text-nowrap\">%s</label>\n\
      <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
-     id=\"b\" name=\"b\" value=\"%s\" size=\"20\">\n\
+     id=\"bw\" name=\"bw\" value=\"%s\" size=\"20\">\n\
      <button type=\"submit\" class=\"btn btn-sm btn-outline-secondary\"><i \
      class=\"fa fa-magnifying-glass\"></i></button>%s\n\
      </form>\n"
@@ -513,7 +512,9 @@ let print_clusters conf entries =
            class=\"fa fa-xmark\"></i></a>"
           (prefix conf ^ "m=PLACE_TERMS" ^ page_param conf)
     | None -> "");
-  let begins_param = match begins with Some b -> "&b=" ^ enc b | None -> "" in
+  let begins_param =
+    match begins with Some b -> "&bw=" ^ enc b | None -> ""
+  in
   if total = 0 then Output.print_sstring conf "<p>0</p>\n"
   else
     print_slice conf
@@ -522,7 +523,7 @@ let print_clusters conf entries =
         Util.hidden_input conf "m" (Adef.encoded "PLACE_TERMS");
         hidden_page conf;
         match begins with
-        | Some b -> Util.hidden_input_s conf "b" b
+        | Some b -> Util.hidden_input_s conf "bw" b
         | None -> ())
       total (from, upto);
   if clusters <> [] then (
