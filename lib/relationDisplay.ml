@@ -325,8 +325,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   ^<^ Adef.escaped ("&et=S" ^ sl)
 
 let print_no_relationship_link conf base p1 p2 =
-  Output.printf conf
-    {|%s.<br><p><span><a href="%sm=R&%s">%s</a> %s.</span></p>|}
+  Output.printf conf {|%s.<br><p><a href="%sm=R&%s">%s</a>.</p>|}
     (([
         Util.gen_person_title_text Util.reference conf base p1;
         Util.gen_person_title_text Util.reference conf base p2;
@@ -337,9 +336,8 @@ let print_no_relationship_link conf base p1 p2 =
     |> Utf8.capitalize_fst)
     (Util.commd ~excl:[ "m"; "em"; "ei"; "et" ] conf :> string)
     (Util.acces conf base p1 :> string)
-    (Util.transl_nth conf "try another/relationship computing" 0
+    (Util.transl conf "try another relationship computing"
     |> Utf8.capitalize_fst)
-    (Util.transl_nth conf "try another/relationship computing" 1)
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then (
