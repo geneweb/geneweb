@@ -34,8 +34,10 @@ val occurrences_of_env : Config.config -> occurrence list
 
 val valid_new_term : string -> bool
 (** A new term must not be empty nor contain brackets or parentheses, which
-    would change how the place strings are split. Commas are allowed (to split a
-    term in two). *)
+    would change how the place strings are split, except one trailing
+    parenthesised part: ["Nantes (Loire-Atlantique)"] is accepted like
+    ["Nantes, Loire-Atlantique"]. Commas are allowed (to split a term in two).
+*)
 
 val terms_of_env : Config.config -> string list
 (** The terms to rename, from the form fields [t] and [t1], [t2]... *)
