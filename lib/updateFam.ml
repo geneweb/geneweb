@@ -389,6 +389,10 @@ and get_parent_sex conf base fn sn oc =
   | _ -> -1
 
 and eval_key conf base (fn, sn, oc, create, _) = function
+  | [ "access" ] -> (
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> str_val (Util.acces conf base (Driver.poi base ip) :> string)
+      | None -> str_val "")
   | [ "create" ] -> str_val (if create <> Update.Link then "create" else "link")
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)

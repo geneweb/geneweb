@@ -8,7 +8,7 @@
     %if;(mrg=1)[*merge::person/persons]1
     %else;[*modify::person/persons]0
     %end;
-    # %index;%nn;
+    # %access;%nn;
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">

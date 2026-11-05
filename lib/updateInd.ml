@@ -38,6 +38,8 @@ let rec eval_var conf base env p _loc sl =
   with Not_found -> eval_simple_var conf base env p sl
 
 and eval_simple_var conf base env p = function
+  | [ "access" ] ->
+      str_val (Util.acces conf base (Driver.poi base p.key_index) :> string)
   | [ "alias" ] -> eval_string_env "alias" env
   | [ "acc_if_titles" ] -> bool_val (p.access = IfTitles)
   | [ "acc_private" ] -> bool_val (p.access = Private)
@@ -260,7 +262,7 @@ and eval_simple_var conf base env p = function
             try Some (List.nth p.rparents (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_relation_var base r sl
+      eval_relation_var conf base r sl
   | [ "sources" ] -> safe_val (Util.escape_html p.psources :> Adef.safe_string)
   | [ "surname" ] -> safe_val (Util.escape_html p.surname :> Adef.safe_string)
   | [ "surname_alias" ] -> eval_string_env "surname_alias" env
@@ -324,7 +326,7 @@ and eval_simple_var conf base env p = function
                     then ("", "", 0, Update.Create (Neuter, None), "")
                     else raise Not_found
                   in
-                  eval_person_var base k sl
+                  eval_person_var conf base k sl
               | _ -> raise Not_found)
           | None -> raise Not_found)
       | _ -> raise Not_found)
@@ -460,21 +462,21 @@ and eval_title_var t = function
       | _ -> str_val "")
   | _ -> raise Not_found
 
-and eval_relation_var base r = function
+and eval_relation_var conf base r = function
   | "r_father" :: sl ->
       let x =
         match r with
         | Some { r_fath = Some x; _ } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
-      eval_person_var base x sl
+      eval_person_var conf base x sl
   | "r_mother" :: sl ->
       let x =
         match r with
         | Some { r_moth = Some x; _ } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
-      eval_person_var base x sl
+      eval_person_var conf base x sl
   | [ "rt_adoption" ] -> eval_is_relation_type Adoption r
   | [ "rt_candidate_parent" ] -> eval_is_relation_type CandidateParent r
   | [ "rt_empty" ] -> (
@@ -486,7 +488,11 @@ and eval_relation_var base r = function
   | [ "rt_recognition" ] -> eval_is_relation_type Recognition r
   | _ -> raise Not_found
 
-and eval_person_var base (fn, sn, oc, create, _) = function
+and eval_person_var conf base (fn, sn, oc, create, _) = function
+  | [ "access" ] -> (
+      match Driver.person_of_key base fn sn oc with
+      | Some ip -> str_val (Util.acces conf base (Driver.poi base ip) :> string)
+      | None -> str_val "")
   | [ "create" ] -> (
       match create with
       | Update.Create (_, _) -> bool_val true
@@ -521,9 +527,8 @@ and eval_is_relation_type rt = function
 
 and eval_special_var conf base = function
   | [ "include_menubar" ] -> (
-      match p_getenv conf.env "i" with
-      | Some i ->
-          let p = Driver.poi base (Driver.Iper.of_string i) in
+      match Util.find_person_in_env conf base "" with
+      | Some p ->
           Perso.interp_templ ~no_headers:true "menubar" conf base p;
           VVstring ""
       | None -> VVstring "")
@@ -676,21 +681,18 @@ let print_del1 conf base p =
   Hutil.trailer conf
 
 let print_mod conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let p = Driver.poi base (Driver.Iper.of_string i) in
+  | Some p ->
       let sp = string_person_of base p in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_person ~salt sp in
       print_update_ind conf base sp digest
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let p = Driver.poi base (Driver.Iper.of_string i) in
-      print_del1 conf base p
+  | Some p -> print_del1 conf base p
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
