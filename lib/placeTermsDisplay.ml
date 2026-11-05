@@ -736,10 +736,12 @@ let apply_edits conf base items =
    fields describing the change, [old_html] renders the old place of an
    item. *)
 let print_plan conf base u items ~hidden ~back ~old_html =
-  (* the list of the changes may be huge (Roglo): shown only when asked
-     ([detail=on]); otherwise a summary, the checked places carried by hidden
-     fields *)
-  let detail = p_getenv conf.env "detail" = Some "on" in
+  (* the list of the changes may be huge (Roglo): shown when it is short
+     (less than 50 places) or when asked ([detail=on]); otherwise a summary,
+     the checked places carried by hidden fields *)
+  let detail =
+    p_getenv conf.env "detail" = Some "on" || List.length items < 50
+  in
   let merged =
     List.length
       (List.filter
