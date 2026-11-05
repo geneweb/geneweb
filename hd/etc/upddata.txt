@@ -40,6 +40,9 @@
 <div class="container-fluid px-4">
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
+  %( rv: explicit order of the place dictionary (o=r from the last term,
+     o=a alphabetic, default dico_inverted), carried by every MOD_DATA link %)
+  %let;rv;%if;(e.data="place")%if;(e.o="r")&o=r%elseif;(e.o="a")&o=a%end;%end;%in;
   %if;(e.data="")
     <h1 class="h3 mt-3">[*book/books]1</h1>
     <ul class="list-unstyled row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
@@ -62,6 +65,13 @@
             <div class="d-none d-lg-block">[*book keyboard help]</div>
           %end;
           %if;(e.data="place")
+            %if;rev_order;
+              <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=a">%nn;
+                <i class="fa fa-arrow-down-a-z fa-fw me-1"></i>[*alphabetic order]</a>
+            %else;
+              <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=r">%nn;
+                <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
+            %end;
             <form method="get" action="%action;" class="d-flex align-items-center gap-1">
               %hidden;
               <input type="hidden" name="m" value="PLACE_TERMS">
@@ -88,14 +98,14 @@
         <ol class="breadcrumb flex-nowrap flex-shrink-0 align-items-center mb-0" style="--bs-breadcrumb-divider: '›';">
           %if;(e.s!="")
             <li class="breadcrumb-item">
-              <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;"
+              <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;%rv;"
                 title="[*back to index and books]" aria-label="[*back to index and books]">%nn;
                 <i class="fa fa-arrow-down-a-z"></i><span class="d-none d-md-inline ms-1">[*alphabetical index]</span></a>
             </li>
             %foreach;substring.s.6;
               <li class="breadcrumb-item">
                 <a class="sub-char btn btn-sm btn-outline-primary fs-6 font-monospace text-nowrap"
-                  href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;">%visual_spaces.escape.substr;</a>
+                  href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;%rv;">%visual_spaces.escape.substr;</a>
               </li>
             %end;
             %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
@@ -109,6 +119,7 @@
               %hidden;
               <input type="hidden" name="m" value="MOD_DATA">
               <input type="hidden" name="data" value="%e.data;">
+              %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
               <input type="text" class="form-control form-control-sm fs-6 font-monospace border-primary"
                 name="s" id="book-filter" autocomplete="off" value="%escape.current_s;"
                 style="width: %expr(len_s+12)ch;" placeholder="[*search/case sensitive]0"
@@ -144,7 +155,7 @@
       %foreach;entry;
         <h3 class="subtitle d-flex align-items-center fs-5 pb-1 mx-3 mt-2" id="_%escape.entry_ini;">
           <span class="font-monospace">%nn;
-            %if;(entry_ini!=e.s)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;"
+            %if;(entry_ini!=e.s)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;"
               title="%entry_label;">%end;%nn;
             %visual_spaces.escape.entry_ini;%nn;
             %if;(entry_ini!=e.s)</a>%end;
@@ -179,7 +190,7 @@
                 <div class="flex-grow-1">
                   <a role="button" class="btn-link%if;(e.data!="src") d-block%end;"
                      title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
-                     href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;"
+                     href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;"
                      data-entry="%escape.printable.entry_value;"%nn;
                      %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
                      %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
@@ -208,6 +219,7 @@
       %hidden;
       <input type="hidden" name="m" value="MOD_DATA_OK">
       <input type="hidden" name="data" value="%e.data;">
+      %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
       <div class="d-flex align-items-start gap-2">
@@ -243,7 +255,7 @@
     <div id="book-index">
       %foreach;entry;
         %if;(entry_ini!=e.s)
-          <a%if;script; class="%script_class;"%end; href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;"
+          <a%if;script; class="%script_class;"%end; href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;"
             title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">
             <span class="fs-4 font-monospace">%visual_spaces.escape.entry_ini_display;</span>
             <span%if;(entry_count>=nb_max) class="fw-bold text-warning-emphasis"%end;>%entry_nb;</span>

@@ -114,7 +114,12 @@ let print_mod_ok conf base =
     let new_istr = Driver.insert_string base new_input in
     let new_istr_s = Driver.Istr.to_string new_istr in
     let ajax = p_getenv conf.env "ajax" <> None in
-    let new_ini = ini_of_update_data ini new_input in
+    let new_ini =
+      if rev_order conf then ini_of_update_data ini (nav_key conf new_input)
+      else ini_of_update_data ini new_input
+    in
+    let order = order_param conf in
+    let o_param = match order with Some o -> "&o=" ^ o | None -> "" in
     let list = get_person_from_data conf base in
     let list =
       List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list
@@ -165,11 +170,11 @@ let print_mod_ok conf base =
                  | None -> `Null );
                ( "url",
                  `String
-                   (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s#k%s"
+                   (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s%s#k%s"
                       (commd conf :> string)
                       (Mutil.encode data :> string)
                       (Mutil.encode new_ini :> string)
-                      new_istr_s) );
+                      o_param new_istr_s) );
              ])
       else
         let title _ =
@@ -206,6 +211,9 @@ let print_mod_ok conf base =
           Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
           Util.hidden_input conf "data" (Mutil.encode data);
           Util.hidden_input conf "s" (Mutil.encode ini);
+          Option.iter
+            (fun o -> Util.hidden_input conf "o" (Adef.encoded o))
+            order;
           Output.print_sstring conf
             {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
           Output.print_string conf (Util.escape_html (only_printable new_input));
@@ -223,6 +231,7 @@ let print_mod_ok conf base =
         Output.print_string conf (Mutil.encode data);
         Output.print_sstring conf {|&s=|};
         Output.print_string conf (Mutil.encode new_ini);
+        Output.print_sstring conf o_param;
         Output.print_sstring conf ("#k" ^ new_istr_s);
         Output.print_sstring conf {|" id="reference">|};
         Output.print_sstring conf
@@ -237,6 +246,7 @@ let print_mod_ok conf base =
           Output.print_string conf (Mutil.encode data);
           Output.print_sstring conf {|&s=|};
           Output.print_string conf (Mutil.encode ini);
+          Output.print_sstring conf o_param;
           Output.print_sstring conf {|">|};
           Output.print_sstring conf (transl conf "at old location");
           Output.print_sstring conf {|</a>|});
@@ -260,6 +270,7 @@ let print_mod_ok conf base =
       Output.print_string conf (Mutil.encode data);
       Output.print_sstring conf {|&s=|};
       Output.print_string conf (Mutil.encode ini);
+      Output.print_sstring conf o_param;
       Output.print_sstring conf ("#k" ^ new_istr_s);
       Output.print_sstring conf {|" id="reference">|};
       Output.print_sstring conf
@@ -301,6 +312,7 @@ let rec eval_var conf base env xx _loc sl =
   with Not_found -> eval_compound_var conf base env xx sl
 
 and eval_simple_var conf base env xx = function
+  | [ "rev_order" ] -> Templ.VVbool (rev_order conf)
   | [ "permalink" ] ->
       Templ.VVstring
         (Permalink.script conf (Permalink.query conf base) :> string)
@@ -367,7 +379,8 @@ and eval_simple_str_var conf _base env _xx = function
             ~wide:
               (List.mem data
                  [ Some "place"; Some "occu"; Some "title"; Some "domain" ])
-            (List.length l + (3 * List.length (combine_by_ini ini l)))
+            (List.length l
+            + (3 * List.length (combine_by_ini (nav_key conf) ini l)))
       | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
   | "entry_count" -> (
@@ -380,7 +393,9 @@ and eval_simple_str_var conf _base env _xx = function
           let n = List.length l in
           (Util.escape_html
              (Printf.sprintf
-                (ftransl conf "%s %s starting with %s")
+                (if rev_order conf then
+                   ftransl conf "%s %s whose last term starts with %s"
+                 else ftransl conf "%s %s starting with %s")
                 (thousands conf n)
                 (snd (translate_title conf n))
                 (eval_string_env "entry_ini" env))
@@ -427,7 +442,11 @@ and eval_simple_str_var conf _base env _xx = function
       | Some ini ->
           if ini = "" then Printf.sprintf "%s %s" len2 book_name
           else
-            let fmt_str = ftransl conf "%s %s starting with %s" in
+            let fmt_str =
+              if rev_order conf then
+                ftransl conf "%s %s whose last term starts with %s"
+              else ftransl conf "%s %s starting with %s"
+            in
             let escaped_ini =
               Printf.sprintf "<span>%s</span>"
                 (visual_spaces_html (Util.escape_html ini :> string))
@@ -575,6 +594,17 @@ let print_foreach conf print_ast _eval_expr =
   and print_foreach_value env xx al =
     let l =
       match get_env "list_value" env with
+      | Vlist_value l when rev_order conf ->
+          List.rev_map (fun (k, s) -> (Place.rev_terms s, (k, s))) l
+          |> List.sort (fun (t1, (_, s1)) (t2, (_, s2)) ->
+              let c = compare_terms t1 t2 in
+              if c <> 0 then c
+              else
+                let rss1 = Place.without_suburb s1 in
+                let rss2 = Place.without_suburb s2 in
+                if rss1 = rss2 then Gutil.alphabetic_order s1 s2
+                else Gutil.alphabetic_order rss1 rss2)
+          |> List.map snd
       | Vlist_value l ->
           List.sort
             (fun (_, s1) (_, s2) ->

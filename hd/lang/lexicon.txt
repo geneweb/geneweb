@@ -144,6 +144,11 @@ no: %s %s for
 pl: %s %s
 ru: %s %s
 
+    %s %s whose last term starts with %s
+de: %s %s, deren letztes Glied mit „%s” beginnt
+en: %s %s whose last term starts with “%s”
+fr: %s %s dont le dernier terme commence par « %s »
+
     %s %s starting with %s
 af: %s %s begin met “%s”
 bg: %s %s започващо с „%s”
@@ -22086,6 +22091,11 @@ fr: fils/filles/enfants
 pt: filhos/filhas/filhos
 sv: söner/döttrar/barn
 tr: oğulları/kızları/çocukları
+
+    order from the last term
+de: Ordnung ab dem letzten Glied
+en: order from the last term
+fr: ordre à partir du dernier terme
 
     sorted by
 de: sortiert nach
