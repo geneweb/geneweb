@@ -32,7 +32,7 @@ let include_home_template conf =
   try Templ.output conf ifun Templ.Env.empty () "home"
   with Sys_error _ | Not_found -> error_cannot_access conf "home"
 
-let header_without_http_nor_home conf title =
+let header_without_http_nor_home ?query conf title =
   let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
   (* conf.lang comes from the URL; escape it to prevent attribute injection
      (e.g. lang="fr" onload="..."). In practice lang is validated as a known
@@ -62,7 +62,10 @@ let header_without_http_nor_home conf title =
   Output.print_sstring conf str1;
   title true;
   Output.print_sstring conf str2;
-  Output.print_string conf (Permalink.script conf (Permalink.query_aux conf));
+  let query =
+    match query with Some q -> q | None -> Permalink.query_aux conf
+  in
+  Output.print_string conf (Permalink.script conf query);
   Templ.output_simple conf Templ.Env.empty "css";
   Output.print_sstring conf "</head>\n";
   let s =
@@ -87,11 +90,11 @@ let header_without_title ?(title = fun _ -> ()) conf =
     (if fluid then "<div class=\"container-fluid px-4\">\n"
      else "<div class=\"container\">\n")
 
-let header_with_title ?(error = false) ?(fluid = false) ?(h1_class = "") conf
-    title =
+let header_with_title ?(error = false) ?(fluid = false) ?(h1_class = "") ?query
+    conf title =
   let fluid = fluid || is_fluid conf in
   Util.html conf;
-  header_without_http_nor_home conf title;
+  header_without_http_nor_home ?query conf title;
   include_home_template conf;
   Output.print_sstring conf
     (if fluid then "<div class=\"container-fluid px-4\">\n"
@@ -102,8 +105,8 @@ let header_with_title ?(error = false) ?(fluid = false) ?(h1_class = "") conf
   title false;
   Output.print_sstring conf "</h1>\n"
 
-let header ?(error = false) ?(fluid = false) ?h1_class conf title =
-  header_with_title ~error ~fluid ?h1_class conf title
+let header ?(error = false) ?(fluid = false) ?h1_class ?query conf title =
+  header_with_title ~error ~fluid ?h1_class ?query conf title
 
 let rheader conf title = header_with_title ~error:true conf title
 
