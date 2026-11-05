@@ -143,13 +143,19 @@
     </div>
   %end;
   %if;(e.data="place")
-    <div class="d-flex justify-content-end mx-2 mt-2">
-      <a class="btn btn-outline-primary btn-sm" role="button"
-         href="%prefix;m=PLACE_TERMS%if;(e.s!="")&ps=%encode.e.s;%end;">
-        <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]
-      </a>
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mx-2 mt-2">
+      <form method="get" action="%action;" class="d-flex align-items-center gap-1">
+        %hidden;
+        <input type="hidden" name="m" value="PLACE_TERMS">
+        %if;(e.s!="")<input type="hidden" name="ps" value="%escape.e.s;">%end;
+        <button type="submit" class="btn btn-outline-primary btn-sm">
+          <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]
+        </button>
+        <input type="text" class="form-control form-control-sm w-auto" size="30"
+               name="bw" placeholder="[starting with]" aria-label="[starting with]">
+      </form>
       %if;(e.s!="")
-        <a class="btn btn-outline-primary btn-sm ms-2" role="button"
+        <a class="btn btn-outline-primary btn-sm" role="button"
            href="%prefix;m=PLACE_TERMS&reorg=on&ps=%encode.e.s;">
           <i class="fa fa-shuffle fa-fw me-1"></i>[*places to reorganize]
         </a>
