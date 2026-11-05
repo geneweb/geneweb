@@ -665,7 +665,25 @@ let check_note_access ~is_new conf base =
 
 let print_gallery conf base =
   if check_note_access ~is_new:false conf base then
-    Templ.output_simple conf Templ.Env.empty "notes_gallery"
+    let ifun =
+      Templ.
+        {
+          eval_var =
+            (fun _ _ _ -> function
+              | [ "access" ] ->
+                  VVstring
+                    (match Util.find_person_in_env conf base "" with
+                    | Some p -> (Util.acces conf base p :> string)
+                    | None -> "")
+              | _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother = (fun x -> x);
+          set_vother = (fun x -> Some x);
+          print_foreach = (fun _ -> raise Not_found);
+        }
+    in
+    Templ.output conf ifun Templ.Env.empty () "notes_gallery"
   else
     Output.print_sstring conf
       (transl conf "note is restricted" |> Utf8.capitalize_fst)
