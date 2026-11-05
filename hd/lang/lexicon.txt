@@ -22858,6 +22858,21 @@ sv: fadern/modern/en förälder
 tr: baba/anne/ebeveyn
 zh: 父/母/a parent
 
+    a large update started by %s at %s is in progress
+de: eine umfangreiche Änderung, gestartet von %s um %s, läuft gerade
+en: a large update started by %s at %s is in progress
+fr: une mise à jour importante lancée par %s à %s est en cours
+
+    your request has not been applied yet
+de: Ihre Anfrage wurde noch nicht ausgeführt
+en: your request has not been applied yet
+fr: votre demande n'a pas encore été prise en compte
+
+    it will be resubmitted automatically in %s seconds
+de: sie wird in %s Sekunden automatisch erneut gesendet
+en: it will be resubmitted automatically in %s seconds
+fr: elle sera renvoyée automatiquement dans %s secondes
+
     the file is temporarily locked: please try again
 af: die lêer is tydelik gesluit: probeer asseblief later weer
 bg: файлът е временно заключен; опитайте отново. Ако това не помага, изчакайте малко преди да опитате пак
