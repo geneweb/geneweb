@@ -902,5 +902,9 @@ val evar_buttons : config -> string -> evar_button list -> string -> unit
 val url_set_aux : config -> string -> string list -> string list -> string
 (** *)
 
+val clear_asset_caches : unit -> unit
+(** Forget the cached directory listings used to resolve templates/assets and
+    the memoized file hashes. Used by [m=RELOAD]. *)
+
 val parse_file_cached : string -> Geneweb_templ.Ast.t list
 (** *)

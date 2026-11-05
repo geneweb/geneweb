@@ -24,7 +24,7 @@
   dune-site.plugins
   ipaddr
   cmdliner)
- (modules request sites cmd cmd_legacy robot gwd_oidc))
+ (modules request reload sites cmd cmd_legacy robot gwd_oidc))
 
 (executable
  (package geneweb)
