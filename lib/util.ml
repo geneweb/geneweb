@@ -511,8 +511,6 @@ let get_referer conf =
   let referer = Header.extract_param "referer: " '\n' conf.request in
   escape_html referer
 
-let end_centered conf = Output.print_sstring conf "</td></tr></table>\n"
-
 let week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
   fun i ->
@@ -2964,122 +2962,55 @@ let html_highlight case_sens h s =
   in
   loop false 0 0
 
-(* Print list in columns with Gutil.alphabetic order *)
+let column_count lines = max 1 (lines / 15)
 
-type elem_kind = HeadElem | ContElem | Elem
+let columns_style ?(wide = false) lines =
+  match column_count lines with
+  | 1 -> ""
+  | n ->
+      Printf.sprintf {| class="list-columns%s" style="--cols:%d"|}
+        (if wide then " wide" else "")
+        n
 
-let kind_size = function HeadElem | ContElem -> 4 | Elem -> 1
-
-let dispatch_in_columns ncol list order =
-  let rlist =
-    List.fold_left
-      (fun rlist elem ->
-        let ord = order elem in
-        let kind =
-          match rlist with
-          | (_, prev_ord, _prev_elem) :: _ ->
-              if
-                ord = prev_ord
-                || (ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0])
-              then Elem
-              else HeadElem
-          | [] -> HeadElem
-        in
-        (ref kind, ord, elem) :: rlist)
-      [] list
-  in
-  let ini_list, ini_len =
-    List.fold_left
-      (fun (list, len) ((kind, _, _) as elem) ->
-        (elem :: list, len + kind_size !kind))
-      ([], 0) rlist
-  in
-  let len_list =
-    let rec loop rlen_list cnt col accu len list =
-      if col > ncol then List.rev rlen_list
-      else
-        let list, kind, is_last =
-          match list with
-          | (kind, _, _) :: list -> (list, kind, false)
-          | [] -> ([], ref Elem, true)
-        in
-        let accu = accu + (ncol * kind_size !kind) in
-        let cnt = cnt + 1 in
-        if accu > len && (not is_last) && !kind = Elem then (
-          (* put a new size and restart from zero *)
-          kind := ContElem;
-          loop [] 0 1 0 (len + kind_size ContElem - 1) ini_list)
-        else
-          let rlen_list, cnt, col, accu =
-            if accu > len && cnt > 1 then
-              ((cnt - 1) :: rlen_list, 1, col + 1, accu - len)
-            else (rlen_list, cnt, col, accu)
-          in
-          loop rlen_list cnt col accu len list
-    in
-    loop [] 0 1 0 ini_len ini_list
-  in
-  (len_list, ini_list)
-
-let print_in_columns conf ncols len_list list wprint_elem =
-  Output.printf conf "<table class=\"w-auto\">\n";
-  Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.left;
-  (let _ =
-     List.fold_left
-       (fun (list, _first) len ->
-         let rec loop n list =
-           if n = 0 then (
-             Output.print_sstring conf "</ul>\n</td>\n";
-             (list, false))
-           else
-             match list with
-             | (kind, ord, elem) :: list ->
-                 if n = len then
-                   Output.printf conf "<td width=\"%d%%\">\n" (100 / ncols)
-                 else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
-                 if !kind <> Elem then (
-                   let letter =
-                     if ord = "" then "…" else String.make 1 ord.[0]
-                   in
-                   let id_attr =
-                     if !kind = HeadElem then Printf.sprintf " id=\"%s\"" letter
-                     else ""
-                   in
-                   Output.printf conf
-                     "<h3%s class=\"subtitle pb-1 mx-3\">%s%s</h3>\n" id_attr
-                     letter
-                     (if !kind = HeadElem then ""
-                      else " (" ^ transl conf "continued" ^ ")");
-                   Output.print_sstring conf "<ul>\n");
-                 Output.print_sstring conf "<li>";
-                 wprint_elem elem;
-                 Output.print_sstring conf "</li>\n";
-                 loop (n - 1) list
-             | [] -> ([], false)
-         in
-         loop len list)
-       (list, true) len_list
-   in
-   ());
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "</table>\n";
-  end_centered conf
+let columns_attrs ?wide l = columns_style ?wide (List.length l)
+let wide_list l = column_count (List.length l) > 4
 
 let wprint_in_columns conf order wprint_elem list =
-  let ncols =
-    match p_getint conf.env "ncols" with
-    | Some n -> max 1 n
-    | None ->
-        let len_list = List.length list in
-        if len_list < 40 then 1
-        else if len_list < 80 then 2
-        else if len_list < 120 then 3
-        else if len_list < 160 then 4
-        else if len_list < 200 then 5
-        else 6
+  let print_items =
+    List.iter (fun elem ->
+        Output.print_sstring conf "<li>";
+        wprint_elem elem;
+        Output.print_sstring conf "</li>")
   in
-  let len_list, list = dispatch_in_columns ncols list order in
-  print_in_columns conf ncols len_list list wprint_elem
+  let len = List.length list in
+  if column_count len = 1 then (
+    Output.print_sstring conf "<ul>";
+    print_items list;
+    Output.print_sstring conf "</ul>")
+  else
+    let groups =
+      List.fold_left
+        (fun acc elem ->
+          let ord = order elem in
+          let head =
+            if ord = "" then "…" else String.sub ord 0 (Utf8.next ord 0)
+          in
+          match acc with
+          | (h, l) :: tl when h = head -> (h, elem :: l) :: tl
+          | _ -> (head, [ elem ]) :: acc)
+        [] list
+    in
+    Output.printf conf "<div%s>"
+      (columns_style (len + (3 * List.length groups)));
+    List.iter
+      (fun (head, l) ->
+        let h = (escape_html head :> string) in
+        Output.printf conf
+          {|<h3 id="%s" class="subtitle pb-1 mx-3">%s</h3><ul>|} h h;
+        print_items (List.rev l);
+        Output.print_sstring conf "</ul>")
+      (List.rev groups);
+    Output.print_sstring conf "</div>"
 
 (* ********************************************************************** *)
 (*  [Fonc] reduce_list : int -> list 'a -> list 'a                        *)

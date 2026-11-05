@@ -70,7 +70,7 @@ a, .pre {
   white-space: unset;
 }
 
-a:has(i), .deslist a, .ind-notes a, .toast-body a {
+a:has(i), .deslist a, .ind-notes a, .toast-body a, .list-columns a {
   white-space: normal;
 }
 
@@ -1827,6 +1827,31 @@ div.summary ul ul
   font-weight:bold
 }
 
+/* lists */
+.list-columns
+{
+  --colw: 15rem;
+  columns: var(--colw) var(--cols);
+  column-gap: 2rem;
+  max-width: calc(var(--cols) * (var(--colw) + 2rem) - 2rem);
+  margin-inline: auto;
+}
+
+.list-columns.wide
+{
+  --colw: 20rem;
+}
+
+.list-columns h3
+{
+  break-after: avoid;
+}
+
+.list-columns li
+{
+  break-inside: avoid;
+  overflow-wrap: anywhere;
+}
 
 /* ------------------------------ Biographie ----------------------------- */
 
