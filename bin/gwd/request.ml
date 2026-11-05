@@ -212,12 +212,34 @@ let try_plugin conn conf base_name meth =
   Registration.try_handlers ~meth (fun ~name handler ->
       List.mem name conf.allowed_plugins && handler conn conf base_name)
 
-let w_lock ~onerror fn conn conf (base_name : string option) =
+(* The lock is first tried without waiting: when it is held by a bulk task
+   (see [w_bulk]), the wizard is told so ([onbulk]) instead of waiting for
+   the end of the task; otherwise the lock is waited for, as before. *)
+let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
   let bfile = !GWPARAM.bpath conf.bname in
+  let lock_file = Mutil.lock_file bfile in
+  let run () = fn conn conf base_name in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
-  Lock.control
-    ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
-    ~wait:true ~lock_file:(Mutil.lock_file bfile)
+  let wait () =
+    Lock.control
+      ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
+      ~wait:true ~lock_file run
+  in
+  match onbulk with
+  | None -> wait ()
+  | Some onbulk ->
+      Lock.control ~wait:false ~lock_file run ~on_exn:(fun exn _bt ->
+          match exn with
+          | Unix.Unix_error ((Unix.EAGAIN | Unix.EACCES), _, _) -> (
+              match BulkStatus.read bfile with
+              | Some st -> onbulk conn conf base_name st
+              | None -> wait ())
+          | _ -> wait ())
+
+(* To be put inside [w_lock]: marks the base as held by a bulk task for the
+   requests arriving meanwhile. *)
+let w_bulk ~command fn conn conf (base_name : string option) =
+  BulkStatus.with_marker (!GWPARAM.bpath conf.bname) ~command ~user:conf.user
   @@ fun () -> fn conn conf base_name
 
 (* Module-level ref used as an init-once guard: the nldb format check
@@ -309,7 +331,11 @@ let w_wizard fn conn conf base =
    The actual per-request entry point is the [fun conf -> ...] at the
    end of this binding. *)
 let treat_request =
-  let w_lock = w_lock ~onerror:(fun _conn conf _ -> Update.error_locked conf) in
+  let w_lock =
+    w_lock
+      ~onerror:(fun _conn conf _ -> Update.error_locked conf)
+      ~onbulk:(fun _conn conf _ st -> Update.error_bulk conf st)
+  in
   let w_base =
     let none conf =
       if conf.bname = "" then GWPARAM.output_error conf Code.Bad_Request
@@ -399,6 +425,7 @@ let treat_request =
              let w_base hdl = w_base (fun _conn -> hdl) conn in
              let w_person hdl = w_person (fun _conn -> hdl) conn in
              let w_lock hdl = w_lock (fun _conn -> hdl) conn in
+             let w_bulk hdl = w_bulk ~command:m (fun _conn -> hdl) conn in
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
              match m with
              | "" -> (
@@ -412,10 +439,11 @@ let treat_request =
                  | None -> handle_no_bfile conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
-             | "ADD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_add
+             | "ADD_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
              | "ADD_PAR" -> w_wizard @@ w_base @@ UpdateFam.print_add_parents
              | "ADD_PAR_OK" ->
-                 w_wizard @@ w_base @@ UpdateFamOk.print_add_parents
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
              | "ANOMA" -> w_wizard @@ w_base @@ AnomalyDisplay.print
              | "ANM" ->
                  w_base @@ fun conf _ ->
@@ -475,7 +503,8 @@ let treat_request =
                  w_wizard @@ w_base
                  @@ CheckDataDisplay.print_redirect_to_list conn
              | "CHK_DATA_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ CheckDataDisplay.print_chk_ok
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 @@ CheckDataDisplay.print_chk_ok
              | "CONN_WIZ" ->
                  w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
              | "D" -> w_base @@ w_person @@ DescendDisplay.print
@@ -584,18 +613,22 @@ let treat_request =
              | "MOD_DATA" -> w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
              | "PLACE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ PlaceTermsDisplay.print_ok
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 @@ PlaceTermsDisplay.print_ok
              | "SOURCE_TERMS" ->
                  w_wizard @@ w_base @@ PlaceTermsDisplay.print_sources
              | "SOURCE_TERMS_OK" ->
-                 w_wizard @@ w_lock @@ w_base
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base
                  @@ PlaceTermsDisplay.print_sources_ok
              | "MOD_DATA_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod
-             | "MOD_FAM_OK" -> w_wizard @@ w_base @@ UpdateFamOk.print_mod
+             | "MOD_FAM_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
              | "MOD_IND" -> w_wizard @@ w_base @@ UpdateInd.print_mod
-             | "MOD_IND_OK" -> w_wizard @@ w_base @@ UpdateIndOk.print_mod
+             | "MOD_IND_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
              | "MOD_NOTES" -> w_wizard @@ w_base @@ NotesDisplay.print_mod
              | "MOD_NOTES_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
