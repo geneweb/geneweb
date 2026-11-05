@@ -73,7 +73,6 @@ let give_access_someone conf base (x, t) list =
       Output.print_sstring conf " ";
       Output.print_string conf (escape_html @@ Driver.p_surname base x)
   | _ -> Output.print_string conf (gen_person_text conf base x));
-  Output.print_sstring conf "\n";
   Output.print_string conf (DateDisplay.short_dates_text conf base x);
   if t.t_nth <> 0 then (
     Output.print_sstring conf " (";
@@ -118,7 +117,7 @@ let propose_tree_for_list list conf =
   in
   match List.rev list with
   | _ :: _ :: _ as list ->
-      Output.print_sstring conf {|<p><a href="|};
+      Output.print_sstring conf {|<p><a class="ms-3" href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf {|m=RLM|};
       ignore
@@ -162,8 +161,8 @@ let print_title_place_list conf base t p t_equiv list =
               (escape_html p)))
         t_equiv
   in
-  Hutil.header conf title;
-  Output.print_sstring conf "<ul>";
+  Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
+  Output.printf conf "<ul%s>" (columns_attrs list);
   ignore
   @@ List.fold_left
        (fun list x ->
@@ -181,8 +180,8 @@ let print_all_with_place_list conf base p list =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
   in
-  Hutil.header conf title;
-  Output.print_sstring conf "<ul>\n";
+  Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
+  Output.printf conf "<ul%s>" (columns_attrs list);
   List.iter
     (fun ((_, t) as x) ->
       Output.print_sstring conf "<li>";
@@ -239,7 +238,7 @@ let print_places_list conf base t t_equiv list =
           ^^^ escape_html @@ surname_particle base p
            :> Adef.safe_string))
   in
-  Hutil.header conf title;
+  Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
   wprint_in_columns conf order wprint_elem list;
   Hutil.trailer conf
 
@@ -256,8 +255,8 @@ let print_titles conf base p =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
   in
-  Hutil.header conf title;
-  Output.print_sstring conf "<ul>\n";
+  Hutil.header ~fluid:(wide_list l) ~h1_class:"ms-3" conf title;
+  Output.printf conf "<ul%s>" (columns_attrs l);
   List.iter
     (fun t ->
       Output.print_sstring conf "<li>";
@@ -289,9 +288,9 @@ let print_all_titles conf base =
   let order (s, _) = Utf8.capitalize_fst (Name.lower s) in
   let wprint_elem (t, cnt) =
     give_access_all_titles conf t false;
-    Output.printf conf " (%d)" cnt
+    Output.printf conf " (%d)" cnt
   in
-  Hutil.header conf title;
+  Hutil.header ~fluid:(wide_list list) ~h1_class:"ms-3" conf title;
   wprint_in_columns conf order wprint_elem list;
   Hutil.trailer conf
 
@@ -304,8 +303,8 @@ let print_all_places conf base =
     let l = select_all_places conf base in
     sort_uniq_by_key String.compare Name.lower l
   in
-  Hutil.header conf title;
-  Output.print_sstring conf "<ul>\n";
+  Hutil.header ~fluid:(wide_list l) ~h1_class:"ms-3" conf title;
+  Output.printf conf "<ul%s>" (columns_attrs l);
   List.iter
     (fun t ->
       Output.print_sstring conf "<li>";
