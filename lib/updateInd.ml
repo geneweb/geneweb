@@ -115,30 +115,6 @@ and eval_simple_var conf base env p = function
         | _ -> None
       in
       eval_date_var od s
-  | [ "event_str" ] -> (
-      match get_env "cnt" env with
-      | Vint i -> (
-          try
-            let p = Driver.poi base p.key_index in
-            let e = List.nth (Driver.get_pevents p) (i - 1) in
-            let name =
-              Util.string_of_pevent_name conf base e.epers_name
-              |> Adef.safe_fn Utf8.capitalize_fst
-            in
-            let date =
-              match Date.od_of_cdate e.epers_date with
-              | Some d -> DateDisplay.string_of_date conf d
-              | None -> Adef.safe ""
-            in
-            let place =
-              Util.string_of_place conf (Driver.sou base e.epers_place)
-            in
-            ([ name; date; (place :> Adef.safe_string) ]
-              : Adef.safe_string list
-              :> string list)
-            |> String.concat ", " |> Adef.safe |> safe_val
-          with Failure _ -> str_val "")
-      | _ -> str_val "")
   | [ "first_name" ] ->
       safe_val (Util.escape_html p.first_name :> Adef.safe_string)
   | [ "first_name_alias" ] -> eval_string_env "first_name_alias" env
@@ -693,20 +669,3 @@ let print_del conf base =
   match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
   | Some p -> print_del1 conf base p
-
-let print_change_event_order conf base =
-  match Util.find_person_in_env conf base "" with
-  | None -> Hutil.incorrect_request conf
-  | Some p ->
-      let p = string_person_of base p in
-      Templ.output conf
-        Templ.
-          {
-            eval_var = eval_var conf base;
-            eval_transl = (fun _ -> Templ.eval_transl conf);
-            eval_predefined_apply = (fun _ -> raise Not_found);
-            get_vother;
-            set_vother;
-            print_foreach;
-          }
-        Templ.Env.empty p "updindevt"

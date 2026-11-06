@@ -23,6 +23,3 @@ val print_del : config -> Geneweb_db.Driver.base -> unit
 
 val print_mod : config -> Geneweb_db.Driver.base -> unit
 (** Displays a form for updating a person *)
-
-val print_change_event_order : config -> Geneweb_db.Driver.base -> unit
-(** Displays the form for changing the order of events for a person *)

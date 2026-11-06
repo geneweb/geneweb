@@ -27,7 +27,6 @@ trl       |   in accordance with the definitions of shortucts in js_perso_access
 %( relations    %)%let;lpc6k;6%in;%let;lpc6;<code>(%lpc6k;)</code>%in;%let;lpa6;accesskey="%lpc6k;"%in;
 %( titres       %)%let;lpc7k;7%in;%let;lpc7;<code>(%lpc7k;)</code>%in;%let;lpa7;accesskey="%lpc7k;"%in;
 %( profession   %)%let;lpcPk;P%in;%let;lpcP;<code>(%lpcPk;)</code>%in;%let;lpaP;accesskey="%lpcPk;"%in;
-%( permuter evt %)%let;lpcOk;O%in;%let;lpcO;<code>(%lpcOk;)</code>%in;%let;lpaO;accesskey="%lpcOk;"%in;
 %(updfam                     | %)
 %( prénom père  %)%let;lfc1k;1%in;%let;lfc1;<code>(%lfc1k;)</code>%in;%let;lfa1;accesskey="%lfc1k;"%in;
 %( enfants      %)%let;lfc2k;2%in;%let;lfc2;<code>(%lfc2k;)</code>%in;%let;lfa2;accesskey="%lfc2k;"%in;

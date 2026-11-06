@@ -53,10 +53,6 @@ val print_del : config -> Geneweb_db.Driver.base -> unit
 (** Tries to remove a person from the base and displays a success HTML page if
     successful *)
 
-val print_change_event_order : config -> Geneweb_db.Driver.base -> unit
-(** Tries to change the order of events for a person and displays a success HTML
-    page if successful *)
-
 val strip_person :
   (Geneweb_db.Driver.iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
   (Geneweb_db.Driver.iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person

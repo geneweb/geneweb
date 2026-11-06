@@ -45,6 +45,18 @@ val misplaced : ('a -> 'a -> int) -> 'a list -> ('a * 'a) option
 (** [misplaced cmp l] is the first pair [(x, y)] of [l], [x] coming before [y],
     that [cmp] orders the other way round ([cmp x y > 0]). *)
 
+val compare_pevents :
+  Geneweb_db.Driver.pers_event -> Geneweb_db.Driver.pers_event -> int
+(** [compare_pevents e1 e2] orders two personal events as {!Event.compare}. *)
+
+val compare_fevents :
+  Geneweb_db.Driver.fam_event -> Geneweb_db.Driver.fam_event -> int
+(** [compare_fevents e1 e2] orders two events of a family as {!Event.compare};
+    events it leaves unordered are ordered by kind: an event of the relation
+    (engagement, banns, contract, licence, marriage, PACS, residence, no
+    mention, no marriage) comes before a divorce, a separation or an annulment.
+    A remarriage of the couple after a divorce thus needs both events dated. *)
+
 val check_siblings :
   ?onchange:bool ->
   Geneweb_db.Driver.base ->

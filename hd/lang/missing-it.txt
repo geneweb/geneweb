@@ -1746,19 +1746,9 @@ en: missing image
 fr: image manquante
 it:
 
-    modify family %s event order
-en: permute the events of family %s
-fr: permuter les événements de la famille %s
-it:
-
     modify note
 en: modify the note
 fr: modifier la note
-it:
-
-    modify person event order
-en: permute personnal events
-fr: permuter les événéments individuels
 it:
 
     modify portrait

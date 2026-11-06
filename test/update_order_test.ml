@@ -50,10 +50,102 @@ let test_free_family_order () =
       ("contradicted dates", true, [ year 1860; year 1850 ]);
     ]
 
+let pevent epers_name epers_date =
+  {
+    epers_name;
+    epers_date;
+    epers_place = Driver.Istr.empty;
+    epers_reason = Driver.Istr.empty;
+    epers_note = Driver.Istr.empty;
+    epers_src = Driver.Istr.empty;
+    epers_witnesses = [||];
+  }
+
+let fevent efam_name efam_date =
+  {
+    efam_name;
+    efam_date;
+    efam_place = Driver.Istr.empty;
+    efam_reason = Driver.Istr.empty;
+    efam_note = Driver.Istr.empty;
+    efam_src = Driver.Istr.empty;
+    efam_witnesses = [||];
+  }
+
+let test_free_event_order () =
+  let none = Date.cdate_None in
+  List.iter
+    (fun (msg, expected, events) ->
+      (check bool) msg expected
+        (CheckItem.free_order CheckItem.compare_pevents events))
+    [
+      ("one event", false, [ pevent Epers_Birth none ]);
+      ( "life events",
+        false,
+        [
+          pevent Epers_Birth none;
+          pevent Epers_Baptism none;
+          pevent Epers_Death none;
+          pevent Epers_Burial none;
+        ] );
+      ( "dated events",
+        false,
+        [
+          pevent Epers_Birth (year 1850);
+          pevent Epers_Residence (year 1870);
+          pevent Epers_Death (year 1900);
+        ] );
+      ( "undated event",
+        true,
+        [ pevent Epers_Birth (year 1850); pevent Epers_Residence none ] );
+    ];
+  List.iter
+    (fun (msg, expected, events) ->
+      (check bool) msg expected
+        (CheckItem.free_order CheckItem.compare_fevents events))
+    [
+      ("union alone", false, [ fevent Efam_Marriage none ]);
+      ( "dated family events",
+        false,
+        [ fevent Efam_Engage (year 1849); fevent Efam_Marriage (year 1850) ] );
+      ( "union and divorce",
+        false,
+        [ fevent Efam_Marriage none; fevent Efam_Divorce none ] );
+      ( "undated family event",
+        true,
+        [
+          fevent Efam_Marriage (year 1850);
+          fevent (Efam_Name Driver.Istr.empty) none;
+        ] );
+    ];
+  (check bool) "event before birth" false
+    (Option.is_some
+       (CheckItem.misplaced CheckItem.compare_pevents
+          [
+            pevent (Epers_Name Driver.Istr.empty) none; pevent Epers_Birth none;
+          ]));
+  (check bool) "baptism before birth" true
+    (Option.is_some
+       (CheckItem.misplaced CheckItem.compare_pevents
+          [ pevent Epers_Baptism none; pevent Epers_Birth none ]));
+  (check bool) "divorce before marriage" true
+    (Option.is_some
+       (CheckItem.misplaced CheckItem.compare_fevents
+          [ fevent Efam_Divorce none; fevent Efam_Marriage none ]));
+  (check bool) "dated remarriage" false
+    (Option.is_some
+       (CheckItem.misplaced CheckItem.compare_fevents
+          [
+            fevent Efam_Marriage (year 1850);
+            fevent Efam_Divorce (year 1860);
+            fevent Efam_Marriage (year 1870);
+          ]))
+
 let v =
   [
     ( "update-order",
       [
         test_case "free family order" `Quick test_free_family_order;
+        test_case "free event order" `Quick test_free_event_order;
       ] );
   ]

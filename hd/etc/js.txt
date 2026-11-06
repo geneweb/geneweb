@@ -142,9 +142,7 @@ document.getElementById('hist-back')?.addEventListener('click', () => history.ba
     %if;(e.m="MOD_IND_OK" or e.m="MOD_FAM_OK"
        or e.m="ADD_FAM_OK" or e.m="ADD_PAR_OK"
        or e.m="DEL_FAM_OK" or e.m="CHG_CHN_OK"
-       or e.m="CHG_EVT_IND_ORD_OK" or e.m="CHG_EVT_FAM_ORD_OK"
-       or e.m="DEL_IMAGE_OK"
-       or (e.m="MOD_DATA_OK" and e.data=""))
+       or e.m="DEL_IMAGE_OK" or (e.m="MOD_DATA_OK" and e.data=""))
       <script>
         var htmlTitle = document.title;
         if (htmlTitle == `[*person modified]` ||

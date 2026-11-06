@@ -702,12 +702,9 @@ let patch_children_with_pevents base des =
   Array.iter (patch_person_with_pevents base) des.children
 
 (* On met à jour les témoins maintenant. *)
-let update_family_with_fevents conf base fam =
+let update_family_with_fevents base nsck fam =
   let marr, div, witnesses =
-    reconstitute_from_fevents
-      (p_getenv conf.env "nsck" = Some "on")
-      (Driver.insert_string base "")
-      fam.fevents
+    reconstitute_from_fevents nsck (Driver.insert_string base "") fam.fevents
   in
   let relation, marriage, marriage_place, marriage_note, marriage_src = marr in
   let divorce = div in
@@ -744,7 +741,9 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   List.iter (Notes.update_notes_links_person ~old_text:"" conf base) !created_p;
   let nfath_p = Driver.poi base (Adef.father ncpl) in
   let nmoth_p = Driver.poi base (Adef.mother ncpl) in
-  let nfam = update_family_with_fevents conf base nfam in
+  let nfam =
+    update_family_with_fevents base (p_getenv conf.env "nsck" = Some "on") nfam
+  in
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
     if conf.api_mode then { nfam with relation = sfam.relation } else nfam
@@ -1111,11 +1110,6 @@ let print_mod_ok ?with_parents conf base (wl, ml) cpl des =
   print_family ?with_parents conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
-let print_change_event_order_ok conf base (wl, ml) cpl des =
-  Hutil.header conf @@ print_title conf "family modified";
-  print_family conf base (wl, ml) cpl des;
-  Hutil.trailer conf
-
 let print_add_ok ?with_parents conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
   (* Si on a supprimé des caractères interdits *)
@@ -1445,72 +1439,3 @@ let print_mod o_conf base =
       print_mod_ok ~with_parents:ipl conf base (wl, ml) cpl des
   in
   print_mod_aux conf base callback
-
-let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
-  | None -> Hutil.incorrect_request conf
-  | Some s ->
-      let ifam = Driver.Ifam.of_string s in
-      let fam = Driver.foi base ifam in
-      let o_f = Util.string_gen_family base (Driver.gen_family_of_family fam) in
-      (* TODO_EVENT use Event.sorted_event *)
-      let ht = Hashtbl.create 50 in
-      let () =
-        ignore
-        @@ List.fold_left
-             (fun id evt ->
-               Hashtbl.add ht id evt;
-               succ id)
-             1 (Driver.get_fevents fam)
-      in
-      let sorted_fevents =
-        List.sort
-          (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-          (reconstitute_sorted_events conf 1)
-      in
-      let fevents =
-        List.fold_right
-          (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
-            with Not_found -> failwith "Sorting event")
-          sorted_fevents []
-      in
-      if fevents = Driver.get_fevents fam then
-        redirect_to_source conf base (Driver.get_father fam)
-      else
-        let fam = Driver.gen_family_of_family fam in
-        let fam = { fam with fevents } in
-        let fam = update_family_with_fevents conf base fam in
-        Driver.patch_family base fam.fam_index fam;
-        let a = Driver.foi base fam.fam_index in
-        let cpl = Adef.parent (Driver.get_parent_array a) in
-        let des = { children = Driver.get_children a } in
-        let wl =
-          let wl = ref [] in
-          let warning w = wl := w :: !wl in
-          let nfam = Driver.family_of_gen_family base (fam, cpl, des) in
-          CheckItem.family base warning fam.fam_index nfam;
-          List.iter
-            (function
-              | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-                  Driver.patch_family base ifam { fam with fevents = after }
-              | _ -> ())
-            !wl;
-          List.rev !wl
-        in
-        Util.commit_patches conf base;
-        let changed =
-          let ip =
-            match p_getenv conf.env "ip" with
-            | Some i -> Driver.Iper.of_string i
-            | None -> Driver.Iper.dummy
-          in
-          let p =
-            Util.string_gen_person base
-              (Driver.gen_person_of_person (Driver.poi base ip))
-          in
-          let n_f = Util.string_gen_family base fam in
-          U_Modify_family (p, o_f, n_f)
-        in
-        History.record conf base changed "mf";
-        print_change_event_order_ok conf base (wl, []) cpl des

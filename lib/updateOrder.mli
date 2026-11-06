@@ -18,3 +18,17 @@ val print_families : Config.config -> Geneweb_db.Driver.base -> unit
     families of the person, keyed by index and ordered by their union dates
     ({!CheckItem.compare_unions}). The union is written at once and the history
     records the inversion (["if"]) of the first moved family. *)
+
+val print_pevents : Config.config -> Geneweb_db.Driver.base -> unit
+(** [print_pevents conf base] handles [m=CHG_EVT_IND_ORD_OK]: the items are the
+    events of the person, keyed by {!Event.pevent_key} and ordered by
+    {!CheckItem.compare_pevents}. The history records a modification of the
+    person (["mp"]). *)
+
+val print_fevents : Config.config -> Geneweb_db.Driver.base -> unit
+(** [print_fevents conf base] handles [m=CHG_EVT_FAM_ORD_OK]: the items are the
+    events of the family that {!Util.find_family_in_env} reads, keyed by
+    {!Event.fevent_key} and ordered by {!CheckItem.compare_fevents}. The summary
+    fields of the family are derived again from its events with the same-sex
+    status of its relation ({!UpdateFamOk.update_family_with_fevents}) and the
+    history records a modification of the family (["mf"]). *)

@@ -1658,6 +1658,10 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   | _ -> null_val)
               | _ -> null_val)
           | _ -> raise Not_found))
+  | "event_key" -> (
+      match get_env "event_key" env with
+      | Vstring s -> str_val s
+      | _ -> raise Not_found)
   | "separation_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
@@ -3728,6 +3732,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_first_names_aliases" ->
       if hide_person conf base p then false
       else Driver.get_first_names_aliases p <> []
+  | "has_free_event_order" ->
+      CheckItem.free_order CheckItem.compare_pevents (Driver.get_pevents p)
   | "has_free_family_order" ->
       CheckItem.free_order
         (CheckItem.compare_unions base)
@@ -3789,15 +3795,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         in
         Driver.get_rparents p <> [] || related <> []
       else p_auth && (Driver.get_rparents p <> [] || Driver.get_related p <> [])
-  | "has_secondary_pevents" ->
-      List.exists
-        (fun e ->
-          match e.epers_name with
-          | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-          | Epers_Cremation ->
-              false
-          | _ -> true)
-        (Driver.get_pevents p)
   | "has_siblings" -> (
       match Driver.get_parents p with
       | Some ifam ->
@@ -4233,8 +4230,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> string_of_int |> str_val)
   | "nb_families" ->
       Driver.get_family p |> Array.length |> string_of_int |> str_val
-  | "nb_pevents" ->
-      Driver.get_pevents p |> List.length |> string_of_int |> str_val
   | "notes" | "pnotes" -> Driver.get_notes p |> get_note conf base ~p p_auth
   | "occ" ->
       if GWPARAM.p_auth_sp conf base p then
@@ -4449,8 +4444,9 @@ and eval_family_field_var conf base env
       let ep = make_ep conf base imoth in
       eval_person_field_var conf base env ep loc sl
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
-  | [ "nb_fevents" ] ->
-      VVstring (string_of_int (List.length (Driver.get_fevents fam)))
+  | [ "has_free_event_order" ] ->
+      VVbool
+        (CheckItem.free_order CheckItem.compare_fevents (Driver.get_fevents fam))
   | [ "sep_date_s" ] | [ "sep_dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base false fam :> string)
@@ -5006,6 +5002,50 @@ let print_foreach conf base print_ast eval_expr =
         in
         List.iter (print_ast env ep) al)
       (Event.sorted_events conf base p)
+  in
+  let print_foreach_pevent env al ((p, _) as ep) =
+    List.iter
+      (fun e ->
+        let item =
+          ( Event.Pevent e.epers_name,
+            e.epers_date,
+            e.epers_place,
+            e.epers_note,
+            e.epers_src,
+            e.epers_witnesses,
+            None )
+        in
+        let env =
+          Templ.Env.(
+            env
+            |> add "event" (Vevent (p, item))
+            |> add "event_key" (Vstring (Event.pevent_key e)))
+        in
+        List.iter (print_ast env ep) al)
+      (Driver.get_pevents p)
+  in
+  let print_foreach_fevent env al ((p, _) as ep) = function
+    | Vfam (_, fam, (_, _, isp), _) ->
+        List.iter
+          (fun e ->
+            let item =
+              ( Event.Fevent e.efam_name,
+                e.efam_date,
+                e.efam_place,
+                e.efam_note,
+                e.efam_src,
+                e.efam_witnesses,
+                Some isp )
+            in
+            let env =
+              Templ.Env.(
+                env
+                |> add "event" (Vevent (p, item))
+                |> add "event_key" (Vstring (Event.fevent_key e)))
+            in
+            List.iter (print_ast env ep) al)
+          (Driver.get_fevents fam)
+    | _ -> ()
   in
   let print_foreach_epers_event_witness env al ((p, _) as ep) epers_event =
     let epers_event_witness_string =
@@ -5582,6 +5622,8 @@ let print_foreach conf base print_ast eval_expr =
     | "descendant_cnt" -> print_foreach_descendant env al ep true
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
+    | "fevent" -> print_foreach_fevent env al ep efam
+    | "pevent" -> print_foreach_pevent env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
     | "img_in_carrousel" -> print_foreach_img_in_carrousel env al ep false

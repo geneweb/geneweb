@@ -27,6 +27,12 @@
     </div>
   </div>
 %end;
+%define;order_event()
+  %apply;order_item%with;%event_key;%and;%apply;capitalize(event.name)%and;
+    %if;(event.date!="")<li class="list-inline-item">%event.date;</li>%end;
+    %if;(event.place!="")<li class="list-inline-item">%event.place;</li>%end;
+  %end;
+%end;
 %define;order_item(x_key,x_label,x_info)
   <div class="list-group-item d-flex align-items-center gap-2" data-key="x_key">
     <i class="fa fa-grip-vertical text-body-secondary" title="[*move up/down]4" aria-hidden="true"></i>
@@ -42,14 +48,15 @@
     </div>
   </div>
 %end;
-%if;has_free_family_order;
-  %apply;order_open%with;update_order_fam%and;m=CHG_FAM_ORD_OK&%access;%and;[*reorder families]%end;
-  %foreach;family;
-    %apply;order_item%with;%family.index;%and;<span class="badge text-bg-secondary me-2">%family_cnt;</span>%spouse;%spouse.dates;%and;
-      %if;(family.marriage_date!="")<li class="list-inline-item">%family.marriage_date;</li>%end;
-      %if;(marriage_place!="")<li class="list-inline-item">%marriage_place;</li>%end;
-      %if;(nb_children>0)<li class="list-inline-item">%nb_children; %if;(nb_children=1)[child/children]0%else;[child/children]1%end;</li>%end;
-    %end;
-  %end;
+%if;has_free_event_order;
+  %apply;order_open%with;update_order_pevt%and;m=CHG_EVT_IND_ORD_OK&%access;%and;[*reorder events]%end;
+  %foreach;pevent;%apply;order_event()%end;
   %apply;order_close()
+%end;
+%foreach;family;
+  %if;family.has_free_event_order;
+    %apply;order_open%with;update_order_fevt_%family_cnt;%and;m=CHG_EVT_FAM_ORD_OK&%family.access;%and;[*reorder events]<small class="d-block text-body-secondary">[*marriage with] %spouse;</small>%end;
+    %foreach;fevent;%apply;order_event()%end;
+    %apply;order_close()
+  %end;
 %end;
