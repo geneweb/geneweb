@@ -134,8 +134,15 @@ let get_person_from_data conf base =
     (* FIXME was istr = istr' ! is this correct *)
     if List.mem istr istr' then fn acc istr else acc
   in
+  let fold_persons f acc =
+    let by_index spi = List.fold_left f acc (Driver.spi_find (spi base) istr) in
+    match p_getenv conf.env "data" with
+    | Some "fn" -> by_index Driver.persons_of_first_name
+    | Some "sn" -> by_index Driver.persons_of_surname
+    | _ -> Collection.fold f acc (Driver.ipers base)
+  in
   let acc =
-    Collection.fold
+    fold_persons
       (fun acc i ->
         let p = pget conf base i in
         let add acc istr = add acc istr p in
@@ -146,7 +153,6 @@ let get_person_from_data conf base =
             List.fold_left (fun acc e -> aux add e acc fn) acc pevents)
           acc get_pe)
       Istr.Map.empty
-      (Geneweb_db.Driver.ipers base)
   in
   let acc =
     if get_f = [] && get_fe = [] then acc
