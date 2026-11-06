@@ -106,9 +106,6 @@
             <a href="%prefix;m=ADD_FAM&%access;&sex=F" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]1)</a>%nn;
           %end;
           %foreach;family;
-            %if;(family_cnt>1)
-            <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)" %l_on1;>⇪ [*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;</a>
-            %end;
             %if;(family_cnt < 4)
               %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%end;%in;
               <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&%family.access;" title="[*modify::family/families]0 %if;(nb_families>1)%family_cnt;%end; (%a_k;)"
@@ -1335,10 +1332,6 @@
       <div class="fam" style="clear:both">
         %if;(wizard and not cancel_links and family_cnt != 1)
           %if;(family_cnt != 1)
-            <span class="button">
-              <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)"
-               title="[*invert::family/families]1" style="background-color:#555;padding:2px;">^</a>
-            </span>
             %if;(family.father.index = prev_family.father.index
               and family.mother.index = prev_family.mother.index)
               <span class="button"><a href="%prefix;m=MRG_FAM&%access;&f=%expr(family_cnt-1)">%nn;

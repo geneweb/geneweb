@@ -902,22 +902,6 @@ let effective_add conf base nsck sfam scpl sdes =
   Update.update_related_pointers base (Adef.father ncpl) [] nl;
   (fi, nfam, ncpl, ndes)
 
-let effective_inv conf base ip u ifam =
-  let rec loop = function
-    | ifam1 :: ifam2 :: ifaml ->
-        if ifam2 = ifam then ifam2 :: ifam1 :: ifaml
-        else ifam1 :: loop (ifam2 :: ifaml)
-    | _ ->
-        Hutil.incorrect_request conf;
-        raise
-        @@ Update.ModErr
-             (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe))
-  in
-  let u =
-    { family = Array.of_list (loop (Array.to_list (Driver.get_family u))) }
-  in
-  Driver.patch_union base ip u
-
 let effective_del conf base fam =
   let ifam = Driver.get_ifam fam in
   let father = Driver.get_father fam in
@@ -1179,13 +1163,6 @@ let print_del conf base =
         Util.commit_patches conf base;
         print_del_ok conf base [] ~father ~mother ~children
   | None -> Hutil.incorrect_request conf
-
-let print_inv_ok conf base p =
-  Hutil.header conf @@ print_title conf "inversion done";
-  Output.print_sstring conf "\n";
-  Output.print_string conf (referenced_person_text conf base p);
-  Output.print_sstring conf "\n";
-  Hutil.trailer conf
 
 let get_create (_, _, _, create, _) = create
 
@@ -1468,24 +1445,6 @@ let print_mod o_conf base =
       print_mod_ok ~with_parents:ipl conf base (wl, ml) cpl des
   in
   print_mod_aux conf base callback
-
-let print_inv conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "f") with
-  | Some ip, Some ifam ->
-      let ip = Driver.Iper.of_string ip in
-      let ifam = Driver.Ifam.of_string ifam in
-      let p = Driver.poi base ip in
-      effective_inv conf base (Driver.get_iper p) p ifam;
-      Util.commit_patches conf base;
-      let changed =
-        let gen_p =
-          Util.string_gen_person base (Driver.gen_person_of_person p)
-        in
-        U_Invert_family (gen_p, ifam)
-      in
-      History.record conf base changed "if";
-      print_inv_ok conf base p
-  | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
