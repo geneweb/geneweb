@@ -133,7 +133,7 @@
           %if;has_possible_duplications;
             <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications] (oc=%occ;)</a>
           %end;
-          <a href="%prefix;m=MRG;i=%index;" style="display:inline-block;width:125px">⨇ [*merge]0</a>%nn;
+          <a href="%prefix;m=MRG&%access;" style="display:inline-block;width:125px">⨇ [*merge]0</a>%nn;
           <a href="%prefix;%access;%l_url;i=%index;&%if;(evar.del!="on")del=on&%end;"
             style="%if;(evar.del!="on")color:red;%end;display:inline-block;float:right;width:125px"
             title="%if;(evar.del="on")[*user/password/cancel]2 [delete::person/persons]0%else;[*delete::person/persons]0%end;/[family/families]0%nl;[click on dates]">%nn;
