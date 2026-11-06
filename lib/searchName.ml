@@ -805,11 +805,19 @@ let search_firstname_direct conf base query =
   let all_ipers =
     if query = "" then []
     else
+      let crushed = Name.crush_lower query in
       let variants = generate_apostrophe_variants query in
       List.concat_map
         (fun variant ->
           try
-            let istrl = Driver.base_strings_of_first_name base variant in
+            let istrl =
+              List.filter
+                (fun istr ->
+                  Mutil.contains
+                    (Name.crush_lower (Driver.sou base istr))
+                    crushed)
+                (Driver.base_strings_of_first_name base variant)
+            in
             let spi_find =
               Driver.spi_find (Driver.persons_of_first_name base)
             in
@@ -1005,10 +1013,12 @@ let search_firstname alias_cache conf base query opts =
     in
     List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) exact_ips;
     let other_ips =
-      List.concat_map
-        (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
-        other_istrl
-      |> List.filter (Util.visible_in_search_ip conf base)
+      if opts.exact1 then []
+      else
+        List.concat_map
+          (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
+          other_istrl
+        |> List.filter (Util.visible_in_search_ip conf base)
     in
     List.iter (fun ip -> Some.AliasCache.add_direct alias_cache ip) other_ips;
     let normalize_person ip =
