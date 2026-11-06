@@ -78,6 +78,7 @@ type witness_kind =
   | Witness_Attending
   | Witness_Mentioned
   | Witness_Other
+  | Witness_Notary
 [@@deriving show { with_path = false }]
 
 (** Personal event name. *)

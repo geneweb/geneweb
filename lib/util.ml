@@ -1314,6 +1314,7 @@ let string_of_witness_kind conf sex witness_kind =
     match witness_kind with
     | Witness -> "witness/witness/witnesses"
     | Witness_CivilOfficer -> "civil registrar/civil registrar/civil registrar"
+    | Witness_Notary -> "notary/notary/notaries"
     | Witness_GodParent -> "godfather/godmother/godparents"
     | Witness_ReligiousOfficer ->
         "parrish registrar/parrish registrar/parrish registrar"
@@ -1329,6 +1330,7 @@ let string_of_witness_kind_raw witness_kind =
     match witness_kind with
     | Witness -> ""
     | Witness_CivilOfficer -> "offi"
+    | Witness_Notary -> "notr"
     | Witness_GodParent -> "godp"
     | Witness_ReligiousOfficer -> "reli"
     | Witness_Informant -> "info"

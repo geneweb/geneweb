@@ -1497,6 +1497,7 @@ let witness_kind_of_rval rval =
   match rval with
   | "GODP" -> Witness_GodParent
   | "officer" | "Civil officer" | "Registry officer" -> Witness_CivilOfficer
+  | "Notary" -> Witness_Notary
   | "Religious officer" | "Officiating priest" -> Witness_ReligiousOfficer
   | "Informant" -> Witness_Informant
   | "Attending" -> Witness_Attending

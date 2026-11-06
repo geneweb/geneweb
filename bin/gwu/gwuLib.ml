@@ -548,6 +548,7 @@ let string_of_witness_kind :
   | Witness_GodParent -> Some "#godp"
   | Witness -> None
   | Witness_CivilOfficer -> Some "#offi"
+  | Witness_Notary -> Some "#notr"
   | Witness_ReligiousOfficer -> Some "#reli"
   | Witness_Informant -> Some "#info"
   | Witness_Attending -> Some "#atte"

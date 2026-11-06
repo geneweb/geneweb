@@ -436,6 +436,7 @@ let relation_format_of_witness_kind :
   | Witness -> "3 RELA Witness"
   | Witness_GodParent -> "3 RELA GODP"
   | Witness_CivilOfficer -> "3 RELA Civil officer"
+  | Witness_Notary -> "3 RELA Notary"
   | Witness_ReligiousOfficer -> "3 RELA Religious officer"
   | Witness_Informant -> "3 RELA Informant"
   | Witness_Attending -> "3 RELA Attending"

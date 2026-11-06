@@ -66,6 +66,7 @@ end
 let eval_witness_kind = function
   | Witness_GodParent -> str_val "godp"
   | Witness_CivilOfficer -> str_val "offi"
+  | Witness_Notary -> str_val "notr"
   | Witness_ReligiousOfficer -> str_val "reli"
   | Witness_Informant -> str_val "info"
   | Witness_Attending -> str_val "atte"
