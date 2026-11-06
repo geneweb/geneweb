@@ -463,7 +463,7 @@ and eval_special_var conf base = function
       match p_getenv conf.env "ip" with
       | Some i ->
           let p = Driver.poi base (Driver.Iper.of_string i) in
-          Perso.interp_templ ~no_headers:true "menubar" conf base p;
+          Perso.interp_templ "menubar" conf base p;
           VVstring ""
       | None ->
           Hutil.include_home_template conf;

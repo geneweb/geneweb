@@ -529,7 +529,7 @@ and eval_special_var conf base = function
   | [ "include_menubar" ] -> (
       match Util.find_person_in_env conf base "" with
       | Some p ->
-          Perso.interp_templ ~no_headers:true "menubar" conf base p;
+          Perso.interp_templ "menubar" conf base p;
           VVstring ""
       | None -> VVstring "")
   | _ -> raise Not_found
