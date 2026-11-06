@@ -112,18 +112,18 @@
               </li>
               <li>
                 %if;(nb_children != 0)
-                  <a href="%prefix;m=CHG_CHN&i=%family.index;&ip=%index;">[*change children's names]</a>
+                  <a href="%prefix;m=CHG_CHN&%access;">[*change children's names]</a>
                 %end;
               </li>
               <li>
                 %if;(family_cnt != 1)
                   %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                    <a href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;">[*merge::]</a>
+                    <a href="%prefix;m=MRG_FAM&%access;&f=%expr(family_cnt-1)">[*merge::]</a>
                   %end;
                 %end;
               </li>
               <li>
-                <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">[*delete::family/families]0</a>
+                <a href="%prefix;m=DEL_FAM&%family.access;">[*delete::family/families]0</a>
               </li>
             </ul>
           </div>
@@ -164,7 +164,7 @@
   <td valign="top">
     %foreach;family;
       %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM&i=%index;&f=%family.index;">[*invert]</a>
+        <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)">[*invert]</a>
         <br>
         %if;(family.father.index = prev_family.father.index
          and family.mother.index = prev_family.mother.index)
@@ -178,7 +178,7 @@
       [*modify::family/families]0%if;(nb_families = 1) %end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
-      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index;">%nn;
+      <a href="%prefix;m=DEL_FAM&%family.access;">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
@@ -200,7 +200,7 @@
     %end;
     %if;(nb_children != 0)
       <br>
-      <a href="%prefix;m=CHG_CHN&ip=%index;">[*change children's names]</a>
+      <a href="%prefix;m=CHG_CHN&%access;">[*change children's names]</a>
     %end;
     %if;has_possible_duplications;
       <br>

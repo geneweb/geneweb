@@ -275,6 +275,11 @@ and eval_event_date env fam s =
   eval_date_var od s
 
 and eval_simple_var conf base env (fam, cpl, des) = function
+  | [ "access" ] -> (
+      match Util.find_family_in_env conf base with
+      | Some (ifam, Some ctx) ->
+          str_val (Util.family_acces conf base ifam ctx :> string)
+      | _ -> str_val "")
   | [ "bvar"; v ] -> eval_bvar conf v
   | "child" :: sl -> eval_child conf base env des sl
   | [ "cnt" ] -> eval_int_env "cnt" env
@@ -649,53 +654,9 @@ let print_inv1 conf base p ifam1 ifam2 =
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
-let family_in_env conf base =
-  match p_getenv conf.env "i" with
-  | Some i -> (
-      try Some (Driver.Ifam.of_string i, Util.find_person_in_env conf base "p")
-      with Failure _ -> None)
-  | None -> (
-      match Util.find_person_in_env conf base "" with
-      | None -> None
-      | Some p ->
-          let ip = Driver.get_iper p in
-          let fams =
-            match Util.find_person_in_env conf base "2" with
-            | Some sp ->
-                let isp = Driver.get_iper sp in
-                Array.of_list
-                  (List.filter
-                     (fun f -> Gutil.spouse ip (Driver.foi base f) = isp)
-                     (Array.to_list (Driver.get_family p)))
-            | None -> Driver.get_family p
-          in
-          let k = Option.value ~default:0 (p_getint conf.env "f") in
-          if k >= 0 && k < Array.length fams then Some (fams.(k), Some p)
-          else None)
-
-let with_form_env conf ifam ctx =
-  let env = List.filter (fun (k, _) -> k <> "i" && k <> "ip") conf.env in
-  let env =
-    match ctx with
-    | Some p ->
-        ("ip", Mutil.encode (Driver.Iper.to_string (Driver.get_iper p))) :: env
-    | None -> env
-  in
-  let env =
-    match ifam with
-    | Some ifam -> ("i", Mutil.encode (Driver.Ifam.to_string ifam)) :: env
-    | None -> env
-  in
-  { conf with env }
-
-let person_in_env conf base =
-  match Util.find_person_in_env conf base "p" with
-  | None -> Util.find_person_in_env conf base ""
-  | p -> p
-
 let print_add conf base =
-  let ctx = person_in_env conf base in
-  let conf = with_form_env conf None ctx in
+  let ctx = Util.find_ctx_person_in_env conf base in
+  let conf = Util.with_index_env conf None ctx in
   let fath, moth, digest =
     match ctx with
     | Some p ->
@@ -740,10 +701,10 @@ let print_add conf base =
   print_update_fam conf base (fam, cpl, des) digest
 
 let print_add_parents conf base =
-  match person_in_env conf base with
+  match Util.find_ctx_person_in_env conf base with
   | None -> Hutil.incorrect_request conf
   | Some p ->
-      let conf = with_form_env conf None (Some p) in
+      let conf = Util.with_index_env conf None (Some p) in
       let fam =
         {
           marriage = Date.cdate_None;
@@ -782,9 +743,9 @@ let print_add_parents conf base =
       print_update_fam conf base (fam, cpl, des) ""
 
 let print_mod conf base =
-  match family_in_env conf base with
+  match Util.find_family_in_env conf base with
   | Some (ifam, ctx) ->
-      let conf = with_form_env conf (Some ifam) ctx in
+      let conf = Util.with_index_env conf (Some ifam) ctx in
       let sfam = string_family_of base ifam in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_family ~salt sfam in
@@ -792,29 +753,18 @@ let print_mod conf base =
   | None -> Hutil.incorrect_request conf
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
-  | Some i -> print_del1 conf base (Driver.Ifam.of_string i)
-  | _ -> Hutil.incorrect_request conf
-
-let rec find_families ifam = function
-  | ifam1 :: ifam2 :: ifaml ->
-      if ifam2 = ifam then Some (ifam1, ifam2)
-      else find_families ifam (ifam2 :: ifaml)
-  | _ -> None
+  match Util.find_family_in_env conf base with
+  | Some (ifam, ctx) ->
+      print_del1 (Util.with_index_env conf (Some ifam) ctx) base ifam
+  | None -> Hutil.incorrect_request conf
 
 let print_inv conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "f") with
-  | Some ip, Some ifam -> (
-      let u = Driver.poi base (Driver.Iper.of_string ip) in
-      match
-        find_families
-          (Driver.Ifam.of_string ifam)
-          (Array.to_list (Driver.get_family u))
-      with
-      | Some (ifam1, ifam2) ->
-          let p = Driver.poi base (Driver.Iper.of_string ip) in
-          print_inv1 conf base p ifam1 ifam2
-      | _ -> Hutil.incorrect_request conf)
+  match (Util.find_person_in_env conf base "", p_getint conf.env "f") with
+  | Some u, Some k ->
+      let fams = Driver.get_family u in
+      if k >= 1 && k < Array.length fams then
+        print_inv1 conf base u fams.(k - 1) fams.(k)
+      else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 let change_order u ifam n =
@@ -902,10 +852,10 @@ let print_change_order conf base =
   | _ -> Hutil.incorrect_request conf ~comment:"bad params for CHG_FAM_ORD"
 
 let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_family_in_env conf base with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let i = Driver.Ifam.of_string i in
+  | Some (i, ctx) ->
+      let conf = Util.with_index_env conf (Some i) ctx in
       let sfam = string_family_of base i in
       let ifun =
         Templ.

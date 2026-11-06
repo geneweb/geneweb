@@ -60,12 +60,12 @@
   <td>
     %foreach;family;
       %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM&i=%index;&f=%family.index;">[*invert::]</a>
+        <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)">[*invert::]</a>
         <br>
         %if;(family.father.index = prev_family.father.index
          and family.mother.index = prev_family.mother.index)
           <a href=%nn;
-          "%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;">%nn;
+          "%prefix;m=MRG_FAM&%access;&f=%expr(family_cnt-1)">%nn;
           [*merge::]</a>
           <br>
         %end;
@@ -75,7 +75,7 @@
       [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
-      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">%nn;
+      <a href="%prefix;m=DEL_FAM&%family.access;">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
@@ -89,7 +89,7 @@
     %end;
     %if;(nb_children != 0)
       <br>
-      <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
+      <a href="%prefix;m=CHG_CHN&%access;">[*change children's names]</a>
     %end;
     %if;has_possible_duplications;
       <br>

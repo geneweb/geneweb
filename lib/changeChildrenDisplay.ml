@@ -124,11 +124,9 @@ let print_change conf base p =
   Hutil.trailer conf
 
 let print conf base =
-  match p_getenv conf.env "ip" with
-  | Some i ->
-      let p = Driver.poi base (Driver.Iper.of_string i) in
-      print_change conf base p
-  | _ -> Hutil.incorrect_request conf
+  match Util.find_ctx_person_in_env conf base with
+  | Some p -> print_change conf base p
+  | None -> Hutil.incorrect_request conf
 
 let print_children_list conf base u =
   Output.print_sstring conf "\n<h2 class=\"h4\">";
