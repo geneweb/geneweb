@@ -127,11 +127,11 @@
             <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;" style="display:inline-block;width:125px" title="[*revision history]">∴ [*history]</a>
           %end;
           %if;(bvar.can_send_image != "no" and not has_portrait_url and first_name != "?" and surname != "?")
-          <a href="%prefix;m=SND_IMAGE;i=%index;" style="display:inline-block;width:125px" %laI; >🎴 [*send::image/images]0</a>%nn;
+          <a href="%prefix;m=SND_IMAGE&%access;" style="display:inline-block;width:125px" %laI; >🎴 [*send::image/images]0</a>%nn;
             %if;(auto_image_file_name != "")<a href="%prefix;m=DEL_IMAGE;i=%index;" style="color:red;display:inline-block;width:125px"><small>[*delete::image/images]0</small></a>%end;
           %end;
           %if;has_possible_duplications;
-            <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications] (oc=%occ;)</a>
+            <a href="%prefix;m=MRG_DUP&%access;">[*merge::possible duplications] (oc=%occ;)</a>
           %end;
           <a href="%prefix;m=MRG&%access;" style="display:inline-block;width:125px">⨇ [*merge]0</a>%nn;
           <a href="%prefix;%access;%l_url;i=%index;&%if;(evar.del!="on")del=on&%end;"

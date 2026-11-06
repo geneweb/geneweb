@@ -62,7 +62,7 @@
         %if;(not has_parents and first_name != "?" and surname != "?")
           <a id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;>[add::parents]</a>%nn;
         %end;
-        <a id="snd_image" href="%prefix;m=SND_IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
+        <a id="snd_image" href="%prefix;m=SND_IMAGE&%access;" %laI;>[send::image/images]0</a>%nn;
         <a href="%prefix;m=MRG&%access;">[merge::]0 (oc=%occ;)</a>%nn;
         <a href="%prefix;m=DEL_IND&%access;">[delete::person/persons]0</a>%nn;
       </span>

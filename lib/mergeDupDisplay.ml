@@ -132,7 +132,10 @@ let main_page conf base =
     | Some i ->
         let i = Driver.Iper.of_string i in
         Some (i, Driver.poi base i)
-    | None -> None
+    | None ->
+        Option.map
+          (fun p -> (Driver.get_iper p, p))
+          (Util.find_person_in_env conf base "")
   in
   let excl = Perso.excluded_possible_duplications conf in
   match ipp with
