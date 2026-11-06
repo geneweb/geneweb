@@ -16840,6 +16840,17 @@ de: Dokument/Dokumente
 en: document/documents
 fr: document/documents
 
+    notary/notary/notaries
+de: Notar/Notarin/Notare
+en: notary/notary/notaries
+es: notario/notaria/notarios
+fr: notaire/notaire/notaires
+it: notaio/notaia/notai
+nl: notaris/notaris/notarissen
+pl: notariusz/notariuszka/notariusze
+pt: notário/notária/notários
+sv: notarie/notarie/notarier
+
     note/notes
 af: nota/notas
 ar: بطاقة/بطاقات

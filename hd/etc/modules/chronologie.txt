@@ -130,6 +130,7 @@
         %elseif;("kindx"="")[*witness/witness/witnesses]2[:]
         %elseif;("kindx"="godp")[*godfather/godmother/godparents]2[:]
         %elseif;("kindx"="offi")[*civil registrar/civil registrar/civil registrar]2[:]
+        %elseif;("kindx"="notr")[*notary/notary/notaries]2[:]
         %elseif;("kindx"="reli")[*parrish registrar/parrish registrar/parrish registrar]2[:]
         %elseif;("kindx"="info")[*informant/informant/informant]2[:]
         %elseif;("kindx"="atte")[*present/present/present]2[:]
@@ -447,6 +448,7 @@
                 %if;event.has_witnesses;
                   <div class="small text-body-secondary">
                     %apply;list_witness_of_kind("offi")
+                    %apply;list_witness_of_kind("notr")
                     %apply;list_witness_of_kind("reli")
                     %apply;list_witness_of_kind("godp")
                     %apply;list_witness_of_kind("")

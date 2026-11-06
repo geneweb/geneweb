@@ -269,6 +269,7 @@ module Make (H : Digestif.S) = struct
     | Witness -> string "Witness"
     | Witness_GodParent -> string "Witness_GodParent"
     | Witness_CivilOfficer -> string "Witness_CivilOfficer"
+    | Witness_Notary -> string "Witness_Notary"
     | Witness_ReligiousOfficer -> string "Witness_ReligiousOfficer"
     | Witness_Informant -> string "Witness_Informant"
     | Witness_Attending -> string "Witness_Attending"
