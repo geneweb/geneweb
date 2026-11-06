@@ -9431,22 +9431,6 @@ ru: влючая супругов
 sv: visa makar
 tr: eşini göster
 
-    display this marriage in this order
-co: cambià l’ordine di l’unioni
-de: diese Verbindung an seine Position setzen
-en: change order of marriage
-es: colocar esta unión en posición
-fi: vaihda avioliiton järjestystä
-fr: modifier l’ordre des relations
-it: sistemare quest’unione in posizione
-nl: dit huwelijk plaatsen als aangeduid
-no: endre sortering av ekteskap
-oc: plaçar aquela union en posicion
-pt: colocar esta união em posição
-ru: изменить сортировку браков
-sv: byt ordning på vigsel
-tr: evlilik sırasını değiştir
-
     distinction
 co: distenzione
 de: Auszeichnung
@@ -13148,39 +13132,6 @@ en: time interval
 es: intervalo de tiempo
 fr: intervalle de temps
 
-    inversion done
-af: omgeruil
-bg: обръщането извършено
-br: eilpennadur kaset da benn
-ca: inversió realitzada
-co: interversione fatta
-cs: prohození dokončeno
-da: rækkefølge omvendt
-de: umgekehrt
-en: reversed
-eo: interŝanĝo farita
-es: inversión realizada
-et: vahetatud
-fi: järjestys vaihdettu
-fr: permutation effectuée
-he: ההחלפה בוצעה
-is: breyting gerð
-it: scambio fatto
-lt: eiliškumas pakeistas
-lv: pārslēgšana izpildīta
-nl: verwisseld/veranderd
-no: rekkefølgen endret
-oc: permutacion efectuada
-pl: kolejność została zmieniona
-pt: inversão efectuada
-pt-br: inversão feita
-ro: inversiune executata
-ru: переключение завершено
-sk: výmena dokončená
-sl: zamenjano
-sv: omflyttning klar
-tr: ters çevrilmiş
-
     add/insert/delete/up/down person
 af: voeg ’n nuwe persoon en ’n nuwe voorvader aan die einde by/voeg ’n nuwe persoon en ’n nuwe voorvader voor hierdie een in/verwyder hierdie persoon en hul voorvaders uit die tabel/skuif hierdie persoon en hul voorvaders voor die vorige persoon/skuif hierdie persoon en hul voorvaders na die volgende persoon
 ar: إضافة شخص جديد وسلف جديد في النهاية/إدراج شخص جديد وسلف جديد قبل هذا/حذف هذا الشخص وأسلافه من الجدول/نقل هذا الشخص وأسلافه قبل الشخص السابق/نقل هذا الشخص وأسلافه بعد الشخص التالي
@@ -13348,38 +13299,6 @@ sk: vymeniť
 sl: zamenjaj
 sv: byt ordning
 tr: ters çevir
-
-    invert the order of the following families
-af: ruil die orde van die families om
-bg: да се смени подредбата на следните семейства
-br: eilpennañ urzh an tiegezhioù da heul
-ca: invertir l’ordre de les famílies següents
-co: intervertisce l’ordine di e famiglie seguente
-cs: prohodit pořadí následujících rodin
-da: omvend rækkefølgen for de følgende familier
-de: die Reihenfolge der folgenden Familien umkehren
-en: reverse the order of the following families
-eo: interŝanĝi la ordon de la familioj sekvantaj
-es: invertir el orden de las familias siguientes
-et: vaheta järgmiste perede järjekord
-fi: vaihda seuraavien perheiden järjestystä
-fr: permuter l’ordre des familles suivantes
-he: לשנות סדר המשפחות הבאות
-is: breyta röð eftirfarandi fjölskyldna
-it: scambiare l’ordine delle famiglie seguenti
-lt: pakeisti šių šeimų eiliškumą
-lv: pārslēgt sekojošo ģimeņu secību (?)
-nl: verwissel de volgorde van de volgende gezinnen
-no: endre rekkefølgen på følgende familier
-oc: permutar l’òrdre d’aquelas familhas
-pl: czy zmienić kolejność nastepujących małżeństw lub związków?
-pt: inverter a ordem das famílias seguintes
-ro: inverseaza ordinea urmatoarelor familii
-ru: изменить порядок следующих семей
-sk: zmeň poradie nasledujúcich rodín
-sl: zamenjaj vrstni red naslednjih družin
-sv: ändra ordningen på de följande familjerna
-tr: aşağıdaki ailelerin sırasını tersine çevirin
 
     is
 af: is

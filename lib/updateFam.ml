@@ -614,46 +614,6 @@ let print_del1 conf base ifam =
   Output.print_sstring conf "</button></p></form>";
   Hutil.trailer conf
 
-let print_inv1 conf base p ifam1 ifam2 =
-  let title _ =
-    transl_decline conf "invert" ""
-    |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
-  in
-  let cpl1 = Driver.foi base ifam1 in
-  let cpl2 = Driver.foi base ifam2 in
-  Hutil.header conf title;
-  Output.print_sstring conf
-    (Utf8.capitalize_fst
-       (transl conf "invert the order of the following families"));
-  Output.print_sstring conf (Util.transl conf ":");
-  Output.print_sstring conf "<ul><li>";
-  Update.print_someone conf base (Driver.poi base (Driver.get_father cpl1));
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Update.print_someone conf base (Driver.poi base (Driver.get_mother cpl1));
-  Output.print_sstring conf "</li><li>";
-  Update.print_someone conf base (Driver.poi base (Driver.get_father cpl2));
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl_nth conf "and" 0);
-  Output.print_sstring conf " ";
-  Update.print_someone conf base (Driver.poi base (Driver.get_mother cpl2));
-  Output.print_sstring conf "</li></ul>";
-  Output.print_sstring conf {|<form method="post" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"><p>|};
-  Util.hidden_env conf;
-  Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.Iper.to_string |> Adef.encoded);
-  Util.hidden_input conf "f" (Driver.Ifam.to_string ifam2 |> Adef.encoded);
-  Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
-  Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
-  Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_sstring conf "</button></p></form>";
-  Hutil.trailer conf
-
 let print_add conf base =
   let ctx = Util.find_ctx_person_in_env conf base in
   let conf = Util.with_index_env conf None ctx in
@@ -757,15 +717,6 @@ let print_del conf base =
   | Some (ifam, ctx) ->
       print_del1 (Util.with_index_env conf (Some ifam) ctx) base ifam
   | None -> Hutil.incorrect_request conf
-
-let print_inv conf base =
-  match (Util.find_person_in_env conf base "", p_getint conf.env "f") with
-  | Some u, Some k ->
-      let fams = Driver.get_family u in
-      if k >= 1 && k < Array.length fams then
-        print_inv1 conf base u fams.(k - 1) fams.(k)
-      else Hutil.incorrect_request conf
-  | _ -> Hutil.incorrect_request conf
 
 let print_change_event_order conf base =
   match Util.find_family_in_env conf base with

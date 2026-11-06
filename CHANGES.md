@@ -94,6 +94,12 @@
   anomalies with who verified them and when.
 - The update menu (`m=U`) is removed: the person page gives all its
   actions.
+- The family inversion (`m=INV_FAM`) and the family order page
+  (`m=CHG_FAM_ORD`) are removed. When the union dates leave the order of
+  the families of a person open, the family menu of the menubar offers a
+  "Reorder families" window: the families are moved by drag and drop or
+  with arrow buttons, and the new order is saved without leaving the
+  page. An order that contradicts the union dates is refused.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

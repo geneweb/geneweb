@@ -1908,11 +1908,6 @@ en: display spouse
 fr: afficher conjoint
 pl:
 
-    display this marriage in this order
-en: change order of marriage
-fr: modifier l’ordre des relations
-pl:
-
     distinction
 en: rank
 fr: distinction

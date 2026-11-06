@@ -19,9 +19,9 @@ let this_request_updates_database conf =
   | Some
       ( "ADD_FAM" | "BLASON_MOVE_TO_ANC" | "BLASON_STOP" | "CHANGE_WIZ_VIS"
       | "CHG_CHN" | "CHG_FAM_ORD_OK" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
-      | "IMAGE_TO_BLASON" | "INV_FAM" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
-      | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
+      | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" | "MOD_NOTES"
+      | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" | "OK_ADD"
+      | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
       | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" | "PLACE_TERMS_OK"
       | "SOURCE_TERMS_OK" ) ->
@@ -557,9 +557,6 @@ let treat_request =
              | "IMAGE_TO_BLASON" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "IMH" -> w_base @@ fun conf _ -> ImageDisplay.print_html conf
-             | "INV_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_inv
-             | "INV_FAM_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
              | "ISOLATED" ->
                  w_base @@ fun conf base -> Perso.print_isolated conf base
              | "KILL_ANC" ->

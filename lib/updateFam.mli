@@ -52,10 +52,6 @@ val print_del : config -> Driver.base -> unit
 (** [print_del conf base] handles [m=DEL_FAM]: confirmation page for the
     deletion of family [i], posting [m=DEL_FAM_OK]. *)
 
-val print_inv : config -> Driver.base -> unit
-(** [print_inv conf base] handles [m=INV_FAM]: confirmation page for swapping
-    family [f] of person [i] with the preceding one, posting [m=INV_FAM_OK]. *)
-
 val print_change_event_order : config -> Driver.base -> unit
 (** [print_change_event_order conf base] handles [m=CHG_EVT_FAM_ORD]: form
     [updfamevt.txt] for reordering the events of family [i]. *)
