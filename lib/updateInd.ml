@@ -343,6 +343,7 @@ and eval_simple_var conf base env p = function
                     match snd e.epers_witnesses.(i) with
                     | Witness_GodParent -> str_val "godp"
                     | Witness_CivilOfficer -> str_val "offi"
+                    | Witness_Notary -> str_val "notr"
                     | Witness_ReligiousOfficer -> str_val "reli"
                     | Witness_Informant -> str_val "info"
                     | Witness_Attending -> str_val "atte"

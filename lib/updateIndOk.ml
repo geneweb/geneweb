@@ -192,6 +192,7 @@ let rec reconstitute_pevents conf ext cnt =
                 match p_getenv conf.env key_c with
                 | Some "godp" -> (c, Witness_GodParent)
                 | Some "offi" -> (c, Witness_CivilOfficer)
+                | Some "notr" -> (c, Witness_Notary)
                 | Some "reli" -> (c, Witness_ReligiousOfficer)
                 | Some "info" -> (c, Witness_Informant)
                 | Some "atte" -> (c, Witness_Attending)

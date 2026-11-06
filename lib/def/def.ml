@@ -73,6 +73,7 @@ type witness_kind =
   | Witness
   | Witness_GodParent
   | Witness_CivilOfficer
+  | Witness_Notary
   | Witness_ReligiousOfficer
   | Witness_Informant
   | Witness_Attending
