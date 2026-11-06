@@ -30,7 +30,7 @@ input[list]:placeholder-shown {
 /* Chronologie */
 .age-years { color: #0066cc; }
 .age-months { color: #000; }
-.age-days { color: #888; }
+.age-days, .age-muted { color: #888; }
 
 .age-posthumous .age-years,
 .age-posthumous .age-months,
