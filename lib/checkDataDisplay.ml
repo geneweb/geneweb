@@ -758,7 +758,6 @@ let perform_check_modification conf base =
               UpdateData.update_person_list conf_tmp base s2 list nb_pers
                 nb_pers
             in
-            Util.commit_patches conf base;
             let new_istr = Geneweb_db.Driver.insert_string base s2 in
             let cache_updated =
               CheckData.update_cache_entry conf dict_info.dict_type ~old_istr:k
