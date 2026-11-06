@@ -123,7 +123,7 @@
 %define;display_edit_fam_btn()
   %if;(wizard and not cancel_links)
     <div>
-      <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%ancestor.index;#marr" title="[modify::family/families]0">
+      <a href="%prefix;m=MOD_FAM&%family.access;#marr" title="[modify::family/families]0">
         <i class="fa fa-wrench fa-lg"></i>
       </a>
     </div>

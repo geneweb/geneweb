@@ -134,11 +134,10 @@ let linked_page_rows conf base ?person pg pgl =
           (Format.sprintf
              {|
 <td class="align-middle">
-  <a href="%sm=MOD_FAM&i=%s&ip=%s#events" title="%s %s %s">
+  <a href="%sm=MOD_FAM&%s#events" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
-             (Driver.Ifam.to_string ifam)
-             (Driver.get_iper fath |> Driver.Iper.to_string)
+             (family_acces conf base ifam fath :> string)
              (Utf8.capitalize_fst (transl conf "modify"))
              (transl_nth conf "event/events" 0)
              (transl_nth conf "family/families" 0));

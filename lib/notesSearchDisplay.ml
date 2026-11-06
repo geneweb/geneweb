@@ -478,9 +478,7 @@ let subject_html conf base hl subject =
       person_link conf base hl fath
       ^ " "
       ^ edit_dates conf
-          (Printf.sprintf "m=MOD_FAM&i=%s&ip=%s"
-             (Driver.Ifam.to_string ifam)
-             (Driver.Iper.to_string (Driver.get_iper fath)))
+          ("m=MOD_FAM&" ^ (Util.family_acces conf base ifam fath :> string))
           (Printf.sprintf "%s %s %s %s"
              (Utf8.capitalize_fst
                 (Util.transl_decline conf "modify"

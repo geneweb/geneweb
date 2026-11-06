@@ -72,10 +72,10 @@
 %let;l_lmarriage1;
   %if;(evar.del="on" and wizard)
     class="del" target="ifr" onclick="javascript:deleted(this);"
-    href="%prefix;m=DEL_FAM_OK;%nn;
+    href="%prefix;m=DEL_FAM_OK&%nn;
   %elseif;(wizard)
     %l_on1;%sp;
-    href="%prefix;m=MOD_FAM;%nn;
+    href="%prefix;m=MOD_FAM&%nn;
   %else;
     href="#%nn;
   %end;
@@ -100,10 +100,10 @@
           <a id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP; %l_on1;>↺ [*modify::person/persons]0</a>%nn;
           <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD&%access;" %l_on1;>⇳ [*invert::event/events]1%(<br>[*modify person event order]0%)</a>
           %if;(is_male or is_female)
-            <a id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
+            <a id="add_fam" href="%prefix;m=ADD_FAM&%access;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
           %else;
-            <a href="%prefix;m=ADD_FAM&ip=%index;&sex=M" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]0)</a>%nn;
-            <a href="%prefix;m=ADD_FAM&ip=%index;&sex=F" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]1)</a>%nn;
+            <a href="%prefix;m=ADD_FAM&%access;&sex=M" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]0)</a>%nn;
+            <a href="%prefix;m=ADD_FAM&%access;&sex=F" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]1)</a>%nn;
           %end;
           %foreach;family;
             %if;(family_cnt>1)
@@ -111,10 +111,10 @@
             %end;
             %if;(family_cnt < 4)
               %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%end;%in;
-              <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %if;(nb_families>1)%family_cnt;%end; (%a_k;)"
+              <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&%family.access;" title="[*modify::family/families]0 %if;(nb_families>1)%family_cnt;%end; (%a_k;)"
                  accesskey="%a_k;" %l_on1;>↺ [*modify::family/families]0 %if;(nb_families>1)%family_cnt;%end;</a>%nn;
             %else;
-              <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %family_cnt;"
+              <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&%family.access;" title="[*modify::family/families]0 %family_cnt;"
                  %l_on1;>↺ [*modify::family/families]0 %family_cnt;</a>%nn;
             %end;
             <a href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br>%apply;chg_evt_fam_ord(family_cnt)%)</a>
@@ -515,7 +515,7 @@
           %if;(ancestor.has_siblings)♦
           %elseif;(ancestor.has_parents)◊
           %elseif;(wizard and not cancel_links)
-            <a id="add_par_%l_sosa;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;"
+            <a id="add_par_%l_sosa;" href="%prefix;m=ADD_PAR&%ancestor.access;"
                title="[*add::parents] (L)" %l_on1;><span class="add">–</span></a>
           %else;–
           %end;
@@ -713,7 +713,7 @@
     %end;
   %elseif;(wizard and not cancel_links and first_name != "?" and surname != "?")
      <div class="fam2 button">
-       <a id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;
+       <a id="add_par" href="%prefix;m=ADD_PAR&%access;" %laL;
           %l_on1;>[*add::parents]</a>
      </div>
   %end;
@@ -1360,7 +1360,7 @@
       <div class="button" style="clear:both">
         %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
         %elseif;(is_male or is_female)
-          <a href="%prefix;m=ADD_FAM;ip=%index;" title="[*add::family/families]0 (A)" %l_on1;>👫 [*add::family/families]0</a>%nn;
+          <a href="%prefix;m=ADD_FAM&%access;" title="[*add::family/families]0 (A)" %l_on1;>👫 [*add::family/families]0</a>%nn;
           <br>
         %end;
       </div>

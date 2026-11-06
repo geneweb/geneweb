@@ -172,7 +172,7 @@
         %if;(not ancestor.has_parents)
           %let;top4;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in;
           %let;left4;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
-          <a style="top:%top4;px;left:%left4;px;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" target="_blank"
+          <a style="top:%top4;px;left:%left4;px;" href="%prefix;m=ADD_PAR&%ancestor.access;" target="_blank"
           title="[*missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor;">%if;(evar.sms="on")·%else; %end;</a>
         %end;
@@ -211,12 +211,12 @@
         %if;(not ancestor.has_parents)
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
-          <a style="top:%top2;px;left:%left2;px;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" 
+          <a style="top:%top2;px;left:%left2;px;" href="%prefix;m=ADD_PAR&%ancestor.access;" 
           title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end;">%if;(evar.sms="on")·%else; %end;</a>
           %let;top3;%expr(topxx_yy(ancestor.anc_sosa.v*2+1)*hb)%in;
           %let;left3;%expr(leftxx_yy(ancestor.anc_sosa.v*2+1)*wb)%in;
-          <a style="top:%top3;px;left:%left3;px" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" target="_blank"
+          <a style="top:%top3;px;left:%left3;px" href="%prefix;m=ADD_PAR&%ancestor.access;" target="_blank"
           title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end;">%if;(evar.sms="on")·%else; %end;</a>
         %end;

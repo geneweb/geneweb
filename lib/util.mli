@@ -167,6 +167,19 @@ val acces :
   Geneweb_db.Driver.person ->
   Adef.escaped_string
 
+val family_acces :
+  config ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.ifam ->
+  Geneweb_db.Driver.person ->
+  Adef.escaped_string
+(** [family_acces conf base ifam ctx] returns the URL parameters giving the
+    family [ifam] reached from its member [ctx]: the key of [ctx], the key of
+    the spouse as [p2], [n2], [oc2], and [f], the rank of the family among the
+    families of [ctx] with that spouse, omitted when 0; without a spouse key,
+    [f] ranks all the families of [ctx]. Returns [i] and [ip] when [ctx] has no
+    key (see {!acces}). *)
+
 val accessible_by_key :
   config ->
   Geneweb_db.Driver.base ->

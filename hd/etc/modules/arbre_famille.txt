@@ -117,7 +117,7 @@
       %elseif;("xx"="father" or "xx"="mother" or "xx"="spouse.father" or "xx"="spouse.mother")w-75 align-self-center mx-1%end;
       %if;("xx"="spouse")me-5 ms-auto%elseif;("xx"="")me-auto ms-5%end; text-center rounded-top %if;(wizard)list-group-item-secondary%end;">
       %if;(wizard)
-        <a href="%prefix;m=ADD_PAR;ip=yy;" class="text-center align-self-center"
+        <a href="%prefix;m=ADD_PAR&yy" class="text-center align-self-center"
           title="%apply;a_of_b%with;[*add] [missing parents]%and;%if;("xx"="spouse")%spouse;%elseif;("xx"="")%self;%else;%xx;%end;%end;">
           <i class="fa fa-plus mx-2 text-danger"></i>
         </a>
@@ -135,7 +135,7 @@
     %foreach;ancestor
       %if;(level=3)
         %if;(not ancestor.has_parents and ((ancestor.anc_sosa.v=4 and ww=8) or (ancestor.anc_sosa.v=6 and ww=12)))
-          %apply;addpar("ancestor",ancestor.index)
+          %apply;addpar("ancestor",ancestor.access)
         %end;
       %end;
       %if;(level=4)
@@ -177,7 +177,7 @@
     %foreach;ancestor
       %if;(level=3)
         %if;(not ancestor.has_parents and ((ancestor.anc_sosa.v=5 and ww=8) or (ancestor.anc_sosa.v=7 and ww=12)))
-         %apply;addpar("ancestor",ancestor.index)
+         %apply;addpar("ancestor",ancestor.access)
         %end;
       %end;
     %end;
@@ -280,7 +280,7 @@
               </div>
               %apply;border()
             %else;
-              %apply;addpar("father",father.index)
+              %apply;addpar("father",father.access)
             %end;
             <div class="list-group">
               %apply;short_display_person_image("father", "yes", "")
@@ -301,7 +301,7 @@
               </div>
               %apply;border()
             %else;
-              %apply;addpar("mother",mother.index)
+              %apply;addpar("mother",mother.access)
             %end;
             <div class="list-group">
               %apply;short_display_person_image("mother", "yes", "")
@@ -312,7 +312,7 @@
       %apply;border()
     %else;
       <div class="d-flex">
-        %apply;addpar("",index)
+        %apply;addpar("",access)
       </div>
     %end;
   </div>
@@ -337,7 +337,7 @@
                   </div>
                   %apply;border()
                 %else;
-                  %apply;addpar("spouse.father",spouse.father.index)
+                  %apply;addpar("spouse.father",spouse.father.access)
                 %end;
                 <div class="list-group">
                   %apply;short_display_person_image("spouse.father", "yes", "")
@@ -358,7 +358,7 @@
                   </div>
                   %apply;border()
                 %else;
-                  %apply;addpar("spouse.mother",spouse.mother.index)
+                  %apply;addpar("spouse.mother",spouse.mother.access)
                 %end;
                 <div class="list-group">
                   %apply;short_display_person_image("spouse.mother", "yes", "")
@@ -369,7 +369,7 @@
           %apply;border()
         %else;
           <div class="d-flex">
-            %apply;addpar("spouse",spouse.index)
+            %apply;addpar("spouse",spouse.access)
           </div>
         %end;
       %end;

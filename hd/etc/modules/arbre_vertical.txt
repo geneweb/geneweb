@@ -90,7 +90,7 @@
         %if;cell.is_right;
           %if;(e.ma!=0)
             %if;(wizard and not cancel_links)
-              <a href="%prefix;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
+              <a href="%prefix;m=MOD_FAM&%cell.family.access;"
             %else;
               <span
             %end;

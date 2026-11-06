@@ -4420,6 +4420,10 @@ and eval_witness_relation_var conf base env
 
 and eval_family_field_var conf base env
     ((_, fam, (ifath, imoth, _), m_auth) as fcd) loc = function
+  | [ "access" ] ->
+      let ifam, _, (_, _, isp), _ = fcd in
+      let ctx = pget conf base (if isp = ifath then imoth else ifath) in
+      VVstring (Util.family_acces conf base ifam ctx :> string)
   | [ "date_s" ] | [ "dates" ] ->
       VVstring
         (DateDisplay.short_family_dates_text conf base true fam :> string)

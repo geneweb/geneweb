@@ -995,6 +995,30 @@ let acces_n conf base n x : Adef.escaped_string =
 *)
 let acces conf base x = acces_n conf base (Adef.escaped "") x
 
+let family_acces conf base ifam ctx : Adef.escaped_string =
+  let ip = Driver.get_iper ctx in
+  let spouse ifam = Gutil.spouse ip (Driver.foi base ifam) in
+  let sp = spouse ifam in
+  let key a = if a <> "" && a.[0] = 'p' then Some a else None in
+  match key (acces conf base ctx :> string) with
+  | Some ctx_key when Array.mem ifam (Driver.get_family ctx) ->
+      let sp_key =
+        key (acces_n conf base (Adef.escaped "2") (pget conf base sp) :> string)
+      in
+      let same f = sp_key = None || spouse f = sp in
+      let rec rank k = function
+        | f :: l when f <> ifam -> rank (if same f then k + 1 else k) l
+        | _ -> k
+      in
+      let k = rank 0 (Array.to_list (Driver.get_family ctx)) in
+      Adef.escaped
+        (ctx_key
+        ^ (match sp_key with Some a -> "&" ^ a | None -> "")
+        ^ if k = 0 then "" else "&f=" ^ string_of_int k)
+  | _ ->
+      Adef.escaped
+        ("i=" ^ Driver.Ifam.to_string ifam ^ "&ip=" ^ Driver.Iper.to_string ip)
+
 (**/**)
 
 let restricted_txt = Adef.safe "....."
@@ -1178,12 +1202,11 @@ let update_family_loop conf base p s =
     if conf.wizard then
       match res with
       | [ res ] ->
-          let iper = Driver.Iper.to_string iper in
-          let ifam = Driver.Ifam.to_string res in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
-          ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
-          ^>^ "</a>"
+          ^^^ "m=MOD_FAM&"
+          ^<^ (family_acces conf base res p :> string)
+          ^<^ "\">" ^<^ s ^>^ "</a>"
       | _ ->
           let iper = Driver.Iper.to_string iper in
           "<a href=\""

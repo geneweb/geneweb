@@ -51,7 +51,7 @@
     %if;(title!=""), %title;%end;
   %end;%sp;
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%nn;
+    <a href="%prefix;m=MOD_FAM&%family.access;" title="[modify::family/families]0">%nn;
   %end;
     <span class="small text-body-secondary text-nowrap fst-italic">%nn;
       %if;(are_engaged or are_married)&%elseif;are_not_married;X%end;
