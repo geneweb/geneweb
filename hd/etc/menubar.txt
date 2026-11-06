@@ -214,7 +214,7 @@
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=MRG&i=%index;" title="[*merge] %first_name;%if;(occ!=0).%occ;%end; %surname; [with]…"><i class="fa fa-compress fa-fw text-danger me-2" aria-hidden="true"></i>[*merge::person/persons]1</a>
+                <a class="dropdown-item" href="%prefix;m=MRG&%access;" title="[*merge] %first_name;%if;(occ!=0).%occ;%end; %surname; [with]…"><i class="fa fa-compress fa-fw text-danger me-2" aria-hidden="true"></i>[*merge::person/persons]1</a>
                 <a class="dropdown-item" href="%prefix;m=DEL_IND&%access;" title="[*delete] %self;"><i class="fa fa-trash-can fa-fw text-danger me-2" aria-hidden="true"></i>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
                   <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">

@@ -49,7 +49,7 @@
     <a href="%prefix;m=DEL_IND&%access;">[*delete::]</a>
     <br>
     <br>
-    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
+    <a href="%prefix;m=MRG&%access;">[*merge::]</a>
     <br>
     %if;(not has_parents and first_name != "?" and surname != "?")
       <br>
