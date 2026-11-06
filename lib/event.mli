@@ -47,5 +47,7 @@ val sorted_events :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   Geneweb_db.Driver.istr event_item list
-(** [sorted_events conf base p] is the list of [p]'s events, sorted by
-    Checkitem.sorted_events *)
+(** [sorted_events conf base p] is the list of [p]'s events sorted by
+    {!compare}, an undated event being sorted with the date of the event before
+    it in its own list (the personal events, or the events of one family), so
+    that it keeps its stored place among dated events. *)
