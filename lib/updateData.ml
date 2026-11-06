@@ -529,20 +529,20 @@ let update_person_list conf base new_input list nb_pers max_updates =
       List.iter
         (fun p ->
           incr cnt;
-          let o_p =
-            Util.string_gen_person base (Driver.gen_person_of_person p)
-          in
+          let gp = Driver.gen_person_of_person p in
+          let o_p = Util.string_gen_person base gp in
           let np = update_person conf base old new_input p in
           if action = "fn" || action = "sn" then
             Image.rename_portrait_and_blason conf base p
               (Driver.sou base np.first_name, Driver.sou base np.surname, np.occ);
-          Driver.patch_person base np.key_index np;
+          if np <> gp then Driver.patch_person base np.key_index np;
           if test_family then
             Array.iter
               (fun ifam ->
                 let fam = Driver.foi base ifam in
                 let nfam = update_family conf base old new_input fam in
-                Driver.patch_family base nfam.fam_index nfam)
+                if nfam <> Driver.gen_family_of_family fam then
+                  Driver.patch_family base nfam.fam_index nfam)
               (Driver.get_family p);
           (* On met aussi à jour l'historique. *)
           if not (Util.is_empty_name p) then
