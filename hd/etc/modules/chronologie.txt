@@ -3,7 +3,8 @@
   %if;(xx.years!="")
     <span%if;(xx.months>0 or xx.days>0) title="%xx;"%end;
       class="age-%nn;
-       %if;(xx.years>0)years">%if;(xx.years<10 and xx.sign="") %end;%xx.sign;%xx.years;%nn;
+       %if;(xx.sign!="")muted">%xx.sign;%if;(xx.years>0)%xx.years;%elseif;(xx.months>0)%xx.months;%else;%xx.days;%end;%nn;
+       %elseif;(xx.years>0)years">%if;(xx.years<10 and xx.sign="") %end;%xx.sign;%xx.years;%nn;
        %elseif;(xx.months>0)months">%if;(xx.months<10 and xx.sign="") %end;%xx.sign;%xx.months;%nn;
        %else;days">%if;(xx.days<10 and xx.sign="") %end;%xx.sign;%xx.days;%end;</span>
   %end;
@@ -263,7 +264,7 @@
       %and;self_evt%nn;
       %and;%event.place;%nn;
       %and;%event.note;%nn;
-      %and;%if;(event.name=[birth/births]0)<span class="age-years">0</span>%nn;
+      %and;%if;(event.name=[birth/births]0)<span class="age-muted">0</span>%nn;
            %elseif;(event.name=[burial/burials]0 or event.name=[incineration/incinerations]0)%nn;
            %else;%apply;age_marker("event.age")%end;
       %and;%if;event.has_spouse;f%event.spouse.index;%end;
