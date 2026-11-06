@@ -199,7 +199,7 @@
                   %else;[*user/password/cancel]2 [navigation] [Sosa]%nn;%end;
                 </a>
               %end;
-              %if;not ("MOD" in e.m or "ADD" in e.m or "MRG" in e.m or e.m="R" or e.m="U")
+              %if;not ("MOD" in e.m or "ADD" in e.m or "MRG" in e.m or e.m="R")
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw me-2" aria-hidden="true"></i>[*cancel GeneWeb links]</a>%nn;
               %end;

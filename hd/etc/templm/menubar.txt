@@ -24,7 +24,6 @@
 %let;laL;title="[add::parents] (L)" accesskey="L"%in;
 %let;laP;title="[modify::person/persons]0 (P)" accesskey="P"%in;
 %let;laR;title="[relationship computing] (R)" accesskey="R"%in;
-%let;laU;title="[update::] (U)" accesskey="U"%in;
 %let;laS;title="(S)" accesskey="S"%in;
 %let;lcS;<code>(S)</code>%in; %( Sosa reference %)
 %let;laY;title="[tree] (Y)" accesskey="Y"%in;
@@ -42,7 +41,7 @@
     %end;
   </span>
   %if;wizard;
-    <span><a id="upd" href="%prefix;m=U;%access;" %laU;>[*update]</a>
+    <span><span id="upd">[*update]</span>
       <span class="s_menu">
         <a id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP;>[modify::person/persons]0</a>%nn;
         %foreach;family;
