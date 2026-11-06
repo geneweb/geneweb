@@ -132,7 +132,18 @@ let events conf base p =
     pevents @ fevents
 
 let sorted_events conf base p =
-  let unsorted_events = events conf base p in
-  let get_name (n, _, _, _, _, _, _) = n in
-  let get_date (_, date, _, _, _, _, _) = date in
-  sort_events get_name get_date unsorted_events
+  let anchored, _, _ =
+    List.fold_left
+      (fun (l, src, prev) ((_, date, _, _, _, _, isp) as e) ->
+        let prev = if src = Some isp then prev else Date.cdate_None in
+        let d =
+          match Date.cdate_to_gregorian_dmy_opt date with
+          | Some _ -> date
+          | None -> prev
+        in
+        ((d, e) :: l, Some isp, d))
+      ([], None, Date.cdate_None) (events conf base p)
+  in
+  List.rev anchored
+  |> List.stable_sort (compare (fun (_, (n, _, _, _, _, _, _)) -> n) fst)
+  |> List.map snd
