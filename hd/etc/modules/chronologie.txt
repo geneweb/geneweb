@@ -159,6 +159,10 @@
   %if;(xx.prec="&#60;")1%elseif;(xx.prec="&#62;")3%else;2%end;
 %end;
 
+%define;set_chrono_key(kkk)
+  %set_var.chrono_key.kkk;
+%end;
+
 %define;one_child(ccc,evm,labl,p_cat)
   %( no test for his_birth_date <= my_death_date here %)
   %apply;add_in_sorted_list%with;%apply;sort_key("ccc.birth_date")
@@ -241,15 +245,19 @@
   %reset_count2;
   %let;after_birth;%apply;date_key("birth_date")4%in;
   %let;after_death;%apply;date_key("death_date")4%in;
-  %( événements self %)
+  %( events of self: an undated event takes the key of the event before it %)
+  %apply;set_chrono_key("0")
   %foreach;event;
     %incr_count2;
     %let;ek;%apply;sort_key("event.date")%in;
-    %apply;add_in_sorted_list%with;%nn;
+    %let;sk;%nn;
       %if;(event.name=[baptism] and ek<after_birth)%after_birth;%nn;
       %elseif;((event.name=[burial/burials]0 or event.name=[incineration/incinerations]0)
         and ek<after_death)%after_death;%nn;
       %else;%ek;%end;%nn;
+    %in;
+    %if;event.has_date;%apply;set_chrono_key(sk)%end;
+    %apply;add_in_sorted_list%with;%get_var.chrono_key;%nn;
       %and;%count2;%nn;
       %and;%if;event.has_date;%event.date;%else;([missing date]0)%end;%nn;
       %and;self_evt%nn;
