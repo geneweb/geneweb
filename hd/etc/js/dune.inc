@@ -322,3 +322,21 @@
     (concurrent
       (run gzip -9 -k -f %{input})
       (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets updateOrder.js.gz updateOrder.js.br)
+  (deps (:input updateOrder.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets updateOrder.min.js.gz updateOrder.min.js.br)
+  (deps (:input updateOrder.min.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))

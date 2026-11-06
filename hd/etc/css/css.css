@@ -659,6 +659,11 @@ html {
   scroll-padding-top: 52px;
 }
 
+/* Reorder window (updateOrder.txt) */
+.reorder-list > [data-key] {
+  cursor: grab;
+}
+
 /* Carrousel */
 .text-pre-line {
   white-space: pre-line;

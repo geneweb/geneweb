@@ -22,6 +22,29 @@ type base_misc =
     Geneweb_db.Driver.title )
   Def.misc
 
+val union_date : Geneweb_db.Driver.family -> Adef.date option
+(** [union_date fam] is the date ordering family [fam] among the families of a
+    person: its marriage date, else the date of its first dated event; textual
+    dates are ignored. *)
+
+val compare_unions :
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.ifam ->
+  Geneweb_db.Driver.ifam ->
+  int
+(** [compare_unions base f1 f2] is [-1] when every day the union date of [f1]
+    may denote precedes every day the one of [f2] may denote, [1] the other way
+    round, [0] otherwise, notably without union date. *)
+
+val free_order : ('a -> 'a -> int) -> 'a list -> bool
+(** [free_order cmp l] tells whether [cmp] leaves the order of [l] open: an item
+    of [l] is not strictly before ([cmp x y < 0]) an item following it. False
+    for fewer than two items. *)
+
+val misplaced : ('a -> 'a -> int) -> 'a list -> ('a * 'a) option
+(** [misplaced cmp l] is the first pair [(x, y)] of [l], [x] coming before [y],
+    that [cmp] orders the other way round ([cmp x y > 0]). *)
+
 val check_siblings :
   ?onchange:bool ->
   Geneweb_db.Driver.base ->

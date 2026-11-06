@@ -21,7 +21,8 @@
   notes_corpus_test
   notes_rename_test
   anomaly_test
-  notes_corpus_test)
+  notes_corpus_test
+  update_order_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix))
 
 (test

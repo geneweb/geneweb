@@ -13879,6 +13879,40 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
+    reorder families
+af: verander die volgorde van die gesinne
+bg: промяна на реда на семействата
+br: cheñch urzh an tiegezhioù
+ca: reordenar les famílies
+co: riurdinà e famiglie
+cs: změnit pořadí rodin
+da: ændr rækkefølgen af familierne
+de: Familien umsortieren
+en: reorder families
+eo: ŝanĝi la ordon de la familioj
+es: reordenar las familias
+et: muuda perede järjekorda
+fi: muuta perheiden järjestystä
+fr: réordonner les familles
+he: שינוי סדר המשפחות
+is: breyta röð fjölskyldna
+it: riordinare le famiglie
+lt: keisti šeimų tvarką
+lv: mainīt ģimeņu secību
+nl: volgorde van de gezinnen wijzigen
+no: endre rekkefølgen på familiene
+oc: reordenar las familhas
+pl: zmień kolejność rodzin
+pt: reordenar as famílias
+pt-br: reordenar as famílias
+ro: reordonează familiile
+ru: изменить порядок семей
+sk: zmeniť poradie rodín
+sl: spremeni vrstni red družin
+sv: ändra ordningen på familjerna
+tr: ailelerin sırasını değiştir
+zh: 调整家庭顺序
+
     reorder images
 de: Bilder umsortieren
 en: reorder images
@@ -17183,6 +17217,142 @@ en: All results for “%s”
 es: Todos los resultados para «%s»
 fr: Tous les résultats pour « %s »
 
+    NOTIF order saved
+af: Die nuwe volgorde is gestoor.
+bg: Новият ред е запазен.
+br: Enrollet eo bet an urzh nevez.
+ca: S’ha desat el nou ordre.
+co: U novu ordine hè statu arregistratu.
+cs: Nové pořadí bylo uloženo.
+da: Den nye rækkefølge er gemt.
+de: Die neue Reihenfolge wurde gespeichert.
+en: The new order has been saved.
+eo: La nova ordo estas konservita.
+es: Se ha guardado el nuevo orden.
+et: Uus järjekord on salvestatud.
+fi: Uusi järjestys on tallennettu.
+fr: Le nouvel ordre est enregistré.
+he: הסדר החדש נשמר.
+is: Nýja röðin hefur verið vistuð.
+it: Il nuovo ordine è stato salvato.
+lt: Naujoji tvarka išsaugota.
+lv: Jaunā secība ir saglabāta.
+nl: De nieuwe volgorde is opgeslagen.
+no: Den nye rekkefølgen er lagret.
+oc: Lo novèl òrdre es enregistrat.
+pl: Nowa kolejność została zapisana.
+pt: A nova ordem foi guardada.
+pt-br: A nova ordem foi salva.
+ro: Noua ordine a fost salvată.
+ru: Новый порядок сохранён.
+sk: Nové poradie bolo uložené.
+sl: Novi vrstni red je shranjen.
+sv: Den nya ordningen har sparats.
+tr: Yeni sıra kaydedildi.
+zh: 新顺序已保存。
+
+    NOTIF order not saved
+af: Die nuwe volgorde kon nie gestoor word nie.
+bg: Новият ред не можа да бъде запазен.
+br: N’eus ket bet gallet enrollañ an urzh nevez.
+ca: No s’ha pogut desar el nou ordre.
+co: U novu ordine ùn hà micca pussutu esse arregistratu.
+cs: Nové pořadí se nepodařilo uložit.
+da: Den nye rækkefølge kunne ikke gemmes.
+de: Die neue Reihenfolge konnte nicht gespeichert werden.
+en: The new order could not be saved.
+eo: La nova ordo ne povis esti konservita.
+es: No se ha podido guardar el nuevo orden.
+et: Uut järjekorda ei õnnestunud salvestada.
+fi: Uutta järjestystä ei voitu tallentaa.
+fr: Le nouvel ordre n’a pas pu être enregistré.
+he: לא ניתן היה לשמור את הסדר החדש.
+is: Ekki tókst að vista nýju röðina.
+it: Non è stato possibile salvare il nuovo ordine.
+lt: Naujosios tvarkos išsaugoti nepavyko.
+lv: Jauno secību neizdevās saglabāt.
+nl: De nieuwe volgorde kon niet worden opgeslagen.
+no: Den nye rekkefølgen kunne ikke lagres.
+oc: Lo novèl òrdre a pas pogut èsser enregistrat.
+pl: Nie udało się zapisać nowej kolejności.
+pt: Não foi possível guardar a nova ordem.
+pt-br: Não foi possível salvar a nova ordem.
+ro: Noua ordine nu a putut fi salvată.
+ru: Не удалось сохранить новый порядок.
+sk: Nové poradie sa nepodarilo uložiť.
+sl: Novega vrstnega reda ni bilo mogoče shraniti.
+sv: Den nya ordningen kunde inte sparas.
+tr: Yeni sıra kaydedilemedi.
+zh: 无法保存新顺序。
+
+    NOTIF order changed
+af: Hierdie lys het verander sedert die venster oopgemaak is. Herlaai die bladsy om van sy huidige volgorde af te begin.
+bg: Този списък е променен след отварянето на прозореца. Презаредете страницата, за да започнете от текущия му ред.
+br: Cheñchet eo bet ar roll-mañ abaoe m’eo bet digoret ar prenestr. Adkargit ar bajenn evit adkregiñ diouzh e urzh a-vremañ.
+ca: Aquesta llista ha canviat des que es va obrir la finestra. Torneu a carregar la pàgina per partir del seu ordre actual.
+co: Sta lista hè cambiata dapoi l’apertura di a finestra. Ricaricate a pagina per ripiglià da u so ordine attuale.
+cs: Tento seznam se od otevření okna změnil. Načtěte stránku znovu a začněte od jeho současného pořadí.
+da: Listen er ændret, siden vinduet blev åbnet. Genindlæs siden for at tage udgangspunkt i den nuværende rækkefølge.
+de: Diese Liste wurde seit dem Öffnen des Fensters geändert. Laden Sie die Seite neu, um von ihrer aktuellen Reihenfolge auszugehen.
+en: This list has changed since the window was opened. Reload the page to start again from its current order.
+eo: Ĉi tiu listo ŝanĝiĝis post la malfermo de la fenestro. Reŝargu la paĝon por rekomenci de ĝia nuna ordo.
+es: Esta lista ha cambiado desde que se abrió la ventana. Vuelva a cargar la página para partir de su orden actual.
+et: Seda loendit on pärast akna avamist muudetud. Laadige leht uuesti, et alustada selle praegusest järjekorrast.
+fi: Luettelo on muuttunut ikkunan avaamisen jälkeen. Lataa sivu uudelleen aloittaaksesi sen nykyisestä järjestyksestä.
+fr: Cette liste a changé depuis l’ouverture de la fenêtre. Rechargez la page pour repartir de son ordre actuel.
+he: רשימה זו השתנתה מאז שנפתח החלון. טענו מחדש את הדף כדי להתחיל מהסדר הנוכחי שלה.
+is: Þessum lista hefur verið breytt síðan glugginn var opnaður. Endurhlaðið síðuna til að byrja á núverandi röð hans.
+it: Questo elenco è cambiato dall’apertura della finestra. Ricaricate la pagina per ripartire dal suo ordine attuale.
+lt: Nuo lango atidarymo šis sąrašas pasikeitė. Įkelkite puslapį iš naujo, kad pradėtumėte nuo dabartinės jo tvarkos.
+lv: Kopš loga atvēršanas šis saraksts ir mainījies. Pārlādējiet lapu, lai sāktu no tā pašreizējās secības.
+nl: Deze lijst is gewijzigd sinds het venster werd geopend. Laad de pagina opnieuw om van de huidige volgorde uit te gaan.
+no: Listen er endret siden vinduet ble åpnet. Last inn siden på nytt for å ta utgangspunkt i den nåværende rekkefølgen.
+oc: Aquesta lista a cambiat dempuèi la dobertura de la fenèstra. Tornatz cargar la pagina per partir de son òrdre actual.
+pl: Ta lista zmieniła się od otwarcia okna. Odśwież stronę, aby zacząć od jej obecnej kolejności.
+pt: Esta lista mudou desde a abertura da janela. Recarregue a página para partir da sua ordem atual.
+pt-br: Esta lista mudou desde que a janela foi aberta. Recarregue a página para partir da ordem atual.
+ro: Această listă s-a schimbat de la deschiderea ferestrei. Reîncărcați pagina pentru a porni de la ordinea ei actuală.
+ru: Этот список изменился с момента открытия окна. Перезагрузите страницу, чтобы начать с его текущего порядка.
+sk: Tento zoznam sa od otvorenia okna zmenil. Načítajte stránku znova a začnite od jeho súčasného poradia.
+sl: Ta seznam se je od odprtja okna spremenil. Znova naložite stran, da začnete od njegovega trenutnega vrstnega reda.
+sv: Listan har ändrats sedan fönstret öppnades. Ladda om sidan för att utgå från dess nuvarande ordning.
+tr: Pencere açıldığından beri bu liste değişti. Geçerli sırasından başlamak için sayfayı yeniden yükleyin.
+zh: 自打开窗口以来，此列表已被修改。请重新加载页面，从当前顺序重新开始。
+
+    NOTIF order contradicts union dates
+af: Hierdie volgorde weerspreek die datums van die verbintenisse: die verbintenis met %s (%s) kan nie voor die verbintenis met %s (%s) kom nie.
+bg: Този ред противоречи на датите на съюзите: съюзът с %s (%s) не може да предхожда съюза с %s (%s).
+br: Enebiñ a ra an urzh-mañ ouzh deiziadoù an unanidigezhioù: an unanidigezh gant %s (%s) ne cʼhall ket dont a-raok an unanidigezh gant %s (%s).
+ca: Aquest ordre contradiu les dates de les unions: la unió amb %s (%s) no pot precedir la unió amb %s (%s).
+co: St’ordine cuntradice e date di l’unioni: l’unione cù %s (%s) ùn pò micca precede quella cù %s (%s).
+cs: Toto pořadí odporuje datům svazků: svazek s osobou %s (%s) nemůže předcházet svazku s osobou %s (%s).
+da: Denne rækkefølge strider mod datoerne for forbindelserne: forbindelsen med %s (%s) kan ikke komme før forbindelsen med %s (%s).
+de: Diese Reihenfolge widerspricht den Daten der Verbindungen: Die Verbindung mit %s (%s) kann nicht vor der Verbindung mit %s (%s) stehen.
+en: This order contradicts the union dates: the union with %s (%s) cannot come before the union with %s (%s).
+eo: Ĉi tiu ordo kontraŭdiras la datojn de la kuniĝoj: la kuniĝo kun %s (%s) ne povas antaŭi la kuniĝon kun %s (%s).
+es: Este orden contradice las fechas de las uniones: la unión con %s (%s) no puede preceder a la unión con %s (%s).
+et: See järjekord on vastuolus liitude kuupäevadega: liit isikuga %s (%s) ei saa olla enne liitu isikuga %s (%s).
+fi: Järjestys on ristiriidassa liittojen päivämäärien kanssa: liitto henkilön %s (%s) kanssa ei voi edeltää liittoa henkilön %s (%s) kanssa.
+fr: Cet ordre contredit les dates d’union : l’union avec %s (%s) ne peut pas précéder celle avec %s (%s).
+he: סדר זה סותר את תאריכי הקשרים: הקשר עם %s (%s) אינו יכול לבוא לפני הקשר עם %s (%s).
+is: Þessi röð stangast á við dagsetningar sambandanna: sambandið við %s (%s) getur ekki komið á undan sambandinu við %s (%s).
+it: Questo ordine contraddice le date delle unioni: l’unione con %s (%s) non può precedere quella con %s (%s).
+lt: Ši tvarka prieštarauja sąjungų datoms: sąjunga su asmeniu %s (%s) negali būti ankstesnė už sąjungą su asmeniu %s (%s).
+lv: Šī secība ir pretrunā ar savienību datumiem: savienība ar personu %s (%s) nevar būt pirms savienības ar personu %s (%s).
+nl: Deze volgorde is in strijd met de datums van de verbintenissen: de verbintenis met %s (%s) kan niet vóór de verbintenis met %s (%s) komen.
+no: Denne rekkefølgen er i strid med datoene for forbindelsene: forbindelsen med %s (%s) kan ikke komme før forbindelsen med %s (%s).
+oc: Aqueste òrdre contradís las datas de las unions: l’union amb %s (%s) pòt pas precedir aquela amb %s (%s).
+pl: Ta kolejność jest sprzeczna z datami związków: związek z osobą %s (%s) nie może poprzedzać związku z osobą %s (%s).
+pt: Esta ordem contradiz as datas das uniões: a união com %s (%s) não pode preceder a união com %s (%s).
+pt-br: Esta ordem contradiz as datas das uniões: a união com %s (%s) não pode preceder a união com %s (%s).
+ro: Această ordine contrazice datele uniunilor: uniunea cu %s (%s) nu poate preceda uniunea cu %s (%s).
+ru: Этот порядок противоречит датам союзов: союз с лицом %s (%s) не может предшествовать союзу с лицом %s (%s).
+sk: Toto poradie odporuje dátumom zväzkov: zväzok s osobou %s (%s) nemôže predchádzať zväzku s osobou %s (%s).
+sl: Ta vrstni red je v nasprotju z datumi zvez: zveza z osebo %s (%s) ne more biti pred zvezo z osebo %s (%s).
+sv: Ordningen strider mot datumen för föreningarna: föreningen med %s (%s) kan inte komma före föreningen med %s (%s).
+tr: Bu sıra birlikteliklerin tarihleriyle çelişiyor: %s (%s) ile birliktelik, %s (%s) ile birliktelikten önce gelemez.
+zh: 此顺序与结合日期矛盾：与%s（%s）的结合不能排在与%s（%s）的结合之前。
+
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 bg: n-ти/първи/втори/трети/четвърти/пети/шести/седми/осми/девети/десети/единадесети/дванадесети/тринадесети/четиринадесети/петнадесети/шестнадесети/седемнадесети/осемнадесети/деветнадесети/двадесети/21-и/22-и/23-и/24-и/25-и/26-и/27-и/28-и/29-и/30-и/31-и/32-и/33-и/34-и/35-и/36-и/37-и/38-и/39-и/40-и/41-и/42-и/43-и/44-и/45-и/46-и/47-и/48-и/49-и/50-и/51-и/52-и/53-и/54-и/55-и/56-и/57-и/58-и/59-и/60-и/61-и/62-и/63-и/64-и/65-и/66-и/67-и/68-и/69-и/70-и/71-и/72-и/73-и/74-и/75-и/76-и/77-и/78-и/79-и/80-и/81-и/82-и/83-и/84-и/85-и/86-и/87-и/88-и/89-и/90-и/91-и/92-и/93-и/94-и/95-и/96-и/97-и/98-и/99-и
@@ -20296,11 +20466,38 @@ sv: samma ättling som n° Sosa
 tr: Sosa ile aynı #
 
     save
+af: stoor
+bg: запази
+br: enrollañ
+ca: desa
 co: arregistrà
+cs: uložit
+da: gem
 de: speichern
 en: save
+eo: konservi
 es: guardar
-fr: sauvegarder
+et: salvesta
+fi: tallenna
+fr: enregistrer
+he: שמירה
+is: vista
+it: salva
+lt: išsaugoti
+lv: saglabāt
+nl: opslaan
+no: lagre
+oc: enregistrar
+pl: zapisz
+pt: guardar
+pt-br: salvar
+ro: salvează
+ru: сохранить
+sk: uložiť
+sl: shrani
+sv: spara
+tr: kaydet
+zh: 保存
 
     save image
 co: una fiura cù un nome simile serà dispiazzata in

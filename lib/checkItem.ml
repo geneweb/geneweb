@@ -886,6 +886,37 @@ let changed_fevents_order warning (ifam, fam) =
   let b = Driver.get_fevents fam in
   if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
 
+let union_date fam =
+  let dated cd =
+    match Date.od_of_cdate cd with
+    | Some (Adef.Dgreg _ as d) -> Some d
+    | Some (Adef.Dtext _) | None -> None
+  in
+  match dated (Driver.get_marriage fam) with
+  | Some _ as d -> d
+  | None -> List.find_map (fun e -> dated e.efam_date) (Driver.get_fevents fam)
+
+let compare_unions base f1 f2 =
+  match (union_date (Driver.foi base f1), union_date (Driver.foi base f2)) with
+  | Some d1, Some d2 ->
+      let d1 = Date.date_to_gregorian_bounds d1 in
+      let d2 = Date.date_to_gregorian_bounds d2 in
+      if strictly_before d1 d2 then -1
+      else if strictly_before d2 d1 then 1
+      else 0
+  | (Some _ | None), _ -> 0
+
+let rec find_pair f l =
+  match l with
+  | [] -> None
+  | x :: rest -> (
+      match List.find_opt (f x) rest with
+      | Some y -> Some (x, y)
+      | None -> find_pair f rest)
+
+let free_order cmp l = Option.is_some (find_pair (fun x y -> cmp x y >= 0) l)
+let misplaced cmp l = find_pair (fun x y -> cmp x y > 0) l
+
 (* main *)
 
 let person ?(onchange = true) base warning p =
