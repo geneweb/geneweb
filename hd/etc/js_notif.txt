@@ -14,6 +14,8 @@ var notifIcons={
 (function(){
   var items=%[%];
   try{items=JSON.parse(document.currentScript.dataset.notif)||items;}catch(e){}
+  try{var s=sessionStorage.getItem('gw_notif');
+    if(s){sessionStorage.removeItem('gw_notif');items=items.concat(JSON.parse(s));}}catch(e){}
   %if;(e.nomod="1")
     items.push({level:'info',title:'[*no modification]',
       message:'[NOTIF no modification]',autohide:true});

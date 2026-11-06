@@ -3728,6 +3728,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_first_names_aliases" ->
       if hide_person conf base p then false
       else Driver.get_first_names_aliases p <> []
+  | "has_free_family_order" ->
+      CheckItem.free_order
+        (CheckItem.compare_unions base)
+        (Array.to_list (Driver.get_family p))
   | "has_history" -> has_history conf base p p_auth
   (* Beware: lots of confusion between image and portrait *)
   | "has_image" | "has_portrait" ->

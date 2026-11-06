@@ -1,0 +1,55 @@
+<!-- $Id: updateOrder.txt v7.1 06/11/2026 $ -->
+%( Windows of the menubar (menubar.txt) reordering a list, driven by
+   js/updateOrder.js: one item per element of the list, keyed for the
+   request of the window (UpdateOrder). The items go between order_open
+   and order_close: %apply arguments cannot hold a %foreach. %)
+%define;order_open(x_id,x_req,x_title)
+  <div class="modal fade" id="x_id" tabindex="-1" aria-labelledby="x_id-title" aria-hidden="true"
+    data-prefix="%prefix;" data-reorder="x_req" data-failed="[NOTIF order not saved]">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="x_id-title">x_title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="[*close]"></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group reorder-list">
+%end;
+%define;order_close()
+          </div>
+          <div class="alert alert-danger mt-3 mb-0 d-none reorder-alert" role="alert"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">[*user/password/cancel]2</button>
+          <button type="button" class="btn btn-primary reorder-save" disabled>[*save]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+%define;order_item(x_key,x_label,x_info)
+  <div class="list-group-item d-flex align-items-center gap-2" data-key="x_key">
+    <i class="fa fa-grip-vertical text-body-secondary" title="[*move up/down]4" aria-hidden="true"></i>
+    <div class="flex-grow-1">
+      <div>x_label</div>
+      <ul class="list-inline small text-body-secondary mb-0">x_info</ul>
+    </div>
+    <div class="btn-group-vertical btn-group-sm">
+      <button type="button" class="btn btn-outline-secondary reorder-up" title="[*move up/down]0">%nn;
+        <i class="fa fa-arrow-up" aria-hidden="true"></i><span class="visually-hidden">[*move up/down]0</span></button>
+      <button type="button" class="btn btn-outline-secondary reorder-down" title="[*move up/down]1">%nn;
+        <i class="fa fa-arrow-down" aria-hidden="true"></i><span class="visually-hidden">[*move up/down]1</span></button>
+    </div>
+  </div>
+%end;
+%if;has_free_family_order;
+  %apply;order_open%with;update_order_fam%and;m=CHG_FAM_ORD_OK&%access;%and;[*reorder families]%end;
+  %foreach;family;
+    %apply;order_item%with;%family.index;%and;<span class="badge text-bg-secondary me-2">%family_cnt;</span>%spouse;%spouse.dates;%and;
+      %if;(family.marriage_date!="")<li class="list-inline-item">%family.marriage_date;</li>%end;
+      %if;(marriage_place!="")<li class="list-inline-item">%marriage_place;</li>%end;
+      %if;(nb_children>0)<li class="list-inline-item">%nb_children; %if;(nb_children=1)[child/children]0%else;[child/children]1%end;</li>%end;
+    %end;
+  %end;
+  %apply;order_close()
+%end;

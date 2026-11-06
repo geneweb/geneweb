@@ -918,25 +918,6 @@ let effective_inv conf base ip u ifam =
   in
   Driver.patch_union base ip u
 
-(* ************************************************************************ *)
-(*  [Fonc] effective_chg_order : base -> iper -> person -> ifam -> int -> unit        *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Modifie l'ordre de la famille en positionnant la famille
-    ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4]. [Args]
-    :
-    - base : base de donnée
-    - ip : iper
-    - u : person
-    - ifam : famille à changer de place
-    - n : nouvelle position de la famille [Retour] : Néant [Rem] : Non exporté
-      en clair hors de ce module. *)
-let effective_chg_order base ip u ifam n =
-  let fam = UpdateFam.change_order u ifam n in
-  let u = { family = Array.of_list fam } in
-  Driver.patch_union base ip u
-
 let effective_del conf base fam =
   let ifam = Driver.get_ifam fam in
   let father = Driver.get_father fam in
@@ -1495,26 +1476,6 @@ let print_inv conf base =
       let ifam = Driver.Ifam.of_string ifam in
       let p = Driver.poi base ip in
       effective_inv conf base (Driver.get_iper p) p ifam;
-      Util.commit_patches conf base;
-      let changed =
-        let gen_p =
-          Util.string_gen_person base (Driver.gen_person_of_person p)
-        in
-        U_Invert_family (gen_p, ifam)
-      in
-      History.record conf base changed "if";
-      print_inv_ok conf base p
-  | _ -> Hutil.incorrect_request conf
-
-let print_change_order_ok conf base =
-  match
-    (p_getenv conf.env "i", p_getenv conf.env "f", p_getint conf.env "n")
-  with
-  | Some ip, Some ifam, Some n ->
-      let ip = Driver.Iper.of_string ip in
-      let ifam = Driver.Ifam.of_string ifam in
-      let p = Driver.poi base ip in
-      effective_chg_order base (Driver.get_iper p) p ifam n;
       Util.commit_patches conf base;
       let changed =
         let gen_p =

@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 03/10/2026 01:19:36 $ -->
+<!-- $Id: js.txt v7.1 06/11/2026 14:42:29 $ -->
 %if;not cancel_links;
 %( Edit pages: is_upd_ind and is_upd_fam are set by the person and family
    form printers, so a *_OK result page is not taken for a form; notes
@@ -688,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-%if;(e.notif!="" or e.nomod="1")
+%if;(e.notif!="" or e.nomod="1" or wizard)
 <script data-notif="%e.notif;">
 %include;js_notif
 </script>
@@ -706,18 +706,25 @@ document.addEventListener('DOMContentLoaded', () => {
 %if;(not is_welcome and e.m!="MOD_DATA" and e.m!="CHK_DATA")
 <script>
 function initializeLazyModules() {
-  function loadScriptOnce(buttonId, scriptUrl) {
-    const btn = document.getElementById(buttonId);
-    if (!btn) return;
-    btn.addEventListener('click', function handler() {
-      const script = document.createElement('script');
-      script.src = scriptUrl;
-      document.head.appendChild(script);
-      btn.removeEventListener('click', handler);
-    });
+  %( async = false: the scripts of one call run in the order listed. %)
+  function loadScriptOnce(selector, ...urls) {
+    const btns = document.querySelectorAll(selector);
+    function handler() {
+      btns.forEach(btn => btn.removeEventListener('click', handler));
+      urls.forEach(url => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = false;
+        document.head.appendChild(script);
+      });
+    }
+    btns.forEach(btn => btn.addEventListener('click', handler));
   }
-  loadScriptOnce('load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
-  loadScriptOnce('load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
+  loadScriptOnce('#load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('#load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
+  loadScriptOnce('.load-update-order',
+    '%etc_prefix;js/html5sortable.min.js?version=0.14.0',
+    '%etc_prefix;js/updateOrder.min.js?hash=%apply;hash%with;%etc_prefix;js/updateOrder.min.js%end;');
 }
 document.addEventListener('DOMContentLoaded', initializeLazyModules);
 </script>

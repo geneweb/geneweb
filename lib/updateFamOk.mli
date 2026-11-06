@@ -147,10 +147,6 @@ val print_inv : config -> Driver.base -> unit
 (** [print_inv conf base] handles [m=INV_FAM_OK]: swaps family [f] of person [i]
     with the preceding one. *)
 
-val print_change_order_ok : config -> Driver.base -> unit
-(** [print_change_order_ok conf base] handles [m=CHG_FAM_ORD_OK]: moves family
-    [f] of person [i] to position [n] ({!UpdateFam.change_order}). *)
-
 val print_change_event_order : config -> Driver.base -> unit
 (** [print_change_event_order conf base] handles [m=CHG_EVT_FAM_ORD_OK]:
     reorders the events of family [i] by the submitted [e_id<k>] and [e_pos<k>],

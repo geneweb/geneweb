@@ -10,6 +10,7 @@
 %let;laY;title="[*tree] (Y)" accesskey="Y"%in;
 %let;sexcolor;%if;is_male;male%elseif;is_female;female%else;neuter%end;%in;
 %let;iswiz;%if;(b.wizard_just_friend!="yes" and wizard)1%end;%in;
+%let;update_order;%if;(iswiz=1 and not ("MOD" in e.m or "ADD" in e.m or "MRG" in e.m))1%end;%in;
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 %let;visib;%if;(not test_p_auth)3%elseif;(b.semi_public="yes" and is_semi_public)2%elseif;(is_public or (b.public_if_titles="yes" and has_titles))1%else;0%end;%in;
 %let;visib_color;%apply;nth%with;text-body-secondary/text-success/text-warning/text-danger%and;%visib;%end;%in;
@@ -307,6 +308,12 @@
                   %else;
                     <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM&%access;" %laA;><i class="fa fa-plus fa-fw me-2" aria-hidden="true"></i>[*add::family/families]0</a>
                   %end;
+                  %if;(update_order=1 and has_free_family_order)
+                    <div class="dropdown-divider"></div>
+                    <button type="button" class="dropdown-item load-update-order"
+                      data-bs-toggle="modal" data-bs-target="#update_order_fam">%nn;
+                      <i class="fa fa-right-left fa-rotate-90 fa-fw me-2" aria-hidden="true"></i>[*reorder families]</button>
+                  %end;
                   %foreach;family;
                     <div class="dropdown-divider"></div>
                     %if;(family_cnt != 1)
@@ -492,6 +499,9 @@
       </div>
     </div>
   </nav>
+  %if;(update_order=1)
+    %include;updateOrder
+  %end;
   %if;(evar.m="C" and (e.v1!="" or e.v2!="") and not cancel_links)
     %include;buttons_cousins
   %end;

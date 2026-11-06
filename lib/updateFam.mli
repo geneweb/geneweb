@@ -56,16 +56,6 @@ val print_inv : config -> Driver.base -> unit
 (** [print_inv conf base] handles [m=INV_FAM]: confirmation page for swapping
     family [f] of person [i] with the preceding one, posting [m=INV_FAM_OK]. *)
 
-val change_order : Driver.person -> Driver.ifam -> int -> Driver.ifam list
-(** [change_order p ifam n] is the list of families of [p] with [ifam] moved to
-    position [n], from 1 to the number of families; out of that range, [ifam] is
-    dropped. *)
-
-val print_change_order : config -> Driver.base -> unit
-(** [print_change_order conf base] handles [m=CHG_FAM_ORD]: shows the families
-    of person [i] before and after moving family [f] to position [n], posting
-    [m=CHG_FAM_ORD_OK]. *)
-
 val print_change_event_order : config -> Driver.base -> unit
 (** [print_change_event_order conf base] handles [m=CHG_EVT_FAM_ORD]: form
     [updfamevt.txt] for reordering the events of family [i]. *)
