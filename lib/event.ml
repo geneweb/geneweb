@@ -34,16 +34,46 @@ let compare_event_name name1 name2 =
   | _ -> 0
 (*TODO Fevent??*)
 
+let life_events =
+  [
+    Epers_Birth;
+    Epers_Baptism;
+    Epers_Death;
+    Epers_Funeral;
+    Epers_Cremation;
+    Epers_Burial;
+  ]
+
+let life_rank name =
+  let rec loop i l =
+    match l with
+    | [] -> None
+    | n :: l -> if n = name then Some i else loop (i + 1) l
+  in
+  loop 0 life_events
+
+let compare_names name1 name2 =
+  match (name1, name2) with
+  | Pevent n1, Pevent n2 -> (
+      match (life_rank n1, life_rank n2) with
+      | Some r1, Some r2 -> Int.compare r1 r2
+      | (Some _ | None), _ -> 0)
+  | Pevent _, Fevent _ | Fevent _, (Pevent _ | Fevent _) ->
+      compare_event_name name1 name2
+
 let compare get_name get_date e1 e2 =
   match Date.cdate_to_gregorian_dmy_opt (get_date e1) with
-  | None -> compare_event_name (get_name e1) (get_name e2)
+  | None -> compare_names (get_name e1) (get_name e2)
   | Some d1 -> (
       match Date.cdate_to_gregorian_dmy_opt (get_date e2) with
-      | None -> compare_event_name (get_name e1) (get_name e2)
+      | None -> compare_names (get_name e1) (get_name e2)
       | Some d2 -> (
           match Date.compare_dmy_period d1 d2 with
-          | 0 -> compare_event_name (get_name e1) (get_name e2)
+          | 0 -> compare_names (get_name e1) (get_name e2)
           | x -> x))
+
+let pevent_key e = Hasher.SHA256.(feeder_to_hasher (gen_pers_event iper istr)) e
+let fevent_key e = Hasher.SHA256.(feeder_to_hasher (gen_fam_event iper istr)) e
 
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events

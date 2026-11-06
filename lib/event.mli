@@ -16,6 +16,21 @@ type 'a event_item =
 
 val compare_event_name : 'a event_name -> 'a event_name -> int
 
+val compare : ('a -> 'b event_name) -> ('a -> Adef.cdate) -> 'a -> 'a -> int
+(** [compare get_name get_date e1 e2] is the order of {!sort_events}: by date
+    when both events have one and their periods differ, otherwise by name.
+    Birth, baptism, death, funeral, cremation and burial keep this order among
+    themselves; a family event comes after a birth and before a death, a
+    funeral, a cremation or a burial; any other pair is not ordered ([0]), so
+    that a personal event may come before the birth or after the burial. *)
+
+val pevent_key : Geneweb_db.Driver.pers_event -> string
+(** [pevent_key e] identifies the personal event [e] by a digest of its content.
+*)
+
+val fevent_key : Geneweb_db.Driver.fam_event -> string
+(** Same as {!pevent_key} for a family event. *)
+
 val sort_events :
   ('a -> 'b event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list
 (** Sort events (both personal and familial) by their date and their name *)

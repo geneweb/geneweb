@@ -198,44 +198,6 @@ and eval_witness conf base env fam sl =
       eval_key conf base k sl
   | _ -> raise Not_found
 
-(* TODO : rewrite, looks bad *)
-and eval_event_str conf base env fam =
-  match get_env "cnt" env with
-  | Vint i -> (
-      try
-        let fam = Driver.foi base fam.fam_index in
-        let e = List.nth (Driver.get_fevents fam) (i - 1) in
-        let name =
-          Util.string_of_fevent_name conf base e.efam_name
-          |> Adef.safe_fn Utf8.capitalize_fst
-        in
-        let date =
-          match Date.od_of_cdate e.efam_date with
-          | Some d -> DateDisplay.string_of_date conf d
-          | None -> Adef.safe ""
-        in
-        let place = Util.string_of_place conf (Driver.sou base e.efam_place) in
-        let note = Util.safe_html (Driver.sou base e.efam_note) in
-        let src = Util.safe_html (Driver.sou base e.efam_src) in
-        let wit =
-          Array.fold_right
-            (fun (w, _) accu ->
-              (transl_nth conf "witness/witnesses" 0
-              ^<^ transl conf ":"
-              ^<^ Util.gen_person_text conf base (Driver.poi base w))
-              :: accu)
-            e.efam_witnesses []
-        in
-        let s =
-          String.concat ", "
-            ([ name; date; (place :> Adef.safe_string); note; src ]
-              :> string list)
-        in
-        let sw = String.concat ", " (wit :> string list) in
-        safe_val (Adef.safe (s ^ ", " ^ sw))
-      with Failure _ -> str_val "")
-  | _ -> str_val ""
-
 and eval_has_fwitness env fam =
   let has_fwitness_opt =
     family_events_opt env fam >>= fun e ->
@@ -324,7 +286,6 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       let e = family_events_opt env fam in
       eval_event_var e sl
   | [ "event_date"; s ] -> eval_event_date env fam s
-  | [ "event_str" ] -> eval_event_str conf base env fam
   | [ "has_fwitness" ] -> eval_has_fwitness env fam
   | "fwitness" :: sl -> eval_fwitness conf base env fam sl
   | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
@@ -717,22 +678,3 @@ let print_del conf base =
   | Some (ifam, ctx) ->
       print_del1 (Util.with_index_env conf (Some ifam) ctx) base ifam
   | None -> Hutil.incorrect_request conf
-
-let print_change_event_order conf base =
-  match Util.find_family_in_env conf base with
-  | None -> Hutil.incorrect_request conf
-  | Some (i, ctx) ->
-      let conf = Util.with_index_env conf (Some i) ctx in
-      let sfam = string_family_of base i in
-      let ifun =
-        Templ.
-          {
-            eval_var = eval_var conf base;
-            eval_transl = (fun _ -> Templ.eval_transl conf);
-            eval_predefined_apply = (fun _ -> raise Not_found);
-            get_vother;
-            set_vother;
-            print_foreach;
-          }
-      in
-      Templ.output conf ifun Templ.Env.empty sfam "updfamevt"

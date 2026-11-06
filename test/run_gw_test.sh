@@ -352,9 +352,9 @@ crl "m=C&i=$ID&t=AN"
 crl "m=C&i=$ID"
 crl "m=CAL" $nodiff
 crl "m=CHG_CHN&ip=$FID"
-crl "m=CHG_EVT_FAM_ORD&i=$FID&ip=$ID"
-crl "m=CHG_EVT_IND_ORD&i=$ID"
 # prev differs from the stored order: refused without writing
+crl "m=CHG_EVT_FAM_ORD_OK&i=$FID&ip=$ID&o=&prev="
+crl "m=CHG_EVT_IND_ORD_OK&i=$ID&o=&prev="
 crl "m=CHG_FAM_ORD_OK&i=$ID&o=$FID&prev="
 crl "m=D&i=$ID"
 crl "m=D&i=$ID&t=V&v=3"

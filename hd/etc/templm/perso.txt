@@ -89,16 +89,12 @@
     %end;
   %end;
 %in;
-%define;chg_evt_fam_ord(xx)
-  [*modify family %s event order:::xx]0
-%end;
 %define;menu()
   <div class="menu%bvar.menu;" style="left:10px;top:0px;height:17px">
     %if;wizard;
       <span style="width:270px">⟔%(⇱%)
         <span class="s_menu">
           <a id="mod_ind" href="%prefix;m=MOD_IND&%access;" %laP; %l_on1;>↺ [*modify::person/persons]0</a>%nn;
-          <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD&%access;" %l_on1;>⇳ [*invert::event/events]1%(<br>[*modify person event order]0%)</a>
           %if;(is_male or is_female)
             <a id="add_fam" href="%prefix;m=ADD_FAM&%access;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
           %else;
@@ -114,7 +110,6 @@
               <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&%family.access;" title="[*modify::family/families]0 %family_cnt;"
                  %l_on1;>↺ [*modify::family/families]0 %family_cnt;</a>%nn;
             %end;
-            <a href="%prefix;m=CHG_EVT_FAM_ORD&%family.access;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br>%apply;chg_evt_fam_ord(family_cnt)%)</a>
           %end;
           %if;has_children;
             <a href="%prefix;m=CHG_CHN&%access;">👦👧 [*change children's names]</a>
@@ -1340,8 +1335,6 @@
           %end;
         %end;
         </div>
-        %(<span class="button"><a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD&%family.access;"
-         style="border:0px;font-size:17px" title="[*invert::event/events]1 [family/families]0">⇳</a></span>%)
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
         %if;(evar.image="on" and nb_families > 1)<hr style="clear:both;">%end;

@@ -18,7 +18,8 @@ let this_request_updates_database conf =
   match p_getenv conf.env "m" with
   | Some
       ( "ADD_FAM" | "BLASON_MOVE_TO_ANC" | "BLASON_STOP" | "CHANGE_WIZ_VIS"
-      | "CHG_CHN" | "CHG_FAM_ORD_OK" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
+      | "CHG_CHN" | "CHG_EVT_FAM_ORD_OK" | "CHG_EVT_IND_ORD_OK"
+      | "CHG_FAM_ORD_OK" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
       | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" | "MOD_NOTES"
       | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" | "OK_ADD"
       | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
@@ -455,16 +456,10 @@ let treat_request =
                  w_wizard @@ w_base @@ ChangeChildrenDisplay.print
              | "CHG_CHN_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
-             | "CHG_EVT_IND_ORD" ->
-                 w_wizard @@ w_base @@ UpdateInd.print_change_event_order
              | "CHG_EVT_IND_ORD_OK" ->
-                 w_wizard @@ w_lock @@ w_base
-                 @@ UpdateIndOk.print_change_event_order
-             | "CHG_EVT_FAM_ORD" ->
-                 w_wizard @@ w_base @@ UpdateFam.print_change_event_order
+                 w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_pevents
              | "CHG_EVT_FAM_ORD_OK" ->
-                 w_wizard @@ w_lock @@ w_base
-                 @@ UpdateFamOk.print_change_event_order
+                 w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_fevents
              | "CHG_FAM_ORD_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_families
              | "CHK_DATA" -> w_wizard @@ w_base @@ CheckDataDisplay.print

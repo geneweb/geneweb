@@ -23,6 +23,15 @@ val reconstitute_from_fevents :
     With [nsck] (no sex check, same-sex couple), [Married] and [NotMarried]
     become their [NoSexesCheck] variants. *)
 
+val update_family_with_fevents :
+  Driver.base ->
+  bool ->
+  (Driver.iper, Driver.ifam, Driver.istr) gen_family ->
+  (Driver.iper, Driver.ifam, Driver.istr) gen_family
+(** [update_family_with_fevents base nsck fam] is [fam] with its summary fields
+    (relation, marriage, divorce, witnesses) derived from its events by
+    {!reconstitute_from_fevents}. *)
+
 val effective_mod :
   config ->
   Driver.base ->
@@ -142,9 +151,3 @@ val print_mod : config -> Driver.base -> unit
 val print_del : config -> Driver.base -> unit
 (** [print_del conf base] handles [m=DEL_FAM_OK]: deletes family [i], commits
     and prints the confirmation. *)
-
-val print_change_event_order : config -> Driver.base -> unit
-(** [print_change_event_order conf base] handles [m=CHG_EVT_FAM_ORD_OK]:
-    reorders the events of family [i] by the submitted [e_id<k>] and [e_pos<k>],
-    derives the summary fields again and prints the result; an unchanged order
-    redirects to the person page. *)

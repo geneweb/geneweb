@@ -56,11 +56,19 @@
   *** ok
   given name.0 surname's benediction before his/her birth
   
-  given name.0 surname's burial before his/her bat mitzvah
+  given name.0 surname's burial before his/her recensement
+  
+  given name.0 surname's death before his/her bat mitzvah
+  
+  given name.0 surname's cremation before his/her education
   
   given name.0 surname's benediction before his/her birth
   
-  given name.0 surname's burial before his/her bat mitzvah
+  given name.0 surname's burial before his/her recensement
+  
+  given name.0 surname's death before his/her bat mitzvah
+  
+  given name.0 surname's cremation before his/her education
   
   given name.0 surname married at age 0
   

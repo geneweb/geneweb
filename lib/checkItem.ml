@@ -917,6 +917,34 @@ let rec find_pair f l =
 let free_order cmp l = Option.is_some (find_pair (fun x y -> cmp x y >= 0) l)
 let misplaced cmp l = find_pair (fun x y -> cmp x y > 0) l
 
+let compare_pevents e1 e2 =
+  Event.compare
+    (fun e -> Event.Pevent e.epers_name)
+    (fun e -> e.epers_date)
+    e1 e2
+
+let separation name =
+  match name with
+  | Efam_Divorce | Efam_Separated | Efam_Annulation -> Some true
+  | Efam_Engage | Efam_Marriage | Efam_NoMarriage | Efam_NoMention
+  | Efam_MarriageBann | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
+  | Efam_Residence ->
+      Some false
+  | Efam_Name _ -> None
+
+let compare_fevents e1 e2 =
+  match
+    Event.compare
+      (fun e -> Event.Fevent e.efam_name)
+      (fun e -> e.efam_date)
+      e1 e2
+  with
+  | 0 -> (
+      match (separation e1.efam_name, separation e2.efam_name) with
+      | Some s1, Some s2 -> Bool.compare s1 s2
+      | (Some _ | None), _ -> 0)
+  | x -> x
+
 (* main *)
 
 let person ?(onchange = true) base warning p =

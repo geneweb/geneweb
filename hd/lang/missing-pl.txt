@@ -2538,19 +2538,9 @@ en: update/updates
 fr: modification/modifications
 pl:
 
-    modify family %s event order
-en: permute the events of family %s
-fr: permuter les événements de la famille %s
-pl:
-
     modify note
 en: modify the note
 fr: modifier la note
-pl:
-
-    modify person event order
-en: permute personnal events
-fr: permuter les événéments individuels
 pl:
 
     modify portrait

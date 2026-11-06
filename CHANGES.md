@@ -100,6 +100,15 @@
   "Reorder families" window: the families are moved by drag and drop or
   with arrow buttons, and the new order is saved without leaving the
   page. An order that contradicts the union dates is refused.
+- The event order pages (`m=CHG_EVT_IND_ORD` and `m=CHG_EVT_FAM_ORD`)
+  are removed. The person and family menus of the menubar offer a
+  "Reorder events" window, like the "Reorder families" one, when the
+  order of the events is left open: an event without date, or dates too
+  close to tell apart. Birth, baptism, death, funeral, cremation and
+  burial keep this order; the other personal events may now come before
+  the birth or after the burial, in the chronology too. In a family, a
+  divorce, a separation or an annulment that the dates leave unordered
+  stays after the events of the relation.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
@@ -142,6 +151,13 @@
   consistent rows with collapsed implexes or without family column,
   generation names in every language. Ancestor table: consistent rows
   with the children column alone.
+- New `has_free_family_order`, `has_free_event_order` and
+  `family.has_free_event_order` template variables, true when the
+  menubar offers to reorder the families, the events of the person or
+  those of a family; new `pevent` and `fevent` loops over the events in
+  their stored order, with `event_key`. The `has_secondary_pevents`,
+  `nb_pevents` and `family.nb_fevents` variables of the person page are
+  removed.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment

@@ -1028,15 +1028,6 @@ let print_del_ok conf =
   Hutil.header conf @@ print_title conf "person deleted";
   Hutil.trailer conf
 
-let print_change_event_order_ok conf base wl p =
-  Hutil.header conf @@ print_title conf "person modified";
-  Update.print_warnings conf base wl;
-  Output.print_sstring conf "\n";
-  Output.print_string conf
-    (referenced_person_text conf base (Driver.poi base p.key_index));
-  Output.print_sstring conf "\n";
-  Hutil.trailer conf
-
 let print_del conf base =
   match Util.find_person_in_env conf base "" with
   | Some p ->
@@ -1113,50 +1104,3 @@ let print_mod ?prerr o_conf base =
       print_mod_ok conf base wl pgl ~remains p ofn osn oocc
   in
   print_mod_aux conf base callback
-
-let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
-  | None -> Hutil.incorrect_request conf
-  | Some s ->
-      let p = Driver.poi base (Driver.Iper.of_string s) in
-      let o_p = Util.string_gen_person base (Driver.gen_person_of_person p) in
-      (* TODO_EVENT use Event.sorted_event *)
-      let ht = Hashtbl.create 50 in
-      let _ =
-        List.fold_left
-          (fun id evt ->
-            Hashtbl.add ht id evt;
-            succ id)
-          1 (Driver.get_pevents p)
-      in
-      let sorted_pevents =
-        List.sort
-          (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-          (reconstitute_sorted_events conf 1)
-      in
-      let pevents =
-        List.fold_right
-          (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
-            with Not_found -> failwith "Sorting event")
-          sorted_pevents []
-      in
-      if pevents = Driver.get_pevents p then
-        Update.redirect_unchanged conf base p
-      else
-        let p = Driver.gen_person_of_person p in
-        let p = { p with pevents } in
-        Driver.patch_person base p.key_index p;
-        let wl =
-          let a = Driver.poi base p.key_index in
-          let a =
-            { parents = Driver.get_parents a; consang = Driver.get_consang a }
-          in
-          let u = Driver.poi base p.key_index in
-          let u = { family = Driver.get_family u } in
-          all_checks_person base p a u
-        in
-        Util.commit_patches conf base;
-        let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
-        History.record conf base changed "mp";
-        print_change_event_order_ok conf base wl p

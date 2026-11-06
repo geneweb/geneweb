@@ -13798,6 +13798,40 @@ sv: länkade bilder
 tr: bağlantılı resimler
 zh: 关联图像
 
+    reorder events
+af: verander die volgorde van die gebeurtenisse
+bg: промяна на реда на събитията
+br: cheñch urzh an darvoudoù
+ca: reordenar els esdeveniments
+co: riurdinà l’evenimenti
+cs: změnit pořadí událostí
+da: ændr rækkefølgen af begivenhederne
+de: Ereignisse umsortieren
+en: reorder events
+eo: ŝanĝi la ordon de la eventoj
+es: reordenar los eventos
+et: muuda sündmuste järjekorda
+fi: muuta tapahtumien järjestystä
+fr: réordonner les événements
+he: שינוי סדר האירועים
+is: breyta röð atburða
+it: riordinare gli eventi
+lt: keisti įvykių tvarką
+lv: mainīt notikumu secību
+nl: volgorde van de gebeurtenissen wijzigen
+no: endre rekkefølgen på hendelsene
+oc: reordenar los eveniments
+pl: zmień kolejność wydarzeń
+pt: reordenar os eventos
+pt-br: reordenar os eventos
+ro: reordonează evenimentele
+ru: изменить порядок событий
+sk: zmeniť poradie udalostí
+sl: spremeni vrstni red dogodkov
+sv: ändra ordningen på händelserna
+tr: olayların sırasını değiştir
+zh: 调整事件顺序
+
     reorder families
 af: verander die volgorde van die gesinne
 bg: промяна на реда на семействата
@@ -15524,16 +15558,6 @@ en: modify the coat of arms
 es: modificar el blasón
 fr: modifier le blason
 
-    modify family %s event order
-co: intervertisce l’evenimenti di a famiglia %s
-de: vertauschen Sie die Ereignisse der Familie %s
-en: permute the events of family %s
-es: permutar los eventos de la familia %s
-fr: permuter les événements de la famille %s
-pt: permutar os eventos da família %s
-sv: ändra ordningen för %s familjehändelser
-tr: %s ailesinin etkinliklerini değiştir
-
     modify all note
 co: mudificà a nota sana/sezzione precedente/sezzione seguente
 de: die ganze Notiz bearbeiten/vorheriger Abschnitt/nächster Abschnitt
@@ -15561,16 +15585,6 @@ de: das Bild&#047;die Galerie ändern
 en: modify the image&#047;the gallery
 es: modificar la imagen (galería)
 fr: modifier l’image&#047;la gallerie
-
-    modify person event order
-co: intervertisce l’evenimenti individuali
-de: Ereignisreihenfolge der Person ändern
-en: permute personnal events
-es: permutar los eventos individuales
-fr: permuter les événéments individuels
-pt: permutar os eventos individuais
-sv: ändra ordningen för personliga händelser
-tr: kişisel etkinlikleri değiştir
 
     modify picture
 af: wysig prent
@@ -17237,6 +17251,40 @@ sl: Ta seznam se je od odprtja okna spremenil. Znova naložite stran, da začnet
 sv: Listan har ändrats sedan fönstret öppnades. Ladda om sidan för att utgå från dess nuvarande ordning.
 tr: Pencere açıldığından beri bu liste değişti. Geçerli sırasından başlamak için sayfayı yeniden yükleyin.
 zh: 自打开窗口以来，此列表已被修改。请重新加载页面，从当前顺序重新开始。
+
+    NOTIF order contradicts events
+af: Hierdie volgorde weerspreek die datums of die lewensloop: “%s” kan nie voor “%s” kom nie.
+bg: Този ред противоречи на датите или на хода на живота: „%s“ не може да предхожда „%s“.
+br: Enebiñ a ra an urzh-mañ ouzh an deiziadoù pe ouzh red ar vuhez: «%s» ne cʼhall ket dont a-raok «%s».
+ca: Aquest ordre contradiu les dates o el curs de la vida: «%s» no pot precedir «%s».
+co: St’ordine cuntradice e date o u corsu di a vita: «%s» ùn pò micca precede «%s».
+cs: Toto pořadí odporuje datům nebo běhu života: „%s“ nemůže předcházet „%s“.
+da: Denne rækkefølge strider mod datoerne eller livets gang: »%s« kan ikke komme før »%s«.
+de: Diese Reihenfolge widerspricht den Daten oder dem Lebenslauf: „%s“ kann nicht vor „%s“ stehen.
+en: This order contradicts the dates or the course of life: “%s” cannot come before “%s”.
+eo: Ĉi tiu ordo kontraŭdiras la datojn aŭ la vivofluon: „%s“ ne povas antaŭi „%s“.
+es: Este orden contradice las fechas o el curso de la vida: «%s» no puede preceder a «%s».
+et: See järjekord on vastuolus kuupäevade või elukäiguga: „%s“ ei saa olla enne „%s“.
+fi: Järjestys on ristiriidassa päivämäärien tai elämänkulun kanssa: ”%s” ei voi edeltää tapahtumaa ”%s”.
+fr: Cet ordre contredit les dates ou le cours de la vie : « %s » ne peut pas précéder « %s ».
+he: סדר זה סותר את התאריכים או את מהלך החיים: “%s” אינו יכול לבוא לפני “%s”.
+is: Þessi röð stangast á við dagsetningarnar eða lífshlaupið: „%s“ getur ekki komið á undan „%s“.
+it: Questo ordine contraddice le date o il corso della vita: «%s» non può precedere «%s».
+lt: Ši tvarka prieštarauja datoms arba gyvenimo eigai: „%s“ negali būti anksčiau už „%s“.
+lv: Šī secība ir pretrunā ar datumiem vai dzīves gaitu: “%s” nevar būt pirms “%s”.
+nl: Deze volgorde is in strijd met de datums of de loop van het leven: ‘%s’ kan niet vóór ‘%s’ komen.
+no: Denne rekkefølgen er i strid med datoene eller livets gang: «%s» kan ikke komme før «%s».
+oc: Aqueste òrdre contradís las datas o lo cors de la vida: «%s» pòt pas precedir «%s».
+pl: Ta kolejność jest sprzeczna z datami lub biegiem życia: „%s” nie może poprzedzać „%s”.
+pt: Esta ordem contradiz as datas ou o curso da vida: «%s» não pode preceder «%s».
+pt-br: Esta ordem contradiz as datas ou o curso da vida: “%s” não pode preceder “%s”.
+ro: Această ordine contrazice datele sau cursul vieții: „%s” nu poate preceda „%s”.
+ru: Этот порядок противоречит датам или ходу жизни: «%s» не может предшествовать «%s».
+sk: Toto poradie odporuje dátumom alebo behu života: „%s“ nemôže predchádzať „%s“.
+sl: Ta vrstni red je v nasprotju z datumi ali potekom življenja: »%s« ne more biti pred »%s«.
+sv: Ordningen strider mot datumen eller livets gång: ”%s” kan inte komma före ”%s”.
+tr: Bu sıra tarihlerle ya da yaşamın akışıyla çelişiyor: “%s”, “%s” olayından önce gelemez.
+zh: 此顺序与日期或人生进程矛盾：“%s”不能排在“%s”之前。
 
     NOTIF order contradicts union dates
 af: Hierdie volgorde weerspreek die datums van die verbintenisse: die verbintenis met %s (%s) kan nie voor die verbintenis met %s (%s) kom nie.

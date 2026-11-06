@@ -160,7 +160,7 @@
           %end;
           %( IND dropdown menu %)
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="CHG_EVT_IND_ORD" or e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
+            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
                data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button" aria-expanded="false" title="[*tools] [person/persons]0">%nn;
               <i class="fa fa-user-gear %visib_color;" aria-hidden="true"></i>%nn;
               <span class="visually-hidden">[*tools] [person/persons]0, [visibility] (%apply;nth%with;[iftitles/public/semipublic/private]%and;%visib;%end;)</span></a>
@@ -207,8 +207,10 @@
               %( WIZARD | CHG_EVT / SND_IMAGE / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
               %if;(iswiz=1)
                 <div class="dropdown-divider"></div>
-                %if;(has_secondary_pevents and nb_pevents>1)
-                  <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&%access;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
+                %if;(update_order=1 and has_free_event_order)
+                  <button type="button" class="dropdown-item load-update-order"
+                    data-bs-toggle="modal" data-bs-target="#update_order_pevt">%nn;
+                    <i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*reorder events]</button>
                 %end;
                 %if;(first_name!="?" and surname!="?")
                   <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&%access;">
@@ -292,9 +294,8 @@
               %( Family dropdown menu %)
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle text-secondary
-                   %if;(e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="CHG_EVT_FAM_ORD" or e.m="DEL_FAM"
-                     or e.m="MRG_FAM" or e.m="MRG_FAM_OK" or e.m="MRG_MOD_FAM_OK" or e.m="MRG_DUP_FAM_Y_N"
-                     or e.m="CHG_CHN") active%end;"
+                   %if;(e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="DEL_FAM" or e.m="MRG_FAM"
+                     or e.m="MRG_FAM_OK" or e.m="MRG_MOD_FAM_OK" or e.m="MRG_DUP_FAM_Y_N" or e.m="CHG_CHN") active%end;"
                    data-bs-toggle="dropdown" role="button" href="#" aria-expanded="false"
                    title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
                    <i class="fa fa-user-plus" aria-hidden="true"></i>%nn;
@@ -319,8 +320,10 @@
                     %if;(nb_families!=1)
                       <span class="dropdown-header">[*marriage with] %spouse;</span>
                     %end;
-                    %if;(family.nb_fevents>1)
-                      <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD&%family.access;" title="[*changed order of family's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
+                    %if;(update_order=1 and family.has_free_event_order)
+                      <button type="button" class="dropdown-item load-update-order"
+                        data-bs-toggle="modal" data-bs-target="#update_order_fevt_%family_cnt;">%nn;
+                        <i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*reorder events]</button>
                     %end;
                     <a class="dropdown-item" href="%prefix;m=DEL_FAM&%family.access;"><i class="fa fa-trash fa-fw text-danger me-2" aria-hidden="true"></i>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)

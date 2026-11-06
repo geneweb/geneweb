@@ -61,16 +61,6 @@ let getn_p conf var ?create_info sex =
   | "create" -> Update.Create (sex, create_info)
   | _s -> Update.Link
 
-let rec reconstitute_sorted_events conf cnt =
-  match (get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt) with
-  | Some id, Some pos ->
-      let id, pos =
-        try (int_of_string id, int_of_string pos) with Failure _ -> (0, 0)
-      in
-      let el = reconstitute_sorted_events conf (cnt + 1) in
-      (id, pos) :: el
-  | _ -> []
-
 let reconstitute_somebody removed_string conf var =
   let first_name = only_printable (getn conf var "fn") in
   let surname = only_printable (getn conf var "sn") in
