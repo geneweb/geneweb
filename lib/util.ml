@@ -3436,16 +3436,6 @@ let note_link_to_sys p =
   String.split_on_char NotesLinks.char_dir_sep p
   |> String.concat Filename.dir_sep
 
-(* TODO: Equivalent of String.for_all , removable when OCaml >= 4.13 *)
-let string_for_all pred s =
-  let len = String.length s in
-  let rec loop i =
-    if i >= len then true
-    else if pred (String.get s i) then loop (i + 1)
-    else false
-  in
-  loop 0
-
 let find_persons_in_env conf base =
   let rec loop acc i =
     let k = string_of_int i in
