@@ -284,9 +284,8 @@ let print_link_delete_image conf base p =
   if Option.is_some @@ Image.get_portrait conf base p then (
     Output.print_sstring conf {|<div><a class="btn btn-danger mt-3" href="|};
     Output.print_string conf (commd conf);
-    Output.print_sstring conf "m=DEL_IMAGE&i=";
-    Output.print_string conf
-      (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+    Output.print_sstring conf "m=DEL_IMAGE&";
+    Output.print_string conf (acces conf base p);
     Output.print_sstring conf {|">|};
     transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
@@ -564,10 +563,9 @@ let print_del_ok conf base =
   with Done -> ()
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
-  | Some ip -> (
-      let p = Driver.poi base (Driver.Iper.of_string ip) in
+  | Some p -> (
       match Image.get_portrait conf base p with
       | Some _ -> print_delete_image conf base p
       | None -> Hutil.incorrect_request conf)
