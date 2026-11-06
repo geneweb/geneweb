@@ -3446,16 +3446,6 @@ let string_for_all pred s =
   in
   loop 0
 
-let url_has_pnoc_params env =
-  List.exists
-    (fun (key, _) ->
-      String.length key >= 2
-      && (String.get key 0 = 'p' || String.get key 0 = 'n')
-      && string_for_all
-           (function '0' .. '9' -> true | _ -> false)
-           (String.sub key 1 (String.length key - 1)))
-    env
-
 let find_persons_in_env conf base =
   let rec loop acc i =
     let k = string_of_int i in
