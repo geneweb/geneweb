@@ -399,6 +399,14 @@ and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "link" ] -> bool_val (create = Update.Link)
   | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
+  | [ "surname_title" ] ->
+      let part = Mutil.get_particle (Driver.base_particles base) sn in
+      let rest = Util.surname_without_particle base sn in
+      String.lowercase_ascii part
+      ^ String.concat " "
+          (List.map Utf8.capitalize (String.split_on_char ' ' rest))
+      |> Util.escape_html
+      |> fun s -> safe_val (s :> Adef.safe_string)
   | [ "sex" ] ->
       if create = Update.Link then
         let sex = get_parent_sex conf base fn sn oc in
