@@ -6,7 +6,7 @@
       <div class="modal-header">
         <h5 class="modal-title" id="carousel_modal_label">
           %if;wizard;
-          <a href="%prefix;m=SND_IMAGE_C&i=%index;"
+          <a href="%prefix;m=SND_IMAGE_C&%access;"
             title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
           %end;
             %if;has_portrait;<i class="fas fa-image-portrait ms-1 me-2" aria-hidden="true"></i>%end;

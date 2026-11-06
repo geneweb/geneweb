@@ -889,9 +889,9 @@ let print_main_c conf base =
                     in
                     let base_url =
                       Printf.sprintf
-                        "%sm=SND_IMAGE_C&i=%s&em=%s&file_name=%s&mode=%s"
+                        "%sm=SND_IMAGE_C&%s&em=%s&file_name=%s&mode=%s"
                         (commd conf :> string)
-                        ip
+                        (acces conf base p :> string)
                         (Mutil.encode m :> string)
                         (Mutil.encode display_filename :> string)
                         (Mutil.encode mode :> string)
@@ -944,10 +944,9 @@ let print_main_c conf base =
   with Done -> ()
 
 let print conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
-  | Some ip ->
-      let p = Driver.poi base (Driver.Iper.of_string ip) in
+  | Some p ->
       let fn = Driver.p_first_name base p in
       let sn = Driver.p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf

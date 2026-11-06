@@ -210,14 +210,14 @@
                   <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&%access;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
                 %end;
                 %if;(first_name!="?" and surname!="?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&i=%index;">
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&%access;">
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=MRG&%access;" title="[*merge] %first_name;%if;(occ!=0).%occ;%end; %surname; [with]…"><i class="fa fa-compress fa-fw text-danger me-2" aria-hidden="true"></i>[*merge::person/persons]1</a>
                 <a class="dropdown-item" href="%prefix;m=DEL_IND&%access;" title="[*delete] %self;"><i class="fa fa-trash-can fa-fw text-danger me-2" aria-hidden="true"></i>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
-                  <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">
+                  <a class="dropdown-item" href="%prefix;m=MRG_DUP&%access;">
                     <i class="fa fa-wrench fa-fw me-2" aria-hidden="true"></i>%nn;
                     [*merge::possible duplications]</a>
                 %end;
@@ -463,7 +463,7 @@
           %end;
           %if;(wizard and not has_portrait and not has_blason and carrousel_img_nbr=0)
             <li class="nav-item">
-              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>%nn;
+              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&%access;" %laI;>%nn;
                 <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
                 <span class="visually-hidden">[*add]/[delete::image/images]1</span></a>
             </li>

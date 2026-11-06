@@ -38,7 +38,7 @@
     <br>
     %if;(bvar.can_send_image != "no" and not has_portrait_url
       and first_name != "?" and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
+      <a href="%prefix;m=SND_IMAGE&%access;">[*send::image/images]0</a>
       <br>
       %if;(auto_image_file_name != "")
         <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
@@ -93,7 +93,7 @@
     %end;
     %if;has_possible_duplications;
       <br>
-      <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
+      <a href="%prefix;m=MRG_DUP&%access;">[*merge::possible duplications]</a>
     %end;
   </td>
 </tr>
