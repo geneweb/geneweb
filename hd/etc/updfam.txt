@@ -7,17 +7,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
-  <title>%nn;
-    %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
-      [*add::family/families]0%nn;
-    %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")[*add::parents]0%nn;
-    %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
-      [*modify::family/families]0 # %evar_i;
-    %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
-             evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
-      [*merge::family/families]1 # %evar_i;
-    %end;
-  </title>
+%define;family_id()
+  %if;(b.access_by_key="yes")%father.surname_title;/%mother.surname_title;%else;# %evar.i;%end;
+%end;
+%define;page_title()
+  %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")
+    [*add::family/families]0%nn;
+  %elseif;(evar.m="ADD_PAR" or evar.m="ADD_PAR_OK")
+    [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
+  %elseif;(evar.m="MOD_FAM" or evar.m="MOD_FAM_OK")
+    [*modify::family/families]0 %apply;family_id()
+  %elseif;(evar.m="MRG_DUP_FAM_Y_N" or evar.m="MRG_FAM" or
+           evar.m="MRG_FAM_OK" or evar.m="MRG_MOD_FAM_OK")
+    [*merge::family/families]1 %apply;family_id()
+  %end;
+%end;
+  <title>%apply;page_title()</title>
   %permalink;
   %include;css
 </head>
@@ -214,18 +219,7 @@
   <hr class="w-100">
 %end;
 
-<h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
-  %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
-    [*add::family/families]0
-  %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")
-    [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
-  %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
-    [*modify::family/families]0 # %evar_i;
-  %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
-           evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
-    [*merge::family/families]1 # %evar_i;
-  %end;
-</h1>
+<h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%apply;page_title()</h1>
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 %define;ev(vv,xx)%e.ins_vvxx_n;%end;
 <form method="post" action="%action;" id="updfam"
