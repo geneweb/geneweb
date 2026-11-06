@@ -142,7 +142,8 @@ let sorted_events conf base p =
           | None -> prev
         in
         ((d, e) :: l, Some isp, d))
-      ([], None, Date.cdate_None) (events conf base p)
+      ([], None, Date.cdate_None)
+      (events conf base p)
   in
   List.rev anchored
   |> List.stable_sort (compare (fun (_, (n, _, _, _, _, _, _)) -> n) fst)
