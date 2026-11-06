@@ -426,6 +426,7 @@ and mk_witness_kind = function
   | Def.Witness -> Tsafe "WITNESS"
   | Def.Witness_GodParent -> Tsafe "WITNESS_GODPARENT"
   | Def.Witness_CivilOfficer -> Tsafe "WITNESS_CIVILOFFICER"
+  | Def.Witness_Notary -> Tsafe "WITNESS_NOTARY"
   | Def.Witness_ReligiousOfficer -> Tsafe "WITNESS_RELIGIOUSOFFICER"
   | Def.Witness_Informant -> Tsafe "WITNESS_INFORMANT"
   | Def.Witness_Attending -> Tsafe "WITNESS_ATTENDING"

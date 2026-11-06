@@ -115,6 +115,7 @@
   %if;(k_cnt>=1)
     %if;("kindx"="")[*witness/witness/witnesses]2[:]
     %elseif;("kindx"="offi")[*civil registrar/civil registrar/civil registrar]2[:]
+    %elseif;("kindx"="notr")[*notary][:]
     %elseif;("kindx"="reli")[*parrish registrar/parrish registrar/parrish registrar]2[:]
     %elseif;("kindx"="info")[*informant/informant/informant]2[:]
     %elseif;("kindx"="pres")[*present/present/present]2[:]

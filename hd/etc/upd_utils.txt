@@ -236,6 +236,7 @@
           <option value="atte"%if;(ww_kind="atte") selected%end;>[*present/present/present]2</option>
           <option value="ment"%if;(ww_kind="ment") selected%end;>[*mentioned/mentioned/mentioned]2</option>
           <option value="offi"%if;(ww_kind="offi") selected%end;>[*civil registrar/civil registrar/civil registrar]2</option>
+          %if;roglo;<option value="notr"%if;(ww_kind="notr") selected%end;>[*notary]</option>%end;
           <option value="reli"%if;(ww_kind="reli") selected%end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
           <option value="othe"%if;(ww_kind="othe") selected%end;>[*other/other/other]2</option>
         </select>

@@ -780,11 +780,13 @@ let get_event_witness_kind l =
   match l with
   | "#godp" :: l' -> (Witness_GodParent, l')
   | "#offi" :: l' -> (Witness_CivilOfficer, l')
+  | "#notr" :: l' -> (Witness_Notary, l')
   | "#reli" :: l' -> (Witness_ReligiousOfficer, l')
   | "#info" :: l' -> (Witness_Informant, l')
   | "#atte" :: l' -> (Witness_Attending, l')
   | "#ment" :: l' -> (Witness_Mentioned, l')
   | "#othe" :: l' -> (Witness_Other, l')
+  | s :: l' when String.length s > 0 && s.[0] = '#' -> (Witness, l')
   | _ -> (Witness, l)
 
 (** Parses the line containing an information about relationship between parents

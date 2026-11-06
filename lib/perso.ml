@@ -4461,6 +4461,10 @@ and eval_family_marriage_field_var fam = function
       VVstring
         (get_nb_marriage_witnesses_of_kind fam Def.Witness_CivilOfficer
         |> string_of_int)
+  | [ "nb_witnesses_notary" ] ->
+      VVstring
+        (get_nb_marriage_witnesses_of_kind fam Def.Witness_Notary
+        |> string_of_int)
   | [ "nb_witnesses_religiousofficer" ] ->
       VVstring
         (get_nb_marriage_witnesses_of_kind fam Def.Witness_ReligiousOfficer
@@ -5596,6 +5600,7 @@ let print_foreach conf base print_ast eval_expr =
         print_foreach_witness env al ep Witness_GodParent efam
     | "witness_civilofficer" ->
         print_foreach_witness env al ep Witness_CivilOfficer efam
+    | "witness_notary" -> print_foreach_witness env al ep Witness_Notary efam
     | "witness_religiousofficer" ->
         print_foreach_witness env al ep Witness_ReligiousOfficer efam
     | "witness_informant" ->
@@ -5933,6 +5938,7 @@ let print_isolated conf base =
       Def.Witness_Attending;
       Def.Witness_Mentioned;
       Def.Witness_CivilOfficer;
+      Def.Witness_Notary;
       Def.Witness_ReligiousOfficer;
       Def.Witness_Other;
     |]

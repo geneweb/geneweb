@@ -18594,6 +18594,10 @@ de: neue Quelle
 en: new source
 fr: nouvelle source
 
+    notary
+en: notary
+fr: notaire
+
     merged into an existing source
 de: mit einer vorhandenen Quelle zusammengeführt
 en: merged into an existing source

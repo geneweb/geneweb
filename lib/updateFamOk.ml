@@ -120,6 +120,7 @@ let rec reconstitute_events conf ext cnt =
                 match p_getenv conf.env (key ^ "_kind") with
                 | Some "godp" -> (c, Witness_GodParent)
                 | Some "offi" -> (c, Witness_CivilOfficer)
+                | Some "notr" -> (c, Witness_Notary)
                 | Some "reli" -> (c, Witness_ReligiousOfficer)
                 | Some "info" -> (c, Witness_Informant)
                 | Some "atte" -> (c, Witness_Attending)
