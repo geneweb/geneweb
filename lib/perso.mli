@@ -15,27 +15,9 @@ type generation_person =
   | GP_missing of Geneweb_sosa.t * Geneweb_db.Driver.iper
 
 val interp_templ :
-  ?no_headers:bool ->
-  string ->
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  unit
+  string -> config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 
-val interp_templ_with_menu :
-  (bool -> unit) ->
-  string ->
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  unit
-
-val print :
-  ?no_headers:bool ->
-  config ->
-  Geneweb_db.Driver.base ->
-  Geneweb_db.Driver.person ->
-  unit
+val print : config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> unit
 (** Displays the HTML page of a Geneweb_db.Driver.person *)
 
 val linked_page_text :

@@ -5791,7 +5791,7 @@ let eval_predefined_apply conf env f vl =
   | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
-let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
+let interp_templ templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
   let emal = match p_getint conf.env "v" with Some i -> i | None -> 0 in
@@ -5894,23 +5894,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       Templ.print_foreach = print_foreach conf base;
     }
   in
-  if no_headers then Templ.output conf ifun env ep templ_fname
-  else if menu then
-    let size =
-      match Util.open_etc_file conf templ_fname with
-      | Some (ic, _) ->
-          let fd = Unix.descr_of_in_channel ic in
-          let stats = Unix.fstat fd in
-          close_in ic;
-          stats.Unix.st_size
-      | None -> 0
-    in
-    if size = 0 then Hutil.header conf title
-    else Templ.output conf ifun env ep templ_fname
-  else Templ.output conf ifun env ep templ_fname
-
-let interp_templ ?no_headers = gen_interp_templ ?no_headers false (fun _ -> ())
-let interp_templ_with_menu = gen_interp_templ true
+  Templ.output conf ifun env ep templ_fname
 
 let print_isolated conf base =
   Driver.load_ascends_array base;
@@ -6200,7 +6184,7 @@ let print_isolated conf base =
 
 (* Main *)
 
-let print ?no_headers conf base p =
+let print conf base p =
   let passwd =
     if conf.wizard || conf.friend then None
     else
@@ -6217,4 +6201,4 @@ let print ?no_headers conf base p =
   | Some (src, passwd)
     when is_that_user_and_password conf.auth_scheme "" passwd = false ->
       Util.unauthorized conf src
-  | Some _ | None -> interp_templ ?no_headers "perso" conf base p
+  | Some _ | None -> interp_templ "perso" conf base p
