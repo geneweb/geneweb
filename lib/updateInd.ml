@@ -695,12 +695,10 @@ let print_del conf base =
   | Some p -> print_del1 conf base p
 
 let print_change_event_order conf base =
-  match p_getenv conf.env "i" with
+  match Util.find_person_in_env conf base "" with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let p =
-        string_person_of base (Driver.poi base (Driver.Iper.of_string i))
-      in
+  | Some p ->
+      let p = string_person_of base p in
       Templ.output conf
         Templ.
           {

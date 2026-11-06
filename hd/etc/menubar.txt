@@ -207,7 +207,7 @@
               %if;(iswiz=1)
                 <div class="dropdown-divider"></div>
                 %if;(has_secondary_pevents and nb_pevents>1)
-                  <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
+                  <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&%access;" title="[*changed order of person's events]"><i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*invert::event/events]1</a>
                 %end;
                 %if;(first_name!="?" and surname!="?")
                   <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&i=%index;">
