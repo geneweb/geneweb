@@ -92,6 +92,8 @@
   count at once; `m=OK_FOLD` (or `anoma`) merges them into
   `<base>.gwb/config/verified.jsonl`. `m=OK_FILE` lists the verified
   anomalies with who verified them and when.
+- The update menu (`m=U`) is removed: the person page gives all its
+  actions.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

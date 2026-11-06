@@ -1208,10 +1208,10 @@ let update_family_loop conf base p s =
           ^<^ (family_acces conf base res p :> string)
           ^<^ "\">" ^<^ s ^>^ "</a>"
       | _ ->
-          let iper = Driver.Iper.to_string iper in
           "<a href=\""
           ^<^ (commd conf :> Adef.safe_string)
-          ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
+          ^^^ (acces conf base p :> string)
+          ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
 
 let no_reference _conf _base _p s = s

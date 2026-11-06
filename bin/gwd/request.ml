@@ -843,8 +843,6 @@ let treat_request =
                            (Driver.empty_person base Driver.Iper.dummy))
                  | None -> request_issue conn conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
-             | "U" ->
-                 w_wizard @@ w_base @@ w_person @@ Perso.interp_templ "updmenu"
              | "UNKNOWN" -> w_wizard @@ w_base @@ UnknownPersons.print
              | "UNKNOWN_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UnknownPersons.print_ok
