@@ -1,4 +1,4 @@
-(* $Id: mergeFam.ml,v 5.13 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mergeFam.ml v 7.1 06/11/2026 11:28:04 $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
@@ -185,11 +185,30 @@ let merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
   else Hutil.incorrect_request conf
 
 let print conf base =
-  match (p_getenv conf.env "i", p_getenv conf.env "i2") with
-  | Some f1, Some f2 ->
-      let ifam1 = Driver.Ifam.of_string f1 in
-      let ifam2 = Driver.Ifam.of_string f2 in
-      let fam1 = Driver.foi base ifam1 in
-      let fam2 = Driver.foi base ifam2 in
-      merge_fam conf base (ifam1, fam1) (ifam2, fam2)
-  | _ -> Hutil.incorrect_request conf
+  let fams =
+    match (p_getenv conf.env "i", p_getenv conf.env "i2") with
+    | Some f1, Some f2 -> (
+        try Some (Driver.Ifam.of_string f1, Driver.Ifam.of_string f2, conf)
+        with Failure _ -> None)
+    | _ -> (
+        match (Util.find_person_in_env conf base "", p_getint conf.env "f") with
+        | Some u, Some k ->
+            let fams = Driver.get_family u in
+            if k >= 1 && k < Array.length fams then
+              let conf =
+                Util.with_index_env conf (Some fams.(k - 1)) (Some u)
+              in
+              let i2 = Mutil.encode (Driver.Ifam.to_string fams.(k)) in
+              Some
+                ( fams.(k - 1),
+                  fams.(k),
+                  { conf with env = ("i2", i2) :: conf.env } )
+            else None
+        | _ -> None)
+  in
+  match fams with
+  | Some (ifam1, ifam2, conf) ->
+      merge_fam conf base
+        (ifam1, Driver.foi base ifam1)
+        (ifam2, Driver.foi base ifam2)
+  | None -> Hutil.incorrect_request conf

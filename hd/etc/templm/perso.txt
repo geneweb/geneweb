@@ -107,7 +107,7 @@
           %end;
           %foreach;family;
             %if;(family_cnt>1)
-            <a href="%prefix;m=INV_FAM&f=%family.index;&i=%index;" %l_on1;>⇪ [*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;</a>
+            <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)" %l_on1;>⇪ [*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;</a>
             %end;
             %if;(family_cnt < 4)
               %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%end;%in;
@@ -117,10 +117,10 @@
               <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&%family.access;" title="[*modify::family/families]0 %family_cnt;"
                  %l_on1;>↺ [*modify::family/families]0 %family_cnt;</a>%nn;
             %end;
-            <a href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br>%apply;chg_evt_fam_ord(family_cnt)%)</a>
+            <a href="%prefix;m=CHG_EVT_FAM_ORD&%family.access;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br>%apply;chg_evt_fam_ord(family_cnt)%)</a>
           %end;
           %if;has_children;
-            <a href="%prefix;m=CHG_CHN;ip=%index;">👦👧 [*change children's names]</a>
+            <a href="%prefix;m=CHG_CHN&%access;">👦👧 [*change children's names]</a>
           %end;
           %if;(bvar.history_diff="yes" and has_history)
             <a id="hist" href="%prefix;m=HIST_DIFF&t=DIFF&f=%history_file;&new=0&old=1" style="display:inline-block;width:125px" %laD;>≏ [*last diff]</a>
@@ -332,7 +332,7 @@
         %end;
       %end;
     %in;
-    <a id="f%family.index;" %l_lmarriage1;i=%family.index;&ip=%index;"
+    <a id="f%family.index;" %l_lmarriage1;%family.access;"
        title="%marriage_date_place;%him;%her;%nl;%l_lmarriage2;"
        >%if;(on_marriage_date != "")&%marriage_date.prec;%marriage_date.year;%else;&%end;
         %foreach;event;
@@ -1097,7 +1097,7 @@
 %if;(evar.del = "on")<h1 class="del">[*delete::] [person/persons]0 (-) [or] [family/families]0 (&)</h1>
   %if;(wizard and bvar.can_kill_ancestors="yes")
     <p><strong>/!\ can_kill_ancestors=yes   </strong>
-       <a class="del" href="%prefix;m=KILL_ANC;i=%index;" target="ifr"
+       <a class="del" href="%prefix;m=KILL_ANC&%access;" target="ifr"
           onclick="javascript:deleted(this);" title="[delete::ancestor/ancestors]0">%nn;
           %self; <em>/!\ [delete::ancestor/ancestors]0 /!\</em></a>
        <strong>   can_kill_ancestors=yes /!\</strong>
@@ -1336,18 +1336,18 @@
         %if;(wizard and not cancel_links and family_cnt != 1)
           %if;(family_cnt != 1)
             <span class="button">
-              <a href="%prefix;m=INV_FAM&i=%index;&f=%family.index;"
+              <a href="%prefix;m=INV_FAM&%access;&f=%expr(family_cnt-1)"
                title="[*invert::family/families]1" style="background-color:#555;padding:2px;">^</a>
             </span>
             %if;(family.father.index = prev_family.father.index
               and family.mother.index = prev_family.mother.index)
-              <span class="button"><a href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;">%nn;
+              <span class="button"><a href="%prefix;m=MRG_FAM&%access;&f=%expr(family_cnt-1)">%nn;
               [*merge::]</a></span>
             %end;
           %end;
         %end;
         </div>
-        %(<span class="button"><a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;"
+        %(<span class="button"><a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD&%family.access;"
          style="border:0px;font-size:17px" title="[*invert::event/events]1 [family/families]0">⇳</a></span>%)
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;

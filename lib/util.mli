@@ -592,6 +592,28 @@ val find_person_in_env_pref :
 (** [find_person_in_env_pref conf base prefix] Same as [find_person_in_env]
     except that it uses a prefix instead of a suffix. *)
 
+val find_ctx_person_in_env :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person option
+(** [find_ctx_person_in_env conf base] returns the person a form is reached
+    from: [ip] or [pp], [np], [ocp], else [i] or [p], [n], [oc]. *)
+
+val find_family_in_env :
+  config ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.ifam * Geneweb_db.Driver.person option) option
+(** [find_family_in_env conf base] returns the family given in [conf.env] with
+    the person it is reached from: by index [i] with [ip], or by keys as
+    {!family_acces} gives them. *)
+
+val with_index_env :
+  config ->
+  Geneweb_db.Driver.ifam option ->
+  Geneweb_db.Driver.person option ->
+  config
+(** [with_index_env conf ifam ctx] returns [conf] with [i] set to [ifam] and
+    [ip] to [ctx] as indexes, for forms whose hidden fields and next steps read
+    them. *)
+
 (* Recherche le sosa uniquement dans le fichier gwf *)
 val default_sosa_ref :
   config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person option

@@ -2296,6 +2296,50 @@ let find_person_in_env_pref conf base pref =
   find_person_in_env_aux conf base (pref ^ "i") (pref ^ "p") (pref ^ "n")
     (pref ^ "oc")
 
+let find_ctx_person_in_env conf base =
+  match find_person_in_env conf base "p" with
+  | None -> find_person_in_env conf base ""
+  | p -> p
+
+let find_family_in_env conf base =
+  match p_getenv conf.env "i" with
+  | Some i -> (
+      try Some (Driver.Ifam.of_string i, find_person_in_env conf base "p")
+      with Failure _ -> None)
+  | None -> (
+      match find_person_in_env conf base "" with
+      | None -> None
+      | Some p ->
+          let ip = Driver.get_iper p in
+          let fams =
+            match find_person_in_env conf base "2" with
+            | Some sp ->
+                let isp = Driver.get_iper sp in
+                Array.of_list
+                  (List.filter
+                     (fun f -> Gutil.spouse ip (Driver.foi base f) = isp)
+                     (Array.to_list (Driver.get_family p)))
+            | None -> Driver.get_family p
+          in
+          let k = Option.value ~default:0 (p_getint conf.env "f") in
+          if k >= 0 && k < Array.length fams then Some (fams.(k), Some p)
+          else None)
+
+let with_index_env conf ifam ctx =
+  let env = List.filter (fun (k, _) -> k <> "i" && k <> "ip") conf.env in
+  let env =
+    match ctx with
+    | Some p ->
+        ("ip", Mutil.encode (Driver.Iper.to_string (Driver.get_iper p))) :: env
+    | None -> env
+  in
+  let env =
+    match ifam with
+    | Some ifam -> ("i", Mutil.encode (Driver.Ifam.to_string ifam)) :: env
+    | None -> env
+  in
+  { conf with env }
+
 let person_exists conf base (fn, sn, oc) =
   let auth =
     match Driver.person_of_key base fn sn oc with

@@ -1184,9 +1184,9 @@ let print_del_ok conf base wl ~father ~mother ~children =
   Hutil.trailer conf
 
 let print_del conf base =
-  match p_getenv conf.env "i" with
-  | Some i ->
-      let ifam = Driver.Ifam.of_string i in
+  match Util.find_family_in_env conf base with
+  | Some (ifam, ctx) ->
+      let conf = Util.with_index_env conf (Some ifam) ctx in
       let fam = Driver.foi base ifam in
       if Driver.get_ifam fam = Driver.Ifam.dummy then
         Hutil.incorrect_request conf
