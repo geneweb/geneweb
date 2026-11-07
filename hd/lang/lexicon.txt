@@ -4407,6 +4407,17 @@ pl: Podczas edycji: ↑ ↓ poprzedni lub następny wpis, Alt + ← → sąsiedn
 pt: Ao editar: ↑ ↓ entrada anterior ou seguinte, Alt + ← → coluna vizinha, Enter valida, Esc fecha
 sv: Vid redigering: ↑ ↓ föregående eller nästa post, Alt + ← → intilliggande kolumn, Enter bekräftar, Esc stänger
 
+    book search here
+de: Klicken, um ab hier zu suchen
+en: Click to search from here
+es: Haga clic para buscar desde aquí
+fr: Cliquer pour rechercher à partir d’ici
+it: Fare clic per cercare da qui
+nl: Klik om vanaf hier te zoeken
+pl: Kliknij, aby szukać od tego miejsca
+pt: Clique para pesquisar a partir daqui
+sv: Klicka för att söka härifrån
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon

@@ -844,6 +844,11 @@ html {
 {
   color: inherit !important;
 }
+.sub-char.btn:hover, .sub-char.btn:focus-visible
+{
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
 
 #main-content li a:hover,
 #main-content li a:focus-visible

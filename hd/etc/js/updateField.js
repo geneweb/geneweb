@@ -280,14 +280,8 @@
         }
       });
       const filter = document.getElementById('book-filter');
+      this.prefix = filter?.value;
       filter?.addEventListener('input', () => this.filter(filter.value));
-      filter?.addEventListener('keydown', ev => {
-        const a = ev.key === 'Enter' && filter.value.trim() && this.entries()[0];
-        if (a) {
-          ev.preventDefault();
-          this.open(a);
-        }
-      });
       const p = new URLSearchParams(location.search);
       const a = document.getElementById('k' + p.get('key'))
         ?.querySelector('a[data-entry]');
@@ -448,11 +442,12 @@
     filter(q) {
       const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
       const n = norm(q.trim());
+      const base = norm(this.prefix ?? '');
       for (const ul of document.querySelectorAll('#main-content ul')) {
         let shown = false;
         for (const li of ul.children) {
           const a = li.querySelector('a[data-entry]');
-          li.hidden = n !== '' && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
+          li.hidden = n !== base && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
           shown ||= !li.hidden;
         }
         ul.hidden = ul.previousElementSibling.hidden = !shown;

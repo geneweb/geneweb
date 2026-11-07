@@ -57,32 +57,22 @@
           </ul>
         </div>
         <span class="text-body-secondary">%subtitle;</span>
-        %if;(nb_results<nb_max)
-          <div class="d-none d-lg-block ms-auto">[*book keyboard help]</div>
-        %end;
-        <form class="ms-auto%if;(nb_results<nb_max) ms-lg-0%end;" role="search" method="get" action="%action;">
-          %hidden;
-          <input type="hidden" name="m" value="MOD_DATA">
-          <input type="hidden" name="data" value="%e.data;">
-          <input type="search" class="form-control form-control-sm" name="s" id="book-filter" accesskey="R"
-            placeholder="[*search/case sensitive]0" aria-label="[*search/case sensitive]0" title="[*search/case sensitive]0 (R)">
-        </form>
-        %if;(e.data="place")
-          <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
-            <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
-        %elseif;(e.data="src")
-          <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=SOURCE_TERMS">%nn;
-            <i class="fa fa-object-group fa-fw me-1"></i>[*sources to group]</a>
-        %end;
+        <div class="d-flex align-items-center gap-3 ms-auto">
+          %if;(nb_results<nb_max)
+            <div class="d-none d-lg-block">[*book keyboard help]</div>
+          %end;
+          %if;(e.data="place")
+            <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
+              <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
+          %elseif;(e.data="src")
+            <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=SOURCE_TERMS">%nn;
+              <i class="fa fa-object-group fa-fw me-1"></i>[*sources to group]</a>
+          %end;
+        </div>
       </div>
       <div class="d-flex align-items-center gap-2 mt-2">
         <ol class="breadcrumb flex-nowrap flex-shrink-0 align-items-center mb-0" style="--bs-breadcrumb-divider: '›';">
-          %if;(e.s="")
-            <li class="breadcrumb-item active" aria-current="page">
-              <span class="btn btn-sm btn-primary fs-6 text-nowrap pe-none">%nn;
-                <i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]</span>
-            </li>
-          %else;
+          %if;(e.s!="")
             <li class="breadcrumb-item">
               <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;"
                 title="[*back to index and books]" aria-label="[*back to index and books]">%nn;
@@ -95,14 +85,26 @@
               </li>
             %end;
             %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
-            <li class="breadcrumb-item active" aria-current="page">
-              <span class="btn btn-sm btn-primary fs-6 font-monospace text-nowrap user-select-all pe-auto">%nn;
-                %visual_spaces.escape.current_s;</span>
-            </li>
           %end;
+          <li class="breadcrumb-item" aria-current="page">
+            <span class="d-inline-block position-relative">
+            <button type="button" class="btn btn-sm btn-primary fs-6 text-nowrap%if;(e.s!="") font-monospace%end;"
+              id="book-here" accesskey="R" title="[*book search here] (R)">%nn;
+              %if;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%else;%visual_spaces.escape.current_s;%end;</button>
+            <form class="position-absolute top-0 start-0 z-3" role="search" method="get" action="%action;" hidden>
+              %hidden;
+              <input type="hidden" name="m" value="MOD_DATA">
+              <input type="hidden" name="data" value="%e.data;">
+              <input type="text" class="form-control form-control-sm fs-6 font-monospace border-primary"
+                name="s" id="book-filter" autocomplete="off" value="%escape.current_s;"
+                style="width: %expr(len_s+12)ch;" placeholder="[*search/case sensitive]0"
+                aria-label="[*search/case sensitive]0">
+            </form>
+            </span>
+          </li>
         </ol>
         %if;(nb_results<nb_max)
-        <div class="d-flex flex-nowrap flex-sm-wrap overflow-x-auto gap-1">
+        <div class="d-flex flex-nowrap flex-sm-wrap overflow-x-auto gap-1 p-1">
           %foreach;entry;
             %if;(entry_ini!=e.s)
               <a class="sup-char btn btn-sm fs-6 text-nowrap%if;script; %script_class;%end;"
@@ -244,6 +246,7 @@ const updateData = {
       this.stableTooltips();
       this.removeLoadingOverlay();
       this.autoSelectLink();
+      this.searchToggle();
       BookEdit.init();
     } catch (e) {
       console.error('updateData init failed:', e);
@@ -309,6 +312,34 @@ const updateData = {
           }
         });
       }
+    });
+  },
+
+  searchToggle() {
+    const here = document.getElementById('book-here');
+    const form = here?.nextElementSibling;
+    if (!form) return;
+    const input = form.elements.s;
+    const close = () => {
+      form.hidden = true;
+      here.classList.remove('invisible');
+    };
+    here.addEventListener('click', () => {
+      here.classList.add('invisible');
+      form.hidden = false;
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
+    input.addEventListener('keydown', ev => {
+      if (ev.key !== 'Escape') return;
+      ev.preventDefault();
+      input.value = input.defaultValue;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      close();
+      here.focus();
+    });
+    input.addEventListener('blur', () => {
+      if (input.value === input.defaultValue) close();
     });
   },
 
