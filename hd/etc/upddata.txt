@@ -57,7 +57,10 @@
           </ul>
         </div>
         <span class="text-body-secondary">%subtitle;</span>
-        <form class="ms-auto" role="search" method="get" action="%action;">
+        %if;(nb_results<nb_max)
+          <div class="d-none d-lg-block ms-auto">[*book keyboard help]</div>
+        %end;
+        <form class="ms-auto%if;(nb_results<nb_max) ms-lg-0%end;" role="search" method="get" action="%action;">
           %hidden;
           <input type="hidden" name="m" value="MOD_DATA">
           <input type="hidden" name="data" value="%e.data;">
