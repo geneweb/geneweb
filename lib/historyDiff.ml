@@ -235,6 +235,21 @@ let records conf base changed o p =
   in
   ((if { o_gr with date = gr.date } = gr then None else Some o_gr), gr)
 
+let change_records conf base changed =
+  let pair o p =
+    let o_gr, gr = records conf base changed o p in
+    Option.map (fun o_gr -> (o_gr, gr)) o_gr
+  in
+  match changed with
+  | U_Modify_person (o, p) | U_Merge_person (o, _, p) | U_Multi (o, p) ->
+      pair o p
+  | U_Add_family (p, _)
+  | U_Modify_family (p, _, _)
+  | U_Merge_family (p, _, _, _)
+  | U_Add_parent (p, _) ->
+      pair p p
+  | _ -> None
+
 (* ************************************************************************ *)
 (*  [Fonc] record_diff : config -> base -> base_changed -> unit             *)
 
