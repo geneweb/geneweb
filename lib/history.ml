@@ -137,7 +137,7 @@ let diff_person conf base changed =
           Array.append accu
             (diff_key (Diff_string ((ofn, osn, oocc), (fn, sn, occ)))))
         [||] l
-  | U_Multi (o, n, _) -> diff_key (Diff_person (o, n))
+  | U_Multi (o, n) -> diff_key (Diff_person (o, n))
   | U_Notes (_, _) | U_Kill_ancestors _ -> [||]
 
 (* ************************************************************************ *)
@@ -172,7 +172,7 @@ let notify_change conf base changed action =
           | U_Add_parent (p, _)
           | U_Kill_ancestors p
           | U_Change_children_name (p, _)
-          | U_Multi (_, p, _) ->
+          | U_Multi (_, p) ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
               [| key; Driver.Iper.to_string p.key_index |]
           | U_Notes (Some num, file) -> [| file; string_of_int num |]
@@ -225,7 +225,7 @@ let gen_record conf base changed action =
         | U_Add_parent (p, _)
         | U_Kill_ancestors p
         | U_Change_children_name (p, _)
-        | U_Multi (_, p, _) ->
+        | U_Multi (_, p) ->
             "(" ^ p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
             ^ ")"
         | U_Notes (Some num, file) ->
@@ -251,7 +251,7 @@ let gen_record conf base changed action =
   (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
   (* mise à jour de l'historique.                                   *)
   match changed with
-  | U_Multi (_, _, _) -> ()
+  | U_Multi _ -> () ()
   | _ -> notify_change conf base changed action
 
 (* ************************************************************************ *)
@@ -308,7 +308,7 @@ let notify conf base action =
   let empty_person =
     Util.string_gen_person base (Driver.gen_person_of_person empty_person)
   in
-  notify_change conf base (U_Multi (empty_person, empty_person, false)) action
+  notify_change conf base (U_Multi (empty_person, empty_person)) action
 
 (* Request for history printing *)
 

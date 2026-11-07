@@ -322,8 +322,7 @@ let apply ?(field = Place) conf base items =
   let record gp np =
     Hashtbl.replace recorded gp.key_index ();
     History.record conf base
-      (U_Multi
-         (Util.string_gen_person base gp, Util.string_gen_person base np, false))
+      (U_Multi (Util.string_gen_person base gp, Util.string_gen_person base np))
       (action field)
   in
   Collection.iter

@@ -212,6 +212,29 @@ let make_gen_record conf base first gen_p =
     gen_c;
   }
 
+let records conf base changed o p =
+  let gr = make_gen_record conf base false p in
+  let o_gr = make_gen_record conf base true o in
+  let restore f o_f =
+    let gen_f, gen_c =
+      List.combine o_gr.gen_f o_gr.gen_c
+      |> List.filter_map (fun ((g, c) as x) ->
+          if Driver.Ifam.equal g.fam_index f.fam_index then
+            Option.map (fun o_f -> (o_f, c)) o_f
+          else Some x)
+      |> List.split
+    in
+    { o_gr with gen_f; gen_c }
+  in
+  let o_gr =
+    match changed with
+    | U_Add_family (_, f) | U_Add_parent (_, f) -> restore f None
+    | U_Modify_family (_, o_f, f) | U_Merge_family (_, o_f, _, f) ->
+        restore f (Some o_f)
+    | _ -> o_gr
+  in
+  ((if { o_gr with date = gr.date } = gr then None else Some o_gr), gr)
+
 (* ************************************************************************ *)
 (*  [Fonc] record_diff : config -> base -> base_changed -> unit             *)
 
@@ -222,9 +245,18 @@ let make_gen_record conf base first gen_p =
     - base : base de donnée
     - changed : le type de modification (voir def.mli) [Retour] : Néant [Rem] :
       Exporté en clair hors de ce module. *)
+
 let record_diff conf base changed =
   match List.assoc_opt "history_diff" conf.base_env with
   | Some "yes" when not conf.manitou -> (
+      let write_change person_file fname o p =
+        let o_gr, gr = records conf base changed o p in
+        (match o_gr with
+        | Some o_gr when not (Sys.file_exists fname) ->
+            write_history_file conf person_file fname o_gr
+        | _ -> ());
+        write_history_file conf person_file fname gr
+      in
       let print_ind_add p =
         let person_file = history_file p.first_name p.surname p.occ in
         let fname = history_path conf person_file in
@@ -246,19 +278,13 @@ let record_diff conf base changed =
              let () = create_history_dirs conf person_file in
              Sys.rename ofname fname
            with Sys_error _ -> ());
-        let gr = make_gen_record conf base false p in
-        if Sys.file_exists fname then
-          write_history_file conf person_file fname gr
-        else
-          let o_gr = make_gen_record conf base true o in
-          write_history_file conf person_file fname o_gr;
-          write_history_file conf person_file fname gr
+        write_change person_file fname o p
       in
       match changed with
       | U_Add_person p -> print_ind_add p
-      | U_Modify_person (o, p) -> print_ind_mod o p
+      | U_Modify_person (o, p) | U_Merge_person (o, _, p) | U_Multi (o, p) ->
+          print_ind_mod o p
       | U_Delete_person _ -> ()
-      | U_Merge_person (o, _, p) -> print_ind_mod o p
       | U_Delete_family (_p, _f) -> ()
       | U_Add_family (p, f)
       | U_Modify_family (p, _, f)
@@ -278,10 +304,8 @@ let record_diff conf base changed =
           let sp_fname = history_path conf sp_file in
           let gen_sp = Driver.gen_person_of_person sp in
           let gen_sp = Util.string_gen_person base gen_sp in
-          let gr = make_gen_record conf base false p in
-          write_history_file conf p_file p_fname gr;
-          let gr = make_gen_record conf base false gen_sp in
-          write_history_file conf sp_file sp_fname gr;
+          write_change p_file p_fname p p;
+          write_change sp_file sp_fname gen_sp gen_sp;
           (* Création des fichiers pour les enfants ajoutés. *)
           Array.iter
             (fun ip ->
@@ -317,11 +341,10 @@ let record_diff conf base changed =
                     (Driver.sou base)
                     (Driver.gen_person_of_person p)
                 in
-                let gr = make_gen_record conf base false p in
-                write_history_file conf person_file fname gr))
+                write_change person_file fname
+                  { p with first_name = ofn; surname = osn; occ = oocc }
+                  p))
             list
-      | U_Multi (o, p, modified_key) ->
-          if modified_key then print_ind_mod o p else print_ind_add p
       | _ -> ())
   | _ -> ()
 

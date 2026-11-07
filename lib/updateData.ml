@@ -546,12 +546,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
               (Driver.get_family p);
           (* On met aussi à jour l'historique. *)
           if not (Util.is_empty_name p) then
-            let changed =
-              U_Multi
-                ( o_p,
-                  Util.string_gen_person base np,
-                  if action = "fn" || action = "sn" then true else false )
-            in
+            let changed = U_Multi (o_p, Util.string_gen_person base np) in
             History.record conf base changed action)
         perl)
     list;
