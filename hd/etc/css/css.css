@@ -378,6 +378,35 @@ td .rm-cell {
   border-radius: 2px;
 }
 
+/* Revision differences (updhist_change.txt) */
+.gw-diff:not(:has(dd)) {
+  display: none;
+}
+
+.gw-diff dd > div {
+  min-height: 1lh;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+  .gw-diff,
+  .gw-diff > * {
+    display: block;
+  }
+  .gw-diff tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gw-diff td {
+    width: auto;
+  }
+  .gw-diff th:not([scope="col"]) {
+    grid-column: 1 / -1;
+    width: auto;
+  }
+}
+
 .editable-div {
   white-space: pre-wrap;
   word-wrap: break-word;

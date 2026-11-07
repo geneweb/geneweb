@@ -1099,7 +1099,7 @@ let print_family ?(with_parents = []) conf base (wl, ml) cpl des =
 let print_title conf fmt _ =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
 
-let print_mod_ok ?with_parents conf base (wl, ml) cpl des =
+let print_mod_ok ?with_parents conf base changed (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
@@ -1114,6 +1114,7 @@ let print_mod_ok ?with_parents conf base (wl, ml) cpl des =
       (fun s -> Output.printf conf "<p>%s</p>" (Util.escape_html s :> string))
       !removed_string);
   print_family ?with_parents conf base (wl, ml) cpl des;
+  HistoryDiffDisplay.print_change conf base changed;
   Hutil.trailer conf
 
 let print_add_ok ?with_parents conf base (wl, ml) cpl des =
@@ -1347,7 +1348,8 @@ let print_add_parents o_conf base =
                   History.record conf base hr "mf";
                   List.iter (fun hr -> History.record conf base hr "aa") hrl;
                   Update.delete_topological_sort conf base;
-                  print_mod_ok ~with_parents:ipl conf base (!wl, []) scpl sdes)
+                  print_mod_ok ~with_parents:ipl conf base hr (!wl, []) scpl
+                    sdes)
                 else loop (i - 1)
             in
             loop (Array.length ffam - 1)
@@ -1442,6 +1444,6 @@ let print_mod o_conf base =
       if not unchanged then History.record conf base changed "mf";
       List.iter (fun hr -> History.record conf base hr "aa") hrl;
       Update.delete_topological_sort conf base;
-      print_mod_ok ~with_parents:ipl conf base (wl, ml) cpl des
+      print_mod_ok ~with_parents:ipl conf base changed (wl, ml) cpl des
   in
   print_mod_aux conf base callback

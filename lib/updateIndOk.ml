@@ -916,7 +916,7 @@ let effective_del conf base p =
 let print_title conf fmt _ =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
 
-let print_mod_ok conf base wl pgl ~remains p ofn osn oocc =
+let print_mod_ok conf base wl pgl ~remains changed p ofn osn oocc =
   Hutil.header conf @@ print_title conf "person modified";
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
@@ -954,6 +954,7 @@ let print_mod_ok conf base wl pgl ~remains p ofn osn oocc =
     (referenced_person_text conf base (Driver.poi base p.key_index));
   Output.print_sstring conf "</p>";
   Update.print_warnings conf base wl;
+  HistoryDiffDisplay.print_change conf base changed;
   let pi = p.key_index in
   let np = Driver.poi base pi in
   let nfn = Driver.p_first_name base np in
@@ -1107,6 +1108,6 @@ let print_mod ?prerr o_conf base =
       let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
       History.record conf base changed "mp";
       Update.delete_topological_sort_v conf base;
-      print_mod_ok conf base wl pgl ~remains p ofn osn oocc
+      print_mod_ok conf base wl pgl ~remains changed p ofn osn oocc
   in
   print_mod_aux conf base callback

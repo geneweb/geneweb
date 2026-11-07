@@ -400,68 +400,99 @@ let string_of_efam_name conf efam_name =
       Adef.safe
       @@ Utf8.capitalize_fst (escape_html n : Adef.safe_string :> string)
 
-(* ************************************************************************ *)
-(*  [Fonc] highlight_diff : char array -> bool array -> string              *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Converti un tableau de char en string, avec les parties
-    modifiées encadrées par des balises <span>. [Args] :
-    - arr : tableau à convertir
-    - diff_arr : tableau des différences [Retour] :
-    - string [Rem] : Non exporté en clair hors de ce module. *)
-let highlight_diff arr diff_arr =
-  let rec loop i s =
-    if i >= Array.length arr then s
-    else if diff_arr.(i) then (
-      let j = ref i in
-      let accu = ref s in
-      accu := !accu ^ "<span class=\"hl\">";
-      while !j < Array.length diff_arr && diff_arr.(!j) do
-        accu := !accu ^ Printf.sprintf "%c" arr.(!j);
-        incr j
-      done;
-      accu := !accu ^ "</span>";
-      loop !j !accu)
-    else loop (i + 1) (s ^ Printf.sprintf "%c" arr.(i))
-  in
-  loop 0 ""
-
-(* ************************************************************************ *)
-(*  [Fonc] array_of_string : string -> char array                           *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Converti une string en tableau de char afin de pouvoir faire
-    un diff. [Args] :
-    - s : string à convertir [Retour] :
-    - char array [Rem] : Non exporté en clair hors de ce module. *)
-let array_of_string s =
+let tokens (s : Adef.safe_string) =
   let s = (s :> string) in
   let len = String.length s in
-  let a = Array.make len ' ' in
-  let rec loop i =
-    if i = len then a
-    else (
-      a.(i) <- s.[i];
-      loop (i + 1))
+  let is_word = function
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '\128' .. '\255' -> true
+    | _ -> false
   in
-  loop 0
+  let upto c i =
+    match String.index_from_opt s i c with Some j -> j + 1 | None -> len
+  in
+  let rec word i = if i < len && is_word s.[i] then word (i + 1) else i in
+  let rec loop i acc =
+    if i >= len then Array.of_list (List.rev acc)
+    else
+      let j =
+        match s.[i] with
+        | '<' -> upto '>' i
+        | '&' -> upto ';' i
+        | c when is_word c -> word (i + 1)
+        | _ -> i + 1
+      in
+      loop j (String.sub s i (j - i) :: acc)
+  in
+  loop 0 []
 
-let diff_string (before : Adef.safe_string) (after : Adef.safe_string) :
-    Adef.safe_string * Adef.safe_string =
-  if before = after then (before, after)
-  else if (before :> string) = "" then
-    (before, "<span class=\"hl\">" ^<^ after ^>^ "</span>")
-  else if (after :> string) = "" then
-    ("<span class=\"hl\">" ^<^ before ^>^ "</span>", after)
+let highlight cls toks diff =
+  let b = Buffer.create 64 in
+  let rec loop i hl =
+    if i = Array.length toks then (if hl then Buffer.add_string b "</span>")
+    else
+      let t = toks.(i) in
+      let d = diff.(i) && t.[0] <> '<' in
+      if d && not hl then Printf.bprintf b {|<span class="%s">|} cls
+      else if hl && not d then Buffer.add_string b "</span>";
+      Buffer.add_string b t;
+      loop (i + 1) d
+  in
+  loop 0 false;
+  Buffer.contents b
+
+let diff_html (before : Adef.safe_string) (after : Adef.safe_string) =
+  if before = after then Adef.safe ""
   else
-    let aa = array_of_string (after :> string) in
-    let bb = array_of_string (before :> string) in
-    let bef_d, aft_d = Difference.f bb aa in
-    let bef_s = highlight_diff bb bef_d in
-    let aft_s = highlight_diff aa aft_d in
-    (Adef.safe bef_s, Adef.safe aft_s)
+    let lines (s : Adef.safe_string) =
+      if (s :> string) = "" then [||]
+      else Array.of_list (String.split_on_char '\n' (s :> string))
+    in
+    let b = lines before and a = lines after in
+    let db, da = Difference.f b a in
+    let rec ops i j acc =
+      if i < Array.length b && db.(i) then ops (i + 1) j (`Del b.(i) :: acc)
+      else if j < Array.length a && da.(j) then ops i (j + 1) (`Ins a.(j) :: acc)
+      else if i < Array.length b then ops (i + 1) (j + 1) (`Ctx b.(i) :: acc)
+      else List.rev acc
+    in
+    let buf = Buffer.create 256 in
+    let line cls s = Printf.bprintf buf {|<div class="%s">%s</div>|} cls s in
+    let span cls s = Printf.sprintf {|<span class="%s">%s</span>|} cls s in
+    let strike = "text-decoration-line-through"
+    and mark = "bg-warning-subtle" in
+    let modified d i =
+      let dt = tokens (Adef.safe d) and it = tokens (Adef.safe i) in
+      let dd, id = Difference.f dt it in
+      line "text-body-secondary" (highlight strike dt dd);
+      line "text-body" (highlight mark it id)
+    in
+    let rec render st = function
+      | [] -> ()
+      | `Ctx s :: l ->
+          if
+            st = `Changed
+            || match l with (`Del _ | `Ins _) :: _ -> true | _ -> false
+          then (
+            line "text-body" s;
+            render `Shown l)
+          else (
+            if st <> `Hidden then line "text-body-tertiary" "…";
+            render `Hidden l)
+      | l ->
+          let rec run d i = function
+            | `Del s :: l when i = [] -> run (s :: d) i l
+            | `Ins s :: l -> run d (s :: i) l
+            | l -> (List.rev d, List.rev i, l)
+          in
+          let d, i, l = run [] [] l in
+          if List.compare_lengths d i = 0 then List.iter2 modified d i
+          else (
+            List.iter (fun s -> line "text-body-secondary" (span strike s)) d;
+            List.iter (fun s -> line "text-body" (span mark s)) i);
+          render `Changed l
+    in
+    render `Shown (ops 0 0 []);
+    Adef.safe (Buffer.contents buf)
 
 type 'a env =
   | Vfam of
@@ -486,6 +517,11 @@ let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let str_val x = Templ.VVstring x
 let safe_val (x : Adef.safe_string) = Templ.VVstring (x :> string)
+let raw b a = (safe_val b, safe_val a)
+
+let unified b a =
+  let v = safe_val (diff_html b a) in
+  (v, v)
 
 let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl
@@ -507,43 +543,41 @@ and eval_compound_var conf base env (bef, aft, p_auth) sl : 'b Templ.expr_val =
         | Some s -> safe_val (escape_html s)
         | None -> str_val "")
     | "before" :: sl ->
-        fst (eval_gen_record conf base env (bef, aft, p_auth) sl)
-    | "after" :: sl -> snd (eval_gen_record conf base env (bef, aft, p_auth) sl)
+        fst (eval_gen_record conf base env (bef, aft, p_auth) raw sl)
+    | "after" :: sl ->
+        snd (eval_gen_record conf base env (bef, aft, p_auth) raw sl)
+    | "diff" :: sl ->
+        fst (eval_gen_record conf base env (bef, aft, p_auth) unified sl)
     | _ -> raise Not_found
   in
   loop sl
 
-and eval_gen_record conf base env (bef, aft, p_auth) :
+and eval_gen_record conf base env (bef, aft, p_auth) pair :
     string list -> 'a Templ.expr_val * 'b Templ.expr_val = function
   | [ "date" ] -> (safe_val bef.date, safe_val aft.date)
   | [ "date_epoch" ] ->
       (str_val (date_epoch_str bef.date), str_val (date_epoch_str aft.date))
   | [ "wizard" ] ->
       (safe_val bef.HistoryDiff.wizard, safe_val aft.HistoryDiff.wizard)
-  | [ s ] -> eval_str_gen_record conf base env (bef, aft, p_auth) s
+  | [ s ] -> eval_str_gen_record conf base env (bef, aft, p_auth) pair s
   | _ -> raise Not_found
 
-and eval_str_gen_record conf base env (bef, aft, p_auth) :
+and eval_str_gen_record conf base env (bef, aft, p_auth) pair :
     string -> 'a Templ.expr_val * 'b Templ.expr_val =
-  let diff_string a b =
-    let a, b = diff_string a b in
-    (safe_val a, safe_val b)
-  in
   let aux g =
-    if p_auth then
-      diff_string (g bef :> Adef.safe_string) (g aft :> Adef.safe_string)
+    if p_auth then pair (g bef :> Adef.safe_string) (g aft :> Adef.safe_string)
     else (str_val "", str_val "")
   in
   let aux' m_auth bef aft f =
-    if p_auth && m_auth then
-      match (bef, aft) with
-      | Some b, Some a -> diff_string (f conf b) (f conf a)
-      | None, Some a -> (str_val "", safe_val (f conf a))
-      | Some b, None -> (safe_val (f conf b), str_val "")
-      | None, None -> (str_val "", str_val "")
-    else (str_val "", str_val "")
+    let v = Option.fold ~none:(Adef.safe "") ~some:(f conf) in
+    if p_auth && m_auth then pair (v bef) (v aft) else (str_val "", str_val "")
   in
   function
+  | "name" ->
+      aux (fun x ->
+          Util.escape_html
+            (Printf.sprintf "%s.%d %s" x.gen_p.first_name x.gen_p.occ
+               x.gen_p.surname))
   | "first_name" -> aux (fun x -> Util.escape_html x.gen_p.first_name)
   | "surname" -> aux (fun x -> Util.escape_html x.gen_p.surname)
   | "occ" -> aux (fun x -> Adef.safe @@ string_of_int x.gen_p.occ)
@@ -741,7 +775,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_simple_str_var conf base env (bef, aft, p_auth) :
+and eval_simple_str_var conf base env (_, aft, p_auth) :
     string -> 'a Templ.expr_val = function
   | "acces" ->
       person_of_gen_p_key base aft.gen_p
@@ -751,9 +785,6 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) :
   | "date_epoch" -> eval_string_env "date_epoch" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
-  | "nb_families" ->
-      max (List.length bef.gen_f) (List.length aft.gen_f)
-      |> string_of_int |> str_val
   | "person" ->
       if p_auth then
         person_of_gen_p_key base aft.gen_p
@@ -957,6 +988,30 @@ let eval_predefined_apply conf _env f vl =
       with Failure _ -> escape_html date_txt)
   | _ -> raise Not_found
 
+let ifun conf base =
+  let eval_predefined_apply _env f vl =
+    (eval_predefined_apply conf _env f vl :> string)
+  in
+  Templ.
+    {
+      eval_var = eval_var conf base;
+      eval_transl = (fun _ -> Templ.eval_transl conf);
+      eval_predefined_apply;
+      get_vother;
+      set_vother;
+      print_foreach = print_foreach conf base;
+    }
+
+let print_change conf base changed =
+  match HistoryDiff.change_records conf base changed with
+  | Some (before, after) ->
+      let p_auth =
+        authorized_age conf base (Driver.poi base after.gen_p.key_index)
+      in
+      Templ.output conf (ifun conf base) Templ.Env.empty (before, after, p_auth)
+        "updhist_change"
+  | None -> ()
+
 let print conf base =
   match p_getenv conf.env "t" with
   | Some ("SUM" | "DIFF") -> (
@@ -985,20 +1040,7 @@ let print conf base =
             |> Templ.Env.add "history_file" (Vstring file)
             |> Templ.Env.add "history_len" (Vint len)
           in
-          let eval_predefined_apply _env f vl =
-            (eval_predefined_apply conf _env f vl :> string)
-          in
-          let ifun =
-            Templ.
-              {
-                eval_var = eval_var conf base;
-                eval_transl = (fun _ -> Templ.eval_transl conf);
-                eval_predefined_apply;
-                get_vother;
-                set_vother;
-                print_foreach = print_foreach conf base;
-              }
-          in
-          Templ.output conf ifun env (before, after, p_auth) "updhist_diff"
+          Templ.output conf (ifun conf base) env (before, after, p_auth)
+            "updhist_diff"
       | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")
   | _ -> Hutil.incorrect_request conf ~comment:"bad t parameter"

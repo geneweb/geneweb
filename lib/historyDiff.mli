@@ -37,6 +37,21 @@ val record_diff :
 (** [record_diff conf base change] records new updated information [change]
     inside the history files of concerned by [change] persons. *)
 
+val change_records :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  ( Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.iper,
+    Geneweb_db.Driver.ifam,
+    string )
+  Def.base_changed ->
+  (gen_record * gen_record) option
+(** [change_records conf base change] Records of the main person of [change]
+    before and after it, built from the current state of the base. The children
+    of a modified family, not carried by [change], keep their current value in
+    the record before. [None] if [change] has no main person or leaves its
+    record unchanged. *)
+
 val output_record : out_channel -> gen_record -> unit
 (** Append a record to a history file. *)
 
