@@ -241,15 +241,38 @@
     }
   };
   const BookEdit = {
-    form: null,
+    a: null,
     init() {
-      this.tpl = document.getElementById('book-edit');
-      if (!this.tpl) return;
+      const form = document.getElementById('book-edit');
+      if (!form) return;
+      this.form = form;
+      this.field = form.elements.nx_input;
+      this.text = form.querySelector('.book-input-text');
+      if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize(this.field);
+      }
       document.addEventListener('click', ev => {
         const a = ev.target.closest('#main-content a[data-entry]');
         if (!a || ev.button || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
         ev.preventDefault();
         this.open(a);
+      });
+      form.addEventListener('submit', ev => {
+        ev.preventDefault();
+        this.save();
+      });
+      form.querySelector('.btn-close').addEventListener('click', () => this.close());
+      this.field.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter' && !ev.isComposing) {
+          ev.preventDefault();
+          this.save();
+        } else if (ev.key === 'Escape') {
+          ev.preventDefault();
+          this.close();
+        } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+          ev.preventDefault();
+          this.move(ev.key === 'ArrowUp' ? -1 : 1);
+        }
       });
       const filter = document.getElementById('book-filter');
       filter?.addEventListener('input', () => this.filter(filter.value));
@@ -269,64 +292,48 @@
       return [...document.querySelectorAll(
         '#main-content li:not([hidden]) a[data-entry]')];
     },
-    move(a, step) {
+    move(step) {
       const all = this.entries();
-      const next = all[all.indexOf(a) + step];
+      const next = all[all.indexOf(this.a) + step];
       if (next) this.open(next);
     },
     open(a, value) {
-      this.close();
-      const form = this.tpl.content.firstElementChild.cloneNode(true);
-      const field = form.elements.nx_input;
-      const text = form.querySelector('.book-input-text');
-      const original = a.dataset.v ?? a.dataset.entry;
-      form.elements.key.value = a.closest('li').id.slice(1);
-      text.textContent = text.dataset.v = original;
-      field.value = value || original;
+      this.a?.closest('li').classList.remove('book-current');
+      this.a = a;
+      const li = a.closest('li');
+      li.classList.add('book-current');
+      this.original = a.dataset.v ?? a.dataset.entry;
+      this.form.elements.key.value = li.id.slice(1);
+      this.text.textContent = this.original;
+      this.field.value = value || this.original;
       bootstrap.Tooltip.getInstance(a)?.hide();
-      for (const c of a.parentElement.children) c.hidden = true;
-      a.parentElement.append(form);
-      if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
-        autosize(field);
+      this.form.hidden = false;
+      if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize.update(this.field);
       }
-      form.addEventListener('submit', ev => {
-        ev.preventDefault();
-        this.save(a, original);
-      });
-      field.addEventListener('keydown', ev => {
-        if (ev.key === 'Enter' && !ev.isComposing) {
-          ev.preventDefault();
-          this.save(a, original);
-        } else if (ev.key === 'Escape') {
-          ev.preventDefault();
-          this.close();
-          a.focus();
-        } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
-          ev.preventDefault();
-          this.move(a, ev.key === 'ArrowUp' ? -1 : 1);
-        }
-      });
-      this.form = form;
-      field.focus();
-      field.setSelectionRange(field.value.length, field.value.length);
+      const h = this.form.offsetHeight + 'px';
+      document.body.style.paddingBottom = h;
+      document.documentElement.style.scrollPaddingBottom = h;
+      li.scrollIntoView({ block: 'nearest' });
+      this.field.focus();
+      this.field.setSelectionRange(this.field.value.length, this.field.value.length);
     },
     close() {
-      const form = this.form;
-      if (!form) return;
-      this.form = null;
-      const field = form.elements.nx_input;
-      if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
-        autosize.destroy(field);
-      }
-      const box = form.parentElement;
-      form.remove();
-      for (const c of box.children) c.hidden = false;
+      const a = this.a;
+      if (!a) return;
+      this.a = null;
+      a.closest('li').classList.remove('book-current');
+      this.form.hidden = true;
+      document.body.style.paddingBottom = '';
+      document.documentElement.style.scrollPaddingBottom = '';
+      if (a.isConnected) a.focus();
     },
-    save(a, original) {
+    save() {
+      const a = this.a;
       const form = this.form;
-      const value = form.elements.nx_input.value.trim();
-      if (!value || value === original) {
-        this.move(a, 1);
+      const value = this.field.value.trim();
+      if (!value || value === this.original) {
+        this.move(1);
         return;
       }
       if (form.dataset.busy) return;
@@ -342,22 +349,23 @@
         .then(data => {
           delete form.dataset.busy;
           if (!data.success) {
-            notify('danger', data.message || this.tpl.dataset.error);
+            notify('danger', data.message || form.dataset.error);
             return;
           }
           notify('success', toast(data.label, data.before, data.after));
           if (!data.complete) return;
-          const here = this.form === form;
+          const here = this.a === a;
           const all = this.entries();
           const next = all[all.indexOf(a) + 1];
-          if (here) this.close();
           this.update(a, data);
-          if (here && next?.isConnected) this.open(next);
+          if (!here) return;
+          if (next?.isConnected) this.open(next);
+          else this.close();
         })
         .catch(err => {
           delete form.dataset.busy;
           console.error('m=MOD_DATA_OK', err);
-          notify('danger', this.tpl.dataset.error);
+          notify('danger', form.dataset.error);
         });
     },
     update(a, data) {
@@ -398,6 +406,7 @@
       }
     }
   };
+
   window.InplaceEdit = InplaceEdit;
   window.BookEdit = BookEdit;
 })();

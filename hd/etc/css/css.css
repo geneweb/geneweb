@@ -781,11 +781,12 @@ html {
   resize: both;
   min-width: 100%;
 }
-.book-input-text[data-v]::after {
-  content: attr(data-v) attr(data-v);
-  display: block;
-  height: 0;
-  overflow: hidden;
+
+#main-content li.book-current
+{
+  background-color: var(--bs-warning-bg-subtle);
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
 }
 
 /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
