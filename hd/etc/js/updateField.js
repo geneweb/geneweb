@@ -248,6 +248,8 @@
       this.form = form;
       this.field = form.elements.nx_input;
       this.text = form.querySelector('.book-input-text');
+      this.extra = form.querySelector('.book-extra');
+      this.field.addEventListener('input', () => this.changed());
       if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
         autosize(this.field);
       }
@@ -255,7 +257,7 @@
         const a = ev.target.closest('#main-content a[data-entry]');
         if (!a || ev.button || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
         ev.preventDefault();
-        this.open(a);
+        this.open(a, null, this.caret(a, ev));
       });
       form.addEventListener('submit', ev => {
         ev.preventDefault();
@@ -269,6 +271,9 @@
         } else if (ev.key === 'Escape') {
           ev.preventDefault();
           this.close();
+        } else if (ev.altKey && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight')) {
+          ev.preventDefault();
+          this.side(ev.key === 'ArrowLeft' ? -1 : 1);
         } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
           ev.preventDefault();
           this.move(ev.key === 'ArrowUp' ? -1 : 1);
@@ -297,7 +302,41 @@
       const next = all[all.indexOf(this.a) + step];
       if (next) this.open(next);
     },
-    open(a, value) {
+    side(step) {
+      const r = this.a.closest('li').getBoundingClientRect();
+      let best = null;
+      let bx = Infinity;
+      let by = Infinity;
+      for (const a of this.entries()) {
+        const q = a.closest('li').getBoundingClientRect();
+        const dx = step * (q.left - r.left);
+        if (dx < r.width / 2) continue;
+        const dy = Math.abs(q.top - r.top);
+        if (dx < bx - 1 || (dx <= bx + 1 && dy < by)) {
+          best = a;
+          bx = dx;
+          by = dy;
+        }
+      }
+      if (best) this.open(best);
+    },
+    caret(a, ev) {
+      let r = document.caretRangeFromPoint?.(ev.clientX, ev.clientY);
+      const p = !r && document.caretPositionFromPoint?.(ev.clientX, ev.clientY);
+      if (p) {
+        r = document.createRange();
+        r.setStart(p.offsetNode, p.offset);
+      }
+      if (!r || !a.contains(r.startContainer)) return null;
+      const pre = document.createRange();
+      pre.selectNodeContents(a);
+      pre.setEnd(r.startContainer, r.startOffset);
+      return pre.toString().trimStart().length;
+    },
+    changed() {
+      this.extra.hidden = this.field.value.trim() === this.original;
+    },
+    open(a, value, pos) {
       this.a?.closest('li').classList.remove('book-current');
       this.a = a;
       const li = a.closest('li');
@@ -306,17 +345,33 @@
       this.form.elements.key.value = li.id.slice(1);
       this.text.textContent = this.original;
       this.field.value = value || this.original;
+      this.changed();
       bootstrap.Tooltip.getInstance(a)?.hide();
-      this.form.hidden = false;
+      li.scrollIntoView({ block: 'nearest' });
+      const form = this.form;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const w = Math.min(Math.max(li.offsetWidth + 8 * rem, 24 * rem),
+        innerWidth - 2 * rem);
+      form.style.width = w + 'px';
+      form.hidden = false;
       if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
         autosize.update(this.field);
       }
-      const h = this.form.offsetHeight + 'px';
-      document.body.style.paddingBottom = h;
-      document.documentElement.style.scrollPaddingBottom = h;
-      li.scrollIntoView({ block: 'nearest' });
-      this.field.focus();
-      this.field.setSelectionRange(this.field.value.length, this.field.value.length);
+      const cs = getComputedStyle(this.field);
+      const fr = form.getBoundingClientRect();
+      const ir = this.field.getBoundingClientRect();
+      const ar = a.getBoundingClientRect();
+      const left = ar.left - (ir.left - fr.left)
+        - parseFloat(cs.borderLeftWidth) - parseFloat(cs.paddingLeft);
+      const top = ar.top - (ir.top - fr.top)
+        - parseFloat(cs.borderTopWidth) - parseFloat(cs.paddingTop);
+      form.style.left = scrollX + Math.min(Math.max(left, rem), innerWidth - w - rem) + 'px';
+      form.style.top = scrollY + top + 'px';
+      form.scrollIntoView({ block: 'nearest' });
+      const at = !value && pos !== null && pos !== undefined
+        && a.textContent.trim() === this.original ? pos : this.field.value.length;
+      this.field.focus({ preventScroll: true });
+      this.field.setSelectionRange(at, at);
     },
     close() {
       const a = this.a;
@@ -324,8 +379,6 @@
       this.a = null;
       a.closest('li').classList.remove('book-current');
       this.form.hidden = true;
-      document.body.style.paddingBottom = '';
-      document.documentElement.style.scrollPaddingBottom = '';
       if (a.isConnected) a.focus();
     },
     save() {

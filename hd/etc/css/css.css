@@ -777,16 +777,114 @@ html {
   word-break: break-all;
   overflow-wrap: break-word;
 }
+
 #nx_input {
-  resize: both;
-  min-width: 100%;
+  resize: vertical;
 }
 
-#main-content li.book-current
-{
+#book-edit {
+  position: absolute;
+  z-index: 1010;
+}
+
+#book-edit .book-input-text {
+  padding-inline-start: calc(.75rem + var(--bs-border-width));
+}
+
+#main-content li.book-current {
   background-color: var(--bs-warning-bg-subtle);
   outline: 2px solid var(--bs-primary);
   outline-offset: -2px;
+}
+#main-content li a:hover,
+#main-content li a:focus-visible
+{
+  background-color: var(--bs-primary-bg-subtle);
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+#book-index
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: .25rem;
+}
+
+#book-index a, .sup-char
+{
+  color: var(--bs-body-color);
+  background-color: #cff9ffb0;
+}
+
+#book-index a
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  column-gap: .25rem;
+  padding: 0 .5rem;
+  line-height: 1.6;
+  text-decoration: none;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+#book-index a:hover, #book-index a:focus-visible,
+.sup-char:hover, .sup-char:focus-visible
+{
+  color: #fff;
+  background-color: var(--bs-primary) !important;
+  outline: 3px solid var(--bs-primary);
+  outline-offset: 1px;
+}
+
+#book-index a:hover *, #book-index a:focus-visible *,
+.sup-char:hover *, .sup-char:focus-visible *
+{
+  color: inherit !important;
+}
+
+#main-content li a:hover,
+#main-content li a:focus-visible
+{
+  background-color: var(--bs-primary-bg-subtle);
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+
+#book-index
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: .25rem;
+}
+
+#book-index a
+{
+  display: block;
+  padding: .25rem .5rem;
+  line-height: 1.25;
+  color: var(--bs-body-color);
+  text-decoration: none;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+#book-index a:hover,
+#book-index a:focus-visible
+{
+  color: #fff;
+  background-color: var(--bs-primary) !important;
+  outline: 3px solid var(--bs-primary);
+  outline-offset: 1px;
+}
+
+#book-index a:hover .small,
+#book-index a:focus-visible .small
+{
+  color: inherit !important;
 }
 
 /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */

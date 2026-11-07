@@ -73,36 +73,44 @@
         %end;
       </div>
       <div class="d-flex align-items-center gap-2 mt-2">
-        <ol class="breadcrumb flex-nowrap mb-0" style="--bs-breadcrumb-divider: '›';">
+        <ol class="breadcrumb flex-nowrap flex-shrink-0 align-items-center mb-0" style="--bs-breadcrumb-divider: '›';">
           %if;(e.s="")
-            <li class="breadcrumb-item active fw-bold text-nowrap" aria-current="page">%nn;
-              <i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]</li>
+            <li class="breadcrumb-item active" aria-current="page">
+              <span class="btn btn-sm btn-primary fs-6 text-nowrap pe-none">%nn;
+                <i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]</span>
+            </li>
           %else;
             <li class="breadcrumb-item">
-              <a class="sub-char text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;"
+              <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;"
                 title="[*back to index and books]" aria-label="[*back to index and books]">%nn;
-                <i class="fa fa-arrow-down-a-z me-1"></i><span class="d-none d-md-inline">[*alphabetical index]</span></a>
+                <i class="fa fa-arrow-down-a-z"></i><span class="d-none d-md-inline ms-1">[*alphabetical index]</span></a>
             </li>
             %foreach;substring.s.6;
-              <li class="breadcrumb-item"><a class="sub-char font-monospace text-nowrap"
-                href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;">%visual_spaces.escape.substr;</a></li>
+              <li class="breadcrumb-item">
+                <a class="sub-char btn btn-sm btn-outline-primary fs-6 font-monospace text-nowrap"
+                  href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;">%visual_spaces.escape.substr;</a>
+              </li>
             %end;
             %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
-            <li class="breadcrumb-item active fw-bold font-monospace text-nowrap user-select-all"
-              aria-current="page">%visual_spaces.escape.current_s;</li>
+            <li class="breadcrumb-item active" aria-current="page">
+              <span class="btn btn-sm btn-primary fs-6 font-monospace text-nowrap user-select-all pe-auto">%nn;
+                %visual_spaces.escape.current_s;</span>
+            </li>
           %end;
         </ol>
+        %if;(nb_results<nb_max)
         <div class="d-flex flex-nowrap flex-sm-wrap overflow-x-auto gap-1">
           %foreach;entry;
             %if;(entry_ini!=e.s)
-              <a class="sup-char btn btn-sm btn-light fs-6 text-nowrap%if;script; %script_class;%end;"
+              <a class="sup-char btn btn-sm fs-6 text-nowrap%if;script; %script_class;%end;"
                 href="%if;(nb_results<nb_max)#_%escape.entry_ini;%else;%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%end;"
                 title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">%nn;
                 <span class="font-monospace">%visual_spaces.escape.entry_ini_display;</span>%nn;
-                <span class="ms-1 %if;(entry_count>=nb_max)fw-semibold text-warning-emphasis%else;text-body-secondary%end;">%entry_nb;</span></a>
+                <span class="ms-1 %if;(entry_count>=nb_max)fw-bold text-warning-emphasis%end;">%entry_nb;</span></a>
             %end;
           %end;
         </div>
+        %end;
       </div>
     </nav>
     <div id="notfound-warning" class="alert alert-danger py-2 mt-2 d-none" role="alert">
@@ -127,7 +135,7 @@
         </h3>
         <ul class="list-unstyled src-list-bg">
           %foreach;value;
-            <li class="px-2" id="k%entry_key;">
+            <li class="%if;(e.data="src")px-2%else;pe-2%end;" id="k%entry_key;">
               %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                 <div class="alert alert-warning mt-2">[*book blank name]</div>
               %end;
@@ -139,18 +147,18 @@
                       %else;
                         %if;(not first and suburb!="")%encode.printable.suburb;%else;%encode.other;%end;
                       %end;"
-                      role="button" class="btn btn-link p-0"
+                      role="button" class="btn btn-link py-0 px-2"
                       title="%apply;wikidata%with;%if;(e.data!="place")%escape.entry_value;%else;%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;%end;%end;"
                       target="_blank" rel="noreferrer noopener" tabindex="-1"><i class="fab fa-wikipedia-w fa-sm"></i></a>
                     %if;(first and suburb!="")
                       <a href="https://www.wikidata.org/w/index.php?search=%encode.printable.suburb;"
-                        role="button" class="btn btn-link p-0" title="%apply;wikidata(escape.printable.suburb)"
+                        role="button" class="btn btn-link py-0 px-2" title="%apply;wikidata(escape.printable.suburb)"
                         target="_blank" rel="noreferrer noopener" tabindex="-1"><i class="fab fa-wikipedia-w fa-sm"></i></a>
                     %end;
                   </span>
                 %end;
                 <div class="flex-grow-1">
-                  <a role="button" class="btn-link"
+                  <a role="button" class="btn-link%if;(e.data!="src") d-block%end;"
                      title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
                      href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;"
                      data-entry="%escape.printable.entry_value;"%nn;
@@ -176,42 +184,51 @@
         </ul>
       %end;
     </div>
-    <form id="book-edit" class="fixed-bottom bg-body-tertiary border-top shadow-lg py-3"
-      method="post" action="%action;" data-error="[*error]" hidden>
+    <form id="book-edit" class="card shadow-lg p-1" method="post" action="%action;"
+      data-error="[*error]" hidden>
       %hidden;
       <input type="hidden" name="m" value="MOD_DATA_OK">
       <input type="hidden" name="data" value="%e.data;">
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
-      <div class="container-fluid px-4 d-flex align-items-start gap-3">
-        <div class="flex-grow-1">
-          <div class="book-input-text fs-5 text-body-secondary"></div>
-          %if;(e.data="src" or e.data="occu" or e.data="place")
-            <textarea class="form-control form-control-lg mt-1" id="nx_input" name="nx_input" rows="1"
-              maxlength="1000" aria-label="[*modify]" required></textarea>
-          %else;
-            <input type="text" class="form-control form-control-lg mt-1" id="nx_input" name="nx_input"
-              maxlength="200" aria-label="[*modify]" required>
-          %end;
-          %if;(e.data="fn" or e.data="sn")
-            <div class="form-check mt-2">
-              <input class="form-check-input" type="checkbox" id="book-alias"
-                name="%if;(e.data="fn")first_name%else;surname%end;_aliases" value="yes">
-              <label class="form-check-label" for="book-alias">%if;(e.data="fn")[*add the previous name as a first name alias]%else;[*add the previous name as a surname alias]%end;</label>
-            </div>
-          %end;
-          <div class="form-text"><i class="fa fa-hat-wizard text-danger me-1"></i>[*help modify data]</div>
-        </div>
-        <div class="d-flex flex-column align-items-center gap-2 mt-4">
-          <button type="submit" class="btn btn-primary btn-lg" title="[*validate/delete]0">OK</button>
-          <button type="button" class="btn-close" title="[*close]" aria-label="[*close]"></button>
-        </div>
+      <div class="d-flex align-items-start gap-2">
+        %if;(e.data="src" or e.data="occu" or e.data="place")
+          <textarea class="form-control" id="nx_input" name="nx_input" rows="1"
+            maxlength="1000" aria-label="[*modify]" required></textarea>
+        %else;
+          <input type="text" class="form-control" id="nx_input" name="nx_input"
+            maxlength="200" aria-label="[*modify]" required>
+        %end;
+        <button type="submit" class="btn btn-primary" title="[*validate/delete]0">OK</button>
+        <button type="button" class="btn-close mt-2" title="[*close]" aria-label="[*close]"></button>
+      </div>
+      <div class="book-extra px-1" hidden>
+        <div class="book-input-text text-body-secondary mt-1"></div>
+        %if;(e.data="fn" or e.data="sn")
+          <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" id="book-alias"
+              name="%if;(e.data="fn")first_name%else;surname%end;_aliases" value="yes">
+            <label class="form-check-label" for="book-alias">%if;(e.data="fn")[*add the previous name as a first name alias]%else;[*add the previous name as a surname alias]%end;</label>
+          </div>
+        %end;
+        <div class="form-text"><i class="fa fa-hat-wizard text-danger me-1"></i>[*help modify data]</div>
       </div>
     </form>
   %else;
-    <div class="alert alert-warning my-3">[*too much results]
+    <p class="text-body-secondary mt-3">[*too much results]
       (> %if;(b.book_max_results!="")<abbr title="book_max_results">%b.book_max_results;</abbr>%else;%nb_max;%end;).
-      %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</div>
+      %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</p>
+    <div id="book-index">
+      %foreach;entry;
+        %if;(entry_ini!=e.s)
+          <a%if;script; class="%script_class;"%end; href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;"
+            title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">
+            <span class="fs-4 font-monospace">%visual_spaces.escape.entry_ini_display;</span>
+            <span%if;(entry_count>=nb_max) class="fw-bold text-warning-emphasis"%end;>%entry_nb;</span>
+          </a>
+        %end;
+      %end;
+    </div>
   %end;
 %include;trl
 %include;copyr
