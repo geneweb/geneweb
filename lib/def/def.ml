@@ -421,7 +421,6 @@ type ('iper, 'person, 'family, 'string) base_changed =
   | U_Multi of
       ('iper, 'person, 'string) gen_person
       * ('iper, 'person, 'string) gen_person
-      * bool
   | U_Notes of int option * string
 
 (** TODOOCP : doc *)

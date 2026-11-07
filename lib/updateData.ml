@@ -546,12 +546,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
               (Driver.get_family p);
           (* On met aussi à jour l'historique. *)
           if not (Util.is_empty_name p) then
-            let changed =
-              U_Multi
-                ( o_p,
-                  Util.string_gen_person base np,
-                  if action = "fn" || action = "sn" then true else false )
-            in
+            let changed = U_Multi (o_p, Util.string_gen_person base np) in
             History.record conf base changed action)
         perl)
     list;
@@ -567,34 +562,26 @@ let update_person_list conf base new_input list nb_pers max_updates =
 let move_particle base s =
   Util.surname_without_particle base s ^ Util.surname_particle base s
 
-(** Get all the data and filter them if ["s"] is defined in [conf.env] *)
-let build_list conf base =
-  (* Paramètre pour savoir par quoi commence la chaine. *)
+let book_entry conf base =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
-  let list = get_all_data conf base in
   let data_type = p_getenv conf.env "data" in
   let has_particle = data_type = Some "sn" || data_type = Some "domain" in
   let is_name_type = data_type = Some "fn" || data_type = Some "sn" in
-  if ini <> "" then
-    Mutil.filter_map
-      (fun istr ->
-        let str = Driver.sou base istr in
-        if is_name_type && str = "?" then None
-        else
-          let str = if has_particle then move_particle base str else str in
-          if String.starts_with ~prefix:ini @@ Place.without_suburb str then
-            Some (istr, str)
-          else None)
-      list
-  else
-    List.filter_map
-      (fun istr ->
-        let str = Driver.sou base istr in
-        if is_name_type && str = "?" then None
-        else
-          let str = if has_particle then move_particle base str else str in
-          Some (istr, str))
-      (List.rev list)
+  fun istr ->
+    let str = Driver.sou base istr in
+    if is_name_type && str = "?" then None
+    else
+      let str = if has_particle then move_particle base str else str in
+      if String.starts_with ~prefix:ini (Place.without_suburb str) then
+        Some (istr, str)
+      else None
+
+(** Get all the data and filter them if ["s"] is defined in [conf.env] *)
+let build_list conf base =
+  let list = get_all_data conf base in
+  if Option.value ~default:"" (p_getenv_notrim conf.env "s") = "" then
+    List.filter_map (book_entry conf base) (List.rev list)
+  else Mutil.filter_map (book_entry conf base) list
 
 let build_list_short conf list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in

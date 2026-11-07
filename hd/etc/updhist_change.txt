@@ -1,0 +1,64 @@
+<!-- $Id: updhist_change.txt v7.1 07/11/2026 $ -->
+%define;diff_row(lbl,fld)
+  %if;(diff.fld!="")
+    <dt class="col-sm-3 col-lg-2 fw-normal text-body-secondary">lbl</dt>
+    <dd class="col-sm-9 col-lg-10">%diff.fld;</dd>
+  %end;
+%end;
+%define;diff_event(evt)
+  %if;(diff.evt_name!="" or diff.evt_date!="" or diff.evt_place!=""
+    or diff.evt_note!="" or diff.evt_src!="" or diff.evt_witness!="")
+    <dt class="col-12 mt-2">%if;(after.evt_name!="")%after.evt_name;%else;%before.evt_name;%end;</dt>
+    %apply;diff_row([*event/events]0,"evt_name")
+    %apply;diff_row([*date/dates]0,"evt_date")
+    %apply;diff_row([*place/places]0,"evt_place")
+    %apply;diff_row([*note/notes]0,"evt_note")
+    %apply;diff_row([*source/sources]0,"evt_src")
+    %apply;diff_row([*witness/witnesses]1,"evt_witness")
+  %end;
+%end;
+%if;(evar.m="HIST_DIFF")
+  <dl class="row mt-3 mb-0">
+    <dt class="col-sm-3 col-lg-2 fw-normal text-body-secondary">[*revision of]</dt>
+    <dd class="col-sm-9 col-lg-10">
+      <div class="text-body-secondary"><span class="gw-hist-time" data-epoch="%before.date_epoch;">%apply;transl_date%with;%before.date;%end;</span></div>
+      <div><span class="gw-hist-time" data-epoch="%after.date_epoch;">%apply;transl_date%with;%after.date;%end;</span></div>
+    </dd>
+    <dt class="col-sm-3 col-lg-2 fw-normal text-body-secondary">[*wizard/wizards/friend/friends/exterior]0</dt>
+    <dd class="col-sm-9 col-lg-10">
+      <div class="text-body-secondary">%before.wizard;</div>
+      <div>%after.wizard;</div>
+    </dd>
+  </dl>
+%end;
+<section class="gw-diff mt-3">
+  <h2 class="h6 border-bottom pb-1">[*person/persons]0</h2>
+  <dl class="row mb-0">
+    %apply;diff_row([*name],"name")
+    %apply;diff_row([*sex],"sex")
+    %apply;diff_row([*public name],"public_name")
+    %apply;diff_row([*image/images]0,"image")
+    %apply;diff_row([*qualifier],"qualifiers")
+    %apply;diff_row([*alias],"aliases")
+    %apply;diff_row([*first name alias]0,"first_names_aliases")
+    %apply;diff_row([*surname alias]0,"surnames_aliases")
+    %apply;diff_row([*occupation/occupations]1,"occupation")
+    %foreach;pevent;%apply;diff_event("pevent")%end;
+    %apply;diff_row([*relation/relations]1,"relations")
+    %apply;diff_row([*title/titles]1,"titles")
+    %apply;diff_row([*person source],"psources")
+    %apply;diff_row([*note/notes]1,"notes")
+    %apply;diff_row([*access],"access")
+  </dl>
+</section>
+%foreach;family;
+  <section class="gw-diff mt-3">
+    <h2 class="h6 border-bottom pb-1">[*family/families]0%if;(after.spouse!="")[:] %after.spouse;%elseif;(before.spouse!="")[:] %before.spouse;%end;</h2>
+    <dl class="row mb-0">
+      %foreach;fevent;%apply;diff_event("fevent")%end;
+      %apply;diff_row([*note/notes]1,"comment")
+      %apply;diff_row([*family source],"fsources")
+      %apply;diff_row([*child/children]1,"children")
+    </dl>
+  </section>
+%end;

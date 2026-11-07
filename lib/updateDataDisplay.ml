@@ -28,6 +28,15 @@ let translate_title conf len =
   in
   (Printf.sprintf (ftransl conf "book of %s") book_name, book_name)
 
+let thousands conf n =
+  Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int n)
+
+let print_json conf json =
+  Output.header conf "Content-type: application/json";
+  Output.header conf "Connection: close";
+  Output.print_sstring conf (Yojson.Basic.to_string json);
+  Output.flush conf
+
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
 
@@ -78,9 +87,9 @@ let print_mod_ok conf base =
     let new_input =
       Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
     in
-    let new_istr_s =
-      Driver.Istr.to_string (Driver.insert_string base new_input)
-    in
+    let new_istr = Driver.insert_string base new_input in
+    let new_istr_s = Driver.Istr.to_string new_istr in
+    let ajax = p_getenv conf.env "ajax" <> None in
     let new_ini = ini_of_update_data ini new_input in
     let list = get_person_from_data conf base in
     let list =
@@ -104,75 +113,119 @@ let print_mod_ok conf base =
       let nb_pers_reel =
         update_person_list conf base new_input list nb_pers max_updates
       in
-      let title _ =
+      let nb = min nb_pers_reel max_updates in
+      if ajax then
+        print_json conf
+          (`Assoc
+             [
+               ("success", `Bool true);
+               ( "label",
+                 `String
+                   (Printf.sprintf "%s%s %d %s%s"
+                      (Utf8.capitalize_fst
+                         (transl conf "modification successful"))
+                      (transl conf ":") nb
+                      (transl_nth conf "modification/modifications"
+                         (if nb > 1 then 1 else 0))
+                      (if nb_pers > max_updates then
+                         " – " ^ transl conf "continue correcting"
+                       else "")) );
+               ( "before",
+                 `String (match list with (s, _) :: _ -> s | [] -> "") );
+               ("after", `String new_input);
+               ("key", `String new_istr_s);
+               ("complete", `Bool (nb_pers <= max_updates));
+               ( "entry",
+                 match book_entry conf base new_istr with
+                 | Some (_, s) -> `String s
+                 | None -> `Null );
+               ( "url",
+                 `String
+                   (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s#k%s"
+                      (commd conf :> string)
+                      (Mutil.encode data :> string)
+                      (Mutil.encode new_ini :> string)
+                      new_istr_s) );
+             ])
+      else
+        let title _ =
+          transl conf "modification successful"
+          |> Utf8.capitalize_fst |> Output.print_sstring conf
+        in
+        Hutil.header conf title;
+        Output.print_sstring conf "<p>";
         transl conf "modification successful"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf
-      in
-      Hutil.header conf title;
-      Output.print_sstring conf "<p>";
-      transl conf "modification successful"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
-      Output.print_sstring conf " ";
-      if List.assoc_opt "history" conf.base_env = Some "yes" then (
-        Output.print_sstring conf "<a href=\"";
-        Output.print_string conf (commd conf);
-        Output.print_sstring conf "m=HIST&k=20\">";
-        Output.print_sstring conf
-          (transl_nth conf "modification/modifications"
-             (if nb_pers_reel > 1 then 1 else 0));
-        Output.print_sstring conf ".</a>")
-      else (
-        Output.print_sstring conf
-          (transl_nth conf "modification/modifications"
-             (if nb_pers_reel > 1 then 1 else 0));
-        Output.print_sstring conf ".");
-      Output.print_sstring conf "</p>";
-      if nb_pers > max_updates then (
-        Output.printf conf {|<form method="post" action="%s"><p>|} conf.command;
-        Util.hidden_env conf;
-        Util.hidden_input conf "key" (List.assoc "key" conf.env);
-        Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
-        Util.hidden_input conf "data" (Mutil.encode data);
-        Util.hidden_input conf "s" (Mutil.encode ini);
-        Output.print_sstring conf
-          {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
-        Output.print_string conf (Util.escape_html (only_printable new_input));
-        Output.print_sstring conf {|" id="data">|};
-        Output.print_sstring conf
-          (Utf8.capitalize_fst (transl conf "continue correcting"));
-        Output.print_sstring conf
-          {|<button type="submit" class="btn btn-primary btn-lg">|};
-        Output.print_sstring conf
-          (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-        Output.print_sstring conf "</button></p></form>");
-      Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf {|m=MOD_DATA&data=|};
-      Output.print_string conf (Mutil.encode data);
-      Output.print_sstring conf {|&s=|};
-      Output.print_string conf (Mutil.encode new_ini);
-      Output.print_sstring conf ("#k" ^ new_istr_s);
-      Output.print_sstring conf {|" id="reference">|};
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "new modification"));
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (transl conf "at new location");
-      Output.print_sstring conf {|</a>|};
-      if not (String.starts_with ~prefix:ini new_ini) then (
-        Output.print_sstring conf {| / <a href="|};
+        |> Utf8.capitalize_fst |> Output.print_sstring conf;
+        Output.print_sstring conf (transl conf ":");
+        Output.print_sstring conf " ";
+        Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
+        Output.print_sstring conf " ";
+        if List.assoc_opt "history" conf.base_env = Some "yes" then (
+          Output.print_sstring conf "<a href=\"";
+          Output.print_string conf (commd conf);
+          Output.print_sstring conf "m=HIST&k=20\">";
+          Output.print_sstring conf
+            (transl_nth conf "modification/modifications"
+               (if nb_pers_reel > 1 then 1 else 0));
+          Output.print_sstring conf ".</a>")
+        else (
+          Output.print_sstring conf
+            (transl_nth conf "modification/modifications"
+               (if nb_pers_reel > 1 then 1 else 0));
+          Output.print_sstring conf ".");
+        Output.print_sstring conf "</p>";
+        if nb_pers > max_updates then (
+          Output.printf conf {|<form method="post" action="%s"><p>|}
+            conf.command;
+          Util.hidden_env conf;
+          Util.hidden_input conf "key" (List.assoc "key" conf.env);
+          Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
+          Util.hidden_input conf "data" (Mutil.encode data);
+          Util.hidden_input conf "s" (Mutil.encode ini);
+          Output.print_sstring conf
+            {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
+          Output.print_string conf (Util.escape_html (only_printable new_input));
+          Output.print_sstring conf {|" id="data">|};
+          Output.print_sstring conf
+            (Utf8.capitalize_fst (transl conf "continue correcting"));
+          Output.print_sstring conf
+            {|<button type="submit" class="btn btn-primary btn-lg">|};
+          Output.print_sstring conf
+            (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+          Output.print_sstring conf "</button></p></form>");
+        Output.print_sstring conf {|<a href="|};
         Output.print_string conf (commd conf);
         Output.print_sstring conf {|m=MOD_DATA&data=|};
         Output.print_string conf (Mutil.encode data);
         Output.print_sstring conf {|&s=|};
-        Output.print_string conf (Mutil.encode ini);
-        Output.print_sstring conf {|">|};
-        Output.print_sstring conf (transl conf "at old location");
-        Output.print_sstring conf {|</a>|});
-      Output.print_sstring conf ".";
-      Hutil.trailer conf)
+        Output.print_string conf (Mutil.encode new_ini);
+        Output.print_sstring conf ("#k" ^ new_istr_s);
+        Output.print_sstring conf {|" id="reference">|};
+        Output.print_sstring conf
+          (Utf8.capitalize_fst (transl conf "new modification"));
+        Output.print_sstring conf " ";
+        Output.print_sstring conf (transl conf "at new location");
+        Output.print_sstring conf {|</a>|};
+        if not (String.starts_with ~prefix:ini new_ini) then (
+          Output.print_sstring conf {| / <a href="|};
+          Output.print_string conf (commd conf);
+          Output.print_sstring conf {|m=MOD_DATA&data=|};
+          Output.print_string conf (Mutil.encode data);
+          Output.print_sstring conf {|&s=|};
+          Output.print_string conf (Mutil.encode ini);
+          Output.print_sstring conf {|">|};
+          Output.print_sstring conf (transl conf "at old location");
+          Output.print_sstring conf {|</a>|});
+        Output.print_sstring conf ".";
+        Hutil.trailer conf)
+    else if ajax then
+      print_json conf
+        (`Assoc
+           [
+             ("success", `Bool false);
+             ( "message",
+               `String (Utf8.capitalize_fst (transl conf "no modification")) );
+           ])
     else (
       Hutil.header conf (fun _ ->
           transl conf "no modification"
@@ -192,7 +245,6 @@ let print_mod_ok conf base =
 
 type 'a env =
   | Vbool of bool
-  | Vcnt of int ref
   | Vint of int
   | Vlist_data of (Driver.istr * string) list
   | Vlist_value of (Driver.istr * string) list
@@ -245,34 +297,26 @@ and eval_simple_var conf base env xx = function
         }
       in
       let istr, p_list = List.hd (get_person_from_data conf base) in
-      (* same code as in place.ml *)
-      let head =
-        Printf.sprintf "<a href=\"%sm=L%s%s&k=%s&nb=%d"
-          (commd conf :> string)
-          (Format.sprintf "&data=%s" data)
-          "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
-          (Mutil.encode (Driver.sou base istr) :> string)
-          (List.length p_list)
-      in
-      let body =
-        let rec loop i acc = function
-          | [] -> acc
-          | p :: pl ->
-              let ip = Driver.get_iper p in
-              loop (i + 1)
-                (acc ^ Printf.sprintf "&i%d=%s" i (Driver.Iper.to_string ip))
-                pl
-        in
-        loop 0 "" p_list
-      in
-      let title =
-        Printf.sprintf
-          "\" title=\"%s\" data-toggle=\"tooltip\" data-placement=\"top\">%d"
-          (Utf8.capitalize (transl conf "list of linked persons"))
-          (List.length p_list)
-      in
-      let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ms-1\"></i></a>" in
-      Printf.sprintf "%s%s%s%s" head body title tail |> str_val
+      let n = List.length p_list in
+      let b = Buffer.create 1024 in
+      Printf.bprintf b
+        {|<a class="btn btn-sm btn-outline-primary text-nowrap align-self-center ms-3"
+   href="%sm=L&data=%s&bi=on&ba=on&ma=on&de=on&bu=on&parents=0&key=%s&k=%s&nb=%d|}
+        (commd conf :> string)
+        (Mutil.encode data :> string)
+        (Driver.Istr.to_string istr)
+        (Mutil.encode (Driver.sou base istr) :> string)
+        n;
+      List.iteri
+        (fun i p ->
+          Printf.bprintf b "&i%d=%s" i
+            (Driver.Iper.to_string (Driver.get_iper p)))
+        p_list;
+      Printf.bprintf b {|" title="%s"><i class="fa fa-user me-1"></i>%d %s</a>|}
+        (Utf8.capitalize_fst (transl conf "list of linked persons"))
+        n
+        (transl_nth conf "person/persons" (if n > 1 then 1 else 0));
+      str_val (Buffer.contents b)
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))
@@ -290,21 +334,44 @@ and eval_simple_bool_var _conf _base env _xx = function
 
 and eval_simple_str_var conf _base env _xx = function
   | "cnt" -> eval_int_env "cnt" env
-  | "count" -> (
-      match get_env "count" env with Vcnt c -> string_of_int !c | _ -> "")
+  | "columns" -> (
+      match (get_env "list" env, p_getenv conf.env "data") with
+      | _, Some "src" -> ""
+      | Vlist_data l, data ->
+          let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+          Util.columns_style
+            ~wide:
+              (List.mem data
+                 [ Some "place"; Some "occu"; Some "title"; Some "domain" ])
+            (List.length l + (3 * List.length (combine_by_ini ini l)))
+      | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
+  | "entry_count" -> (
+      match get_env "list_value" env with
+      | Vlist_value l -> string_of_int (List.length l)
+      | _ -> raise Not_found)
+  | "entry_label" -> (
+      match get_env "list_value" env with
+      | Vlist_value l ->
+          let n = List.length l in
+          (Util.escape_html
+             (Printf.sprintf
+                (ftransl conf "%s %s starting with %s")
+                (thousands conf n)
+                (snd (translate_title conf n))
+                (eval_string_env "entry_ini" env))
+            :> string)
+      | _ -> raise Not_found)
+  | "entry_nb" -> (
+      match get_env "list_value" env with
+      | Vlist_value l -> thousands conf (List.length l)
+      | _ -> raise Not_found)
   | "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_ini_display" -> eval_string_env "entry_ini_display" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
-  | "incr_count" -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          incr c;
-          ""
-      | _ -> "")
   | "max" -> eval_int_env "max" env
   | "nb_results" -> (
       match get_env "list" env with
@@ -313,12 +380,6 @@ and eval_simple_str_var conf _base env _xx = function
   | "other" -> (
       match p_getenv conf.env "data" with
       | Some "place" -> Place.without_suburb (eval_string_env "entry_value" env)
-      | _ -> "")
-  | "reset_count" -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          c := 0;
-          ""
       | _ -> "")
   | "script_class" -> eval_string_env "script_class" env
   | "script_title" -> eval_string_env "script_title" env
@@ -336,11 +397,7 @@ and eval_simple_str_var conf _base env _xx = function
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
-      let len2 =
-        Sosa.to_string_sep
-          (transl conf "(thousand separator)")
-          (Sosa.of_int len)
-      in
+      let len2 = thousands conf len in
       let _, book_name = translate_title conf len in
       match p_getenv_notrim conf.env "s" with
       | Some ini ->
@@ -534,11 +591,7 @@ let print_foreach conf print_ast _eval_expr =
 
 let print_mod conf base =
   let list = build_list conf base in
-  let env =
-    Templ.Env.empty
-    |> Templ.Env.add "list" (Vlist_data list)
-    |> Templ.Env.add "count" (Vcnt (ref 0))
-  in
+  let env = Templ.Env.empty |> Templ.Env.add "list" (Vlist_data list) in
   let ifun =
     Templ.
       {
