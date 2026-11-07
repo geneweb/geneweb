@@ -245,34 +245,26 @@ and eval_simple_var conf base env xx = function
         }
       in
       let istr, p_list = List.hd (get_person_from_data conf base) in
-      (* same code as in place.ml *)
-      let head =
-        Printf.sprintf "<a href=\"%sm=L%s%s&k=%s&nb=%d"
-          (commd conf :> string)
-          (Format.sprintf "&data=%s" data)
-          "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
-          (Mutil.encode (Driver.sou base istr) :> string)
-          (List.length p_list)
-      in
-      let body =
-        let rec loop i acc = function
-          | [] -> acc
-          | p :: pl ->
-              let ip = Driver.get_iper p in
-              loop (i + 1)
-                (acc ^ Printf.sprintf "&i%d=%s" i (Driver.Iper.to_string ip))
-                pl
-        in
-        loop 0 "" p_list
-      in
-      let title =
-        Printf.sprintf
-          "\" title=\"%s\" data-toggle=\"tooltip\" data-placement=\"top\">%d"
-          (Utf8.capitalize (transl conf "list of linked persons"))
-          (List.length p_list)
-      in
-      let tail = Printf.sprintf "<i class=\"fa fa-user fa-xs ms-1\"></i></a>" in
-      Printf.sprintf "%s%s%s%s" head body title tail |> str_val
+      let n = List.length p_list in
+      let b = Buffer.create 1024 in
+      Printf.bprintf b
+        {|<a class="btn btn-sm btn-outline-primary text-nowrap align-self-center ms-3"
+   href="%sm=L&data=%s&bi=on&ba=on&ma=on&de=on&bu=on&parents=0&key=%s&k=%s&nb=%d|}
+        (commd conf :> string)
+        (Mutil.encode data :> string)
+        (Driver.Istr.to_string istr)
+        (Mutil.encode (Driver.sou base istr) :> string)
+        n;
+      List.iteri
+        (fun i p ->
+          Printf.bprintf b "&i%d=%s" i
+            (Driver.Iper.to_string (Driver.get_iper p)))
+        p_list;
+      Printf.bprintf b {|" title="%s"><i class="fa fa-user me-1"></i>%d %s</a>|}
+        (Utf8.capitalize_fst (transl conf "list of linked persons"))
+        n
+        (transl_nth conf "person/persons" (if n > 1 then 1 else 0));
+      str_val (Buffer.contents b)
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))

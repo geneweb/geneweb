@@ -251,7 +251,7 @@ let gen_record conf base changed action =
   (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
   (* mise à jour de l'historique.                                   *)
   match changed with
-  | U_Multi _ -> () ()
+  | U_Multi _ -> ()
   | _ -> notify_change conf base changed action
 
 (* ************************************************************************ *)
