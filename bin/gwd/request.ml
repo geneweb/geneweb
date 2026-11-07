@@ -29,7 +29,7 @@ let this_request_updates_database conf =
       | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
       | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" | "PLACE_TERMS_OK"
-      | "SOURCE_TERMS_OK" ) ->
+      | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
       true
   | _ -> false
 
@@ -646,6 +646,11 @@ let treat_request =
              | "SOURCE_TERMS_OK" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ PlaceTermsDisplay.print_sources_ok
+             | "OCCU_TERMS" ->
+                 w_wizard @@ w_base @@ PlaceTermsDisplay.print_occupations
+             | "OCCU_TERMS_OK" ->
+                 w_wizard @@ w_lock @@ w_base
+                 @@ PlaceTermsDisplay.print_occupations_ok
              | "MOD_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod

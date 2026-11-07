@@ -416,6 +416,33 @@ td .rm-cell {
   max-height: 1.4em;
 }
 
+/* places, sources, occupations to group: the spellings to keep, with the
+   "do not modify" checkboxes in a column */
+.keep-grid {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 1.5rem;
+  align-items: center;
+}
+
+/* invisible characters shown as in CHK_DATA (places, sources, occupations to
+   group) */
+.inv-hl {
+  white-space: pre-wrap;
+}
+
+.inv-hl .ic, .inv-hl .zw {
+  background-color: #ffeb3b;
+  border-bottom: 1px dashed #e65100;
+  border-right: 1px dashed #e65100;
+}
+
+.inv-hl .zw {
+  display: inline-block;
+  min-width: 0.5em;
+  max-height: 1.4em;
+}
+
 #cd .err {
   display: flex;
   align-items: center;
@@ -686,6 +713,24 @@ html {
   right: 0;
   transform: translateX(-5px) translateY(1px);
   z-index: 1000;
+}
+
+.book-nb {
+  display: block;
+  font-size: 0.65em;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  color: var(--bs-secondary-color);
+}
+
+.book-head {
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0.3em 0 0 0.5rem;
+  color: var(--bs-secondary-color);
+  background-color: transparent !important;
 }
 
 .sp-ul {

@@ -56,12 +56,32 @@ let terms_of_env conf =
     conf.env
   |> List.sort_uniq compare
 
+let has_delimiter s =
+  String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s
+
+(* ["aaaa (bbbb)"] is [Some ("aaaa", "bbbb")]: one trailing parenthesised
+   part, both parts non empty and free of brackets and parentheses *)
+let paren_form s =
+  let n = String.length s in
+  if n > 0 && s.[n - 1] = ')' then
+    match String.index_opt s '(' with
+    | Some i when i > 0 ->
+        let host = String.trim (String.sub s 0 i) in
+        let parent = String.trim (String.sub s (i + 1) (n - i - 2)) in
+        if
+          host <> "" && parent <> ""
+          && (not (has_delimiter host))
+          && not (has_delimiter parent)
+        then Some (host, parent)
+        else None
+    | Some _ | None -> None
+  else None
+
 let valid_new_term s =
   let s = PlaceTerms.clean_term s in
-  s <> ""
-  && not (String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s)
+  s <> "" && ((not (has_delimiter s)) || paren_form s <> None)
 
-let rewrite_with inverted ~terms f raw depths =
+let rewrite_spans inverted ~terms f raw depths =
   let comps = Place.components inverted raw in
   let main = List.filter (fun (c : Place.component) -> not c.suburb) comps in
   let pick = function
@@ -84,16 +104,42 @@ let rewrite_with inverted ~terms f raw depths =
     Some
       (List.fold_left
          (fun s (c : Place.component) ->
-           String.sub s 0 c.pos ^ f c.text
+           String.sub s 0 c.pos ^ f c
            ^ String.sub s (c.pos + c.len) (String.length s - c.pos - c.len))
          raw spans)
 
+let rewrite_with inverted ~terms f raw depths =
+  rewrite_spans inverted ~terms
+    (fun (c : Place.component) -> f c.text)
+    raw depths
+
+(* A new term "aaaa (bbbb)" is written as is, except next to the parentheses
+   of the place, inside them ("Nantes (44)" for "44") or before them ("Nantes"
+   in "Nantes (44)"), where it would give two parenthesised parts: there it is
+   written "aaaa, bbbb", which has the same meaning. *)
 let rewrite inverted ~terms ~new_term raw depths =
-  rewrite_with inverted ~terms (Fun.const new_term) raw depths
+  let n = String.length raw in
+  let in_parens (c : Place.component) =
+    (c.pos > 0 && String.unsafe_get raw (c.pos - 1) = '(')
+    ||
+    let rec next i =
+      if i < n && String.unsafe_get raw i = ' ' then next (i + 1) else i
+    in
+    let i = next (c.pos + c.len) in
+    i < n && String.unsafe_get raw i = '('
+  in
+  let nested =
+    match paren_form new_term with
+    | Some (host, parent) -> host ^ ", " ^ parent
+    | None -> new_term
+  in
+  rewrite_spans inverted ~terms
+    (fun c -> if in_parens c then nested else new_term)
+    raw depths
 
 (* ------------------------------------------------------------------------ *)
 
-type field = Place | Source
+type field = Place | Source | Occupation
 type usage = int ref IT.t
 
 let uses u i = match IT.find_opt u i with Some r -> !r | None -> 0
@@ -116,8 +162,17 @@ let family_sources f =
   Driver.get_fsources f :: Driver.get_marriage_src f
   :: List.map (fun e -> e.efam_src) (Driver.get_fevents f)
 
-let person_fields = function Place -> person_places | Source -> person_sources
-let family_fields = function Place -> family_places | Source -> family_sources
+let person_fields field p =
+  match field with
+  | Place -> person_places p
+  | Source -> person_sources p
+  | Occupation -> [ Driver.get_occupation p ]
+
+let family_fields field f =
+  match field with
+  | Place -> family_places f
+  | Source -> family_sources f
+  | Occupation -> []
 
 (* the fields of [field] of a person or family moved by [f] *)
 let map_person field f (gp : (_, _, Driver.istr) gen_person) =
@@ -145,6 +200,7 @@ let map_person field f (gp : (_, _, Driver.istr) gen_person) =
         pevents =
           List.map (fun e -> { e with epers_src = f e.epers_src }) gp.pevents;
       }
+  | Occupation -> { gp with occupation = f gp.occupation }
 
 let map_family field f (gf : (_, _, Driver.istr) gen_family) =
   match field with
@@ -163,8 +219,10 @@ let map_family field f (gf : (_, _, Driver.istr) gen_family) =
         fevents =
           List.map (fun e -> { e with efam_src = f e.efam_src }) gf.fevents;
       }
+  | Occupation -> gf
 
-let action = function Place -> "mq" | Source -> "ms"
+let action field =
+  match field with Place -> "mq" | Source -> "ms" | Occupation -> "mo"
 
 let usage ?(field = Place) base =
   let u = IT.create 4096 in

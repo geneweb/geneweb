@@ -438,7 +438,10 @@ let clusters d part =
         Hashtbl.replace sp t (n + 1, u + uses));
   Hashtbl.fold
     (fun ckey sp acc ->
-      if Hashtbl.length sp < 2 then acc
+      let single_clean () =
+        Hashtbl.fold (fun t _ ok -> ok && PlaceTerms.is_clean t) sp true
+      in
+      if Hashtbl.length sp < 2 && single_clean () then acc
       else
         let spellings =
           Hashtbl.fold

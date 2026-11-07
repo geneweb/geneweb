@@ -56,6 +56,9 @@
 <div class="container">
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
+  %( rv: explicit order of the place dictionary (o=r from the last term,
+     o=a alphabetic, default dico_inverted), carried by every MOD_DATA link %)
+  %let;rv;%if;(e.data="place")%if;(e.o="r")&o=r%elseif;(e.o="a")&o=a%end;%end;%in;
   <nav class="navbar bg-light sticky-top justify-content-start py-1 mt-1 mb-0 px-1 mx-0" aria-labelledby="sub-caracter-selection-heading" id="fixed-nav">
     <h2 id="sub-caracter-selection-heading" class="visually-hidden">
       %if;(e.s="")[*select a letter]%else;[*hierarchical navigation]%end;
@@ -71,9 +74,10 @@
                 <div class="list-group-item list-group-item-action bg-info-subtle text-info-emphasis w-auto px-3 sup-char-div%if;script; %script_class;%end;" tabindex="%expr(len_s+(2*cnt)+5)"
                      title="[*search/case sensitive]0 “%escape.entry_ini;”%if;script; (%script_title;)%end;" data-bs-toggle="tooltip">
                   <a class="stretched-link sup-char"
-                     href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;">%nn;
+                     href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;">%nn;
                      %visual_spaces.escape.entry_ini_display;%nn;
                   </a>
+                  <span class="book-nb">%entry_nb;</span>
                   %if;(max>0 and nb_results<nb_max)%nn;
                     <span class="bottom-book-arrow">
                       <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
@@ -98,7 +102,7 @@
             %end;
           </div>
           %if;(e.s!="")<a class="btn-link border-0 align-self-center mt-1 mb-2 sub-char"
-            href="%prefix;m=MOD_DATA&data=%e.data;" title="[*back to index and books]" data-bs-toggle="tooltip" data-placement="bottom">
+            href="%prefix;m=MOD_DATA&data=%e.data;%rv;" title="[*back to index and books]" data-bs-toggle="tooltip" data-placement="bottom">
               <span class="fa-stack mb-1">
                 <i class="fa fa-a fa-stack-2x pe-3"></i>
                 <i class="fa-solid fa-z fa-2x fa-stack-1x text-success pt-2 ps-3"></i>
@@ -109,7 +113,7 @@
             <div class="d-flex flex-grow-1 align-self-sm-center ms-2" id="subinit">
               %foreach;substring.s.6;
                 <div class="list-group-item list-group-item-action bg-info-subtle text-info-emphasis w-auto" tabindex="%expr(5+cnt)">
-                  <a class="stretched-link sub-char text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;"
+                  <a class="stretched-link sub-char text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;%rv;"
                      title="[*search/case sensitive]0 “%escape.substr;”" data-bs-toggle="tooltip">%visual_spaces.escape.substr;</a>
                 </div>
               %end;
@@ -134,12 +138,44 @@
       </a>
     </div>
   %end;
-  %if;(e.data="place")
+  %if;(e.data="occu")
     <div class="d-flex justify-content-end mx-2 mt-2">
       <a class="btn btn-outline-primary btn-sm" role="button"
-         href="%prefix;m=PLACE_TERMS">
-        <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]
+         href="%prefix;m=OCCU_TERMS">
+        <i class="fa fa-object-group fa-fw me-1"></i>[*occupations to group]
       </a>
+    </div>
+  %end;
+  %if;(e.data="place")
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mx-2 mt-2">
+      %if;rev_order;
+        <a class="btn btn-outline-secondary btn-sm" role="button"
+           href="%prefix;m=MOD_DATA&data=place&o=a">
+          <i class="fa fa-arrow-down-a-z fa-fw me-1"></i>[*alphabetic order]
+        </a>
+      %else;
+        <a class="btn btn-outline-secondary btn-sm" role="button"
+           href="%prefix;m=MOD_DATA&data=place&o=r">
+          <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]
+        </a>
+      %end;
+      <form method="get" action="%action;" class="d-flex align-items-center gap-1">
+        %hidden;
+        <input type="hidden" name="m" value="PLACE_TERMS">
+        %if;(e.s!="")<input type="hidden" name="ps" value="%escape.e.s;">%nn;
+          %if;rev_order;<input type="hidden" name="po" value="r">%end;%end;
+        <button type="submit" class="btn btn-outline-primary btn-sm">
+          <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]
+        </button>
+        <input type="text" class="form-control form-control-sm w-auto" size="30"
+               name="bw" placeholder="[starting with]" aria-label="[starting with]">
+      </form>
+      %if;(e.s!="")
+        <a class="btn btn-outline-primary btn-sm" role="button"
+           href="%prefix;m=PLACE_TERMS&reorg=on&ps=%encode.e.s;%if;rev_order;&po=r%end;">
+          <i class="fa fa-shuffle fa-fw me-1"></i>[*places to reorganize]
+        </a>
+      %end;
     </div>
   %end;
   <div class="d-flex flex-column justify-content-center mx-2">
@@ -166,6 +202,7 @@
         %hidden;
         <input type="hidden" name="m" value="MOD_DATA">
         <input type="hidden" name="data" value="%e.data;">
+        %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
         <div class="form-group mb-0">
           <label class="user-select-none mb-0 mb-sm-1 ms-1 ms-sm-3" for="search_s" title="[*search/case sensitive]0 (R)">[*search/case sensitive]0</label>
           <input type="search" accesskey="R" class="form-control ms-2 ms-sm-3" name="s" id="search_s">
@@ -186,7 +223,7 @@
             <a role="button" class="stretched-link w-100 mx-3" href="#top" title="[*return to top]" data-bs-toggle="tooltip" data-placement="top" tabindex="-1"><i class="fa-solid fa-sort-up ms-sm-1 mt-1"></i></a>
           </div>
           <div class="%if;(entry_ini=e.s)bg-success-subtle text-success-emphasis%else;bg-info-subtle text-info-emphasis%end; position-relative w-100 border fw-bold font-monospace">
-            %if;(entry_ini!=e.s)<a class="stretched-link ms-1" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;" title="[*search/case sensitive]0 “%escape.entry_ini;”">%end;
+            %if;(entry_ini!=e.s)<a class="stretched-link ms-1" href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;" title="[*search/case sensitive]0 “%escape.entry_ini;”">%end;
             <span class="ms-3">%visual_spaces.escape.entry_ini;</span>
             %if;(entry_ini!=e.s)</a>%end;
           </div>
@@ -194,6 +231,7 @@
         <li class="list-unstyled mt-1 ps-0">
           <ul class="list-group src-list-bg my-1">
             %foreach;value;
+              %if;new_head;<li class="list-unstyled book-head">%escape.rev_head;</li>%end;
               <li class="list-unstyled ms-sm-1 ps-0" id="k%entry_key;">
                 %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                   <div class="alert alert-warning mx-2 mt-2">[*book blank name]</div>
@@ -235,6 +273,7 @@
                           %hidden;
                           <input type="hidden" name="m" value="MOD_DATA_OK">
                           <input type="hidden" name="data" value="%e.data;">
+                          %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
                           <input type="hidden" name="key" value="%entry_key;">
                           <input type="hidden" name="s" value="%escape.current_s;">
                           %let;val;%if;(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
@@ -278,7 +317,7 @@
                       %else;
                         <a role="button" class="btn-link ms-1 me-3"
                            title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
-                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;"
+                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;"
                            data-entry="%escape.printable.entry_value;">%nn;
                            %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
                            %if;(e.data="place" and suburb!="")

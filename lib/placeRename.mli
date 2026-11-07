@@ -34,8 +34,10 @@ val occurrences_of_env : Config.config -> occurrence list
 
 val valid_new_term : string -> bool
 (** A new term must not be empty nor contain brackets or parentheses, which
-    would change how the place strings are split. Commas are allowed (to split a
-    term in two). *)
+    would change how the place strings are split, except one trailing
+    parenthesised part: ["Nantes (Loire-Atlantique)"] is accepted like
+    ["Nantes, Loire-Atlantique"]. Commas are allowed (to split a term in two).
+*)
 
 val terms_of_env : Config.config -> string list
 (** The terms to rename, from the form fields [t] and [t1], [t2]... *)
@@ -63,6 +65,7 @@ val rewrite_with :
 type field =
   | Place  (** the place fields of persons, families and their events *)
   | Source  (** their source fields *)
+  | Occupation  (** the occupation of the persons *)
 
 type usage
 (** For every string id used as a place: the number of persons and families
@@ -122,5 +125,6 @@ type result = {
 
 val apply :
   ?field:field -> Config.config -> Geneweb_db.Driver.base -> item list -> result
-(** Carries out a plan like m=MOD_DATA_OK (history "mq" for each modified person
-    and the spouses of each modified family) and commits the patches. *)
+(** Carries out a plan like m=MOD_DATA_OK (history "mq", "ms" or "mo" for each
+    modified person and the spouses of each modified family) and commits the
+    patches. *)

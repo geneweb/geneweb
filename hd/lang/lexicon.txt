@@ -144,6 +144,11 @@ no: %s %s for
 pl: %s %s
 ru: %s %s
 
+    %s %s whose last term starts with %s
+de: %s %s, deren letztes Glied mit „%s” beginnt
+en: %s %s whose last term starts with “%s”
+fr: %s %s dont le dernier terme commence par « %s »
+
     %s %s starting with %s
 af: %s %s begin met “%s”
 bg: %s %s започващо с „%s”
@@ -18934,6 +18939,91 @@ de: zusammenzuführende Quellen
 en: sources to group
 fr: sources à regrouper
 
+    do not modify
+de: nicht ändern
+en: do not modify
+fr: ne pas modifier
+
+    terms to split
+de: zu trennende Begriffe
+en: terms to split
+fr: termes à séparer
+
+    terms to split help
+de: Begriffe, die mit einem häufigen Begriff enden, ohne Komma: „Montréal Canada“ → „Montréal, Canada“. Die Vorschläge, deren erster Teil bereits ein Begriff der Datenbank ist, sind angekreuzt.
+en: Terms ending with a frequent term, without a comma: “Montréal Canada” → “Montréal, Canada”. The proposals whose first part is already a term of the base are checked.
+fr: Termes se terminant par un terme fréquent, sans virgule : « Montréal Canada » → « Montréal, Canada ». Les propositions dont la première partie est déjà un terme de la base sont cochées.
+
+    frequent terms: minimum uses
+de: häufige Begriffe: Mindestanzahl der Verwendungen
+en: frequent terms: minimum uses
+fr: termes fréquents : nombre minimal d'utilisations
+
+    terms to join
+de: zusammenzufügende Begriffe
+en: terms to join
+fr: termes à regrouper
+
+    terms to join help
+de: Zwei aufeinanderfolgende Begriffe, die einen häufigen Begriff bilden: „Paris, 1er“ → „Paris 1er“; oder ein Begriff mit einer anderen Nummerierung: „Paris XIVe“ → „Paris 14e“.
+en: Two consecutive terms forming a frequent term: “Paris, 1er” → “Paris 1er”; or a term written with another numbering: “Paris XIVe” → “Paris 14e”.
+fr: Deux termes consécutifs formant un terme fréquent : « Paris, 1er » → « Paris 1er » ; ou un terme écrit avec une autre numérotation : « Paris XIVe » → « Paris 14e ».
+
+    %d places to change (%d merged), %d uses
+de: %d zu ändernde Orte (davon %d zusammengeführt), %d Verwendungen
+en: %d places to change (%d merged), %d uses
+fr: %d lieux à modifier (dont %d fusionnés), %d utilisations
+
+    show the list of the changes
+de: Liste der Änderungen anzeigen
+en: show the list of the changes
+fr: afficher la liste des modifications
+
+    show the places
+de: Orte anzeigen
+en: show the places
+fr: afficher les lieux
+
+    places to reorganize
+de: neu zu ordnende Orte
+en: places to reorganize
+fr: lieux à réorganiser
+
+    places to reorganize help
+de: Ein Ort gefolgt von seinen anderen Teilen in Klammern, darunter das Département, als Name oder Nummer: „Nantes (44) (Rue du Bocage)“ → „Rue du Bocage, Nantes, Loire-Atlantique“. Die Vorschläge, deren Ort bereits unter dem Département bekannt ist, sind angekreuzt.
+en: A town followed by its other parts in parentheses, the department among them, by its name or its code: “Nantes (44) (Rue du Bocage)” → “Rue du Bocage, Nantes, Loire-Atlantique”. The proposals whose town is already known under the department are checked.
+fr: Une ville suivie de ses autres parties entre parenthèses, dont le département, en nom ou en code : « Nantes (44) (Rue du Bocage) » → « Rue du Bocage, Nantes, Loire-Atlantique ». Les propositions dont la ville est déjà connue sous ce département sont cochées.
+
+    known term
+de: bekannter Begriff
+en: known term
+fr: terme connu
+
+    new occupation
+de: neuer Beruf
+en: new occupation
+fr: nouvelle profession
+
+    merged into an existing occupation
+de: mit einem vorhandenen Beruf zusammengeführt
+en: merged into an existing occupation
+fr: fusionnée avec une profession existante
+
+    merged with another renamed occupation
+de: mit einem anderen umbenannten Beruf zusammengeführt
+en: merged with another renamed occupation
+fr: fusionnée avec une autre profession renommée
+
+    occupations to group
+de: zusammenzuführende Berufe
+en: occupations to group
+fr: professions à regrouper
+
+    %d occupations renamed (%d merged), %d records updated
+de: %d Berufe umbenannt (%d zusammengeführt), %d Datensätze geändert
+en: %d occupations renamed (%d merged), %d records updated
+fr: %d professions renommées (dont %d fusionnées), %d fiches modifiées
+
     %d sources renamed (%d merged), %d records updated
 de: %d Quellen umbenannt (%d zusammengeführt), %d Datensätze geändert
 en: %d sources renamed (%d merged), %d records updated
@@ -21935,6 +22025,11 @@ fr: fils/filles/enfants
 pt: filhos/filhas/filhos
 sv: söner/döttrar/barn
 tr: oğulları/kızları/çocukları
+
+    order from the last term
+de: Ordnung ab dem letzten Glied
+en: order from the last term
+fr: ordre à partir du dernier terme
 
     sorted by
 de: sortiert nach

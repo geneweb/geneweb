@@ -55,6 +55,7 @@ let space_for p s =
   in
   loop 0
 
+let is_clean s = clean_term s = s
 let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
 
 (* as check_data: spaces at both ends and invisible characters ignored *)
@@ -169,7 +170,8 @@ let clusters entries =
   Hashtbl.fold
     (fun k l acc ->
       match !l with
-      | [] | [ _ ] -> acc
+      | [] -> acc
+      | [ e ] when is_clean e.term -> acc
       | l ->
           let l =
             List.sort (fun a b -> compare (b.uses, a.term) (a.uses, b.term)) l

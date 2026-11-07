@@ -26,6 +26,12 @@ type error_type =
   | RepeatedWords
   | NoLetters
 
+val invisible_html : Config.config -> string -> string
+(** [invisible_html conf s] is [s] escaped for HTML, with its invisible
+    characters, its non-breaking spaces and its spaces at both ends wrapped in
+    the spans of m=CHK_DATA (classes [ic], [zw], titled with the code point and
+    its name), so that they can be seen. *)
+
 val applies : error_type -> dict_type -> bool
 (** [applies error_type dict] tells whether [error_type] is checked in the
     entries of [dict]. *)
