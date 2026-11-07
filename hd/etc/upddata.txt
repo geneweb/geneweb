@@ -142,14 +142,6 @@
       </a>
     </div>
   %end;
-  <div class="d-flex flex-column justify-content-center mx-2">
-    %if;(e.key!="")
-      <div class="alert alert-warning w-auto text-center my-2 mx-3 mx-lg-5" role="alert">
-        <i class="fas fa-hat-wizard fa-fw text-danger me-1"></i>[*help modify data]%nn;
-        <i class="fas fa-hat-wizard fa-fw text-danger ms-1"></i>
-      </div>
-    %end;
-  </div>
   %if;(e.data!="" and e.s!="")
     <div id="notfound-warning" class="d-none">
       <div class="d-flex justify-content-center">
@@ -221,65 +213,13 @@
                       %end;
                     </div>
                   %end;
-                  %if;is_modified;
-                    <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-0%if;(e.data="src") ms-5%elseif;(e.data!="place") ms-sm-1%end;">
-                      <div class="d-flex d-sm-inline-flex flex-row flex-sm-column align-self-start align-self-sm-center ms-5 ms-sm-4">
-                        <div class="fw-bold">[*modify]</div>
-                        <div class="text-nowrap align-self-sm-center ms-2 ms-sm-0">%p_list;</div>
-                      </div>
-                  %end;
                   <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-2 px-sm-1%if;(e.data!="place" and e.data!="src") ms-3%end;">
                     <div class="flex-column flex-sm-row ms-sm-2%if;is_modified; mb-2%end;">
-                      %if;is_modified;
-                        <form class="needs-validation d-flex flex-row" method="post" action="%action;" novalidate>
-                          %hidden;
-                          <input type="hidden" name="m" value="MOD_DATA_OK">
-                          <input type="hidden" name="data" value="%e.data;">
-                          <input type="hidden" name="key" value="%entry_key;">
-                          <input type="hidden" name="s" value="%escape.current_s;">
-                          %let;val;%if;(entry_value.original=entry_value)%escape.printable.entry_value;%else;%escape.entry_value.original;%end;%in;
-                          <div class="flex-grow-1">
-                            <div class="ps-2 me-2 pe-sm-2 text-body-secondary book-input-text" data-v="%val;">%nn;
-                              %if;(e.data="place" and suburb!="")
-                                %escape.entry_value;
-                              %else;
-                                %if;(e.data!="src")%val;%else;%entry_value;
-                                %if;(e.key!="" and is_modified and "<a" in entry_value)<hr class="my-0">%val;%end;%end;
-                              %end;
-                            </div>
-                            <div class="mt-1">
-                              %if;(e.data="src" or e.data="occu" or e.data="place")
-                                <textarea class="form-control ps-2 pe-2" id="nx_input" name="nx_input" rows="1"
-                                  maxlength="1000" placeholder="%val;" autofocus required>%val;</textarea>
-                              %else;
-                                <input type="text" class="form-control flex-grow-1 ps-2 pe-1" id="nx_input" name="nx_input"
-                                  maxlength="200" value="%val;" placeholder="%val;" autofocus aria-label="[*modify]" required>
-                              %end;
-                              %if;(e.data="fn")
-                                <div class="form-check form-check-inline ms-sm-2">
-                                  <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes">
-                                  <label class="form-check-label" for="first_name_aliases">[*add the previous name as a first name alias]</label>
-                                </div>
-                              %end;
-                              %if;(e.data="sn")
-                                <div class="form-check form-check-inline mt-2 mt-sm-0 ms-sm-2">
-                                  <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes">
-                                  <label class="form-check-label" for="surname_aliases">[*add the previous name as a surname alias]</label>
-                                </div>
-                              %end;
-                              <div class="valid-feedback">must be different!</div>
-                            </div>
-                          </div>
-                          <div class="d-flex pt-2">
-                            <button type="submit" class="btn btn-primary ms-3 align-self-center h-100"
-                              title="[*validate/delete]0" data-bs-toggle="tooltip" data-placement="bottom">OK</button>
-                          </div>
-                        </form>
-                      %else;
                         <a role="button" class="btn-link ms-1 me-3"
                            title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
                            href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;"
-                           data-entry="%escape.printable.entry_value;">%nn;
+                           data-entry="%escape.printable.entry_value;"%nn;
+                           %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
                            %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
                            %if;(e.data="place" and suburb!="")
                             %if;(first)
@@ -293,10 +233,9 @@
                             %if;(e.data!="src")%escape.entry_value;%else;<span class="ms-3">%entry_value;</span>%end;
                           %end;
                           %if;(e.data!="src")</a>%end;
-                      %end;
                     </div>
                   </div>
-                  %if;is_modified;</div>%end;
+                  %if;is_modified;%p_list;%end;
                 </div>
               </li>
             %end;
@@ -304,6 +243,38 @@
         </li>
       %end;
     </ul>
+    <template id="book-edit" data-error="[*error]">
+      <form class="d-flex flex-row my-1" method="post" action="%action;">
+        %hidden;
+        <input type="hidden" name="m" value="MOD_DATA_OK">
+        <input type="hidden" name="data" value="%e.data;">
+        <input type="hidden" name="key">
+        <input type="hidden" name="s" value="%escape.current_s;">
+        <div class="flex-grow-1">
+          <div class="ps-2 me-2 pe-sm-2 text-body-secondary book-input-text"></div>
+          <div class="mt-1">
+            %if;(e.data="src" or e.data="occu" or e.data="place")
+              <textarea class="form-control ps-2 pe-2" id="nx_input" name="nx_input" rows="1"
+                maxlength="1000" aria-label="[*modify]" required></textarea>
+            %else;
+              <input type="text" class="form-control flex-grow-1 ps-2 pe-1" id="nx_input" name="nx_input"
+                maxlength="200" aria-label="[*modify]" required>
+            %end;
+            %if;(e.data="fn" or e.data="sn")
+              <div class="form-check form-check-inline mt-2 mt-sm-0 ms-sm-2">
+                <input class="form-check-input" type="checkbox" id="book-alias"
+                  name="%if;(e.data="fn")first_name%else;surname%end;_aliases" value="yes">
+                <label class="form-check-label" for="book-alias">%if;(e.data="fn")[*add the previous name as a first name alias]%else;[*add the previous name as a surname alias]%end;</label>
+              </div>
+            %end;
+            <div class="form-text"><i class="fa fa-hat-wizard text-danger me-1"></i>[*help modify data]</div>
+          </div>
+        </div>
+        <div class="d-flex pt-2">
+          <button type="submit" class="btn btn-primary ms-3 align-self-center h-100" title="[*validate/delete]0">OK</button>
+        </div>
+      </form>
+    </template>
   %else;
     <div class="alert alert-warning my-3">[*too much results]
       (> %if;(b.book_max_results!="")<abbr title="book_max_results">%b.book_max_results;</abbr>%else;%nb_max;%end;).
@@ -320,9 +291,7 @@ const updateData = {
       this.stableTooltips();
       this.removeLoadingOverlay();
       this.autoSelectLink();
-      this.updateInputField();
-      this.placeCursorAtEnd();
-      this.submitOnEnter();
+      BookEdit.init();
     } catch (e) {
       console.error('updateData init failed:', e);
     }
@@ -436,10 +405,6 @@ const updateData = {
       const sParam  = urlParams.get('s');
       const value   = s1Param || sParam;
 
-      if (s2Param) {
-        this._lsSet('s2Tmp', this._safeDecode(s2Param));
-      }
-
       if (value && value.trim()) {
         const decodedValue = this._safeDecode(value);
         const link = Array.from(
@@ -449,7 +414,9 @@ const updateData = {
         );
 
         if (link) {
-          link.click();
+          window.location.href = s2Param
+            ? `${link.href}&s2=${encodeURIComponent(this._safeDecode(s2Param))}`
+            : link.href;
         } else {
           if (decodedValue.trim()) {
             this._lsSet('notFoundValue', decodedValue);
@@ -477,35 +444,6 @@ const updateData = {
       }
       this._lsRemove('notFoundValue');
     }
-  },
-
-  updateInputField() {
-    const s2 = this._lsGet('s2Tmp');
-    if (s2 && window.location.href.includes('key=')) {
-      const input = document.getElementById('nx_input');
-      if (input) {
-        input.value = s2;
-        this._lsRemove('s2Tmp');
-      }
-    }
-  },
-
-  placeCursorAtEnd() {
-    const input = document.getElementById('nx_input');
-    if (!input) return;
-    input.focus();
-    const len = input.value.length;
-    try { input.setSelectionRange(len, len); } catch { /* type non-text */ }
-  },
-
-  submitOnEnter() {
-    const area = document.querySelector('textarea#nx_input');
-    area?.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.isComposing) {
-        e.preventDefault();
-        area.form.requestSubmit();
-      }
-    });
   }
 };
 </script>

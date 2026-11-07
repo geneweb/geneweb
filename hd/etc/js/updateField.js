@@ -240,5 +240,139 @@
         });
     }
   };
+  const BookEdit = {
+    form: null,
+    init() {
+      this.tpl = document.getElementById('book-edit');
+      if (!this.tpl) return;
+      document.addEventListener('click', ev => {
+        const a = ev.target.closest('#main-content a[data-entry]');
+        if (!a || ev.button || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+        ev.preventDefault();
+        this.open(a);
+      });
+      const p = new URLSearchParams(location.search);
+      const a = document.getElementById('k' + p.get('key'))
+        ?.querySelector('a[data-entry]');
+      if (a) this.open(a, p.get('s2'));
+    },
+    entries() {
+      return [...document.querySelectorAll('#main-content a[data-entry]')];
+    },
+    move(a, step) {
+      const all = this.entries();
+      const next = all[all.indexOf(a) + step];
+      if (next) this.open(next);
+    },
+    open(a, value) {
+      this.close();
+      const form = this.tpl.content.firstElementChild.cloneNode(true);
+      const field = form.elements.nx_input;
+      const text = form.querySelector('.book-input-text');
+      const original = a.dataset.v ?? a.dataset.entry;
+      form.elements.key.value = a.closest('li').id.slice(1);
+      text.textContent = text.dataset.v = original;
+      field.value = value || original;
+      bootstrap.Tooltip.getInstance(a)?.hide();
+      for (const c of a.parentElement.children) c.hidden = true;
+      a.parentElement.append(form);
+      if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize(field);
+      }
+      form.addEventListener('submit', ev => {
+        ev.preventDefault();
+        this.save(a, original);
+      });
+      field.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter' && !ev.isComposing) {
+          ev.preventDefault();
+          this.save(a, original);
+        } else if (ev.key === 'Escape') {
+          ev.preventDefault();
+          this.close();
+          a.focus();
+        } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+          ev.preventDefault();
+          this.move(a, ev.key === 'ArrowUp' ? -1 : 1);
+        }
+      });
+      this.form = form;
+      field.focus();
+      field.setSelectionRange(field.value.length, field.value.length);
+    },
+    close() {
+      const form = this.form;
+      if (!form) return;
+      this.form = null;
+      const field = form.elements.nx_input;
+      if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize.destroy(field);
+      }
+      const box = form.parentElement;
+      form.remove();
+      for (const c of box.children) c.hidden = false;
+    },
+    save(a, original) {
+      const form = this.form;
+      const value = form.elements.nx_input.value.trim();
+      if (!value || value === original) {
+        this.move(a, 1);
+        return;
+      }
+      if (form.dataset.busy) return;
+      form.dataset.busy = '1';
+      const body = new URLSearchParams(new FormData(form));
+      body.set('nx_input', value);
+      body.set('ajax', '1');
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body })
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(data => {
+          delete form.dataset.busy;
+          if (!data.success) {
+            notify('danger', data.message || this.tpl.dataset.error);
+            return;
+          }
+          notify('success', toast(data.label, data.before, data.after));
+          if (!data.complete) return;
+          const here = this.form === form;
+          const all = this.entries();
+          const next = all[all.indexOf(a) + 1];
+          if (here) this.close();
+          this.update(a, data);
+          if (here && next?.isConnected) this.open(next);
+        })
+        .catch(err => {
+          delete form.dataset.busy;
+          console.error('m=MOD_DATA_OK', err);
+          notify('danger', this.tpl.dataset.error);
+        });
+    },
+    update(a, data) {
+      const li = a.closest('li');
+      const other = document.getElementById('k' + data.key);
+      if (data.entry === null || (other && other !== li)) {
+        const ul = li.parentElement;
+        li.remove();
+        if (!ul.querySelector('a[data-entry]')) {
+          ul.parentElement.previousElementSibling.remove();
+          ul.parentElement.remove();
+        }
+        if (!this.entries().length) location.href = data.url;
+        return;
+      }
+      li.id = 'k' + data.key;
+      const u = new URL(a.href);
+      u.searchParams.set('key', data.key);
+      a.href = u;
+      a.dataset.entry = data.entry;
+      if (data.after === data.entry) delete a.dataset.v;
+      else a.dataset.v = data.after;
+      (a.nextElementSibling ?? a).textContent = data.entry;
+    }
+  };
   window.InplaceEdit = InplaceEdit;
+  window.BookEdit = BookEdit;
 })();
