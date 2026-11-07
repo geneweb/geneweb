@@ -2659,6 +2659,17 @@ sl: abecedni red
 sv: bokstavsordning
 tr: alfabetik sıra
 
+    alphabetical index
+de: alphabetischer Index
+en: alphabetical index
+es: índice alfabético
+fr: index alphabétique
+it: indice alfabetico
+nl: alfabetische index
+pl: indeks alfabetyczny
+pt: índice alfabético
+sv: alfabetiskt register
+
     also
 af: ook
 bg: също

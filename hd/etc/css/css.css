@@ -708,15 +708,6 @@ html {
 }
 
 /* Books */
-/* fix small down-arrow position on books navigation entries */
-.bottom-book-arrow {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  transform: translateX(-5px) translateY(1px);
-  z-index: 1000;
-}
-
 .sp-ul {
   display: inline-block;
   width: 0.75ch;
@@ -728,21 +719,6 @@ html {
 /* Light green background for odd-numbered items */
 .src-list-bg li:nth-child(even) {
   background-color: #e4f5df;
-}
-a.stretched-link.sup-char, a.stretched-link.sub-char {
-    color: #0050a6 !important
-}
-a.stretched-link.sup-char:hover, a.stretched-link.sub-char:hover {
-    color: #003366 !important;
-}
-.sup-char-div {
-    background-color: #cff9ffb0 !important
-}
-.sup-char-div:hover {
-    background-color: #e6f7ff !important;
-}
-.sup-char-div .bottom-book-arrow a:hover .book-arrow {
-    color: #89CAFE !important;
 }
 .arab-char {
     background-color: #ccecf1 !important
@@ -792,22 +768,9 @@ a.stretched-link.sup-char:hover, a.stretched-link.sub-char:hover {
 .khmr-char:hover {
     background-color: #b4df8c99 !important;
 }
-a.book-arrow:hover {
-    color: white;
-}
 
 #book {
   scroll-padding-top: 4rem;
-}
-.top-book-arrow {
-  z-index: 1000;
-}
-#book-navigation .d-inline-flex > :nth-child(n) {
-  margin-bottom: 1px;
-  margin-top: 1px;
-}
-#book-navigation .d-inline-flex, #subinit div > *:not(:first-child) {
-  border-left: 0px;
 }
 
 .book-input-text, #nx_input {
@@ -1894,6 +1857,13 @@ div.summary ul ul
 {
   break-inside: avoid;
   overflow-wrap: anywhere;
+}
+
+#main-content.list-columns li
+{
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
 }
 
 /* ------------------------------ Biographie ----------------------------- */

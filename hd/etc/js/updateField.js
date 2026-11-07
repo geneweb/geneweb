@@ -251,13 +251,23 @@
         ev.preventDefault();
         this.open(a);
       });
+      const filter = document.getElementById('book-filter');
+      filter?.addEventListener('input', () => this.filter(filter.value));
+      filter?.addEventListener('keydown', ev => {
+        const a = ev.key === 'Enter' && filter.value.trim() && this.entries()[0];
+        if (a) {
+          ev.preventDefault();
+          this.open(a);
+        }
+      });
       const p = new URLSearchParams(location.search);
       const a = document.getElementById('k' + p.get('key'))
         ?.querySelector('a[data-entry]');
       if (a) this.open(a, p.get('s2'));
     },
     entries() {
-      return [...document.querySelectorAll('#main-content a[data-entry]')];
+      return [...document.querySelectorAll(
+        '#main-content li:not([hidden]) a[data-entry]')];
     },
     move(a, step) {
       const all = this.entries();
@@ -357,10 +367,12 @@
         const ul = li.parentElement;
         li.remove();
         if (!ul.querySelector('a[data-entry]')) {
-          ul.parentElement.previousElementSibling.remove();
-          ul.parentElement.remove();
+          ul.previousElementSibling.remove();
+          ul.remove();
         }
-        if (!this.entries().length) location.href = data.url;
+        if (!document.querySelector('#main-content a[data-entry]')) {
+          location.href = data.url;
+        }
         return;
       }
       li.id = 'k' + data.key;
@@ -371,6 +383,19 @@
       if (data.after === data.entry) delete a.dataset.v;
       else a.dataset.v = data.after;
       (a.nextElementSibling ?? a).textContent = data.entry;
+    },
+    filter(q) {
+      const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+      const n = norm(q.trim());
+      for (const ul of document.querySelectorAll('#main-content ul')) {
+        let shown = false;
+        for (const li of ul.children) {
+          const a = li.querySelector('a[data-entry]');
+          li.hidden = n !== '' && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
+          shown ||= !li.hidden;
+        }
+        ul.hidden = ul.previousElementSibling.hidden = !shown;
+      }
     }
   };
   window.InplaceEdit = InplaceEdit;
