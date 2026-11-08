@@ -767,6 +767,10 @@ val columns_attrs : ?wide:bool -> 'a list -> string
     elements per column, centered; [""] for a list fitting one column. [wide]
     (default [false]) widens the columns for longer elements such as persons. *)
 
+val columns_style : ?wide:bool -> int -> string
+(** [columns_style ?wide n] is {!columns_attrs} for a list of [n] lines, such as
+    elements and their headings. *)
+
 val wide_list : 'a list -> bool
 (** [wide_list l] tells whether a list of the length of [l] needs more columns
     than a [container] holds, that is a [container-fluid] page. *)

@@ -28,6 +28,9 @@ let translate_title conf len =
   in
   (Printf.sprintf (ftransl conf "book of %s") book_name, book_name)
 
+let thousands conf n =
+  Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int n)
+
 let print_json conf json =
   Output.header conf "Content-type: application/json";
   Output.header conf "Connection: close";
@@ -242,7 +245,6 @@ let print_mod_ok conf base =
 
 type 'a env =
   | Vbool of bool
-  | Vcnt of int ref
   | Vint of int
   | Vlist_data of (Driver.istr * string) list
   | Vlist_value of (Driver.istr * string) list
@@ -332,21 +334,44 @@ and eval_simple_bool_var _conf _base env _xx = function
 
 and eval_simple_str_var conf _base env _xx = function
   | "cnt" -> eval_int_env "cnt" env
-  | "count" -> (
-      match get_env "count" env with Vcnt c -> string_of_int !c | _ -> "")
+  | "columns" -> (
+      match (get_env "list" env, p_getenv conf.env "data") with
+      | _, Some "src" -> ""
+      | Vlist_data l, data ->
+          let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+          Util.columns_style
+            ~wide:
+              (List.mem data
+                 [ Some "place"; Some "occu"; Some "title"; Some "domain" ])
+            (List.length l + (3 * List.length (combine_by_ini ini l)))
+      | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
+  | "entry_count" -> (
+      match get_env "list_value" env with
+      | Vlist_value l -> string_of_int (List.length l)
+      | _ -> raise Not_found)
+  | "entry_label" -> (
+      match get_env "list_value" env with
+      | Vlist_value l ->
+          let n = List.length l in
+          (Util.escape_html
+             (Printf.sprintf
+                (ftransl conf "%s %s starting with %s")
+                (thousands conf n)
+                (snd (translate_title conf n))
+                (eval_string_env "entry_ini" env))
+            :> string)
+      | _ -> raise Not_found)
+  | "entry_nb" -> (
+      match get_env "list_value" env with
+      | Vlist_value l -> thousands conf (List.length l)
+      | _ -> raise Not_found)
   | "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_ini_display" -> eval_string_env "entry_ini_display" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
-  | "incr_count" -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          incr c;
-          ""
-      | _ -> "")
   | "max" -> eval_int_env "max" env
   | "nb_results" -> (
       match get_env "list" env with
@@ -355,12 +380,6 @@ and eval_simple_str_var conf _base env _xx = function
   | "other" -> (
       match p_getenv conf.env "data" with
       | Some "place" -> Place.without_suburb (eval_string_env "entry_value" env)
-      | _ -> "")
-  | "reset_count" -> (
-      match get_env "count" env with
-      | Vcnt c ->
-          c := 0;
-          ""
       | _ -> "")
   | "script_class" -> eval_string_env "script_class" env
   | "script_title" -> eval_string_env "script_title" env
@@ -378,11 +397,7 @@ and eval_simple_str_var conf _base env _xx = function
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
-      let len2 =
-        Sosa.to_string_sep
-          (transl conf "(thousand separator)")
-          (Sosa.of_int len)
-      in
+      let len2 = thousands conf len in
       let _, book_name = translate_title conf len in
       match p_getenv_notrim conf.env "s" with
       | Some ini ->
@@ -576,11 +591,7 @@ let print_foreach conf print_ast _eval_expr =
 
 let print_mod conf base =
   let list = build_list conf base in
-  let env =
-    Templ.Env.empty
-    |> Templ.Env.add "list" (Vlist_data list)
-    |> Templ.Env.add "count" (Vcnt (ref 0))
-  in
+  let env = Templ.Env.empty |> Templ.Env.add "list" (Vlist_data list) in
   let ifun =
     Templ.
       {
