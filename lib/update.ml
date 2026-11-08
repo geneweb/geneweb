@@ -1028,7 +1028,7 @@ let error_bulk conf (st : BulkStatus.t) =
        (Util.escape_html user :> string)
        at
     |> Utf8.capitalize_fst |> Adef.safe);
-  Output.print_sstring conf {| <small class="text-muted">(|};
+  Output.print_sstring conf {| <small class="text-body-secondary">(|};
   Output.print_string conf (Util.escape_html st.command);
   Output.print_sstring conf {|)</small>.<br>|};
   Output.print_sstring conf
@@ -1041,25 +1041,7 @@ let error_bulk conf (st : BulkStatus.t) =
           bulk_retry_delay)
     |> Utf8.capitalize_fst);
   Output.print_sstring conf "</p></div>";
-  print_retry_forms ~form_id:"bulk-retry" conf;
-  Output.printf conf
-    {|<script>
-(function () {
-  var n = %d, span = document.getElementById("bulk-retry-delay");
-  span.textContent = n;
-  var t = setInterval(function () {
-    n -= 1;
-    span.textContent = n;
-    if (n <= 0) {
-      clearInterval(t);
-      /* the form has an input named "submit", which hides form.submit */
-      HTMLFormElement.prototype.submit.call(
-        document.getElementById("bulk-retry"));
-    }
-  }, 1000);
-})();
-</script>|}
-    bulk_retry_delay
+  print_retry_forms ~form_id:"bulk-retry" conf
 
 let error_digest conf =
   let err = UERR_digest in
