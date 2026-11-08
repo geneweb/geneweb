@@ -4,6 +4,7 @@ module Driver = Geneweb_db.Driver
 module Dict = Geneweb_db.Dict
 module Outbase = Geneweb_db.Outbase
 module BaseIndex = Geneweb_db.BaseIndex
+module Collection = Geneweb_db.Collection
 
 let particles_txt = [ "de_"; "d'" ]
 let particles = Mutil.compile_particles particles_txt
@@ -113,24 +114,36 @@ let with_base name budget k =
       Outbase.set_index_budget BaseIndex.default_budget)
   @@ fun () -> Driver.make name particles_txt data k
 
-(* Entries of [d] by scanning the records: key, string id and records. *)
-let scan d =
+(* Entries of [d] by scanning the records of [base]: key, string id and
+   records. *)
+let scan base d =
   let tbl = Hashtbl.create 16 in
   let add r istr =
     if istr <> 0 || d = Dict.First_name || d = Dict.Surname then
       Hashtbl.replace tbl istr
         (r :: Option.value ~default:[] (Hashtbl.find_opt tbl istr))
   in
-  let add_all r l = List.iter (add r) (List.sort_uniq Int.compare l) in
-  Array.iteri (fun i p -> add_all (2 * i) (Dict.person_strings d p)) persons;
-  Array.iteri
-    (fun i f ->
-      if f.fam_index >= 0 then add_all ((2 * i) + 1) (Dict.family_strings d f))
-    families;
+  let add_all r l =
+    List.iter (add r) (List.sort_uniq Int.compare (List.map Driver.Istr.hash l))
+  in
+  Collection.iter
+    (fun ip ->
+      add_all
+        (2 * Driver.Iper.hash ip)
+        (Dict.person_strings d
+           (Driver.gen_person_of_person (Driver.poi base ip))))
+    (Driver.ipers base);
+  Collection.iter
+    (fun ifam ->
+      add_all
+        ((2 * Driver.Ifam.hash ifam) + 1)
+        (Dict.family_strings d
+           (Driver.gen_family_of_family (Driver.foi base ifam))))
+    (Driver.ifams base);
   Hashtbl.fold
     (fun istr refs l ->
-      (Dict.key particles d strings.(istr), istr, List.sort Int.compare refs)
-      :: l)
+      let s = Driver.sou base (Driver.Istr.of_string (string_of_int istr)) in
+      (Dict.key particles d s, istr, List.sort Int.compare refs) :: l)
     tbl []
   |> List.sort compare
 
@@ -166,7 +179,7 @@ let prefixes entries =
 
 let check_dict base d =
   let name = Dict.to_string d in
-  let entries = scan d in
+  let entries = scan base d in
   let istrs l = List.map Driver.Istr.hash l in
   List.iter
     (fun p ->
@@ -240,11 +253,53 @@ let examples () =
     (List.map Driver.Iper.hash
        (fst (Driver.dict_records base Dict.Place (istr 16))))
 
+let patched () =
+  with_base "base_index_patched" 40 @@ fun base ->
+  let iper i = Driver.Iper.of_string (string_of_int i) in
+  let ifam i = Driver.Ifam.of_string (string_of_int i) in
+  let istr i = Driver.Istr.of_string (string_of_int i) in
+  let person i = Driver.gen_person_of_person (Driver.poi base (iper i)) in
+  let family i = Driver.gen_family_of_family (Driver.foi base (ifam i)) in
+  let check_all () = List.iter (check_dict base) Dict.all in
+  let lyon69 = Driver.insert_string base "Lyon (69)" in
+  Driver.patch_person base (iper 6) { (person 6) with death_place = lyon69 };
+  Driver.patch_person base (iper 1) { (person 1) with birth_place = istr 9 };
+  ignore
+    (Driver.replace_string base "Lyon, Rhône" "Lyon, Rhône-Alpes" : Driver.istr);
+  Driver.delete_person base (iper 3);
+  ignore
+    (Driver.insert_person_with_union_and_ascendants base
+       {
+         (person 5) with
+         key_index = Driver.Iper.dummy;
+         first_name = Driver.insert_string base "Zoé";
+       }
+       Driver.no_ascend Driver.no_union
+      : Driver.iper);
+  Driver.patch_family base (ifam 0) { (family 0) with marriage_place = istr 12 };
+  Driver.commit_patches base;
+  check_all ();
+  (check (list (pair string int)))
+    "moved and new places"
+    [ ("Lyon", 1); ("Lyon ", 1); ("Lyon,", 1) ]
+    (Driver.dict_groups base Dict.Place "Lyon");
+  (check int) "place left out" 0 (Driver.dict_size base Dict.Place "Paris,");
+  Driver.patch_person base (iper 0) { (person 0) with occupation = istr 0 };
+  ignore (Driver.replace_string base "Paris" "Paris (75)" : Driver.istr);
+  Driver.commit_patches base;
+  check_all ();
+  (check (list int))
+    "records of a moved place" [ 0; 1; 2 ]
+    (List.sort Int.compare
+       (List.map Driver.Iper.hash
+          (fst (Driver.dict_records base Dict.Place (istr 9)))))
+
 let v =
   [
     ( "base-index",
       [
         test_case "Index examples" `Quick examples;
+        test_case "Index corrected by the patches" `Quick patched;
         test_case "Index with blocks of 1" `Quick
           (index "base_index_default" BaseIndex.default_budget);
         test_case "Index with small blocks" `Quick (index "base_index_small" 40);

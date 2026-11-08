@@ -565,9 +565,10 @@ val spi_find : string_person_index -> istr -> iper list
 (** {2 Dictionaries}
 
     Queries over the index of the dictionaries ({!Dict}), written by gwc in
-    {i base.inx} and {i base.dat}. A prefix selects the entries whose key
-    ({!Dict.key}) starts with it: those whose displayed text starts with it.
-    Entries come in the order of their keys. *)
+    {i base.inx} and {i base.dat} and corrected by the committed patches. A
+    prefix selects the entries whose key ({!Dict.key}) starts with it: those
+    whose displayed text starts with it. Entries come in the order of their
+    keys. *)
 
 val dict_size : base -> Dict.t -> string -> int
 (** [dict_size base dict prefix] Number of entries starting with [prefix]. *)
