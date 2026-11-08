@@ -655,7 +655,9 @@ let treat_request =
                  @@ MergeIndDisplay.print_kill_ancestors
              | "L" ->
                  w_base @@ fun conf base ->
-                 Perso.interp_templ "list" conf base
+                 Perso.interp_templ "list"
+                   (UpdateDataDisplay.list_env conf base)
+                   base
                    (Driver.empty_person base Driver.Iper.dummy)
              | "LB" -> w_base @@ BirthDeathDisplay.print_birth
              | "LD" -> w_base @@ BirthDeathDisplay.print_death
