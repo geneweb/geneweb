@@ -206,6 +206,14 @@ val write :
     A failure is reported on stderr and otherwise ignored: the report must never
     make a build fail. *)
 
+val still_present : Geneweb_db.Driver.base -> t -> bool
+(** [still_present base a] replays the per-subject checks ({!CheckItem.person}
+    and {!CheckItem.family}) on the live [base] and tells whether an anomaly
+    with the same {!identity} as [a] is still produced. Used by the display to
+    hide anomalies corrected since the report was written.
+    [IncoherentAncestorDate] comes from an ancestry walk and is always reported
+    present. *)
+
 (** {1 Responsible wizard} *)
 
 type rule = First_signer | Last_signer
