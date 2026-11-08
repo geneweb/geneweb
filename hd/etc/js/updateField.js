@@ -240,5 +240,221 @@
         });
     }
   };
+  const BookEdit = {
+    a: null,
+    init() {
+      const form = document.getElementById('book-edit');
+      if (!form) return;
+      this.form = form;
+      this.field = form.elements.nx_input;
+      this.text = form.querySelector('.book-input-text');
+      this.extra = form.querySelector('.book-extra');
+      this.field.addEventListener('input', () => this.changed());
+      if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize(this.field);
+      }
+      document.addEventListener('click', ev => {
+        const a = ev.target.closest('#main-content a[data-entry]');
+        if (!a || ev.button || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+        ev.preventDefault();
+        this.open(a, null, this.caret(a, ev));
+      });
+      form.addEventListener('submit', ev => {
+        ev.preventDefault();
+        this.save();
+      });
+      form.querySelector('.btn-close').addEventListener('click', () => this.close());
+      this.field.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter' && !ev.isComposing) {
+          ev.preventDefault();
+          this.save();
+        } else if (ev.key === 'Escape') {
+          ev.preventDefault();
+          this.close();
+        } else if (ev.altKey && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight')) {
+          ev.preventDefault();
+          this.side(ev.key === 'ArrowLeft' ? -1 : 1);
+        } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+          ev.preventDefault();
+          this.move(ev.key === 'ArrowUp' ? -1 : 1);
+        }
+      });
+      const filter = document.getElementById('book-filter');
+      this.prefix = filter?.value;
+      filter?.addEventListener('input', () => this.filter(filter.value));
+      const p = new URLSearchParams(location.search);
+      const a = document.getElementById('k' + p.get('key'))
+        ?.querySelector('a[data-entry]');
+      if (a) this.open(a, p.get('s2'));
+    },
+    entries() {
+      return [...document.querySelectorAll(
+        '#main-content li:not([hidden]) a[data-entry]')];
+    },
+    move(step) {
+      const all = this.entries();
+      const next = all[all.indexOf(this.a) + step];
+      if (next) this.open(next);
+    },
+    side(step) {
+      const r = this.a.closest('li').getBoundingClientRect();
+      let best = null;
+      let bx = Infinity;
+      let by = Infinity;
+      for (const a of this.entries()) {
+        const q = a.closest('li').getBoundingClientRect();
+        const dx = step * (q.left - r.left);
+        if (dx < r.width / 2) continue;
+        const dy = Math.abs(q.top - r.top);
+        if (dx < bx - 1 || (dx <= bx + 1 && dy < by)) {
+          best = a;
+          bx = dx;
+          by = dy;
+        }
+      }
+      if (best) this.open(best);
+    },
+    caret(a, ev) {
+      let r = document.caretRangeFromPoint?.(ev.clientX, ev.clientY);
+      const p = !r && document.caretPositionFromPoint?.(ev.clientX, ev.clientY);
+      if (p) {
+        r = document.createRange();
+        r.setStart(p.offsetNode, p.offset);
+      }
+      if (!r || !a.contains(r.startContainer)) return null;
+      const pre = document.createRange();
+      pre.selectNodeContents(a);
+      pre.setEnd(r.startContainer, r.startOffset);
+      return pre.toString().trimStart().length;
+    },
+    changed() {
+      this.extra.hidden = this.field.value.trim() === this.original;
+    },
+    open(a, value, pos) {
+      this.a?.closest('li').classList.remove('book-current');
+      this.a = a;
+      const li = a.closest('li');
+      li.classList.add('book-current');
+      this.original = a.dataset.v ?? a.dataset.entry;
+      this.form.elements.key.value = li.id.slice(1);
+      this.text.textContent = this.original;
+      this.field.value = value || this.original;
+      this.changed();
+      bootstrap.Tooltip.getInstance(a)?.hide();
+      li.scrollIntoView({ block: 'nearest' });
+      const form = this.form;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const w = Math.min(Math.max(li.offsetWidth + 8 * rem, 24 * rem),
+        innerWidth - 2 * rem);
+      form.style.width = w + 'px';
+      form.hidden = false;
+      if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize.update(this.field);
+      }
+      const cs = getComputedStyle(this.field);
+      const fr = form.getBoundingClientRect();
+      const ir = this.field.getBoundingClientRect();
+      const ar = a.getBoundingClientRect();
+      const left = ar.left - (ir.left - fr.left)
+        - parseFloat(cs.borderLeftWidth) - parseFloat(cs.paddingLeft);
+      const top = ar.top - (ir.top - fr.top)
+        - parseFloat(cs.borderTopWidth) - parseFloat(cs.paddingTop);
+      form.style.left = scrollX + Math.min(Math.max(left, rem), innerWidth - w - rem) + 'px';
+      form.style.top = scrollY + top + 'px';
+      form.scrollIntoView({ block: 'nearest' });
+      const at = !value && pos !== null && pos !== undefined
+        && a.textContent.trim() === this.original ? pos : this.field.value.length;
+      this.field.focus({ preventScroll: true });
+      this.field.setSelectionRange(at, at);
+    },
+    close() {
+      const a = this.a;
+      if (!a) return;
+      this.a = null;
+      a.closest('li').classList.remove('book-current');
+      this.form.hidden = true;
+      if (a.isConnected) a.focus();
+    },
+    save() {
+      const a = this.a;
+      const form = this.form;
+      const value = this.field.value.trim();
+      if (!value || value === this.original) {
+        this.move(1);
+        return;
+      }
+      if (form.dataset.busy) return;
+      form.dataset.busy = '1';
+      const body = new URLSearchParams(new FormData(form));
+      body.set('nx_input', value);
+      body.set('ajax', '1');
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body })
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(data => {
+          delete form.dataset.busy;
+          if (!data.success) {
+            notify('danger', data.message || form.dataset.error);
+            return;
+          }
+          notify('success', toast(data.label, data.before, data.after));
+          if (!data.complete) return;
+          const here = this.a === a;
+          const all = this.entries();
+          const next = all[all.indexOf(a) + 1];
+          this.update(a, data);
+          if (!here) return;
+          if (next?.isConnected) this.open(next);
+          else this.close();
+        })
+        .catch(err => {
+          delete form.dataset.busy;
+          console.error('m=MOD_DATA_OK', err);
+          notify('danger', form.dataset.error);
+        });
+    },
+    update(a, data) {
+      const li = a.closest('li');
+      const other = document.getElementById('k' + data.key);
+      if (data.entry === null || (other && other !== li)) {
+        const ul = li.parentElement;
+        li.remove();
+        if (!ul.querySelector('a[data-entry]')) {
+          ul.previousElementSibling.remove();
+          ul.remove();
+        }
+        if (!document.querySelector('#main-content a[data-entry]')) {
+          location.href = data.url;
+        }
+        return;
+      }
+      li.id = 'k' + data.key;
+      const u = new URL(a.href);
+      u.searchParams.set('key', data.key);
+      a.href = u;
+      a.dataset.entry = data.entry;
+      if (data.after === data.entry) delete a.dataset.v;
+      else a.dataset.v = data.after;
+      (a.nextElementSibling ?? a).textContent = data.entry;
+    },
+    filter(q) {
+      const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+      const n = norm(q.trim());
+      const base = norm(this.prefix ?? '');
+      for (const ul of document.querySelectorAll('#main-content ul')) {
+        let shown = false;
+        for (const li of ul.children) {
+          const a = li.querySelector('a[data-entry]');
+          li.hidden = n !== base && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
+          shown ||= !li.hidden;
+        }
+        ul.hidden = ul.previousElementSibling.hidden = !shown;
+      }
+    }
+  };
+
   window.InplaceEdit = InplaceEdit;
+  window.BookEdit = BookEdit;
 })();
