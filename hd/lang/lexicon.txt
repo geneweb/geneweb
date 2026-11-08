@@ -1470,6 +1470,17 @@ sl: polbrata/polsestra/polbrat ali polsestra
 sv: en halvbror/en halvsyster/ett halvsyskon
 tr: bir üvey erkek kardeş/bir üvey kız kardeş/bir üvey kardeş
 
+    a large update started by %s at %s is in progress
+de: eine umfangreiche Änderung, gestartet von %s um %s, läuft gerade
+en: a large update started by %s at %s is in progress
+es: una actualización importante iniciada por %s a las %s está en curso
+fr: une mise à jour importante lancée par %s à %s est en cours
+it: un aggiornamento importante avviato da %s alle %s è in corso
+nl: een grote bijwerking, gestart door %s om %s, is bezig
+pl: trwa duża aktualizacja uruchomiona przez %s o %s
+pt: uma atualização importante iniciada por %s às %s está em curso
+sv: en stor uppdatering som startades av %s kl. %s pågår
+
     a nephew/a niece
 af: ’n %sbroerskind/’n %ssusterskind/%sbroers- en %ssusterskinders
 bg: %sплеменник/%sплеменница/%sплеменници/%sплеменнички/%sплеменници и %sплеменнички
@@ -13574,6 +13585,17 @@ sl: je ena in ista oseba!
 sv: det är samma person!
 tr: aynı kişi!
 
+    it will be resubmitted automatically in %s seconds
+de: sie wird in %s Sekunden automatisch erneut gesendet
+en: it will be resubmitted automatically in %s seconds
+es: se volverá a enviar automáticamente dentro de %s segundos
+fr: elle sera renvoyée automatiquement dans %s secondes
+it: sarà inviata di nuovo automaticamente tra %s secondi
+nl: het wordt over %s seconden automatisch opnieuw verzonden
+pl: zostanie automatycznie wysłane ponownie za %s sekund
+pt: será reenviado automaticamente dentro de %s segundos
+sv: den skickas automatiskt igen om %s sekunder
+
     itree
 co: arburu in I
 de: I-Baum
@@ -23260,21 +23282,6 @@ sv: fadern/modern/en förälder
 tr: baba/anne/ebeveyn
 zh: 父/母/a parent
 
-    a large update started by %s at %s is in progress
-de: eine umfangreiche Änderung, gestartet von %s um %s, läuft gerade
-en: a large update started by %s at %s is in progress
-fr: une mise à jour importante lancée par %s à %s est en cours
-
-    your request has not been applied yet
-de: Ihre Anfrage wurde noch nicht ausgeführt
-en: your request has not been applied yet
-fr: votre demande n'a pas encore été prise en compte
-
-    it will be resubmitted automatically in %s seconds
-de: sie wird in %s Sekunden automatisch erneut gesendet
-en: it will be resubmitted automatically in %s seconds
-fr: elle sera renvoyée automatiquement dans %s secondes
-
     the file is temporarily locked: please try again
 af: die lêer is tydelik gesluit: probeer asseblief later weer
 bg: файлът е временно заключен; опитайте отново. Ако това не помага, изчакайте малко преди да опитате пак
@@ -25918,6 +25925,17 @@ ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
+
+    your request has not been applied yet
+de: Ihre Anfrage wurde noch nicht ausgeführt
+en: your request has not been applied yet
+es: su solicitud aún no se ha aplicado
+fr: votre demande n’a pas encore été prise en compte
+it: la sua richiesta non è ancora stata applicata
+nl: uw verzoek is nog niet uitgevoerd
+pl: Twoje żądanie nie zostało jeszcze wykonane
+pt: o seu pedido ainda não foi aplicado
+sv: din begäran har inte utförts ännu
 
     zero-width character
 co: stu caratteru senza caccia hè statu allargatu per esse videvule

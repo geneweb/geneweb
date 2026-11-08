@@ -844,5 +844,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 </script>
 %end;
+%if;wizard;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const span = document.getElementById('bulk-retry-delay');
+  const form = document.getElementById('bulk-retry');
+  if (!span || !form) return;
+  let n = parseInt(span.textContent, 10);
+  const t = setInterval(() => {
+    span.textContent = --n;
+    if (n <= 0) {
+      clearInterval(t);
+      HTMLFormElement.prototype.submit.call(form);
+    }
+  }, 1000);
+});
+</script>
+%end;
 %end;%( closing “e.templ” of the DOMContentLoaded blocks, not indented for convenience %)
 %end;%( closing initial “not cancel_links”, not indented either %)
