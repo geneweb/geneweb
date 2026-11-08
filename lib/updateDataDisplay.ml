@@ -270,7 +270,7 @@ let print_mod_ok conf base =
 type 'a env =
   | Vbool of bool
   | Vint of int
-  | Vlist_data of (Driver.istr * string) list
+  | Vlist_data of book
   | Vlist_value of (Driver.istr * string) list
   | Vnone
   | Vother of 'a
@@ -361,23 +361,18 @@ and eval_simple_str_var conf _base env _xx = function
   | "columns" -> (
       match (get_env "list" env, p_getenv conf.env "data") with
       | _, Some "src" -> ""
-      | Vlist_data l, data ->
-          let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+      | Vlist_data b, data ->
           Util.columns_style
             ~wide:
               (List.mem data
                  [ Some "place"; Some "occu"; Some "title"; Some "domain" ])
-            (List.length l + (3 * List.length (combine_by_ini ini l)))
+            (b.count + (3 * List.length b.groups))
       | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
-  | "entry_count" -> (
-      match get_env "list_value" env with
-      | Vlist_value l -> string_of_int (List.length l)
-      | _ -> raise Not_found)
+  | "entry_count" -> eval_int_env "entry_count" env
   | "entry_label" -> (
-      match get_env "list_value" env with
-      | Vlist_value l ->
-          let n = List.length l in
+      match get_env "entry_count" env with
+      | Vint n ->
           (Util.escape_html
              (Printf.sprintf
                 (ftransl conf "%s %s starting with %s")
@@ -387,8 +382,8 @@ and eval_simple_str_var conf _base env _xx = function
             :> string)
       | _ -> raise Not_found)
   | "entry_nb" -> (
-      match get_env "list_value" env with
-      | Vlist_value l -> thousands conf (List.length l)
+      match get_env "entry_count" env with
+      | Vint n -> thousands conf n
       | _ -> raise Not_found)
   | "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_ini_display" -> eval_string_env "entry_ini_display" env
@@ -399,7 +394,7 @@ and eval_simple_str_var conf _base env _xx = function
   | "max" -> eval_int_env "max" env
   | "nb_results" -> (
       match get_env "list" env with
-      | Vlist_data l -> string_of_int (List.length l)
+      | Vlist_data b -> string_of_int b.count
       | _ -> "0")
   | "other" -> (
       match p_getenv conf.env "data" with
@@ -419,7 +414,7 @@ and eval_simple_str_var conf _base env _xx = function
       Utf8.capitalize_fst book_of
   | "subtitle" -> (
       let len =
-        match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
+        match get_env "list" env with Vlist_data b -> b.count | _ -> 0
       in
       let len2 = thousands conf len in
       let _, book_name = translate_title conf len in
@@ -488,14 +483,15 @@ let print_foreach conf print_ast _eval_expr =
     | [ "value" ] -> print_foreach_value env xx al
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
-    let list = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let list = build_list_long conf list in
+    let list =
+      match get_env "list" env with Vlist_data b -> b.groups | _ -> []
+    in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
     let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
 
     List.iteri
-      (fun i (ini_k, (list_v : (Driver.istr * string) list)) ->
+      (fun i (ini_k, n, list_v) ->
         let display_ini =
           let should_truncate =
             (String.length current_s > 6 && max > 6)
@@ -542,6 +538,7 @@ let print_foreach conf print_ast _eval_expr =
                  (Vstring (Option.fold ~none:"" ~some:fst script_info))
             |> add "script_title"
                  (Vstring (Option.fold ~none:"" ~some:snd script_info))
+            |> add "entry_count" (Vint n)
             |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)
@@ -603,8 +600,18 @@ let print_foreach conf print_ast _eval_expr =
     in
     loop 0 l ""
   and print_foreach_initial env xx al =
-    let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let ini_l = build_list_short conf l in
+    let ini_l =
+      match get_env "list" env with
+      | Vlist_data b -> (
+          match
+            List.fold_left
+              (fun acc (_, _, l) -> List.rev_append l acc)
+              [] b.groups
+          with
+          | [] -> List.map (fun (ini, _, _) -> ini) b.groups
+          | l -> build_list_short conf l)
+      | _ -> []
+    in
     List.iter
       (fun ini ->
         let env = Templ.Env.add "ini" (Vstring ini) env in
@@ -614,8 +621,9 @@ let print_foreach conf print_ast _eval_expr =
   print_foreach
 
 let print_mod conf base =
-  let list = build_list conf base in
-  let env = Templ.Env.empty |> Templ.Env.add "list" (Vlist_data list) in
+  let env =
+    Templ.Env.empty |> Templ.Env.add "list" (Vlist_data (book conf base))
+  in
   let ifun =
     Templ.
       {
