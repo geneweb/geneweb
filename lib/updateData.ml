@@ -4,6 +4,7 @@ open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
+module Dict = Geneweb_db.Dict
 module Istr = Driver.Istr
 
 module PersSet = Set.Make (struct
@@ -19,165 +20,81 @@ module StringSet = Set.Make (String)
    Later, we should update places values while keeping the suburb value.
 *)
 
-let get_title p = List.map (fun t -> t.t_ident) (Driver.get_titles p)
-let get_domain p = List.map (fun t -> t.t_place) (Driver.get_titles p)
-let get_occupation_x p = [ Driver.get_occupation p ]
-let get_birth_place_x p = [ Driver.get_birth_place p ]
-let get_baptism_place_x p = [ Driver.get_baptism_place p ]
-let get_death_place_x p = [ Driver.get_death_place p ]
-let get_burial_place_x p = [ Driver.get_burial_place p ]
-let get_birth_src_x p = [ Driver.get_birth_src p ]
-let get_baptism_src_x p = [ Driver.get_baptism_src p ]
-let get_death_src_x p = [ Driver.get_death_src p ]
-let get_burial_src_x p = [ Driver.get_burial_src p ]
-let get_burial__src_x p = [ Driver.get_burial_src p ]
-let get_psources_x p = [ Driver.get_psources p ]
-let get_first_name_x p = [ Driver.get_first_name p ]
-let get_surname_x p = [ Driver.get_surname p ]
-let get_public_name_x p = [ Driver.get_public_name p ]
-let get_epers_place evt = evt.epers_place
-let get_epers_place_x p = [ get_epers_place p ]
-let get_epers_src evt = evt.epers_src
-let get_epers_src_x p = [ get_epers_src p ]
-let get_marriage_place_x p = [ Driver.get_marriage_place p ]
-let get_efam_place evt = evt.efam_place
-let get_efam_place_x p = [ get_efam_place p ]
-let get_marriage_src_x p = [ Driver.get_marriage_src p ]
-let get_fsources_x p = [ Driver.get_fsources p ]
-let get_efam_src evt = evt.efam_src
-let get_efam_src_x p = [ get_efam_src p ]
-
-let get_data conf =
-  match p_getenv conf.env "data" with
-  | Some "occu" -> ([ get_occupation_x ], [], [], [])
-  | Some "place" ->
-      ( [
-          get_birth_place_x;
-          get_baptism_place_x;
-          get_death_place_x;
-          get_burial_place_x;
-        ],
-        [ get_epers_place_x ],
-        [ get_marriage_place_x ],
-        [ get_efam_place_x ] )
-  | Some "src" ->
-      ( [
-          get_birth_src_x;
-          get_baptism_src_x;
-          get_death_src_x;
-          get_burial_src_x;
-          get_psources_x;
-        ],
-        [ get_epers_src_x ],
-        [ get_marriage_src_x; get_fsources_x ],
-        [ get_efam_src_x ] )
-  | Some "fn" -> ([ get_first_name_x ], [], [], [])
-  | Some "sn" -> ([ get_surname_x ], [], [], [])
-  | Some "fna" -> ([ Driver.get_first_names_aliases ], [], [], [])
-  | Some "sna" -> ([ Driver.get_surnames_aliases ], [], [], [])
-  | Some "alias" -> ([ Driver.get_aliases ], [], [], [])
-  | Some "qual" -> ([ Driver.get_qualifiers ], [], [], [])
-  | Some "pubn" -> ([ get_public_name_x ], [], [], [])
-  | Some "title" -> ([ get_title ], [], [], [])
-  | Some "domain" -> ([ get_domain ], [], [], [])
-  | _ -> ([], [], [], [])
+let dict conf = Option.bind (p_getenv conf.env "data") Dict.of_string
 
 let get_all_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
-  let aux : 'a. 'a -> Istr.Set.t -> ('a -> Driver.istr list) -> Istr.Set.t =
-   fun arg acc get ->
-    let strings = get arg in
-    List.fold_left
-      (fun acc istr ->
-        if not (Driver.Istr.is_empty istr) then Istr.Set.add istr acc else acc)
-      acc strings
-  in
-  let acc =
-    Collection.fold
-      (fun acc i ->
-        let p = pget conf base i in
-        let acc = List.fold_left (fun acc get -> aux p acc get) acc get_p in
-        let pevents = Driver.get_pevents p in
+  match dict conf with
+  | None -> []
+  | Some d ->
+      let add acc l =
         List.fold_left
-          (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents)
-          acc get_pe)
-      Istr.Set.empty
-      (Geneweb_db.Driver.ipers base)
-  in
-  let acc =
-    if get_f = [] && get_fe = [] then acc
-    else
-      Collection.fold
-        (fun acc i ->
-          let f = Driver.foi base i in
-          let acc = List.fold_left (fun acc get -> aux f acc get) acc get_f in
-          let fevents = Driver.get_fevents f in
-          List.fold_left
-            (fun acc fn ->
-              List.fold_left (fun acc e -> aux e acc fn) acc fevents)
-            acc get_fe)
-        acc
-        (Geneweb_db.Driver.ifams base)
-  in
-  Istr.Set.elements acc
+          (fun acc istr ->
+            if Driver.Istr.is_empty istr then acc else Istr.Set.add istr acc)
+          acc l
+      in
+      let acc =
+        Collection.fold
+          (fun acc i ->
+            add acc
+              (Dict.person_strings d
+                 (Driver.gen_person_of_person (pget conf base i))))
+          Istr.Set.empty (Driver.ipers base)
+      in
+      let acc =
+        if Dict.has_family_fields d then
+          Collection.fold
+            (fun acc i ->
+              add acc
+                (Dict.family_strings d
+                   (Driver.gen_family_of_family (Driver.foi base i))))
+            acc (Driver.ifams base)
+        else acc
+      in
+      Istr.Set.elements acc
 
 let get_person_from_data conf base =
-  let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Driver.Istr.of_string @@ (List.assoc "key" conf.env :> string) in
-  let add acc (istr : Driver.istr) p =
-    try Istr.Map.add istr (PersSet.add p @@ Istr.Map.find istr acc) acc
-    with Not_found -> Istr.Map.add istr (PersSet.add p PersSet.empty) acc
-  in
-  let aux (fn : PersSet.t Istr.Map.t -> Driver.istr -> PersSet.t Istr.Map.t) arg
-      acc get =
-    let istr' = get arg in
-    (* FIXME was istr = istr' ! is this correct *)
-    if List.mem istr istr' then fn acc istr else acc
-  in
-  let fold_persons f acc =
-    let by_index spi = List.fold_left f acc (Driver.spi_find (spi base) istr) in
-    match p_getenv conf.env "data" with
-    | Some "fn" -> by_index Driver.persons_of_first_name
-    | Some "sn" -> by_index Driver.persons_of_surname
-    | _ -> Collection.fold f acc (Driver.ipers base)
-  in
-  let acc =
-    fold_persons
-      (fun acc i ->
-        let p = pget conf base i in
-        let add acc istr = add acc istr p in
-        let acc = List.fold_left (aux add p) acc get_p in
-        let pevents = Driver.get_pevents p in
-        List.fold_left
-          (fun acc fn ->
-            List.fold_left (fun acc e -> aux add e acc fn) acc pevents)
-          acc get_pe)
-      Istr.Map.empty
-  in
-  let acc =
-    if get_f = [] && get_fe = [] then acc
-    else
-      Collection.fold
-        (fun acc i ->
-          let f = Driver.foi base i in
-          let add acc istr =
-            add
-              (add acc istr (pget conf base (Driver.get_father f)))
-              istr
-              (pget conf base (Driver.get_mother f))
-          in
-          let acc = List.fold_left (aux add f) acc get_f in
-          let fevents = Driver.get_fevents f in
-          List.fold_left
-            (fun acc fn ->
-              List.fold_left (fun acc e -> aux add e acc fn) acc fevents)
-            acc get_fe)
-        acc
-        (Geneweb_db.Driver.ifams base)
-  in
-  Istr.Map.fold
-    (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
-    acc []
+  match dict conf with
+  | None -> []
+  | Some d ->
+      let uses l = List.exists (Driver.Istr.equal istr) l in
+      let fold_persons f acc =
+        match d with
+        | Dict.First_name ->
+            List.fold_left f acc
+              (Driver.spi_find (Driver.persons_of_first_name base) istr)
+        | Dict.Surname ->
+            List.fold_left f acc
+              (Driver.spi_find (Driver.persons_of_surname base) istr)
+        | Dict.(
+            ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
+            | Occupation | Place | Source | Title | Domain )) ->
+            Collection.fold f acc (Driver.ipers base)
+      in
+      let acc =
+        fold_persons
+          (fun acc i ->
+            let p = pget conf base i in
+            if uses (Dict.person_strings d (Driver.gen_person_of_person p)) then
+              PersSet.add p acc
+            else acc)
+          PersSet.empty
+      in
+      let acc =
+        if Dict.has_family_fields d then
+          Collection.fold
+            (fun acc i ->
+              let f = Driver.foi base i in
+              if uses (Dict.family_strings d (Driver.gen_family_of_family f))
+              then
+                PersSet.add
+                  (pget conf base (Driver.get_mother f))
+                  (PersSet.add (pget conf base (Driver.get_father f)) acc)
+              else acc)
+            acc (Driver.ifams base)
+        else acc
+      in
+      if PersSet.is_empty acc then [] else [ (istr, PersSet.elements acc) ]
 
 let combine_by_ini ini list =
   let len = Utf8.length ini + 1 in
@@ -501,7 +418,7 @@ let update_family conf base old new_istr fam =
     - unit [Rem] : Non exporté en clair hors de ce module. *)
 let update_person_list conf base new_input list nb_pers max_updates =
   let test_family =
-    match get_data conf with _, _, [], [] -> false | _ -> true
+    Option.fold ~none:false ~some:Dict.has_family_fields (dict conf)
   in
   let action =
     match p_getenv conf.env "data" with

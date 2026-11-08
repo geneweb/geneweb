@@ -14,33 +14,9 @@ module Gutil = Geneweb_db.Gutil
 let max_rlm_nbr_default = 80
 
 let suburb_aux sub nosub s =
-  let len = String.length s in
-  if len = 0 then nosub ""
-  else if String.unsafe_get s 0 = '[' then
-    match String.index_opt s ']' with
-    | None -> nosub s
-    | Some i -> (
-        match
-          let rec loop b i =
-            if i = len then None
-            else
-              match Char.code s.[i] with
-              | 0x20 -> loop b (i + 1)
-              | 0x2D when not b -> loop true (i + 1) (* hyphen *)
-              (* handle en and em dash as well *)
-              | 0xE2
-                when Char.code s.[i + 1] = 0x80
-                     && (Char.code s.[i + 2] = 0x93
-                        || Char.code s.[i + 2] = 0x94)
-                     && not b ->
-                  loop true (i + 3)
-              | _ -> if b then Some i else None
-          in
-          loop false (i + 1)
-        with
-        | None -> nosub s
-        | Some j -> sub s len i j)
-  else nosub s
+  match Geneweb_db.Dict.suburb s with
+  | Some (i, j) -> sub s (String.length s) i j
+  | None -> nosub s
 
 (** [split_suburb "[foo-bar] - boobar (baz)"] is ["foo-bar", "boobar (baz)")] *)
 let split_suburb =
@@ -55,8 +31,7 @@ let only_suburb =
 
 (** [without_suburb "[foo-bar] - boobar (baz)"] is ["boobar (baz)"]
     [without_suburb "boobar (baz)"] is ["boobar (baz)"] *)
-let without_suburb =
-  suburb_aux (fun s len _i j -> String.sub s j (len - j)) (fun s -> s)
+let without_suburb = Geneweb_db.Dict.without_suburb
 
 let normalize =
   suburb_aux

@@ -5,6 +5,7 @@
   test
   sosa_test
   place_test
+  dict_test
   place_rename_test
   source_test
   calendar_test

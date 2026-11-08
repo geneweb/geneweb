@@ -2,6 +2,7 @@ open Config
 open Def
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
+module Dict = Geneweb_db.Dict
 module IT = Driver.Istr.Table
 
 type occurrence = Driver.istr * int option
@@ -97,27 +98,13 @@ type field = Place | Source
 type usage = int ref IT.t
 
 let uses u i = match IT.find_opt u i with Some r -> !r | None -> 0
+let dict field = match field with Place -> Dict.Place | Source -> Dict.Source
 
-let person_places p =
-  Driver.get_birth_place p :: Driver.get_baptism_place p
-  :: Driver.get_death_place p :: Driver.get_burial_place p
-  :: List.map (fun e -> e.epers_place) (Driver.get_pevents p)
+let person_fields field p =
+  Dict.person_strings (dict field) (Driver.gen_person_of_person p)
 
-let family_places f =
-  Driver.get_marriage_place f
-  :: List.map (fun e -> e.efam_place) (Driver.get_fevents f)
-
-let person_sources p =
-  Driver.get_psources p :: Driver.get_birth_src p :: Driver.get_baptism_src p
-  :: Driver.get_death_src p :: Driver.get_burial_src p
-  :: List.map (fun e -> e.epers_src) (Driver.get_pevents p)
-
-let family_sources f =
-  Driver.get_fsources f :: Driver.get_marriage_src f
-  :: List.map (fun e -> e.efam_src) (Driver.get_fevents f)
-
-let person_fields = function Place -> person_places | Source -> person_sources
-let family_fields = function Place -> family_places | Source -> family_sources
+let family_fields field f =
+  Dict.family_strings (dict field) (Driver.gen_family_of_family f)
 
 (* the fields of [field] of a person or family moved by [f] *)
 let map_person field f (gp : (_, _, Driver.istr) gen_person) =
