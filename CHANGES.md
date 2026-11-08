@@ -156,6 +156,14 @@
   older `gwc` accept.
 - `gwb2ged` exports the witness note as a `NOTE` of the witness `ASSO`,
   and `ged2gwb` reads it back.
+- `gwc` writes the index of the dictionaries of the base (first names,
+  surnames, places, sources…) in `base.inx` and `base.dat`: the entries
+  of each dictionary in sorted order, with the persons and families
+  using them. `-index-budget <KiB>` sets the size of the landmarks of
+  each dictionary, kept in memory to search it (1024 KiB by default: on
+  a large base, a larger size reads fewer strings per search).
+  `gwc -reindex <base>` rebuilds this index alone for an existing base,
+  without importing it again.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person

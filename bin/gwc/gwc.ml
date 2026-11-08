@@ -121,6 +121,7 @@ let just_comp = ref false
 let kill_gwo = ref false
 let no_warn = ref false
 let ngrams_arg = ref None
+let reindex = ref false
 let prog = ref false
 let default_separate = false
 let separate = ref default_separate
@@ -160,6 +161,10 @@ let rev_inputs : input list ref = ref []
 let add_input i = rev_inputs := i :: !rev_inputs
 let output : string option ref = ref None
 let set_output s = output := Some s
+
+let set_reindex s =
+  reindex := true;
+  set_output s
 
 (* Parse -ngrams argument: <bi>[,<tri>[,<quad>]] *)
 let parse_ngrams s =
@@ -202,6 +207,10 @@ let speclist =
     );
     ("-f", Arg.Set GWPARAM.force, " Remove database if already existing");
     ("-gwo", Arg.Set kill_gwo, " Suppress .gwo files after base creation");
+    ( "-index-budget",
+      Arg.Int (fun n -> Geneweb_db.Outbase.set_index_budget (1024 * max 1 n)),
+      "<KiB> Size of the landmarks of each dictionary of the index (default \
+       1024)" );
     ("-mem", Arg.Set Geneweb_db.Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
@@ -222,6 +231,9 @@ let speclist =
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
     ("-q", Arg.Clear Gwcomp.verbose, " Quiet");
+    ( "-reindex",
+      Arg.String set_reindex,
+      "<base> Only rebuild the index of the dictionaries of an existing base" );
     ("-reorg", Arg.Set GWPARAM.reorg, " Mode reorg");
     ("-rgpd", Arg.String (fun s -> Gwcomp.rgpd_dir := s), "<dir> Rgpd directory");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
@@ -279,6 +291,8 @@ let parse_output inputs output =
 let parse_cmd () =
   Arg.parse speclist anonfun errmsg;
   let inputs = List.rev !rev_inputs in
+  if !reindex && inputs <> [] then
+    raise_bad "-reindex rebuilds an existing base and takes no input file.";
   let bname = parse_output inputs !output in
   (* derive only now, once all options (incl. -bd) are known *)
   (if !bases_dir = None then
@@ -310,10 +324,27 @@ let cleanup gwo_files =
     (fun (fname, _, _, _, was_gw) -> if was_gw then Mutil.rm fname)
     gwo_files
 
+let reindex_database bname =
+  let bdir = !GWPARAM.bpath bname in
+  if not (Sys.file_exists bdir) then (
+    Fmt.epr "Database %S not found.@." bname;
+    exit 2);
+  let on_exn exn bt =
+    Fmt.epr "%a@." Lock.pp_exception (exn, bt);
+    exit 2
+  in
+  Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bdir)
+  @@ fun () ->
+  let (), duration = with_timer @@ fun () -> Geneweb_db.Driver.reindex bdir in
+  Format.eprintf "Index generation: %a@." pp_duration duration
+
 let () =
   let inputs, bname, bases_dir, gw_prefix = parse_cmd () in
   Secure.set_base_dir bases_dir;
   GWPARAM.init ();
+  if !reindex then (
+    reindex_database bname;
+    exit 0);
   let dist_etc_d = gw_prefix // "etc" in
   if !Db1link.particules_file = "" then
     Db1link.particules_file := dist_etc_d // "particles.txt";

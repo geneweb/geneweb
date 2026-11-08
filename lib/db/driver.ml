@@ -285,6 +285,13 @@ let make bname particles arrays k =
   Database.make bname particles arrays (sync ~scratch:true);
   with_database bname k
 
+let reindex bname =
+  Database.with_database ~with_patches:false bname (fun base ->
+      load_persons_array base;
+      load_families_array base;
+      load_strings_array base;
+      Outbase.output_index base)
+
 let bfname base fname = Filename.concat base.data.bdir fname
 
 module NLDB = struct

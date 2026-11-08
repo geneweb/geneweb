@@ -17,6 +17,7 @@
     -f                            Remove database if already existing
     -gwo                          Suppress .gwo files after base creation
     -hd <DIR>                     Specify where "etc", "images" and "lang" directories are installed.
+    -index-budget <KiB>           Size of the landmarks of each dictionary of the index (default 1024)
     -mem                          Save memory, but slower
     -nc                           No consistency check
     -ngrams <bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or '500')
@@ -28,6 +29,7 @@
     -particles <file>             Particles file (default = predefined particles)
     -prog                         show progress bar
     -q                            Quiet
+    -reindex <base>               Only rebuild the index of the dictionaries of an existing base
     -reorg                        Mode reorg
     -rgpd <dir>                   Rgpd directory
     -roglo_special                Special treatment for Roglo (ignore multiple relations definitions)
@@ -60,6 +62,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -86,6 +89,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -117,6 +121,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -143,6 +148,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -169,6 +175,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -195,6 +202,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -205,3 +213,13 @@
   Database generation: 0 min 0 sec
   ../galichet.gwo galichet.gwo differ: char 16, line 1
   [1]
+
+  $ gwc -bd . -reindex galichet
+  Index generation: 0 min 0 sec
+  $ ls galichet.gwb/base.inx galichet.gwb/base.dat
+  galichet.gwb/base.dat
+  galichet.gwb/base.inx
+
+  $ gwc -bd . -reindex nobase
+  Database "nobase" not found.
+  [2]

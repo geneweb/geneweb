@@ -8,6 +8,8 @@ let load_descends_array base = base.data.descends.load_array ()
 let load_strings_array base = base.data.strings.load_array ()
 let save_mem = ref false
 let verbose = Mutil.verbose
+let index_budget = ref BaseIndex.default_budget
+let set_index_budget n = index_budget := n
 
 let trace s =
   if !verbose then (
@@ -473,6 +475,8 @@ let output base =
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
+  let tmp_index_inx = Filename.concat bname "1base.inx" in
+  let tmp_index_dat = Filename.concat bname "1base.dat" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
   load_ascends_array base;
@@ -531,6 +535,9 @@ let output base =
      Position.output oc couples_array_pos;
      Position.output oc descends_array_pos;
      Position.output oc strings_array_pos;
+     trace "create dictionaries index";
+     BaseIndex.output ~budget:!index_budget base.data ~inx:tmp_index_inx
+       ~dat:tmp_index_dat;
      base.data.families.clear_array ();
      base.data.descends.clear_array ();
      close_out oc;
@@ -611,6 +618,8 @@ let output base =
      Mutil.rm tmp_names_inx;
      Mutil.rm tmp_names_acc;
      Mutil.rm tmp_strings_inx;
+     Mutil.rm tmp_index_inx;
+     Mutil.rm tmp_index_dat;
      Mutil.rm_rf tmp_notes_d;
      raise e);
   safe_rename tmp_base (Filename.concat bname "base");
@@ -622,6 +631,8 @@ let output base =
   safe_rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
   safe_rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
   safe_rename tmp_strings_inx (Filename.concat bname "strings.inx");
+  safe_rename tmp_index_dat (Filename.concat bname "base.dat");
+  safe_rename tmp_index_inx (Filename.concat bname "base.inx");
   safe_rename tmp_particles (Filename.concat bname "particles.txt");
   Mutil.rm (Filename.concat bname "notes");
   if Sys.file_exists tmp_notes then
@@ -647,3 +658,16 @@ let output base =
   Mutil.rm (Filename.concat bname "tstab_visitor");
   (* final test against 4Go size limit *)
   test_size bname
+
+let output_index base =
+  let bname = base.data.bdir in
+  let tmp_inx = Filename.concat bname "1base.inx" in
+  let tmp_dat = Filename.concat bname "1base.dat" in
+  (try
+     BaseIndex.output ~budget:!index_budget base.data ~inx:tmp_inx ~dat:tmp_dat
+   with e ->
+     Mutil.rm tmp_inx;
+     Mutil.rm tmp_dat;
+     raise e);
+  safe_rename tmp_dat (Filename.concat bname "base.dat");
+  safe_rename tmp_inx (Filename.concat bname "base.inx")
