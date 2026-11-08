@@ -242,6 +242,14 @@ let label g =
   let n = String.length g in
   if n > 0 && g.[n - 1] = '\000' then String.sub g 0 (n - 1) else g
 
+type stamp = int * int64 * float
+
+let stamp_of st = Unix.LargeFile.(st.st_ino, st.st_size, st.st_mtime)
+
+let stamp fname =
+  try Some (stamp_of (Unix.LargeFile.stat fname))
+  with Unix.Unix_error _ -> None
+
 type source = {
   file_person : int -> dsk_person;
   persons_len : int;
@@ -252,6 +260,7 @@ type source = {
   person_patches : (int, dsk_person) Hashtbl.t;
   family_patches : (int, dsk_family) Hashtbl.t;
   string_patches : (int, string) Hashtbl.t;
+  patches_stamp : stamp option;
 }
 
 type file_section = {
@@ -433,6 +442,33 @@ let groups next_entry count p =
   in
   loop p []
 
+type memo = {
+  inx : stamp;
+  sections : (int * section) list;
+  landmarks : (int, string array) Hashtbl.t;
+  mutable patches : stamp option;
+  mutable corrections : (Dict.t, correction) Hashtbl.t;
+}
+
+let memos = Hashtbl.create 1
+
+let memo_of fname ic =
+  let inx = stamp_of (Unix.LargeFile.fstat (Unix.descr_of_in_channel ic)) in
+  match Hashtbl.find_opt memos fname with
+  | Some m when m.inx = inx -> m
+  | Some _ | None ->
+      let m =
+        {
+          inx;
+          sections = List.map (fun s -> (s.code, s)) (input_sections fname ic);
+          landmarks = Hashtbl.create 12;
+          patches = None;
+          corrections = Hashtbl.create 12;
+        }
+      in
+      Hashtbl.replace memos fname m;
+      m
+
 let with_reader bdir ~particles src k =
   let fname = Filename.concat bdir "base.inx" in
   let inx = lazy (Secure.open_in_bin fname) in
@@ -442,25 +478,28 @@ let with_reader bdir ~particles src k =
       close inx;
       close dat)
   @@ fun () ->
-  let sections =
-    lazy
-      (let ic = Lazy.force inx in
-       List.map
-         (fun s -> (s.code, (s, lazy (input_landmarks ic s))))
-         (input_sections fname ic))
-  in
+  let memo = lazy (memo_of fname (Lazy.force inx)) in
   let current_string i =
     match Hashtbl.find_opt src.string_patches i with
     | Some s -> s
     | None -> src.file_string i
   in
   let file_section d =
-    let s, landmarks =
-      match List.assoc_opt (code d) (Lazy.force sections) with
-      | Some (s, landmarks) -> (s, Lazy.force landmarks)
+    let m = Lazy.force memo in
+    let s =
+      match List.assoc_opt (code d) m.sections with
+      | Some s -> s
       | None -> failwith (fname ^ ": no dictionary " ^ Dict.to_string d)
     in
     let inx = Lazy.force inx in
+    let landmarks =
+      match Hashtbl.find_opt m.landmarks s.code with
+      | Some l -> l
+      | None ->
+          let l = input_landmarks inx s in
+          Hashtbl.replace m.landmarks s.code l;
+          l
+    in
     let key_of str = Dict.key (Lazy.force particles) d str in
     let istr r = istr_at inx s r in
     let key r = key_of (src.file_string (istr r)) in
@@ -484,9 +523,21 @@ let with_reader bdir ~particles src k =
     let refs r = input_refs (Lazy.force dat) (pos_at inx s r) in
     ({ s; istr; key; lower_bound; rank; count; refs }, key_of)
   in
-  let corrections = Hashtbl.create 12 in
+  let corrections =
+    ref
+      (lazy
+        (let m = Lazy.force memo in
+         match src.patches_stamp with
+         | None -> Hashtbl.create 12
+         | Some _ as st ->
+             if st <> m.patches then (
+               m.patches <- st;
+               m.corrections <- Hashtbl.create 12);
+             m.corrections))
+  in
   let view d =
     let f, key_of = file_section d in
+    let corrections = Lazy.force !corrections in
     let c =
       match Hashtbl.find_opt corrections d with
       | Some c -> c
@@ -521,4 +572,4 @@ let with_reader bdir ~particles src k =
   let dict_first d str = entry_from d (key_of d str) in
   let dict_after d i = entry_from d (key_of d (current_string i) ^ "\000") in
   k { dict_size; dict_groups; dict_entries; dict_refs; dict_first; dict_after }
-    (fun () -> Hashtbl.reset corrections)
+    (fun () -> corrections := lazy (Hashtbl.create 12))

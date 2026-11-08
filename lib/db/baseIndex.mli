@@ -25,6 +25,13 @@ val output : budget:int -> Dbdisk.base_data -> inx:string -> dat:string -> unit
     aside, to the files [inx] and [dat]. The block size of a section is the
     smallest power of 2 whose landmarks fit in [budget] bytes. *)
 
+type stamp
+(** Version of a file: inode, size and modification time. *)
+
+val stamp : string -> stamp option
+(** [stamp fname] is the version of the file [fname], [None] if it does not
+    exist. *)
+
 type source = {
   file_person : int -> Dbdisk.dsk_person;
   persons_len : int;
@@ -35,9 +42,11 @@ type source = {
   person_patches : (int, Dbdisk.dsk_person) Hashtbl.t;
   family_patches : (int, Dbdisk.dsk_family) Hashtbl.t;
   string_patches : (int, string) Hashtbl.t;
+  patches_stamp : stamp option;
 }
 (** What the index is read with: the records and strings of the files of the
-    base, patches left aside, their numbers, and the committed patches. *)
+    base, patches left aside, their numbers, the committed patches and the
+    version of the file they were read from, taken before reading it. *)
 
 val with_reader :
   string ->
@@ -55,6 +64,12 @@ val with_reader :
     is compared to its version in the files, and a string rewritten by
     replace_string moves to its new key. An entry no longer used by any record
     is left out, a string newly used is added.
+
+    The process keeps the directory and the landmarks of a version of
+    {i base.inx}, and its corrections by a version of the patches, for the next
+    readers of the same versions: a worker of gwd reads and corrects them once
+    per commit of the base. Patches without version are corrected for this
+    reader only, as are the patches after a commit of this reader.
 
     @raise Dutil.Incompatible_format
       at the first query if {i base.inx} is not in the format of this version.

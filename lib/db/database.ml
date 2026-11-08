@@ -1080,6 +1080,9 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
         raise (Dutil.Incompatible_format (fname, found, Dutil.base_magics))
   in
   let witness_notes = has_witness_notes version in
+  let patches_stamp =
+    if with_patches then BaseIndex.stamp (bname // "patches") else None
+  in
   let patches =
     if with_patches then input_patches ~witness_notes bname
     else Ok (empty_patch_ht ())
@@ -1529,6 +1532,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       person_patches = snd patches.h_person;
       family_patches = snd patches.h_family;
       string_patches = snd patches.h_string;
+      patches_stamp;
     }
   @@ fun dict_index reset_dict_index ->
   let commit_patches () =
