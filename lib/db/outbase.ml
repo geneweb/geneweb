@@ -642,7 +642,6 @@ let output base =
   Mutil.rm (Filename.concat bname "notes_link");
   Mutil.rm (Filename.concat bname "restrict");
   Mutil.rm (Filename.concat bname "tstab_visitor");
-  Mutil.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
   Mutil.rm (Filename.concat bname "tstab");
   Mutil.rm (Filename.concat bname "tstab_visitor");
