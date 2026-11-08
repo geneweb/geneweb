@@ -96,7 +96,7 @@ let of_places inverted places =
       | x -> x)
 
 let build conf base =
-  PlaceTerms.place_uses conf base
+  PlaceTerms.place_uses base
   |> List.map (fun (istr, uses) -> (istr, Driver.sou base istr, uses))
   |> of_places (Place.places_inverted conf)
 

@@ -1,6 +1,5 @@
-open Def
-open Config
 module Driver = Geneweb_db.Driver
+module Dict = Geneweb_db.Dict
 
 type dict_type =
   | Fnames
@@ -1457,24 +1456,6 @@ let get_highlight_style error_type conf =
   | HtmlEntities -> with_message "he"
   | FrenchOrdinals -> with_message "fo"
 
-(* Event accessors *)
-let get_epers_place evt = evt.epers_place
-let get_epers_src evt = evt.epers_src
-let get_efam_place evt = evt.efam_place
-let get_efam_src evt = evt.efam_src
-
-(* Basic getters returning lists *)
-let get_birth_place_x p = [ Driver.get_birth_place p ]
-let get_baptism_place_x p = [ Driver.get_baptism_place p ]
-let get_death_place_x p = [ Driver.get_death_place p ]
-let get_burial_place_x p = [ Driver.get_burial_place p ]
-let get_birth_src_x p = [ Driver.get_birth_src p ]
-let get_baptism_src_x p = [ Driver.get_baptism_src p ]
-let get_death_src_x p = [ Driver.get_death_src p ]
-let get_burial_src_x p = [ Driver.get_burial_src p ]
-let get_psources_x p = [ Driver.get_psources p ]
-let get_marriage_place_x fam = [ Driver.get_marriage_place fam ]
-
 (* HTML Generation *)
 let make_highlight_html s highlight_info error_type conf =
   let buf = Buffer.create (String.length s * 2) in
@@ -1575,74 +1556,6 @@ let make_error_html conf base data istr entry error_type =
   in
   (hl, url_mod, url_chk, entry_escaped, s2_auto)
 
-(* Generic collector for attributes - places or sources *)
-let collect_attributes base p
-    ~std_attrs (* list of standard attribute collectors *)
-    ~epers_attr_get (* personal event attribute getter *)
-    ~marriage_attr (* marriage attribute collector *)
-    ~efam_attr_get (* family event attribute getter *) =
-  let attrs = ref [] in
-  List.iter
-    (fun getter -> List.iter (fun x -> attrs := x :: !attrs) (getter p))
-    std_attrs;
-  List.iter
-    (fun evt -> attrs := epers_attr_get evt :: !attrs)
-    (Driver.get_pevents p);
-  Array.iter
-    (fun ifam ->
-      let fam = Driver.foi base ifam in
-      List.iter (fun x -> attrs := x :: !attrs) (marriage_attr fam);
-      List.iter
-        (fun evt -> attrs := efam_attr_get evt :: !attrs)
-        (Driver.get_fevents fam))
-    (Driver.get_family p);
-  !attrs
-  |> List.filter (fun i -> not (Driver.Istr.is_empty i))
-  |> List.sort_uniq Driver.Istr.compare
-
-let collect_places base p =
-  collect_attributes base p
-    ~std_attrs:
-      [
-        get_birth_place_x;
-        get_baptism_place_x;
-        get_death_place_x;
-        get_burial_place_x;
-      ]
-    ~epers_attr_get:get_epers_place ~marriage_attr:get_marriage_place_x
-    ~efam_attr_get:get_efam_place
-
-let collect_sources base p =
-  collect_attributes base p
-    ~std_attrs:
-      [
-        get_birth_src_x;
-        get_baptism_src_x;
-        get_death_src_x;
-        get_burial_src_x;
-        get_psources_x;
-      ]
-    ~epers_attr_get:get_epers_src
-    ~marriage_attr:(fun fam ->
-      [ Driver.get_marriage_src fam; Driver.get_fsources fam ])
-    ~efam_attr_get:get_efam_src
-
-let collect_dict_strings base = function
-  | Fnames -> fun p -> [ Driver.get_first_name p ]
-  | Snames -> fun p -> [ Driver.get_surname p ]
-  | Fnames_alias -> Driver.get_first_names_aliases
-  | Snames_alias -> Driver.get_surnames_aliases
-  | Places -> collect_places base
-  | PubNames -> fun p -> [ Driver.get_public_name p ]
-  | Qualifiers -> Driver.get_qualifiers
-  | Aliases -> Driver.get_aliases
-  | Occupation -> fun p -> [ Driver.get_occupation p ]
-  | Titles -> fun p -> List.map (fun t -> t.t_ident) (Driver.get_titles p)
-  | Estates -> fun p -> List.map (fun t -> t.t_place) (Driver.get_titles p)
-  | Sources -> collect_sources base
-
-exception Max_results_reached
-
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
 let analyze_string_errors dict_type base s check_errors_set =
   let add_if test error acc =
@@ -1670,41 +1583,24 @@ let analyze_string_errors dict_type base s check_errors_set =
   |> add_if (fun () -> has_repeated_words s) RepeatedWords
   |> add_if (fun () -> has_no_letter dict_type s) NoLetters
 
-let dict_to_cache_name dict_type =
+let dict dict_type =
   match dict_type with
-  | Fnames -> "fnames"
-  | Snames -> "snames"
-  | Fnames_alias -> "fnames_alias"
-  | Snames_alias -> "snames_alias"
-  | Places -> "places"
-  | PubNames -> "pub_names"
-  | Qualifiers -> "qualifiers"
-  | Aliases -> "aliases"
-  | Occupation -> "occupations"
-  | Titles -> "titles"
-  | Estates -> "estates"
-  | Sources -> "sources"
+  | Fnames -> Dict.First_name
+  | Snames -> Dict.Surname
+  | Fnames_alias -> Dict.First_name_alias
+  | Snames_alias -> Dict.Surname_alias
+  | Places -> Dict.Place
+  | PubNames -> Dict.Public_name
+  | Qualifiers -> Dict.Qualifier
+  | Aliases -> Dict.Alias
+  | Occupation -> Dict.Occupation
+  | Titles -> Dict.Title
+  | Estates -> Dict.Domain
+  | Sources -> Dict.Source
 
-let cache_file_exists conf dict_type =
-  Cache.exists conf.bname (dict_to_cache_name dict_type)
-
-let read_cache conf dict_type =
-  Option.value ~default:[]
-    (Cache.read conf.bname (dict_to_cache_name dict_type))
-
-let update_cache_entry conf dict_type ~old_istr ~new_istr new_value =
-  Cache.update conf.bname
-    (dict_to_cache_name dict_type)
-    ~old_istr ~new_istr new_value
-
-let find_dict_type_for_istr conf istr =
-  let check_in_cache dict_type =
-    if cache_file_exists conf dict_type then
-      let entries = read_cache conf dict_type in
-      List.exists (fun (i, _) -> Driver.Istr.equal i istr) entries
-    else false
-  in
-  List.find_opt check_in_cache
+let find_dict_type_for_istr base istr =
+  List.find_opt
+    (fun dict_type -> Driver.dict_count base (dict dict_type) istr > 0)
     [
       Fnames;
       Snames;
@@ -1720,60 +1616,20 @@ let find_dict_type_for_istr conf istr =
       Sources;
     ]
 
-(* Collecter les erreurs depuis le cache binaire checkdata *)
-let collect_all_errors_from_cache conf dict_type base max_results
-    ?(sel_err_types = []) () =
-  let entries = read_cache conf dict_type in
+let collect_all_errors ?max_results ?(sel_err_types = []) base dict_type =
   let check_errors_set = make_error_set sel_err_types in
-
-  let rec process_entries entries acc count =
-    match (entries, max_results) with
-    | [], _ -> acc
-    | _, Some max when count >= max -> acc
-    | (istr, s) :: rest, _ ->
-        let errors = analyze_string_errors dict_type base s check_errors_set in
-        if errors = [] then process_entries rest acc count
-        else process_entries rest ((istr, s, errors) :: acc) (count + 1)
+  let full count =
+    match max_results with Some max -> count >= max | None -> false
   in
-  List.rev (process_entries entries [] 0)
-
-let collect_all_errors ?max_results ?(sel_err_types = []) base dict =
-  let seen = Hashtbl.create 4096 in
-  let found = ref [] in
-  let count = ref 0 in
-  let collect_strings = collect_dict_strings base dict in
-  let check_errors_set = make_error_set sel_err_types in
-  let check istr =
-    if not (Driver.Istr.is_empty istr || Hashtbl.mem seen istr) then (
-      Hashtbl.replace seen istr ();
-      let s = Driver.sou base istr in
-      match analyze_string_errors dict base s check_errors_set with
-      | [] -> ()
-      | errs -> (
-          found := (istr, s, errs) :: !found;
-          incr count;
-          match max_results with
-          | Some max when !count >= max -> raise Max_results_reached
-          | _ -> ()))
+  let rec loop acc count l =
+    match l with
+    | [] -> List.rev acc
+    | _ :: _ when full count -> List.rev acc
+    | istr :: l when Driver.Istr.is_empty istr -> loop acc count l
+    | istr :: l -> (
+        let s = Driver.sou base istr in
+        match analyze_string_errors dict_type base s check_errors_set with
+        | [] -> loop acc count l
+        | errors -> loop ((istr, s, errors) :: acc) (count + 1) l)
   in
-  (try
-     Geneweb_db.Collection.iter
-       (fun i -> List.iter check (collect_strings (Driver.poi base i)))
-       (Driver.ipers base)
-   with Max_results_reached -> ());
-  List.sort (fun (_, s1, _) (_, s2, _) -> String.compare s1 s2) !found
-
-(* Main function *)
-let collect_all_errors_with_cache ?max_results ?(sel_err_types = []) conf base
-    dict =
-  let use_cache =
-    match Util.p_getenv conf.env "nocache" with Some "1" -> false | _ -> true
-  in
-  if use_cache then
-    if cache_file_exists conf dict then
-      collect_all_errors_from_cache conf dict base max_results ~sel_err_types ()
-    else []
-  else
-    let is_roglo = List.assoc_opt "roglo" conf.base_env = Some "yes" in
-    if is_roglo then []
-    else collect_all_errors ?max_results ~sel_err_types base dict
+  loop [] 0 (Driver.dict_entries base (dict dict_type) "")

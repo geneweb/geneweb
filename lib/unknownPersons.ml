@@ -244,37 +244,21 @@ let has_letter_or_digit s =
   in
   loop 0
 
-let blank_names conf base =
-  let names =
-    lazy
-      (Collection.fold
-         (fun (fn, sn) p ->
-           ( Driver.Istr.Set.add (Driver.get_first_name p) fn,
-             Driver.Istr.Set.add (Driver.get_surname p) sn ))
-         (Driver.Istr.Set.empty, Driver.Istr.Set.empty)
-         (Driver.persons base))
-  in
-  let entries name proj =
-    match Cache.read conf.Config.bname name with
-    | Some l -> l
-    | None ->
-        List.map
-          (fun istr -> (istr, Driver.sou base istr))
-          (Driver.Istr.Set.elements (proj (Lazy.force names)))
-  in
-  let found data l =
+let blank_names base =
+  let found data d =
     List.filter_map
-      (fun (istr, s) ->
+      (fun istr ->
+        let s = Driver.sou base istr in
         if
-          Driver.Istr.is_quest istr
+          Driver.Istr.is_empty istr || Driver.Istr.is_quest istr
           || (has_letter_or_digit s && Name.lower s <> "")
         then None
         else Some (data, istr, s))
-      l
+      (Driver.dict_entries base d "")
   in
   List.rev_append
-    (found "fn" (entries "fnames" fst))
-    (found "sn" (entries "snames" snd))
+    (found "fn" Geneweb_db.Dict.First_name)
+    (found "sn" Geneweb_db.Dict.Surname)
 
 let char_name = function
   | 0xA0 -> Some "NO-BREAK SPACE"
@@ -322,7 +306,7 @@ let print_lists conf base names l =
     | g -> Some g
   in
   let blank, odd =
-    List.partition (fun (_, _, s) -> Name.lower s = "") (blank_names conf base)
+    List.partition (fun (_, _, s) -> Name.lower s = "") (blank_names base)
   in
   let name_group =
     nonempty

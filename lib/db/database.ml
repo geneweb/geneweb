@@ -1641,6 +1641,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
           dict_groups = (fun _ -> assert false);
           dict_entries = (fun _ -> assert false);
           dict_refs = (fun _ -> assert false);
+          dict_count = (fun _ -> assert false);
           dict_first = (fun _ -> assert false);
           dict_after = (fun _ -> assert false);
         };

@@ -163,7 +163,7 @@ let test_blank_list () =
     (List.sort compare
        (List.map
           (fun (data, _, s) -> (data, s))
-          (UnknownPersons.blank_names wizard base)))
+          (UnknownPersons.blank_names base)))
 
 let test_index_patches () =
   with_base "index_patches_test" @@ fun base ->

@@ -563,12 +563,13 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_fevents
              | "CHG_FAM_ORD_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_families
-             | "CHK_DATA" -> w_wizard @@ w_base @@ CheckDataDisplay.print
+             | "CHK_DATA" ->
+                 w_wizard @@ w_base @@ w_index @@ CheckDataDisplay.print
              | "CHK_DATA_L" ->
-                 w_wizard @@ w_base
+                 w_wizard @@ w_base @@ w_index
                  @@ CheckDataDisplay.print_redirect_to_list conn
              | "CHK_DATA_OK" ->
-                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base @@ w_index
                  @@ CheckDataDisplay.print_chk_ok
              | "CONN_WIZ" ->
                  w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
@@ -676,14 +677,16 @@ let treat_request =
                  w_base @@ NotesDisplay.print_misc_notes_search
              | "MOD_DATA" ->
                  w_wizard @@ w_base @@ w_index @@ UpdateDataDisplay.print_mod
-             | "PLACE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print
+             | "PLACE_TERMS" ->
+                 w_wizard @@ w_base @@ w_index @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->
-                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base @@ w_index
                  @@ PlaceTermsDisplay.print_ok
              | "SOURCE_TERMS" ->
-                 w_wizard @@ w_base @@ PlaceTermsDisplay.print_sources
+                 w_wizard @@ w_base @@ w_index
+                 @@ PlaceTermsDisplay.print_sources
              | "SOURCE_TERMS_OK" ->
-                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base @@ w_index
                  @@ PlaceTermsDisplay.print_sources_ok
              | "MOD_DATA_OK" ->
                  w_wizard @@ w_lock @@ w_bulk @@ w_base @@ w_index
@@ -941,9 +944,11 @@ let treat_request =
                            (Driver.empty_person base Driver.Iper.dummy))
                  | None -> request_issue conn conf base ~key:"missing v param")
              | "TT" -> w_base @@ TitleDisplay.print
-             | "UNKNOWN" -> w_wizard @@ w_base @@ UnknownPersons.print
+             | "UNKNOWN" ->
+                 w_wizard @@ w_base @@ w_index @@ UnknownPersons.print
              | "UNKNOWN_OK" ->
-                 w_wizard @@ w_lock @@ w_base @@ UnknownPersons.print_ok
+                 w_wizard @@ w_lock @@ w_base @@ w_index
+                 @@ UnknownPersons.print_ok
              | "UPD" -> w_wizard @@ w_lock @@ w_base @@ UpdateField.print
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view

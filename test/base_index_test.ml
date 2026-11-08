@@ -210,7 +210,11 @@ let check_dict base d =
         (List.sort Int.compare
            (List.rev_append
               (List.map (fun i -> 2 * Driver.Iper.hash i) ipers)
-              (List.map (fun i -> (2 * Driver.Ifam.hash i) + 1) ifams))))
+              (List.map (fun i -> (2 * Driver.Ifam.hash i) + 1) ifams)));
+      (check int)
+        (Printf.sprintf "%s count %d" name istr)
+        (List.length refs)
+        (Driver.dict_count base d (Driver.Istr.of_string (string_of_int istr))))
     entries;
   let check_spi spi =
     let rec walk acc i =

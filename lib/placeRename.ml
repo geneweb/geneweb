@@ -1,7 +1,6 @@
 open Config
 open Def
 module Driver = Geneweb_db.Driver
-module Collection = Geneweb_db.Collection
 module Dict = Geneweb_db.Dict
 module IT = Driver.Istr.Table
 
@@ -95,16 +94,10 @@ let rewrite inverted ~terms ~new_term raw depths =
 (* ------------------------------------------------------------------------ *)
 
 type field = Place | Source
-type usage = int ref IT.t
+type usage = Driver.istr -> int
 
-let uses u i = match IT.find_opt u i with Some r -> !r | None -> 0
+let uses u i = u i
 let dict field = match field with Place -> Dict.Place | Source -> Dict.Source
-
-let person_fields field p =
-  Dict.person_strings (dict field) (Driver.gen_person_of_person p)
-
-let family_fields field f =
-  Dict.family_strings (dict field) (Driver.gen_family_of_family f)
 
 (* the fields of [field] of a person or family moved by [f] *)
 let map_person field f (gp : (_, _, Driver.istr) gen_person) =
@@ -152,24 +145,7 @@ let map_family field f (gf : (_, _, Driver.istr) gen_family) =
       }
 
 let action = function Place -> "mq" | Source -> "ms"
-
-let usage ?(field = Place) base =
-  let u = IT.create 4096 in
-  let count l =
-    List.filter (fun i -> not (Driver.Istr.is_empty i)) l
-    |> List.sort_uniq compare
-    |> List.iter (fun i ->
-        match IT.find_opt u i with
-        | Some r -> incr r
-        | None -> IT.add u i (ref 1))
-  in
-  Collection.iter
-    (fun ip -> count (person_fields field (Driver.poi base ip)))
-    (Driver.ipers base);
-  Collection.iter
-    (fun ifam -> count (family_fields field (Driver.foi base ifam)))
-    (Driver.ifams base);
-  u
+let usage ?(field = Place) base = Driver.dict_count base (dict field)
 
 (* ------------------------------------------------------------------------ *)
 
@@ -286,8 +262,9 @@ let max_updates conf =
    families pointing to the old id are moved to it, each modified person is
    recorded in the history with the action "mq", the spouses of a modified
    family too. Unlike MOD_DATA, all the places are done in a single pass over
-   the base. At most [max_nb_update] records are modified: the rest is done by
-   applying the same plan again. *)
+   their records, read from the index of the dictionaries. At most
+   [max_nb_update] records are modified: the rest is done by applying the same
+   plan again. *)
 let apply ?(field = Place) conf base items =
   let remap = IT.create 64 in
   List.iter
@@ -300,7 +277,13 @@ let apply ?(field = Place) conf base items =
       List.iter (fun it -> IT.replace remap it.istr target) members)
     (group_by_new_s items);
   let f i = match IT.find_opt remap i with Some j -> j | None -> i in
-  let touched l = List.exists (fun i -> IT.mem remap i) l in
+  let ipers, ifams =
+    List.fold_left
+      (fun (ipers, ifams) it ->
+        let ps, fs = Driver.dict_records base (dict field) it.istr in
+        (List.rev_append ps ipers, List.rev_append fs ifams))
+      ([], []) items
+  in
   let max = max_updates conf in
   let persons = ref 0 and families = ref 0 in
   let full () = !persons + !families >= max in
@@ -312,36 +295,33 @@ let apply ?(field = Place) conf base items =
       (U_Multi (Util.string_gen_person base gp, Util.string_gen_person base np))
       (action field)
   in
-  Collection.iter
+  List.iter
     (fun ip ->
-      let p = Driver.poi base ip in
-      if touched (person_fields field p) then (
-        if full () then complete := false
-        else
-          let gp = Driver.gen_person_of_person p in
-          let np = map_person field f gp in
-          Driver.patch_person base ip np;
-          incr persons;
-          record gp np))
-    (Driver.ipers base);
-  Collection.iter
+      if full () then complete := false
+      else
+        let gp = Driver.gen_person_of_person (Driver.poi base ip) in
+        let np = map_person field f gp in
+        Driver.patch_person base ip np;
+        incr persons;
+        record gp np)
+    (List.sort_uniq Driver.Iper.compare ipers);
+  List.iter
     (fun ifam ->
-      let fam = Driver.foi base ifam in
-      if touched (family_fields field fam) then (
-        if full () then complete := false
-        else
-          let gf = Driver.gen_family_of_family fam in
-          let nf = map_family field f gf in
-          Driver.patch_family base ifam nf;
-          incr families;
-          (* as MOD_DATA, which reaches the families through the spouses *)
-          List.iter
-            (fun ip ->
-              if not (Hashtbl.mem recorded ip) then
-                let gp = Driver.gen_person_of_person (Driver.poi base ip) in
-                record gp gp)
-            [ Driver.get_father fam; Driver.get_mother fam ]))
-    (Driver.ifams base);
+      if full () then complete := false
+      else
+        let fam = Driver.foi base ifam in
+        let gf = Driver.gen_family_of_family fam in
+        let nf = map_family field f gf in
+        Driver.patch_family base ifam nf;
+        incr families;
+        (* as MOD_DATA, which reaches the families through the spouses *)
+        List.iter
+          (fun ip ->
+            if not (Hashtbl.mem recorded ip) then
+              let gp = Driver.gen_person_of_person (Driver.poi base ip) in
+              record gp gp)
+          [ Driver.get_father fam; Driver.get_mother fam ])
+    (List.sort_uniq Driver.Ifam.compare ifams);
   Util.commit_patches conf base;
   History.notify conf base (action field);
   {

@@ -40,7 +40,7 @@ let write_cache_file bname fname data =
   Secure.with_open_out_bin gz_file (fun oc -> output_string oc compressed)
 
 let entries_strings bname fname collect_fn =
-  match Geneweb.Cache.read bname fname with
+  match if !binary then Geneweb.Cache.read bname fname else None with
   | Some entries -> List.map snd entries
   | None ->
       ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter collect_fn
@@ -51,10 +51,7 @@ let should_gen_datalist () =
   | false, false | false, true | true, true -> true
   | true, false -> false
 
-let should_gen_checkdata () =
-  match (!binary, !datalist) with
-  | false, false | true, false | true, true -> true
-  | false, true -> false
+let should_gen_checkdata () = !binary
 
 let with_timer f =
   let start = Unix.gettimeofday () in
@@ -361,7 +358,11 @@ let validate_options () =
 
   if (!fname_aliases || !sname_aliases) && not !binary then (
     Printf.eprintf "Error: -fna and -sna can only be used with -binary\n";
-    exit 1)
+    exit 1);
+  if !binary then
+    Printf.eprintf
+      "Warning: -binary is deprecated: gwd no longer reads the binary caches, \
+       it queries the index of the base (base.inx)\n"
 
 let speclist =
   [
@@ -399,8 +400,8 @@ let speclist =
     ("", Arg.Unit (fun () -> ()), "");
     ( "-binary",
       Arg.Set binary,
-      " generate binary caches only, in <bases>/<base>.gwb/caches (for tools)"
-    );
+      " deprecated: generate binary caches in <bases>/<base>.gwb/caches, no \
+       longer read by gwd" );
     ( "-datalist",
       Arg.Set datalist,
       " generate text caches only, in <bases>/etc/<base>/cache (for datalists)"

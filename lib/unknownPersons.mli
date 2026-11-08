@@ -13,15 +13,11 @@ val sort : Config.config -> Geneweb_db.Driver.base -> string list -> lists
     into the lists displayed by {!val:print}. *)
 
 val blank_names :
-  Config.config ->
-  Geneweb_db.Driver.base ->
-  (string * Geneweb_db.Driver.istr * string) list
-(** [blank_names conf base] returns the first names (["fn"]) and surnames
-    (["sn"]) other than ["?"] without any letter or digit (Unicode) or that
-    Name.lower reduces to nothing, with their string index and value. They are
-    read from the checkdata caches of first names and surnames when they exist,
-    so that a name of an outdated cache may have no bearer left, and from the
-    persons otherwise. *)
+  Geneweb_db.Driver.base -> (string * Geneweb_db.Driver.istr * string) list
+(** [blank_names base] returns the first names (["fn"]) and surnames (["sn"])
+    other than ["?"] without any letter or digit (Unicode) or that Name.lower
+    reduces to nothing, with their string index and value, borne by at least one
+    person according to the index of the dictionaries. *)
 
 val print : Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] displays the form of the names that stand for an unknown
