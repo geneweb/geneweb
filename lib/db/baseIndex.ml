@@ -151,3 +151,161 @@ let output ~budget data ~inx ~dat =
   in
   seek_out oc directory;
   List.iter (output_section oc) (List.rev sections)
+
+let input_int64 ic =
+  Int64.to_int (String.get_int64_be (really_input_string ic 8) 0)
+
+let input_section ic =
+  let code = input_binary_int ic in
+  let n = input_binary_int ic in
+  let block = input_binary_int ic in
+  let width = input_binary_int ic in
+  let istr_off = input_int64 ic in
+  let landmarks_len = input_binary_int ic in
+  { code; n; block; width; istr_off; landmarks_len }
+
+let input_sections fname ic =
+  seek_in ic 0;
+  let found =
+    try really_input_string ic (String.length magic) with End_of_file -> ""
+  in
+  if found <> magic then
+    raise (Dutil.Incompatible_format (fname, found, [ magic ]));
+  let nb = input_binary_int ic in
+  List.init nb (fun _ -> input_section ic)
+
+let input_landmarks ic s =
+  seek_in ic (s.istr_off + ((4 + s.width) * s.n));
+  let b = really_input_string ic s.landmarks_len in
+  let a = Array.make ((s.n + s.block - 1) / s.block) "" in
+  let rec loop i pos =
+    if i < Array.length a then (
+      let len = Char.code b.[pos] in
+      a.(i) <- String.sub b (pos + 1) len;
+      loop (i + 1) (pos + 1 + len))
+  in
+  loop 0 0;
+  a
+
+let istr_at ic s r =
+  seek_in ic (s.istr_off + (4 * r));
+  input_binary_int ic
+
+let pos_at ic s r =
+  seek_in ic (s.istr_off + (4 * s.n) + (s.width * r));
+  if s.width = 4 then input_binary_int ic else input_int64 ic
+
+let input_refs ic pos =
+  seek_in ic pos;
+  let n = input_binary_int ic in
+  List.init n (fun _ -> input_binary_int ic)
+
+(* Smallest [i] of [lo, hi) such that [p i], [hi] if none; [p] is monotone. *)
+let first p lo hi =
+  let rec loop lo hi =
+    if lo >= hi then lo
+    else
+      let mid = (lo + hi) / 2 in
+      if p mid then loop lo mid else loop (mid + 1) hi
+  in
+  loop lo hi
+
+(* Rank of the first key not less than [k]. The landmark of a block bounds
+   its first key from below; a truncated landmark that is a prefix of [k]
+   tells nothing, so the keys of its block are read. *)
+let lower_bound landmarks s key k =
+  let surely_ge j = String.compare landmarks.(j) k >= 0 in
+  let maybe_ge j =
+    surely_ge j
+    || String.length landmarks.(j) = landmark_max
+       && String.starts_with ~prefix:landmarks.(j) k
+  in
+  let nl = Array.length landmarks in
+  let j1 = first maybe_ge 0 nl in
+  let j2 = first surely_ge j1 nl in
+  let lo = if j1 = 0 then 0 else ((j1 - 1) * s.block) + 1 in
+  let hi = if j2 = nl then s.n else j2 * s.block in
+  first (fun r -> String.compare (key r) k >= 0) lo hi
+
+let after_prefix p = p ^ "\xFF"
+
+let label g =
+  let n = String.length g in
+  if n > 0 && g.[n - 1] = '\000' then String.sub g 0 (n - 1) else g
+
+let groups lower_bound key p =
+  let lp = String.length p in
+  let stop = lower_bound (after_prefix p) in
+  let rec loop r acc =
+    if r >= stop then List.rev acc
+    else
+      let k = key r in
+      if String.length k = lp then loop (r + 1) ((p, 1) :: acc)
+      else
+        let g =
+          String.sub k 0
+            (lp + Uchar.utf_decode_length (String.get_utf_8_uchar k lp))
+        in
+        let next = lower_bound (after_prefix g) in
+        loop next ((label g, next - r) :: acc)
+  in
+  loop (lower_bound p) []
+
+let with_reader bdir ~particles ~strings_len ~file_string k =
+  let fname = Filename.concat bdir "base.inx" in
+  let inx = lazy (Secure.open_in_bin fname) in
+  let dat = lazy (Secure.open_in_bin (Filename.concat bdir "base.dat")) in
+  let close c = if Lazy.is_val c then close_in_noerr (Lazy.force c) in
+  Fun.protect ~finally:(fun () ->
+      close inx;
+      close dat)
+  @@ fun () ->
+  let sections =
+    lazy
+      (let ic = Lazy.force inx in
+       List.map
+         (fun s -> (s.code, (s, lazy (input_landmarks ic s))))
+         (input_sections fname ic))
+  in
+  let section d =
+    match List.assoc_opt (code d) (Lazy.force sections) with
+    | Some (s, landmarks) -> (s, Lazy.force landmarks)
+    | None -> failwith (fname ^ ": no dictionary " ^ Dict.to_string d)
+  in
+  let key d istr = Dict.key (Lazy.force particles) d (file_string istr) in
+  let search d =
+    let s, landmarks = section d in
+    let ic = Lazy.force inx in
+    let istr r = istr_at ic s r in
+    (s, istr, lower_bound landmarks s (fun r -> key d (istr r)))
+  in
+  let range lower_bound p = (lower_bound p, lower_bound (after_prefix p)) in
+  let dict_size d p =
+    let _, _, lower_bound = search d in
+    let lo, hi = range lower_bound p in
+    hi - lo
+  in
+  let dict_groups d p =
+    let _, istr, lower_bound = search d in
+    groups lower_bound (fun r -> key d (istr r)) p
+  in
+  let dict_entries d p =
+    let _, istr, lower_bound = search d in
+    let lo, hi = range lower_bound p in
+    List.init (hi - lo) (fun i -> istr (lo + i))
+  in
+  let dict_refs d i =
+    if i < 0 || i >= strings_len then []
+    else
+      let s, istr, lower_bound = search d in
+      let k = key d i in
+      let rec find r =
+        if r < s.n && String.equal (key d (istr r)) k then
+          if istr r = i then
+            input_refs (Lazy.force dat) (pos_at (Lazy.force inx) s r)
+          else find (r + 1)
+        else []
+      in
+      find (lower_bound k)
+  in
+  k { dict_size; dict_groups; dict_entries; dict_refs }

@@ -79,6 +79,15 @@ type string_person_index = Dbdisk.string_person_index
 let spi_find spi = spi.find
 let spi_first spi = spi.cursor
 let spi_next (spi : string_person_index) istr = spi.next istr
+let dict_size base d prefix = base.func.dict_index.dict_size d prefix
+let dict_groups base d prefix = base.func.dict_index.dict_groups d prefix
+let dict_entries base d prefix = base.func.dict_index.dict_entries d prefix
+
+let dict_records base d istr =
+  List.partition_map
+    (fun r ->
+      if r land 1 = 0 then Either.Left (r lsr 1) else Either.Right (r lsr 1))
+    (base.func.dict_index.dict_refs d istr)
 
 type base = dsk_base
 

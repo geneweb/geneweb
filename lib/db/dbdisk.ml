@@ -21,6 +21,13 @@ type string_person_index = {
   next : int -> int;
 }
 
+type dict_index = {
+  dict_size : Dict.t -> string -> int;
+  dict_groups : Dict.t -> string -> (string * int) list;
+  dict_entries : Dict.t -> string -> int list;
+  dict_refs : Dict.t -> int -> int list;
+}
+
 type perm = RDONLY | RDRW
 
 type base_data = {
@@ -45,6 +52,7 @@ type base_func = {
   strings_of_fname : string -> int list;
   persons_of_surname : string_person_index;
   persons_of_first_name : string_person_index;
+  dict_index : dict_index;
   patch_person : int -> dsk_person -> unit;
   patch_ascend : int -> dsk_ascend -> unit;
   patch_union : int -> dsk_union -> unit;
