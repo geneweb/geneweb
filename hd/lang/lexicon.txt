@@ -4938,22 +4938,6 @@ pt: por casal
 sv: per par
 tr: çift tarafından
 
-    cache updated
-co: cache aghjurnatu
-de: Cache aktualisiert
-en: cache updated
-es: caché actualizado
-fi: välimuisti päivitetty
-fr: cache mis à jour
-it: cache aggiornata
-nl: cache bijgewerkt
-no: hurtigbuffer oppdatert
-oc: cache mes a jorn
-pt: cache atualizada
-ru: кэш обновлён
-sv: cache uppdaterad
-tr: önbellek güncellendi
-
     calendar/calendars
 af: kalender/kalenders
 ar: تقويم/تقاويم
@@ -5388,12 +5372,6 @@ en: dictionaries to check
 es: diccionarios a verificar
 fr: dictionnaires à vérifier
 
-    chk_data cache file not found
-de: Cache-Datei(en) nicht gefunden/zur Erzeugung fehlender Caches, gwsetup verwenden oder ausführen
-en: cache file(s) not found/to generate missing caches, use gwsetup or run
-es: archivo(s) de caché no encontrado(s)/para generar los cachés faltantes, usar gwsetup o ejecutar
-fr: fichier(s) cache absent(s)/pour générer les caches manquants, utiliser gwsetup ou exécutez
-
     chk_data check data
 de: Daten prüfen
 en: check data
@@ -5551,12 +5529,6 @@ fr: caractère non apparié
 de: Validierungs-Popup vom Browser blockiert
 en: validation popup blocked by the browser
 fr: fenêtre de validation bloquée par le navigateur
-
-    chk_data use database/cache
-de: Datenbank nutzen/<b>Datenbank</b> nutzen (sehr langsam)/<b>Cache-Daten</b> nutzen (sehr schnell, kann aber Einträge zeigen die korrigiert oder gelöscht wurden)
-en: use database/using <b>database</b> (very slow)/using <b>cached data</b> (very fast but may show entries that have been corrected or deleted)
-es: usar la base de datos/usando la <b>base de datos</b> (muy lento)/usando los <b>datos en caché</b> (muy rápido, pero puede mostrar entradas ya corregidas o eliminadas)
-fr: utiliser la base de données/utilisation de la <b>base de données</b> (très lent)/utilisation des <b>données en cache</b> (très rapide mais peut afficher des entrées déjà corrigées ou supprimées)
 
     chk_data validation timeout
 de: Zeitüberschreitung bei der Validierung

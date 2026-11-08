@@ -8,12 +8,13 @@
 > in format `GnWb0026`. Bases of the earlier formats of GeneWeb 7
 > (`GnWb0020` to `GnWb0025`) and their history files are still read,
 > their witnesses getting an empty note, but they are read-only: gwd
-> refuses the edit forms and the books of `m=MOD_DATA`, built on the
-> index, and tells wizards so on the welcome page. To edit such a base
-> again, export it with the `gwu` of this version, then rebuild it with
-> its `gwc`; until then, the version that built it can still use it. A
-> base of format `GnWb0025`, written by a development version, only
-> lacks the index: `gwc -reindex <base>` adds it in place.
+> refuses the edit forms and the pages built on the index (books of
+> `m=MOD_DATA`, chk_data, place and source terms, unknown persons), and
+> tells wizards so on the welcome page. To edit such a base again,
+> export it with the `gwu` of this version, then rebuild it with its
+> `gwc`; until then, the version that built it can still use it. A base
+> of format `GnWb0025`, written by a development version, only lacks
+> the index: `gwc -reindex <base>` adds it in place.
 > A base rebuilt by this version cannot be read by an older one.
 > Bases written by GeneWeb 6 or earlier are refused: export them with the
 > `gwu` of their own version.
@@ -36,6 +37,12 @@
   base. A book of `book_max_results` entries or more (1000 by default)
   is no longer listed in full, only its groups: the datalists of the
   templm forms (`datalist_*=1`) stay empty for such a book.
+- chk_data (`m=CHK_DATA`), the place and source terms (`m=PLACE_TERMS`,
+  `m=SOURCE_TERMS`) and the unknown persons (`m=UNKNOWN`) read the index
+  of the dictionaries too: they no longer read every person and family
+  of the base, nor the binary caches of `cache_files`, and always show
+  the current data. The option of chk_data to read the database instead
+  of the caches is removed.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.
@@ -217,6 +224,10 @@
   arguments, so `--cgi` requires a wrapper script; this has to be settled
   before the inference is actually removed.
 - The `--min-disp-req` option of `gwd` has no effect and is deprecated (#3066).
+- The binary caches of `cache_files` (`-binary`, files
+  `<base>.gwb/caches/*.bin`) are no longer read by gwd and can be
+  deleted: `cache_files` writes only the datalists by default, and
+  `-binary` is deprecated.
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)

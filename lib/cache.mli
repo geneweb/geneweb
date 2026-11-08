@@ -1,6 +1,6 @@
 (** Binary caches of a base: the distinct values of a field type with their
-    istr, written by cache_files and read by gwd tools such as chk_data, in
-    [GWPARAM.cache_d]. *)
+    istr, in [GWPARAM.cache_d], written by [cache_files -binary] (deprecated):
+    gwd no longer reads them, it queries the index of the dictionaries. *)
 
 type entry = Geneweb_db.Driver.istr * string
 

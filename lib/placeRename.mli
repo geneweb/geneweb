@@ -15,7 +15,8 @@
     - [Merge_batch]: several places of the batch get the same new string; they
       share the id created for the first one.
 
-    All the places are done in a single pass over persons and families. *)
+    All the places are done in a single pass over the persons and families using
+    them, read from the index of the dictionaries. *)
 
 type occurrence = Geneweb_db.Driver.istr * int option
 (** A place string and the term to rename in it: [Some d] is the component at
@@ -69,7 +70,7 @@ type usage
     using it. *)
 
 val usage : ?field:field -> Geneweb_db.Driver.base -> usage
-(** One pass over all persons and families, regardless of access rights. *)
+(** Read from the index of the dictionaries, regardless of access rights. *)
 
 val uses : usage -> Geneweb_db.Driver.istr -> int
 

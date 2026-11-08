@@ -297,9 +297,10 @@ fr: Construire tous les fichiers de cache.
 
     binary
 aa: cache_file.htm
-en: Build only cache files with binary format (for tools like chk_data)
-fr: Construit uniquement les fichiers cache au format binaire (pour les \
-  autres outils comme chk_data)
+en: Build only cache files with binary format (deprecated, no longer read by \
+  gwd)
+fr: Construit uniquement les fichiers cache au format binaire (obsolète, plus \
+  lus par gwd)
 
     datalist
 aa: cache_file.htm

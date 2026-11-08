@@ -1,5 +1,4 @@
 module Driver = Geneweb_db.Driver
-module Collection = Geneweb_db.Collection
 
 type span = { text : string; pos : int; len : int }
 
@@ -386,30 +385,10 @@ let of_strings strings =
 let load conf base =
   let u = PlaceRename.usage ~field:PlaceRename.Source base in
   ignore conf;
-  let strings = ref [] in
-  let seen = Hashtbl.create 4096 in
-  let add i =
-    if (not (Driver.Istr.is_empty i)) && not (Hashtbl.mem seen i) then (
-      Hashtbl.add seen i ();
-      strings := (i, Driver.sou base i, PlaceRename.uses u i) :: !strings)
-  in
-  Collection.iter
-    (fun ip ->
-      let p = Driver.poi base ip in
-      List.iter add
-        (Driver.get_psources p :: Driver.get_birth_src p
-       :: Driver.get_baptism_src p :: Driver.get_death_src p
-       :: Driver.get_burial_src p
-        :: List.map (fun e -> e.Def.epers_src) (Driver.get_pevents p)))
-    (Driver.ipers base);
-  Collection.iter
-    (fun ifam ->
-      let f = Driver.foi base ifam in
-      List.iter add
-        (Driver.get_fsources f :: Driver.get_marriage_src f
-        :: List.map (fun e -> e.Def.efam_src) (Driver.get_fevents f)))
-    (Driver.ifams base);
-  of_strings !strings
+  of_strings
+    (List.map
+       (fun i -> (i, Driver.sou base i, PlaceRename.uses u i))
+       (Driver.dict_entries base Geneweb_db.Dict.Source ""))
 
 (* the distinct spellings of [part] in each string *)
 let iter_spellings d part f =

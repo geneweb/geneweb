@@ -590,6 +590,10 @@ val dict_records : base -> Dict.t -> istr -> iper list * ifam list
 (** [dict_records base dict istr] The persons and the families using [istr] in
     the fields of [dict]. *)
 
+val dict_count : base -> Dict.t -> istr -> int
+(** [dict_count base dict istr] Number of persons and families using [istr] in
+    the fields of [dict], without reading them. *)
+
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 (** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not
     visible (restrited)) from the [base]. If file {i restrict} is present then

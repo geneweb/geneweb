@@ -77,7 +77,7 @@ type data = {
 }
 
 val load : Config.config -> Geneweb_db.Driver.base -> data
-(** One pass over the persons and families, then the analysis of the strings. *)
+(** The source strings of the index of the dictionaries, then their analysis. *)
 
 val of_strings : (Geneweb_db.Driver.istr * string * int) list -> data
 

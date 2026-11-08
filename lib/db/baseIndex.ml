@@ -320,6 +320,13 @@ let delta src d =
       src.family_patches;
   tbl
 
+let records_count f delta rank i =
+  let removed, added =
+    Option.value ~default:([], []) (Hashtbl.find_opt delta i)
+  in
+  Option.fold ~none:0 ~some:f.count rank
+  - List.length removed + List.length added
+
 let correction src key f d =
   let delta = delta src d in
   let moved = Hashtbl.create 16 in
@@ -333,14 +340,8 @@ let correction src key f d =
   let hidden, extra =
     Hashtbl.fold
       (fun i () (hidden, extra) ->
-        let removed, added =
-          Option.value ~default:([], []) (Hashtbl.find_opt delta i)
-        in
         let rank = f.rank i in
-        let count =
-          Option.fold ~none:0 ~some:f.count rank
-          - List.length removed + List.length added
-        in
+        let count = records_count f delta rank i in
         let moved = Hashtbl.mem moved i in
         let hidden =
           match rank with
@@ -564,6 +565,10 @@ let with_reader bdir ~particles src k =
     let f, c = view d in
     refs f c i
   in
+  let dict_count d i =
+    let f, c = view d in
+    records_count f c.delta (f.rank i) i
+  in
   let entry_from d k =
     let f, c = view d in
     Option.map snd (next_entry f c k)
@@ -571,5 +576,13 @@ let with_reader bdir ~particles src k =
   let key_of d str = Dict.key (Lazy.force particles) d str in
   let dict_first d str = entry_from d (key_of d str) in
   let dict_after d i = entry_from d (key_of d (current_string i) ^ "\000") in
-  k { dict_size; dict_groups; dict_entries; dict_refs; dict_first; dict_after }
-    (fun () -> corrections := lazy (Hashtbl.create 12))
+  k
+    {
+      dict_size;
+      dict_groups;
+      dict_entries;
+      dict_refs;
+      dict_count;
+      dict_first;
+      dict_after;
+    } (fun () -> corrections := lazy (Hashtbl.create 12))

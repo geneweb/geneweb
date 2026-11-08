@@ -67,6 +67,8 @@ type dict_index = {
   (* Records using a string: 2 * iper for a person, 2 * ifam + 1 for a
      family. *)
   dict_refs : Dict.t -> int -> int list;
+  (* Number of these records. *)
+  dict_count : Dict.t -> int -> int;
   (* First entry whose key is not less than the key of a string. *)
   dict_first : Dict.t -> string -> int option;
   (* Entry following a string. *)

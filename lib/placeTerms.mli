@@ -31,10 +31,10 @@ type entry = {
   uses : int;
 }
 
-val place_uses :
-  Config.config -> Geneweb_db.Driver.base -> (Geneweb_db.Driver.istr * int) list
+val place_uses : Geneweb_db.Driver.base -> (Geneweb_db.Driver.istr * int) list
 (** Every non-empty place string used by an event (main fields and person/family
-    events), with the number of persons and families using it. *)
+    events), with the number of persons and families using it, read from the
+    index of the dictionaries. *)
 
 val build : Config.config -> Geneweb_db.Driver.base -> entry list
 (** All terms of the base, sorted alphabetically. *)

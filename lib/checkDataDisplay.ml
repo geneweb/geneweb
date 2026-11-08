@@ -340,26 +340,6 @@ let render_dict_section conf base dict filtrd_entries sel_err_types =
     sel_err_types;
   Output.print_sstring conf "</div></div>"
 
-let render_missing_cache_warning conf missing_caches =
-  if missing_caches = [] then ""
-  else
-    let buf = Buffer.create 512 in
-    let msg = tn conf "chk_data cache file not found" 0 ^ t conf ":" in
-    Buffer.add_string buf
-      {|<div class="alert alert-danger mt-2">
-          <i class="fa fa-exclamation-triangle me-2"></i>|};
-    Buffer.add_string buf msg;
-    Buffer.add_string buf " ";
-    Buffer.add_string buf
-      (missing_caches |> List.rev
-      |> List.map CheckData.dict_to_cache_name
-      |> String.concat ", ");
-    Printf.bprintf buf
-      {|.<br>%s%s <b><code class="user-select-all">cache_files -bd ... -all %s</code></b></div>|}
-      (tn conf "chk_data cache file not found" 1)
-      (t conf ":") conf.bname;
-    Buffer.contents buf
-
 let render_summary_message conf total_entries max_results =
   match total_entries with
   | 0 ->
@@ -469,9 +449,7 @@ let render_error_checkboxes conf sel_err_types =
   Buffer.contents buf
 
 let display_results conf base dicts sel_err_types max_results =
-  let use_cache = Util.p_getenv conf.env "nocache" <> Some "1" in
   let total_entries_found = ref 0 in
-  let missing_caches = ref [] in
   let entries_with_dicts =
     List.fold_left
       (fun acc dict ->
@@ -482,11 +460,9 @@ let display_results conf base dicts sel_err_types max_results =
         | Some r when r <= 0 -> acc
         | _ ->
             let entries =
-              CheckData.collect_all_errors_with_cache ?max_results:remaining
-                ~sel_err_types conf base dict
+              CheckData.collect_all_errors ?max_results:remaining ~sel_err_types
+                base dict
             in
-            if use_cache && not (CheckData.cache_file_exists conf dict) then
-              missing_caches := dict :: !missing_caches;
             if entries = [] then acc
             else (
               total_entries_found := !total_entries_found + List.length entries;
@@ -498,9 +474,6 @@ let display_results conf base dicts sel_err_types max_results =
     (fun (dict, entries) ->
       render_dict_section conf base dict entries sel_err_types)
     entries_with_dicts;
-  if !missing_caches <> [] then
-    Output.print_sstring conf
-      (render_missing_cache_warning conf !missing_caches);
   if dicts <> [] then
     Output.print_sstring conf
       (render_summary_message conf !total_entries_found max_results)
@@ -511,8 +484,6 @@ type params = {
   max_results : int option;
   form_max : int option;
   config_max : int option;
-  nocache_checked : bool;
-  is_roglo : bool;
 }
 
 let print conf base =
@@ -524,8 +495,6 @@ let print conf base =
       max_results = get_max_results conf;
       form_max = get_form_max conf;
       config_max = get_config_max conf;
-      nocache_checked = Util.p_getenv conf.env "nocache" = Some "1";
-      is_roglo = List.assoc_opt "roglo" conf.base_env = Some "yes";
     }
   in
   Hutil.header conf title;
@@ -585,17 +554,6 @@ let print conf base =
     (render_error_checkboxes conf params.sel_err_types)
     (t conf "toggle all") (t conf "options")
     (t conf "chk_data keyboard navigation tooltip");
-  if not params.is_roglo then
-    Output.printf conf
-      {|
-          <div class="form-check mb-1">
-            <input class="form-check-input" type="checkbox" name="nocache" id="use-db" value="1"%s>
-            <label class="form-check-label" for="use-db">
-              <i class="fa fa-database me-2"></i>%s
-            </label>
-          </div>|}
-      (if params.nocache_checked then " checked" else "")
-      (tn conf "chk_data use database/cache" 0);
   let limit_msg =
     match params.config_max with
     | Some c ->
@@ -639,7 +597,6 @@ let print conf base =
   </form>|}
     (t conf "chk_data check data");
   if params.selected_dicts <> [] && params.sel_err_types <> [] then (
-    let cache_index = if params.nocache_checked then 1 else 2 in
     let warning =
       if List.mem CheckData.BadCapitalization params.sel_err_types then
         Printf.sprintf
@@ -651,13 +608,9 @@ let print conf base =
       else ""
     in
     Output.printf conf
-      {|
-  <div class="alert alert-info mt-3">
-    <i class="fa fa-database me-2"></i>%s
-  </div>%s
+      {|%s
   <div id="cd" data-ok-title="%s" data-msg-invalid="%s" data-msg-timeout="%s" data-msg-popup="%s">
 |}
-      (tn conf "chk_data use database/cache" cache_index)
       warning
       (tn conf "validate/delete" 0)
       (t conf "chk_data invalid response")
@@ -673,7 +626,6 @@ let print conf base =
 type chk_success = {
   before : string;
   after : string;
-  cache_updated : bool;
   nb_modified : int option;
   elapsed : float option;
 }
@@ -695,13 +647,7 @@ let perform_check_modification conf base =
     let current_val = Geneweb_db.Driver.sou base k in
     if current_val = s2 then
       Success
-        {
-          before = s;
-          after = s2;
-          cache_updated = false;
-          nb_modified = Some 0;
-          elapsed = Some 0.0;
-        }
+        { before = s; after = s2; nb_modified = Some 0; elapsed = Some 0.0 }
     else if current_val <> s then
       Error
         (Printf.sprintf "%s (%s → %s, %s: %s)"
@@ -714,7 +660,7 @@ let perform_check_modification conf base =
         match dict_param with
         | Some param -> DictInfo.find_by_url_param param
         | None -> (
-            match CheckData.find_dict_type_for_istr conf k with
+            match CheckData.find_dict_type_for_istr base k with
             | Some dict_type -> (
                 try Some (DictInfo.find_by_type dict_type)
                 with Not_found -> None)
@@ -758,17 +704,11 @@ let perform_check_modification conf base =
               UpdateData.update_person_list conf_tmp base s2 list nb_pers
                 nb_pers
             in
-            let new_istr = Geneweb_db.Driver.insert_string base s2 in
-            let cache_updated =
-              CheckData.update_cache_entry conf dict_info.dict_type ~old_istr:k
-                ~new_istr s2
-            in
             let elapsed = Unix.gettimeofday () -. start_time in
             Success
               {
                 before = s;
                 after = s2;
-                cache_updated;
                 nb_modified = Some nb_modified;
                 elapsed = Some elapsed;
               }
@@ -782,18 +722,14 @@ let perform_check_modification conf base =
 
 let build_success_message conf r =
   let base_msg = t conf "modification successful" in
-  let cache_msg =
-    if r.cache_updated then "✓ " ^ t conf "cache updated" else ""
-  in
   match (r.nb_modified, r.elapsed) with
   | Some n, Some time when n > 0 ->
       let modif_word =
         Util.transl_nth conf "modification/modifications"
           (if n = 1 then 0 else 1)
       in
-      Printf.sprintf "%s<br>%s<br><br>%d %s – %.1f s" base_msg cache_msg n
-        modif_word time
-  | _ -> base_msg ^ cache_msg
+      Printf.sprintf "%s<br><br>%d %s – %.1f s" base_msg n modif_word time
+  | _ -> base_msg
 
 let print_result_as_json conf result =
   let json =
@@ -804,7 +740,6 @@ let print_result_as_json conf result =
           [
             ("success", `Bool true);
             ("message", `String msg);
-            ("cache_updated", `Bool r.cache_updated);
             ("before", `String r.before);
             ("after", `String r.after);
             ("validated_title", `String (t conf "validated"));
@@ -818,7 +753,6 @@ let print_result_as_json conf result =
           [
             ("success", `Bool false);
             ("message", `String msg);
-            ("cache_updated", `Bool false);
             ("before", `String "");
             ("after", `String "");
           ]
@@ -881,10 +815,6 @@ let print_result_as_html conf result =
 
       print_status_message conf ~success:true
         ~content:(t conf "modification successful");
-      if r.cache_updated then
-        Output.printf conf
-          {|<div class="text-body-secondary mt-2"><i class="fa fa-check-circle me-1"></i>%s</div>|}
-          (t conf "cache updated");
       (match (r.nb_modified, r.elapsed) with
       | Some n, Some time when n > 1 ->
           let modif_word =

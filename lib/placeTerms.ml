@@ -1,5 +1,4 @@
 module Driver = Geneweb_db.Driver
-module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 
 type place = { istr : Driver.istr; raw : string; uses : int }
@@ -60,33 +59,10 @@ let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
 (* as check_data: spaces at both ends and invisible characters ignored *)
 let cluster_key term = Name.abbrev (Name.lower (key_text term))
 
-let place_uses conf base =
-  let counts : (Driver.istr, int ref) Hashtbl.t = Hashtbl.create 4096 in
-  let count istrs =
-    istrs
-    |> List.filter (fun i -> not (Driver.Istr.is_empty i))
-    |> List.sort_uniq compare
-    |> List.iter (fun i ->
-        match Hashtbl.find_opt counts i with
-        | Some r -> incr r
-        | None -> Hashtbl.add counts i (ref 1))
-  in
-  Collection.iter
-    (fun ip ->
-      let p = Util.pget conf base ip in
-      count
-        (Driver.get_birth_place p :: Driver.get_baptism_place p
-       :: Driver.get_death_place p :: Driver.get_burial_place p
-        :: List.map (fun e -> e.Def.epers_place) (Driver.get_pevents p)))
-    (Driver.ipers base);
-  Collection.iter
-    (fun ifam ->
-      let f = Driver.foi base ifam in
-      count
-        (Driver.get_marriage_place f
-        :: List.map (fun e -> e.Def.efam_place) (Driver.get_fevents f)))
-    (Driver.ifams base);
-  Hashtbl.fold (fun i r acc -> (i, !r) :: acc) counts []
+let place_uses base =
+  List.map
+    (fun i -> (i, Driver.dict_count base Geneweb_db.Dict.Place i))
+    (Driver.dict_entries base Geneweb_db.Dict.Place "")
 
 let compare_place p1 p2 = Place.compare_places p1.raw p2.raw
 
@@ -153,7 +129,7 @@ let of_places inverted places =
       | x -> x)
 
 let build conf base =
-  place_uses conf base
+  place_uses base
   |> List.map (fun (istr, uses) -> (istr, Driver.sou base istr, uses))
   |> of_places (Place.places_inverted conf)
 
