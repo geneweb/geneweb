@@ -325,12 +325,33 @@ let patched () =
        (List.map Driver.Iper.hash
           (fst (Driver.dict_records base Dict.Place (istr 9)))))
 
+let shared () =
+  let name = "base_index_shared" in
+  let iper = Driver.Iper.of_string "6" in
+  let move place base =
+    Driver.patch_person base iper
+      {
+        (Driver.gen_person_of_person (Driver.poi base iper)) with
+        death_place = Driver.insert_string base place;
+      };
+    Driver.commit_patches base
+  in
+  let count base = Driver.dict_size base Dict.Place "Lyon (69)" in
+  with_base name 40 (move "Lyon (69)");
+  Driver.with_database name (fun base ->
+      (check int) "next reader" 1 (count base));
+  Driver.with_database name (move "Paris");
+  Driver.with_database name (fun base ->
+      (check int) "reader after a commit of another one" 0 (count base);
+      List.iter (check_dict base) Dict.all)
+
 let v =
   [
     ( "base-index",
       [
         test_case "Index examples" `Quick examples;
         test_case "Index corrected by the patches" `Quick patched;
+        test_case "Index shared by the readers" `Quick shared;
         test_case "Index with blocks of 1" `Quick
           (index "base_index_default" BaseIndex.default_budget);
         test_case "Index with small blocks" `Quick (index "base_index_small" 40);
