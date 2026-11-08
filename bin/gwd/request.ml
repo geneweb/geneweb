@@ -366,6 +366,10 @@ let w_person ~none fn conn conf base =
   | Some p -> fn conn conf base p
   | _ -> none conn conf base
 
+let w_index ~none fn conn conf base =
+  if Driver.base_format base = Driver.current_base_format then fn conn conf base
+  else none conn conf base
+
 let w_wizard fn conn conf base =
   if conf.wizard then fn conn conf base
   else if conf.just_friend_wizard then GWPARAM.output_error conf Code.Forbidden
@@ -405,6 +409,7 @@ let treat_request =
     SrcfileDisplay.print_welcome conf base
   in
   let w_person = w_person ~none:print_welcome in
+  let w_index = w_index ~none:print_welcome in
   let print_page conn conf l =
     w_base
       (if only_special_env conf.env then print_welcome
@@ -490,6 +495,7 @@ let treat_request =
              in
              let w_base hdl = w_base (fun _conn -> hdl) conn in
              let w_person hdl = w_person (fun _conn -> hdl) conn in
+             let w_index hdl = w_index (fun _conn -> hdl) conn in
              let w_lock hdl = w_lock (fun _conn -> hdl) conn in
              let w_bulk hdl = w_bulk ~command:m (fun _conn -> hdl) conn in
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
@@ -668,7 +674,8 @@ let treat_request =
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
-             | "MOD_DATA" -> w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
+             | "MOD_DATA" ->
+                 w_wizard @@ w_base @@ w_index @@ UpdateDataDisplay.print_mod
              | "PLACE_TERMS" -> w_wizard @@ w_base @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->
                  w_wizard @@ w_lock @@ w_bulk @@ w_base
@@ -679,7 +686,7 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_bulk @@ w_base
                  @@ PlaceTermsDisplay.print_sources_ok
              | "MOD_DATA_OK" ->
-                 w_wizard @@ w_lock @@ w_bulk @@ w_base
+                 w_wizard @@ w_lock @@ w_bulk @@ w_base @@ w_index
                  @@ UpdateDataDisplay.print_mod_ok
              | "MOD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_mod
              | "MOD_FAM_OK" ->

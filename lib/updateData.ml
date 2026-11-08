@@ -3,9 +3,7 @@ open Def
 open Util
 module Driver = Geneweb_db.Driver
 module Gutil = Geneweb_db.Gutil
-module Collection = Geneweb_db.Collection
 module Dict = Geneweb_db.Dict
-module Istr = Driver.Istr
 
 module PersSet = Set.Make (struct
   type t = Driver.person
@@ -22,77 +20,20 @@ module StringSet = Set.Make (String)
 
 let dict conf = Option.bind (p_getenv conf.env "data") Dict.of_string
 
-let get_all_data conf base =
-  match dict conf with
-  | None -> []
-  | Some d ->
-      let add acc l =
-        List.fold_left
-          (fun acc istr ->
-            if Driver.Istr.is_empty istr then acc else Istr.Set.add istr acc)
-          acc l
-      in
-      let acc =
-        Collection.fold
-          (fun acc i ->
-            add acc
-              (Dict.person_strings d
-                 (Driver.gen_person_of_person (pget conf base i))))
-          Istr.Set.empty (Driver.ipers base)
-      in
-      let acc =
-        if Dict.has_family_fields d then
-          Collection.fold
-            (fun acc i ->
-              add acc
-                (Dict.family_strings d
-                   (Driver.gen_family_of_family (Driver.foi base i))))
-            acc (Driver.ifams base)
-        else acc
-      in
-      Istr.Set.elements acc
-
 let get_person_from_data conf base =
   let istr = Driver.Istr.of_string @@ (List.assoc "key" conf.env :> string) in
   match dict conf with
   | None -> []
   | Some d ->
-      let uses l = List.exists (Driver.Istr.equal istr) l in
-      let fold_persons f acc =
-        match d with
-        | Dict.First_name ->
-            List.fold_left f acc
-              (Driver.spi_find (Driver.persons_of_first_name base) istr)
-        | Dict.Surname ->
-            List.fold_left f acc
-              (Driver.spi_find (Driver.persons_of_surname base) istr)
-        | Dict.(
-            ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-            | Occupation | Place | Source | Title | Domain )) ->
-            Collection.fold f acc (Driver.ipers base)
-      in
+      let ipers, ifams = Driver.dict_records base d istr in
+      let add acc ip = PersSet.add (pget conf base ip) acc in
       let acc =
-        fold_persons
-          (fun acc i ->
-            let p = pget conf base i in
-            if uses (Dict.person_strings d (Driver.gen_person_of_person p)) then
-              PersSet.add p acc
-            else acc)
-          PersSet.empty
-      in
-      let acc =
-        if Dict.has_family_fields d then
-          Collection.fold
-            (fun acc i ->
-              let f = Driver.foi base i in
-              if uses (Dict.family_strings d (Driver.gen_family_of_family f))
-              then
-                PersSet.add
-                  (pget conf base (Driver.get_mother f))
-                  (PersSet.add (pget conf base (Driver.get_father f)) acc)
-              else acc)
-            acc (Driver.ifams base)
-        else acc
+        List.fold_left
+          (fun acc ifam ->
+            let f = Driver.foi base ifam in
+            add (add acc (Driver.get_father f)) (Driver.get_mother f))
+          (List.fold_left add PersSet.empty ipers)
+          ifams
       in
       if PersSet.is_empty acc then [] else [ (istr, PersSet.elements acc) ]
 
@@ -493,13 +434,6 @@ let book_entry conf base =
         Some (istr, str)
       else None
 
-(** Get all the data and filter them if ["s"] is defined in [conf.env] *)
-let build_list conf base =
-  let list = get_all_data conf base in
-  if Option.value ~default:"" (p_getenv_notrim conf.env "s") = "" then
-    List.filter_map (book_entry conf base) (List.rev list)
-  else Mutil.filter_map (book_entry conf base) list
-
 let build_list_short conf list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
@@ -536,3 +470,70 @@ let build_list_long conf list : (string * (Driver.istr * string) list) list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
   let list = combine_by_ini ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
+
+type book = {
+  count : int;
+  groups : (string * int * (Driver.istr * string) list) list;
+}
+
+let book_max_results conf =
+  match
+    Option.bind
+      (List.assoc_opt "book_max_results" conf.base_env)
+      int_of_string_opt
+  with
+  | Some n when n > 0 -> n
+  | Some _ | None -> 1000
+
+let book conf base =
+  match dict conf with
+  | None -> { count = 0; groups = [] }
+  | Some d ->
+      let p = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+      let hidden =
+        match d with
+        | Dict.First_name | Dict.Surname ->
+            List.filter_map
+              (fun istr ->
+                let s = Driver.sou base istr in
+                if
+                  String.starts_with ~prefix:p s
+                  && fst (Driver.dict_records base d istr) <> []
+                then Some s
+                else None)
+              [ Driver.Istr.empty; Driver.Istr.quest ]
+        | Dict.(
+            ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
+            | Occupation | Place | Source | Title | Domain )) ->
+            []
+      in
+      let count = Driver.dict_size base d p - List.length hidden in
+      if count < book_max_results conf then
+        let entry = book_entry conf base in
+        let list =
+          List.filter_map
+            (fun istr -> if Driver.Istr.is_empty istr then None else entry istr)
+            (Driver.dict_entries base d p)
+        in
+        {
+          count = List.length list;
+          groups =
+            List.map
+              (fun (ini, l) -> (ini, List.length l, l))
+              (build_list_long conf list);
+        }
+      else
+        let groups =
+          List.filter_map
+            (fun (g, n) ->
+              let n = if List.mem g hidden then n - 1 else n in
+              if n > 0 then Some (g, n, []) else None)
+            (Driver.dict_groups base d p)
+        in
+        {
+          count;
+          groups =
+            List.sort
+              (fun (g1, _, _) (g2, _, _) -> Gutil.alphabetic_order g1 g2)
+              groups;
+        }

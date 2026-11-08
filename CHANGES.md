@@ -8,11 +8,12 @@
 > in format `GnWb0026`. Bases of the earlier formats of GeneWeb 7
 > (`GnWb0020` to `GnWb0025`) and their history files are still read,
 > their witnesses getting an empty note, but they are read-only: gwd
-> refuses the edit forms and tells wizards so on the welcome page. To
-> edit such a base again, export it with the `gwu` of this version, then
-> rebuild it with its `gwc`; until then, the version that built it can
-> still use it. A base of format `GnWb0025`, written by a development
-> version, only lacks the index: `gwc -reindex <base>` adds it in place.
+> refuses the edit forms and the books of `m=MOD_DATA`, built on the
+> index, and tells wizards so on the welcome page. To edit such a base
+> again, export it with the `gwu` of this version, then rebuild it with
+> its `gwc`; until then, the version that built it can still use it. A
+> base of format `GnWb0025`, written by a development version, only
+> lacks the index: `gwc -reindex <base>` adds it in place.
 > A base rebuilt by this version cannot be read by an older one.
 > Bases written by GeneWeb 6 or earlier are refused: export them with the
 > `gwu` of their own version.
@@ -28,6 +29,13 @@
   database.
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)
+- The books of first names, surnames, places, sources… (`m=MOD_DATA`)
+  read the index of the dictionaries: counting, grouping and listing the
+  entries starting with the typed letters, and finding the persons of an
+  entry to rename it, no longer read every person and family of the
+  base. A book of `book_max_results` entries or more (1000 by default)
+  is no longer listed in full, only its groups: the datalists of the
+  templm forms (`datalist_*=1`) stay empty for such a book.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.
