@@ -94,7 +94,8 @@
 %let;burial_symbol;%evt_symbol.burial;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 %define;evt(p_key,p_lbl,p_sym)
-  %if;("p_key"!="bi"), %end;%if;(e.p_key!="on")<s>%else;<span>%end;p_lbl p_sym%if;(e.p_key!="on")</s>%else;</span>%end;%nn;
+  %if;("p_key"!="bi"), %end;%nn;
+  %if;(e.p_key!="on" and e.key="")<s>p_lbl p_sym</s>%else;<span>p_lbl p_sym</span>%end;%nn;
 %end;
 <div class="mt-3">%if;(e.surn!="")[*surname/surnames]0[:] <span class="text-primary">%e.surn;</span>.%end;
   %if;(e.data="place")

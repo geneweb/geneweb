@@ -248,6 +248,8 @@
       this.form = form;
       this.field = form.elements.nx_input;
       this.text = form.querySelector('.book-input-text');
+      this.persons = document.getElementById('book-persons');
+      this.personsHref = this.persons.href;
       this.extra = form.querySelector('.book-extra');
       this.field.addEventListener('input', () => this.changed());
       if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
@@ -337,6 +339,7 @@
       li.classList.add('book-current');
       this.original = a.dataset.v ?? a.dataset.entry;
       this.form.elements.key.value = li.id.slice(1);
+      this.persons.href = `${this.personsHref}&key=${li.id.slice(1)}`;
       this.text.textContent = this.original;
       this.field.value = value || this.original;
       this.changed();

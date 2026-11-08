@@ -31,6 +31,30 @@ let translate_title conf len =
 let thousands conf n =
   Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int n)
 
+let list_env conf base =
+  match
+    (p_getenv conf.env "data", p_getenv conf.env "key", p_getenv conf.env "i0")
+  with
+  | Some _, Some _, None -> (
+      match get_person_from_data conf base with
+      | (istr, pl) :: _ ->
+          let ipers =
+            List.mapi
+              (fun i p ->
+                ( Printf.sprintf "i%d" i,
+                  Adef.encoded (Driver.Iper.to_string (Driver.get_iper p)) ))
+              pl
+          in
+          {
+            conf with
+            env =
+              ("nb", Adef.encoded (string_of_int (List.length pl)))
+              :: ("k", Mutil.encode (Driver.sou base istr))
+              :: List.rev_append ipers conf.env;
+          }
+      | [] -> conf)
+  | _ -> conf
+
 let print_json conf json =
   Output.header conf "Content-type: application/json";
   Output.header conf "Connection: close";
@@ -301,7 +325,7 @@ and eval_simple_var conf base env xx = function
       let b = Buffer.create 1024 in
       Printf.bprintf b
         {|<a class="btn btn-sm btn-outline-primary text-nowrap align-self-center ms-3"
-   href="%sm=L&data=%s&bi=on&ba=on&ma=on&de=on&bu=on&parents=0&key=%s&k=%s&nb=%d|}
+   href="%sm=L&data=%s&parents=on&key=%s&k=%s&nb=%d|}
         (commd conf :> string)
         (Mutil.encode data :> string)
         (Driver.Istr.to_string istr)
