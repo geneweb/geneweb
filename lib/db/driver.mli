@@ -116,6 +116,11 @@ val sync : ?scratch:bool -> base -> unit
     Otherwise, only changes that occured since the last [sync] call are treated.
 *)
 
+val reindex : string -> unit
+(** [reindex bname] rewrites the index of the dictionaries of the database
+    [bname] (files {i base.inx} and {i base.dat}) from the files of the base,
+    its patches left aside. The base must be locked by the caller. *)
+
 (** {2 Unique identifiers} *)
 
 type person

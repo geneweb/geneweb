@@ -6,6 +6,11 @@ val set_ngram_thresholds : int -> int -> int -> unit
     occurrence thresholds for bigrams, trigrams and quadrigrams. Call before
     rebuild to enable n-gram enrichment of names.inx index. *)
 
+val set_index_budget : int -> unit
+(** [set_index_budget bytes] Size of the landmarks of each dictionary in the
+    index written by {!output} and {!output_index} (see {!BaseIndex.output}).
+    Default: {!BaseIndex.default_budget}. *)
+
 val output : Dbdisk.dsk_base -> unit
 (** [output base] uses data section of the [base] to store database on the disk
     in the files:
@@ -32,6 +37,12 @@ val output : Dbdisk.dsk_base -> unit
       (index of its entry)
     - {i fnames.inx} and {i fnames.dat} same as for {i snames.inx} and
       {i snames.dat} but deals with first names
+    - {i base.inx} and {i base.dat} index of the dictionaries (first names,
+      surnames, places, sources...), see {!BaseIndex}.
     - {i notes} text file containing data base notes.
     - {i notes_d} directory containing .txt for each extended page.
     - {i particles.txt} text file with autorised name's particles. *)
+
+val output_index : Dbdisk.dsk_base -> unit
+(** [output_index base] writes the files {i base.inx} and {i base.dat} of [base]
+    alone (see {!output}). *)

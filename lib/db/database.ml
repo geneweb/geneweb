@@ -1034,7 +1034,7 @@ let try_with_open openfun s f =
 
 let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
 
-let with_database ?(read_only = false) bname k =
+let with_database ?(read_only = false) ?(with_patches = true) bname k =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
@@ -1054,7 +1054,10 @@ let with_database ?(read_only = false) bname k =
         raise (Dutil.Incompatible_format (fname, found, Dutil.base_magics))
   in
   let witness_notes = has_witness_notes version in
-  let patches = input_patches ~witness_notes bname in
+  let patches =
+    if with_patches then input_patches ~witness_notes bname
+    else Ok (empty_patch_ht ())
+  in
   let pending : patches_ht = empty_patch_ht () in
   let patches, perm, rdonly_reason =
     match patches with
@@ -1093,6 +1096,10 @@ let with_database ?(read_only = false) bname k =
             "base %s is in an earlier format, read-only until rebuilt (gwu \
              then gwc)"
             bname )
+    | RDRW, true when not with_patches ->
+        ( RDONLY,
+          Printf.sprintf "base %s is read without its patches, read-only" bname
+        )
     | RDRW, true | RDONLY, (true | false) -> (perm, rdonly_reason)
   in
   let forbidden loc = HttpExn (Forbidden, loc ^ ": " ^ rdonly_reason) in

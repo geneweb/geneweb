@@ -15,6 +15,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -47,6 +48,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -90,6 +92,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -115,6 +118,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -140,6 +144,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -165,6 +170,7 @@
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
@@ -191,6 +197,7 @@ Check the support for ANSEL encoding
   *** saving couples array
   *** saving descends array
   *** saving strings array
+  *** create dictionaries index
   *** create name index
   *** create strings of sname
   *** create strings of fname
