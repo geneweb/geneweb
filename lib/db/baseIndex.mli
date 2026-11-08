@@ -25,18 +25,36 @@ val output : budget:int -> Dbdisk.base_data -> inx:string -> dat:string -> unit
     aside, to the files [inx] and [dat]. The block size of a section is the
     smallest power of 2 whose landmarks fit in [budget] bytes. *)
 
+type source = {
+  file_person : int -> Dbdisk.dsk_person;
+  persons_len : int;
+  file_family : int -> Dbdisk.dsk_family;
+  families_len : int;
+  file_string : int -> string;
+  strings_len : int;
+  person_patches : (int, Dbdisk.dsk_person) Hashtbl.t;
+  family_patches : (int, Dbdisk.dsk_family) Hashtbl.t;
+  string_patches : (int, string) Hashtbl.t;
+}
+(** What the index is read with: the records and strings of the files of the
+    base, patches left aside, their numbers, and the committed patches. *)
+
 val with_reader :
   string ->
   particles:Re.re Lazy.t ->
-  strings_len:int ->
-  file_string:(int -> string) ->
-  (Dbdisk.dict_index -> 'a) ->
+  source ->
+  (Dbdisk.dict_index -> (unit -> unit) -> 'a) ->
   'a
-(** [with_reader bdir ~particles ~strings_len ~file_string k] calls [k] with the
-    queries over the index of the base directory [bdir]. [file_string] is the
-    string of an id in the files of the base, patches left aside, and
-    [strings_len] their number. The files of the index are opened at the first
-    query and closed when [k] returns.
+(** [with_reader bdir ~particles source k] calls [k] with the queries over the
+    index of the base directory [bdir] and a function to call after a commit of
+    the patches. The files of the index are opened at the first query and closed
+    when [k] returns.
+
+    The index is a snapshot of the files of the base, corrected by the patches
+    of [source] at the first query of each dictionary: a record of the patches
+    is compared to its version in the files, and a string rewritten by
+    replace_string moves to its new key. An entry no longer used by any record
+    is left out, a string newly used is added.
 
     @raise Dutil.Incompatible_format
       at the first query if {i base.inx} is not in the format of this version.

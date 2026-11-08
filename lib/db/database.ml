@@ -1487,9 +1487,23 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
-  BaseIndex.with_reader bname ~particles:base_data.particles ~strings_len
-    ~file_string:im_strings.im_get
-  @@ fun dict_index ->
+  BaseIndex.with_reader bname ~particles:base_data.particles
+    {
+      BaseIndex.file_person = im_persons.im_get;
+      persons_len;
+      file_family = im_families.im_get;
+      families_len;
+      file_string = im_strings.im_get;
+      strings_len;
+      person_patches = snd patches.h_person;
+      family_patches = snd patches.h_family;
+      string_patches = snd patches.h_string;
+    }
+  @@ fun dict_index reset_dict_index ->
+  let commit_patches () =
+    commit_patches ();
+    reset_dict_index ()
+  in
   let base_func =
     {
       person_of_key = person_of_key persons strings persons_of_name;

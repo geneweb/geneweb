@@ -66,22 +66,31 @@ let block_size keys budget =
   in
   loop 1
 
-let records data d =
+let section_person d p =
+  let l = Dict.person_strings d p in
+  List.sort_uniq Int.compare
+    (if keeps_empty d then l else List.filter (fun i -> i <> 0) l)
+
+let section_family d (f : dsk_family) =
+  if f.Def.fam_index < 0 || not (Dict.has_family_fields d) then []
+  else
+    List.sort_uniq Int.compare
+      (List.filter (fun i -> i <> 0) (Dict.family_strings d f))
+
+let records (data : base_data) d =
   let refs = Dutil.IntHT.create 1024 in
   let add r istr =
-    if istr <> 0 || keeps_empty d then
-      Dutil.IntHT.replace refs istr
-        (r :: Option.value ~default:[] (Dutil.IntHT.find_opt refs istr))
+    Dutil.IntHT.replace refs istr
+      (r :: Option.value ~default:[] (Dutil.IntHT.find_opt refs istr))
   in
-  let add_all r l = List.iter (add r) (List.sort_uniq Int.compare l) in
   for i = 0 to data.persons.len - 1 do
-    add_all (2 * i) (Dict.person_strings d (data.persons.get_nopending i))
+    List.iter (add (2 * i)) (section_person d (data.persons.get_nopending i))
   done;
   if Dict.has_family_fields d then
     for i = 0 to data.families.len - 1 do
-      let f = data.families.get_nopending i in
-      if f.Def.fam_index >= 0 then
-        add_all ((2 * i) + 1) (Dict.family_strings d f)
+      List.iter
+        (add ((2 * i) + 1))
+        (section_family d (data.families.get_nopending i))
     done;
   refs
 
@@ -233,25 +242,198 @@ let label g =
   let n = String.length g in
   if n > 0 && g.[n - 1] = '\000' then String.sub g 0 (n - 1) else g
 
-let groups lower_bound key p =
-  let lp = String.length p in
-  let stop = lower_bound (after_prefix p) in
-  let rec loop r acc =
-    if r >= stop then List.rev acc
-    else
-      let k = key r in
-      if String.length k = lp then loop (r + 1) ((p, 1) :: acc)
-      else
-        let g =
-          String.sub k 0
-            (lp + Uchar.utf_decode_length (String.get_utf_8_uchar k lp))
-        in
-        let next = lower_bound (after_prefix g) in
-        loop next ((label g, next - r) :: acc)
-  in
-  loop (lower_bound p) []
+type source = {
+  file_person : int -> dsk_person;
+  persons_len : int;
+  file_family : int -> dsk_family;
+  families_len : int;
+  file_string : int -> string;
+  strings_len : int;
+  person_patches : (int, dsk_person) Hashtbl.t;
+  family_patches : (int, dsk_family) Hashtbl.t;
+  string_patches : (int, string) Hashtbl.t;
+}
 
-let with_reader bdir ~particles ~strings_len ~file_string k =
+type file_section = {
+  s : section;
+  istr : int -> int;
+  key : int -> string;
+  lower_bound : string -> int;
+  rank : int -> int option;
+  count : int -> int;
+  refs : int -> int list;
+}
+
+(* [hidden]: ranks of the file entries without records left or whose string
+   was rewritten by replace_string; [extra]: entries out of the file order,
+   sorted by their current key. *)
+type correction = {
+  delta : (int, int list * int list) Hashtbl.t;
+  hidden : int array;
+  extra : (string * int) array;
+}
+
+let delta src d =
+  let tbl = Hashtbl.create 64 in
+  let update i f =
+    Hashtbl.replace tbl i
+      (f (Option.value ~default:([], []) (Hashtbl.find_opt tbl i)))
+  in
+  let diff r old_l new_l =
+    List.iter
+      (fun i ->
+        if not (List.mem i new_l) then
+          update i (fun (rm, add) -> (r :: rm, add)))
+      old_l;
+    List.iter
+      (fun i ->
+        if not (List.mem i old_l) then
+          update i (fun (rm, add) -> (rm, r :: add)))
+      new_l
+  in
+  Hashtbl.iter
+    (fun ip p ->
+      let old_l =
+        if ip < src.persons_len then section_person d (src.file_person ip)
+        else []
+      in
+      diff (2 * ip) old_l (section_person d p))
+    src.person_patches;
+  if Dict.has_family_fields d then
+    Hashtbl.iter
+      (fun ifam f ->
+        let old_l =
+          if ifam < src.families_len then
+            section_family d (src.file_family ifam)
+          else []
+        in
+        diff ((2 * ifam) + 1) old_l (section_family d f))
+      src.family_patches;
+  tbl
+
+let correction src key f d =
+  let delta = delta src d in
+  let moved = Hashtbl.create 16 in
+  Hashtbl.iter
+    (fun i s ->
+      if i < src.strings_len && s <> src.file_string i then
+        Hashtbl.replace moved i ())
+    src.string_patches;
+  let touched = Hashtbl.copy moved in
+  Hashtbl.iter (fun i _ -> Hashtbl.replace touched i ()) delta;
+  let hidden, extra =
+    Hashtbl.fold
+      (fun i () (hidden, extra) ->
+        let removed, added =
+          Option.value ~default:([], []) (Hashtbl.find_opt delta i)
+        in
+        let rank = f.rank i in
+        let count =
+          Option.fold ~none:0 ~some:f.count rank
+          - List.length removed + List.length added
+        in
+        let moved = Hashtbl.mem moved i in
+        let hidden =
+          match rank with
+          | Some r when count = 0 || moved -> r :: hidden
+          | Some _ | None -> hidden
+        in
+        let extra =
+          if count > 0 && (moved || Option.is_none rank) then
+            (key i, i) :: extra
+          else extra
+        in
+        (hidden, extra))
+      touched ([], [])
+  in
+  let hidden = Array.of_list hidden and extra = Array.of_list extra in
+  Array.sort Int.compare hidden;
+  Array.sort (fun (k1, _) (k2, _) -> String.compare k1 k2) extra;
+  { delta; hidden; extra }
+
+let first_index a p = first (fun i -> p a.(i)) 0 (Array.length a)
+let hidden_from c r = first_index c.hidden (fun r' -> r' >= r)
+
+let is_hidden c r =
+  let i = hidden_from c r in
+  i < Array.length c.hidden && c.hidden.(i) = r
+
+let extra_from c k =
+  first_index c.extra (fun (k', _) -> String.compare k' k >= 0)
+
+let count f c k1 k2 =
+  let lo = f.lower_bound k1 and hi = f.lower_bound k2 in
+  hi - lo
+  - (hidden_from c hi - hidden_from c lo)
+  + (extra_from c k2 - extra_from c k1)
+
+let next_entry f c k =
+  let rec visible r =
+    if r < f.s.n && is_hidden c r then visible (r + 1) else r
+  in
+  let r = visible (f.lower_bound k) in
+  let e = extra_from c k in
+  let file = if r < f.s.n then Some (f.key r, f.istr r) else None in
+  let extra = if e < Array.length c.extra then Some c.extra.(e) else None in
+  match (file, extra) with
+  | Some (kf, _), Some (ke, _) when String.compare ke kf < 0 -> extra
+  | Some _, (Some _ | None) -> file
+  | None, (Some _ | None) -> extra
+
+let entries f c k1 k2 =
+  let hi = f.lower_bound k2 in
+  let e1 = extra_from c k1 in
+  let extras =
+    List.map
+      (fun (k, i) -> (f.lower_bound k, i))
+      (Array.to_list (Array.sub c.extra e1 (extra_from c k2 - e1)))
+  in
+  let rec loop r extras acc =
+    match extras with
+    | (before, i) :: l when before <= r || r >= hi -> loop r l (i :: acc)
+    | _ :: _ | [] ->
+        if r >= hi then List.rev acc
+        else
+          loop (r + 1) extras (if is_hidden c r then acc else f.istr r :: acc)
+  in
+  loop (f.lower_bound k1) extras []
+
+let without removed l =
+  match removed with
+  | [] -> l
+  | _ :: _ ->
+      let t = Hashtbl.create (List.length removed) in
+      List.iter (fun r -> Hashtbl.replace t r ()) removed;
+      List.filter (fun r -> not (Hashtbl.mem t r)) l
+
+let refs f c i =
+  let removed, added =
+    Option.value ~default:([], []) (Hashtbl.find_opt c.delta i)
+  in
+  let file = Option.fold ~none:[] ~some:f.refs (f.rank i) in
+  List.rev_append
+    (List.rev (without removed file))
+    (List.sort Int.compare added)
+
+let groups next_entry count p =
+  let lp = String.length p in
+  let stop = after_prefix p in
+  let rec loop cursor acc =
+    match next_entry cursor with
+    | Some (k, _) when String.compare k stop < 0 ->
+        if String.length k = lp then loop (p ^ "\000") ((p, 1) :: acc)
+        else
+          let g =
+            String.sub k 0
+              (lp + Uchar.utf_decode_length (String.get_utf_8_uchar k lp))
+          in
+          let next = after_prefix g in
+          loop next ((label g, count g next) :: acc)
+    | Some _ | None -> List.rev acc
+  in
+  loop p []
+
+let with_reader bdir ~particles src k =
   let fname = Filename.concat bdir "base.inx" in
   let inx = lazy (Secure.open_in_bin fname) in
   let dat = lazy (Secure.open_in_bin (Filename.concat bdir "base.dat")) in
@@ -267,45 +449,69 @@ let with_reader bdir ~particles ~strings_len ~file_string k =
          (fun s -> (s.code, (s, lazy (input_landmarks ic s))))
          (input_sections fname ic))
   in
-  let section d =
-    match List.assoc_opt (code d) (Lazy.force sections) with
-    | Some (s, landmarks) -> (s, Lazy.force landmarks)
-    | None -> failwith (fname ^ ": no dictionary " ^ Dict.to_string d)
+  let current_string i =
+    match Hashtbl.find_opt src.string_patches i with
+    | Some s -> s
+    | None -> src.file_string i
   in
-  let key d istr = Dict.key (Lazy.force particles) d (file_string istr) in
-  let search d =
-    let s, landmarks = section d in
-    let ic = Lazy.force inx in
-    let istr r = istr_at ic s r in
-    (s, istr, lower_bound landmarks s (fun r -> key d (istr r)))
+  let file_section d =
+    let s, landmarks =
+      match List.assoc_opt (code d) (Lazy.force sections) with
+      | Some (s, landmarks) -> (s, Lazy.force landmarks)
+      | None -> failwith (fname ^ ": no dictionary " ^ Dict.to_string d)
+    in
+    let inx = Lazy.force inx in
+    let key_of str = Dict.key (Lazy.force particles) d str in
+    let istr r = istr_at inx s r in
+    let key r = key_of (src.file_string (istr r)) in
+    let lower_bound = lower_bound landmarks s key in
+    let rank i =
+      if i < 0 || i >= src.strings_len then None
+      else
+        let k = key_of (src.file_string i) in
+        let rec find r =
+          if r < s.n && String.equal (key r) k then
+            if istr r = i then Some r else find (r + 1)
+          else None
+        in
+        find (lower_bound k)
+    in
+    let count r =
+      let dat = Lazy.force dat in
+      seek_in dat (pos_at inx s r);
+      input_binary_int dat
+    in
+    let refs r = input_refs (Lazy.force dat) (pos_at inx s r) in
+    ({ s; istr; key; lower_bound; rank; count; refs }, key_of)
   in
-  let range lower_bound p = (lower_bound p, lower_bound (after_prefix p)) in
+  let corrections = Hashtbl.create 12 in
+  let view d =
+    let f, key_of = file_section d in
+    let c =
+      match Hashtbl.find_opt corrections d with
+      | Some c -> c
+      | None ->
+          let c = correction src (fun i -> key_of (current_string i)) f d in
+          Hashtbl.replace corrections d c;
+          c
+    in
+    (f, c)
+  in
   let dict_size d p =
-    let _, _, lower_bound = search d in
-    let lo, hi = range lower_bound p in
-    hi - lo
+    let f, c = view d in
+    count f c p (after_prefix p)
   in
   let dict_groups d p =
-    let _, istr, lower_bound = search d in
-    groups lower_bound (fun r -> key d (istr r)) p
+    let f, c = view d in
+    groups (next_entry f c) (count f c) p
   in
   let dict_entries d p =
-    let _, istr, lower_bound = search d in
-    let lo, hi = range lower_bound p in
-    List.init (hi - lo) (fun i -> istr (lo + i))
+    let f, c = view d in
+    entries f c p (after_prefix p)
   in
   let dict_refs d i =
-    if i < 0 || i >= strings_len then []
-    else
-      let s, istr, lower_bound = search d in
-      let k = key d i in
-      let rec find r =
-        if r < s.n && String.equal (key d (istr r)) k then
-          if istr r = i then
-            input_refs (Lazy.force dat) (pos_at (Lazy.force inx) s r)
-          else find (r + 1)
-        else []
-      in
-      find (lower_bound k)
+    let f, c = view d in
+    refs f c i
   in
-  k { dict_size; dict_groups; dict_entries; dict_refs }
+  k { dict_size; dict_groups; dict_entries; dict_refs } (fun () ->
+      Hashtbl.reset corrections)
