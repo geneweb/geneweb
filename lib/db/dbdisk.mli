@@ -67,6 +67,10 @@ type dict_index = {
   (* Records using a string: 2 * iper for a person, 2 * ifam + 1 for a
      family. *)
   dict_refs : Dict.t -> int -> int list;
+  (* First entry whose key is not less than the key of a string. *)
+  dict_first : Dict.t -> string -> int option;
+  (* Entry following a string. *)
+  dict_after : Dict.t -> int -> int option;
 }
 (** Queries over the index of the dictionaries of the base. *)
 
@@ -169,6 +173,7 @@ type base_version =
   | GnWb0023
   | GnWb0024
   | GnWb0025
+  | GnWb0026
 
 type dsk_base = { data : base_data; func : base_func; version : base_version }
 (** Database representation: data and basic requests over this data. *)

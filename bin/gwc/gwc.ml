@@ -335,7 +335,14 @@ let reindex_database bname =
   in
   Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bdir)
   @@ fun () ->
-  let (), duration = with_timer @@ fun () -> Geneweb_db.Driver.reindex bdir in
+  let reindexed, duration =
+    with_timer @@ fun () -> Geneweb_db.Driver.reindex bdir
+  in
+  if not reindexed then (
+    Fmt.epr
+      "Database %S is in an earlier format: rebuild it with gwu then gwc.@."
+      bname;
+    exit 2);
   Format.eprintf "Index generation: %a@." pp_duration duration
 
 let () =

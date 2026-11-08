@@ -116,10 +116,13 @@ val sync : ?scratch:bool -> base -> unit
     Otherwise, only changes that occured since the last [sync] call are treated.
 *)
 
-val reindex : string -> unit
+val reindex : string -> bool
 (** [reindex bname] rewrites the index of the dictionaries of the database
     [bname] (files {i base.inx} and {i base.dat}) from the files of the base,
-    its patches left aside. The base must be locked by the caller. *)
+    its patches left aside, and upgrades a base of format GnWb0025 to the
+    current format. It returns [false], writing nothing, for a base of an
+    earlier format, which must be rebuilt (gwu then gwc). The base must be
+    locked by the caller. *)
 
 (** {2 Unique identifiers} *)
 

@@ -31,18 +31,18 @@ val output : Dbdisk.dsk_base -> unit
     - {i strings.inx} strings index. Associate hash of the string to the index
       of its entry in the base's string array. Save also previus value in the
       case of collision of hash.
-    - {i snames.inx} ordered index for surnames. Associate index of surname to
-      its offset in {i snames.dat}.
-    - {i snames.dat} For a giving surname give associated list of perosons
-      (index of its entry)
-    - {i fnames.inx} and {i fnames.dat} same as for {i snames.inx} and
-      {i snames.dat} but deals with first names
     - {i base.inx} and {i base.dat} index of the dictionaries (first names,
-      surnames, places, sources...), see {!BaseIndex}.
+      surnames, places, sources...), see {!BaseIndex}. Its sections of first
+      names and surnames replace {i fnames.*} and {i snames.*} of earlier
+      formats, which are removed.
     - {i notes} text file containing data base notes.
     - {i notes_d} directory containing .txt for each extended page.
     - {i particles.txt} text file with autorised name's particles. *)
 
 val output_index : Dbdisk.dsk_base -> unit
 (** [output_index base] writes the files {i base.inx} and {i base.dat} of [base]
-    alone (see {!output}). *)
+    alone (see {!output}). A base of format GnWb0025, which only lacks them, is
+    upgraded to the current format: its header is rewritten and its files
+    {i snames.*} and {i fnames.*} are removed.
+
+    @raise Invalid_argument for a base of an earlier format. *)

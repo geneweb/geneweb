@@ -513,5 +513,12 @@ let with_reader bdir ~particles src k =
     let f, c = view d in
     refs f c i
   in
-  k { dict_size; dict_groups; dict_entries; dict_refs } (fun () ->
-      Hashtbl.reset corrections)
+  let entry_from d k =
+    let f, c = view d in
+    Option.map snd (next_entry f c k)
+  in
+  let key_of d str = Dict.key (Lazy.force particles) d str in
+  let dict_first d str = entry_from d (key_of d str) in
+  let dict_after d i = entry_from d (key_of d (current_string i) ^ "\000") in
+  k { dict_size; dict_groups; dict_entries; dict_refs; dict_first; dict_after }
+    (fun () -> Hashtbl.reset corrections)

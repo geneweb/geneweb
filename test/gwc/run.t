@@ -67,8 +67,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 
@@ -94,8 +92,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 
@@ -126,8 +122,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 
@@ -153,8 +147,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 
@@ -180,8 +172,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 
@@ -207,8 +197,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
   ../galichet.gwo galichet.gwo differ: char 16, line 1

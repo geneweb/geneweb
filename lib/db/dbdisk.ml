@@ -26,6 +26,8 @@ type dict_index = {
   dict_groups : Dict.t -> string -> (string * int) list;
   dict_entries : Dict.t -> string -> int list;
   dict_refs : Dict.t -> int -> int list;
+  dict_first : Dict.t -> string -> int option;
+  dict_after : Dict.t -> int -> int option;
 }
 
 type perm = RDONLY | RDRW
@@ -78,5 +80,6 @@ type base_version =
   | GnWb0023
   | GnWb0024
   | GnWb0025
+  | GnWb0026
 
 type dsk_base = { data : base_data; func : base_func; version : base_version }

@@ -2,14 +2,18 @@
 
 > [!WARNING]
 > **New database format.**
-> Event witnesses now carry a note, so bases are written in format
-> `GnWb0025`. Bases of the earlier formats of GeneWeb 7 (`GnWb0020` to
-> `GnWb0024`) and their history files are still read, their witnesses
-> getting an empty note, but they are read-only: gwd refuses the edit
-> forms and tells wizards so on the welcome page. To edit such a base
-> again, export it with the `gwu` of this version, then rebuild it with
-> its `gwc`; until then, the version that built it can still use it. A
-> base rebuilt by this version cannot be read by an older one.
+> Event witnesses now carry a note, and the dictionaries of a base (first
+> names, surnames, places, sources…) are indexed in `base.inx` and
+> `base.dat`, which replace `fnames.*` and `snames.*`: bases are written
+> in format `GnWb0026`. Bases of the earlier formats of GeneWeb 7
+> (`GnWb0020` to `GnWb0025`) and their history files are still read,
+> their witnesses getting an empty note, but they are read-only: gwd
+> refuses the edit forms and tells wizards so on the welcome page. To
+> edit such a base again, export it with the `gwu` of this version, then
+> rebuild it with its `gwc`; until then, the version that built it can
+> still use it. A base of format `GnWb0025`, written by a development
+> version, only lacks the index: `gwc -reindex <base>` adds it in place.
+> A base rebuilt by this version cannot be read by an older one.
 > Bases written by GeneWeb 6 or earlier are refused: export them with the
 > `gwu` of their own version.
 > Compiled `.gwo` files must be regenerated.
@@ -159,11 +163,13 @@
 - `gwc` writes the index of the dictionaries of the base (first names,
   surnames, places, sources…) in `base.inx` and `base.dat`: the entries
   of each dictionary in sorted order, with the persons and families
-  using them. `-index-budget <KiB>` sets the size of the landmarks of
-  each dictionary, kept in memory to search it (1024 KiB by default: on
-  a large base, a larger size reads fewer strings per search).
-  `gwc -reindex <base>` rebuilds this index alone for an existing base,
-  without importing it again.
+  using them. gwd corrects it by the changes made since, and searches
+  first names and surnames in it: `fnames.*` and `snames.*` are no
+  longer written. `-index-budget <KiB>` sets the size of the landmarks
+  of each dictionary, kept in memory to search it (1024 KiB by default:
+  on a large base, a larger size reads fewer strings per search).
+  `gwc -reindex <base>` rebuilds this index alone, without importing the
+  base again, and upgrades a base of format `GnWb0025`.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person

@@ -20,8 +20,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
   $ ged2gwb -bd . ALLGED.GED -o ALLGED
@@ -53,8 +51,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   given name.0 surname's benediction before his/her birth
   
@@ -97,8 +93,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
   $ ged2gwb -bd . LTERLF.GED -o LTERLF
@@ -123,8 +117,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
   $ ged2gwb -bd . LTERCRLF.GED -o LTERCRLF
@@ -149,8 +141,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
   $ ged2gwb -bd . LTERLFCR.GED -o LTERLFCR
@@ -175,8 +165,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
 Check the support for ANSEL encoding 
@@ -202,8 +190,6 @@ Check the support for ANSEL encoding
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
 
 Check the support for UTF-16 LE encoding without BOM mark.

@@ -14,8 +14,9 @@
 > A base built by GeneWeb 7.0 or a 7.1 beta is still displayed, but it is
 > read-only: the edit forms are refused until the base is rebuilt. Keep a
 > copy of the base, export it with the `gwu` of the new version, then
-> rebuild it with its `gwc`. A rebuilt base cannot be read by an older
-> version. See [CHANGES.md](CHANGES.md) for details.
+> rebuild it with its `gwc`, which also writes the index of its
+> dictionaries (`base.inx` and `base.dat`). A rebuilt base cannot be read
+> by an older version. See [CHANGES.md](CHANGES.md) for details.
 
 ---
 
