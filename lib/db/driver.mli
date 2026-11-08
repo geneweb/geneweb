@@ -562,6 +562,30 @@ val spi_next : string_person_index -> istr -> istr
 val spi_find : string_person_index -> istr -> iper list
 (** Retruns all persons id having that [first/sur]name. *)
 
+(** {2 Dictionaries}
+
+    Queries over the index of the dictionaries ({!Dict}), written by gwc in
+    {i base.inx} and {i base.dat}. A prefix selects the entries whose key
+    ({!Dict.key}) starts with it: those whose displayed text starts with it.
+    Entries come in the order of their keys. *)
+
+val dict_size : base -> Dict.t -> string -> int
+(** [dict_size base dict prefix] Number of entries starting with [prefix]. *)
+
+val dict_groups : base -> Dict.t -> string -> (string * int) list
+(** [dict_groups base dict prefix] The entries starting with [prefix] grouped by
+    the character following it: the prefix of each group, one character longer
+    than [prefix], and its number of entries. The entries displayed exactly as
+    [prefix] (a place with its suburbs, a surname with or without a particle)
+    form a group whose prefix is [prefix]. *)
+
+val dict_entries : base -> Dict.t -> string -> istr list
+(** [dict_entries base dict prefix] The entries starting with [prefix]. *)
+
+val dict_records : base -> Dict.t -> istr -> iper list * ifam list
+(** [dict_records base dict istr] The persons and the families using [istr] in
+    the fields of [dict]. *)
+
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 (** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not
     visible (restrited)) from the [base]. If file {i restrict} is present then

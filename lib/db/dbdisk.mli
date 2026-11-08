@@ -56,6 +56,20 @@ type string_person_index = {
 (** Data structure for optimised search throughout index by name (surname or
     first name). Considers also patched persons. *)
 
+type dict_index = {
+  (* Number of entries of a dictionary whose key starts with a prefix. *)
+  dict_size : Dict.t -> string -> int;
+  (* Entries whose key starts with a prefix, grouped by their next
+     character: prefix and number of entries of each group. *)
+  dict_groups : Dict.t -> string -> (string * int) list;
+  (* String ids of the entries whose key starts with a prefix. *)
+  dict_entries : Dict.t -> string -> int list;
+  (* Records using a string: 2 * iper for a person, 2 * ifam + 1 for a
+     family. *)
+  dict_refs : Dict.t -> int -> int list;
+}
+(** Queries over the index of the dictionaries of the base. *)
+
 type perm = RDONLY | RDRW
 
 type base_data = {
@@ -102,6 +116,8 @@ type base_func = {
   persons_of_surname : string_person_index;
   (* Search functionalities throughout index by first name *)
   persons_of_first_name : string_person_index;
+  (* Queries over the index of the dictionaries *)
+  dict_index : dict_index;
   (* Insert or modify person with a giving id (add to pending patches). *)
   patch_person : int -> dsk_person -> unit;
   (* Insert or modify ascendants of a person with a giving id (add to pending patches). *)

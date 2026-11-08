@@ -24,3 +24,20 @@ val output : budget:int -> Dbdisk.base_data -> inx:string -> dat:string -> unit
     and strings of [data], committed patches included and pending ones left
     aside, to the files [inx] and [dat]. The block size of a section is the
     smallest power of 2 whose landmarks fit in [budget] bytes. *)
+
+val with_reader :
+  string ->
+  particles:Re.re Lazy.t ->
+  strings_len:int ->
+  file_string:(int -> string) ->
+  (Dbdisk.dict_index -> 'a) ->
+  'a
+(** [with_reader bdir ~particles ~strings_len ~file_string k] calls [k] with the
+    queries over the index of the base directory [bdir]. [file_string] is the
+    string of an id in the files of the base, patches left aside, and
+    [strings_len] their number. The files of the index are opened at the first
+    query and closed when [k] returns.
+
+    @raise Dutil.Incompatible_format
+      at the first query if {i base.inx} is not in the format of this version.
+*)

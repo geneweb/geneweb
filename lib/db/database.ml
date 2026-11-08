@@ -1487,6 +1487,9 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
+  BaseIndex.with_reader bname ~particles:base_data.particles ~strings_len
+    ~file_string:im_strings.im_get
+  @@ fun dict_index ->
   let base_func =
     {
       person_of_key = person_of_key persons strings persons_of_name;
@@ -1507,6 +1510,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
             "fnames.inx",
             "fnames.dat",
             bname );
+      dict_index;
       patch_person;
       patch_ascend;
       patch_union;
@@ -1581,6 +1585,13 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
           find = (fun _ -> assert false);
           cursor = (fun _ -> assert false);
           next = (fun _ -> assert false);
+        };
+      dict_index =
+        {
+          dict_size = (fun _ -> assert false);
+          dict_groups = (fun _ -> assert false);
+          dict_entries = (fun _ -> assert false);
+          dict_refs = (fun _ -> assert false);
         };
       patch_person = (fun _ -> assert false);
       patch_ascend = (fun _ -> assert false);
