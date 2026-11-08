@@ -1200,6 +1200,41 @@ let load config_dir =
     (fun (header, rev) -> { header with items = List.rev rev })
     (fold config_dir (fun acc it -> it :: acc) [])
 
+(* Re-detect [a] on the live [base] by replaying, for its subjects, the checks
+   that produced the report ([CheckItem.person] and [CheckItem.family]): the
+   anomaly still holds iff one of them emits an anomaly with the same
+   {!identity}. Lets the display drop anomalies corrected since the report was
+   written. [IncoherentAncestorDate] comes from an ancestry walk that cannot be
+   replayed from a single subject, so it is always kept. *)
+let still_present base a =
+  match kind a with
+  | K_IncoherentAncestorDate -> true
+  | _ ->
+      let target = identity a in
+      let found = ref false in
+      let warning w =
+        if (not !found) && identity (of_warning base w) = target then
+          found := true
+      in
+      let seen = Hashtbl.create 8 in
+      let check_family ifam =
+        if not (Hashtbl.mem seen ifam) then (
+          Hashtbl.add seen ifam ();
+          CheckItem.family ~onchange:false base warning ifam
+            (Driver.foi base ifam))
+      in
+      List.iter
+        (fun p ->
+          if not (is_unnamed p) then
+            match Driver.person_of_key base p.first_name p.surname p.occ with
+            | None -> ()
+            | Some ip ->
+                let dp = Driver.poi base ip in
+                ignore (CheckItem.person ~onchange:false base warning dp);
+                Array.iter check_family (Driver.get_family dp))
+        (persons a);
+      !found
+
 let write ?(verbose = false) ~base ~bdir ~producer anomalies =
   let dir = Filename.concat bdir "config" in
   match save dir (make ~verbose ~base ~bdir ~producer anomalies) with

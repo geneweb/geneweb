@@ -757,7 +757,13 @@ let print_kind conf base (st : state) items k =
         && (f.all || not (verified st it)))
       items
   in
-  let shown = List.filter (of_wizard st) of_kind in
+  (* The report is a snapshot (anoma runs on a schedule); re-check each entry of
+     the viewed kind against the live base and drop the ones fixed since. *)
+  let shown =
+    List.filter
+      (fun it -> of_wizard st it && Anomaly.still_present base it.anomaly)
+      of_kind
+  in
   let total = List.length shown in
   let pages = max 1 ((total + page_size - 1) / page_size) in
   let pg =
