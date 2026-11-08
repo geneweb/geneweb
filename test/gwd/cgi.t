@@ -20,8 +20,6 @@
   *** create strings of sname
   *** create strings of fname
   *** create string index
-  *** create surname index
-  *** create first name index
   *** ok
   Database generation: 0 min 0 sec
 

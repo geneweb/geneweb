@@ -296,10 +296,14 @@ let make bname particles arrays k =
 
 let reindex bname =
   Database.with_database ~with_patches:false bname (fun base ->
-      load_persons_array base;
-      load_families_array base;
-      load_strings_array base;
-      Outbase.output_index base)
+      match base.version with
+      | GnWb0026 | GnWb0025 ->
+          load_persons_array base;
+          load_families_array base;
+          load_strings_array base;
+          Outbase.output_index base;
+          true
+      | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> false)
 
 let bfname base fname = Filename.concat base.data.bdir fname
 
@@ -360,7 +364,7 @@ module NLDB = struct
       Sys.rename fname_tmp fname_def
 end
 
-let current_base_format = Dutil.magic_GnWb0025
+let current_base_format = Dutil.magic_GnWb0026
 let base_format base = Database.magic_of_version base.version
 let base_format_of_dir = Database.base_format_of_dir
 

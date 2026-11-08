@@ -299,8 +299,8 @@ let warn_old_base_format conf base =
   if conf.wizard && found <> Driver.current_base_format then (
     Log.warn (fun k ->
         k
-          "base %s is in format %s, converted on every read and read-only; \
-           rebuild it (gwu then gwc) to write format %s"
+          "base %s is in format %s and read-only; rebuild it (gwu then gwc) to \
+           write format %s"
           conf.bname found Driver.current_base_format);
     Notif.warning ~mode:Notif.Dismissible
       ~title:(Util.transl conf "NOTIF_TT old base format")

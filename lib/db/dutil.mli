@@ -26,8 +26,14 @@ val magic_GnWb0024 : string
 (** Header for the {i base} file (version 0024) *)
 
 val magic_GnWb0025 : string
-(** Header for the latest version of {i base} file, where event witnesses carry
-    a note *)
+(** Header for the {i base} file (version 0025), where event witnesses carry a
+    note *)
+
+val magic_GnWb0026 : string
+(** Header for the latest version of {i base} file, whose first names and
+    surnames are searched in the index of the dictionaries ({i base.inx} and
+    {i base.dat}) instead of {i fnames.inx}, {i fnames.dat}, {i snames.inx} and
+    {i snames.dat} *)
 
 val base_magics : string list
 (** Headers of the {i base} file versions this executable can read, latest

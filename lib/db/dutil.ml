@@ -12,9 +12,11 @@ let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
 let magic_GnWb0024 = "GnWb0024"
 let magic_GnWb0025 = "GnWb0025"
+let magic_GnWb0026 = "GnWb0026"
 
 let base_magics =
   [
+    magic_GnWb0026;
     magic_GnWb0025;
     magic_GnWb0024;
     magic_GnWb0023;

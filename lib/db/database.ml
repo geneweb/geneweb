@@ -355,21 +355,44 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   in
   { find; cursor; next }
 
-let persons_of_first_name = function
+let persons_of_dict dict_index d =
+  {
+    find =
+      (fun i ->
+        List.filter_map
+          (fun r -> if r land 1 = 0 then Some (r lsr 1) else None)
+          (dict_index.dict_refs d i));
+    cursor =
+      (fun s ->
+        match dict_index.dict_first d s with
+        | Some i -> i
+        | None -> raise Not_found);
+    next =
+      (fun i ->
+        match dict_index.dict_after d i with
+        | Some i -> i
+        | None -> raise Not_found);
+  }
+
+let persons_of_first_name version dict_index base_data params =
+  match version with
+  | GnWb0026 -> persons_of_dict dict_index Dict.First_name
   | GnWb0025 | GnWb0024 ->
       new_persons_of_first_name_or_surname
         (fun _ -> Dutil.compare_fnames)
-        Dutil.compare_fnames_i
+        Dutil.compare_fnames_i base_data params
   | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
-        Dutil.compare_snames_i
-  | GnWb0020 -> old_persons_of_first_name_or_surname
+        Dutil.compare_snames_i base_data params
+  | GnWb0020 -> old_persons_of_first_name_or_surname base_data params
 
-let persons_of_surname = function
+let persons_of_surname version dict_index base_data params =
+  match version with
+  | GnWb0026 -> persons_of_dict dict_index Dict.Surname
   | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
-        Dutil.compare_snames_i
-  | GnWb0020 -> old_persons_of_first_name_or_surname
+        Dutil.compare_snames_i base_data params
+  | GnWb0020 -> old_persons_of_first_name_or_surname base_data params
 
 (* Search index for a given name in file names.inx *)
 
@@ -501,11 +524,11 @@ let new_strings_of_fname =
   new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
 
 let strings_of_sname = function
-  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_sname
+  | GnWb0026 | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_sname
   | GnWb0022 | GnWb0021 | GnWb0020 -> old_strings_of_fsname
 
 let strings_of_fname = function
-  | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_fname
+  | GnWb0026 | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | GnWb0022 | GnWb0021 | GnWb0020 -> old_strings_of_fsname
 
 (*
@@ -577,11 +600,12 @@ end
 
 let has_witness_notes version =
   match version with
-  | GnWb0025 -> true
+  | GnWb0026 | GnWb0025 -> true
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> false
 
 let base_version_of_magic found =
-  if found = Dutil.magic_GnWb0025 then Some GnWb0025
+  if found = Dutil.magic_GnWb0026 then Some GnWb0026
+  else if found = Dutil.magic_GnWb0025 then Some GnWb0025
   else if found = Dutil.magic_GnWb0024 then Some GnWb0024
   else if found = Dutil.magic_GnWb0023 then Some GnWb0023
   else if found = Dutil.magic_GnWb0022 then Some GnWb0022
@@ -590,7 +614,7 @@ let base_version_of_magic found =
   else None
 
 let read_base_magic ic =
-  let len = String.length Dutil.magic_GnWb0025 in
+  let len = String.length Dutil.magic_GnWb0026 in
   if in_channel_length ic < len then "" else really_input_string ic len
 
 let read_header fname read =
@@ -635,12 +659,13 @@ let has_current_layout bname =
 
 let readable_version bname version =
   match version with
-  | GnWb0025 -> true
+  | GnWb0026 | GnWb0025 -> true
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
       has_current_layout bname
 
 let magic_of_version version =
   match version with
+  | GnWb0026 -> Dutil.magic_GnWb0026
   | GnWb0025 -> Dutil.magic_GnWb0025
   | GnWb0024 -> Dutil.magic_GnWb0024
   | GnWb0023 -> Dutil.magic_GnWb0023
@@ -717,7 +742,7 @@ end = struct
     Secure.with_open_in_bin inx @@ fun ic ->
     let start =
       match version with
-      | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
+      | GnWb0026 | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 -> int_size
       | GnWb0021 | GnWb0020 -> 3 * int_size
     in
     let size = input_binary_int ic in
@@ -980,8 +1005,9 @@ let base_format_status_of_dir bname =
       then Unreadable patches_magic
       else
         match version with
-        | GnWb0025 -> Current
-        | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> Older found)
+        | GnWb0026 -> Current
+        | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
+            Older found)
 
 let input_synchro bname =
   try
@@ -1086,21 +1112,26 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
   if rdonly_reason <> "" then Log.err (fun k -> k "%s" rdonly_reason);
   (* A base of an earlier format is only read: patches or history records
      written by this version would make it unreadable for the version that
-     built it. It must be rebuilt first (gwu then gwc). Not logged, as this
-     applies to every request. *)
+     built it, and the editing tools need the index of the dictionaries. It
+     must be rebuilt first (gwu then gwc, or gwc -reindex for GnWb0025). Not
+     logged, as this applies to every request. *)
   let perm, rdonly_reason =
-    match (perm, witness_notes) with
-    | RDRW, false ->
+    match (perm, version) with
+    | RDRW, (GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020) ->
         ( RDONLY,
           Printf.sprintf
             "base %s is in an earlier format, read-only until rebuilt (gwu \
              then gwc)"
             bname )
-    | RDRW, true when not with_patches ->
+    | RDRW, GnWb0026 when not with_patches ->
         ( RDONLY,
           Printf.sprintf "base %s is read without its patches, read-only" bname
         )
-    | RDRW, true | RDONLY, (true | false) -> (perm, rdonly_reason)
+    | RDRW, GnWb0026
+    | ( RDONLY,
+        ( GnWb0026 | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021
+        | GnWb0020 ) ) ->
+        (perm, rdonly_reason)
   in
   let forbidden loc = HttpExn (Forbidden, loc ^ ": " ^ rdonly_reason) in
   let fname = bname // "particles.txt" in
@@ -1511,14 +1542,14 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       strings_of_sname = strings_of_sname version bname strings patches.h_person;
       strings_of_fname = strings_of_fname version bname strings patches.h_person;
       persons_of_surname =
-        persons_of_surname version base_data
+        persons_of_surname version dict_index base_data
           ( (fun p -> p.surname),
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
             bname );
       persons_of_first_name =
-        persons_of_first_name version base_data
+        persons_of_first_name version dict_index base_data
           ( (fun p -> p.first_name),
             snd patches.h_person,
             "fnames.inx",
@@ -1606,6 +1637,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
           dict_groups = (fun _ -> assert false);
           dict_entries = (fun _ -> assert false);
           dict_refs = (fun _ -> assert false);
+          dict_first = (fun _ -> assert false);
+          dict_after = (fun _ -> assert false);
         };
       patch_person = (fun _ -> assert false);
       patch_ascend = (fun _ -> assert false);
@@ -1625,4 +1658,4 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       ifam_exists = (fun _ -> assert false);
     }
   in
-  k { data; func; version = GnWb0025 }
+  k { data; func; version = GnWb0026 }

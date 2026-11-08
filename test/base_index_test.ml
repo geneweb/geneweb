@@ -211,7 +211,38 @@ let check_dict base d =
            (List.rev_append
               (List.map (fun i -> 2 * Driver.Iper.hash i) ipers)
               (List.map (fun i -> (2 * Driver.Ifam.hash i) + 1) ifams))))
-    entries
+    entries;
+  let check_spi spi =
+    let rec walk acc i =
+      match i with
+      | None -> List.rev acc
+      | Some i ->
+          walk
+            (Driver.Istr.hash i :: acc)
+            (try Some (Driver.spi_next spi i) with Not_found -> None)
+    in
+    (check (list int))
+      (name ^ " spi order")
+      (List.map (fun (_, i, _) -> i) entries)
+      (walk [] (try Some (Driver.spi_first spi "") with Not_found -> None));
+    List.iter
+      (fun (_, istr, refs) ->
+        (check (list int))
+          (Printf.sprintf "%s spi_find %d" name istr)
+          (List.map (fun r -> r / 2) refs)
+          (List.sort Int.compare
+             (List.map Driver.Iper.hash
+                (Driver.spi_find spi
+                   (Driver.Istr.of_string (string_of_int istr))))))
+      entries
+  in
+  match d with
+  | Dict.First_name -> check_spi (Driver.persons_of_first_name base)
+  | Dict.Surname -> check_spi (Driver.persons_of_surname base)
+  | Dict.(
+      ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
+      | Occupation | Place | Source | Title | Domain )) ->
+      ()
 
 let index name budget () =
   with_base name budget @@ fun base -> List.iter (check_dict base) Dict.all

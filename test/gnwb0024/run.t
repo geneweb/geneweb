@@ -53,6 +53,12 @@ Recompiling the export writes the current format, with the same content.
 
   $ gwc -bd . old.gw -o new -f > /dev/null 2>&1
   $ head -c 8 new.gwb/base; echo
-  GnWb0025
+  GnWb0026
   $ gwu -bd . new -o new.gw
   $ diff old.gw new.gw
+
+A base of an earlier format is not reindexed: it must be rebuilt.
+
+  $ gwc -bd . -reindex old
+  Database "old" is in an earlier format: rebuild it with gwu then gwc.
+  [2]

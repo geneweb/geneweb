@@ -215,9 +215,12 @@ The search system (introduced by DDR) uses a 4-level fallback:
 `Name.crush_lower` (phonetic) → `Name.lower` (exact) →
 `Name.strip_lower` → all phonetic.
 
-Index files (`fnames.inx`/`fnames.dat`, `snames.inx`/`snames.dat`)
-provide O(log n) access. **Never use `Collection.iter` for search**
-— it is O(n) over the entire database.
+The index of the dictionaries (`base.inx`/`base.dat`, written by gwc,
+module `BaseIndex`) provides O(log n) access to first names, surnames,
+places, sources and the other dictionaries of `Dict`, corrected by the
+patches when read: use `Driver.dict_*`, `Driver.persons_of_surname` and
+`Driver.persons_of_first_name`. **Never use `Collection.iter` for
+search** — it is O(n) over the entire database.
 
 ## Wiki / Notes Syntax (TLSW)
 

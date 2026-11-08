@@ -350,54 +350,6 @@ let output_strings_hash tmp_strings_inx base =
   done;
   close_out oc
 
-(* Associate istr to persons.
-   A person is associated with its first name/surname and aliases
-*)
-let output_name_index_aux cmp get base names_inx names_dat =
-  let ht = Dutil.IntHT.create 0 in
-  for i = 0 to base.data.persons.len - 1 do
-    let p = base.data.persons.get i in
-    let k = get p in
-    match Dutil.IntHT.find_opt ht k with
-    | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
-    | None -> Dutil.IntHT.add ht k [ p.key_index ]
-  done;
-  let a = Array.make (Dutil.IntHT.length ht) (0, []) in
-  ignore
-  @@ Dutil.IntHT.fold
-       (fun k v i ->
-         Array.set a i (k, v);
-         succ i)
-       ht 0;
-  (* sort by name behind the int order *)
-  Array.sort (fun (k, _) (k', _) -> cmp k k') a;
-  let oc_n_dat = Secure.open_out_bin names_dat in
-  let bt2 =
-    Array.map
-      (fun (k, ipl) ->
-        let off = pos_out oc_n_dat in
-        output_binary_int oc_n_dat (List.length ipl);
-        List.iter (output_binary_int oc_n_dat) ipl;
-        (k, off))
-      a
-  in
-  close_out oc_n_dat;
-  let oc_n_inx = Secure.open_out_bin names_inx in
-  Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
-  close_out oc_n_inx
-
-let output_surname_index base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux
-    (Dutil.compare_snames_i base.data)
-    (fun p -> p.surname)
-    base tmp_snames_inx tmp_snames_dat
-
-let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux
-    (Dutil.compare_fnames_i base.data)
-    (fun p -> p.first_name)
-    base tmp_fnames_inx tmp_fnames_dat
-
 let output_particles_file particles fname =
   let oc = open_out fname in
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
@@ -454,11 +406,16 @@ let test_size bname =
   if Int64.compare sz (Int64.div (Int64.mul limit 9L) 10L) > 0 then
     Printf.eprintf
       "Warning: %s is %Ld bytes (%.1f%% of the 4 GiB limit of 32-bit positions \
-       in format GnWb0025).\n\
+       in format GnWb0026).\n\
        A wider position format will be required soon.\n\
        %!"
       base_file sz
       (100. *. Int64.to_float sz /. Int64.to_float limit)
+
+let remove_name_indexes bname =
+  List.iter
+    (fun f -> Mutil.rm (Filename.concat bname f))
+    [ "snames.inx"; "snames.dat"; "fnames.inx"; "fnames.dat" ]
 
 let output base =
   (* create database directory *)
@@ -470,10 +427,6 @@ let output base =
   let tmp_base_acc = Filename.concat bname "1base.acc" in
   let tmp_names_inx = Filename.concat bname "1names.inx" in
   let tmp_names_acc = Filename.concat bname "1names.acc" in
-  let tmp_snames_inx = Filename.concat bname "1snames.inx" in
-  let tmp_snames_dat = Filename.concat bname "1snames.dat" in
-  let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
-  let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_index_inx = Filename.concat bname "1base.inx" in
   let tmp_index_dat = Filename.concat bname "1base.dat" in
@@ -497,7 +450,7 @@ let output base =
   in
   (try
      (* output header of "base" *)
-     output_string oc Dutil.magic_GnWb0025;
+     output_string oc Dutil.magic_GnWb0026;
      output_binary_int oc base.data.persons.len;
      output_binary_int oc base.data.families.len;
      output_binary_int oc base.data.strings.len;
@@ -576,16 +529,6 @@ let output base =
          Gc.compact ();
          trace "create string index";
          output_strings_hash tmp_strings_inx base;
-         if !save_mem then (
-           trace "compacting";
-           Gc.compact ());
-         trace "create surname index";
-         output_surname_index base tmp_snames_inx tmp_snames_dat;
-         if !save_mem then (
-           trace "compacting";
-           Gc.compact ());
-         trace "create first name index";
-         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
          output_notes base tmp_notes;
          output_notes_d base tmp_notes_d;
          output_particles_file base.data.particles_txt tmp_particles);
@@ -626,10 +569,6 @@ let output base =
   safe_rename tmp_base_acc (Filename.concat bname "base.acc");
   safe_rename tmp_names_inx (Filename.concat bname "names.inx");
   safe_rename tmp_names_acc (Filename.concat bname "names.acc");
-  safe_rename tmp_snames_dat (Filename.concat bname "snames.dat");
-  safe_rename tmp_snames_inx (Filename.concat bname "snames.inx");
-  safe_rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-  safe_rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
   safe_rename tmp_strings_inx (Filename.concat bname "strings.inx");
   safe_rename tmp_index_dat (Filename.concat bname "base.dat");
   safe_rename tmp_index_inx (Filename.concat bname "base.inx");
@@ -653,6 +592,7 @@ let output base =
   Mutil.rm (Filename.concat bname "notes_link");
   Mutil.rm (Filename.concat bname "restrict");
   Mutil.rm (Filename.concat bname "tstab_visitor");
+  remove_name_indexes bname;
   (* FIXME: should not be present in this part of the code? *)
   Mutil.rm (Filename.concat bname "tstab");
   Mutil.rm (Filename.concat bname "tstab_visitor");
@@ -660,6 +600,13 @@ let output base =
   test_size bname
 
 let output_index base =
+  let upgrade =
+    match base.version with
+    | GnWb0026 -> false
+    | GnWb0025 -> true
+    | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
+        invalid_arg "Outbase.output_index: format earlier than GnWb0025"
+  in
   let bname = base.data.bdir in
   let tmp_inx = Filename.concat bname "1base.inx" in
   let tmp_dat = Filename.concat bname "1base.dat" in
@@ -670,4 +617,15 @@ let output_index base =
      Mutil.rm tmp_dat;
      raise e);
   safe_rename tmp_dat (Filename.concat bname "base.dat");
-  safe_rename tmp_inx (Filename.concat bname "base.inx")
+  safe_rename tmp_inx (Filename.concat bname "base.inx");
+  if upgrade then (
+    let oc =
+      Secure.open_out_gen
+        [ Open_wronly; Open_binary ]
+        0
+        (Filename.concat bname "base")
+    in
+    Fun.protect
+      ~finally:(fun () -> close_out oc)
+      (fun () -> output_string oc Dutil.magic_GnWb0026);
+    remove_name_indexes bname)
