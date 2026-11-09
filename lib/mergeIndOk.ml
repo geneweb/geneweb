@@ -384,60 +384,45 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
             else
               let ifam = (Driver.get_family pc).(i) in
               let fam = Driver.gen_family_of_family (Driver.foi base ifam) in
-              let p_related, mod_p =
-                if Array.mem ip2 fam.witnesses then (
-                  let p_related, mod_p =
-                    let rec loop (p_related, mod_p) j =
-                      if j = Array.length fam.witnesses then (p_related, mod_p)
-                      else
-                        let p_related, mod_p =
-                          if fam.witnesses.(j) = ip2 then (
-                            fam.witnesses.(j) <- p.key_index;
-                            if List.mem ipc p_related then (p_related, mod_p)
-                            else (ipc :: p_related, true))
-                          else (p_related, mod_p)
-                        in
-                        loop (p_related, mod_p) (j + 1)
-                    in
-                    loop (p_related, mod_p) 0
-                  in
-                  Driver.patch_family base ifam fam;
-                  (p_related, mod_p))
-                else (p_related, mod_p)
+              (* Never mutate [fam] in place: it is the record held by the base
+                 (cache, patches table, or out-of-heap Ancient data with
+                 -cache-in-memory). Storing a freshly allocated tuple into Ancient
+                 memory leaves it unreachable for the GC, which frees it; the
+                 iper read back (and committed to patches) is then garbage. *)
+              let found = ref false in
+              let witnesses =
+                Array.map
+                  (fun ip ->
+                    if ip = ip2 then (
+                      found := true;
+                      p.key_index)
+                    else ip)
+                  fam.witnesses
               in
-              let pc_fevents, mod_pc, p_related, mod_p =
-                List.fold_right
-                  (fun e (pc_fevents, _, p_related, mod_p) ->
-                    let e, mod_pc, p_related, mod_p =
-                      let p_related, mod_p =
-                        let rec loop (p_related, mod_p) j =
-                          if j = Array.length e.efam_witnesses then
-                            (p_related, mod_p)
-                          else
-                            let p_related, mod_p =
-                              let wip, _, _ = e.efam_witnesses.(j) in
-                              if wip = ip2 then (
-                                let _, wk, wn = e.efam_witnesses.(j) in
-                                e.efam_witnesses.(j) <- (p.key_index, wk, wn);
-                                if List.mem ipc p_related then (p_related, mod_p)
-                                else (ipc :: p_related, true))
-                              else (p_related, mod_p)
-                            in
-                            loop (p_related, mod_p) (j + 1)
-                        in
-                        loop (p_related, mod_p) 0
-                      in
-                      (e, true, p_related, mod_p)
-                    in
-                    (e :: pc_fevents, mod_pc, p_related, mod_p))
+              let fevents =
+                List.map
+                  (fun e ->
+                    if
+                      Array.exists (fun (ip, _, _) -> ip = ip2) e.efam_witnesses
+                    then (
+                      found := true;
+                      {
+                        e with
+                        efam_witnesses =
+                          Array.map
+                            (fun ((ip, wk, wn) as w) ->
+                              if ip = ip2 then (p.key_index, wk, wn) else w)
+                            e.efam_witnesses;
+                      })
+                    else e)
                   fam.fevents
-                  ([], false, p_related, mod_p)
               in
-              let () =
-                (* TODO mod_pc = True tout le temps *)
-                if mod_pc then
-                  let fam = { fam with fevents = pc_fevents } in
-                  Driver.patch_family base ifam fam
+              let p_related, mod_p =
+                if !found then (
+                  Driver.patch_family base ifam { fam with witnesses; fevents };
+                  if List.mem ipc p_related then (p_related, mod_p)
+                  else (ipc :: p_related, true))
+                else (p_related, mod_p)
               in
               loop (p_related, mod_p) (i + 1)
           in
