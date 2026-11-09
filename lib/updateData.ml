@@ -450,10 +450,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
                 Gwdb.patch_family base nfam.fam_index nfam)
               (Gwdb.get_family p);
           (* On met aussi à jour l'historique. *)
-          let changed =
-            Def.U_Multi
-              (o_p, np, if action = "fn" || action = "sn" then true else false)
-          in
+          let changed = Def.U_Multi (o_p, np, action = "fn" || action = "sn") in
           History.record conf base changed action)
         perl)
     list;

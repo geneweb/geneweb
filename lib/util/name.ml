@@ -70,8 +70,7 @@ let abbrev_list =
 (* Checks if the word starting at [i] in [s] is [p]. *)
 let is_word s i p =
   let rec is_word s i p ip =
-    if ip = String.length p then
-      if i = String.length s then true else if s.[i] = ' ' then true else false
+    if ip = String.length p then i = String.length s || s.[i] = ' '
     else if i = String.length s then false
     else if s.[i] = p.[ip] then is_word s (i + 1) p (ip + 1)
     else false

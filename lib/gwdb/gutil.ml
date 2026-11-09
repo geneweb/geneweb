@@ -11,15 +11,10 @@ let spouse ip cpl =
 
 let person_is_key base p k =
   let k = Name.crush_lower k in
-  if
-    k = Name.crush_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
-  then true
-  else if
-    List.exists
-      (fun x -> k = Name.crush_lower x)
-      (Gwdb.person_misc_names base p Gwdb.get_titles)
-  then true
-  else false
+  k = Name.crush_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p)
+  || List.exists
+       (fun x -> k = Name.crush_lower x)
+       (Gwdb.person_misc_names base p Gwdb.get_titles)
 
 let find_num s i =
   let rec loop start i =
