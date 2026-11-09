@@ -135,21 +135,34 @@ let compare_title_order conf base (x1, t1) (x2, t2) =
 let to_string_list base ht =
   T.to_seq ht |> Seq.map (fun (i, ()) -> Driver.sou base i) |> List.of_seq
 
+let bearers base d select =
+  if Driver.base_format base <> Driver.current_base_format then
+    List.rev (Collection.fold (fun acc i -> i :: acc) [] (Driver.ipers base))
+  else
+    List.sort_uniq Driver.Iper.compare
+      (List.fold_left
+         (fun acc i ->
+           if select (Driver.sou base i) then
+             List.rev_append (fst (Driver.dict_records base d i)) acc
+           else acc)
+         []
+         (Driver.dict_entries base d ""))
+
+let same ~absolute s =
+  let l = Name.lower s in
+  fun s' ->
+    if absolute then String.equal s s' else String.equal l (Name.lower s')
+
 let select_title_place conf base ~absolute title place =
   let names : unit T.t = T.create 17 in
-  let select =
-    let tl1 = Name.lower title in
-    let pl1 = Name.lower place in
-    fun t ->
-      let tl2 = Driver.sou base t.t_ident in
-      let pl2 = Driver.sou base t.t_place in
-      (absolute && String.equal title tl2 && String.equal place pl2)
-      || (not absolute)
-         && String.equal tl1 (Name.lower tl2)
-         && String.equal pl1 (Name.lower pl2)
+  let same_title = same ~absolute title in
+  let same_place = same ~absolute place in
+  let select t =
+    same_title (Driver.sou base t.t_ident)
+    && same_place (Driver.sou base t.t_place)
   in
   let l =
-    Collection.fold
+    List.fold_left
       (fun acc i ->
         let x = pget conf base i in
         let titles = listed_titles conf base x in
@@ -161,17 +174,15 @@ let select_title_place conf base ~absolute title place =
             else acc)
           acc titles)
       []
-      (Geneweb_db.Driver.ipers base)
+      (bearers base Geneweb_db.Dict.Title same_title)
   in
   let names = to_string_list base names in
   (l, names)
 
 let select_all_with_place conf base place =
-  let select =
-    let p = Name.lower place in
-    fun t -> String.equal (Name.lower (Driver.sou base t.t_place)) p
-  in
-  Collection.fold
+  let same_place = same ~absolute:false place in
+  let select t = same_place (Driver.sou base t.t_place) in
+  List.fold_left
     (fun acc i ->
       let x = pget conf base i in
       let titles = listed_titles conf base x in
@@ -179,19 +190,14 @@ let select_all_with_place conf base place =
         (fun acc t -> if select t then (x, t) :: acc else acc)
         acc titles)
     []
-    (Geneweb_db.Driver.ipers base)
+    (bearers base Geneweb_db.Dict.Domain same_place)
 
 let select_title conf base ~absolute title =
   let places : unit T.t = T.create 17 in
   let names : unit T.t = T.create 17 in
-  let select =
-    let tl = Name.lower title in
-    fun t ->
-      let tn = Driver.sou base t.t_ident in
-      (absolute && String.equal tn title)
-      || ((not absolute) && String.equal (Name.lower tn) tl)
-  in
-  Collection.iter
+  let same_title = same ~absolute title in
+  let select t = same_title (Driver.sou base t.t_ident) in
+  List.iter
     (fun i ->
       let x = pget conf base i in
       List.iter
@@ -200,40 +206,36 @@ let select_title conf base ~absolute title =
             T.replace names t.t_ident ();
             T.replace places t.t_place ()))
         (listed_titles conf base x))
-    (Geneweb_db.Driver.ipers base);
+    (bearers base Geneweb_db.Dict.Title same_title);
   let places = to_string_list base places in
   let names = to_string_list base names in
   (places, names)
 
 let select_place conf base place =
   let names : unit T.t = T.create 17 in
-  let select =
-    let p = Name.lower place in
-    fun t ->
-      let pn = Driver.sou base t.t_place in
-      String.equal (Name.lower pn) p
-  in
-  Collection.iter
+  let same_place = same ~absolute:false place in
+  let select t = same_place (Driver.sou base t.t_place) in
+  List.iter
     (fun i ->
       let x = pget conf base i in
       let titles = listed_titles conf base x in
       List.iter (fun t -> if select t then T.replace names t.t_ident ()) titles)
-    (Geneweb_db.Driver.ipers base);
+    (bearers base Geneweb_db.Dict.Domain same_place);
   to_string_list base names
 
-let select_all proj conf base =
+let select_all d proj conf base =
   let ht : unit T.t = T.create 17 in
-  Collection.iter
+  List.iter
     (fun i ->
       let x = pget conf base i in
       let titles = listed_titles conf base x in
       List.iter (fun t -> T.add ht (proj t) ()) titles)
-    (Geneweb_db.Driver.ipers base);
+    (bearers base d (fun _ -> true));
   to_string_list base ht
 
-let select_all_with_counter proj conf base =
+let select_all_with_counter d proj conf base =
   let ht : int T.t = T.create 17 in
-  Collection.iter
+  List.iter
     (fun i ->
       let x = pget conf base i in
       let titles = listed_titles conf base x in
@@ -244,8 +246,10 @@ let select_all_with_counter proj conf base =
           | i -> T.replace ht y (i + 1)
           | exception Not_found -> T.add ht y 1)
         titles)
-    (Geneweb_db.Driver.ipers base);
+    (bearers base d (fun _ -> true));
   T.to_seq ht |> Seq.map (fun (i, c) -> (Driver.sou base i, c)) |> List.of_seq
 
-let select_all_titles = select_all_with_counter (fun t -> t.t_ident)
-let select_all_places = select_all (fun t -> t.t_place)
+let select_all_titles =
+  select_all_with_counter Geneweb_db.Dict.Title (fun t -> t.t_ident)
+
+let select_all_places = select_all Geneweb_db.Dict.Domain (fun t -> t.t_place)
