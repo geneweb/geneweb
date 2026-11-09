@@ -50,45 +50,44 @@ let select_names conf base is_surnames ini limit =
         if Mutil.start_with_wildcard ini 0 k then
           let list, len =
             if s <> "?" then
-              let ips = Driver.spi_find iii istr in
               let cnt =
-                (* Optimization:
-                 * In the case of [Specify _]:
-                 * [cnt] is not used except for zero equality test
-                 * so we can use List.exists in order to avoid useless operations *)
-                match list with
-                | Specify _ ->
-                    if ips = [] then 0
-                    else if conf.use_restrict then
-                      if
-                        List.exists
-                          (fun i -> not @@ is_restricted conf base i)
-                          ips
-                      then 1
-                      else 0
-                    else if conf.hide_names then
-                      if
+                if not (conf.use_restrict || conf.hide_names) then
+                  Driver.spi_count iii istr
+                else
+                  let ips = Driver.spi_find iii istr in
+                  (* Optimization:
+                   * In the case of [Specify _]:
+                   * [cnt] is not used except for zero equality test
+                   * so we can use List.exists in order to avoid useless operations *)
+                  match list with
+                  | Specify _ ->
+                      if conf.use_restrict then
+                        if
+                          List.exists
+                            (fun i -> not @@ is_restricted conf base i)
+                            ips
+                        then 1
+                        else 0
+                      else if
                         List.exists
                           (fun i ->
                             Util.authorized_age conf base (Driver.poi base i))
                           ips
                       then 1
                       else 0
-                    else 1
-                | Result _ ->
-                    if conf.use_restrict then
-                      List.fold_left
-                        (fun acc i ->
-                          if is_restricted conf base i then acc else acc + 1)
-                        0 ips
-                    else if conf.hide_names then
-                      List.fold_left
-                        (fun acc i ->
-                          if Util.authorized_age conf base (Driver.poi base i)
-                          then acc + 1
-                          else acc)
-                        0 ips
-                    else List.length ips
+                  | Result _ ->
+                      if conf.use_restrict then
+                        List.fold_left
+                          (fun acc i ->
+                            if is_restricted conf base i then acc else acc + 1)
+                          0 ips
+                      else
+                        List.fold_left
+                          (fun acc i ->
+                            if Util.authorized_age conf base (Driver.poi base i)
+                            then acc + 1
+                            else acc)
+                          0 ips
               in
               if cnt = 0 then (list, len)
               else
