@@ -118,26 +118,26 @@ let bench () =
         let r = bench ?t name (fn base) args in
         r
       in
-      bench_w_base "UpdateData.get_all_data"
-        (fun base conf -> UpdateData.get_all_data conf base)
-        [ { conf with Config.env = [ ("data", Adef.encoded "place") ] } ]
-      :: bench_w_base "UpdateData.build_list"
-           (fun base conf -> UpdateData.build_list conf base)
-           [
-             {
-               conf with
-               Config.env = [ ("data", Adef.encoded "src") ];
-               wizard = true;
-             };
-             {
-               conf with
-               Config.env = [ ("data", Adef.encoded "place") ];
-               wizard = true;
-             };
-           ]
+      bench_w_base "UpdateData.book"
+        (fun base conf -> UpdateData.book conf base)
+        [
+          {
+            conf with
+            Config.env = [ ("data", Adef.encoded "src") ];
+            wizard = true;
+          };
+          {
+            conf with
+            Config.env = [ ("data", Adef.encoded "place") ];
+            wizard = true;
+          };
+        ]
       :: bench_w_base "UpdateData.build_list_short"
            (fun base conf ->
-             UpdateData.build_list_short conf @@ UpdateData.build_list conf base)
+             UpdateData.build_list_short conf
+             @@ List.concat_map
+                  (fun (_, _, l) -> l)
+                  (UpdateData.book conf base).groups)
            [
              {
                conf with
