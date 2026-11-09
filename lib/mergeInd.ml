@@ -111,12 +111,11 @@ let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =
         if Array.mem ip1 des.children then
           { children = Mutil.array_except ip2 des.children }
         else
-          let rec replace i =
-            if des.children.(i) = ip2 then des.children.(i) <- ip1
-            else replace (i + 1)
-          in
-          replace 0;
-          des
+          (* copy, do not mutate the record held by the base *)
+          {
+            children =
+              Array.map (fun ip -> if ip = ip2 then ip1 else ip) des.children;
+          }
       in
       let a1 = { parents = Some ifam; consang = Adef.fix (-1) } in
       Driver.patch_ascend base ip1 a1;
