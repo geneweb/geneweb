@@ -196,13 +196,12 @@ let rename_rewrite () =
   (check bool) "new term ok" true (PlaceRename.valid_new_term "Saint-L\195\180");
   (check bool) "comma allowed" true (PlaceRename.valid_new_term "a, b");
   (check bool) "empty refused" false (PlaceRename.valid_new_term "  ");
-  (check bool)
-    "trailing parenthesis allowed" true
+  (check bool) "trailing parenthesis allowed" true
     (PlaceRename.valid_new_term "a (b)");
-  (check bool)
-    "inner parenthesis refused" false
+  (check bool) "inner parenthesis refused" false
     (PlaceRename.valid_new_term "a (b) c");
-  (check bool) "lone parenthesis refused" false (PlaceRename.valid_new_term "(b)");
+  (check bool) "lone parenthesis refused" false
+    (PlaceRename.valid_new_term "(b)");
   (check bool) "bracket refused" false (PlaceRename.valid_new_term "a [b]");
   ()
 
