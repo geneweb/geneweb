@@ -22,7 +22,7 @@
 (executable
   (name gwd)
   (public_name geneweb.gwd)
-  (flags -linkall)
+  (flags (:standard -linkall))
   (libraries
     dynlink
     geneweb

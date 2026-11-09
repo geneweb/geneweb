@@ -9,7 +9,7 @@
  (libraries geneweb.gwd_lib geneweb_def_show)
  (preprocess
   (pps ppx_deriving.show))
- (flags -linkall)
+ (flags (:standard -linkall))
  (modes
   (native plugin))
  (modules plugin_fixbase))
