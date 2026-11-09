@@ -2154,7 +2154,7 @@ let () =
          Solution: kill the other program or launch GeneWeb with another port \
          number (option -p)";
       flush stderr
-  | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
+  | Unix.Unix_error (Unix.EACCES, "bind", _) ->
       Printf.eprintf
         "Error: invalid access to the port %d: users port number less than \
          1024 are reserved to the system. Solution: do it as root or choose \
