@@ -19,6 +19,7 @@ type string_person_index = {
   find : int -> int list;
   cursor : string -> int;
   next : int -> int;
+  count : int -> int;
 }
 
 type dict_index = {

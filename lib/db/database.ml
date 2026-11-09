@@ -203,7 +203,7 @@ let old_persons_of_first_name_or_surname base_data params =
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
-  { find; cursor; next }
+  { find; cursor; next; count = (fun i -> List.length (find i)) }
 
 let binary_search arr cmp =
   if arr = [||] then raise Not_found;
@@ -353,7 +353,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
       in
       if c < 0 then istr1 else istr2
   in
-  { find; cursor; next }
+  { find; cursor; next; count = (fun i -> List.length (find i)) }
 
 let persons_of_dict dict_index d =
   {
@@ -372,6 +372,7 @@ let persons_of_dict dict_index d =
         match dict_index.dict_after d i with
         | Some i -> i
         | None -> raise Not_found);
+    count = dict_index.dict_count d;
   }
 
 let persons_of_first_name version dict_index base_data params =
@@ -1628,12 +1629,14 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
           find = (fun _ -> assert false);
           cursor = (fun _ -> assert false);
           next = (fun _ -> assert false);
+          count = (fun _ -> assert false);
         };
       persons_of_first_name =
         {
           find = (fun _ -> assert false);
           cursor = (fun _ -> assert false);
           next = (fun _ -> assert false);
+          count = (fun _ -> assert false);
         };
       dict_index =
         {

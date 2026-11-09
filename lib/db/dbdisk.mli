@@ -52,6 +52,8 @@ type string_person_index = {
   (* Return surname's/first name's id. If it doen't present return id of the next
      name by alphabetical order *)
   next : int -> int;
+  (* Number of persons that have the giving surname/first name. *)
+  count : int -> int;
 }
 (** Data structure for optimised search throughout index by name (surname or
     first name). Considers also patched persons. *)

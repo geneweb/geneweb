@@ -565,6 +565,11 @@ val spi_next : string_person_index -> istr -> istr
 val spi_find : string_person_index -> istr -> iper list
 (** Retruns all persons id having that [first/sur]name. *)
 
+val spi_count : string_person_index -> istr -> int
+(** [spi_count spi istr] Number of persons having that [first/sur]name, read
+    from the index of the dictionaries without listing them on a base of the
+    current format. *)
+
 (** {2 Dictionaries}
 
     Queries over the index of the dictionaries ({!Dict}), written by gwc in

@@ -237,7 +237,11 @@ let check_dict base d =
           (List.sort Int.compare
              (List.map Driver.Iper.hash
                 (Driver.spi_find spi
-                   (Driver.Istr.of_string (string_of_int istr))))))
+                   (Driver.Istr.of_string (string_of_int istr)))));
+        (check int)
+          (Printf.sprintf "%s spi_count %d" name istr)
+          (List.length refs)
+          (Driver.spi_count spi (Driver.Istr.of_string (string_of_int istr))))
       entries
   in
   match d with
