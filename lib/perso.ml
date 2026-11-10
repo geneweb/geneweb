@@ -3767,8 +3767,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   (* Beware: lots of confusion between image and portrait *)
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
-  | "has_blason" -> Image.has_blason conf base p false
-  | "has_blason_self" -> Image.has_blason conf base p true
+  | "has_blason" -> p_auth && Image.has_blason conf base p false
+  | "has_blason_self" -> p_auth && Image.has_blason conf base p true
   | "has_blason_stop" -> Image.has_blason_stop conf base p
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
@@ -3786,7 +3786,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait_or_blason conf base "portraits" p |> Option.is_some
   | "has_old_blason" ->
-      Image.get_old_portrait_or_blason conf base "blasons" p |> Option.is_some
+      p_auth
+      && Image.get_old_portrait_or_blason conf base "blasons" p
+         |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -4609,7 +4611,7 @@ and string_of_blason_url conf base (p, p_auth) html saved : Adef.escaped_string
         |> Adef.escaped
     | Some (`Url url) -> Adef.escaped url (* FIXME *)
     | None -> Adef.escaped ""
-  else Adef.escaped "xz"
+  else Adef.escaped ""
 
 and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
   match Driver.get_parents p with
