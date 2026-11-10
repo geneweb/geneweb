@@ -19002,6 +19002,16 @@ nl: volgorde vanaf de laatste term
 pt: ordem a partir do último termo
 sv: ordning från sista ledet
 
+    rows per page
+de: Zeilen pro Seite
+en: rows per page
+es: filas por página
+fr: lignes par page
+it: righe per pagina
+nl: rijen per pagina
+pt: linhas por página
+sv: rader per sida
+
     sources to group
 de: zusammenzuführende Quellen
 en: sources to group

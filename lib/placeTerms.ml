@@ -54,12 +54,11 @@ let space_for p s =
   in
   loop 0
 
+let is_clean s = clean_term s = s
 let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
 
 (* as check_data: spaces at both ends and invisible characters ignored *)
 let cluster_key term = Name.abbrev (Name.lower (key_text term))
-
-(* in one pass over the index, with the counts *)
 let place_uses base = Driver.dict_entries_count base Geneweb_db.Dict.Place ""
 let compare_place p1 p2 = Place.compare_places p1.raw p2.raw
 
@@ -68,7 +67,7 @@ let compare_context c1 c2 =
   | 0 -> compare c1.suburb c2.suburb
   | x -> x
 
-let of_places inverted places =
+let of_places ?(only = fun _ -> true) inverted places =
   (* term -> (parents, suburb) -> places *)
   let terms : (string, (string list * bool, place list ref) Hashtbl.t) Hashtbl.t
       =
@@ -83,8 +82,11 @@ let of_places inverted places =
           Hashtbl.add terms term h;
           h
     in
+    (* a place is added once to a context: a term of a place has a single
+       context in it (its parents differ at each depth), so only the last
+       place added can be [p] *)
     match Hashtbl.find_opt ctxs ctx with
-    | Some l -> if not (List.memq p !l) then l := p :: !l
+    | Some l -> ( match !l with q :: _ when q == p -> () | _ -> l := p :: !l)
     | None -> Hashtbl.add ctxs ctx (ref [ p ])
   in
   List.iter
@@ -93,7 +95,8 @@ let of_places inverted places =
       let rec loop parents = function
         | [] -> ()
         | (c : Place.component) :: rest ->
-            if c.text <> "" then add c.text (List.rev parents, c.suburb) p;
+            if c.text <> "" && only c.text then
+              add c.text (List.rev parents, c.suburb) p;
             loop (if c.suburb then parents else c.text :: parents) rest
       in
       loop [] (Place.components inverted raw))
@@ -125,10 +128,51 @@ let of_places inverted places =
       | 0 -> compare e1.term e2.term
       | x -> x)
 
-let build conf base =
+let places base =
   place_uses base
   |> List.map (fun (istr, uses) -> (istr, Driver.sou base istr, uses))
-  |> of_places (Place.places_inverted conf)
+
+let build ?only conf base =
+  of_places ?only (Place.places_inverted conf) (places base)
+
+let summary inverted places =
+  let h = Hashtbl.create 65536 in
+  List.iter
+    (fun (_, raw, uses) ->
+      List.iter
+        (fun (c : Place.component) ->
+          if c.text <> "" then
+            match Hashtbl.find_opt h c.text with
+            | Some (n, u) ->
+                incr n;
+                u := !u + uses
+            | None -> Hashtbl.add h c.text (ref 1, ref uses))
+        (Place.components inverted raw))
+    places;
+  Hashtbl.fold
+    (fun term (n, u) acc ->
+      {
+        term;
+        key = "";
+        cluster = cluster_key term;
+        contexts = [];
+        nb_places = !n;
+        uses = !u;
+      }
+      :: acc)
+    h []
+
+let build_summary conf base = summary (Place.places_inverted conf) (places base)
+
+let in_cluster key =
+  let h = Hashtbl.create 1024 in
+  fun t ->
+    match Hashtbl.find_opt h t with
+    | Some b -> b
+    | None ->
+        let b = cluster_key t = key in
+        Hashtbl.add h t b;
+        b
 
 let clusters entries =
   let h = Hashtbl.create 1024 in
@@ -142,7 +186,8 @@ let clusters entries =
   Hashtbl.fold
     (fun k l acc ->
       match !l with
-      | [] | [ _ ] -> acc
+      | [] -> acc
+      | [ e ] when is_clean e.term -> acc
       | l ->
           let l =
             List.sort (fun a b -> compare (b.uses, a.term) (a.uses, b.term)) l

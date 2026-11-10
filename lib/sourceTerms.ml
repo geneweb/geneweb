@@ -389,34 +389,36 @@ let load conf base =
        (fun (i, uses) -> (i, Driver.sou base i, uses))
        (Driver.dict_entries_count base Geneweb_db.Dict.Source ""))
 
-(* the distinct spellings of [part] in each string *)
-let iter_spellings d part f =
+(* ---- spellings that are spans of raw strings: sources, occupations ---- *)
+
+let clusters_of ~split ~key strings =
+  let h = Hashtbl.create 4096 in
   List.iter
-    (fun ((_, raw, _) as x) ->
-      parse d.known raw |> spans part
+    (fun (_, raw, uses) ->
+      (* the distinct spellings of each string *)
+      split raw
       |> List.map (fun (sp : span) -> sp.text)
       |> List.sort_uniq compare
-      |> List.iter (fun t -> f x t))
-    d.strings
-
-let clusters d part =
-  let h = Hashtbl.create 4096 in
-  iter_spellings d part (fun (_, _, uses) t ->
-      let k = key part t in
-      if k <> "" then
-        let sp =
-          match Hashtbl.find_opt h k with
-          | Some sp -> sp
-          | None ->
-              let sp = Hashtbl.create 4 in
-              Hashtbl.add h k sp;
-              sp
-        in
-        let n, u = Option.value ~default:(0, 0) (Hashtbl.find_opt sp t) in
-        Hashtbl.replace sp t (n + 1, u + uses));
+      |> List.iter (fun t ->
+          let k = key t in
+          if k <> "" then
+            let sp =
+              match Hashtbl.find_opt h k with
+              | Some sp -> sp
+              | None ->
+                  let sp = Hashtbl.create 4 in
+                  Hashtbl.add h k sp;
+                  sp
+            in
+            let n, u = Option.value ~default:(0, 0) (Hashtbl.find_opt sp t) in
+            Hashtbl.replace sp t (n + 1, u + uses)))
+    strings;
   Hashtbl.fold
     (fun ckey sp acc ->
-      if Hashtbl.length sp < 2 then acc
+      let single_clean () =
+        Hashtbl.fold (fun t _ ok -> ok && PlaceTerms.is_clean t) sp true
+      in
+      if Hashtbl.length sp < 2 && single_clean () then acc
       else
         let spellings =
           Hashtbl.fold
@@ -425,16 +427,16 @@ let clusters d part =
           |> List.sort (fun a b -> compare (b.uses, a.text) (a.uses, b.text))
         in
         let total = List.fold_left (fun n sp -> n + sp.uses) 0 spellings in
-        { part; ckey; spellings; total } :: acc)
+        (ckey, spellings, total) :: acc)
     h []
-  |> List.sort (fun a b -> compare (b.total, a.ckey) (a.total, b.ckey))
+  |> List.sort (fun (k1, _, t1) (k2, _, t2) -> compare (t2, k1) (t1, k2))
 
-let samples d part spellings n =
+let samples_of ~split strings spellings n =
   let h = Hashtbl.create 16 in
   List.iter (fun t -> Hashtbl.replace h t []) spellings;
   List.iter
     (fun (_, raw, _) ->
-      let sps = parse d.known raw |> spans part in
+      let sps = split raw in
       List.iter
         (fun t ->
           match Hashtbl.find_opt h t with
@@ -442,9 +444,9 @@ let samples d part spellings n =
               match List.filter (fun (sp : span) -> sp.text = t) sps with
               | [] -> ()
               | l' -> Hashtbl.replace h t ((raw, l') :: l))
-          | _ -> ())
+          | Some _ | None -> ())
         spellings)
-    d.strings;
+    strings;
   List.map (fun t -> (t, List.rev (Hashtbl.find h t))) spellings
 
 let replace_spans raw (spans : span list) new_term =
@@ -455,14 +457,13 @@ let replace_spans raw (spans : span list) new_term =
          ^ String.sub s (sp.pos + sp.len) (String.length s - sp.pos - sp.len))
        raw
 
-let plan base d part ~terms ~new_term =
+let plan_of ~split base strings ~terms ~new_term =
   let new_term = PlaceTerms.clean_term new_term in
   let items =
     List.filter_map
       (fun (istr, raw, _) ->
         match
-          parse d.known raw |> spans part
-          |> List.filter (fun (sp : span) -> List.mem sp.text terms)
+          List.filter (fun (sp : span) -> List.mem sp.text terms) (split raw)
         with
         | [] -> None
         | sps ->
@@ -480,7 +481,7 @@ let plan base d part ~terms ~new_term =
                     kind = PlaceRename.New_place;
                   },
                   sps ))
-      d.strings
+      strings
   in
   let spans_of = Hashtbl.create 64 in
   List.iter
@@ -489,3 +490,17 @@ let plan base d part ~terms ~new_term =
   PlaceRename.classify base (List.map fst items)
   |> List.map (fun (it : PlaceRename.item) ->
       (it, Option.value ~default:[] (Hashtbl.find_opt spans_of it.istr)))
+
+(* ---- the sources ---- *)
+
+let split d part raw = spans part (parse d.known raw)
+
+let clusters d part =
+  clusters_of ~split:(split d part) ~key:(key part) d.strings
+  |> List.map (fun (ckey, spellings, total) -> { part; ckey; spellings; total })
+
+let samples d part spellings n =
+  samples_of ~split:(split d part) d.strings spellings n
+
+let plan base d part ~terms ~new_term =
+  plan_of ~split:(split d part) base d.strings ~terms ~new_term
