@@ -2709,3 +2709,12 @@ body.upd-edit [data-updfield] a {
 
 /* m=L place-event markers: fixed-width cell so any glyph stays column-aligned */
 .evm { display: inline-block; width: 1.2em; text-align: center; }
+
+/* book of places in the order from the last term: a heading before each
+   last term (country, region...) */
+.book-head {
+  font-weight: bold;
+  list-style: none;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}

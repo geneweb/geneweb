@@ -600,6 +600,11 @@ val dict_records : base -> Dict.t -> istr -> iper list * ifam list
 (** [dict_records base dict istr] The persons and the families using [istr] in
     the fields of [dict]. *)
 
+val dict_has : base -> Dict.t -> bool
+(** [dict_has base dict] Whether the index of [base] has the section of [dict]:
+    an index written before [dict] was defined has not, until the base is
+    rebuilt. *)
+
 val dict_count : base -> Dict.t -> istr -> int
 (** [dict_count base dict istr] Number of persons and families using [istr] in
     the fields of [dict], without reading them. *)

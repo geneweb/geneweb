@@ -31,6 +31,9 @@ type dict_index = {
   dict_count : Dict.t -> int -> int;
   dict_first : Dict.t -> string -> int option;
   dict_after : Dict.t -> int -> int option;
+  (* Whether the index has the section of a dictionary: an index written
+     before a dictionary was defined has not. *)
+  dict_has : Dict.t -> bool;
 }
 
 type perm = RDONLY | RDRW

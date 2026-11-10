@@ -134,7 +134,7 @@ let bench () =
         ]
       :: bench_w_base "UpdateData.build_list_short"
            (fun base conf ->
-             UpdateData.build_list_short conf
+             UpdateData.build_list_short conf base
              @@ List.concat_map
                   (fun (_, _, l) -> l)
                   (UpdateData.book conf base).groups)
