@@ -51,6 +51,9 @@ type config = {
   oidc : bool;  (** the current session was established through OIDC (SSO) *)
   semi_public : bool;
   just_friend_wizard : bool;
+  as_friend : bool;
+      (** a wizard viewing the current page with friend rights only
+          ([asfriend=on]); not propagated to links *)
   user : string;
   username : string;
   userkey : string;
@@ -135,6 +138,7 @@ let empty =
     oidc = false;
     semi_public = false;
     just_friend_wizard = false;
+    as_friend = false;
     user = "";
     username = "";
     userkey = "";
