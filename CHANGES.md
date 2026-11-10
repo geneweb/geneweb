@@ -43,6 +43,14 @@
   of the base, nor the binary caches of `cache_files`, and always show
   the current data. The option of chk_data to read the database instead
   of the caches is removed.
+- The places and surnames (`m=PS`), the titles and estates (`m=TT`) and
+  the advanced search with AND (`m=AS_OK`, with a place or an
+  occupation and no name) read only the persons and families found in
+  the index for the requested places, titles or occupations, instead of
+  the whole base; `m=PS` no longer reads the base twice when the long
+  display falls back to the short one. The lists of first names and
+  surnames (`m=P`, `m=N`) count the bearers of a name without listing
+  them, when no access restriction applies.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.
@@ -191,6 +199,8 @@
   on a large base, a larger size reads fewer strings per search).
   `gwc -reindex <base>` rebuilds this index alone, without importing the
   base again, and upgrades a base of format `GnWb0025`.
+- `cache_files` takes the strings of the datalists from this index
+  instead of reading every person and family.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person
