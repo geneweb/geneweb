@@ -51,12 +51,14 @@
     %end;
     <div class="d-flex align-items-center">
     %if;(e.im!=0 and ("yyy"="yes" or "yyy"="force"))
-      %if;xxx.has_image;
+      %if;(xxx.has_image or xxx.has_blason)
+        %let;img_url;%if;xxx.has_image;%xxx.image_url;%else;%xxx.blason_url;%end;%in;
+        %let;img_txt;%if;xxx.has_image;[image/images]0%else;[blason/blasons]0%end;%in;
         %if;not cancel_links;
-          <a href="%xxx.image_url;" class="normal_anchor"
-            target="_blank" title="[*image/images]0 %xxx;%personinfo;">%nn;
+          <a href="%img_url;" class="normal_anchor"
+            target="_blank" title="%if;xxx.has_image;[*image/images]0%else;[*blason/blasons]0%end; %xxx;%personinfo;">%nn;
         %end;
-          <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ms-0 pe-0" src="%xxx.image_url;" alt="[image/images]0">%nn;
+          <img class="image-arbre-famille %if;not cancel_links;fade_image%end; rounded ms-0 pe-0" src="%img_url;" alt="%img_txt;">%nn;
         %if;not cancel_links;</a>%end;
       %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)

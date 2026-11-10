@@ -963,7 +963,7 @@ let get_text conf base p img cgl =
     if cgl then s else Adef.safe (anchored_reference conf base p (s :> string))
   in
   let txt = person_lines ~link conf base p auth in
-  let has_image = Image.get_portrait conf base p |> Option.is_some in
+  let has_image = DagDisplay.has_image conf base p in
   if has_image && img then txt ^^^ DagDisplay.image_txt conf base p else txt
 
 let lastx tdal ir = fst tdal.(ir)
@@ -1094,7 +1094,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     else (tdal, x, x, x)
   in
   let txt = get_text conf base sp img cgl in
-  let has_image = Image.get_portrait conf base p |> Option.is_some in
+  let has_image = DagDisplay.has_image conf base sp in
   let br_sp = if has_image && img then "" else "<br>" in
   let auth =
     Util.authorized_age conf base p && Util.authorized_age conf base sp

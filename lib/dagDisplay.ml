@@ -9,14 +9,42 @@ module Iper = Driver.Iper
 module Server = Geneweb_http.Server
 module Connection = Geneweb_http.Connection
 
-let image_normal_txt conf base p fname width height =
-  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
+type image_kind = Portrait | Blason
+
+let image_alt_txt conf = function
+  | Portrait -> Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0)
+  | Blason -> Utf8.capitalize_fst (Util.transl_nth conf "blason/blasons" 0)
+
+(* Portrait of [p] if any, else its coat of arms, possibly inherited from
+   its paternal line (same lookup as the person page, ".stop" honoured). *)
+let get_image_with_size conf base p =
+  match Image.get_portrait_with_size conf base p with
+  | Some (src, size) -> Some (Portrait, src, size)
+  | None -> (
+      match Image.get_blason conf base p false with
+      | Some (`Path f) when Filename.extension f = ".url" ->
+          Some (Blason, `Url (Image.read_url_file f), None)
+      | Some (`Path f) ->
+          Some (Blason, `Path f, Image.size_from_path f |> Result.to_option)
+      | Some (`Url u) -> Some (Blason, `Url u, None)
+      | None -> None)
+
+let has_image conf base p = get_image_with_size conf base p <> None
+
+let image_normal_txt ?(kind = Portrait) conf base p fname width height =
+  let image_txt = image_alt_txt conf kind in
   let s = Unix.stat fname in
-  let k = Image.default_image_filename "portraits" base p in
+  (* m=FIM resolves the (inherited) blason from the person access itself *)
+  let m, k =
+    match kind with
+    | Portrait -> ("IM", "&k=" ^ Image.default_image_filename "portraits" base p)
+    | Blason -> ("FIM", "")
+  in
   let r =
     Format.sprintf
-      {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s" style="%s %s">|}
+      {|<img src="%sm=%s&d=%s&%s%s"%s%s alt="%s" title="%s" style="%s %s">|}
       (Util.commd conf : Adef.escaped_string :> string)
+      m
       (string_of_int
       @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
       (Util.acces conf base p : Adef.escaped_string :> string)
@@ -29,15 +57,16 @@ let image_normal_txt conf base p fname width height =
   in
   (if Util.p_getenv conf.env "cgl" = Some "on" then r
    else
-     Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
+     Format.sprintf {|<a href="%sm=%s&%s%s">%s</a>|}
        (Util.commd conf : Adef.escaped_string :> string)
+       m
        (Util.acces conf base p : Adef.escaped_string :> string)
        k r)
   |> Adef.safe
 
-let image_url_txt conf url_p url ~width ~height =
+let image_url_txt ?(kind = Portrait) conf url_p url ~width ~height =
   let width = Option.value ~default:0 width in
-  let image_txt = Utf8.capitalize_fst (Util.transl_nth conf "image/images" 0) in
+  let image_txt = image_alt_txt conf kind in
   let size =
     Format.sprintf "%s %s"
       (if width = 0 then "" else Format.sprintf {|width="%d"|} width)
@@ -68,26 +97,26 @@ let image_txt ?(reserve = false) conf base p =
   if img then
     let cls = if reserve then "dag-img-slot" else "text-center" in
     let wrap inner = Printf.sprintf {|<div class="%s">%s</div>|} cls inner in
-    match Image.get_portrait_with_size conf base p with
+    match get_image_with_size conf base p with
     | None -> if reserve then wrap "" else ""
-    | Some (`Path s, size_opt) ->
+    | Some (kind, `Path s, size_opt) ->
         let max_w, max_h = (100, 75) in
         let w, h =
           match size_opt with
           | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
           | None -> (0, max_h)
         in
-        wrap (image_normal_txt conf base p s w h |> Adef.as_string)
-    | Some (`Url url, Some (width, height)) ->
+        wrap (image_normal_txt ~kind conf base p s w h |> Adef.as_string)
+    | Some (kind, `Url url, Some (width, height)) ->
         let url_p = Util.commd conf ^^^ Util.acces conf base p in
         wrap
-          (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
-             ~height
+          (image_url_txt ~kind conf url_p (Util.escape_html url)
+             ~width:(Some width) ~height
           |> Adef.as_string)
-    | Some (`Url url, None) ->
+    | Some (kind, `Url url, None) ->
         let url_p = Util.commd conf ^^^ Util.acces conf base p in
         wrap
-          (image_url_txt conf url_p (Util.escape_html url) ~width:None
+          (image_url_txt ~kind conf url_p (Util.escape_html url) ~width:None
              ~height:75
           |> Adef.as_string)
   else ""
@@ -291,9 +320,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
       | Some ("D" | "RLM") -> true
       | _ -> false
     in
-    let has_portrait ip =
-      Image.get_portrait_with_size conf base (Util.pget conf base ip) <> None
-    in
+    let has_portrait ip = has_image conf base (Util.pget conf base ip) in
     let graph_has_portrait =
       align_top
       && Util.get_opt conf "im" true
@@ -390,9 +417,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
           ( hs || shown <> [],
             hsp
             || List.exists
-                 (fun (ips, _) ->
-                   Image.get_portrait conf base (Util.pget conf base ips)
-                   |> Option.is_some)
+                 (fun (ips, _) -> has_image conf base (Util.pget conf base ips))
                  shown ))
         (false, false) d.Dag2html.dag
     in

@@ -19,12 +19,18 @@ val image_txt :
       regardless of which persons carry a portrait (self image, [align-top] DAG
       modes).
 
-    Resolves the portrait via {!Image.get_portrait_with_size} and dispatches on
-    its source kind:
+    Resolves the portrait via {!Image.get_portrait_with_size}; when [p] has
+    none, falls back to its coat of arms, possibly inherited
+    ({!Image.get_blason} with [self = false]). Dispatches on the source kind:
     - [`Path]: local image, scaled to fit within 100x75 px, wrapped in a link to
-      [m=IM] unless [cgl=on];
+      [m=IM] (portrait) or [m=FIM] (blason) unless [cgl=on];
     - [`Url] with explicit size: external URL, sized as provided;
     - [`Url] without size: external URL, height defaulted to 75 px. *)
+
+val has_image :
+  Config.config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** [has_image conf base p] is [true] when {!image_txt} would display an image
+    for [p]: its portrait or, failing that, its coat of arms. *)
 
 type item =
   | Item of Geneweb_db.Driver.person * Adef.safe_string

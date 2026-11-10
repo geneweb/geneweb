@@ -244,11 +244,17 @@
     %if;not cancel_links;</a>%end;%xx.title;
     %if;not cancel_links;<a href="%prefix;%xx.index">%end;<i>%xx.dates;</i>
     %if;not cancel_links;</a>%end;
-    %if;(xx.has_image and e.im!=0)
+    %if;((xx.has_image or xx.has_blason) and e.im!=0)
       <div>
+      %if;xx.has_image;
         %if;not cancel_links;<a href="%xx.image_html_url;">%end;
         <img class="rounded" src="%xx.image_url;"%xx.image_small_size;
           alt="[image/images]0 %xx;" title="[image/images]0">%nn;
+      %else;
+        %if;not cancel_links;<a href="%xx.blason_url;">%end;
+        <img class="rounded" src="%xx.blason_url;"%xx.blason_small_size;
+          alt="[blason/blasons]0 %xx;" title="[blason/blasons]0">%nn;
+      %end;
         %if;not cancel_links;</a>%end;
       </div>
     %end;
