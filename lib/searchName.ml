@@ -428,6 +428,9 @@ let search_sosa_opt conf base query =
   | None -> []
   | Some p -> [ Driver.get_iper p ]
 
+(* Whether the normalized query word [q] starts the name word [n]. *)
+let starts_word n q = String.starts_with ~prefix:q.normalized n.normalized
+
 (* [qlist] is the pre-normalized query — List.map normalize_query
    (cut_words fn) — hoisted out of the per-candidate loops: this function
    is called up to four times per person in the hot FullName path. *)
@@ -443,10 +446,10 @@ let match_fn_lists qlist fn1_l opts =
       in
       qsorted = nsorted
     else
-      List.for_all
-        (fun q ->
-          List.exists (fun n -> Mutil.contains n.normalized q.normalized) nlist)
-        qlist
+      (* A query word must start a word of the first name: "ann" finds
+         Anne and Annette, "anne" finds Marie Anne, Anne-Françoise, but no
+         longer Jeanne or Johannes. *)
+      List.for_all (fun q -> List.exists (fun n -> starts_word n q) nlist) qlist
   in
   let passes_order_test =
     if opts.order then
@@ -474,9 +477,7 @@ let match_fn_lists qlist fn1_l opts =
                 match rest with
                 | [] -> false
                 | n :: ns' ->
-                    if Mutil.contains n.normalized q.normalized then
-                      in_order qs' ns'
-                    else find_next ns'
+                    if starts_word n q then in_order qs' ns' else find_next ns'
               in
               find_next ns
         in
@@ -607,8 +608,8 @@ let partition_for_multiple_fn_variants cache conf base variants_fn pl opts =
    - word: the variant occurs as a contiguous sequence of its words
      (compound surnames: "vivier" -> "de Lagoutte du Vivier",
      "de belloy" -> "de Belloy de Saint-Lienard");
-   - phonetic: its crush code matches the query's (equality for codes of
-     <= 2 chars, containment otherwise), as in search_phonetic_generic.
+   - phonetic: its crush code, or the one of a piece or a component, is
+     the query's.
    Visibility filters are unchanged: exact and word candidates exclude
    restricted persons (as persons_of_fsname did through pget); phonetic
    candidates exclude persons with an empty name and hidden persons.
@@ -623,10 +624,18 @@ let rec search_surname_candidates conf base variants =
     List.sort_uniq String.compare (List.map Name.lower variants)
   in
   let q_crushed = Name.crush_lower (List.hd variants) in
+  (* Equality of the crush codes of the query and of the surname, one of its
+     pieces or one of its components (particles left out).  Formerly the
+     code of a long query was only required to be contained in the code of
+     the surname: "flichy" ("flc") matched "de La Roche Foulques"
+     ("lrcflc"), "Emptoz Falcoz" or "de Félice-Grin".  The components,
+     indexed by gwc, find a compound surname by one of its parts. *)
+  let particles = Driver.base_particles base in
   let sounds_like str =
-    let c = Name.crush_lower str in
-    if String.length q_crushed <= 2 then c = q_crushed
-    else Mutil.contains c q_crushed
+    Name.crush_lower str = q_crushed
+    || List.exists
+         (fun c -> Name.crush_lower c = q_crushed)
+         (Mutil.surnames_pieces str @ Mutil.surname_components particles str)
   in
   (* One representative variant per distinct crush code, i.e. per bucket. *)
   (* Word lists of the variants, for the whole-word test: the variant must
@@ -1399,20 +1408,19 @@ let search_fullname ?(any_order = false) cache conf base variants_fn variants_sn
         in
         spouse_all
       in
-      (* Same rule as for direct candidates: when some candidates carry the
-         exact surname, a person reached only as the spouse of a
-         phonetic-only candidate must not compete with the spouses of
-         exact-surname candidates: move them to the partial pile.  A person
-         married to both kinds stays in the spouse pile. *)
-      let spouse, partial =
-        if Iper.Set.is_empty sn_exact_set then (spouse, partial)
+      (* When some candidates carry the exact surname, a person reached only
+         as the spouse of a phonetic-only candidate is left out: neither
+         this person nor the spouse bears the queried surname, and these
+         persons filled the other possibilities ("anne flichy" listed every
+         Anne married to a Floch, a Falk or a Fulach).  Formerly they were
+         moved to the partial pile.  A person married to both kinds stays
+         in the spouse pile. *)
+      let spouse =
+        if Iper.Set.is_empty sn_exact_set then spouse
         else
-          let keep, demoted =
-            List.partition
-              (fun p -> Iper.Set.mem (Driver.get_iper p) spouse_of_exact)
-              spouse
-          in
-          (keep, List.rev_append demoted partial)
+          List.filter
+            (fun p -> Iper.Set.mem (Driver.get_iper p) spouse_of_exact)
+            spouse
       in
       {
         exact = persons_to_ipers exact;
@@ -1955,10 +1963,16 @@ let rec handle_search_results alias_cache conn conf base query fn_options
      Without it, specify re-parses pn up to the first space, which is
      wrong for "fn/sn", "fn.oc sn" and multi-word first names. *)
   let specify conf =
-    match components.first_name with
-    | Some fn when fn <> "" ->
-        specify { conf with env = ("search_fn", Mutil.encode fn) :: conf.env }
-    | _ -> specify conf
+    let add key = function
+      | Some v when v <> "" -> fun env -> (key, Mutil.encode v) :: env
+      | _ -> Fun.id
+    in
+    let env =
+      conf.env
+      |> add "search_sn" components.surname
+      |> add "search_fn" components.first_name
+    in
+    specify { conf with env }
   in
   let redirect_to_person ?(extra = "") ip =
     record_visited conf ip;

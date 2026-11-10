@@ -527,6 +527,44 @@ let first_name_matches base query =
   let query_lower = Name.lower query in
   fun p -> Name.lower (Driver.sou base (Driver.get_first_name p)) = query_lower
 
+(* Edit distance between two strings, byte by byte. *)
+let edit_distance a b =
+  let la = String.length a and lb = String.length b in
+  let prev = Array.init (lb + 1) Fun.id and cur = Array.make (lb + 1) 0 in
+  for i = 1 to la do
+    cur.(0) <- i;
+    for j = 1 to lb do
+      let cost = if a.[i - 1] = b.[j - 1] then 0 else 1 in
+      cur.(j) <- min (min (prev.(j) + 1) (cur.(j - 1) + 1)) (prev.(j - 1) + cost)
+    done;
+    Array.blit cur 0 prev 0 (lb + 1)
+  done;
+  prev.(lb)
+
+(* Closeness of the surname of [p] to the queried surname [query]: the
+   smallest edit distance between Name.lower of the query and of the
+   surname, one of its pieces or one of its components.  0 for the queried
+   surname itself. *)
+let surname_distance base query =
+  let q = Name.lower query in
+  let particles = Driver.base_particles base in
+  fun p ->
+    let sn = Driver.sou base (Driver.get_surname p) in
+    List.fold_left
+      (fun d s -> min d (edit_distance q (Name.lower s)))
+      max_int
+      ((sn :: Mutil.surnames_pieces sn) @ Mutil.surname_components particles sn)
+
+(* Stable sort of [persons_with_titles] by closeness of their surname to
+   [query]: the order given (birth date or first name) is kept among
+   persons at the same distance. *)
+let sort_by_surname_distance base query persons_with_titles =
+  let dist = surname_distance base query in
+  persons_with_titles
+  |> List.map (fun ((p, _) as pt) -> (dist p, pt))
+  |> List.stable_sort (fun (d1, _) (d2, _) -> compare d1 d2)
+  |> List.map snd
+
 let sort_by_fn_relevance_then_date base query persons_with_titles =
   let first_name_matches_query = first_name_matches base query in
   let birth_or_baptism_dmy p =
@@ -990,8 +1028,16 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
     let same_fn, others = List.partition (fun (p, _) -> fn_ok p) ptll3 in
     ("sn-spouse", capitalized "with spouse name", [ same_fn; others ])
   in
+  (* The other possibilities, closest surnames first ("flichy": Flichy,
+     Fliche, Flèche... before Falk or Fiolka). *)
   let other_section =
-    ("sn-other", capitalized "other possibilities", [ process_list pl22 ])
+    let ptll22 =
+      match p_getenv conf.env "search_sn" with
+      | Some sn when sn <> "" ->
+          sort_by_surname_distance base sn (process_list pl22)
+      | Some _ | None -> process_list pl22
+    in
+    ("sn-other", capitalized "other possibilities", [ ptll22 ])
   in
   let count (_, _, lists) =
     List.fold_left (fun n l -> n + List.length l) 0 lists
