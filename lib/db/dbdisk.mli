@@ -66,6 +66,9 @@ type dict_index = {
   dict_groups : Dict.t -> string -> (string * int) list;
   (* String ids of the entries whose key starts with a prefix. *)
   dict_entries : Dict.t -> string -> int list;
+  (* The same, each with its number of records ([dict_count]), read in
+     order. *)
+  dict_entries_count : Dict.t -> string -> (int * int) list;
   (* Records using a string: 2 * iper for a person, 2 * ifam + 1 for a
      family. *)
   dict_refs : Dict.t -> int -> int list;
