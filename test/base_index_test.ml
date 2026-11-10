@@ -181,6 +181,17 @@ let check_dict base d =
   let name = Dict.to_string d in
   let entries = scan base d in
   let istrs l = List.map Driver.Istr.hash l in
+  (let refs = ref [] in
+   let iter_persons, iter_families =
+     Driver.dict_select base d (fun _ -> true)
+   in
+   iter_persons (fun i -> refs := (2 * Driver.Iper.hash i) :: !refs);
+   iter_families (fun i -> refs := ((2 * Driver.Ifam.hash i) + 1) :: !refs);
+   (check (list int))
+     (name ^ " select")
+     (List.sort_uniq Int.compare
+        (List.concat_map (fun (_, _, refs) -> refs) entries))
+     (List.sort Int.compare !refs));
   List.iter
     (fun p ->
       let selected =

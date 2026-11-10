@@ -318,8 +318,8 @@ let print_html_places_surnames_long conf base link_to_ind
   loop [] l;
   Output.print_sstring conf "</ul>\n"
 
-let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
-    ~add_death ~add_burial ~add_marriage max_length short filter =
+let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
+    ~add_burial ~add_marriage lim filter =
   let inverted = Place.places_inverted conf in
   let arry =
     Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
@@ -342,7 +342,19 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
               loop ((Driver.sou base sn, [ iper ]) :: acc) tl_list
         in
         loop [] v)
-      max_length
+  in
+  let short =
+    p_getenv conf.env "display" = Some "long" && Array.length arry > lim
+  in
+  let conf =
+    if short then
+      {
+        conf with
+        env =
+          ("display", Adef.encoded "short")
+          :: List.remove_assoc "display" conf.env;
+      }
+    else conf
   in
   let title _ =
     Output.printf conf "%s / %s"
@@ -410,25 +422,10 @@ let print_all_places_surnames conf base =
     try int_of_string @@ List.assoc "short_place_threshold" conf.base_env
     with _ -> 500
   in
-  let ini, filter =
+  let filter =
     match p_getenv conf.env "k" with
-    | Some ini ->
-        ( ini,
-          if ini = "" then fun _ -> true
-          else fun (x, _) -> Place.find_in conf x ini )
-    | None -> ("", fun _ -> true)
+    | Some ini when ini <> "" -> fun (x, _) -> Place.find_in conf x ini
+    | Some _ | None -> fun _ -> true
   in
-  try
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim false filter
-  with Place.List_too_long ->
-    let conf =
-      {
-        conf with
-        env =
-          ("display", Adef.encoded "short")
-          :: List.remove_assoc "display" conf.env;
-      }
-    in
-    print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
-      ~add_death ~add_burial ~add_marriage lim true filter
+  print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
+    ~add_burial ~add_marriage lim filter

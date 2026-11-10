@@ -10,7 +10,7 @@
 
     where the bracketed suburb and the parenthesised subdivision are optional.
     This module splits such strings into their components, normalises them, and
-    scans the base to build the raw-place -> persons/surnames array consumed by
+    reads the base to build the raw-place -> persons/surnames array consumed by
     {!PlaceDisplay}. All rendering lives in {!PlaceDisplay}; this module is pure
     apart from {!get_all}, which reads the base. *)
 
@@ -82,11 +82,6 @@ val max_rlm_nbr : config -> int
     Read from the ["max_rlm_nbr"] request parameter, then the base [.gwf], then
     a built-in default. *)
 
-exception List_too_long
-(** Raised by {!get_all} in long-display mode once the number of distinct places
-    exceeds the [max_length] threshold, letting the caller fall back to short
-    display. *)
-
 val get_all :
   config ->
   base ->
@@ -101,23 +96,22 @@ val get_all :
   ('key -> bool) ->
   ('acc option -> person -> 'acc) ->
   ('acc -> 'value) ->
-  int ->
   ('key * 'value) array
 (** [get_all conf base ~add_birth .. dummy_key dummy_value fold_place filter
-     mk_value fn max_length] scans [base] once and returns an array mapping each
-    selected place key to its accumulated value.
+     mk_value fn] returns an array mapping each selected place key to its
+    accumulated value.
 
     - [fold_place] turns a raw place string into the key (typically
-      {!fold_place_long}); [filter] keeps only the keys of interest.
+      {!fold_place_long}); [filter] keeps only the keys of interest. Each place
+      of the index of the dictionaries is folded once, and only the persons and
+      families using a kept place are read; on a base of an earlier format,
+      without index, all of them are read.
     - [mk_value] folds each matching person into an accumulator ([None] the
       first time a key is seen), and [fn] finalises the accumulator into the
       stored value.
     - [dummy_key] / [dummy_value] seed the result array before it is filled.
     - Only persons and families passing {!Util.authorized_age} are counted, and
-      the [add_*] flags select which events contribute.
-
-    Raises {!List_too_long} in long-display mode once more than [max_length]
-    distinct keys are seen. *)
+      the [add_*] flags select which events contribute. *)
 
 val find_in : config -> string list -> string -> bool
 (** [find_in conf components ini] tests whether the query [ini] matches the

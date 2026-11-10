@@ -599,6 +599,18 @@ val dict_count : base -> Dict.t -> istr -> int
 (** [dict_count base dict istr] Number of persons and families using [istr] in
     the fields of [dict], without reading them. *)
 
+val dict_select :
+  base ->
+  Dict.t ->
+  (istr -> bool) ->
+  ((iper -> unit) -> unit) * ((ifam -> unit) -> unit)
+(** [dict_select base dict select] Iterators, in increasing order, over the
+    persons and over the families using an entry of [dict] whose string id
+    satisfies [select], marked with one byte per person and per family from the
+    index of the dictionaries. On a base of an earlier format, without index,
+    [select] is not called and they iterate over all the persons and families.
+*)
+
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 (** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not
     visible (restrited)) from the [base]. If file {i restrict} is present then
