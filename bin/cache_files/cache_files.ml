@@ -1,6 +1,7 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Dutil = Geneweb_db.Dutil
+module Dict = Geneweb_db.Dict
 module Dirs = Geneweb_dirs
 
 let bname = ref ""
@@ -125,37 +126,64 @@ let field_name = function
   | `Titles -> "titles"
   | `Sources -> "sources"
 
-let collect_checkdata_places base bar =
-  let len = Driver.nb_of_persons base + Driver.nb_of_families base in
-  let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 2048 in
-  let add_istr istr =
-    if not (Driver.Istr.is_empty istr) then
-      let val_ = Driver.sou base istr in
-      if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
-  in
-  iteri_places
-    (fun i istr ->
-      if !prog then ProgrBar.progress bar i len;
-      add_istr istr)
-    base;
-  Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
+let dict_of_field = function
+  | `Fnames -> Dict.First_name
+  | `Fnames_alias -> Dict.First_name_alias
+  | `Snames -> Dict.Surname
+  | `Snames_alias -> Dict.Surname_alias
+  | `Aliases -> Dict.Alias
+  | `Occupations -> Dict.Occupation
+  | `Qualifiers -> Dict.Qualifier
+  | `Pub_names -> Dict.Public_name
+  | `Estates -> Dict.Domain
+  | `Titles -> Dict.Title
+  | `Sources -> Dict.Source
+
+let indexed base = Driver.base_format base = Driver.current_base_format
+
+let index_entries base d =
+  List.filter_map
+    (fun istr ->
+      let s = Driver.sou base istr in
+      if s = "" then None else Some (istr, s))
+    (Driver.dict_entries base d "")
   |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
 
+let collect_checkdata_places base bar =
+  if indexed base then index_entries base Dict.Place
+  else
+    let len = Driver.nb_of_persons base + Driver.nb_of_families base in
+    let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 2048 in
+    let add_istr istr =
+      if not (Driver.Istr.is_empty istr) then
+        let val_ = Driver.sou base istr in
+        if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
+    in
+    iteri_places
+      (fun i istr ->
+        if !prog then ProgrBar.progress bar i len;
+        add_istr istr)
+      base;
+    Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
+    |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
+
 let collect_checkdata_names base field bar =
-  let len = Driver.nb_of_persons base in
-  let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 17 in
-  let add_istr istr =
-    if not (Driver.Istr.is_empty istr) then
-      let val_ = Driver.sou base istr in
-      if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
-  in
-  iteri_pers
-    (fun i p ->
-      if !prog then ProgrBar.progress bar i len;
-      iter_field base p add_istr field)
-    base;
-  Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
-  |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
+  if indexed base then index_entries base (dict_of_field field)
+  else
+    let len = Driver.nb_of_persons base in
+    let tbl : string Driver.Istr.Table.t = Driver.Istr.Table.create 17 in
+    let add_istr istr =
+      if not (Driver.Istr.is_empty istr) then
+        let val_ = Driver.sou base istr in
+        if val_ <> "" then Driver.Istr.Table.replace tbl istr val_
+    in
+    iteri_pers
+      (fun i p ->
+        if !prog then ProgrBar.progress bar i len;
+        iter_field base p add_istr field)
+      base;
+    Driver.Istr.Table.fold (fun istr val_ acc -> (istr, val_) :: acc) tbl []
+    |> List.sort (fun (_, s1) (_, s2) -> String.compare s1 s2)
 
 let gen_checkdata_cache bname fname collect_fn =
   let entries, duration =
