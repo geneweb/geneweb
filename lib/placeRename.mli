@@ -75,6 +75,7 @@ val rewrite_with :
 type field =
   | Place  (** the place fields of persons, families and their events *)
   | Source  (** their source fields *)
+  | Occupation  (** the occupation of persons *)
 
 type usage
 (** For every string id used as a place: the number of persons and families

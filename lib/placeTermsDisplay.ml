@@ -525,13 +525,15 @@ let mark_terms conf terms depths raw =
   | Some s -> marked conf s
   | None -> vis conf raw
 
-(* the places and the sources have their own pages, with the same layout *)
-type section = Places | Sources
+(* the places, the sources and the occupations have their own pages, with
+   the same layout *)
+type section = Places | Sources | Occupations
 
 let noun section =
   match section with
   | Places -> "place"
   | Sources -> "source"
+  | Occupations -> "occupation"
 
 let kind_html ?(section = Places) conf base (k : PlaceRename.kind) =
   let badge cls txt =
@@ -1178,6 +1180,38 @@ let src_items conf base terms nt =
   let d = SourceTerms.load conf base in
   SourceTerms.plan base d (src_part conf) ~terms ~new_term:nt
 
+(* ---- occupations ---- *)
+
+let occu_page_of conf =
+  {
+    section = Occupations;
+    m = "OCCU_TERMS";
+    href = prefix conf ^ "m=OCCU_TERMS";
+    hidden = (fun () -> ());
+    field = PlaceRename.Occupation;
+    plural = "occupation/occupations";
+    title = "occupations to group";
+  }
+
+let print_occu_cluster conf base key =
+  let d = OccuTerms.load base in
+  match
+    List.find_opt
+      (fun (c : OccuTerms.cluster) -> c.ckey = key)
+      (OccuTerms.clusters d)
+  with
+  | None ->
+      Output.printf conf "<p>%s</p>\n"
+        (Utf8.capitalize_fst (transl conf "not found"))
+  | Some c ->
+      print_spellings_form conf (occu_page_of conf) c.spellings
+        (OccuTerms.samples d
+           (List.map (fun (sp : SourceTerms.spelling) -> sp.text) c.spellings)
+           5)
+
+let occu_items base terms nt =
+  OccuTerms.plan base (OccuTerms.load base) ~terms ~new_term:nt
+
 (* the title of a page and the function printing its body *)
 let page conf title f = (Utf8.capitalize_fst (transl conf title), f)
 
@@ -1203,6 +1237,17 @@ let src_page conf base =
     ~cluster:(print_src_cluster conf base)
     ~items:(src_items conf base)
 
+let occu_page conf base =
+  spans_page conf base (occu_page_of conf)
+    ~clusters:(fun () ->
+      print_spans_clusters conf (occu_page_of conf) ~shown:Fun.id
+        ~clusters:(fun () ->
+          List.map
+            (fun (c : OccuTerms.cluster) -> (c.ckey, c.spellings, c.total))
+            (OccuTerms.clusters (OccuTerms.load base))))
+    ~cluster:(print_occu_cluster conf base)
+    ~items:(occu_items base)
+
 (* the pages of a section start with the same links: the dictionary, then
    the pages of grouping *)
 let header ?(section = Places) ~title conf =
@@ -1211,7 +1256,10 @@ let header ?(section = Places) ~title conf =
     Printf.sprintf
       "<a href=\"%sm=MOD_DATA&data=%s\"><i class=\"fa fa-%s me-1\"></i>%s</a>"
       (prefix conf) data
-      (match data with "src" -> "box-archive" | _ -> "location-dot")
+      (match data with
+      | "src" -> "box-archive"
+      | "occu" -> "briefcase"
+      | _ -> "location-dot")
       (Utf8.capitalize_fst
          (Printf.sprintf (ftransl conf "book of %s") (transl_nth conf plural 1)))
   in
@@ -1229,6 +1277,13 @@ let header ?(section = Places) ~title conf =
              link
                (prefix conf ^ "m=SOURCE_TERMS")
                "object-group" "sources to group";
+           ]
+       | Occupations ->
+           [
+             book "occu" "occupation/occupations";
+             link
+               (prefix conf ^ "m=OCCU_TERMS")
+               "object-group" "occupations to group";
            ]
        | Places ->
            [
@@ -1323,6 +1378,10 @@ let print_result ?(section = Places) conf (r : PlaceRename.result) =
         Printf.sprintf
           (ftransl conf "%d sources renamed (%d merged), %d records updated")
           r.places r.merged records
+    | Occupations ->
+        Printf.sprintf
+          (ftransl conf "%d occupations renamed (%d merged), %d records updated")
+          r.places r.merged records
     | Places ->
         Printf.sprintf
           (ftransl conf "%d places renamed (%d merged), %d records updated")
@@ -1332,6 +1391,7 @@ let print_result ?(section = Places) conf (r : PlaceRename.result) =
       ~m:
         (match section with
         | Sources -> "SOURCE_TERMS_OK"
+        | Occupations -> "OCCU_TERMS_OK"
         | Places -> "PLACE_TERMS_OK");
   if List.assoc_opt "history" conf.base_env = Some "yes" then
     Output.printf conf "<p><a href=\"%sm=HIST&k=20\">%s</a></p>\n" (prefix conf)
@@ -1467,3 +1527,12 @@ let print_spans_ok conf base pg ~items =
 
 let print_sources_ok conf base =
   print_spans_ok conf base (src_page_of conf) ~items:(src_items conf base)
+
+let print_occupations conf base =
+  let title, body = occu_page conf base in
+  header ~section:Occupations ~title conf;
+  body ();
+  Hutil.trailer conf
+
+let print_occupations_ok conf base =
+  print_spans_ok conf base (occu_page_of conf) ~items:(occu_items base)

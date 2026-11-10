@@ -21,6 +21,7 @@ let () =
          Notes_corpus_test.v;
          Notes_rename_test.v;
          Notes_search_test.v;
+         Occu_test.v;
          Oidc_test.v;
          Place_rename_test.v;
          Place_test.v;

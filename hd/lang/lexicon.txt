@@ -19022,6 +19022,56 @@ de: %d Quellen umbenannt (%d zusammengeführt), %d Datensätze geändert
 en: %d sources renamed (%d merged), %d records updated
 fr: %d sources renommées (dont %d fusionnées), %d fiches modifiées
 
+    new occupation
+de: neuer Beruf
+en: new occupation
+es: nueva profesión
+fr: nouvelle profession
+it: nuova professione
+nl: nieuw beroep
+pt: nova ocupação
+sv: nytt yrke
+
+    merged into an existing occupation
+de: mit einem vorhandenen Beruf zusammengeführt
+en: merged into an existing occupation
+es: fusionada con una profesión existente
+fr: fusionnée avec une profession existante
+it: unita a una professione esistente
+nl: samengevoegd met een bestaand beroep
+pt: fundida com uma ocupação existente
+sv: sammanslaget med ett befintligt yrke
+
+    merged with another renamed occupation
+de: mit einem anderen umbenannten Beruf zusammengeführt
+en: merged with another renamed occupation
+es: fusionada con otra profesión renombrada
+fr: fusionnée avec une autre profession renommée
+it: unita a un’altra professione rinominata
+nl: samengevoegd met een ander hernoemd beroep
+pt: fundida com outra ocupação renomeada
+sv: sammanslaget med ett annat omdöpt yrke
+
+    occupations to group
+de: zusammenzuführende Berufe
+en: occupations to group
+es: profesiones por agrupar
+fr: professions à regrouper
+it: professioni da raggruppare
+nl: te groeperen beroepen
+pt: ocupações a agrupar
+sv: yrken att gruppera
+
+    %d occupations renamed (%d merged), %d records updated
+de: %d Berufe umbenannt (%d zusammengeführt), %d Datensätze geändert
+en: %d occupations renamed (%d merged), %d records updated
+es: %d profesiones renombradas (%d fusionadas), %d fichas modificadas
+fr: %d professions renommées (dont %d fusionnées), %d fiches modifiées
+it: %d professioni rinominate (%d unite), %d schede modificate
+nl: %d beroepen hernoemd (%d samengevoegd), %d records gewijzigd
+pt: %d ocupações renomeadas (%d fundidas), %d fichas modificadas
+sv: %d yrken omdöpta (%d sammanslagna), %d poster ändrade
+
     places to complete
 de: zu vervollständigende Orte
 en: places to complete

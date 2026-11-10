@@ -233,12 +233,16 @@ let rewrite inverted ~terms ~new_term raw depths =
 
 (* ------------------------------------------------------------------------ *)
 
-type field = Place | Source
+type field = Place | Source | Occupation
 type usage = Driver.istr -> int
 
 let uses u i = u i
 
-let dict field = match field with Place -> Dict.Place | Source -> Dict.Source
+let dict field =
+  match field with
+  | Place -> Dict.Place
+  | Source -> Dict.Source
+  | Occupation -> Dict.Occupation
 
 (* the fields of [field] of a person or family moved by [f] *)
 let map_person field f (gp : (_, _, Driver.istr) gen_person) =
@@ -266,6 +270,7 @@ let map_person field f (gp : (_, _, Driver.istr) gen_person) =
         pevents =
           List.map (fun e -> { e with epers_src = f e.epers_src }) gp.pevents;
       }
+  | Occupation -> { gp with occupation = f gp.occupation }
 
 let map_family field f (gf : (_, _, Driver.istr) gen_family) =
   match field with
@@ -284,9 +289,10 @@ let map_family field f (gf : (_, _, Driver.istr) gen_family) =
         fevents =
           List.map (fun e -> { e with efam_src = f e.efam_src }) gf.fevents;
       }
+  | Occupation -> gf
 
 let action field =
-  match field with Place -> "mq" | Source -> "ms"
+  match field with Place -> "mq" | Source -> "ms" | Occupation -> "mo"
 
 let usage ?(field = Place) base = Driver.dict_count base (dict field)
 

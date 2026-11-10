@@ -30,3 +30,16 @@ val print_sources : Config.config -> Geneweb_db.Driver.base -> unit
 val print_sources_ok : Config.config -> Geneweb_db.Driver.base -> unit
 (** [m=SOURCE_TERMS_OK]: replaces the spellings in the source strings (see
     {!PlaceRename.apply}) and commits. *)
+
+val print_occupations : Config.config -> Geneweb_db.Driver.base -> unit
+(** [m=OCCU_TERMS]: occupations to group, same layout as [m=SOURCE_TERMS]; each
+    occupation of a comma-separated list is a spelling of its own
+    ({!OccuTerms.spans}).
+    - no parameter: the clusters of spellings ({!OccuTerms.clusters}), computed
+      once [bw=] or [all=on] is given;
+    - [c=<cluster key>]: the spelling to keep and the spellings to replace;
+    - [t1=...&nt=...]: preview, with the form leading to [m=OCCU_TERMS_OK]. *)
+
+val print_occupations_ok : Config.config -> Geneweb_db.Driver.base -> unit
+(** [m=OCCU_TERMS_OK]: replaces the spellings in the occupation strings (see
+    {!PlaceRename.apply}, history action "mo") and commits. *)

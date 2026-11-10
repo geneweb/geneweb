@@ -51,7 +51,9 @@
   the spellings are shown as in chk_data, and a single spelling that has
   some is listed, to clean it. On the preview of a change, the new
   spelling and every line can be edited. A new place term may be
-  `town (county)`, `[suburb] - town` or `(county)`.
+  `town (county)`, `[suburb] - town` or `(county)`. New pages
+  `m=OCCU_TERMS` and `m=OCCU_TERMS_OK` group the spellings of the
+  occupations, each item of a comma-separated list on its own.
 - The book of places (`m=MOD_DATA&data=place`) can be sorted from the
   last term of the places (country, county, town): button on the page,
   or `dico_inverted=yes` in the `.gwf` file to make it the default
