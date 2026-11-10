@@ -73,11 +73,17 @@
 %end;
 %define;picture(xxx,yyy)
   %if;not cancel_links;<a href="%xxx.yyy_url;" class="align-self-start" target="_blank">%end;
+    %if;xxx.is_visible;
     <img class="%if;("xxx"="spouse")big%else;small%end;_image fade_image mx-1 rounded" src="%xxx.yyy_url;" alt="[xxx/xxxs]0 [yyy/yyys]0"
       title="%if;("xxx"="spouse")%xxx; ([spouse/spouses]0)
              %elseif;("xxx"="parent")%xxx; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)
              %elseif;("xxx"="child")%count1;. %xxx; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)
              %end;">
+    %elseif;(b.default_image="yes");
+      <img class="small_image rounded align-self-center ms-2"%nn;
+        src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" alt="[missing image]"%nn;
+        title="%if;(xxx.is_male)[*a brother/a sister/a sibling]0%elseif;(xxx.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;">
+    %end;
   %if;not cancel_links;</a>%end;
 %end;
 %( ATTENTION: on n'utilise pas max_desc_level parce que c'est extremement
