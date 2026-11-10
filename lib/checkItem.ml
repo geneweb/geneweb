@@ -841,13 +841,19 @@ let check_parent_marriage_age warning fam p =
   loop (Gwdb.get_fevents fam)
 
 let can_have_unnamed_spouse_duplicate base p families =
-  let count_unnamed count ifam =
-    let sp =
-      Gwdb.poi base (Gutil.spouse (Gwdb.get_iper p) (Gwdb.foi base ifam))
+  if Array.length families = 2 then
+    let check ifam =
+      let fam = Gwdb.foi base ifam in
+      let sp = Gwdb.poi base (Gutil.spouse (Gwdb.get_iper p) fam) in
+      if Person.is_empty_name sp then
+        if Array.length (Gwdb.get_children fam) = 0 then `UnnamedChildless
+        else `UnnamedWithChildren
+      else `Named
     in
-    if Person.is_empty_name sp then count + 1 else count
-  in
-  Array.length families = 2 && Array.fold_left count_unnamed 0 families = 1
+    match (check families.(0), check families.(1)) with
+    | `UnnamedChildless, `Named | `Named, `UnnamedChildless -> true
+    | _ -> false
+  else false
 
 let has_named_homonymous_spouses base p families =
   let spouses =
