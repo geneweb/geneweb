@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_descendants.txt v7.1 01/03/2025 19:03:50 $ -->
+<!-- $Id: modules/arbre_descendants.txt v7.1 10/11/2026 19:03:50 $ -->
 %define;display_person(xxx)
   <div class="px-0 mx-0 border-0">
   %if;(not cancel_links)
@@ -36,13 +36,15 @@
   %end;
   <br>
   %if;(e_im=1)
-    %if;xxx.has_image;
+    %if;(xxx.has_image or xxx.has_blason)
+      %let;img_url;%if;xxx.has_image;%xxx.image_url;%else;%xxx.blason_url;%end;%in;
+      %let;img_txt;%if;xxx.has_image;[image/images]0%else;[blason/blasons]0%end;%in;
       %if;not cancel_links;
-        <a href="%xxx.image_url;" class="normal_anchor" %nn;
-          target="_blank" title="[*image/images]0 %xxx;">%nn;
+        <a href="%img_url;" class="normal_anchor" %nn;
+          target="_blank" title="%if;xxx.has_image;[*image/images]0%else;[*blason/blasons]0%end; %xxx;">%nn;
       %end;
         <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ms-0 pe-0" %nn;
-          src="%xxx.image_url;" alt="[image/images]0">%nn;
+          src="%img_url;" alt="%img_txt;">%nn;
       %if;not cancel_links;</a>%end;
     %elseif;(bvar.default_image="yes")
       %if;(wizard and not cancel_links)

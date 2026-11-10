@@ -82,6 +82,8 @@
     %end;>
     %if;(e.image!=0 and has_image)
       <img src="%image_url;"><br>
+    %elseif;(e.image!=0 and has_blason)
+      <img src="%blason_url;"><br>
     %end;
     %if;(e.sosa=1 and browsing_with_sosa_ref and has_sosa)
       &middot; %sosa; &middot;<br>
@@ -98,6 +100,8 @@
         %foreach;ancestor;
           %if;ancestor.has_image;
             <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"></p>
+          %elseif;ancestor.has_blason;
+            <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.blason_url;"></p>
           %end;
         %end;
       %end;

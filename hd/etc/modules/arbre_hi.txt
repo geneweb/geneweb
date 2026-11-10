@@ -112,8 +112,8 @@
       %if;(evarcpl!="on")
         <a class="big_anchor_1 list-group-item-action"
           href="%prefix;%aaaaccess;" title="%aaafirst_name; %aaasurname; (%aaaocc;)">
-          %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
+          %if;(aaahas_image or aaahas_blason)
+            <img style="width:%imsz;px" src="%if;aaahas_image;%aaaimage_url;%else;%aaablason_url;%end;" alt="[image/images]0">
           %end;
         </a>
         <a class="big_anchor_1m list-group-item-action"
@@ -121,15 +121,15 @@
       %else;
         <a class="big_anchor_him list-group-item-action"
           href="%prefix;%aaaaccess;" title="%aaafirst_name; %aaasurname; (%aaaocc;)">%nn;
-          %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">%nn;
+          %if;(aaahas_image or aaahas_blason)
+            <img style="width:%imsz;px" src="%if;aaahas_image;%aaaimage_url;%else;%aaablason_url;%end;" alt="[image/images]0">%nn;
           %end;
         </a>
         %if;(aaasame="")
         <a class="big_anchor_her list-group-item-action"
           href="%prefix;%aaaspouse.access;" title="%aaaspouse;">
-          %if;(aaaspouse.has_image)
-            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
+          %if;(aaaspouse.has_image or aaaspouse.has_blason)
+            <img style="width:%imsz;px" src="%if;aaaspouse.has_image;%aaaspouse.image_url;%else;%aaaspouse.blason_url;%end;" alt="[image/images]0">
           %end;
         </a>
         %end;
@@ -147,11 +147,11 @@
       %let;tm;%if;(boxsize=2)8%else;2%end;%in;
       %let;dw1;%expr(width-imsz)%in;
       %let;dw2;%expr(width-2*imsz)%in;
-      %let;dm;%if;(aaahas_image)%imsz;%end;%in;
+      %let;dm;%if;(aaahas_image or aaahas_blason)%imsz;%end;%in;
       %if;(evarcpl!="on")
         <div class="d-flex">
-        %if;(aaahas_image)
-          <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
+        %if;(aaahas_image or aaahas_blason)
+          <img style="width:%imsz;px" src="%if;aaahas_image;%aaaimage_url;%else;%aaablason_url;%end;" alt="[image/images]0">
         %end;
         <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
           %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
@@ -159,16 +159,16 @@
         </div>
       %else;
         <div class="d-flex justify-content-between">
-        %if;(aaahas_image)%nn;
-          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"></div>%nn;
+        %if;(aaahas_image or aaahas_blason)%nn;
+          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%if;aaahas_image;%aaaimage_url;%else;%aaablason_url;%end;" alt="[image/images]0"></div>%nn;
         %else;
           <div style="margin:0 0 2px 0;width:%imsz;px"></div>
         %end;%nn;
         <div style="margin:0 0 2px 0;text-align:center;width:%dw2;px;font-size:%fs1;px;">%nn;
           %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
         </div>%nn;
-        %if;(aaaspouse.has_image)%nn;
-          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"></div>%nn;
+        %if;(aaaspouse.has_image or aaaspouse.has_blason)%nn;
+          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%if;aaaspouse.has_image;%aaaspouse.image_url;%else;%aaaspouse.blason_url;%end;" alt="[image/images]0"></div>%nn;
         %end;%nn;
         </div>
       %end;
