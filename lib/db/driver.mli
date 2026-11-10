@@ -591,6 +591,11 @@ val dict_groups : base -> Dict.t -> string -> (string * int) list
 val dict_entries : base -> Dict.t -> string -> istr list
 (** [dict_entries base dict prefix] The entries starting with [prefix]. *)
 
+val dict_entries_count : base -> Dict.t -> string -> (istr * int) list
+(** [dict_entries_count base dict prefix] The entries starting with [prefix],
+    each with its {!dict_count}, read in order: much faster than calling
+    {!dict_count} for each entry. *)
+
 val dict_records : base -> Dict.t -> istr -> iper list * ifam list
 (** [dict_records base dict istr] The persons and the families using [istr] in
     the fields of [dict]. *)

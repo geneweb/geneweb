@@ -59,11 +59,8 @@ let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
 (* as check_data: spaces at both ends and invisible characters ignored *)
 let cluster_key term = Name.abbrev (Name.lower (key_text term))
 
-let place_uses base =
-  List.map
-    (fun i -> (i, Driver.dict_count base Geneweb_db.Dict.Place i))
-    (Driver.dict_entries base Geneweb_db.Dict.Place "")
-
+(* in one pass over the index, with the counts *)
+let place_uses base = Driver.dict_entries_count base Geneweb_db.Dict.Place ""
 let compare_place p1 p2 = Place.compare_places p1.raw p2.raw
 
 let compare_context c1 c2 =

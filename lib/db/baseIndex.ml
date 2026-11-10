@@ -271,6 +271,9 @@ type file_section = {
   rank : int -> int option;
   count : int -> int;
   refs : int -> int list;
+  (* [istrs_counts lo hi]: the string ids and numbers of records of the
+     ranks [lo, hi), read in bulk (no seek back and forth per rank) *)
+  istrs_counts : int -> int -> (int * int) array;
 }
 
 (* [hidden]: ranks of the file entries without records left or whose string
@@ -320,12 +323,13 @@ let delta src d =
       src.family_patches;
   tbl
 
-let records_count f delta rank i =
-  let removed, added =
-    Option.value ~default:([], []) (Hashtbl.find_opt delta i)
-  in
-  Option.fold ~none:0 ~some:f.count rank
-  - List.length removed + List.length added
+(* [n]: number of records of [i] in the file *)
+let records_count delta n i =
+  match Hashtbl.find_opt delta i with
+  | None -> n
+  | Some (removed, added) -> n - List.length removed + List.length added
+
+let file_count f rank = Option.fold ~none:0 ~some:f.count rank
 
 let correction src key f d =
   let delta = delta src d in
@@ -341,7 +345,7 @@ let correction src key f d =
     Hashtbl.fold
       (fun i () (hidden, extra) ->
         let rank = f.rank i in
-        let count = records_count f delta rank i in
+        let count = records_count delta (file_count f rank) i in
         let moved = Hashtbl.mem moved i in
         let hidden =
           match rank with
@@ -390,7 +394,9 @@ let next_entry f c k =
   | Some _, (Some _ | None) -> file
   | None, (Some _ | None) -> extra
 
-let entries f c k1 k2 =
+(* [file r] of each entry read from the file at rank [r], [extra i] of each
+   extra entry [i], in order *)
+let entries_with ~file ~extra f c k1 k2 =
   let hi = f.lower_bound k2 in
   let e1 = extra_from c k1 in
   let extras =
@@ -400,13 +406,14 @@ let entries f c k1 k2 =
   in
   let rec loop r extras acc =
     match extras with
-    | (before, i) :: l when before <= r || r >= hi -> loop r l (i :: acc)
+    | (before, i) :: l when before <= r || r >= hi -> loop r l (extra i :: acc)
     | _ :: _ | [] ->
         if r >= hi then List.rev acc
-        else
-          loop (r + 1) extras (if is_hidden c r then acc else f.istr r :: acc)
+        else loop (r + 1) extras (if is_hidden c r then acc else file r :: acc)
   in
   loop (f.lower_bound k1) extras []
+
+let entries f c k1 k2 = entries_with ~file:f.istr ~extra:Fun.id f c k1 k2
 
 let without removed l =
   match removed with
@@ -522,7 +529,25 @@ let with_reader bdir ~particles src k =
       input_binary_int dat
     in
     let refs r = input_refs (Lazy.force dat) (pos_at inx s r) in
-    ({ s; istr; key; lower_bound; rank; count; refs }, key_of)
+    let istrs_counts lo hi =
+      let n = max 0 (hi - lo) in
+      seek_in inx (s.istr_off + (4 * lo));
+      let istrs = really_input_string inx (4 * n) in
+      seek_in inx (s.istr_off + (4 * s.n) + (s.width * lo));
+      let poss = really_input_string inx (s.width * n) in
+      let dat = Lazy.force dat in
+      (* the records are written in the order of the ranks: [dat] is read
+         forward *)
+      Array.init n (fun j ->
+          let pos =
+            if s.width = 4 then Int32.to_int (String.get_int32_be poss (4 * j))
+            else Int64.to_int (String.get_int64_be poss (8 * j))
+          in
+          seek_in dat pos;
+          ( Int32.to_int (String.get_int32_be istrs (4 * j)),
+            input_binary_int dat ))
+    in
+    ({ s; istr; key; lower_bound; rank; count; refs; istrs_counts }, key_of)
   in
   let corrections =
     ref
@@ -561,13 +586,27 @@ let with_reader bdir ~particles src k =
     let f, c = view d in
     entries f c p (after_prefix p)
   in
+  (* the rank of an entry read in order is known: no search per entry, as
+     [dict_count] does (12 s for the 800,000 places of Roglo) *)
+  let dict_entries_count d p =
+    let f, c = view d in
+    let k2 = after_prefix p in
+    let lo = f.lower_bound p in
+    let a = f.istrs_counts lo (f.lower_bound k2) in
+    entries_with
+      ~file:(fun r ->
+        let i, n = a.(r - lo) in
+        (i, records_count c.delta n i))
+      ~extra:(fun i -> (i, records_count c.delta (file_count f (f.rank i)) i))
+      f c p k2
+  in
   let dict_refs d i =
     let f, c = view d in
     refs f c i
   in
   let dict_count d i =
     let f, c = view d in
-    records_count f c.delta (f.rank i) i
+    records_count c.delta (file_count f (f.rank i)) i
   in
   let entry_from d k =
     let f, c = view d in
@@ -581,6 +620,7 @@ let with_reader bdir ~particles src k =
       dict_size;
       dict_groups;
       dict_entries;
+      dict_entries_count;
       dict_refs;
       dict_count;
       dict_first;

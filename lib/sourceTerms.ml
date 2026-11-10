@@ -383,12 +383,11 @@ let of_strings strings =
   { known = known_of_strings (List.map (fun (_, s, _) -> s) strings); strings }
 
 let load conf base =
-  let u = PlaceRename.usage ~field:PlaceRename.Source base in
   ignore conf;
   of_strings
     (List.map
-       (fun i -> (i, Driver.sou base i, PlaceRename.uses u i))
-       (Driver.dict_entries base Geneweb_db.Dict.Source ""))
+       (fun (i, uses) -> (i, Driver.sou base i, uses))
+       (Driver.dict_entries_count base Geneweb_db.Dict.Source ""))
 
 (* the distinct spellings of [part] in each string *)
 let iter_spellings d part f =

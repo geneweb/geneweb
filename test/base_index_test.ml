@@ -205,6 +205,12 @@ let check_dict base d =
         (Printf.sprintf "%s entries %S" name p)
         (List.map (fun (_, i, _) -> i) selected)
         (istrs (Driver.dict_entries base d p));
+      (check (list (pair int int)))
+        (Printf.sprintf "%s entries with counts %S" name p)
+        (List.map (fun (_, i, refs) -> (i, List.length refs)) selected)
+        (List.map
+           (fun (i, n) -> (Driver.Istr.hash i, n))
+           (Driver.dict_entries_count base d p));
       (check (list (pair string int)))
         (Printf.sprintf "%s groups %S" name p)
         (scan_groups entries p)
