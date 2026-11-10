@@ -116,6 +116,16 @@ val get_particle : Re.re -> string -> string
 (** [get_particle particles name] Return [p] where [p] is in [particles] and is
     prefix of [name]. If no such [p] exists, empty string [""] is returned. *)
 
+val surname_components : Re.re -> string -> string list
+(** [surname_components particles s] The components of the surname [s] under
+    which it is also indexed: its words, separated by spaces and hyphens,
+    without the particles [particles] (see {!get_particle}) found at the start
+    of any word, then the runs of several consecutive words between two
+    particles. Words of fewer than three bytes ("La", "Le") and the words
+    "saint" and "sainte" are left out, but kept in the runs; [s] itself is left
+    out. With the particles "de " and "du ", ["de Lagoutte du Vivier"] gives
+    ["Lagoutte"; "Vivier"] and ["de La Tour"] gives ["La Tour"; "Tour"]. *)
+
 val compare_after_particle : Re.re -> string -> string -> int
 (** [compare_after_particle particles s1 s2] compare strings [s1] [s2] starting
     from the first character after particle's match. If they are equal, compare

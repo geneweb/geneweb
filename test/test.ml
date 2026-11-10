@@ -11,6 +11,6 @@ let () =
     (Sosa_test.v @ Place_test.v @ Dict_test.v @ Base_index_test.v
    @ Place_rename_test.v @ Source_test.v @ Calendar_test.v @ Wiki_test.v
    @ Merge_test.v @ Util_test.v @ Dag2html_test.v @ Oidc_test.v @ Userkey_test.v
-   @ Templ_test.v @ Cache_test.v @ Blank_name_test.v @ Notes_search_test.v
-   @ Notes_corpus_test.v @ Notes_rename_test.v @ Anomaly_test.v
-   @ Update_order_test.v)
+   @ Templ_test.v @ Cache_test.v @ Blank_name_test.v @ Surname_index_test.v
+   @ Notes_search_test.v @ Notes_corpus_test.v @ Notes_rename_test.v
+   @ Anomaly_test.v @ Update_order_test.v)

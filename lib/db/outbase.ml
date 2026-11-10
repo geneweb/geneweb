@@ -276,8 +276,11 @@ let make_strings_of_fsname_aux split get base =
       a)
     t
 
-(* Index surnames using surname pieces grouping, preserves particles *)
+(* Index surnames under the whole name, its pieces (particles kept, see
+   Mutil.surnames_pieces) and its components (particles left out, see
+   Mutil.surname_components): "Vivier" finds "de Lagoutte du Vivier". *)
 let make_strings_of_sname_with_pieces base =
+  let particles = Lazy.force base.data.particles in
   let t = Array.make Dutil.table_size IntSet.empty in
   let add_name (key : string) (value : int) =
     let key = Dutil.name_index key in
@@ -285,14 +288,20 @@ let make_strings_of_sname_with_pieces base =
     let set' = IntSet.add value set in
     if set == set' then () else Array.set t key set'
   in
+  (* A surname is split once, not once per person bearing it. *)
+  let indexed = Hashtbl.create 4096 in
   for i = 0 to base.data.persons.len - 1 do
     let p = Dutil.poi base i in
-    if p.surname <> 1 then (
+    if p.surname <> 1 && not (Hashtbl.mem indexed p.surname) then (
+      Hashtbl.add indexed p.surname ();
       let s = base.data.strings.get p.surname in
       add_name s p.surname;
       List.iter
         (fun piece -> add_name piece p.surname)
-        (Mutil.surnames_pieces s))
+        (Mutil.surnames_pieces s);
+      List.iter
+        (fun c -> add_name c p.surname)
+        (Mutil.surname_components particles s))
   done;
   Array.map
     (fun set ->
