@@ -294,6 +294,17 @@ let clusters () =
        (fun (key, l) ->
          (key, List.map (fun (e : PlaceTerms.entry) -> e.term) l))
        (PlaceTerms.clusters entries));
+  (* a single spelling is a cluster only when it must be cleaned *)
+  (check (list string))
+    "single unclean spelling" [ "Granville\u{00A0}" ]
+    (List.concat_map
+       (fun (_, l) -> List.map (fun (e : PlaceTerms.entry) -> e.term) l)
+       (PlaceTerms.clusters
+          (PlaceTerms.of_places false
+             [
+               (istr "5", "Granville\u{00A0}, Manche, France", 1);
+               (istr "6", "Avranches, Manche, France", 1);
+             ])));
   (check (option string))
     "rewrite several spellings" (Some "Saint-Malo, Saint-Malo, France")
     (PlaceRename.rewrite false
@@ -346,6 +357,53 @@ let groups () =
           ]));
   ()
 
+let summary () =
+  let istr i = Geneweb_db.Driver.Istr.of_string (string_of_int i) in
+  let places =
+    List.mapi
+      (fun i (raw, uses) -> (istr (i + 1), raw, uses))
+      [
+        ("Saint-Martin, Manche, France", 3);
+        ("[Le Bourg] - Saint-Martin, Manche, France", 2);
+        ("Saint-Martin, Calvados, France", 1);
+        ("Paris, Paris, France", 4);
+        ("Paris (75)", 1);
+        ("Saint Martin, Manche", 5);
+      ]
+  in
+  let counts l =
+    List.map
+      (fun (e : PlaceTerms.entry) -> (e.term, e.nb_places, e.uses, e.cluster))
+      l
+    |> List.sort compare
+  in
+  (check (list (pair (pair string int) (pair int string))))
+    "same numbers"
+    (List.map
+       (fun (t, n, u, c) -> ((t, n), (u, c)))
+       (counts (PlaceTerms.of_places false places)))
+    (List.map
+       (fun (t, n, u, c) -> ((t, n), (u, c)))
+       (counts (PlaceTerms.summary false places)));
+  (check (list (pair string (list string))))
+    "same clusters"
+    (List.map
+       (fun (k, l) -> (k, List.map (fun (e : PlaceTerms.entry) -> e.term) l))
+       (PlaceTerms.clusters (PlaceTerms.of_places false places)))
+    (List.map
+       (fun (k, l) -> (k, List.map (fun (e : PlaceTerms.entry) -> e.term) l))
+       (PlaceTerms.clusters (PlaceTerms.summary false places)));
+  (* only the terms of a cluster *)
+  (check (list string))
+    "only"
+    [ "Saint Martin"; "Saint-Martin" ]
+    (List.map
+       (fun (e : PlaceTerms.entry) -> e.term)
+       (PlaceTerms.of_places
+          ~only:(PlaceTerms.in_cluster (PlaceTerms.cluster_key "St Martin"))
+          false places));
+  ()
+
 let v =
   [
     ("place-normalize", [ test_case "Place normalize" `Quick normalize ]);
@@ -362,6 +420,8 @@ let v =
     ( "place-components",
       [ test_case "Place components spans" `Quick components ] );
     ("place-terms", [ test_case "PlaceTerms of_places" `Quick of_places ]);
+    ( "place-terms-summary",
+      [ test_case "PlaceTerms summary = of_places" `Quick summary ] );
     ("place-groups", [ test_case "PlaceGroups of_places" `Quick groups ]);
     ( "place-clusters",
       [ test_case "PlaceTerms cluster_key and clusters" `Quick clusters ] );

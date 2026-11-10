@@ -43,6 +43,15 @@
   of the base, nor the binary caches of `cache_files`, and always show
   the current data. The option of chk_data to read the database instead
   of the caches is removed.
+- Spellings to group: the lists of `m=PLACE_TERMS` and `m=SOURCE_TERMS`
+  open empty and are computed once a beginning is typed ("starting
+  with") or all of them asked; they are sent by pages of
+  `terms_page_size` rows (100 by default, changed on the page). The
+  invisible characters, non-breaking spaces and spaces at both ends of
+  the spellings are shown as in chk_data, and a single spelling that has
+  some is listed, to clean it. On the preview of a change, the new
+  spelling and every line can be edited. A new place term may be
+  `town (county)`, `[suburb] - town` or `(county)`.
 - The book of places (`m=MOD_DATA&data=place`) can be sorted from the
   last term of the places (country, county, town): button on the page,
   or `dico_inverted=yes` in the `.gwf` file to make it the default

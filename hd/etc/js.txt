@@ -686,6 +686,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+%if;("_TERMS" in e.m)
+<script>
+%( spellings to group (m=PLACE_TERMS, SOURCE_TERMS, OCCU_TERMS):
+   a checkbox .ctx-all with data-ctx="x" checks or unchecks every checkbox
+   of class ctxx; a select .auto-submit submits its form when changed; a
+   field with data-check="id" checks the radio button #id when focused %)
+document.querySelectorAll('.ctx-all').forEach(function (b) {
+  b.addEventListener('change', function () {
+    document.querySelectorAll('.ctx' + b.dataset.ctx).forEach(function (x) {
+      x.checked = b.checked;
+    });
+  });
+});
+document.querySelectorAll('select.auto-submit').forEach(function (s) {
+  s.addEventListener('change', function () { s.form.submit(); });
+});
+document.querySelectorAll('input[data-check]').forEach(function (i) {
+  i.addEventListener('focus', function () {
+    document.getElementById(i.dataset.check).checked = true;
+  });
+});
+</script>
+%end;
 %if;(e.notif!="" or e.nomod="1" or wizard)
 <script data-notif="%e.notif;">
 %include;js_notif

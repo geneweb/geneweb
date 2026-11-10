@@ -477,6 +477,10 @@
 # Limits the results of all books (m=MOD_DATA) accessible by wizard
 #book_max_results=1000
 
+# Number of rows of a page of the lists of spellings to group (places,
+# sources: m=PLACE_TERMS, m=SOURCE_TERMS) and of places to complete. The wizard can change it on the page. From 1 to 5000.
+#terms_page_size=100
+
 # Limits the results of data typographic checker (m=CHK_DATA) accessible by wizard
 # This variable allows to set up the maximum number of entries with errors
 # that can be displayed at a single time to avoid server timeout on large databases.

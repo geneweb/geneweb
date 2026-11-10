@@ -81,8 +81,44 @@ val load : Config.config -> Geneweb_db.Driver.base -> data
 
 val of_strings : (Geneweb_db.Driver.istr * string * int) list -> data
 
+(** {2 Spellings that are spans of raw strings}
+
+    Shared by the sources and the occupations ({!OccuTerms}). [split raw] gives
+    the spellings of a raw string, [key] their cluster key; the strings come
+    with their id and their number of uses. *)
+
+val clusters_of :
+  split:(string -> span list) ->
+  key:(string -> string) ->
+  (Geneweb_db.Driver.istr * string * int) list ->
+  (string * spelling list * int) list
+(** The clusters [(key, spellings, uses)] of two spellings or more, and the
+    single spellings that are not {!PlaceTerms.is_clean}, by decreasing uses;
+    the spellings of a cluster most used first. *)
+
+val samples_of :
+  split:(string -> span list) ->
+  (Geneweb_db.Driver.istr * string * int) list ->
+  string list ->
+  int ->
+  (string * (string * span list) list) list
+(** [samples_of ~split strings spellings n]: for each spelling, up to [n]
+    strings containing it, with its spans. *)
+
+val plan_of :
+  split:(string -> span list) ->
+  Geneweb_db.Driver.base ->
+  (Geneweb_db.Driver.istr * string * int) list ->
+  terms:string list ->
+  new_term:string ->
+  (PlaceRename.item * span list) list
+(** Replacing the spellings [terms] by [new_term] in every string, with the
+    replaced spans of each old string. *)
+
+(** {2 The sources} *)
+
 val clusters : data -> part -> cluster list
-(** The clusters of two spellings or more, by decreasing uses. *)
+(** {!clusters_of} for the wizards or the sources of the source strings. *)
 
 val samples :
   data ->
