@@ -196,7 +196,58 @@ let rename_rewrite () =
   (check bool) "new term ok" true (PlaceRename.valid_new_term "Saint-L\195\180");
   (check bool) "comma allowed" true (PlaceRename.valid_new_term "a, b");
   (check bool) "empty refused" false (PlaceRename.valid_new_term "  ");
-  (check bool) "parenthesis refused" false (PlaceRename.valid_new_term "a (b)");
+  (check bool) "trailing parenthesis allowed" true
+    (PlaceRename.valid_new_term "a (b)");
+  (check bool) "inner parenthesis refused" false
+    (PlaceRename.valid_new_term "a (b) c");
+  (check bool) "empty parentheses refused" false
+    (PlaceRename.valid_new_term "()");
+  (check bool) "nested parentheses refused" false
+    (PlaceRename.valid_new_term "(b (c))");
+  (check bool) "bracket refused" false (PlaceRename.valid_new_term "a [b]");
+  (check bool) "two parentheses refused" false
+    (PlaceRename.valid_new_term "a (b) (c)");
+  (check (option (pair string string)))
+    "paren_form reads the last parenthesis"
+    (Some ("a (b)", "c"))
+    (Geneweb_db.Dict.paren_form "a (b) (c)");
+  List.iter
+    (fun (s, ok) ->
+      (check bool) ("valid_place " ^ s) ok (PlaceRename.valid_place s))
+    [
+      ("Toulouse (Haute-Garonne)", true);
+      ("[Saint-Simplice] - Metz, Moselle", true);
+      ("Paris (75), France", true);
+      ("", false);
+      ("Metz [Saint-Simplice", false);
+      ("[] - Metz", false);
+      ("Metz, [Saint-Simplice] - Moselle", false);
+      ("Toulouse (Haute-Garonne", false);
+      ("Toulouse ((31))", false);
+      ("Toulouse ()", false);
+    ];
+  (check bool) "suburb allowed" true
+    (PlaceRename.valid_new_term "[Saint-Simplice] \xE2\x80\x93 Metz");
+  (check bool) "lone parenthesis term allowed" true
+    (PlaceRename.valid_new_term "(Haute-Garonne)");
+  (check (option string))
+    "last term into parentheses" (Some "Toulouse (Haute-Garonne)")
+    (PlaceRename.rewrite false ~terms:[ "Haute-Garonne" ]
+       ~new_term:"(Haute-Garonne)" "Toulouse, Haute-Garonne" [ Some 0 ]);
+  (check (option string))
+    "first term not into parentheses" (Some "Haute-Garonne, France")
+    (PlaceRename.rewrite false ~terms:[ "Haute-Garonne" ]
+       ~new_term:"(Haute-Garonne)" "Haute-Garonne, France" [ Some 1 ]);
+  (check bool) "empty suburb refused" false
+    (PlaceRename.valid_new_term "[] - Metz");
+  (check (option string))
+    "suburb at the start" (Some "[Saint-Simplice] - Metz, Moselle")
+    (PlaceRename.rewrite false ~terms:[ "Saint-Simplice" ]
+       ~new_term:"[Saint-Simplice] - Metz" "Saint-Simplice, Moselle" [ Some 1 ]);
+  (check (option string))
+    "suburb not as a parent" (Some "Metz, Saint-Simplice")
+    (PlaceRename.rewrite false ~terms:[ "Saint-Simplice" ]
+       ~new_term:"[Saint-Simplice] - Metz" "Metz, Saint-Simplice" [ Some 0 ]);
   ()
 
 let rename_occurrence_key () =

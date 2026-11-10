@@ -56,15 +56,85 @@ let terms_of_env conf =
     conf.env
   |> List.sort_uniq compare
 
+let has_delimiter s =
+  String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s
+
+(* ["aaaa (bbbb)"] as the book of places reads it ({!Dict.paren_form}), both
+   parts free of brackets and parentheses *)
+let paren_form s =
+  match Dict.paren_form s with
+  | Some (host, parent)
+    when (not (has_delimiter host)) && not (has_delimiter parent) ->
+      Some (host, parent)
+  | Some _ | None -> None
+
+(* the term after the suburb, plain or "aaaa (bbbb)" *)
+let valid_main s = (not (has_delimiter s)) || paren_form s <> None
+
+(* ["[faubourg] - ville"] (separator -, – or —) is [Some ("faubourg",
+   "ville")]: a suburb isolated before its town, both non empty *)
+let suburb_form s =
+  match Place.split_suburb s with
+  | "", _ -> None
+  | sub, rest ->
+      let sub = String.trim sub and rest = String.trim rest in
+      if sub <> "" && rest <> "" && (not (has_delimiter sub)) && valid_main rest
+      then Some (sub, rest)
+      else None
+
+(* ["(Haute-Garonne)"] is [Some "Haute-Garonne"]: the last term of a place
+   moved into parentheses, "aaaa, Haute-Garonne" becoming "aaaa
+   (Haute-Garonne)" *)
+let lone_paren s =
+  let n = String.length s in
+  if n > 2 && s.[0] = '(' && s.[n - 1] = ')' then
+    let inner = String.trim (String.sub s 1 (n - 2)) in
+    if inner <> "" && not (has_delimiter inner) then Some inner else None
+  else None
+
 let valid_new_term s =
   let s = PlaceTerms.clean_term s in
-  s <> ""
-  && not (String.exists (fun c -> c = '[' || c = ']' || c = '(' || c = ')') s)
+  s <> "" && (valid_main s || suburb_form s <> None || lone_paren s <> None)
 
-let rewrite_with inverted ~terms f raw depths =
+let valid_place s =
+  let s = PlaceTerms.clean_term s in
+  let brackets_ok s = not (String.exists (fun c -> c = '[' || c = ']') s) in
+  let parens_ok s =
+    let n = String.length s in
+    let rec loop i opened =
+      if i = n then opened < 0
+      else
+        match s.[i] with
+        | '(' -> opened < 0 && loop (i + 1) i
+        | ')' ->
+            opened >= 0
+            && String.trim (String.sub s (opened + 1) (i - opened - 1)) <> ""
+            && loop (i + 1) (-1)
+        | _ -> loop (i + 1) opened
+    in
+    loop 0 (-1)
+  in
+  s <> ""
+  &&
+  match Dict.suburb s with
+  | None -> brackets_ok s && parens_ok s
+  | Some (i, j) ->
+      let sub = String.sub s 1 (i - 1) in
+      let rest = String.sub s j (String.length s - j) in
+      String.trim sub <> ""
+      && (not (has_delimiter sub))
+      && String.trim rest <> ""
+      && brackets_ok rest && parens_ok rest
+
+let rtrim s =
+  let rec last i = if i > 0 && s.[i - 1] = ' ' then last (i - 1) else i in
+  String.sub s 0 (last (String.length s))
+
+let rewrite_spans inverted ~terms f raw depths =
   let comps = Place.components inverted raw in
   let main = List.filter (fun (c : Place.component) -> not c.suburb) comps in
-  let pick = function
+  let pick depth =
+    match depth with
     | None -> List.find_opt (fun (c : Place.component) -> c.suburb) comps
     | Some d -> List.nth_opt main d
   in
@@ -84,12 +154,82 @@ let rewrite_with inverted ~terms f raw depths =
     Some
       (List.fold_left
          (fun s (c : Place.component) ->
-           String.sub s 0 c.pos ^ f c.text
+           String.sub s 0 c.pos ^ f c
            ^ String.sub s (c.pos + c.len) (String.length s - c.pos - c.len))
          raw spans)
 
+let rewrite_with inverted ~terms f raw depths =
+  rewrite_spans inverted ~terms
+    (fun (c : Place.component) -> f c.text)
+    raw depths
+
+(* A new term "aaaa (bbbb)" is written as is, except next to the parentheses
+   of the place, inside them ("Nantes (44)" for "44") or before them ("Nantes"
+   in "Nantes (44)"), where it would give two parenthesised parts: there it is
+   written "aaaa, bbbb", which has the same meaning. *)
 let rewrite inverted ~terms ~new_term raw depths =
-  rewrite_with inverted ~terms (Fun.const new_term) raw depths
+  let n = String.length raw in
+  let in_parens (c : Place.component) =
+    (c.pos > 0 && String.unsafe_get raw (c.pos - 1) = '(')
+    ||
+    let rec next i =
+      if i < n && String.unsafe_get raw i = ' ' then next (i + 1) else i
+    in
+    let i = next (c.pos + c.len) in
+    i < n && String.unsafe_get raw i = '('
+  in
+  let nested =
+    match paren_form new_term with
+    | Some (host, parent) -> host ^ ", " ^ parent
+    | None -> new_term
+  in
+  (* a new term "[faubourg] - ville" can only start a place without suburb:
+     elsewhere the occurrence is left as it is *)
+  let suburb_ok (c : Place.component) =
+    (not
+       (List.exists
+          (fun (x : Place.component) -> x.suburb)
+          (Place.components inverted raw)))
+    && String.trim (String.sub raw 0 c.pos) = ""
+  in
+  match lone_paren new_term with
+  | Some inner -> (
+      (* a new term "(bbbb)" replaces the last term of a place, after a
+         comma, and its comma: "aaaa, bbbb" becomes "aaaa (bbbb)"; elsewhere
+         (first term, term inside, place already with parentheses) the
+         occurrence is left as it is *)
+      let paren_ok (c : Place.component) =
+        let after = String.sub raw (c.pos + c.len) (n - c.pos - c.len) in
+        let before = rtrim (String.sub raw 0 c.pos) in
+        let nb = String.length before in
+        String.trim after = ""
+        && nb > 0
+        && before.[nb - 1] = ','
+        && not (has_delimiter before)
+      in
+      match
+        rewrite_spans inverted ~terms
+          (fun c -> if paren_ok c then "\001" else c.text)
+          raw depths
+      with
+      | Some s -> (
+          match String.index_opt s '\001' with
+          | Some k ->
+              let before = rtrim (String.sub s 0 k) in
+              let before = String.sub before 0 (String.length before - 1) in
+              Some
+                (rtrim before ^ " (" ^ inner ^ ")"
+                ^ String.sub s (k + 1) (String.length s - k - 1))
+          | None -> Some s)
+      | None -> None)
+  | None ->
+      rewrite_spans inverted ~terms
+        (fun c ->
+          if suburb_form new_term <> None then
+            if suburb_ok c then new_term else c.text
+          else if in_parens c then nested
+          else new_term)
+        raw depths
 
 (* ------------------------------------------------------------------------ *)
 
@@ -97,6 +237,7 @@ type field = Place | Source
 type usage = Driver.istr -> int
 
 let uses u i = u i
+
 let dict field = match field with Place -> Dict.Place | Source -> Dict.Source
 
 (* the fields of [field] of a person or family moved by [f] *)
@@ -144,7 +285,9 @@ let map_family field f (gf : (_, _, Driver.istr) gen_family) =
           List.map (fun e -> { e with efam_src = f e.efam_src }) gf.fevents;
       }
 
-let action = function Place -> "mq" | Source -> "ms"
+let action field =
+  match field with Place -> "mq" | Source -> "ms"
+
 let usage ?(field = Place) base = Driver.dict_count base (dict field)
 
 (* ------------------------------------------------------------------------ *)
@@ -210,21 +353,35 @@ and classify base items =
             members)
   |> List.sort (fun a b -> Place.compare_places a.old_s b.old_s)
 
-let plan_places base ~target istrs =
-  let new_s = Driver.sou base target in
-  List.sort_uniq compare istrs
-  |> List.filter_map (fun istr ->
-      if Driver.Istr.equal istr target then None
-      else
-        Some
-          {
-            istr;
-            old_s = Driver.sou base istr;
-            new_s;
-            depths = [];
-            kind = Merge_existing target;
-          })
-  |> List.sort (fun a b -> Place.compare_places a.old_s b.old_s)
+let plan_places ?new_s base ~target istrs =
+  let target_s = Driver.sou base target in
+  match new_s with
+  | Some new_s
+    when Mutil.normalize_utf_8 (PlaceTerms.clean_term new_s) <> target_s ->
+      (* the complete place itself rewritten ("aaaa (bbbb)" for "aaaa,
+         bbbb"): every place given, the target too when given, gets the new
+         text *)
+      let new_s = Mutil.normalize_utf_8 (PlaceTerms.clean_term new_s) in
+      List.sort_uniq compare istrs
+      |> List.filter_map (fun istr ->
+          let old_s = Driver.sou base istr in
+          if old_s = new_s then None
+          else Some { istr; old_s; new_s; depths = []; kind = New_place })
+      |> classify base
+  | Some _ | None ->
+      List.sort_uniq compare istrs
+      |> List.filter_map (fun istr ->
+          if Driver.Istr.equal istr target then None
+          else
+            Some
+              {
+                istr;
+                old_s = Driver.sou base istr;
+                new_s = target_s;
+                depths = [];
+                kind = Merge_existing target;
+              })
+      |> List.sort (fun a b -> Place.compare_places a.old_s b.old_s)
 
 let places_of_env conf =
   List.filter_map

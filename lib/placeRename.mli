@@ -35,8 +35,19 @@ val occurrences_of_env : Config.config -> occurrence list
 
 val valid_new_term : string -> bool
 (** A new term must not be empty nor contain brackets or parentheses, which
-    would change how the place strings are split. Commas are allowed (to split a
-    term in two). *)
+    would change how the place strings are split, except one trailing
+    parenthesised part: ["Nantes (Loire-Atlantique)"] is accepted like
+    ["Nantes, Loire-Atlantique"], and a suburb isolated before its town:
+    ["[Saint-Simplice] - Metz"] (separator -, – or —), written only where a
+    place without suburb starts with the term, and a term moved into
+    parentheses: ["(Haute-Garonne)"], written only where the term ends a place
+    after a comma ("aaaa, Haute-Garonne" becomes "aaaa (Haute-Garonne)"). Commas
+    are allowed (to split a term in two). *)
+
+val valid_place : string -> bool
+(** A whole place typed by the wizard (a line edited on the preview): not empty,
+    brackets only around a suburb at its start (["[faubourg] - ville"]),
+    parentheses closed, not nested and not empty. *)
 
 val terms_of_env : Config.config -> string list
 (** The terms to rename, from the form fields [t] and [t1], [t2]... *)
@@ -100,12 +111,16 @@ val classify : Geneweb_db.Driver.base -> item list -> item list
     and sorts them. *)
 
 val plan_places :
+  ?new_s:string ->
   Geneweb_db.Driver.base ->
   target:Geneweb_db.Driver.istr ->
   Geneweb_db.Driver.istr list ->
   item list
 (** [plan_places base ~target places]: every place of [places] replaced as a
-    whole by the existing place [target] ([Merge_existing target]). *)
+    whole by the existing place [target] ([Merge_existing target]). With [new_s]
+    different from [target] (the complete place edited, "aaaa (bbbb)" for "aaaa,
+    bbbb"), every place of [places], [target] included if it is there, is
+    replaced by [new_s], classified as by {!classify}. *)
 
 val places_of_env : Config.config -> Geneweb_db.Driver.istr list
 (** The places checked in the submitted form (fields [p<istr>=on]). *)
