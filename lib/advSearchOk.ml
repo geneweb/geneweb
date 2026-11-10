@@ -542,11 +542,59 @@ let advanced_search conf base max_answers =
       in
       loop ([], 0) list
     else
-      Collection.fold_until
-        (fun (_, len) -> len <= max_answers)
-        (fun acc i -> match_person acc (pget conf base i) search_type)
-        ([], 0)
-        (Geneweb_db.Driver.ipers base)
+      let matching d cmp y =
+        let y = List.map abbrev_lower y in
+        Driver.dict_select base d (fun istr ->
+            let s = abbrev_lower (Driver.sou base istr) in
+            List.exists (fun s' -> cmp s' s) y)
+      in
+      let candidates =
+        if search_type = "OR" then None
+        else
+          match
+            List.find_opt
+              (fun x -> getss x <> [])
+              [
+                birth_place_field_name;
+                bapt_place_field_name;
+                death_place_field_name;
+                burial_place_field_name;
+              ]
+          with
+          | Some x ->
+              Some (fst (matching Geneweb_db.Dict.Place cmp_place (getss x)))
+          | None when gets "occu" <> "" ->
+              Some
+                (fst
+                   (matching Geneweb_db.Dict.Occupation string_incl
+                      [ gets "occu" ]))
+          | None when getss marriage_place_field_name <> [] ->
+              let _, iter_families =
+                matching Geneweb_db.Dict.Place cmp_place
+                  (getss marriage_place_field_name)
+              in
+              let spouses = ref [] in
+              iter_families (fun ifam ->
+                  let fam = Driver.foi base ifam in
+                  spouses :=
+                    Driver.get_father fam :: Driver.get_mother fam :: !spouses);
+              let spouses = List.sort_uniq Iper.compare !spouses in
+              Some (fun f -> List.iter f spouses)
+          | None -> None
+      in
+      match candidates with
+      | Some iter ->
+          let acc = ref ([], 0) in
+          iter (fun i ->
+              if snd !acc <= max_answers then
+                acc := match_person !acc (pget conf base i) search_type);
+          !acc
+      | None ->
+          Collection.fold_until
+            (fun (_, len) -> len <= max_answers)
+            (fun acc i -> match_person acc (pget conf base i) search_type)
+            ([], 0)
+            (Geneweb_db.Driver.ipers base)
   in
   (List.rev list, len)
 
