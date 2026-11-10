@@ -29,7 +29,7 @@
       </a>
     %end;
     %( Wizard: view the current page as a friend would (this page only) %)
-    %if;((wizard or as_friend) and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+    %if;(roglo and (wizard or as_friend) and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
       %if;as_friend;
         <a class="btn btn-sm btn-link p-0 border-0 fa-icon" href="%url_set.asfriend;"
           title="[*view as friend/back to wizard]1">%nn;
