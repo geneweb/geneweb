@@ -59,7 +59,18 @@ let key_text s = List.fold_left (fun s p -> space_for p s) (clean_term s) nbsps
 
 (* as check_data: spaces at both ends and invisible characters ignored *)
 let cluster_key term = Name.abbrev (Name.lower (key_text term))
-let place_uses base = Driver.dict_entries_count base Geneweb_db.Dict.Place ""
+
+(* kept as two arrays of integers: 16 bytes per place *)
+let uses_memo : (Driver.istr array * int array) DictMemo.t = DictMemo.create ()
+
+let place_uses base =
+  let istrs, uses =
+    DictMemo.get uses_memo base (fun () ->
+        let l = Driver.dict_entries_count base Geneweb_db.Dict.Place "" in
+        (Array.of_list (List.map fst l), Array.of_list (List.map snd l)))
+  in
+  List.init (Array.length istrs) (fun i -> (istrs.(i), uses.(i)))
+
 let compare_place p1 p2 = Place.compare_places p1.raw p2.raw
 
 let compare_context c1 c2 =
@@ -196,3 +207,10 @@ let clusters entries =
     h []
   |> List.sort (fun (k1, l1) (k2, l2) ->
       match compare (uses l2) (uses l1) with 0 -> compare k1 k2 | x -> x)
+
+let clusters_memo : (string * entry list) list DictMemo.t = DictMemo.create ()
+
+let summary_clusters conf base =
+  let inverted = Place.places_inverted conf in
+  DictMemo.get clusters_memo ~key:(string_of_bool inverted) base (fun () ->
+      clusters (summary inverted (places base)))

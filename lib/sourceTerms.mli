@@ -120,6 +120,11 @@ val plan_of :
 val clusters : data -> part -> cluster list
 (** {!clusters_of} for the wizards or the sources of the source strings. *)
 
+val load_clusters :
+  Config.config -> Geneweb_db.Driver.base -> part -> cluster list
+(** [clusters (load conf base) part], kept by the process ({!DictMemo}) until
+    the base is modified. *)
+
 val samples :
   data ->
   part ->

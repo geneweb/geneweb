@@ -368,7 +368,26 @@ let shared () =
   Driver.with_database name (move "Paris");
   Driver.with_database name (fun base ->
       (check int) "reader after a commit of another one" 0 (count base);
-      List.iter (check_dict base) Dict.all)
+      List.iter (check_dict base) Dict.all);
+  (* a result is kept as long as the index and the patches do not change *)
+  let memo : int Geneweb.DictMemo.t = Geneweb.DictMemo.create () in
+  let computed = ref 0 in
+  let get base =
+    Geneweb.DictMemo.get memo base (fun () ->
+        incr computed;
+        !computed)
+  in
+  Driver.with_database name (fun base -> (check int) "computed" 1 (get base));
+  Driver.with_database name (fun base -> (check int) "kept" 1 (get base));
+  Driver.with_database name (move "Lyon (69)");
+  Driver.with_database name (fun base ->
+      (check int) "computed again after a commit" 2 (get base);
+      (check int) "kept again" 2 (get base));
+  Driver.with_database name (fun base ->
+      move "Paris" base;
+      (check bool) "version unknown after a commit through the base" true
+        (Driver.dict_version base = None);
+      (check int) "not kept then" 3 (get base))
 
 let v =
   [
