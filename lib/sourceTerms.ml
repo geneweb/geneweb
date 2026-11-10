@@ -504,3 +504,9 @@ let samples d part spellings n =
 
 let plan base d part ~terms ~new_term =
   plan_of ~split:(split d part) base d.strings ~terms ~new_term
+
+let clusters_memo : cluster list DictMemo.t = DictMemo.create ()
+
+let load_clusters conf base part =
+  DictMemo.get clusters_memo ~key:(string_of_part part) base (fun () ->
+      clusters (load conf base) part)

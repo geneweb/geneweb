@@ -43,6 +43,11 @@ let clusters d =
   SourceTerms.clusters_of ~split:spans ~key d
   |> List.map (fun (ckey, spellings, total) -> { ckey; spellings; total })
 
+let clusters_memo : cluster list DictMemo.t = DictMemo.create ()
+
+let load_clusters base =
+  DictMemo.get clusters_memo base (fun () -> clusters (load base))
+
 let samples d spellings n = SourceTerms.samples_of ~split:spans d spellings n
 
 let plan base d ~terms ~new_term =

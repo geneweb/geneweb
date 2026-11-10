@@ -38,6 +38,10 @@ val clusters : data -> cluster list
 (** The clusters of two spellings or more, and the single spellings that are not
     {!PlaceTerms.is_clean}, by decreasing uses. *)
 
+val load_clusters : Geneweb_db.Driver.base -> cluster list
+(** [clusters (load base)], kept by the process ({!DictMemo}) until the base is
+    modified. *)
+
 val samples :
   data -> string list -> int -> (string * (string * span list) list) list
 (** [samples d spellings n]: for each spelling, up to [n] strings containing it,

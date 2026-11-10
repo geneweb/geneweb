@@ -84,6 +84,10 @@ type dict_index = {
   (* Whether the index has the section of a dictionary: an index written
      before a dictionary was defined has not. *)
   dict_has : Dict.t -> bool;
+  (* Version of what the queries answer from: the index and the patches
+     correcting it. [None] when it is not known: no patches file, or patches
+     committed since the base was opened. *)
+  dict_version : unit -> string option;
 }
 (** Queries over the index of the dictionaries of the base. *)
 

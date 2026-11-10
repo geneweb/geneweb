@@ -34,7 +34,7 @@ type entry = {
 val place_uses : Geneweb_db.Driver.base -> (Geneweb_db.Driver.istr * int) list
 (** Every non-empty place string used by an event (main fields and person/family
     events), with the number of persons and families using it, read from the
-    index of the dictionaries. *)
+    index of the dictionaries and kept by the process ({!DictMemo}). *)
 
 val build :
   ?only:(string -> bool) ->
@@ -90,3 +90,9 @@ val clusters : entry list -> (string * entry list) list
     of two terms or more, and the single terms that are not {!is_clean} (to
     remove their invisible characters and spaces). Each group is sorted by
     decreasing uses, the groups by decreasing total uses. *)
+
+val summary_clusters :
+  Config.config -> Geneweb_db.Driver.base -> (string * entry list) list
+(** [clusters (build_summary conf base)], kept by the process ({!DictMemo}): the
+    list of the spellings to group, long to compute on a large base, is computed
+    once for all its pages until the base is modified. *)

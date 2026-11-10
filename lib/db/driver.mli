@@ -610,6 +610,15 @@ val dict_has : base -> Dict.t -> bool
     an index written before [dict] was defined has not, until the base is
     rebuilt. *)
 
+val dict_version : base -> (string * string) option
+(** [dict_version base] The directory of [base] and the version of what the
+    [dict_*] queries answer from: the index of the dictionaries and the patches
+    correcting it. Two bases opened with the same directory and version give the
+    same answers, so a result computed from these queries can be kept by the
+    process and reused (see {!Geneweb.DictMemo}). [None] when the version is not
+    known: no patches file, or patches committed through [base] since it was
+    opened. *)
+
 val dict_count : base -> Dict.t -> istr -> int
 (** [dict_count base dict istr] Number of persons and families using [istr] in
     the fields of [dict], without reading them. *)

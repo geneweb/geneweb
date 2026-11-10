@@ -93,6 +93,11 @@ let dict_exact_count base d prefix =
 
 let dict_has base d = base.func.dict_index.dict_has d
 
+let dict_version base =
+  Option.map
+    (fun v -> (base.data.bdir, v))
+    (base.func.dict_index.dict_version ())
+
 let dict_records base d istr =
   List.partition_map
     (fun r ->

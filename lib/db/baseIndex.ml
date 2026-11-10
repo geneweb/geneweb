@@ -678,6 +678,21 @@ let with_reader bdir ~particles src k =
     try List.mem_assoc (code d) (Lazy.force memo).sections
     with Sys_error _ -> false
   in
+  (* What the answers of the queries depend on: the index and the patches
+     they were corrected with. Unknown without the version of the patches,
+     and after a commit made through this reader. *)
+  let committed = ref false in
+  let dict_version () =
+    match src.patches_stamp with
+    | Some (ino, size, mtime) when not !committed -> (
+        match (Lazy.force memo).inx with
+        | ino', size', mtime' ->
+            Some
+              (Printf.sprintf "%d:%Ld:%h/%d:%Ld:%h" ino' size' mtime' ino size
+                 mtime)
+        | exception Sys_error _ -> None)
+    | Some _ | None -> None
+  in
   k
     {
       dict_size;
@@ -690,4 +705,7 @@ let with_reader bdir ~particles src k =
       dict_first;
       dict_after;
       dict_has;
-    } (fun () -> corrections := lazy (Hashtbl.create 12))
+      dict_version;
+    } (fun () ->
+      committed := true;
+      corrections := lazy (Hashtbl.create 12))
