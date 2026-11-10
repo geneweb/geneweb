@@ -588,6 +588,30 @@ let families ?(select = fun _ -> true) base =
 
 let ifam_marker c i = Collection.Marker.make (fun i -> i) c i
 
+let dict_select base d select =
+  if base_format base <> current_base_format then
+    ( (fun f -> Collection.iter f (ipers base)),
+      fun f -> Collection.iter f (ifams base) )
+  else
+    let persons = Bytes.make (nb_of_persons base) '\000' in
+    let families = Bytes.make (nb_of_families base) '\000' in
+    List.iter
+      (fun i ->
+        if select i then
+          List.iter
+            (fun r ->
+              Bytes.set
+                (if r land 1 = 0 then persons else families)
+                (r lsr 1) '\001')
+            (base.func.dict_index.dict_refs d i))
+      (base.func.dict_index.dict_entries d "");
+    let iter b f =
+      for i = 0 to Bytes.length b - 1 do
+        if Bytes.get b i <> '\000' then f i
+      done
+    in
+    (iter persons, iter families)
+
 (* Restrict file *)
 
 (* FIXME: these values should not be global *)

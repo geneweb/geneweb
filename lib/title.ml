@@ -4,7 +4,6 @@ open Config
 open Def
 open Util
 module Driver = Geneweb_db.Driver
-module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 module T = Driver.Istr.Table
 
@@ -136,17 +135,12 @@ let to_string_list base ht =
   T.to_seq ht |> Seq.map (fun (i, ()) -> Driver.sou base i) |> List.of_seq
 
 let bearers base d select =
-  if Driver.base_format base <> Driver.current_base_format then
-    List.rev (Collection.fold (fun acc i -> i :: acc) [] (Driver.ipers base))
-  else
-    List.sort_uniq Driver.Iper.compare
-      (List.fold_left
-         (fun acc i ->
-           if select (Driver.sou base i) then
-             List.rev_append (fst (Driver.dict_records base d i)) acc
-           else acc)
-         []
-         (Driver.dict_entries base d ""))
+  let iter_persons, _ =
+    Driver.dict_select base d (fun i -> select (Driver.sou base i))
+  in
+  let l = ref [] in
+  iter_persons (fun i -> l := i :: !l);
+  List.rev !l
 
 let same ~absolute s =
   let l = Name.lower s in

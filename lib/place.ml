@@ -7,7 +7,6 @@ let src = Logs.Src.create ~doc:"Place" "PLAC"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
-module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
 
 (* max number of persons for which a m=RLM graph will be computed *)
@@ -204,41 +203,33 @@ let normalize_place inverted s =
 let places_inverted conf =
   List.assoc_opt "places_inverted" conf.base_env = Some "yes"
 
-exception List_too_long
-
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
     (fold_place : string -> 'a) (filter : 'a -> bool)
-    (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c)
-    (max_length : int) : ('a * 'c) array =
-  (* [fold_cache] is keyed by place [istr]; the total string population is a
-     tight upper bound on the distinct place istrs, so pre-size it there to
-     avoid rehashing during the scan. [ht] holds the (fewer) distinct folded
-     place keys, whose count is unknown up front — start small and let it grow
-     (amortised O(1)). *)
+    (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c) :
+    ('a * 'c) array =
   let ht : ('a, 'b) Hashtbl.t = Hashtbl.create 2048 in
-  (* Many people share the same place [istr]; fold each distinct place string
-     once (sou + fold_place) instead of once per person. *)
-  let fold_cache : (Driver.istr, 'a) Hashtbl.t =
-    Hashtbl.create (Driver.nb_of_strings base)
-  in
+  let keys : (Driver.istr, 'a option) Hashtbl.t = Hashtbl.create 2048 in
   let key_of istr =
-    match Hashtbl.find_opt fold_cache istr with
+    match Hashtbl.find_opt keys istr with
     | Some key -> key
     | None ->
-        let key = Driver.sou base istr |> fold_place in
-        Hashtbl.add fold_cache istr key;
+        let key = fold_place (Driver.sou base istr) in
+        let key = if filter key then Some key else None in
+        Hashtbl.add keys istr key;
         key
   in
-  let long = p_getenv conf.env "display" = Some "long" in
+  let iter_persons, iter_families =
+    Driver.dict_select base Geneweb_db.Dict.Place (fun istr ->
+        Option.is_some (key_of istr))
+  in
   let ht_add istr p =
-    let key : 'a = key_of istr in
-    if filter key then
-      match Hashtbl.find_opt ht key with
-      | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
-      | None ->
-          Hashtbl.add ht key (mk_value None p);
-          if Hashtbl.length ht > max_length && long then raise List_too_long
+    match key_of istr with
+    | None -> ()
+    | Some key -> (
+        match Hashtbl.find_opt ht key with
+        | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
+        | None -> Hashtbl.add ht key (mk_value None p))
   in
   (if add_birth || add_death || add_baptism || add_burial then
      let aux b fn p =
@@ -246,18 +237,15 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
          let x = fn p in
          if not (Driver.Istr.is_empty x) then ht_add x p
      in
-     Collection.iter
-       (fun i ->
+     iter_persons (fun i ->
          let p = pget conf base i in
          if authorized_age conf base p then (
            aux add_birth Driver.get_birth_place p;
            aux add_baptism Driver.get_baptism_place p;
            aux add_death Driver.get_death_place p;
-           aux add_burial Driver.get_burial_place p))
-       (Geneweb_db.Driver.ipers base));
+           aux add_burial Driver.get_burial_place p)));
   if add_marriage then
-    Collection.iter
-      (fun i ->
+    iter_families (fun i ->
         let fam = Driver.foi base i in
         let pl_ma = Driver.get_marriage_place fam in
         if not (Driver.Istr.is_empty pl_ma) then
@@ -265,8 +253,7 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
           let moth = pget conf base (Driver.get_mother fam) in
           if authorized_age conf base fath && authorized_age conf base moth then (
             ht_add pl_ma fath;
-            ht_add pl_ma moth))
-      (Geneweb_db.Driver.ifams base);
+            ht_add pl_ma moth));
   let len = Hashtbl.length ht in
   let array = Array.make len (dummy_key, dummy_value) in
   let i = ref 0 in
