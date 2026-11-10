@@ -10258,6 +10258,11 @@ sl: točno
 sv: exakt
 tr: tam
 
+    exact results
+de: genaue Treffer
+en: exact results
+fr: résultats exacts
+
     excommunication
 co: scumunicazione
 de: Exkommunizierung

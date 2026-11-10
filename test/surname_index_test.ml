@@ -30,14 +30,15 @@ let with_base k =
           surname = i + 3;
         })
   in
- let data =
+  let data =
     ( ( persons,
         Array.make n { parents = None; consang = Adef.no_consang },
         Array.make n { family = [||] } ),
       ([||], [||], [||]),
       strings,
       { nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun () -> []) } )
-  in  Driver.make "surname_index_test" particles data k
+  in
+  Driver.make "surname_index_test" particles data k
 
 (* Surnames of the index bucket of [query]. *)
 let bucket base query =
