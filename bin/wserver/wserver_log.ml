@@ -29,9 +29,13 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
     Option.value ~default:"" @@ Option.map string_of_status resp_status
   in
   let mode, url =
-    match Mutil.extract_param "GET /" ' ' request with
-    | None -> ("POST", Mutil.extract_param "Referer: " '\n' request)
-    | Some _ as url -> ("GET", url)
+    match Http.parse_request_line request with
+    | Some req_line ->
+        (Http.string_of_meth req_line.meth, Some req_line.raw_target)
+    | None -> (
+        match Mutil.extract_param "GET /" ' ' request with
+        | None -> ("POST", Mutil.extract_param "Referer: " '\n' request)
+        | Some _ as url -> ("GET", url))
   in
   "{"
   ^ String.concat ","
