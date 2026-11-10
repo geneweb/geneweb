@@ -25159,6 +25159,13 @@ en: very short display
 es: visualización muy corta
 fr: affichage très court
 
+    view as friend/back to wizard
+de: als Freund ansehen/zurück zum Meister
+en: view as friend/back to wizard
+es: ver como amigo/volver a mago
+fr: voir comme un ami/revenir en magicien
+it: vedere come amico/tornare mago
+
     view source
 co: fighjà a fonte
 de: siehe Quelle

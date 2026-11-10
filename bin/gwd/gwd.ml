@@ -1246,6 +1246,11 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     in
     let bases = Util.get_bases_list () in
     let bname = match bases with [ x ] -> x | _ -> bname in
+    (* Set the per-base cnt directory before [get_token] reads the actlog:
+       the gwd worker is reused between requests, and !GWPARAM.cnt_dir may
+       still point to the base of the previous request. *)
+    GWPARAM.set_reorg bname None;
+    GWPARAM.cnt_dir := !GWPARAM.cnt_d bname;
     let passwd, env, access_type =
       let has_passwd = List.mem_assoc "w" env in
       let x, env = extract_assoc "w" env in
@@ -1286,9 +1291,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | "" -> ("", env)
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
-  (* read base environment from the right location *)
-  GWPARAM.set_reorg base_file None;
-  GWPARAM.cnt_dir := !GWPARAM.cnt_d base_file;
+  (* base environment location (reorg, cnt_dir) set above, before get_token *)
   let base_env =
     if base_file = "" then []
     else Util.read_base_env base_file (Option.get !gw_prefix) !debug
@@ -1330,16 +1333,19 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
   let is_rtl =
     try Hashtbl.find lexicon " !dir" = "rtl" with Not_found -> false
   in
+  (* A wizard can display the current page as a friend would see it with
+     [asfriend=on]. Not propagated to links: next click is back to wizard. *)
+  let as_friend = ar.ar_wizard && p_getenv env "asfriend" = Some "on" in
   let manitou =
     try
-      ar.ar_wizard && ar.ar_user <> ""
+      ar.ar_wizard && ar.ar_user <> "" && (not as_friend)
       && p_getenv env "manitou" <> Some "off"
       && List.assoc "manitou" base_env = ar.ar_user
     with Not_found -> false
   in
   let supervisor =
     try
-      ar.ar_wizard && ar.ar_user <> ""
+      ar.ar_wizard && ar.ar_user <> "" && (not as_friend)
       && List.assoc "supervisor" base_env = ar.ar_user
     with Not_found -> false
   in
@@ -1358,15 +1364,17 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       api_mode = false;
       manitou;
       supervisor;
-      wizard = ar.ar_wizard && not wizard_just_friend;
+      wizard = ar.ar_wizard && (not wizard_just_friend) && not as_friend;
       is_printed_by_template = true;
       debug = !debug;
       query_start = Unix.gettimeofday ();
-      friend = ar.ar_friend || (wizard_just_friend && ar.ar_wizard);
+      friend =
+        ar.ar_friend || ((wizard_just_friend || as_friend) && ar.ar_wizard);
       oidc = oidc_session;
       semi_public =
         (try List.assoc "semi_public" base_env = "yes" with Not_found -> false);
       just_friend_wizard = ar.ar_wizard && wizard_just_friend;
+      as_friend;
       user = ar.ar_user;
       username;
       userkey = Name.lower userkey;

@@ -158,6 +158,7 @@ let make_henv _conn conf base =
 let special_vars =
   [
     "alwsurn";
+    "asfriend";
     "cgl";
     "dsrc";
     "em";

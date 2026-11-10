@@ -693,6 +693,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
   | [ "is_upd_ind" ] | [ "is_upd_fam" ] -> VVbool false
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
+  | [ "as_friend" ] -> VVbool conf.as_friend
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
   | [ "oidc" ] -> VVbool conf.oidc

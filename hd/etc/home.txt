@@ -1,4 +1,4 @@
-<!-- $Id: home.txt v7.1 03/04/2026 $ -->
+<!-- $Id: home.txt v7.1 10/11/2026 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference][:]
   <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
@@ -27,6 +27,22 @@
         <i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
         <span class="visually-hidden">[*random individual]</span>%nn;
       </a>
+    %end;
+    %( Wizard: view the current page as a friend would (this page only) %)
+    %if;((wizard or as_friend) and not (e.m="MOD_IND_OK" or e.m="MOD_FAM_OK" or e.m="ADD_PAR_OK"))
+      %if;as_friend;
+        <a class="btn btn-sm btn-link p-0 border-0 fa-icon" href="%url_set.asfriend;"
+          title="[*view as friend/back to wizard]1">%nn;
+          <i class="fa fa-hat-wizard fa-fw fa-xs text-danger" aria-hidden="true"></i>%nn;
+          <span class="visually-hidden">[*view as friend/back to wizard]1</span>%nn;
+        </a>
+      %else;
+        <a class="btn btn-sm btn-link p-0 border-0 fa-icon" href="%url_set.asfriend.on;"
+          title="[*view as friend/back to wizard]0">%nn;
+          <i class="fa fa-eye fa-fw fa-xs" aria-hidden="true"></i>%nn;
+          <span class="visually-hidden">[*view as friend/back to wizard]0</span>%nn;
+        </a>
+      %end;
     %end;
     %if;(b.hide_querytime_bugs!="yes" and not predictable_mode)
       <div class="btn btn-sm p-0 border-0" id="q_time">%nn;
