@@ -86,10 +86,10 @@
         %apply;link%with;%access;%and;%if;(e.fn=1)%first_name; %surname;%else;%self;%end;%end;
         %if;(e.tt=1 and title!=""), %title;%end;
       </div>
-      %if;(e.im="" and has_image)
-        %if;not cancel_links;<a href="%image_url;" target="_blank" title="%self;">%end;
-        <img src="%image_url;" class="rounded align-self-center ms-1 table-img-max-width"
-          height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;[portrait]%and;%self;%end;">
+      %if;(e.im="" and (has_image or has_blason))
+        %if;not cancel_links;<a href="%if;has_image;%image_url;%else;%blason_url;%end;" target="_blank" title="%self;">%end;
+        <img src="%if;has_image;%image_url;%else;%blason_url;%end;" class="rounded align-self-center ms-1 table-img-max-width"
+          height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;%if;has_image;[portrait]%else;[blason/blasons]0%end;%and;%self;%end;">
         %if;not cancel_links;</a>%end;
       %end;
     </div>
@@ -209,10 +209,10 @@
       %apply;add_in_sorted_list(spouse.index)
       %apply;add_in_sorted_listc(spouse.index)
       <div class="d-flex justify-content-between">
-        %if;(e.im="" and spouse.has_image)
-          %if;not cancel_links;<a href="%spouse.image_url;" target="_blank" title="%spouse;">%end;
-          <img src="%spouse.image_url;" class="rounded align-self-center table-img-max-width"
-            height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;[portrait]%and;%spouse;%end;">
+        %if;(e.im="" and (spouse.has_image or spouse.has_blason))
+          %if;not cancel_links;<a href="%if;spouse.has_image;%spouse.image_url;%else;%spouse.blason_url;%end;" target="_blank" title="%spouse;">%end;
+          <img src="%if;spouse.has_image;%spouse.image_url;%else;%spouse.blason_url;%end;" class="rounded align-self-center table-img-max-width"
+            height="%if;(e.px!="")%e.px;%else;60%end;" alt="%apply;a_of_b%with;%if;spouse.has_image;[portrait]%else;[blason/blasons]0%end;%and;%spouse;%end;">
           %if;not cancel_links;</a>%end;
         %else;<div></div>
         %end;

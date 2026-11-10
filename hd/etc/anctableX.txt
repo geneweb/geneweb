@@ -45,8 +45,8 @@
 
 %define;pers_cell(xx,z1)
   <td class="align-middle text-center%if;("z1"!="") z1%end;">
-    %if;(e.im!=0 and e.image!="off" and xx.has_image)
-      <img class="img-fluid w-50" src="%xx.image_url;" alt="%xx;">%nn;
+    %if;(e.im!=0 and e.image!="off" and (xx.has_image or xx.has_blason))
+      <img class="img-fluid w-50" src="%if;xx.has_image;%xx.image_url;%else;%xx.blason_url;%end;" alt="%xx;">%nn;
     %end;
     <div>%if;cancel_links;%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;</div>
     %if;xx.has_nobility_titles;<div class="fst-italic">%xx.nobility_title;</div>%end;

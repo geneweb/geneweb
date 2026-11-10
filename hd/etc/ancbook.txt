@@ -192,11 +192,15 @@
       %end;
     </header>
     <div class="fp_person_info">
-      %if;(e.im="" and xx.has_image)
+      %if;(e.im="" and (xx.has_image or xx.has_blason))
         <table class="w-100">
           <tr>
             <td>
-              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" >
+              %if;xx.has_image;
+                <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0">
+              %else;
+                <img src="%xx.blason_url;"%xx.blason_size; alt="[blason/blasons]0">
+              %end;
             </td>
             <td class="align-top">
       %end;
@@ -268,7 +272,7 @@
           </li>
         %end;
       </ul>
-      %if;(e.im="" and xx.has_image)
+      %if;(e.im="" and (xx.has_image or xx.has_blason))
         </td></tr></table>
       %end;
     </div>

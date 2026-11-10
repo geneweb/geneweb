@@ -73,9 +73,9 @@
           %apply;implex()
         %end;
       </div>
-      %if;(e.im="" and ancestor.has_image)
-        %if;not cancel_links;<a href="%ancestor.image_url;" target="_blank" title="%ancestor; img">%end;
-          <img src="%ancestor.image_url;" class="rounded align-self-center ms-1 table-img-max-width"
+      %if;(e.im="" and (ancestor.has_image or ancestor.has_blason))
+        %if;not cancel_links;<a href="%if;ancestor.has_image;%ancestor.image_url;%else;%ancestor.blason_url;%end;" target="_blank" title="%ancestor; img">%end;
+          <img src="%if;ancestor.has_image;%ancestor.image_url;%else;%ancestor.blason_url;%end;" class="rounded align-self-center ms-1 table-img-max-width"
             height="%if;(e.px!="")%e.px;%else;60%end;" alt="%ancestor;">
         %if;not cancel_links;</a>%end;
       %end;
