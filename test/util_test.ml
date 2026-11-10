@@ -64,6 +64,29 @@ let mutil_compare_after_particle _ =
   test "d'aboville" "d'artagnan";
   test "descartes" "dupont"
 
+let mutil_surname_components _ =
+  let particles =
+    Mutil.compile_particles [ "de_"; "du_"; "d'"; "van_der_"; "van_'t_" ]
+  in
+  let test s expected =
+    (check (list string)) s expected (Mutil.surname_components particles s)
+  in
+  test "Dupont" [];
+  test "de Foresta" [ "Foresta" ];
+  test "de Lagoutte du Vivier" [ "Lagoutte"; "Vivier" ];
+  test "Martin du Gard" [ "Gard"; "Martin" ];
+  test "de La Tour d'Auvergne" [ "Auvergne"; "La Tour"; "Tour" ];
+  test "du Bois de La Motte" [ "Bois"; "La Motte"; "Motte" ];
+  test "Le Bas de Bouclans" [ "Bas"; "Bouclans"; "Le Bas" ];
+  test "Dupont-Durand" [ "Dupont"; "Durand" ];
+  test "de Saint-Exupéry" [ "Exupéry"; "Saint-Exupéry" ];
+  test "van der Meer" [ "Meer" ];
+  test "van 't Hoff" [ "Hoff" ];
+  test "Ruiz y Picasso" [ "Picasso"; "Ruiz" ];
+  (* A capitalised particle is a word of the name, too short to be kept. *)
+  test "De Gaulle" [ "Gaulle" ];
+  test "Du Guesclin" [ "Guesclin" ]
+
 let mutil_string_of_int_sep _ =
   let test sep exp int =
     (check string) "" exp (Mutil.string_of_int_sep sep int)
@@ -240,6 +263,7 @@ let v =
         test_case "Mutil.contains" `Quick mutil_contains;
         test_case "Mutil arabian-roman" `Quick mutil_arabian_romian;
         test_case "Mutil particule" `Quick mutil_compare_after_particle;
+        test_case "Mutil.surname_components" `Quick mutil_surname_components;
         test_case "Mutil.string_of_int_sep" `Quick mutil_string_of_int_sep;
         test_case "Mutil.epoch_of_date" `Quick mutil_epoch_of_date;
       ] );

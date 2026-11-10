@@ -440,6 +440,50 @@ let compare_after_particle particles s1 s2 =
   in
   loop (String.length p1) (String.length p2)
 
+(* Words of a surname, particles left out, and the runs of consecutive words
+   between two particles. A particle is recognised at the start of a word
+   only, as in [get_particle]; words are separated by spaces and hyphens. *)
+let surname_components particles s =
+  let len = String.length s in
+  let is_sep c = c = ' ' || c = '-' in
+  let rec skip_seps i =
+    if i < len && is_sep s.[i] then skip_seps (i + 1) else i
+  in
+  let rec word_end j =
+    if j < len && not (is_sep s.[j]) then word_end (j + 1) else j
+  in
+  (* [runs]: the runs read so far, last first, each one the list of its
+     words (start, end), last first. *)
+  let rec loop i runs cur =
+    let i = skip_seps i in
+    if i >= len then cur :: runs
+    else
+      let p = get_particle particles (String.sub s i (len - i)) in
+      if p <> "" then loop (i + String.length p) (cur :: runs) []
+      else
+        let j = word_end i in
+        loop j runs ((i, j) :: cur)
+  in
+  let runs = List.filter (fun r -> r <> []) (loop 0 [] []) in
+  let sub (i, j) = String.sub s i (j - i) in
+  let words =
+    List.concat_map
+      (List.filter_map (fun ((i, j) as w) ->
+           if j - i < 3 || List.mem (Name.lower (sub w)) saints then None
+           else Some (sub w)))
+      runs
+  in
+  let multi =
+    List.filter_map
+      (function
+        | (_, j) :: (_ :: _ as l) ->
+            let i, _ = List.nth l (List.length l - 1) in
+            Some (sub (i, j))
+        | [ _ ] | [] -> None)
+      runs
+  in
+  List.sort_uniq String.compare (words @ multi) |> List.filter (fun c -> c <> s)
+
 let hold = ref ""
 let fallback = ref []
 

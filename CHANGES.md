@@ -101,6 +101,12 @@
   `cache_files -notes` (also part of `-all`); changes made since are searched
   directly, so it needs rebuilding only after the base is regenerated (gwc).
   Base parameter `notes_search_max_results` (default 500).
+- The search by surname finds a compound surname by any of its components,
+  particles left out: "Vivier" finds "de Lagoutte du Vivier", "Gard"
+  "Martin du Gard", "Meer" "van der Meer", "La Tour" "de La Tour
+  d'Auvergne". The particles are those of the base (`particles.txt`).
+  The base must be rebuilt by gwc for its index (`names.inx`) to hold the
+  components; its format is unchanged.
 - Case-insensitive text searches (notes, history) treat the apostrophes
   ' and ’ as equal (#3051).
 - The descendant counters of the templates (number_of_descendants,

@@ -291,6 +291,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   let x_crushed = Name.crush_lower x in
   let x_lower = Name.lower x in
   let x_stripped = Name.strip_lower x in
+  let particles = Driver.base_particles base in
   let l =
     List.fold_right
       (fun istr l ->
@@ -299,6 +300,9 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           Name.crush_lower str = x_crushed
           || List.mem x_crushed
                (List.map Name.crush_lower (Mutil.surnames_pieces str))
+          || List.mem x_crushed
+               (List.map Name.crush_lower
+                  (Mutil.surname_components particles str))
         then
           let iperl = find istr in
           let iperl =
