@@ -7,8 +7,9 @@ GeneWeb repository.
 
 GeneWeb is an open-source genealogy web application written in OCaml,
 started in late 1997. It serves databases with millions of
-individuals (Roglo.eu: 11M+ records). Version 7.1 (beta2, December
-2025). Supported platforms: Linux, macOS, Windows (Cygwin/mingw64).
+individuals (Roglo.eu: 11M+ records). Version 7.1 in preparation
+(7.1~beta2, December 2025). Supported platforms: Linux, macOS, Windows
+(Cygwin/mingw64; no `ADDR_UNIX` sockets and no gwd workers there).
 
 ## Build and Test
 
@@ -25,10 +26,19 @@ Test locally after `make distrib`:
 cd distribution && gw/gwd
 ```
 
+The dev profile turns warnings into errors: removing the last caller
+of a function, or the last use of a module, breaks the build on the
+now unused value (warning 32) or `open` (warning 33). Remove them in
+the same commit, and grep `bin/`, `benchmark/` and `test/` for the
+removed names too. Every commit must build and pass `dune fmt` on its
+own.
+
 ## Architecture
 
-Avoid bloating catch-all modules. `perso.ml` (~4000 LOC) and
-`util.ml` are already overloaded — prefer creating focused modules.
+Avoid bloating catch-all modules. `perso.ml` (~6300 LOC) and
+`util.ml` (~3600 LOC) are already overloaded — prefer creating focused
+modules, in a dedicated `lib/<x>/` subfolder rather than at the root of
+`lib/`, and never two modules of the same name.
 `templ.ml` is the template engine runtime; changes there affect every
 page.
 
@@ -38,7 +48,9 @@ and do not propose a plugin as the solution to a feature request.
 ## OCaml Conventions
 
 1. Never disable compiler warnings.
-2. Never remove code in `test/` — you can add tests.
+2. Never remove a useful test in `test/` — you can add tests. When a
+   function or a mode is removed or replaced, replace its tests
+   (including `test/run_gw_test.sh`) in the same series.
 3. Never use the `Obj` module.
 4. **No global mutable state.** Do not use `ref` at module level.
    Pass data as function arguments. Existing global `ref` values are
@@ -68,6 +80,15 @@ and do not propose a plugin as the solution to a feature request.
 11. No `| _ -> ...` over a closed variant type: enumerate the
     constructors so that adding one raises a warning at every site
     that must be updated. `_` is fine for `int`, `char`, `string`.
+12. `Hashtbl.replace`, not `Hashtbl.add`, unless shadowing is wanted.
+    Open files with `Secure.with_open_*` or under `Fun.protect`.
+13. Access control filters at display time: compute on the full data,
+    then mask what the user may not see.
+14. HTML emitted from OCaml: one readable `{|...|}` string with
+    `Output.printf`, near 80 columns; no inline JS (`onclick`…), put a
+    function in `js.txt` behind `%if;(e.m="…")`.
+15. Document functions in English in the `.mli`; comment the `.ml`
+    only for what the code cannot say.
 
 ## Template Engine
 
@@ -98,7 +119,9 @@ field, not `Version.src`.
 - `[text]` / `[*text]` — Lexicon lookup (capitalized variant).
 - `%sq;` — Strip following whitespace.
 - `%nn;` — Strip surrounding newline.
-- `%(comment%)` — Comment (not emitted).
+- `%(comment%)` — Comment (not emitted). Keep the
+  `<!-- $Id: … -->` header as an HTML comment: it identifies the
+  template in the page source.
 - `%for;i;min;max;...%end;` — Numeric for loop.
 - `%count;` / `%incr_count;` / `%reset_count;` — Built-in counter
   for numbering iterations.
@@ -106,6 +129,13 @@ field, not `Version.src`.
   `%foreach;sorted_list_item;...%end;` — Sorted list accumulator;
   `mem_sorted_list("listb", value)` is 1 when `value` is in `listb`, else 0.
 - `%apply;sorted_list_size("listc")` — Number of items of a sorted list.
+
+`%expr(…)` takes no final `;`: a `;` after the parenthesis is
+emitted as is (e.g. inside a URL). The arguments of `%apply` may hold
+text, variables, translations, `%if`, `%for` and `%apply`, but not a
+`%foreach` ("not impl tag"): to wrap a loop, split the macro into an
+opening and a closing one (`order_open`/`order_close` in
+`updateOrder.txt`).
 
 Operators in conditions: `=`, `!=`, `<`, `<=`, `>`, `>=`, `and`,
 `or`, `not`, `|` (integer division), `%` (modulo), `in` (substring
@@ -130,7 +160,9 @@ The template parser interprets `%` and `[` **everywhere**, including
 inside inline `<script>` blocks. External `.js` files are not
 affected. Escape sequences: `%%` → literal `%`, `%[` → literal `[`,
 `%]` → literal `]`. For complex JS, `\u0025` / `\u005b` avoid
-ambiguity.
+ambiguity. Never interpolate a translation into a JS string delimited
+by straight quotes: an apostrophe in some language breaks the whole
+script. Pass it through a `data-` attribute instead.
 
 ### `%include;` is Parse-Time AST Inlining
 
@@ -146,15 +178,27 @@ For template `templx` on base `mybase`:
 
 ### Frontend Stack
 
-Bootstrap 5.3.8 (no jQuery), Chart.js 4.5.1 (UMD, not ESM), Font Awesome.
-CSS/JS assets in `hd/etc/css/` and `hd/etc/js/` use template wrappers
-(`css.txt`, `js.txt`) for conditional includes. Regenerate `.min.js`
-with Terser after editing any `.js` file.
+Bootstrap 5.3.8 (no jQuery), Tom Select, DataTables, Chart.js 4.5.1
+(UMD, not ESM), Font Awesome. CSS/JS assets in `hd/etc/css/` and
+`hd/etc/js/` use template wrappers (`css.txt`, `js.txt`) for
+conditional includes; page JS belongs there, not inline in
+`perso.txt`. Regenerate `.min.js` after editing a `.js` file:
+`terser f.js -c passes=2 -m --toplevel -o f.min.js` (no `--unsafe`).
+Prefer template + CSS over JS that computes or toggles classes.
 
 ### Best Practices
 
 - **URL construction**: use `%url_set;key=value`, not the legacy
-  `%foreach;env_binding;` loops.
+  `%foreach;env_binding;` loops. Separate parameters with `&`, not
+  `;`. Every mode taking a person must accept both the index (`i=`)
+  and the key (`p=`, `n=`, `oc=`); do not convert keys to indexes,
+  which do not survive a rebuild of the base.
+- **Styles**: a class in `css.css` rather than `style="…"`; vertical
+  spacing with `mt-*`, not `mb-*`; a literal U+00A0, not `&nbsp;`.
+- **Roglo**: `%if;roglo;` (base_env `roglo=yes`) only for what is
+  really specific to Roglo; an improvement for all bases is not
+  guarded. Grey out (`disabled`) an unwanted option rather than hide
+  it.
 - **Separation of concerns**: keep HTML, CSS, and JS disentangled.
   Isolate responsibilities into focused sub-templates via `%include;`.
 - **W3C validation** helps catch structural issues.
@@ -190,7 +234,12 @@ Avoid duplicating existing entries — search the lexicon first.
 Prefer a long specific entry over concatenating shorter ones: word
 order differs across languages, making concatenation unreliable.
 The lexicon supports declension for Slavic languages and specific
-handling for German grammar.
+handling for German grammar; entries with arguments must allow for
+it. No HTML markup in the lexicon beyond a little inline text: the
+markup stays in the template, the variants in stacked entries. Remove
+the entries a change leaves unused, and translate new ones into as
+many languages as possible. Messages to users avoid internal jargon
+(executable names, format magics); technical detail goes to the log.
 
 ## Calendar / Date System
 
@@ -213,14 +262,34 @@ Julian/French Republican/Hebrew dates — easy to miss in testing.
 
 The search system (introduced by DDR) uses a 4-level fallback:
 `Name.crush_lower` (phonetic) → `Name.lower` (exact) →
-`Name.strip_lower` → all phonetic.
+`Name.strip_lower` → all phonetic. Variants are generated at query
+time only: never canonicalize stored data. Distinct apostrophes
+(U+0027, U+2019, U+02BC, U+02BB) are distinct in keys.
 
-The index of the dictionaries (`base.inx`/`base.dat`, written by gwc,
-module `BaseIndex`) provides O(log n) access to first names, surnames,
-places, sources and the other dictionaries of `Dict`, corrected by the
-patches when read: use `Driver.dict_*`, `Driver.persons_of_surname` and
-`Driver.persons_of_first_name`. **Never use `Collection.iter` for
-search** — it is O(n) over the entire database.
+The index of the dictionaries (`base.inx`/`base.dat`, written by
+`Outbase.output`, module `BaseIndex`) gives each of the 12
+dictionaries of `Dict` (first names, surnames, places, sources,
+titles, estates…) sorted by key, with the persons and families using
+each entry:
+- `Driver.dict_size`, `dict_groups`, `dict_entries`, `dict_records`,
+  `dict_count`, `dict_select`, and `Driver.persons_of_surname` /
+  `persons_of_first_name` / `spi_count`.
+- Keys are compared byte-wise: surnames and estates without their
+  particle, places without their suburb, other strings as is. It is no
+  case- or accent-insensitive index: `Driver.base_strings_of_*` still
+  read `names.inx` (crushed names in hash buckets, which hold
+  unrelated names: filter them before loading their persons).
+- Corrected by the committed patches when read, kept per process
+  until the files change, reset after `commit_patches`; pending
+  patches are ignored.
+- A base of an earlier format has no index and is read-only: guard
+  with `Driver.base_format base = Driver.current_base_format` (or use
+  `dict_select`, which falls back to all records); gwd shows such a
+  base's welcome page instead of the pages built on the index.
+
+**Never use `Collection.iter` over all persons to find those using a
+string** — it is O(n) over the entire database; read their records
+from the index.
 
 ## Wiki / Notes Syntax (TLSW)
 
@@ -249,3 +318,25 @@ Collection.iter : ('a -> unit) -> 'a Collection.t -> unit
 
 Always check `Util.authorized_age conf base p` before exposing
 date-based information.
+
+## Database Format and Patches
+
+- Format `GnWb0026` (`head -c8 base`). `gwc -reindex <base>` writes
+  the index alone and upgrades `GnWb0025` in place; older formats
+  are read-only until exported with `gwu` and rebuilt with `gwc`.
+  A format change needs a visible warning in `CHANGES.md`.
+- `patch_name` (`lib/db/database.ml`) writes into the name table of
+  the committed patches before any commit: never share the patches
+  read by a request with other requests.
+- `Driver.insert_person` reads the ascendants of the person: in tests
+  use `Driver.insert_person_with_union_and_ascendants`.
+- `My_gzip.gzip_string` writes the time in the gzip header: the same
+  content gives a different `.gz` hash at each run.
+
+## Commits
+
+English, imperative, prefixed by the component (`search: …`),
+the fix first, then the rationale. A deprecated option or a
+user-visible change goes into `CHANGES.md`; never edit the entries of
+past releases. Correct a series in progress by amending the commits
+concerned, each staying buildable, rather than adding fix-up commits.
