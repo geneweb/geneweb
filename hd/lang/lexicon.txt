@@ -144,6 +144,16 @@ no: %s %s for
 pl: %s %s
 ru: %s %s
 
+    %s %s whose last term starts with %s
+de: %s %s, deren letztes Glied mit „%s“ beginnt
+en: %s %s whose last term starts with “%s”
+es: %s %s cuyo último término comienza con «%s»
+fr: %s %s dont le dernier terme commence par « %s »
+it: %s %s il cui ultimo termine inizia con «%s»
+nl: %s %s waarvan de laatste term begint met “%s”
+pt: %s %s cujo último termo começa por «%s»
+sv: %s %s vars sista led börjar med ”%s”
+
     %s %s starting with %s
 af: %s %s begin met “%s”
 bg: %s %s започващо с „%s”
@@ -18971,6 +18981,26 @@ fr: fusionnée avec une source existante
 de: mit einer anderen umbenannten Quelle zusammengeführt
 en: merged with another renamed source
 fr: fusionnée avec une autre source renommée
+
+    order from the last term: reindex the base
+de: Für die Ordnung ab dem letzten Glied muss die Datenbank neu indexiert werden (gwc -reindex).
+en: The order from the last term needs the base to be reindexed (gwc -reindex).
+es: El orden a partir del último término requiere reindexar la base (gwc -reindex).
+fr: L’ordre à partir du dernier terme demande de réindexer la base (gwc -reindex).
+it: L’ordine a partire dall’ultimo termine richiede di reindicizzare la base (gwc -reindex).
+nl: Voor de volgorde vanaf de laatste term moet de database opnieuw worden geïndexeerd (gwc -reindex).
+pt: A ordem a partir do último termo requer reindexar a base (gwc -reindex).
+sv: Ordningen från sista ledet kräver att databasen indexeras om (gwc -reindex).
+
+    order from the last term
+de: Ordnung ab dem letzten Glied
+en: order from the last term
+es: orden a partir del último término
+fr: ordre à partir du dernier terme
+it: ordine a partire dall’ultimo termine
+nl: volgorde vanaf de laatste term
+pt: ordem a partir do último termo
+sv: ordning från sista ledet
 
     sources to group
 de: zusammenzuführende Quellen

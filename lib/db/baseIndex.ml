@@ -29,13 +29,14 @@ let code d =
   | Dict.Source -> 9
   | Dict.Title -> 10
   | Dict.Domain -> 11
+  | Dict.Place_last -> 12
 
 let keeps_empty d =
   match d with
   | Dict.First_name | Dict.Surname -> true
   | Dict.(
       ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-      | Occupation | Place | Source | Title | Domain )) ->
+      | Occupation | Place | Source | Title | Domain | Place_last )) ->
       false
 
 let landmark_len k = min landmark_max (String.length k)
@@ -94,31 +95,51 @@ let records (data : base_data) d =
     done;
   refs
 
-let output_dict ~budget data particles oc oc_dat d =
-  let refs = records data d in
-  let entries = Array.make (Dutil.IntHT.length refs) ("", 0) in
-  ignore
-    (Dutil.IntHT.fold
-       (fun istr _ i ->
-         entries.(i) <-
-           (Dict.key particles d (data.strings.get_nopending istr), istr);
-         i + 1)
-       refs 0
-      : int);
-  Array.sort
-    (fun (k1, i1) (k2, i2) ->
-      match String.compare k1 k2 with 0 -> Int.compare i1 i2 | c -> c)
-    entries;
-  let n = Array.length entries in
-  let positions =
-    Array.init n (fun r ->
-        let pos = pos_out oc_dat in
-        let l = List.rev (Dutil.IntHT.find refs (snd entries.(r))) in
-        output_binary_int oc_dat (List.length l);
-        List.iter (output_binary_int oc_dat) l;
-        pos)
+(* [written] holds, for the dictionaries already written, the position in
+   [oc_dat] of the records of each string. A dictionary with the same records
+   as one of them ([Dict.records_dict]: the places sorted from their last
+   term) points to these records instead of writing them again: its positions
+   do not follow its ranks. *)
+let output_dict ~budget ~written data particles oc oc_dat d =
+  let sorted_entries istrs =
+    let entries =
+      Array.map
+        (fun istr ->
+          (Dict.key particles d (data.strings.get_nopending istr), istr))
+        istrs
+    in
+    Array.sort
+      (fun (k1, i1) (k2, i2) ->
+        match String.compare k1 k2 with 0 -> Int.compare i1 i2 | c -> c)
+      entries;
+    entries
   in
-  let width = if n = 0 || positions.(n - 1) < 1 lsl 31 then 4 else 8 in
+  let keys_of tbl = Array.of_seq (Seq.map fst (Dutil.IntHT.to_seq tbl)) in
+  let entries, positions =
+    match List.assoc_opt (Dict.records_dict d) written with
+    | Some pos_of when Dict.records_dict d <> d ->
+        let entries = sorted_entries (keys_of pos_of) in
+        ( entries,
+          Array.map (fun (_, istr) -> Dutil.IntHT.find pos_of istr) entries )
+    | Some _ | None ->
+        let refs = records data d in
+        let entries = sorted_entries (keys_of refs) in
+        let positions =
+          Array.map
+            (fun (_, istr) ->
+              let pos = pos_out oc_dat in
+              let l = List.rev (Dutil.IntHT.find refs istr) in
+              output_binary_int oc_dat (List.length l);
+              List.iter (output_binary_int oc_dat) l;
+              pos)
+            entries
+        in
+        (entries, positions)
+  in
+  let n = Array.length entries in
+  let width =
+    if Array.for_all (fun pos -> pos < 1 lsl 31) positions then 4 else 8
+  in
   let keys = Array.map fst entries in
   let block = block_size keys budget in
   let istr_off = pos_out oc in
@@ -136,14 +157,16 @@ let output_dict ~budget data particles oc oc_dat d =
       loop (r + block))
   in
   loop 0;
-  {
-    code = code d;
-    n;
-    block;
-    width;
-    istr_off;
-    landmarks_len = pos_out oc - landmarks_off;
-  }
+  ( {
+      code = code d;
+      n;
+      block;
+      width;
+      istr_off;
+      landmarks_len = pos_out oc - landmarks_off;
+    },
+    entries,
+    positions )
 
 let output ~budget data ~inx ~dat =
   let particles = Lazy.force data.particles in
@@ -153,10 +176,24 @@ let output ~budget data ~inx ~dat =
   output_binary_int oc (List.length Dict.all);
   let directory = pos_out oc in
   output_string oc (String.make (section_size * List.length Dict.all) '\000');
-  let sections =
+  let sections, _ =
     List.fold_left
-      (fun l d -> output_dict ~budget data particles oc oc_dat d :: l)
-      [] Dict.all
+      (fun (l, written) d ->
+        let s, entries, positions =
+          output_dict ~budget ~written data particles oc oc_dat d
+        in
+        (* only the positions another dictionary will point to are kept *)
+        let shared =
+          List.exists (fun d' -> d' <> d && Dict.records_dict d' = d) Dict.all
+        in
+        if shared then (
+          let pos_of = Dutil.IntHT.create (Array.length entries) in
+          Array.iteri
+            (fun r (_, istr) -> Dutil.IntHT.replace pos_of istr positions.(r))
+            entries;
+          (s :: l, (d, pos_of) :: written))
+        else (s :: l, written))
+      ([], []) Dict.all
   in
   seek_out oc directory;
   List.iter (output_section oc) (List.rev sections)
@@ -331,8 +368,7 @@ let records_count delta n i =
 
 let file_count f rank = Option.fold ~none:0 ~some:f.count rank
 
-let correction src key f d =
-  let delta = delta src d in
+let correction src key f delta =
   let moved = Hashtbl.create 16 in
   Hashtbl.iter
     (fun i s ->
@@ -536,8 +572,9 @@ let with_reader bdir ~particles src k =
       seek_in inx (s.istr_off + (4 * s.n) + (s.width * lo));
       let poss = really_input_string inx (s.width * n) in
       let dat = Lazy.force dat in
-      (* the records are written in the order of the ranks: [dat] is read
-         forward *)
+      (* the records are written in the order of the ranks, so [dat] is read
+         forward; not for a dictionary pointing to the records of another
+         one ([Dict.records_dict]), read correctly but with more seeks *)
       Array.init n (fun j ->
           let pos =
             if s.width = 4 then Int32.to_int (String.get_int32_be poss (4 * j))
@@ -568,7 +605,24 @@ let with_reader bdir ~particles src k =
       match Hashtbl.find_opt corrections d with
       | Some c -> c
       | None ->
-          let c = correction src (fun i -> key_of (current_string i)) f d in
+          (* dictionaries with the same records ([Dict.records_dict]) have
+             the same delta: it is computed once *)
+          let records = Dict.records_dict d in
+          let delta =
+            match
+              List.find_map
+                (fun d' ->
+                  if Dict.records_dict d' = records then
+                    Option.map
+                      (fun (c : correction) -> c.delta)
+                      (Hashtbl.find_opt corrections d')
+                  else None)
+                Dict.all
+            with
+            | Some delta -> delta
+            | None -> delta src records
+          in
+          let c = correction src (fun i -> key_of (current_string i)) f delta in
           Hashtbl.replace corrections d c;
           c
     in
@@ -615,6 +669,12 @@ let with_reader bdir ~particles src k =
   let key_of d str = Dict.key (Lazy.force particles) d str in
   let dict_first d str = entry_from d (key_of d str) in
   let dict_after d i = entry_from d (key_of d (current_string i) ^ "\000") in
+  (* an index written before a dictionary was defined has no section for
+     it; a base without index has none *)
+  let dict_has d =
+    try List.mem_assoc (code d) (Lazy.force memo).sections
+    with Sys_error _ -> false
+  in
   k
     {
       dict_size;
@@ -625,4 +685,5 @@ let with_reader bdir ~particles src k =
       dict_count;
       dict_first;
       dict_after;
+      dict_has;
     } (fun () -> corrections := lazy (Hashtbl.create 12))

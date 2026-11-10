@@ -1648,6 +1648,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
           dict_count = (fun _ -> assert false);
           dict_first = (fun _ -> assert false);
           dict_after = (fun _ -> assert false);
+          dict_has = (fun _ -> false);
         };
       patch_person = (fun _ -> assert false);
       patch_ascend = (fun _ -> assert false);

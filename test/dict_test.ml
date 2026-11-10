@@ -9,8 +9,10 @@ let names () =
   List.iter
     (fun d ->
       let s = Dict.to_string d in
+      (* [Place_last] is an order of the book of places, not a book *)
       (check (option string))
-        s (Some s)
+        s
+        (if d = Dict.Place_last then None else Some s)
         (Option.map Dict.to_string (Dict.of_string s)))
     Dict.all;
   (check bool) "unknown" true (Dict.of_string "x" = None)
@@ -70,6 +72,44 @@ let place_keys () =
        (fun a b -> String.compare (key Dict.Place a) (key Dict.Place b))
        l)
 
+let last_keys () =
+  (check (list string))
+    "last terms"
+    [ "France"; "Manche"; "Granville" ]
+    (Dict.last_terms "[Boileau] - Granville (Manche), France");
+  (check string) "same as with commas"
+    (Dict.last_key "Granville, Manche")
+    (Dict.last_key "Granville (Manche)");
+  let l =
+    [
+      "Granville, Manche, France";
+      "[Saint-Pair] - Granville, Manche, France";
+      "Paris, France";
+      "Avranches, Manche, France";
+      "Granville (Manche)";
+      "France";
+    ]
+  in
+  List.iter
+    (fun s ->
+      (check bool) ("prefix " ^ s) true
+        (String.starts_with ~prefix:(Dict.last_key s) (key Dict.Place_last s)))
+    l;
+  (check (list string))
+    "from the last term"
+    [
+      "France";
+      "Avranches, Manche, France";
+      "Granville, Manche, France";
+      "[Saint-Pair] - Granville, Manche, France";
+      "Paris, France";
+      "Granville (Manche)";
+    ]
+    (List.sort
+       (fun a b ->
+         String.compare (key Dict.Place_last a) (key Dict.Place_last b))
+       l)
+
 let suburb () =
   let bounds = check (option (pair int int)) in
   bounds "hyphen" (Some (3, 7)) (Dict.suburb "[ab] - c");
@@ -122,6 +162,7 @@ let v =
         test_case "Dict names" `Quick names;
         test_case "Dict surname order" `Quick surname_order;
         test_case "Dict place keys" `Quick place_keys;
+        test_case "Dict place keys from the last term" `Quick last_keys;
         test_case "Dict suburb" `Quick suburb;
         test_case "Dict fields" `Quick fields;
       ] );

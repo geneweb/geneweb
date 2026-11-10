@@ -78,6 +78,9 @@ type dict_index = {
   dict_first : Dict.t -> string -> int option;
   (* Entry following a string. *)
   dict_after : Dict.t -> int -> int option;
+  (* Whether the index has the section of a dictionary: an index written
+     before a dictionary was defined has not. *)
+  dict_has : Dict.t -> bool;
 }
 (** Queries over the index of the dictionaries of the base. *)
 

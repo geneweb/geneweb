@@ -43,6 +43,13 @@
   of the base, nor the binary caches of `cache_files`, and always show
   the current data. The option of chk_data to read the database instead
   of the caches is removed.
+- The book of places (`m=MOD_DATA&data=place`) can be sorted from the
+  last term of the places (country, county, town): button on the page,
+  or `dico_inverted=yes` in the `.gwf` file to make it the default
+  order. This order reads a new section of the index of the
+  dictionaries: on a base indexed by an earlier development version,
+  run `gwc -reindex <base>`; until then the book stays in alphabetic
+  order and says so.
 - The places and surnames (`m=PS`), the titles and estates (`m=TT`) and
   the advanced search with AND (`m=AS_OK`, with a place or an
   occupation and no name) read only the persons and families found in

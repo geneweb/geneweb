@@ -266,7 +266,7 @@ let check_dict base d =
   | Dict.Surname -> check_spi (Driver.persons_of_surname base)
   | Dict.(
       ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-      | Occupation | Place | Source | Title | Domain )) ->
+      | Occupation | Place | Source | Title | Domain | Place_last )) ->
       ()
 
 let index name budget () =

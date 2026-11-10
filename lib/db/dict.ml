@@ -13,6 +13,7 @@ type t =
   | Source
   | Title
   | Domain
+  | Place_last
 
 let all =
   [
@@ -28,6 +29,7 @@ let all =
     Source;
     Title;
     Domain;
+    Place_last;
   ]
 
 let to_string d =
@@ -44,8 +46,17 @@ let to_string d =
   | Source -> "src"
   | Title -> "title"
   | Domain -> "domain"
+  | Place_last -> "place_last"
 
-let of_string s = List.find_opt (fun d -> to_string d = s) all
+let of_string s =
+  List.find_opt
+    (fun d ->
+      match d with
+      | Place_last -> false
+      | First_name | Surname | First_name_alias | Surname_alias | Public_name
+      | Qualifier | Alias | Occupation | Place | Source | Title | Domain ->
+          to_string d = s)
+    all
 
 let person_strings d p =
   match d with
@@ -57,7 +68,7 @@ let person_strings d p =
   | Qualifier -> p.qualifiers
   | Alias -> p.aliases
   | Occupation -> [ p.occupation ]
-  | Place ->
+  | Place | Place_last ->
       List.fold_left
         (fun l e -> e.epers_place :: l)
         [ p.birth_place; p.baptism_place; p.death_place; p.burial_place ]
@@ -72,7 +83,7 @@ let person_strings d p =
 
 let family_strings d f =
   match d with
-  | Place ->
+  | Place | Place_last ->
       List.fold_left
         (fun l e -> e.efam_place :: l)
         [ f.marriage_place ] f.fevents
@@ -85,9 +96,16 @@ let family_strings d f =
   | Qualifier | Alias | Occupation | Title | Domain ->
       []
 
+let records_dict d =
+  match d with
+  | Place_last -> Place
+  | First_name | Surname | First_name_alias | Surname_alias | Public_name
+  | Qualifier | Alias | Occupation | Place | Source | Title | Domain ->
+      d
+
 let has_family_fields d =
   match d with
-  | Place | Source -> true
+  | Place | Place_last | Source -> true
   | First_name | Surname | First_name_alias | Surname_alias | Public_name
   | Qualifier | Alias | Occupation | Title | Domain ->
       false
@@ -120,6 +138,39 @@ let without_suburb s =
   | Some (_, j) -> String.sub s j (String.length s - j)
   | None -> s
 
+let paren_form t =
+  let len = String.length t in
+  if len > 2 && t.[len - 1] = ')' then
+    match String.rindex_opt t '(' with
+    | Some i when i > 0 ->
+        let host = String.trim (String.sub t 0 i) in
+        let parent = String.trim (String.sub t (i + 1) (len - i - 2)) in
+        if host = "" || parent = "" then None else Some (host, parent)
+    | Some _ | None -> None
+  else None
+
+let split_paren_term t =
+  match paren_form t with
+  | Some (host, parent) -> [ host; parent ]
+  | None -> [ t ]
+
+let last_terms s =
+  let terms =
+    String.split_on_char ',' (without_suburb s)
+    |> List.filter_map (fun t ->
+        let t = String.trim t in
+        if t = "" then None else Some t)
+  in
+  let rec loop acc l =
+    match l with
+    | [] -> acc
+    | t :: l -> loop (List.rev_append (split_paren_term t) acc) l
+  in
+  loop [] terms
+
+let last_terms_sep = ", "
+let last_key s = String.concat last_terms_sep (last_terms s)
+
 let key particles d s =
   match d with
   | Surname | Domain ->
@@ -131,6 +182,7 @@ let key particles d s =
       | Some (_, j) ->
           String.concat "\000" [ String.sub s j (String.length s - j); s ]
       | None -> s ^ "\000")
+  | Place_last -> String.concat "\000" [ last_key s; s ]
   | First_name | First_name_alias | Surname_alias | Public_name | Qualifier
   | Alias | Occupation | Source | Title ->
       s

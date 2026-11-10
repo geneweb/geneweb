@@ -37,11 +37,41 @@ let get_person_from_data conf base =
       in
       if PersSet.is_empty acc then [] else [ (istr, PersSet.elements acc) ]
 
-let combine_by_ini ini list =
+(* The book of places ordered from the last term ("France, Manche,
+   Granville"): asked by [o=r], or by default by [dico_inverted=yes] in the
+   .gwf, [o=a] asking for the alphabetic order. It reads the section
+   [Dict.Place_last] of the index; an index written before it has none, and
+   the book stays in the alphabetic order until "gwc -reindex" writes it. *)
+let order_param conf =
+  match p_getenv conf.env "o" with
+  | Some ("r" | "a") as o -> o
+  | Some _ | None -> None
+
+let rev_order conf base =
+  p_getenv conf.env "data" = Some "place"
+  && (match order_param conf with
+    | Some o -> o = "r"
+    | None -> List.assoc_opt "dico_inverted" conf.base_env = Some "yes")
+  && Driver.dict_has base Dict.Place_last
+
+(* the text the navigation by 1, 2... characters runs on *)
+let nav_key conf base =
+  if rev_order conf base then Dict.last_key else Place.without_suburb
+
+let rec compare_terms l1 l2 =
+  match (l1, l2) with
+  | [], [] -> 0
+  | [], _ :: _ -> -1
+  | _ :: _, [] -> 1
+  | t1 :: l1, t2 :: l2 ->
+      let c = Gutil.alphabetic_order t1 t2 in
+      if c <> 0 then c else compare_terms l1 l2
+
+let combine_by_ini key ini list =
   let len = Utf8.length ini + 1 in
   Mutil.groupby
     ~key:(fun (_, s) ->
-      let s = Place.without_suburb s in
+      let s = key s in
       if Utf8.length s >= len then Utf8.sub s 0 len else s)
     ~value:(fun x -> x)
     list
@@ -425,17 +455,18 @@ let book_entry conf base =
   let data_type = p_getenv conf.env "data" in
   let has_particle = data_type = Some "sn" || data_type = Some "domain" in
   let is_name_type = data_type = Some "fn" || data_type = Some "sn" in
+  let key = nav_key conf base in
   fun istr ->
     let str = Driver.sou base istr in
     if is_name_type && str = "?" then None
     else
       let str = if has_particle then move_particle base str else str in
-      if String.starts_with ~prefix:ini (Place.without_suburb str) then
-        Some (istr, str)
+      if String.starts_with ~prefix:ini (key str) then Some (istr, str)
       else None
 
-let build_list_short conf list =
+let build_list_short conf base list =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+  let key = nav_key conf base in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -446,7 +477,7 @@ let build_list_short conf list =
     let inis =
       List.rev_map
         (fun (_, s) ->
-          let s = Place.without_suburb s in
+          let s = key s in
           if String.length s > i then String.sub s 0 (Utf8.next s i) else s)
         l
     in
@@ -466,9 +497,10 @@ let build_list_short conf list =
   in
   build_ini list (String.length ini)
 
-let build_list_long conf list : (string * (Driver.istr * string) list) list =
+let build_list_long conf base list : (string * (Driver.istr * string) list) list
+    =
   let ini = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
-  let list = combine_by_ini ini list in
+  let list = combine_by_ini (nav_key conf base) ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
 
 type book = {
@@ -489,6 +521,9 @@ let book conf base =
   match dict conf with
   | None -> { count = 0; groups = [] }
   | Some d ->
+      let d =
+        if d = Dict.Place && rev_order conf base then Dict.Place_last else d
+      in
       let p = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
       let hidden =
         match d with
@@ -504,7 +539,7 @@ let book conf base =
               [ Driver.Istr.empty; Driver.Istr.quest ]
         | Dict.(
             ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-            | Occupation | Place | Source | Title | Domain )) ->
+            | Occupation | Place | Source | Title | Domain | Place_last )) ->
             []
       in
       let count = Driver.dict_size base d p - List.length hidden in
@@ -520,7 +555,7 @@ let book conf base =
           groups =
             List.map
               (fun (ini, l) -> (ini, List.length l, l))
-              (build_list_long conf list);
+              (build_list_long conf base list);
         }
       else
         let groups =
