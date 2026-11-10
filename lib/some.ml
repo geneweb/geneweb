@@ -523,12 +523,12 @@ let sort_by_first_name base persons_with_titles =
 (* Sort by first-name exact match first (score 0), then by birth (or baptism) date within
    each tier.  Used for spouse lists so that e.g. "Annie" appears before "Anne"
    when the query is "annie vivier", regardless of birth-date ordering. *)
-let sort_by_fn_relevance_then_date base query persons_with_titles =
+let first_name_matches base query =
   let query_lower = Name.lower query in
-  let first_name_matches_query p =
-    let fn = Driver.sou base (Driver.get_first_name p) in
-    Name.lower fn = query_lower
-  in
+  fun p -> Name.lower (Driver.sou base (Driver.get_first_name p)) = query_lower
+
+let sort_by_fn_relevance_then_date base query persons_with_titles =
+  let first_name_matches_query = first_name_matches base query in
   let birth_or_baptism_dmy p =
     let b = Driver.get_birth p in
     let b = if b = Date.cdate_None then Driver.get_baptism p else b in
@@ -962,32 +962,63 @@ let specify conf base alias_cache n pl1 pl2 pl3 =
   (* identify alias matches in pl1 and pl2 *)
   let pl11, pl12 = split_pl n pl1 in
   let pl21, pl22 = split_pl n pl2 in
-  (if pl11 @ pl21 <> [] then (
-     let ptll11 = process_list pl11 in
-     let ptll12 = process_list pl12 in
-     let ptll21 = process_list pl21 in
-     let title = transl conf "alias" |> Utf8.capitalize_fst in
-     print_person_list conf base alias_cache n (Some title) (ptll11 @ ptll21);
-     let title = transl_nth conf "surname/surnames" 0 |> Utf8.capitalize_fst in
-     print_person_list conf base alias_cache n (Some title) ptll12)
-   else
-     let ptll1 = process_list pl1 in
-     print_person_list conf base alias_cache n None ptll1);
-  if pl22 <> [] then
-    let ptll22 = process_list pl22 in
-    let title = transl conf "other possibilities" |> Utf8.capitalize_fst in
-    print_person_list conf base alias_cache n (Some title) ptll22
-  else ();
   let ptll3 =
     pl3
     |> List.map (fun p -> (p, process_titles conf base n p))
     |> sort_by_fn_relevance_then_date base query_fn
   in
-  if ptll3 <> [] then
-    let title = transl conf "with spouse name" |> Utf8.capitalize_fst in
-    print_person_list conf base alias_cache n (Some title) ptll3
-  else ();
-  (* FIXME why are those else () needed ? *)
+  (* Sections in display order: exact results (split into aliases and
+     surnames when some exact or partial result matches by alias), with
+     spouse name, other possibilities.  Each one is (anchor, title, lists):
+     the persons with the queried first name come first in the spouse
+     section, set apart from the others. *)
+  let capitalized key = Utf8.capitalize_fst (transl conf key) in
+  let exact_sections =
+    if pl11 @ pl21 <> [] then
+      [
+        ( "sn-alias",
+          capitalized "alias",
+          [ process_list pl11 @ process_list pl21 ] );
+        ( "sn-surname",
+          Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0),
+          [ process_list pl12 ] );
+      ]
+    else [ ("sn-exact", capitalized "exact results", [ process_list pl1 ]) ]
+  in
+  let spouse_section =
+    let fn_ok = first_name_matches base query_fn in
+    let same_fn, others = List.partition (fun (p, _) -> fn_ok p) ptll3 in
+    ("sn-spouse", capitalized "with spouse name", [ same_fn; others ])
+  in
+  let other_section =
+    ("sn-other", capitalized "other possibilities", [ process_list pl22 ])
+  in
+  let count (_, _, lists) =
+    List.fold_left (fun n l -> n + List.length l) 0 lists
+  in
+  let sections =
+    List.filter
+      (fun sec -> count sec > 0)
+      (exact_sections @ [ spouse_section; other_section ])
+  in
+  let several = List.length sections > 1 in
+  if several then (
+    Output.print_sstring conf {|<div class="mb-3">|};
+    List.iter
+      (fun ((anchor, title, _) as sec) ->
+        Output.printf conf
+          {|<a href="#%s" class="btn btn-sm btn-outline-primary me-2 mb-1"><i class="fa fa-arrow-down me-1"></i>%s<span class="badge text-bg-light ms-2">%d</span></a>|}
+          anchor title (count sec))
+      sections;
+    Output.print_sstring conf "</div>\n");
+  List.iter
+    (fun ((anchor, title, lists) as sec) ->
+      (* A single section of exact results keeps its former look: no title. *)
+      if several || anchor <> "sn-exact" then
+        Output.printf conf {|<h2 class="h4 mt-3 mb-2" id="%s">%s (%d)</h2>|}
+          anchor title (count sec);
+      List.iter (print_person_list conf base alias_cache n None) lists)
+    sections;
   Hutil.trailer conf
 
 let first_name_print_sections conf base alias_cache listes ~rev =
