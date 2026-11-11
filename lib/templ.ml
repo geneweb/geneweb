@@ -1188,7 +1188,7 @@ let rec eval conf ifun env =
             Translate.language_name s (Util.transl conf "!languages")
         | "url_encode", [ (None, VVstring s) ]
         | "uri_encode", [ (None, VVstring s) ] ->
-            Util.uri_encode s
+            Util.uri_encode (Util.unescape_html s)
         | "url_set", [ (None, VVstring s1) ] ->
             let s1 = String.split_on_char '/' s1 in
             Util.url_set_aux conf (Util.commd conf :> string) s1 []
