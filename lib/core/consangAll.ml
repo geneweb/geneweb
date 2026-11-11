@@ -3,19 +3,7 @@
 module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 module Gutil = Geneweb_db.Gutil
-
-(* let rec clear_descend_consang base consang mark ifam =
- *   let des = foi base ifam in
- *   Array.iter
- *     (fun ip ->
- *        if not (Collection.Marker.get mark ip) then
- *          begin
- *            consang ip Adef.no_consang;
- *            Collection.Marker.set mark ip true ;
- *            let u = poi base ip in
- *            Array.iter (clear_descend_consang base consang mark) (get_family u)
- *          end)
- *     (get_children des) *)
+module Index = Geneweb_db.ConsangIndex
 
 let relationship base tab ip1 ip2 =
   fst (Consang.relationship_and_links base tab false ip1 ip2)
@@ -42,6 +30,8 @@ let compute ?(verbosity = 2) base from_scratch =
   Driver.load_ascends_array base;
   Driver.load_couples_array base;
   let fget, cget, cset, patched = consang_array base in
+  Driver.update_consang_index base @@ fun get set ->
+  let known i x = set i { (get i) with Index.consang = Index.Known x } in
   (try
      let tab =
        let ts = Consang.topological_sort base Driver.poi in
@@ -50,20 +40,16 @@ let compute ?(verbosity = 2) base from_scratch =
      let persons = Driver.ipers base in
      let families = Driver.ifams base in
      let consang_tab = Driver.ifam_marker families Adef.no_consang in
+     let exact = Driver.ifam_marker families (-1.) in
      let cnt = ref 0 in
-     (* FIXME *)
-     (* if not from_scratch then
-      *   begin
-      *     let mark = Collection.Marker.make (Geneweb_db.Collection.length persons) false in
-      *     List.iter
-      *       (fun ip ->
-      *          let u = poi base ip in
-      *          Array.iter (clear_descend_consang base cset mark) (get_family u))
-      *       (patched_ascends base)
-      *   end; *)
      Collection.iter
        (fun i ->
-         if from_scratch then (
+         let outdated =
+           match (get i).Index.consang with
+           | Index.Outdated | Index.Deferred -> true
+           | Index.Unset | Index.Known _ -> false
+         in
+         if from_scratch || outdated then (
            cset i Adef.no_consang;
            incr cnt)
          else
@@ -108,7 +94,9 @@ let compute ?(verbosity = 2) base from_scratch =
                      decr cnt;
                      let cg = Adef.fix_of_float consang in
                      cset i cg;
+                     known i consang;
                      Collection.Marker.set consang_tab ifam cg;
+                     Collection.Marker.set exact ifam consang;
                      if verbosity >= 2 then
                        if
                          match !most with Some m -> cg > cget m | None -> true
@@ -124,12 +112,15 @@ let compute ?(verbosity = 2) base from_scratch =
                  else (
                    trace verbosity !cnt max_cnt;
                    decr cnt;
-                   cset i pconsang)
+                   cset i pconsang;
+                   let x = Collection.Marker.get exact ifam in
+                   known i (if x >= 0. then x else Adef.float_of_fix pconsang))
              (* if he doesn't then set his consanguinity to 0 *)
              | None ->
                  trace verbosity !cnt max_cnt;
                  decr cnt;
-                 cset i (Adef.fix_of_float 0.0))
+                 cset i (Adef.fix_of_float 0.0);
+                 known i 0.)
          persons
      done;
      if max_cnt <> 0 then
