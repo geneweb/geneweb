@@ -53,3 +53,10 @@
 %if;(is_welcome or is_upd_ind or is_upd_fam)
   <link rel="stylesheet" href="%etc_prefix;css/autocomplete.css?hash=%apply;hash%with;%etc_prefix;css/autocomplete.css%end;">
 %end;
+%if;roglo;
+  <style>
+  a:visited:not(.btn, .nav-link, .dropdown-item):not(:hover) {
+    color: #7952b3;                     /* :visited  peut être #8a5cc4 */
+  }
+  </style>
+%end;
