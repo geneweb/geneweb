@@ -28,13 +28,13 @@
     [*godfather/godmother/godparents]s
   %end; [and]%sp;
 %end;
-%define;link(xxx,zzz)
+%define;link(xxx,zzz,yyy)
   %if;(not cancel_links)<a href="%prefix;m=zzz&v=%sq;
     %if;("xxx"=first_name)%first_name_key;%sq;
     %elseif;("xxx"=surname)%surname_key;%sq;
     %( how to get (first/sur)_name_alias_keys? %)
     %else;xxx%sq;
-    %end;">%sq;
+    %end;#iyyy">%sq;
   %end;xxx%if;(not cancel_links)</a>%end;
 %end;
 %define;detailed_names()
@@ -50,7 +50,7 @@
       %incr_count;
     %end;
     %if;has_public_name;
-      <span class="d-block fw-bold">%apply;updfield%with;first_name%and;%apply;link(first_name,"P")%end; %apply;link(surname,"N")</span>
+      <span class="d-block fw-bold">%apply;updfield%with;first_name%and;%apply;link(first_name,"P",index)%end; %apply;link(surname,"N",index)</span>
     %end;
     %if;has_aliases;
       <div>%reset_count;
@@ -94,24 +94,24 @@
     %if;(has_linked_page.HEAD and linked_page.HEAD!="") %linked_page.HEAD;%end;
     %if;has_first_names_aliases;
       <div>%reset_count;
-        %apply;link(first_name,"P")/%sq;
+        %apply;link(first_name,"P",index)/%sq;
         %apply;lazy_print("")
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;updfield%with;first_name_alias%count;%and;%apply;link(first_name_alias,"P")%end;
+          %apply;updfield%with;first_name_alias%count;%and;%apply;link(first_name_alias,"P",index)%end;
           %incr_count;
         %end;
       </div>
     %end;
     %if;has_surnames_aliases;
       <div>%reset_count;
-        %apply;link(surname,"N")/%sq;
+        %apply;link(surname,"N",index)/%sq;
         %apply;lazy_print("")
         %foreach;surname_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;updfield%with;surname_alias%count;%and;%apply;link(surname_alias,"N")%end;
+          %apply;updfield%with;surname_alias%count;%and;%apply;link(surname_alias,"N",index)%end;
           %incr_count;
         %end;
       </div>
