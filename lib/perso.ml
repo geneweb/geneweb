@@ -1333,6 +1333,19 @@ let bool_val x = Templ.VVbool x
 let str_val x = Templ.VVstring x
 let null_val = Templ.VVstring ""
 
+let has_consanguinity auth x =
+  auth && match x with Some x -> x > 0. | None -> false
+
+let consanguinity conf auth x =
+  match x with
+  | Some x when auth ->
+      let pct = 100. *. x in
+      str_val
+        (string_of_decimal_num conf
+           (if pct >= 0.01 then round_2_dec pct else pct)
+        ^ " %")
+  | Some _ | None -> null_val
+
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   Templ.VVstring ((x :> Adef.safe_string) :> string)
 
@@ -2098,10 +2111,17 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "anc_stats_json" ] ->
       VVstring (AncStatsDisplay.compute_json conf base (fst ep))
   | [ "implex_count" ] ->
-      VVstring
-        (string_of_int (Implex.loop_count base (Driver.get_iper (fst ep))))
+      let i = Inbreeding.of_person base (Driver.get_iper a) in
+      VVstring (string_of_int i.Inbreeding.implexes)
   | [ "has_implex" ] ->
-      VVbool (Implex.loop_count ~limit:1 base (Driver.get_iper (fst ep)) > 0)
+      let i = Inbreeding.of_person base (Driver.get_iper a) in
+      VVbool (i.Inbreeding.implexes > 0)
+  | [ "consanguinity" ] ->
+      let i = Inbreeding.of_person base (Driver.get_iper a) in
+      consanguinity conf (snd ep) i.Inbreeding.coefficient
+  | [ "has_consanguinity" ] ->
+      let i = Inbreeding.of_person base (Driver.get_iper a) in
+      VVbool (has_consanguinity (snd ep) i.Inbreeding.coefficient)
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
@@ -3664,9 +3684,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             (fun ifam -> [||] <> Driver.get_children (Driver.foi base ifam))
             (Driver.get_family p))
   | "has_consanguinity" ->
-      p_auth
-      && Driver.get_consang p != Adef.fix (-1)
-      && Driver.get_consang p >= Adef.fix_of_float 0.0001
+      has_consanguinity p_auth (Inbreeding.stored base (Driver.get_iper p))
   | "has_cremation_date" ->
       if p_auth then
         match Driver.get_burial p with
@@ -3980,12 +3998,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else if force_surname then gen_person_text conf base p |> safe_val
       else gen_person_text ~sn:false conf base p |> safe_val
   | "consanguinity" ->
-      if p_auth then
-        string_of_decimal_num conf
-          (round_2_dec (Adef.float_of_fix (Driver.get_consang p) *. 100.0))
-        ^ " %"
-        |> str_val
-      else null_val
+      consanguinity conf p_auth (Inbreeding.stored base (Driver.get_iper p))
   | "cremation_place" ->
       if p_auth then
         Driver.get_burial_place p |> Driver.sou base

@@ -31,14 +31,6 @@ val profile : Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> profile
     of [fresh] is the number of repeated positions; the sum of [loops] is the
     cyclomatic number of the ancestry graph. *)
 
-val loop_count :
-  ?limit:int -> Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> int
-(** [loop_count base ip] is the sum of [loops] of [profile base ip], computed by
-    a breadth-first walk expanding each ancestor once. With [~limit], the walk
-    stops after the first generation reaching [limit] loops, so
-    [loop_count ~limit:1 base ip > 0] cheaply tells whether the ancestry of [ip]
-    has any loop. *)
-
 type link = {
   ancestor : Geneweb_db.Driver.iper;  (** Repeated ancestor. *)
   partner : Geneweb_db.Driver.iper option;
@@ -55,8 +47,8 @@ type link = {
 type junction = {
   sosa : Geneweb_sosa.t;  (** Sosa number of the junction person. *)
   person : Geneweb_db.Driver.iper;
-      (** Person whose parents are related by loops, or having a stored
-          inbreeding coefficient. *)
+      (** Person whose parents are related by loops, or having an inbreeding
+          coefficient. *)
   links : link list;
   direct : float;
       (** Sum of the contributions: part of the inbreeding coefficient of
@@ -64,7 +56,7 @@ type junction = {
           from loops nested in repeated ancestries. *)
   nested : Geneweb_db.Driver.iper list;
       (** Minimal common ancestors of the parents of [person] missing from
-          [links], when the stored inbreeding coefficient exceeds [direct]: the
+          [links], when the inbreeding coefficient exceeds [direct]: the
           ancestors explaining the nested remainder. *)
   enclosing : Geneweb_sosa.t option;
       (** Nearest junction below on the same line. *)
@@ -98,12 +90,18 @@ type structure = {
   clusters : cluster list;  (** By decreasing size, [id] counting from 1. *)
 }
 
-val structure : Geneweb_db.Driver.base -> Geneweb_db.Driver.iper -> structure
-(** [structure base ip] pairs the occurrences of each repeated ancestor met by a
-    breadth-first walk expanding each ancestor once. Each pair closes a loop at
-    its junction, the common Sosa prefix of both occurrences. Both paths share
-    no other person, so each pair gives an exact term of Wright's formula. The
-    [nested] ancestors are searched in the parent links kept by the walk,
-    indexed in arrays, without reading the database again. Clusters are the
-    connected components of the graph linking each junction to the ancestors of
-    its links and to its [nested] ancestors. *)
+val structure :
+  coefficient:(Geneweb_db.Driver.iper -> float option) ->
+  Geneweb_db.Driver.base ->
+  Geneweb_db.Driver.iper ->
+  structure
+(** [structure ~coefficient base ip] pairs the occurrences of each repeated
+    ancestor met by a breadth-first walk expanding each ancestor once. Each pair
+    closes a loop at its junction, the common Sosa prefix of both occurrences.
+    Both paths share no other person, so each pair gives an exact term of
+    Wright's formula, with the inbreeding coefficients of the ancestors given by
+    [coefficient] ({!Inbreeding.of_ancestry}), zero when unknown. The [nested]
+    ancestors are searched in the parent links kept by the walk, indexed in
+    arrays, without reading the database again. Clusters are the connected
+    components of the graph linking each junction to the ancestors of its links
+    and to its [nested] ancestors. *)
