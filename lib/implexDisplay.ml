@@ -5,6 +5,7 @@ module Sosa = Geneweb_sosa
 let max_dag_branches = 60
 let max_rl_paths = 100
 let budget = 500
+let first_implexes = 50
 let sep conf = Util.transl conf "(thousand separator)"
 let num conf n = Mutil.string_of_int_sep (sep conf) n
 let sosa conf s = Sosa.to_string_sep (sep conf) s
@@ -15,11 +16,12 @@ let tr_nth conf s n = Utf8.capitalize_fst (Util.transl_nth conf s n)
 let gen_title conf gen =
   tr_nth conf "generation/generations" 0 ^ " " ^ string_of_int gen
 
+let attr s = (Util.escape_html s :> string)
+
 let help text label =
   Printf.sprintf
-    {|<span class="implex-help" data-bs-toggle="tooltip" title="%s">%s</span>|}
-    (Util.escape_html text :> string)
-    label
+    {|<span class="implex-help" data-bs-toggle="tooltip" data-bs-custom-class="implex-tip" title="%s">%s</span>|}
+    (attr text) label
 
 let th ?(cls = "") conf key =
   Printf.sprintf "<th%s>%s</th>"
@@ -135,9 +137,10 @@ let print_summary conf base coefficient root href generations st =
   let depth = List.fold_left (fun _ g -> g.Implex.gen) 0 generations in
   let row label key value =
     Output.printf conf
-      {|<dt class="col-sm-6 text-sm-end">%s</dt><dd class="col-sm-6">%s</dd>|}
-      (help (tr conf (key ^ " helper")) label)
-      value
+      {|<dt class="col-sm-6 text-sm-end">%s</dt>
+<dd class="col-sm-6">%s<div class="collapse implex-note">%s</div></dd>|}
+      label value
+      (tr conf (key ^ " helper"))
   in
   Output.print_sstring conf {|<dl class="row mt-3">|};
   row (tr conf "distinct ancestors") "distinct ancestors" (num conf distinct);
@@ -537,9 +540,9 @@ let print_ancestors conf base root n index ancestors =
     top;
   Output.print_sstring conf "</tbody></table></div>"
 
-let print_range conf root page lo hi depth total =
+let print_range conf root page previous lo hi depth total =
   Output.printf conf
-    {|<form method="get" action="%s" class="d-flex flex-wrap align-items-center gap-2 mt-3">|}
+    {|<form method="get" action="%s#range" id="range" class="d-flex flex-wrap align-items-center gap-2 mt-3">|}
     conf.command;
   Util.hidden_env conf;
   Util.hidden_input_s conf "m" "A";
@@ -550,14 +553,19 @@ let print_range conf root page lo hi depth total =
 <input type="number" id="implex_g" name="g" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
 <label for="implex_v">%s</label>
 <input type="number" id="implex_v" name="v" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
-<button type="submit" class="btn btn-sm btn-outline-primary">OK</button>%s
-<a href="%s&v=%d"%s>%s</a></form>|}
+<button type="submit" class="btn btn-sm btn-outline-primary">OK</button>%s%s
+<a href="%s&v=%d#range"%s>%s</a></form>|}
     (tr_nth conf "generation/generations" 1)
     lo depth
     (Util.transl conf "to (generation range)")
     hi depth
+    (match previous with
+    | Some (g, v) ->
+        Printf.sprintf {|<a href="%s&v=%d#range">%s</a>|} (page g) v
+          (Util.transl conf "previous generations")
+    | None -> "")
     (if hi < depth then
-       Printf.sprintf {|<a href="%s">%s</a>|}
+       Printf.sprintf {|<a href="%s#range">%s</a>|}
          (page (hi + 1))
          (Util.transl conf "next generations")
      else "")
@@ -573,30 +581,49 @@ let print conf base p =
   let depth = List.fold_left (fun _ g -> g.Implex.gen) 0 generations in
   let n = Option.value ~default:50 (Util.p_getint conf.env "n") in
   let rows = Hashtbl.create 64 in
-  let add gen k =
-    Hashtbl.replace rows gen
-      (k + Option.value ~default:0 (Hashtbl.find_opt rows gen))
+  let implexes = Hashtbl.create 64 in
+  let add tbl gen k =
+    Hashtbl.replace tbl gen
+      (k + Option.value ~default:0 (Hashtbl.find_opt tbl gen))
   in
   List.iter
-    (fun x -> add (generation (List.hd x.Implex.occurrences)) 1)
+    (fun x ->
+      let gen = generation (List.hd x.Implex.occurrences) in
+      add rows gen 1;
+      add implexes gen 1)
     st.Implex.implexes;
   List.iter
-    (fun j -> add (generation j.Implex.sosa) (1 + List.length j.Implex.links))
+    (fun j ->
+      add rows (generation j.Implex.sosa) (1 + List.length j.Implex.links))
     st.Implex.junctions;
-  let rows_at gen = Option.value ~default:0 (Hashtbl.find_opt rows gen) in
+  let at tbl gen = Option.value ~default:0 (Hashtbl.find_opt tbl gen) in
   let total = Hashtbl.fold (fun _ k acc -> acc + k) rows 0 in
-  let lo = max 0 (Option.value ~default:0 (Util.p_getint conf.env "g")) in
+  let lo =
+    match Util.p_getint conf.env "g" with
+    | Some g -> max 0 g
+    | None -> (
+        match st.Implex.implexes with
+        | x :: _ -> generation (List.hd x.Implex.occurrences)
+        | [] -> 0)
+  in
   let hi =
     match Util.p_getint conf.env "v" with
     | Some v -> max lo v
     | None ->
-        let rec extend hi acc =
-          if hi >= depth then hi
-          else
-            let acc = acc + rows_at (hi + 1) in
-            if acc > budget then hi else extend (hi + 1) acc
+        let rec extend hi n r =
+          if hi >= depth || n >= first_implexes || r > budget then hi
+          else extend (hi + 1) (n + at implexes (hi + 1)) (r + at rows (hi + 1))
         in
-        extend lo (rows_at lo)
+        extend lo (at implexes lo) (at rows lo)
+  in
+  let previous =
+    let rec back g n r =
+      if g <= 0 || n >= first_implexes || r > budget then g
+      else back (g - 1) (n + at implexes (g - 1)) (r + at rows (g - 1))
+    in
+    if lo > 0 then
+      Some (back (lo - 1) (at implexes (lo - 1)) (at rows (lo - 1)), lo - 1)
+    else None
   in
   let shown gen = lo <= gen && gen <= hi in
   let page gen =
@@ -619,20 +646,25 @@ let print conf base p =
         x.Implex.persons)
     st.Implex.implexes;
   let title h =
-    Output.printf conf "%s – %s"
-      (tr conf "implexes and inbreeding")
-      (if h then (Util.gen_person_text ~html:false conf base p :> string)
-       else
-         (Util.referenced_person_text conf base p :> string)
-         ^ " "
-         ^ (Util.mod_ind_link conf base p
-              (Adef.safe (DateDisplay.short_dates_text_notag conf base p))
-             :> string))
+    if h then
+      Output.printf conf "%s – %s"
+        (tr conf "implexes and inbreeding")
+        (Util.gen_person_text ~html:false conf base p :> string)
+    else
+      Output.printf conf
+        {|<span class="d-flex justify-content-between align-items-center gap-2">%s<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target=".implex-note" aria-expanded="false" title="%s"><i class="fa fa-info fa-fw"></i></button></span>|}
+        (tr conf "implexes and inbreeding")
+        (attr (tr conf "implex help button"))
   in
   Hutil.header conf title;
+  Output.printf conf {|<h2 class="h5">%s %s</h2>|}
+    (Util.referenced_person_text conf base p :> string)
+    (Util.mod_ind_link conf base p
+       (Adef.safe (DateDisplay.short_dates_text_notag conf base p))
+      :> string);
   print_summary conf base coefficient root href generations st;
   print_generations conf href generations st;
-  print_range conf root page lo hi depth total;
+  print_range conf root page previous lo hi depth total;
   print_implexes conf base coefficient root shown href data st;
   print_junctions conf base coefficient shown href data index st;
   print_clusters conf root href st;

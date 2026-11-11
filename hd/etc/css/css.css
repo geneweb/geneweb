@@ -693,9 +693,16 @@ td .rm-cell {
 }
 
 .implex-help {
-  text-decoration: underline dotted;
+  text-decoration: underline dotted var(--bs-border-color);
   text-underline-offset: 3px;
   cursor: help;
+}
+.implex-tip .tooltip-inner {
+  text-align: left;
+}
+.implex-note {
+  border-left: 2px solid var(--bs-border-color);
+  padding-left: .5rem;
 }
 
 .ancmenu-legend {

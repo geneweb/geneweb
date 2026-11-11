@@ -26141,19 +26141,19 @@ en: loop/loops
 fr: boucle/boucles
 
     loops helper
-de: Anzahl der Fälle, in denen ein Durchlauf, der jeden Vorfahren nur einmal erweitert, auf einen bereits erreichten Vorfahren trifft: die unabhängigen Schleifen (zyklomatische Zahl) des Ahnengraphen; ein über k Kinder erreichter Vorfahre schließt k − 1 Schleifen.
-en: times a walk expanding each ancestor once meets an ancestor already met: the independent loops (cyclomatic number) of the ancestry graph; an ancestor reached through k children closes k − 1 loops.
-fr: nombre de fois où un parcours développant chaque ancêtre une seule fois rencontre un ancêtre déjà rencontré : les boucles indépendantes (nombre cyclomatique) du graphe d’ascendance ; un ancêtre atteint par k enfants ferme k − 1 boucles.
+de: Elternverbindungen des Ahnengraphen, die zu einem bereits über eine andere Verbindung erreichten Vorfahren führen: die unabhängigen Schleifen (zyklomatische Zahl) des Graphen; ein über k Kinder erreichter Vorfahre schließt k − 1 Schleifen.
+en: parent links of the ancestry graph leading to an ancestor already reached through another link: the independent loops (cyclomatic number) of the graph; an ancestor reached through k children closes k − 1 loops.
+fr: liens de filiation du graphe d’ascendance qui mènent à un ancêtre déjà atteint par un autre lien : les boucles indépendantes (nombre cyclomatique) du graphe ; un ancêtre atteint par k enfants ferme k − 1 boucles.
 
     loop rate (loops per parent link)
-de: Schleifenrate (Schleifen je Elternverbindung)
-en: loop rate (loops per parent link)
-fr: taux de bouclage (boucles par lien parental)
+de: Schleifen je Elternverbindung
+en: loops per parent link
+fr: boucles par lien de filiation
 
     loop rate helper
-de: Anteil der vom Durchlauf verfolgten Elternverbindungen, die eine Schleife schließen.
-en: share of the parent links followed by the walk that close a loop.
-fr: part des liens parentaux suivis par le parcours qui ferment une boucle.
+de: Anteil der Elternverbindungen des Ahnengraphen, die eine Schleife schließen; jede Verbindung von der Person oder einem Vorfahren zu einem seiner Eltern zählt einmal. Null ohne Implex, der Anteil wächst, je mehr Linien zusammenlaufen.
+en: share of the parent links of the ancestry graph that close a loop, each link from the person or an ancestor to one of its parents counted once. Zero without implex, it grows as the lines merge.
+fr: part des liens de filiation du graphe d’ascendance qui ferment une boucle, chaque lien de la personne ou d’un ancêtre vers l’un de ses parents étant compté une fois. Nulle sans implexe, elle croît à mesure que les lignées se rejoignent.
 
     complete generations
 de: vollständige Generationen
@@ -26420,7 +26420,17 @@ de: nächste Generationen
 en: next generations
 fr: générations suivantes
 
+    previous generations
+de: vorherige Generationen
+en: previous generations
+fr: générations précédentes
+
     all (%s rows)
 de: alle (%s Zeilen)
 en: all (%s rows)
 fr: tout (%s lignes)
+
+    implex help button
+de: Erläuterungen ein- oder ausblenden
+en: show or hide the explanations
+fr: afficher ou masquer les explications
