@@ -31,16 +31,13 @@ let person conf base ip =
 let name conf base ip =
   (Util.gen_person_text conf base (Util.pget conf base ip) :> string)
 
-let inbreeding conf base ip =
-  let p = Util.pget conf base ip in
-  let c = Driver.get_consang p in
+let inbreeding conf base coefficient ip =
   if
-    c = Adef.no_consang
-    || (not (Util.authorized_age conf base p))
+    (not (Util.authorized_age conf base (Util.pget conf base ip)))
     || (not conf.manitou)
        && List.assoc_opt "show_consang" conf.base_env = Some "no"
   then None
-  else Some (Adef.float_of_fix c)
+  else coefficient ip
 
 let optional conf = function Some x -> percent conf x | None -> "—"
 
@@ -104,7 +101,7 @@ let junction_link conf href j =
     (href (generation j) ("j" ^ Sosa.to_string j))
     (sosa conf j)
 
-let print_summary conf base root href generations st =
+let print_summary conf base coefficient root href generations st =
   let sum f = List.fold_left (fun acc g -> acc + f g) 0 generations in
   let distinct = sum (fun g -> g.Implex.fresh) in
   let known = sum (fun g -> g.Implex.paths) in
@@ -138,9 +135,8 @@ let print_summary conf base root href generations st =
   row "Complete generations" (string_of_int complete);
   row "Deepest generation" (string_of_int depth);
   row "Inbreeding coefficient"
-    (if Driver.get_consang (Util.pget conf base root) = Adef.no_consang then
-       "not computed (consang)"
-     else optional conf (inbreeding conf base root));
+    (if coefficient root = None then "not computed (consang)"
+     else optional conf (inbreeding conf base coefficient root));
   row "Direct part"
     (match
        List.find_opt
@@ -211,7 +207,7 @@ let print_generations conf href generations st =
     generations;
   Output.print_sstring conf "</tbody></table></div>"
 
-let print_implexes conf base root shown href data st =
+let print_implexes conf base coefficient root shown href data st =
   let clusters = Hashtbl.create 1024 in
   List.iter
     (fun j ->
@@ -256,7 +252,9 @@ let print_implexes conf base root shown href data st =
                       (List.tl occurrences))))
             (num conf a.Implex.multiplicity)
             (percent conf a.Implex.weight)
-            (lines (fun ip -> optional conf (inbreeding conf base ip)) persons)
+            (lines
+               (fun ip -> optional conf (inbreeding conf base coefficient ip))
+               persons)
             (num conf known) (num conf loops)
             (String.concat ", " (List.map (junction_link conf href) closing))
             (match closing with
@@ -277,7 +275,7 @@ let print_implexes conf base root shown href data st =
   if last >= 0 then Output.print_sstring conf "</tbody>";
   Output.print_sstring conf "</table></div>"
 
-let print_junctions conf base shown href data index st =
+let print_junctions conf base coefficient shown href data index st =
   let implex_href ip =
     match Driver.Iper.Table.find_opt index ip with
     | Some x ->
@@ -313,7 +311,7 @@ let print_junctions conf base shown href data index st =
              Output.printf conf
                {|<tbody id="jg%d"><tr><th colspan="8">Generation %d</th></tr></tbody>|}
                gen gen;
-           let f = inbreeding conf base jp in
+           let f = inbreeding conf base coefficient jp in
            let couple = parents conf base jp in
            let remainder =
              match f with
@@ -485,8 +483,9 @@ let print_range conf root page lo hi depth total =
 
 let print conf base p =
   let root = Driver.get_iper p in
+  Inbreeding.of_ancestry base root @@ fun coefficient ->
   let { Implex.generations; ancestors } = Implex.profile base root in
-  let st = Implex.structure base root in
+  let st = Implex.structure ~coefficient base root in
   let depth = List.fold_left (fun _ g -> g.Implex.gen) 0 generations in
   let n = Option.value ~default:50 (Util.p_getint conf.env "n") in
   let rows = Hashtbl.create 64 in
@@ -541,11 +540,11 @@ let print conf base p =
       (Util.gen_person_text ~html:false conf base p :> string)
   in
   Hutil.header conf title;
-  print_summary conf base root href generations st;
+  print_summary conf base coefficient root href generations st;
   print_generations conf href generations st;
   print_range conf root page lo hi depth total;
-  print_implexes conf base root shown href data st;
-  print_junctions conf base shown href data index st;
+  print_implexes conf base coefficient root shown href data st;
+  print_junctions conf base coefficient shown href data index st;
   print_clusters conf root href st;
   print_ancestors conf base root n index ancestors;
   Hutil.trailer conf

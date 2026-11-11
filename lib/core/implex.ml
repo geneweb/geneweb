@@ -74,9 +74,7 @@ type graph = {
   mutable stamp : int;
 }
 
-let is_unknown p =
-  Driver.Istr.is_quest (Driver.get_first_name p)
-  && Driver.Istr.is_quest (Driver.get_surname p)
+let is_unknown = Inbreeding.is_unknown
 
 let parents base ip =
   match Driver.get_parents (Driver.poi base ip) with
@@ -257,30 +255,6 @@ let walk base root =
     !ups;
   (at, roots, unknown, g, pos)
 
-let loop_count ?(limit = max_int) base root =
-  let seen = Iper.Table.create 1024 in
-  Iper.Table.replace seen root ();
-  let rec loop n = function
-    | [] -> n
-    | _ when n >= limit -> n
-    | frontier ->
-        let n, next =
-          List.fold_left
-            (fun acc ip ->
-              List.fold_left
-                (fun (n, next) parent ->
-                  if Iper.Table.mem seen parent then (n + 1, next)
-                  else if is_unknown (Driver.poi base parent) then (n, next)
-                  else (
-                    Iper.Table.replace seen parent ();
-                    (n, parent :: next)))
-                acc (parents base ip))
-            (n, []) frontier
-        in
-        loop n next
-  in
-  loop 0 [ root ]
-
 let rec junction u v =
   let c = compare (Sosa.gen u) (Sosa.gen v) in
   if c > 0 then junction (Sosa.half u) v
@@ -288,11 +262,7 @@ let rec junction u v =
   else if Sosa.eq u v then u
   else junction (Sosa.half u) (Sosa.half v)
 
-let coefficient base ip =
-  let c = Driver.get_consang (Driver.poi base ip) in
-  if c = Adef.no_consang then 0. else Adef.float_of_fix c
-
-let make_link base at unknown ip u v =
+let make_link coefficient base at unknown ip u v =
   let family s =
     Driver.get_parents (Driver.poi base (SosaMap.find (Sosa.half s) at))
   in
@@ -305,9 +275,9 @@ let make_link base at unknown ip u v =
     in
     let len1, len2 = if paternal u then (len u, len v) else (len v, len u) in
     let w_partner =
-      match partner with Some b -> 1. +. coefficient base b | None -> 0.
+      match partner with Some b -> 1. +. coefficient b | None -> 0.
     in
-    let w = 1. +. coefficient base ip +. w_partner in
+    let w = 1. +. coefficient ip +. w_partner in
     let contribution = ldexp w (-(len1 + len2 + 1)) in
     Some
       ( j,
@@ -383,7 +353,8 @@ let linked links =
 
 let total links = List.fold_left (fun s l -> s +. l.contribution) 0. links
 
-let structure base root =
+let structure ~coefficient base root =
+  let coefficient ip = Option.value ~default:0. (coefficient ip) in
   let at, roots, unknown, graph, pos = walk base root in
   let occurrences = Iper.Table.create 256 in
   List.iter
@@ -401,7 +372,7 @@ let structure base root =
       (fun ip l acc ->
         fold_pairs
           (fun acc u v ->
-            match make_link base at unknown ip u v with
+            match make_link coefficient base at unknown ip u v with
             | Some (j, link) ->
                 SosaMap.update j
                   (fun ls -> Some (link :: Option.value ~default:[] ls))
@@ -415,14 +386,14 @@ let structure base root =
       (fun _ links _ -> Some links)
       found
       (SosaMap.filter_map
-         (fun _ ip -> if coefficient base ip > 0. then Some [] else None)
+         (fun _ ip -> if coefficient ip > 0. then Some [] else None)
          at)
   in
   let nested =
     SosaMap.mapi
       (fun j links ->
         let jp = SosaMap.find j at in
-        if coefficient base jp -. total links > 1e-6 then
+        if coefficient jp -. total links > 1e-6 then
           let direct = linked links in
           List.filter
             (fun x -> not (Iper.Set.mem x direct))
