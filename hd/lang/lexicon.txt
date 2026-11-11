@@ -26434,3 +26434,28 @@ fr: tout (%s lignes)
 de: Erläuterungen ein- oder ausblenden
 en: show or hide the explanations
 fr: afficher ou masquer les explications
+
+    implex chart button
+de: Diagramme
+en: charts
+fr: graphiques
+
+    implex chart progression
+de: Vorfahren je Generation: neue Vorfahren, wiederholte Positionen und bekannte Positionen, ihre Summe
+en: ancestors per generation: new ancestors, repeated positions and known positions, their sum
+fr: ancêtres par génération : nouveaux ancêtres, positions répétées et positions connues, leur somme
+
+    new ancestors
+de: neue Vorfahren
+en: new ancestors
+fr: nouveaux ancêtres
+
+    implex chart collapse
+de: Theoretische Positionen, bekannte Positionen und verschiedene Vorfahren je Generation (logarithmische Skala)
+en: theoretical positions, known positions and distinct ancestors per generation (logarithmic scale)
+fr: positions théoriques, positions connues et ancêtres distincts par génération (échelle logarithmique)
+
+    theoretical positions
+de: theoretische Positionen
+en: theoretical positions
+fr: positions théoriques

@@ -191,6 +191,59 @@ function initBsValidation() {
 document.addEventListener('DOMContentLoaded', initBsValidation);
 </script>
 %end;
+%if;(e.m="A" and e.t="I")
+<script>
+%( Implex page: Chart.js is loaded and the charts are drawn on the first
+   opening of their collapse. %)
+function implexCharts(box) {
+  const d = box.dataset;
+  const s = JSON.parse(d.series);
+  const set = (label, data, color) =>
+    ({ label, data, backgroundColor: color, borderColor: color, pointRadius: 2 });
+  const axis = { display: true, text: d.labelGen };
+  new Chart(document.getElementById('implex-progression'), {
+    type: 'line',
+    data: {
+      labels: s.gen,
+      datasets: %[
+        set(d.labelFresh, s.fresh, 'rgb(13,110,253)'),
+        set(d.labelRepeated, s.repeated, 'rgb(253,126,20)'),
+        set(d.labelKnown, s.known, 'rgb(108,117,125)')
+      %]
+    },
+    options: {
+      plugins: { title: { display: true, text: d.titleProgression } },
+      scales: { x: { title: axis }, y: { beginAtZero: true } }
+    }
+  });
+  new Chart(document.getElementById('implex-collapse'), {
+    type: 'line',
+    data: {
+      labels: s.gen,
+      datasets: %[
+        set(d.labelTheoretical, s.theoretical, 'rgb(173,181,189)'),
+        set(d.labelKnown, s.known, 'rgb(253,126,20)'),
+        set(d.labelDistinct, s.distinct, 'rgb(13,110,253)')
+      %]
+    },
+    options: {
+      plugins: { title: { display: true, text: d.titleCollapse } },
+      scales: { x: { title: axis }, y: { type: 'logarithmic' } }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const box = document.getElementById('implex-chart');
+  if (!box) return;
+  box.addEventListener('show.bs.collapse', () => {
+    const script = document.createElement('script');
+    script.src = '%if;(bvar.use_cdn="yes")https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js%else;%etc_prefix;js/chart.umd.min.js?version=4.5.1%end;';
+    script.onload = () => implexCharts(box);
+    document.head.appendChild(script);
+  }, { once: true });
+});
+</script>
+%end;
 %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
 <script>
   document.addEventListener('DOMContentLoaded', function() {

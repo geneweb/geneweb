@@ -194,6 +194,36 @@ let print_summary conf base coefficient root href generations st =
        (num conf (List.length st.Implex.clusters)));
   Output.print_sstring conf "</dl>"
 
+let print_chart conf generations =
+  let known = List.fold_left (fun m g -> max m g.Implex.paths) 1 generations in
+  let series f = "[" ^ String.concat "," (List.map f generations) ^ "]" in
+  let count f = series (fun g -> string_of_int (f g)) in
+  Output.printf conf
+    {|<button type="button" class="btn btn-sm btn-outline-secondary mt-3" data-bs-toggle="collapse" data-bs-target="#implex-chart" aria-expanded="false" aria-controls="implex-chart"><i class="fa fa-chart-bar fa-fw"></i> %s</button>
+<div class="collapse" id="implex-chart" data-series='{"gen":%s,"fresh":%s,"repeated":%s,"theoretical":%s,"known":%s,"distinct":%s}'
+data-label-gen="%s" data-label-fresh="%s" data-label-repeated="%s"
+data-label-theoretical="%s" data-label-known="%s" data-label-distinct="%s"
+data-title-progression="%s" data-title-collapse="%s">
+<div class="row mt-2"><div class="col-lg-6"><canvas id="implex-progression"></canvas></div>
+<div class="col-lg-6"><canvas id="implex-collapse"></canvas></div></div></div>|}
+    (tr conf "implex chart button")
+    (count (fun g -> g.Implex.gen))
+    (count (fun g -> g.Implex.fresh))
+    (count (fun g -> g.Implex.paths - g.Implex.fresh))
+    (series (fun g ->
+         let t = ldexp 1. g.Implex.gen in
+         if t > 1000. *. float known then "null" else Printf.sprintf "%.0f" t))
+    (count (fun g -> g.Implex.paths))
+    (count (fun g -> g.Implex.present))
+    (attr (tr_nth conf "generation/generations" 0))
+    (attr (tr conf "new ancestors"))
+    (attr (tr conf "repeated positions"))
+    (attr (tr conf "theoretical positions"))
+    (attr (tr conf "known positions (paths)"))
+    (attr (tr conf "distinct ancestors"))
+    (attr (tr conf "implex chart progression"))
+    (attr (tr conf "implex chart collapse"))
+
 let print_generations conf href generations st =
   let tally = Hashtbl.create 64 in
   let add key n =
@@ -663,6 +693,7 @@ let print conf base p =
        (Adef.safe (DateDisplay.short_dates_text_notag conf base p))
       :> string);
   print_summary conf base coefficient root href generations st;
+  print_chart conf generations;
   print_generations conf href generations st;
   print_range conf root page previous lo hi depth total;
   print_implexes conf base coefficient root shown href data st;
