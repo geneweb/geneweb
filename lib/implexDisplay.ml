@@ -9,6 +9,25 @@ let sep conf = Util.transl conf "(thousand separator)"
 let num conf n = Mutil.string_of_int_sep (sep conf) n
 let sosa conf s = Sosa.to_string_sep (sep conf) s
 let nowrap s = {|<span class="text-nowrap">|} ^ s ^ "</span>"
+let tr conf s = Utf8.capitalize_fst (Util.transl conf s)
+let tr_nth conf s n = Utf8.capitalize_fst (Util.transl_nth conf s n)
+
+let gen_title conf gen =
+  tr_nth conf "generation/generations" 0 ^ " " ^ string_of_int gen
+
+let help text label =
+  Printf.sprintf
+    {|<span class="implex-help" data-bs-toggle="tooltip" title="%s">%s</span>|}
+    (Util.escape_html text :> string)
+    label
+
+let th ?(cls = "") conf key =
+  Printf.sprintf "<th%s>%s</th>"
+    (if cls = "" then "" else Printf.sprintf {| class="%s"|} cls)
+    (help
+       (Utf8.capitalize_fst (Util.transl_nth conf key 1))
+       (tr_nth conf key 0))
+
 let percent conf x = nowrap (Util.string_of_decimal_num conf (100. *. x) ^ " %")
 
 let ratio conf x =
@@ -114,30 +133,43 @@ let print_summary conf base coefficient root href generations st =
       0 generations
   in
   let depth = List.fold_left (fun _ g -> g.Implex.gen) 0 generations in
-  let row label value =
+  let row label key value =
     Output.printf conf
-      {|<dt class="col-sm-6">%s</dt><dd class="col-sm-6">%s</dd>|} label value
+      {|<dt class="col-sm-6 text-sm-end">%s</dt><dd class="col-sm-6">%s</dd>|}
+      (help (tr conf (key ^ " helper")) label)
+      value
   in
   Output.print_sstring conf {|<dl class="row mt-3">|};
-  row "Distinct ancestors" (num conf distinct);
-  row "Known positions (paths)" (num conf known);
-  row "Repeated positions" (num conf (known - distinct));
-  row "Implex ancestors"
+  row (tr conf "distinct ancestors") "distinct ancestors" (num conf distinct);
+  row (tr conf "known positions (paths)") "known positions" (num conf known);
+  row
+    (tr conf "repeated positions")
+    "repeated positions"
+    (num conf (known - distinct));
+  row
+    (tr conf "implex ancestors")
+    "implex ancestors"
     (Printf.sprintf {|<a href="#implexes">%s</a>|}
        (num conf
           (List.fold_left
              (fun n x -> n + List.length x.Implex.persons)
              0 st.Implex.implexes)));
-  row "Loops" (num conf loops);
-  row "Loop rate (loops / parent links)"
+  row (tr_nth conf "loop/loops" 1) "loops" (num conf loops);
+  row
+    (tr conf "loop rate (loops per parent link)")
+    "loop rate"
     (if loops = 0 then "0"
      else ratio conf (float loops /. float (distinct + loops)));
-  row "Complete generations" (string_of_int complete);
-  row "Deepest generation" (string_of_int depth);
-  row "Inbreeding coefficient"
-    (if coefficient root = None then "not computed (consang)"
+  row
+    (tr conf "complete generations")
+    "complete generations" (string_of_int complete);
+  row (tr conf "deepest generation") "deepest generation" (string_of_int depth);
+  row
+    (tr conf "inbreeding coefficient")
+    "inbreeding coefficient"
+    (if coefficient root = None then Util.transl conf "not computed (consang)"
      else optional conf (inbreeding conf base coefficient root));
-  row "Direct part"
+  row (tr conf "direct part") "direct part"
     (match
        List.find_opt
          (fun j -> Sosa.eq j.Implex.sosa Sosa.one)
@@ -147,10 +179,14 @@ let print_summary conf base coefficient root href generations st =
         Printf.sprintf {|<a href="%s">%s</a>|} (href 0 "j1")
           (percent conf j.Implex.direct)
     | None -> "0 %");
-  row "Junctions"
+  row
+    (tr_nth conf "junction/junctions" 1)
+    "junctions"
     (Printf.sprintf {|<a href="#junctions">%s</a>|}
        (num conf (List.length st.Implex.junctions)));
-  row "Clusters"
+  row
+    (tr_nth conf "cluster/clusters" 1)
+    "clusters"
     (Printf.sprintf {|<a href="#clusters">%s</a>|}
        (num conf (List.length st.Implex.clusters)));
   Output.print_sstring conf "</dl>"
@@ -178,17 +214,31 @@ let print_generations conf href generations st =
           (num conf c)
     | None -> "0"
   in
-  Output.print_sstring conf
+  Output.printf conf
     {|<div class="table-responsive mt-3"><table class="table table-sm table-striped table-hover text-end">
-<thead><tr><th>Gen.</th><th>Period</th><th>Theoretical</th><th>Known</th>
-<th>Completeness</th><th>Distinct</th><th>New</th><th>Seen earlier</th>
-<th>Repeated here</th><th>Loops</th><th>Already seen</th><th>Implexes</th>
-<th>Junctions</th></tr></thead><tbody>|};
+<thead><tr>%s</tr></thead><tbody>|}
+    (String.concat ""
+       (List.map (th conf)
+          [
+            "generation (column)";
+            "period (column)";
+            "theoretical (column)";
+            "known (column)";
+            "completeness (column)";
+            "distinct (column)";
+            "new (column)";
+            "earlier (column)";
+            "repeated (column)";
+            "loops (column)";
+            "repetition (column)";
+            "implexes (column)";
+            "junctions (column)";
+          ]));
   List.iter
     (fun g ->
       let { Implex.gen; paths; present; fresh; loops; period } = g in
       Output.printf conf
-        {|<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+        {|<tr><td>%d</td><td class="text-nowrap">%s</td><td>%s</td><td>%s</td><td>%s</td>
 <td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
 <td>%s</td><td>%s</td></tr>|}
         gen
@@ -213,14 +263,22 @@ let print_implexes conf base coefficient root shown href data st =
     (fun j ->
       Hashtbl.replace clusters (Sosa.to_string j.Implex.sosa) j.Implex.cluster)
     st.Implex.junctions;
-  Output.print_sstring conf
-    {|<h2 class="h4 mt-4" id="implexes">Implexes</h2>
+  Output.printf conf
+    {|<h2 class="h4 mt-4" id="implexes">%s</h2>
 <div class="table-responsive"><table class="table table-sm table-striped align-middle">
-<thead><tr><th class="text-end">Sosa</th><th>Implex</th>
-<th class="text-end">Other occurrences</th><th class="text-end">Paths</th>
-<th class="text-end">Expected contribution</th><th class="text-end">Inbreeding</th>
-<th class="text-end">Known ancestors</th><th class="text-end">Loops above</th>
-<th>Junctions</th><th class="text-end">Cluster</th><th>Graph</th></tr></thead>|};
+<thead><tr>%s%s%s%s%s%s%s%s%s%s%s</tr></thead>|}
+    (tr_nth conf "implex/implexes" 1)
+    (th ~cls:"text-end" conf "Sosa (column)")
+    (th conf "implex (column)")
+    (th ~cls:"text-end" conf "other occurrences (column)")
+    (th ~cls:"text-end" conf "paths (column)")
+    (th ~cls:"text-end" conf "contribution (column)")
+    (th ~cls:"text-end" conf "F (column)")
+    (th ~cls:"text-end" conf "ancestors above (column)")
+    (th ~cls:"text-end" conf "loops above (column)")
+    (th conf "closing junctions (column)")
+    (th ~cls:"text-end" conf "cluster (column)")
+    (th conf "graph (column)");
   let last =
     List.fold_left
       (fun prev x ->
@@ -232,8 +290,8 @@ let print_implexes conf base coefficient root shown href data st =
           if gen <> prev then (
             if prev >= 0 then Output.print_sstring conf "</tbody>";
             Output.printf conf
-              {|<tbody id="ig%d"><tr class="table-light"><th colspan="11">Generation %d</th></tr></tbody><tbody>|}
-              gen gen);
+              {|<tbody id="ig%d"><tr class="table-light"><th colspan="11">%s</th></tr></tbody><tbody>|}
+              gen (gen_title conf gen));
           let a = Driver.Iper.Table.find data (List.hd persons) in
           let known, loops = Lazy.force above in
           let each f = String.concat "<br>" (List.mapi f persons) in
@@ -283,13 +341,19 @@ let print_junctions conf base coefficient shown href data index st =
         href (generation s) ("x" ^ Sosa.to_string s)
     | None -> "#"
   in
-  Output.print_sstring conf
-    {|<h2 class="h4 mt-4" id="junctions">Junctions</h2>
+  Output.printf conf
+    {|<h2 class="h4 mt-4" id="junctions">%s</h2>
 <div class="table-responsive"><table class="table table-sm table-striped align-middle">
-<thead><tr><th class="text-end">Sosa</th><th>Person, common ancestors</th>
-<th class="text-end">Occurrences</th><th class="text-end">Degrees</th>
-<th class="text-end">Contribution</th><th class="text-end">Inbreeding</th>
-<th class="text-end">Nested</th><th>Graphs</th></tr></thead>|};
+<thead><tr>%s%s%s%s%s%s%s%s</tr></thead>|}
+    (tr_nth conf "junction/junctions" 1)
+    (th ~cls:"text-end" conf "Sosa (column)")
+    (th conf "junction person (column)")
+    (th ~cls:"text-end" conf "occurrences (column)")
+    (th ~cls:"text-end" conf "degrees (column)")
+    (th ~cls:"text-end" conf "Wright term (column)")
+    (th ~cls:"text-end" conf "F (column)")
+    (th ~cls:"text-end" conf "nested (column)")
+    (th conf "graph (column)");
   ignore
     (List.fold_left
        (fun prev j ->
@@ -309,13 +373,13 @@ let print_junctions conf base coefficient shown href data index st =
          else (
            if gen <> prev then
              Output.printf conf
-               {|<tbody id="jg%d"><tr><th colspan="8">Generation %d</th></tr></tbody>|}
-               gen gen;
+               {|<tbody id="jg%d"><tr><th colspan="8">%s</th></tr></tbody>|} gen
+               (gen_title conf gen);
            let f = inbreeding conf base coefficient jp in
            let couple = parents conf base jp in
            let remainder =
              match f with
-             | Some x when x +. 1e-6 < direct -> "outdated"
+             | Some x when x +. 1e-6 < direct -> Util.transl conf "outdated"
              | Some x when x -. direct > 1e-6 -> percent conf (x -. direct)
              | _ -> ""
            in
@@ -323,7 +387,9 @@ let print_junctions conf base coefficient shown href data index st =
              match nested with
              | [] -> ""
              | l ->
-                 "<br><small>nested through "
+                 "<br><small>"
+                 ^ Util.transl conf "nested through"
+                 ^ " "
                  ^ String.concat ", "
                      (List.map
                         (fun ip ->
@@ -334,14 +400,19 @@ let print_junctions conf base coefficient shown href data index st =
            in
            Output.printf conf
              {|<tbody id="j%s" class="border-top"><tr class="table-light">
-<td class="text-end">%s</td><td>%s</td><td colspan="2">%d loop(s)%s, cluster %d%s</td>
+<td class="text-end">%s</td><td>%s</td><td colspan="2">%d %s%s, %s %d%s</td>
 <td class="text-end">%s</td><td class="text-end">%s</td><td class="text-end">%s</td>
 <td>%s%s</td></tr>|}
              (Sosa.to_string js) (sosa conf js) (person conf base jp)
              (List.length links)
+             (Util.transl_nth conf "loop/loops"
+                (if List.length links = 1 then 0 else 1))
              (match enclosing with
-             | Some e -> ", within " ^ junction_link conf href e
+             | Some e ->
+                 ", " ^ Util.transl conf "within" ^ " "
+                 ^ junction_link conf href e
              | None -> "")
+             (Util.transl_nth conf "cluster/clusters" 0)
              cluster through (percent conf direct) (optional conf f) remainder
              (dag_link conf jp
                 (List.concat_map
@@ -405,12 +476,15 @@ let print_clusters conf root href st =
         (List.rev_append l
            (Option.value ~default:[] (Hashtbl.find_opt links cluster))))
     st.Implex.junctions;
-  Output.print_sstring conf
-    {|<h2 class="h4 mt-4" id="clusters">Clusters</h2>
+  Output.printf conf
+    {|<h2 class="h4 mt-4" id="clusters">%s</h2>
 <div class="table-responsive"><table class="table table-sm table-striped table-hover">
-<thead><tr><th class="text-end">#</th><th class="text-end">Loops</th>
-<th class="text-end">Common ancestors</th><th>Junctions</th><th>Graph</th></tr>
-</thead><tbody>|};
+<thead><tr><th class="text-end">#</th>%s%s%s%s</tr></thead><tbody>|}
+    (tr_nth conf "cluster/clusters" 1)
+    (th ~cls:"text-end" conf "cluster loops (column)")
+    (th ~cls:"text-end" conf "common ancestors (column)")
+    (th conf "cluster junctions (column)")
+    (th conf "graph (column)");
   List.iter
     (fun c ->
       let { Implex.id; members; common; size } = c in
@@ -436,12 +510,17 @@ let print_ancestors conf base root n index ancestors =
         compare b.Implex.multiplicity a.Implex.multiplicity)
     |> List.filteri (fun i _ -> i < n)
   in
-  Output.print_sstring conf
-    {|<h2 class="h4 mt-4" id="ancestors">Most repeated ancestors</h2>
+  Output.printf conf
+    {|<h2 class="h4 mt-4" id="ancestors">%s</h2>
 <div class="table-responsive"><table class="table table-sm table-striped table-hover">
-<thead><tr><th>Person</th><th class="text-end">First gen.</th>
-<th class="text-end">Branches</th><th class="text-end">Paths</th>
-<th class="text-end">Expected contribution</th><th>Graph</th></tr></thead><tbody>|};
+<thead><tr><th>%s</th>%s%s%s%s%s</tr></thead><tbody>|}
+    (tr conf "most repeated ancestors")
+    (tr_nth conf "person/persons" 0)
+    (th ~cls:"text-end" conf "first generation (column)")
+    (th ~cls:"text-end" conf "branches (column)")
+    (th ~cls:"text-end" conf "paths (column)")
+    (th ~cls:"text-end" conf "contribution (column)")
+    (th conf "graph (column)");
   List.iter
     (fun a ->
       let { Implex.ip; first_gen; multiplicity; weight } = a in
@@ -467,19 +546,24 @@ let print_range conf root page lo hi depth total =
   Util.hidden_input_s conf "t" "I";
   Util.hidden_input_s conf "i" (Driver.Iper.to_string root);
   Output.printf conf
-    {|<label for="implex_g">Generations</label>
+    {|<label for="implex_g">%s</label>
 <input type="number" id="implex_g" name="g" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
-<label for="implex_v">to</label>
+<label for="implex_v">%s</label>
 <input type="number" id="implex_v" name="v" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
 <button type="submit" class="btn btn-sm btn-outline-primary">OK</button>%s
-<a href="%s&v=%d"%s>all (%s rows)</a></form>|}
-    lo depth hi depth
+<a href="%s&v=%d"%s>%s</a></form>|}
+    (tr_nth conf "generation/generations" 1)
+    lo depth
+    (Util.transl conf "to (generation range)")
+    hi depth
     (if hi < depth then
-       Printf.sprintf {|<a href="%s">next generations</a>|} (page (hi + 1))
+       Printf.sprintf {|<a href="%s">%s</a>|}
+         (page (hi + 1))
+         (Util.transl conf "next generations")
      else "")
     (page 0) depth
     (if total > 2000 then {| class="text-danger"|} else "")
-    (num conf total)
+    (Util.cftransl conf "all (%s rows)" [ num conf total ])
 
 let print conf base p =
   let root = Driver.get_iper p in
@@ -534,10 +618,16 @@ let print conf base p =
         (fun ip -> Driver.Iper.Table.replace index ip x)
         x.Implex.persons)
     st.Implex.implexes;
-  let title _ =
+  let title h =
     Output.printf conf "%s – %s"
-      (Utf8.capitalize_fst (Util.transl_nth conf "implex/implexes" 1))
-      (Util.gen_person_text ~html:false conf base p :> string)
+      (tr conf "implexes and inbreeding")
+      (if h then (Util.gen_person_text ~html:false conf base p :> string)
+       else
+         (Util.referenced_person_text conf base p :> string)
+         ^ " "
+         ^ (Util.mod_ind_link conf base p
+              (Adef.safe (DateDisplay.short_dates_text_notag conf base p))
+             :> string))
   in
   Hutil.header conf title;
   print_summary conf base coefficient root href generations st;

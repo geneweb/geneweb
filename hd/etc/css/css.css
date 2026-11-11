@@ -692,6 +692,12 @@ td .rm-cell {
   color: rgb(255,255,255);
 }
 
+.implex-help {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
 .ancmenu-legend {
   padding: 3px .75rem;
   overflow: hidden;

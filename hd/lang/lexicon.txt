@@ -26089,3 +26089,338 @@ de: vergrößern/verkleinern
 en: zoom/unzoom
 es: acercar/alejar
 fr: zoomer/dézoomer
+
+    implexes and inbreeding
+de: Implexe und Inzucht
+en: implexes and inbreeding
+fr: implexes et consanguinité
+
+    distinct ancestors
+de: verschiedene Vorfahren
+en: distinct ancestors
+fr: ancêtres distincts
+
+    distinct ancestors helper
+de: Personen der Ahnenschaft, jede einmal gezählt; Datensätze mit dem Namen „? ?“ werden nicht berücksichtigt.
+en: persons of the ancestry, each counted once; records named “? ?” are ignored.
+fr: personnes de l’ascendance, chacune comptée une fois ; les fiches nommées « ? ? » sont ignorées.
+
+    known positions (paths)
+de: bekannte Positionen (Wege)
+en: known positions (paths)
+fr: positions connues (chemins)
+
+    known positions helper
+de: Von bekannten Personen besetzte Ahnennummern (Kekule): ein über mehrere Linien erreichter Vorfahre besetzt mehrere Nummern.
+en: Sosa numbers held by a known person: an ancestor reached through several lines holds several numbers.
+fr: numéros Sosa occupés par une personne connue : un ancêtre atteint par plusieurs lignées occupe plusieurs numéros.
+
+    repeated positions
+de: wiederholte Positionen
+en: repeated positions
+fr: positions répétées
+
+    repeated positions helper
+de: Bekannte Positionen abzüglich der verschiedenen Vorfahren: die Positionen jedes Vorfahren über die erste hinaus.
+en: known positions minus distinct ancestors: the positions of each ancestor beyond the first one.
+fr: positions connues moins ancêtres distincts : les positions de chaque ancêtre au-delà de la première.
+
+    implex ancestors
+de: Implexahnen
+en: implex ancestors
+fr: ancêtres implexes
+
+    implex ancestors helper
+de: Personen, die über mindestens zwei verschiedene Kinder erreicht werden; ihre eigenen Vorfahren, die mit ihnen wiederholt auftreten, werden nicht erneut gezählt.
+en: persons reached through at least two distinct children; their own ancestors, repeated with them, are not counted again.
+fr: personnes atteintes par au moins deux enfants distincts ; leurs propres ancêtres, répétés avec elles, ne sont pas comptés à nouveau.
+
+    loop/loops
+de: Schleife/Schleifen
+en: loop/loops
+fr: boucle/boucles
+
+    loops helper
+de: Anzahl der Fälle, in denen ein Durchlauf, der jeden Vorfahren nur einmal erweitert, auf einen bereits erreichten Vorfahren trifft: die unabhängigen Schleifen (zyklomatische Zahl) des Ahnengraphen; ein über k Kinder erreichter Vorfahre schließt k − 1 Schleifen.
+en: times a walk expanding each ancestor once meets an ancestor already met: the independent loops (cyclomatic number) of the ancestry graph; an ancestor reached through k children closes k − 1 loops.
+fr: nombre de fois où un parcours développant chaque ancêtre une seule fois rencontre un ancêtre déjà rencontré : les boucles indépendantes (nombre cyclomatique) du graphe d’ascendance ; un ancêtre atteint par k enfants ferme k − 1 boucles.
+
+    loop rate (loops per parent link)
+de: Schleifenrate (Schleifen je Elternverbindung)
+en: loop rate (loops per parent link)
+fr: taux de bouclage (boucles par lien parental)
+
+    loop rate helper
+de: Anteil der vom Durchlauf verfolgten Elternverbindungen, die eine Schleife schließen.
+en: share of the parent links followed by the walk that close a loop.
+fr: part des liens parentaux suivis par le parcours qui ferment une boucle.
+
+    complete generations
+de: vollständige Generationen
+en: complete generations
+fr: générations complètes
+
+    complete generations helper
+de: Generationen ab den Eltern, deren 2ⁿ Positionen alle bekannt sind.
+en: generations, from the parents on, whose 2ⁿ positions are all known.
+fr: générations, à partir des parents, dont les 2ⁿ positions sont toutes connues.
+
+    deepest generation
+de: entfernteste Generation
+en: deepest generation
+fr: génération la plus éloignée
+
+    deepest generation helper
+de: Letzte Generation mit einem bekannten Vorfahren.
+en: last generation with a known ancestor.
+fr: dernière génération comportant un ancêtre connu.
+
+    inbreeding coefficient
+de: Inzuchtkoeffizient
+en: inbreeding coefficient
+fr: coefficient de consanguinité
+
+    inbreeding coefficient helper
+de: Wahrscheinlichkeit, dass die beiden Allele an einem Genort abstammungsidentisch sind, also vom selben Vorfahren ererbt (Wright, Malécot); gleich dem Verwandtschaftskoeffizienten der Eltern.
+en: probability that the two alleles at a locus are identical by descent, inherited from the same ancestor (Wright, Malécot); equal to the kinship coefficient of the parents.
+fr: probabilité que les deux allèles d’un locus soient identiques par descendance, hérités d’un même ancêtre (Wright, Malécot) ; égale au coefficient de parenté des parents.
+
+    not computed (consang)
+de: nicht berechnet (consang)
+en: not computed (consang)
+fr: non calculé (consang)
+
+    direct part
+de: direkter Anteil
+en: direct part
+fr: part directe
+
+    direct part helper
+de: Anteil des Koeffizienten aus den Schleifen, die sich bei den Eltern dieser Person schließen; der Rest stammt aus Schleifen, die in wiederholte Ahnenschaften eingebettet sind.
+en: part of the coefficient given by the loops closing at the parents of this person; the remainder comes from loops nested in repeated ancestries.
+fr: part du coefficient due aux boucles qui se ferment sur les parents de cette personne ; le reste provient de boucles imbriquées dans des ascendances répétées.
+
+    junction/junctions
+de: Verbindungsstelle/Verbindungsstellen
+en: junction/junctions
+fr: jonction/jonctions
+
+    junctions helper
+de: Personen, deren Vater und Mutter miteinander verwandt sind: die Stellen, an denen sich Schleifen schließen.
+en: persons whose father and mother are related: the places where loops close.
+fr: personnes dont le père et la mère sont apparentés : les points où se ferment les boucles.
+
+    cluster/clusters
+de: Cluster/Cluster
+en: cluster/clusters
+fr: grappe/grappes
+
+    clusters helper
+de: Gruppen von Verbindungsstellen, die über gemeinsame wiederholte Vorfahren zusammenhängen.
+en: groups of junctions linked through shared repeated ancestors.
+fr: groupes de jonctions reliées par des ancêtres répétés communs.
+
+    generation (column)
+de: Gen./Generation
+en: gen./generation
+fr: gén./génération
+
+    period (column)
+de: Zeitraum/früheste und späteste Geburts- und Sterbejahre der Vorfahren der Generation
+en: period/earliest and latest years of birth and death of the ancestors of the generation
+fr: période/années extrêmes de naissance et de décès des ancêtres de la génération
+
+    theoretical (column)
+de: theor./theoretische Positionen: 2ⁿ Ahnennummern
+en: theor./theoretical positions: 2ⁿ Sosa numbers
+fr: théor./positions théoriques : 2ⁿ numéros Sosa
+
+    known (column)
+de: bekannt/von einer bekannten Person besetzte Positionen
+en: known/positions held by a known person
+fr: connues/positions occupées par une personne connue
+
+    completeness (column)
+de: Vollst./bekannte Positionen im Verhältnis zu den theoretischen Positionen
+en: completeness/known positions divided by theoretical positions
+fr: complétude/positions connues rapportées aux positions théoriques
+
+    distinct (column)
+de: verschieden/verschiedene Vorfahren der Generation
+en: distinct/distinct ancestors of the generation
+fr: distincts/ancêtres distincts de la génération
+
+    new (column)
+de: neu/erstmals in der Generation auftretende Vorfahren
+en: new/ancestors met for the first time at the generation
+fr: nouveaux/ancêtres rencontrés pour la première fois à la génération
+
+    earlier (column)
+de: früher/Vorfahren der Generation, die bereits in einer näheren Generation auftraten
+en: earlier/ancestors of the generation already met at a closer generation
+fr: antérieurs/ancêtres de la génération déjà rencontrés à une génération plus proche
+
+    repeated (column)
+de: wiederholt/zusätzliche Positionen der Generation, die von dort bereits vorhandenen Vorfahren besetzt werden
+en: repeated/additional positions held at the generation by ancestors already present in it
+fr: répétés/positions supplémentaires occupées à la génération par des ancêtres qui y figurent déjà
+
+    loops (column)
+de: Schleifen/in der Generation geschlossene Schleifen
+en: loops/loops closed at the generation
+fr: boucles/boucles fermées à la génération
+
+    repetition (column)
+de: Wiederh./Anteil der bekannten Positionen, die von bereits erreichten Vorfahren besetzt werden
+en: repetition/share of the known positions held by ancestors already met
+fr: répétition/part des positions connues occupées par des ancêtres déjà rencontrés
+
+    implexes (column)
+de: Implexe/erstmals in der Generation auftretende Implexahnen
+en: implexes/implex ancestors first met at the generation
+fr: implexes/ancêtres implexes rencontrés pour la première fois à la génération
+
+    junctions (column)
+de: Knoten/Verbindungsstellen der Generation
+en: junctions/junctions of the generation
+fr: jonctions/jonctions de la génération
+
+    Sosa (column)
+de: Kekule/Ahnennummer nach Kekule (Sosa-Nummer)
+en: Sosa/Sosa number
+fr: Sosa/numéro Sosa
+
+    implex (column)
+de: Implex/wiederholter Vorfahre oder durch dieselben Kinder wiederholtes Paar
+en: implex/repeated ancestor, or couple repeated through the same children
+fr: implexe/ancêtre répété, ou couple répété par les mêmes enfants
+
+    other occurrences (column)
+de: weitere/Ahnennummern der weiteren Vorkommen
+en: others/Sosa numbers of the other occurrences
+fr: autres/numéros Sosa des autres occurrences
+
+    paths (column)
+de: Wege/Wege von der Person zum Vorfahren
+en: paths/paths from the person to the ancestor
+fr: chemins/chemins de la personne à l’ancêtre
+
+    contribution (column)
+de: Beitrag/erwarteter genetischer Beitrag: Summe von 2⁻ⁿ über die Wege
+en: contribution/expected genetic contribution: sum of 2⁻ⁿ over the paths
+fr: contribution/contribution génétique attendue : somme des 2⁻ⁿ sur les chemins
+
+    F (column)
+de: F/Inzuchtkoeffizient
+en: F/inbreeding coefficient
+fr: F/coefficient de consanguinité
+
+    ancestors above (column)
+de: Vorfahren/bekannte Vorfahren des Implexes
+en: ancestors/known ancestors of the implex
+fr: ancêtres/ancêtres connus de l’implexe
+
+    loops above (column)
+de: Schleifen/Schleifen der Ahnenschaft des Implexes
+en: loops/loops of the ancestry of the implex
+fr: boucles/boucles de l’ascendance de l’implexe
+
+    closing junctions (column)
+de: Knoten/Verbindungsstellen, an denen seine Vorkommen Schleifen schließen
+en: junctions/junctions where its occurrences close loops
+fr: jonctions/jonctions où ses occurrences ferment des boucles
+
+    cluster (column)
+de: Cluster/Cluster seiner Verbindungsstellen
+en: cluster/cluster of its junctions
+fr: grappe/grappe de ses jonctions
+
+    graph (column)
+de: Graph/Verwandtschaftsgraphen
+en: graph/relationship graphs
+fr: graphe/graphes de parenté
+
+    junction person (column)
+de: Person, gemeinsame Vorfahren/Person der Verbindungsstelle, dann die gemeinsamen Vorfahren ihrer Eltern
+en: person, common ancestors/junction person, then the common ancestors of its parents
+fr: personne, ancêtres communs/personne de jonction, puis les ancêtres communs de ses parents
+
+    occurrences (column)
+de: Vorkommen/Ahnennummern der beiden Vorkommen des gemeinsamen Vorfahren
+en: occurrences/Sosa numbers of the two occurrences of the common ancestor
+fr: occurrences/numéros Sosa des deux occurrences de l’ancêtre commun
+
+    degrees (column)
+de: Grade/Generationen vom Vater und von der Mutter bis zum gemeinsamen Vorfahren, und ihre Summe n
+en: degrees/generations from the father and from the mother to the common ancestor, and their sum n
+fr: degrés/générations du père et de la mère jusqu’à l’ancêtre commun, et leur somme n
+
+    Wright term (column)
+de: Beitrag/Term der Formel von Wright: 2⁻⁽ⁿ⁺¹⁾ (1 + F_A), F_A Inzuchtkoeffizient des gemeinsamen Vorfahren
+en: contribution/term of Wright’s formula: 2⁻⁽ⁿ⁺¹⁾ (1 + F_A), F_A being the inbreeding coefficient of the common ancestor
+fr: contribution/terme de la formule de Wright : 2⁻⁽ⁿ⁺¹⁾ (1 + F_A), F_A étant le coefficient de consanguinité de l’ancêtre commun
+
+    nested (column)
+de: verschachtelt/Anteil von F aus Schleifen, die in wiederholte Ahnenschaften eingebettet sind
+en: nested/part of F from loops nested in repeated ancestries
+fr: imbriquée/part de F due aux boucles imbriquées dans des ascendances répétées
+
+    cluster loops (column)
+de: Schleifen/Schleifen des Clusters
+en: loops/loops of the cluster
+fr: boucles/boucles de la grappe
+
+    common ancestors (column)
+de: gemeinsame Vorfahren/von den Verbindungsstellen geteilte wiederholte Vorfahren
+en: common ancestors/repeated ancestors shared by the junctions
+fr: ancêtres communs/ancêtres répétés partagés par les jonctions
+
+    cluster junctions (column)
+de: Knoten/Verbindungsstellen des Clusters
+en: junctions/junctions of the cluster
+fr: jonctions/jonctions de la grappe
+
+    first generation (column)
+de: Gen./Generation des ersten Vorkommens
+en: gen./generation of the first occurrence
+fr: gén./génération de la première occurrence
+
+    branches (column)
+de: Zweige/verschiedene Kinder, über die der Vorfahre erreicht wird
+en: branches/distinct children through which the ancestor is reached
+fr: branches/enfants distincts par lesquels l’ancêtre est atteint
+
+    most repeated ancestors
+de: am häufigsten wiederholte Vorfahren
+en: most repeated ancestors
+fr: ancêtres les plus répétés
+
+    outdated
+de: veraltet
+en: outdated
+fr: périmé
+
+    nested through
+de: verschachtelt über
+en: nested through
+fr: imbriquée via
+
+    within
+de: innerhalb von
+en: within
+fr: incluse dans
+
+    to (generation range)
+de: bis
+en: to
+fr: à
+
+    next generations
+de: nächste Generationen
+en: next generations
+fr: générations suivantes
+
+    all (%s rows)
+de: alle (%s Zeilen)
+en: all (%s rows)
+fr: tout (%s lignes)
