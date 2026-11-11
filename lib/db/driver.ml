@@ -109,6 +109,9 @@ let replace_string base old_s new_s =
 
 let find_string base s = base.func.Dbdisk.find_string @@ Mutil.normalize_utf_8 s
 let commit_patches base = base.func.Dbdisk.commit_patches ()
+let consang_index base ip = ConsangIndex.get base.data.consang ip
+let update_consang_index base k = ConsangIndex.update base.data.consang k
+let cache_consang_index base k = ConsangIndex.cache base.data.consang k
 let commit_notes base s = base.func.Dbdisk.commit_notes s
 let commit_wiznotes base s = base.func.Dbdisk.commit_wiznotes s
 let person_of_key base = base.func.Dbdisk.person_of_key

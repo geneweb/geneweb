@@ -1084,6 +1084,10 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
   let patches_stamp =
     if with_patches then BaseIndex.stamp (bname // "patches") else None
   in
+  let consang =
+    ConsangIndex.make bname ~unchanged:(fun () ->
+        BaseIndex.stamp (bname // "patches") = patches_stamp)
+  in
   let patches =
     if with_patches then input_patches ~witness_notes bname
     else Ok (empty_patch_ht ())
@@ -1519,6 +1523,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       bnotes;
       bdir = bname;
       perm;
+      consang;
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
@@ -1536,8 +1541,67 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       patches_stamp;
     }
   @@ fun dict_index reset_dict_index ->
+  let ancestry_changes () =
+    let before get len (_, committed) i =
+      if i < len || Hashtbl.mem committed i then Some (get i) else None
+    in
+    let unknown (p : dsk_person) = p.first_name = 1 && p.surname = 1 in
+    let roots =
+      Hashtbl.fold
+        (fun i (a : dsk_ascend) acc ->
+          match before ascends.get_nopending persons_len patches.h_ascend i with
+          | Some old when old.parents = a.parents -> acc
+          | None when a.parents = None -> acc
+          | Some _ | None -> i :: acc)
+        (snd pending.h_ascend) []
+    in
+    let roots =
+      Hashtbl.fold
+        (fun i p acc ->
+          match before persons.get_nopending persons_len patches.h_person i with
+          | Some old when unknown old <> unknown p -> i :: acc
+          | Some _ | None -> acc)
+        (snd pending.h_person) roots
+    in
+    Hashtbl.fold
+      (fun i (c : dsk_couple) acc ->
+        match before couples.get_nopending families_len patches.h_couple i with
+        | Some old when old <> c ->
+            Array.fold_left
+              (fun acc ip -> ip :: acc)
+              acc (descends.get i).children
+        | Some _ | None -> acc)
+      (snd pending.h_couple) roots
+  in
+  let outdate set roots =
+    let seen = Bytes.make persons.len '\000' in
+    let rec loop todo =
+      match todo with
+      | [] -> ()
+      | i :: todo when i < 0 || i >= persons.len || Bytes.get seen i <> '\000'
+        ->
+          loop todo
+      | i :: todo ->
+          Bytes.set seen i '\001';
+          set i ConsangIndex.outdated;
+          loop
+            (Array.fold_left
+               (fun todo ifam ->
+                 Array.fold_left
+                   (fun todo ip -> ip :: todo)
+                   todo (descends.get ifam).children)
+               todo
+               (if i < unions.len then (unions.get i).family else [||]))
+    in
+    loop roots
+  in
   let commit_patches () =
-    commit_patches ();
+    (match ancestry_changes () with
+    | [] -> commit_patches ()
+    | roots ->
+        ConsangIndex.update consang (fun _ set ->
+            commit_patches ();
+            outdate set roots));
     reset_dict_index ()
   in
   let base_func =
@@ -1579,7 +1643,9 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       ifam_exists;
     }
   in
-  k { data = base_data; func = base_func; version }
+  Fun.protect
+    ~finally:(fun () -> ConsangIndex.close consang)
+    (fun () -> k { data = base_data; func = base_func; version })
 
 let record_access_of tab =
   {
@@ -1600,6 +1666,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
   Filesystem.create_file (bdir // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
+  let consang = ConsangIndex.make bdir ~unchanged:(fun () -> false) in
+  ConsangIndex.remove consang;
   let data : Dbdisk.base_data =
     {
       persons = record_access_of persons;
@@ -1614,6 +1682,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       bnotes;
       bdir;
       perm = RDRW;
+      consang;
     }
   in
   (* since this function is called exclusively to create a database, it doesn't

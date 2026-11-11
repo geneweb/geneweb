@@ -47,6 +47,7 @@ type base_data = {
   bnotes : Def.base_notes;
   bdir : string;
   perm : perm;
+  consang : ConsangIndex.t;
 }
 
 type base_func = {

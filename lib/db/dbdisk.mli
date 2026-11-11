@@ -104,6 +104,8 @@ type base_data = {
   (* Directory where database's files are stored *)
   bdir : string;
   perm : perm;
+  (* Index of the consanguinities *)
+  consang : ConsangIndex.t;
 }
 (** Data part of database *)
 
