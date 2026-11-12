@@ -314,7 +314,8 @@ const updateData = {
     const inputTags = new Set(['input', 'textarea']);
     document.addEventListener('keydown', (event) => {
       const action = keyActions.get(event.key);
-      if (action && (event.altKey || !inputTags.has(event.target.tagName.toLowerCase()))) {
+      if (action && !event.ctrlKey && !event.metaKey
+        && (event.altKey || !inputTags.has(event.target.tagName.toLowerCase()))) {
         event.preventDefault();
         action();
       }
