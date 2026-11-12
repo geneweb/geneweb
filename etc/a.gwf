@@ -465,8 +465,12 @@
 #perso_module_x=file_2
 #perso_module_z=file_3
 
-# Limits the results of all books (m=MOD_DATA) accessible by wizard
-#book_max_results=1000
+# Number of entries from which a book (m=MOD_DATA) shows an index of the
+# next characters instead of the list of its entries, the index being cut
+# into pages of fewer entries; also the longest list of the spellings to
+# group (m=PLACE_TERMS). 500 by default: a larger value lists more entries
+# at once, slower to display on a large book.
+#book_max_results=500
 
 # A change in a book (m=MOD_DATA) of an entry used by more records (persons
 # and families) than this number asks for a confirmation before it is done.

@@ -6,12 +6,6 @@ let esc s = (Util.escape_html s :> string)
 let enc s = (Mutil.encode s :> string)
 let prefix conf = (commd conf :> string)
 
-let nb_max conf =
-  match List.assoc_opt "book_max_results" conf.base_env with
-  | Some n -> (
-      match int_of_string_opt n with Some n when n > 0 -> n | _ -> 1000)
-  | None -> 1000
-
 (* [s] escaped, its invisible characters and the spaces at both ends marked as
    in m=CHK_DATA, so that "Canada", " Canada" and "Canada " can be told apart *)
 let vis conf s =
@@ -134,7 +128,7 @@ let print_list conf entries s =
   in
   print_initials conf s inis;
   if key <> "" then
-    if List.length selected <= nb_max conf then
+    if List.length selected <= UpdateData.book_max_results conf then
       print_table conf (variants_of entries) selected
     else
       Output.printf conf "<p>%s</p>\n"

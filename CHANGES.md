@@ -34,8 +34,9 @@
   read the index of the dictionaries: counting, grouping and listing the
   entries starting with the typed letters, and finding the persons of an
   entry to rename it, no longer read every person and family of the
-  base. A book of `book_max_results` entries or more (1000 by default)
-  is no longer listed in full, only its groups.
+  base. A book of `book_max_results` entries or more (500 by default)
+  shows an index of its next characters, cut into pages of fewer
+  entries, each listed by one click.
 - templm no longer has its own books (`m=MOD_DATA`) and uses those of
   the default templates. The completion of its person and family forms
   from the books (`datalist_fn`, `datalist_sn`, `datalist_occu`,
