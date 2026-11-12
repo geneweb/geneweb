@@ -1,3 +1,4 @@
+
 .PHONY: info refresh-version fmt build build-geneweb build-geneweb-rpc gwd \
         install uninstall distrib distrib-rpc doc opendoc test bench \
         bench-marshal bench-tabulate clean ci ocp-indent help bundle \
@@ -124,27 +125,13 @@ endif
 	rm $(DISTRIB_DIR)/gw/dune
 	rm $(DISTRIB_DIR)/gw/etc/js/dune
 	rm $(DISTRIB_DIR)/gw/etc/js/dune.inc
-	for f in $(DISTRIB_DIR)/gw/etc/js/*.js ; do \
-	  [ -e "$$f" ] || continue ; \
-	  case "$$f" in *.min.js) continue ;; esac ; \
-	  if [ -f "$${f%.js}.min.js" ]; then rm -f "$$f" ; fi ; \
-	done
-	@printf "\n\033[1;1m└ Compressing large JS/CSS assets\033[0m\n"
-	@for f in $(DISTRIB_DIR)/gw/etc/js/*.min.js; do \
-	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 4500 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
-	  fi; \
-	done
-	@for f in $(DISTRIB_DIR)/gw/etc/css/*.css; do \
-	  if [ -f "$$f" ] && [ $$(stat -c%s "$$f" 2>/dev/null || stat -f%z "$$f") -gt 10000 ]; then \
-	    printf "gzip -9 -k %s\n" "$$f"; \
-	    gzip -9 -k -f "$$f"; \
-	    printf "brotli %s\n" "$$f"; \
-	    brotli -f -q 11 "$$f"; \
-	  fi; \
+	@printf "\n\033[1;1m└ Compressing JS/CSS assets\033[0m\n"
+	@for f in $(DISTRIB_DIR)/gw/etc/js/*.js $(DISTRIB_DIR)/gw/etc/css/*.css; do \
+	  [ -f "$$f" ] || continue; \
+	  printf "gzip -9 -k %s\n" "$$f"; \
+	  gzip -9 -k -f "$$f"; \
+	  printf "brotli %s\n" "$$f"; \
+	  brotli -f -q 11 "$$f"; \
 	done
 	mkdir $(DISTRIB_DIR)/gw/setup
 	@printf "\n\033[1;1m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"

@@ -335,7 +335,7 @@ li.in { background-color: #FFE8CC; }
   <script src="%etc_prefix;js/datatables.min.js?version=dt-3.0.0+rr-2.0.0-beta.1"></script>
   <script src="%etc_prefix;js/html5sortable.min.js?version=0.14.0"></script>
 %end;
-<script src="%etc_prefix;js/maphilight.min.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.min.js%end;"></script>
+<script src="%etc_prefix;js/maphilight.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.js%end;"></script>
 <script>
 window.GW = {
   prefix: "%prefix;",
@@ -369,7 +369,7 @@ window.GW = {
   }
 };
 </script>
-<script src="%etc_prefix;js/notes_upd_gallery.min.js?hash=%apply;hash%with;%etc_prefix;js/notes_upd_gallery.min.js%end;"></script>
-<script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
+<script src="%etc_prefix;js/notes_upd_gallery.js?hash=%apply;hash%with;%etc_prefix;js/notes_upd_gallery.js%end;"></script>
+<script src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"></script>
 </body>
 </html>

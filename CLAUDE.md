@@ -182,8 +182,9 @@ Bootstrap 5.3.8 (no jQuery), Tom Select, DataTables, Chart.js 4.5.1
 (UMD, not ESM), Font Awesome. CSS/JS assets in `hd/etc/css/` and
 `hd/etc/js/` use template wrappers (`css.txt`, `js.txt`) for
 conditional includes; page JS belongs there, not inline in
-`perso.txt`. Regenerate `.min.js` after editing a `.js` file:
-`terser f.js -c passes=2 -m --toplevel -o f.min.js` (no `--unsafe`).
+`perso.txt`. GeneWeb's own scripts are served as sources, never
+minified: gwd sends their precompressed `.br`/`.gz` variants. Only
+third-party libraries are shipped as `.min.js`.
 Prefer template + CSS over JS that computes or toggles classes.
 
 ### Best Practices

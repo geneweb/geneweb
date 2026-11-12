@@ -55,7 +55,7 @@
 %include;copyr
 %include;js
 %query_time;
-<script src="%etc_prefix;js/maphilight.min.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.min.js%end;"></script>
+<script src="%etc_prefix;js/maphilight.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.js%end;"></script>
 <script>
 'use strict';
 

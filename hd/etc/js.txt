@@ -68,7 +68,7 @@
       results: "[result/results]1"
     };
     </script>
-    <script src="%etc_prefix;js/autocomplete.min.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.min.js%end;"
+    <script src="%etc_prefix;js/autocomplete.js?hash=%apply;hash%with;%etc_prefix;js/autocomplete.js%end;"
       %if;(b.rpc_datalist=1)data-rpc="%if;("/" in rpc_addr)%rpc_addr;%elseif;(":" in rpc_addr)%rpc_addr;/search%else;%rpc_addr;:8080/search%end;"
       data-base="%base.name;" data-debug="%if;(b.rpc_debug="yes")1%end;"%end;></script>
   %end;
@@ -76,13 +76,13 @@
     <script src="%etc_prefix;js/line.js?hash=%apply;hash%with;%etc_prefix;js/line.js%end;"></script>
   %end;
   %if;(e.m="CHK_DATA")
-    <script src="%etc_prefix;js/checkdata.min.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.min.js%end;"></script>
+    <script src="%etc_prefix;js/checkdata.js?hash=%apply;hash%with;%etc_prefix;js/checkdata.js%end;"></script>
   %end;
   %if;(e.m="ANOMA" or e.m="OK_FILE")
-    <script src="%etc_prefix;js/anomalies.min.js?hash=%apply;hash%with;%etc_prefix;js/anomalies.min.js%end;"></script>
+    <script src="%etc_prefix;js/anomalies.js?hash=%apply;hash%with;%etc_prefix;js/anomalies.js%end;"></script>
   %end;
   %if;(e.m="RM")
-    <script src="%etc_prefix;js/relationmatrix.min.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.min.js%end;"></script>
+    <script src="%etc_prefix;js/relationmatrix.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.js%end;"></script>
   %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
   %if;(upd_form=1 or e.m="MOD_GALLERY" or e.m="UNKNOWN" or e.m="MOD_DATA")
@@ -96,10 +96,10 @@
 <script>
 window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
 </script>
-<script src="%etc_prefix;js/person_picker.min.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.min.js%end;"></script>
+<script src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"></script>
 %end;
 %if;(e.m="C" and e.t="")
-<script src="%etc_prefix;js/cousins.min.js?hash=%apply;hash%with;%etc_prefix;js/cousins.min.js%end;"></script>
+<script src="%etc_prefix;js/cousins.js?hash=%apply;hash%with;%etc_prefix;js/cousins.js%end;"></script>
 %end;
 %if;(e.m="CHK_DATA")
 <script>
@@ -666,7 +666,7 @@ const UPD = {
     if (loaded) { if (window.InplaceEdit) InplaceEdit.toggle(); return; }
     loaded = true;
     const s = document.createElement('script');
-    s.src = "%etc_prefix;js/updateField.min.js?hash=%apply;hash%with;%etc_prefix;js/updateField.min.js%end;";
+    s.src = "%etc_prefix;js/updateField.js?hash=%apply;hash%with;%etc_prefix;js/updateField.js%end;";
     s.onload = () => { InplaceEdit.init(); InplaceEdit.toggle(); };
     document.head.appendChild(s);
   });
@@ -741,11 +741,11 @@ function initializeLazyModules() {
     }
     btns.forEach(btn => btn.addEventListener('click', handler));
   }
-  loadScriptOnce('#load_once_p_mod', '%etc_prefix;js/p_mod.min.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.min.js%end;');
+  loadScriptOnce('#load_once_p_mod', '%etc_prefix;js/p_mod.js?hash=%apply;hash%with;%etc_prefix;js/p_mod.js%end;');
   loadScriptOnce('#load_once_rlm_builder', '%etc_prefix;js/rlm_builder.js?hash=%apply;hash%with;%etc_prefix;js/rlm_builder.js%end;');
   loadScriptOnce('.load-update-order',
     '%etc_prefix;js/html5sortable.min.js?version=0.14.0',
-    '%etc_prefix;js/updateOrder.min.js?hash=%apply;hash%with;%etc_prefix;js/updateOrder.min.js%end;');
+    '%etc_prefix;js/updateOrder.js?hash=%apply;hash%with;%etc_prefix;js/updateOrder.js%end;');
 }
 document.addEventListener('DOMContentLoaded', initializeLazyModules);
 </script>
@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded', setupAutofocusInput);
 %end;
 
 %if;(e.m="MOD_DATA")
-<script src="%etc_prefix;js/updateField.min.js?hash=%apply;hash%with;%etc_prefix;js/updateField.min.js%end;"></script>
+<script src="%etc_prefix;js/updateField.js?hash=%apply;hash%with;%etc_prefix;js/updateField.js%end;"></script>
 <script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
 %end;
 %if;(e.m="RM")

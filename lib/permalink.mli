@@ -23,7 +23,7 @@ val query_aux : config -> Adef.encoded_string
 val script : config -> Adef.encoded_string -> Adef.safe_string
 (** [script conf q] emits the common permalink head block: the inline
     [<script>window.GWPERMA={"q":...,"r"?:1|2,"t":{...}};</script>] data island
-    plus a deferred, content-hashed [<script>] loading [copylink.min.js]. [r] is
+    plus a deferred, content-hashed [<script>] loading [permalink.js]. [r] is
     the server-known role (1 friend, 2 wizard, omitted if anonymous); [t] holds
     the role-restricted localized labels (the external script cannot reach the
     lexicon). The bare base name and cgi flag are not embedded: the client
