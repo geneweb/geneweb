@@ -256,6 +256,7 @@
         this.helpPopover();
         this.searchFocus();
         this.alignBar();
+        this.balanceIndex();
         BookEdit.init();
       } catch (e) {
         console.error('updateData init failed:', e);
@@ -349,6 +350,19 @@
       const bar = document.getElementById('book-bar');
       if (!list || !bar) return;
       const fit = () => { bar.style.maxWidth = `max(40rem, ${list.offsetWidth}px)`; };
+      fit();
+      addEventListener('resize', fit);
+    },
+
+    balanceIndex() {
+      const box = document.getElementById('book-index');
+      const n = box?.children.length;
+      if (!n) return;
+      const fit = () => {
+        box.style.removeProperty('--cols');
+        const max = getComputedStyle(box).gridTemplateColumns.split(' ').length;
+        box.style.setProperty('--cols', Math.ceil(n / Math.ceil(n / max)));
+      };
       fit();
       addEventListener('resize', fit);
     },
