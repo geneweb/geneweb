@@ -661,7 +661,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
               :> string)
             (Util.transl conf "see" |> Utf8.capitalize_fst)
             (if n > 1 && not propose_dag then
-               Util.transl conf " the first branch"
+               " " ^ Util.transl conf "the first branch"
              else "")
         in
         Output.print_sstring conf str)
