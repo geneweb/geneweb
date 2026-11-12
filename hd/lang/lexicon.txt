@@ -154,6 +154,17 @@ nl: %s %s waarvan de laatste term begint met “%s”
 pt: %s %s cujo último termo começa por «%s»
 sv: %s %s vars sista led börjar med ”%s”
 
+    %s %s from %s to %s
+de: %s %s von „%s” bis „%s”
+en: %s %s from “%s” to “%s”
+es: %s %s de «%s» a «%s»
+fr: %s %s de « %s » à « %s »
+it: %s %s da «%s» a «%s»
+nl: %s %s van “%s” tot “%s”
+pl: %s %s od „%s” do „%s”
+pt: %s %s de «%s» a «%s»
+sv: %s %s från ”%s” till ”%s”
+
     %s %s starting with %s
 af: %s %s begin met “%s”
 bg: %s %s започващо с „%s”

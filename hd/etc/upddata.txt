@@ -116,9 +116,18 @@
               %end;
               %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
             %end;
+            %if;(range_from!="")
+              <li class="breadcrumb-item">
+                <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap%if;(e.s!="") font-monospace%end;"
+                  href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.current_s;%rv;">%nn;
+                  %if;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%else;%visual_spaces.escape.current_s;%end;</a>
+              </li>
+            %end;
             <li class="breadcrumb-item" aria-current="page">
-              <span class="btn btn-sm btn-primary fs-6 text-nowrap pe-none%if;(e.s!="") font-monospace%end;">%nn;
-                %if;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%else;%visual_spaces.escape.current_s;%end;</span>
+              <span class="btn btn-sm btn-primary fs-6 text-nowrap pe-none%if;(e.s!="" or range_from!="") font-monospace%end;">%nn;
+                %if;(range_from!="")%visual_spaces.escape.range_from; – %visual_spaces.escape.range_to;%nn;
+                %elseif;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%nn;
+                %else;%visual_spaces.escape.current_s;%end;</span>
             </li>
           </ol>
           %if;(nb_results<nb_max)
@@ -188,7 +197,7 @@
                 <div class="flex-grow-1">
                   <a role="button" class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
                      %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
-                     href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;"
+                     href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;%if;(range_from!="")&from=%encode.range_from;&to=%encode.range_to;%end;"
                      data-entry="%escape.printable.entry_value;" data-n="%entry_records;"%nn;
                      %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
                      %if;(e.data="src")</a>%end;
@@ -254,13 +263,13 @@
       %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</p>
     <div id="book-index">
       %foreach;entry;
-        %if;(entry_ini!=e.s)
-          <a%if;script; class="%script_class;"%end; href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.entry_ini;%rv;"
+        %if;page_first;<div class="book-set">%end;
+          <a%if;script; class="%script_class;"%end; href="%prefix;m=MOD_DATA&data=%e.data;%rv;%entry_page;"
             title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">
             <span class="fs-3 lh-1 font-monospace">%visual_spaces.escape.entry_ini_display;</span>
             <span class="text-nowrap %if;(entry_count>=nb_max)fw-bold text-warning-emphasis%else;text-body-secondary%end;">%entry_nb;</span>
           </a>
-        %end;
+        %if;page_last;</div>%end;
       %end;
     </div>
   %end;

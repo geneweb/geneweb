@@ -332,6 +332,10 @@ and eval_simple_bool_var _conf _base env _xx = function
   | "new_head" -> (
       match get_env "new_head" env with Vbool x -> x | _ -> false)
   | "script" -> ( match get_env "script" env with Vbool x -> x | _ -> false)
+  | "page_first" -> (
+      match get_env "page_first" env with Vbool x -> x | _ -> false)
+  | "page_last" -> (
+      match get_env "page_last" env with Vbool x -> x | _ -> false)
   | "entry_blank" -> Name.lower (eval_string_env "entry_value" env) = ""
   | _ -> raise Not_found
 
@@ -348,6 +352,9 @@ and eval_simple_str_var conf base env _xx = function
             (b.count + (3 * List.length b.groups))
       | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
+  | "entry_page" -> eval_string_env "entry_page" env
+  | "range_from" -> Option.fold ~none:"" ~some:fst (book_range conf)
+  | "range_to" -> Option.fold ~none:"" ~some:snd (book_range conf)
   | "entry_count" -> eval_int_env "entry_count" env
   | "entry_records" -> eval_int_env "entry_records" env
   | "entry_label" -> (
@@ -401,21 +408,23 @@ and eval_simple_str_var conf base env _xx = function
       in
       let len2 = thousands conf len in
       let _, book_name = translate_title conf len in
-      match p_getenv_notrim conf.env "s" with
-      | Some ini ->
-          if ini = "" then Printf.sprintf "%s %s" len2 book_name
-          else
-            let fmt_str =
-              if rev_order conf base then
-                ftransl conf "%s %s whose last term starts with %s"
-              else ftransl conf "%s %s starting with %s"
-            in
-            let escaped_ini =
-              Printf.sprintf "<span>%s</span>"
-                (visual_spaces_html (Util.escape_html ini :> string))
-            in
-            Printf.sprintf fmt_str len2 book_name escaped_ini
-      | None -> Printf.sprintf "%s %s" len2 book_name)
+      let span s =
+        Printf.sprintf "<span>%s</span>"
+          (visual_spaces_html (Util.escape_html s :> string))
+      in
+      match (book_range conf, p_getenv_notrim conf.env "s") with
+      | Some (a, b), _ ->
+          Printf.sprintf
+            (ftransl conf "%s %s from %s to %s")
+            len2 book_name (span a) (span b)
+      | None, Some ini when ini <> "" ->
+          let fmt_str =
+            if rev_order conf base then
+              ftransl conf "%s %s whose last term starts with %s"
+            else ftransl conf "%s %s starting with %s"
+          in
+          Printf.sprintf fmt_str len2 book_name (span ini)
+      | None, (Some _ | None) -> Printf.sprintf "%s %s" len2 book_name)
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =
@@ -470,12 +479,39 @@ let print_foreach conf base print_ast _eval_expr =
     | [ "value" ] -> print_foreach_value env xx al
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
-    let list =
-      match get_env "list" env with Vlist_data b -> b.groups | _ -> []
+    let list, index =
+      match get_env "list" env with
+      | Vlist_data b -> (b.groups, b.count >= book_max_results conf)
+      | _ -> ([], false)
     in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
     let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+    (* in an index, the page of each group: its first and last groups *)
+    let page_of = Hashtbl.create 16 in
+    if index then
+      List.iter
+        (fun page ->
+          match (page, List.rev page) with
+          | (a, _, _) :: _, (b, _, _) :: _ ->
+              List.iter (fun (g, _, _) -> Hashtbl.replace page_of g (a, b)) page
+          | _ -> ())
+        (book_pages conf list);
+    let entry_page ini =
+      match Hashtbl.find_opt page_of ini with
+      | Some (a, b) when a <> b || a = current_s ->
+          Printf.sprintf "&s=%s&from=%s&to=%s%s"
+            (Mutil.encode current_s :> string)
+            (Mutil.encode a :> string)
+            (Mutil.encode b :> string)
+            (if a <> b then "#_" ^ (Util.escape_html ini :> string) else "")
+      | Some _ | None -> "&s=" ^ (Mutil.encode ini :> string)
+    in
+    let page_bound f ini =
+      Option.fold ~none:true
+        ~some:(fun page -> f page = ini)
+        (Hashtbl.find_opt page_of ini)
+    in
 
     List.iteri
       (fun i (ini_k, n, list_v) ->
@@ -526,6 +562,9 @@ let print_foreach conf base print_ast _eval_expr =
             |> add "script_title"
                  (Vstring (Option.fold ~none:"" ~some:snd script_info))
             |> add "entry_count" (Vint n)
+            |> add "entry_page" (Vstring (entry_page ini_k))
+            |> add "page_first" (Vbool (page_bound fst ini_k))
+            |> add "page_last" (Vbool (page_bound snd ini_k))
             |> add "list_value" (Vlist_value list_v))
         in
         List.iter (print_ast env xx) al)
