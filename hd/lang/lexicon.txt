@@ -4439,6 +4439,17 @@ pl: Enter/Esc
 pt: Enter/Esc
 sv: Enter/Esc
 
+    book bulk change %d
+de: Diese Änderung betrifft %d Datensätze der Datenbank: zum Bestätigen erneut bestätigen.
+en: This change modifies %d records of the database: validate again to confirm.
+es: Esta modificación afecta a %d fichas de la base: valide de nuevo para confirmar.
+fr: Cette modification touche %d fiches de la base : validez à nouveau pour la confirmer.
+it: Questa modifica riguarda %d schede della base: convalidare di nuovo per confermare.
+nl: Deze wijziging raakt %d fiches van de database: bevestig opnieuw om door te gaan.
+pl: Ta zmiana dotyczy %d rekordów bazy: zatwierdź ponownie, aby potwierdzić.
+pt: Esta alteração afeta %d fichas da base: valide de novo para confirmar.
+sv: Denna ändring påverkar %d poster i databasen: bekräfta igen för att fortsätta.
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon

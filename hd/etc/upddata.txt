@@ -189,7 +189,7 @@
                   <a role="button" class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
                      %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
                      href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;"
-                     data-entry="%escape.printable.entry_value;"%nn;
+                     data-entry="%escape.printable.entry_value;" data-n="%entry_records;"%nn;
                      %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
                      %if;(e.data="src")</a>%end;
                      %if;(e.data="place" and suburb!="")
@@ -220,9 +220,11 @@
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
       <div class="book-row">
-        <a class="btn btn-outline-primary" id="book-persons" target="_blank" rel="noopener"
-          href="%prefix;m=L&data=%e.data;&parents=on"
-          title="[*list of linked persons]" aria-label="[*list of linked persons]"><i class="fa fa-list"></i></a>
+        <a class="btn btn-outline-primary d-inline-flex align-items-center gap-1" id="book-persons"
+          target="_blank" rel="noopener" href="%prefix;m=L&data=%e.data;&parents=on"
+          title="[*list of linked persons]"><i class="fa fa-list"></i>%nn;
+          <span class="badge text-bg-secondary" id="book-count"></span>%nn;
+          <span class="visually-hidden">[*list of linked persons]</span></a>
         %if;(e.data="src" or e.data="occu" or e.data="place")
           <textarea class="form-control" id="nx_input" name="nx_input" rows="1"
             maxlength="1000" aria-label="[*modify]" required></textarea>
@@ -243,6 +245,7 @@
           %end;
           <div class="text-small"><i class="fa fa-hat-wizard fa-xs text-danger me-1"></i>[*help modify data]</div>
         </div>
+        <div class="book-warn alert alert-warning py-1 px-2 mt-1 mb-0" role="alert" hidden></div>
       </div>
     </form>
   %else;

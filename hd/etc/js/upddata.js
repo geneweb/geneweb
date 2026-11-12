@@ -10,7 +10,9 @@
       this.text = form.querySelector('.book-input-text');
       this.persons = document.getElementById('book-persons');
       this.personsHref = this.persons.href;
+      this.count = document.getElementById('book-count');
       this.extra = form.querySelector('.book-extra');
+      this.warn = form.querySelector('.book-warn');
       this.field.addEventListener('input', () => {
         this.changed();
         this.fit();
@@ -94,6 +96,7 @@
     },
     changed() {
       this.extra.hidden = this.field.value.trim() === this.original;
+      this.warn.hidden = true;
     },
     open(a, value, pos) {
       this.a?.closest('li').classList.remove('book-current');
@@ -103,6 +106,7 @@
       this.original = a.dataset.v ?? a.dataset.entry;
       this.form.elements.key.value = li.id.slice(1);
       this.persons.href = `${this.personsHref}&key=${li.id.slice(1)}`;
+      this.count.textContent = a.dataset.n;
       this.text.textContent = this.original;
       this.field.value = value || this.original;
       this.changed();
@@ -171,6 +175,7 @@
       const body = new URLSearchParams(new FormData(form));
       body.set('nx_input', value);
       body.set('ajax', '1');
+      if (!this.warn.hidden) body.set('confirm', 'on');
       fetch(form.action, {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
@@ -178,6 +183,15 @@
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
         .then(data => {
           delete form.dataset.busy;
+          if (data.confirm) {
+            if (this.a !== a) {
+              notify('danger', data.message);
+              return;
+            }
+            this.warn.textContent = data.message;
+            this.warn.hidden = false;
+            return;
+          }
           if (!data.success) {
             notify('danger', data.message || form.dataset.error);
             return;
@@ -201,6 +215,7 @@
       const li = a.closest('li');
       const other = document.getElementById('k' + data.key);
       if (data.entry === null || (other && other !== li)) {
+        if (other) other.querySelector('a[data-entry]').dataset.n = data.records;
         const ul = li.parentElement;
         li.remove();
         if (!ul.querySelector('a[data-entry]')) {
@@ -217,6 +232,7 @@
       u.searchParams.set('key', data.key);
       a.href = u;
       a.dataset.entry = data.entry;
+      a.dataset.n = data.records;
       if (data.after === data.entry) delete a.dataset.v;
       else a.dataset.v = data.after;
       (a.nextElementSibling ?? a).textContent = data.entry;
