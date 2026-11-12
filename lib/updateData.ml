@@ -491,10 +491,32 @@ let book_bulk_confirm conf =
   | Some n when n > 0 -> n
   | Some _ | None -> 150
 
+(* [from] and [to]: a page of the index of the prefix [s], the groups from
+   [from] to [to] listed together *)
+let book_range conf =
+  match (p_getenv_notrim conf.env "from", p_getenv_notrim conf.env "to") with
+  | Some a, Some b -> Some (a, b)
+  | _ -> None
+
+(* The groups of an index cut into the pages listed by one click: consecutive
+   groups of less than [book_max_results] entries in all. A group of more
+   entries is a page of its own, which opens its own index. *)
+let book_pages conf groups =
+  let max = book_max_results conf in
+  let close cur acc = if cur = [] then acc else List.rev cur :: acc in
+  let rec loop acc cur sum = function
+    | [] -> List.rev (close cur acc)
+    | ((_, n, _) as g) :: l ->
+        if n >= max then loop ([ g ] :: close cur acc) [] 0 l
+        else if sum + n >= max then loop (close cur acc) [ g ] n l
+        else loop acc (g :: cur) (sum + n) l
+  in
+  loop [] [] 0 groups
+
 let book conf base =
   match dict conf with
   | None -> { count = 0; groups = []; records = Hashtbl.create 1 }
-  | Some d ->
+  | Some d -> (
       let d =
         if d = Dict.Place && rev_order conf base then Dict.Place_last else d
       in
@@ -516,8 +538,15 @@ let book conf base =
             | Occupation | Place | Source | Title | Domain | Place_last )) ->
             []
       in
-      let count = Driver.dict_size base d p - List.length hidden in
-      if count < book_max_results conf then
+      let index () =
+        List.filter_map
+          (fun (g, n) ->
+            let n = if List.mem g hidden then n - 1 else n in
+            if n > 0 then Some (g, n, []) else None)
+          (Driver.dict_groups base d p)
+        |> List.sort (fun (g1, _, _) (g2, _, _) -> Gutil.alphabetic_order g1 g2)
+      in
+      let listed entries =
         let entry = book_entry conf base in
         let records = Hashtbl.create 256 in
         let list =
@@ -527,7 +556,7 @@ let book conf base =
               else (
                 Hashtbl.replace records istr n;
                 entry istr))
-            (Driver.dict_entries_count base d p)
+            entries
         in
         {
           count = List.length list;
@@ -537,19 +566,27 @@ let book conf base =
               (build_list_long conf base list);
           records;
         }
-      else
-        let groups =
-          List.filter_map
-            (fun (g, n) ->
-              let n = if List.mem g hidden then n - 1 else n in
-              if n > 0 then Some (g, n, []) else None)
-            (Driver.dict_groups base d p)
-        in
-        {
-          count;
-          groups =
-            List.sort
-              (fun (g1, _, _) (g2, _, _) -> Gutil.alphabetic_order g1 g2)
-              groups;
-          records = Hashtbl.create 1;
-        }
+      in
+      match book_range conf with
+      | Some (a, b) ->
+          let rec from = function
+            | (g, _, _) :: _ as l when g = a -> l
+            | _ :: l -> from l
+            | [] -> []
+          in
+          let rec until acc = function
+            | ((g, _, _) as x) :: l ->
+                if g = b then List.rev (x :: acc) else until (x :: acc) l
+            | [] -> List.rev acc
+          in
+          listed
+            (List.concat_map
+               (fun (g, _, _) ->
+                 if g = p then Driver.dict_exact_count base d p
+                 else Driver.dict_entries_count base d g)
+               (until [] (from (index ()))))
+      | None ->
+          let count = Driver.dict_size base d p - List.length hidden in
+          if count < book_max_results conf then
+            listed (Driver.dict_entries_count base d p)
+          else { count; groups = index (); records = Hashtbl.create 1 })

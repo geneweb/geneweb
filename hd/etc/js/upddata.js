@@ -371,7 +371,7 @@
 
     balanceIndex() {
       const box = document.getElementById('book-index');
-      const n = box?.children.length;
+      const n = box?.querySelectorAll('a').length;
       if (!n) return;
       const fit = () => {
         box.style.removeProperty('--cols');

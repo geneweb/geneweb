@@ -897,6 +897,18 @@ html {
   color: inherit !important;
 }
 
+#book-index .book-set
+{
+  display: contents;
+}
+
+#book-index .book-set:hover > a:not(:hover),
+#book-index .book-set:focus-within > a:not(:focus-visible)
+{
+  background-color: var(--bs-primary-bg-subtle) !important;
+  border-color: var(--bs-primary);
+}
+
 .sub-char.btn:hover, .sub-char.btn:focus-visible
 {
   outline: 2px solid #fff;
