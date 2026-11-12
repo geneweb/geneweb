@@ -23989,6 +23989,17 @@ en: qualifier/qualifiers
 es: calificativo/calificativos
 fr: sobriquet/sobriquets
 
+    title or estate missing
+de: Titel oder Ort fehlt
+en: title or estate missing
+es: falta el título o el lugar
+fr: titre ou domaine manquant
+it: titolo o dominio mancante
+nl: titel of domein ontbreekt
+pl: brak tytułu lub posiadłości
+pt: falta o título ou o domínio
+sv: titel eller domän saknas
+
     title/titles
 af: titel/titels
 bg: титла/титли
