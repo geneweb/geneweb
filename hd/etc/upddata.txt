@@ -39,7 +39,7 @@
 %end;
 <div class="container-fluid px-4">
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
-  %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
+  %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;500%end;%in;
   %( rv: book of places in the order from the last term, carried by every
      MOD_DATA link %)
   %let;rv;%if;(e.data="place" and e.o="r")&o=r%end;%in;

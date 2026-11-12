@@ -480,7 +480,7 @@ let book_max_results conf =
       int_of_string_opt
   with
   | Some n when n > 0 -> n
-  | Some _ | None -> 1000
+  | Some _ | None -> 500
 
 let book_bulk_confirm conf =
   match
