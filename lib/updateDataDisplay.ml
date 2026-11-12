@@ -140,21 +140,8 @@ let print_mod_ok conf base =
       List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
     in
     let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
-    (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
-    (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
-    (* pour ne pas dépasser le time out du serveur.                    *)
-    let max_updates =
-      match List.assoc_opt "max_nb_update" conf.base_env with
-      | Some n ->
-          let n = int_of_string n in
-          if n > 5000 then 5000 else n
-      | _ -> 5000
-    in
     if nb_pers <> 0 && data_modified then (
-      let nb_pers_reel =
-        update_person_list conf base new_input list nb_pers max_updates
-      in
-      let nb = min nb_pers_reel max_updates in
+      let nb = update_person_list conf base new_input list in
       if ajax then
         print_json conf
           (`Assoc
@@ -162,20 +149,16 @@ let print_mod_ok conf base =
                ("success", `Bool true);
                ( "label",
                  `String
-                   (Printf.sprintf "%s%s %d %s%s"
+                   (Printf.sprintf "%s%s %d %s"
                       (Utf8.capitalize_fst
                          (transl conf "modification successful"))
                       (transl conf ":") nb
                       (transl_nth conf "modification/modifications"
-                         (if nb > 1 then 1 else 0))
-                      (if nb_pers > max_updates then
-                         " – " ^ transl conf "continue correcting"
-                       else "")) );
+                         (if nb > 1 then 1 else 0))) );
                ( "before",
                  `String (match list with (s, _) :: _ -> s | [] -> "") );
                ("after", `String new_input);
                ("key", `String new_istr_s);
-               ("complete", `Bool (nb_pers <= max_updates));
                ( "entry",
                  match book_entry conf base new_istr with
                  | Some (_, s) -> `String s
@@ -199,7 +182,7 @@ let print_mod_ok conf base =
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
         Output.print_sstring conf (transl conf ":");
         Output.print_sstring conf " ";
-        Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
+        Output.print_sstring conf (string_of_int nb);
         Output.print_sstring conf " ";
         if List.assoc_opt "history" conf.base_env = Some "yes" then (
           Output.print_sstring conf "<a href=\"";
@@ -207,34 +190,14 @@ let print_mod_ok conf base =
           Output.print_sstring conf "m=HIST&k=20\">";
           Output.print_sstring conf
             (transl_nth conf "modification/modifications"
-               (if nb_pers_reel > 1 then 1 else 0));
+               (if nb > 1 then 1 else 0));
           Output.print_sstring conf ".</a>")
         else (
           Output.print_sstring conf
             (transl_nth conf "modification/modifications"
-               (if nb_pers_reel > 1 then 1 else 0));
+               (if nb > 1 then 1 else 0));
           Output.print_sstring conf ".");
         Output.print_sstring conf "</p>";
-        if nb_pers > max_updates then (
-          Output.printf conf {|<form method="post" action="%s"><p>|}
-            conf.command;
-          Util.hidden_env conf;
-          Util.hidden_input conf "key" (List.assoc "key" conf.env);
-          Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
-          Util.hidden_input conf "data" (Mutil.encode data);
-          Util.hidden_input conf "s" (Mutil.encode ini);
-          if rev_param conf then Util.hidden_input conf "o" (Adef.encoded "r");
-          Output.print_sstring conf
-            {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
-          Output.print_string conf (Util.escape_html (only_printable new_input));
-          Output.print_sstring conf {|" id="data">|};
-          Output.print_sstring conf
-            (Utf8.capitalize_fst (transl conf "continue correcting"));
-          Output.print_sstring conf
-            {|<button type="submit" class="btn btn-primary btn-lg">|};
-          Output.print_sstring conf
-            (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-          Output.print_sstring conf "</button></p></form>");
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf (commd conf);
         Output.print_sstring conf {|m=MOD_DATA&data=|};

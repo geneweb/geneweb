@@ -71,30 +71,6 @@ let combine_by_ini key ini list =
     list
 
 (* ************************************************************************** *)
-(*  [Fonc] reduce_cpl_list : int -> ('a, 'b list) list -> ('a, 'b list) list  *)
-
-(* ************************************************************************** *)
-
-(** [Description] : Retourne la sous liste telle que la somme des longueurs des
-    ('b list) soit égale à size. [Args] :
-    - size : la taille de la liste retournée
-    - list : la liste originale [Retour] :
-    - list : la nouvelle liste dont la somme des ('b list) est égale à size
-      [Rem] : Non exporté en clair hors de ce module. *)
-let reduce_cpl_list size list =
-  let rec loop size cnt reduced_list list =
-    if cnt >= size then reduced_list
-    else
-      match list with
-      | [] -> reduced_list
-      | (a, sl) :: l ->
-          if List.length sl >= size - cnt then
-            (a, Util.reduce_list (size - cnt) sl) :: reduced_list
-          else loop size (cnt + List.length sl) ((a, sl) :: reduced_list) l
-  in
-  loop size 0 [] list
-
-(* ************************************************************************** *)
 (* [Fonc] update_person : conf -> base -> string -> string -> person ->
                             gen_person iper istr *)
 
@@ -368,8 +344,7 @@ let update_family conf base old new_istr fam =
 
 (* ********************************************************************** *)
 (* [Fonc] update_person_list :
-            config -> base -> string -> (string * person) list -> int
-              -> int -> unit *)
+            config -> base -> string -> (string * person list) list -> int *)
 
 (* ********************************************************************** *)
 
@@ -377,11 +352,9 @@ let update_family conf base old new_istr fam =
     - conf : configuration
     - base : base
     - new_input : le nouveau contenu
-    - list : la liste des (clé, person list)
-    - nb_pers : le nombre de personnes concernées par la mise à jour
-    - max_updates = le nombre maximum de persons que l'on met à jour [Retour] :
-    - unit [Rem] : Non exporté en clair hors de ce module. *)
-let update_person_list conf base new_input list nb_pers max_updates =
+    - list : la liste des (clé, person list) [Retour] :
+    - le nombre de personnes mises à jour *)
+let update_person_list conf base new_input list =
   let test_family =
     Option.fold ~none:false ~some:Dict.has_family_fields (dict conf)
   in
@@ -400,9 +373,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
     | Some "fna" -> "fa"
     | Some "sna" -> "sa"
     | _ -> ""
-  in
-  let list =
-    if nb_pers > max_updates then reduce_cpl_list max_updates list else list
   in
   let cnt = ref 0 in
   List.iter

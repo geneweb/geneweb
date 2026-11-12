@@ -701,8 +701,7 @@ let perform_check_modification conf base =
           if nb_pers = 0 then Error (t conf "no modification")
           else
             let nb_modified =
-              UpdateData.update_person_list conf_tmp base s2 list nb_pers
-                nb_pers
+              UpdateData.update_person_list conf_tmp base s2 list
             in
             let elapsed = Unix.gettimeofday () -. start_time in
             Success
