@@ -55,9 +55,8 @@
   `m=OCCU_TERMS` and `m=OCCU_TERMS_OK` group the spellings of the
   occupations, each item of a comma-separated list on its own.
 - The book of places (`m=MOD_DATA&data=place`) can be sorted from the
-  last term of the places (country, county, town): button on the page,
-  or `dico_inverted=yes` in the `.gwf` file to make it the default
-  order. This order reads a new section of the index of the
+  last term of the places (country, county, town): toggle button on the
+  page (`o=r`). This order reads a new section of the index of the
   dictionaries: on a base indexed by an earlier development version,
   run `gwc -reindex <base>`; until then the book stays in alphabetic
   order and says so.
