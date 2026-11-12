@@ -10,26 +10,8 @@
 
 (rule
   (package geneweb)
-  (targets anomalies.min.js.gz anomalies.min.js.br)
-  (deps (:input anomalies.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets autocomplete.js.gz autocomplete.js.br)
   (deps (:input autocomplete.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets autocomplete.min.js.gz autocomplete.min.js.br)
-  (deps (:input autocomplete.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -73,15 +55,6 @@
 
 (rule
   (package geneweb)
-  (targets checkdata.min.js.gz checkdata.min.js.br)
-  (deps (:input checkdata.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets clearinput.js.gz clearinput.js.br)
   (deps (:input clearinput.js))
   (action
@@ -93,15 +66,6 @@
   (package geneweb)
   (targets cousins.js.gz cousins.js.br)
   (deps (:input cousins.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets cousins.min.js.gz cousins.min.js.br)
-  (deps (:input cousins.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -129,15 +93,6 @@
   (package geneweb)
   (targets fanchart.js.gz fanchart.js.br)
   (deps (:input fanchart.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets fanchart.min.js.gz fanchart.min.js.br)
-  (deps (:input fanchart.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -181,26 +136,8 @@
 
 (rule
   (package geneweb)
-  (targets maphilight.min.js.gz maphilight.min.js.br)
-  (deps (:input maphilight.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets notes_upd_gallery.js.gz notes_upd_gallery.js.br)
   (deps (:input notes_upd_gallery.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets notes_upd_gallery.min.js.gz notes_upd_gallery.min.js.br)
-  (deps (:input notes_upd_gallery.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -217,15 +154,6 @@
 
 (rule
   (package geneweb)
-  (targets p_mod.min.js.gz p_mod.min.js.br)
-  (deps (:input p_mod.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets permalink.js.gz permalink.js.br)
   (deps (:input permalink.js))
   (action
@@ -235,26 +163,8 @@
 
 (rule
   (package geneweb)
-  (targets permalink.min.js.gz permalink.min.js.br)
-  (deps (:input permalink.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets person_picker.js.gz person_picker.js.br)
   (deps (:input person_picker.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets person_picker.min.js.gz person_picker.min.js.br)
-  (deps (:input person_picker.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -273,15 +183,6 @@
   (package geneweb)
   (targets relationmatrix.js.gz relationmatrix.js.br)
   (deps (:input relationmatrix.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets relationmatrix.min.js.gz relationmatrix.min.js.br)
-  (deps (:input relationmatrix.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})
@@ -316,26 +217,8 @@
 
 (rule
   (package geneweb)
-  (targets updateField.min.js.gz updateField.min.js.br)
-  (deps (:input updateField.min.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
   (targets updateOrder.js.gz updateOrder.js.br)
   (deps (:input updateOrder.js))
-  (action
-    (concurrent
-      (run gzip -9 -k -f %{input})
-      (run brotli -q 11 %{input}))))
-
-(rule
-  (package geneweb)
-  (targets updateOrder.min.js.gz updateOrder.min.js.br)
-  (deps (:input updateOrder.min.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})

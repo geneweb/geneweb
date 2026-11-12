@@ -72,7 +72,6 @@ let currentRotation = 0;
 // maternelle (S3, S6, S12…) : 'sosa' (_|) bord gauche et axe, ordre Sosa ;
 // 'center' (||) de part et d'autre de l'axe ; 'edges' (__) aux deux bords.
 // En 360°, chaque demi-disque l'applique à l'ascendance de son parent.
-// Chaînes et non clés d'objet : la config terser renomme les propriétés.
 const LINE_LAYOUTS = ['sosa', 'center', 'edges'];
 let lineLayout = 'sosa';
 

@@ -142,7 +142,7 @@ let script conf (q : Adef.encoded_string) : Adef.safe_string =
       let p = if conf.cgi then conf.etc_prefix else "" in
       if p = "" then "" else p ^ "/"
     in
-    let file = pfx ^ "js/permalink.min.js" in
+    let file = pfx ^ "js/permalink.js" in
     let fpath = if conf.cgi then file else Util.resolve_asset_file conf file in
     let src =
       match Util.hash_file_cached fpath with

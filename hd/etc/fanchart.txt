@@ -405,6 +405,6 @@ window.t = function(key, defaultValue = key) {
   return typeof value === 'string' ? value : defaultValue;
 };
 </script>
-<script src="%etc_prefix;js/fanchart.min.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.min.js%end;"></script>
+<script src="%etc_prefix;js/fanchart.js?hash=%apply;hash%with;%etc_prefix;js/fanchart.js%end;"></script>
 </body>
 </html>
