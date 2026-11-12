@@ -1158,7 +1158,7 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                       loop 0 0
                   | None -> v
                 in
-                Notes.linked_page_add conf pg s text.Def.NLDB.lnPos v str
+                Notes.linked_page_add conf pg nenv s text.Def.NLDB.lnPos v str
           with Not_found -> str)
         l str
   | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes | Def.NLDB.PgWizard _

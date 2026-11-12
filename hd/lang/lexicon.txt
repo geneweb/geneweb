@@ -23989,6 +23989,17 @@ en: qualifier/qualifiers
 es: calificativo/calificativos
 fr: sobriquet/sobriquets
 
+    added by the note %s
+de: Adelstitel aus der Notiz %s/Zugehörigkeit aus der Notiz %s/Beruf aus der Notiz %s/Eintrag aus der Notiz %s/Angabe aus der Notiz %s
+en: nobility title added by the note %s/membership added by the note %s/occupation added by the note %s/entry added by the note %s/information added by the note %s
+es: título nobiliario añadido por la nota %s/pertenencia añadida por la nota %s/profesión añadida por la nota %s/mención añadida por la nota %s/información añadida por la nota %s
+fr: titre nobiliaire ajouté par la note %s/appartenance ajoutée par la note %s/profession ajoutée par la note %s/mention ajoutée par la note %s/information ajoutée par la note %s
+it: titolo nobiliare aggiunto dalla nota %s/appartenenza aggiunta dalla nota %s/professione aggiunta dalla nota %s/menzione aggiunta dalla nota %s/informazione aggiunta dalla nota %s
+nl: adellijke titel toegevoegd door de notitie %s/lidmaatschap toegevoegd door de notitie %s/beroep toegevoegd door de notitie %s/vermelding toegevoegd door de notitie %s/gegeven toegevoegd door de notitie %s
+pl: tytuł szlachecki dodany przez notatkę %s/przynależność dodana przez notatkę %s/zawód dodany przez notatkę %s/wzmianka dodana przez notatkę %s/informacja dodana przez notatkę %s
+pt: título nobiliárquico acrescentado pela nota %s/pertença acrescentada pela nota %s/profissão acrescentada pela nota %s/menção acrescentada pela nota %s/informação acrescentada pela nota %s
+sv: adelstitel tillagd av anteckningen %s/tillhörighet tillagd av anteckningen %s/yrke tillagt av anteckningen %s/omnämnande tillagt av anteckningen %s/uppgift tillagd av anteckningen %s
+
     title or estate missing
 de: Titel oder Ort fehlt
 en: title or estate missing
