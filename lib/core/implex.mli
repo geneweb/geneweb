@@ -19,6 +19,7 @@ type ancestor = {
   ip : Geneweb_db.Driver.iper;
   first_gen : int;  (** Generation of the first occurrence. *)
   multiplicity : int;  (** Number of paths from the root person. *)
+  levels : int list;  (** Generations of these paths, increasing. *)
   weight : float;
       (** Expected genetic contribution: sum of 2{^ -g} over the paths. *)
 }

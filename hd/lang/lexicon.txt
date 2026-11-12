@@ -26230,20 +26230,15 @@ de: Zeitraum/früheste und späteste Geburts- und Sterbejahre der Vorfahren der 
 en: period/earliest and latest years of birth and death of the ancestors of the generation
 fr: période/années extrêmes de naissance et de décès des ancêtres de la génération
 
-    theoretical (column)
-de: theor./theoretische Positionen: 2ⁿ Ahnennummern
-en: theor./theoretical positions: 2ⁿ Sosa numbers
-fr: théor./positions théoriques : 2ⁿ numéros Sosa
-
     known (column)
 de: bekannt/von einer bekannten Person besetzte Positionen
 en: known/positions held by a known person
 fr: connues/positions occupées par une personne connue
 
     completeness (column)
-de: Vollst./bekannte Positionen im Verhältnis zu den theoretischen Positionen
-en: completeness/known positions divided by theoretical positions
-fr: complétude/positions connues rapportées aux positions théoriques
+de: Vollst./bekannte Positionen im Verhältnis zu den 2ⁿ theoretischen Positionen
+en: completeness/known positions divided by the 2ⁿ theoretical positions
+fr: complétude/positions connues rapportées aux 2ⁿ positions théoriques
 
     distinct (column)
 de: verschieden/verschiedene Vorfahren der Generation

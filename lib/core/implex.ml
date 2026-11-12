@@ -21,6 +21,7 @@ type ancestor = {
   ip : Driver.iper;
   first_gen : int;
   multiplicity : int;
+  levels : int list;
   weight : float;
 }
 
@@ -113,6 +114,7 @@ type tally = {
   t_span : (int * int) option;
   mutable t_paths : int;
   mutable t_weight : float;
+  mutable t_levels : int list;
 }
 
 let profile base root =
@@ -129,7 +131,13 @@ let profile base root =
           None)
         else
           let t =
-            { t_gen = gen; t_span = span p; t_paths = 0; t_weight = 0. }
+            {
+              t_gen = gen;
+              t_span = span p;
+              t_paths = 0;
+              t_weight = 0.;
+              t_levels = [];
+            }
           in
           Iper.Table.replace seen ip t;
           Some (t, true)
@@ -152,6 +160,9 @@ let profile base root =
                 paths := !paths + n;
                 t.t_paths <- t.t_paths + n;
                 t.t_weight <- t.t_weight +. ldexp (float n) (-gen);
+                (match t.t_levels with
+                | g :: _ when g = gen -> ()
+                | _ -> t.t_levels <- gen :: t.t_levels);
                 Iper.Table.replace next ip
                   (n + Option.value ~default:0 (Iper.Table.find_opt next ip)))
           (parents base child))
@@ -189,6 +200,7 @@ let profile base root =
           ip;
           first_gen = t.t_gen;
           multiplicity = t.t_paths;
+          levels = List.rev t.t_levels;
           weight = t.t_weight;
         }
         :: acc)

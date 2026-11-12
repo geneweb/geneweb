@@ -39,7 +39,6 @@ let ratio conf x =
       else Util.string_of_decimal_num conf (if r = 0. then 100. *. x else r))
     ^ " %")
 
-let rec pow2 g = if g = 0 then Sosa.one else Sosa.twice (pow2 (g - 1))
 let generation s = Sosa.gen s - 1
 let spouse s = Sosa.inc s (if Sosa.even s then 1 else -1)
 let lines f l = String.concat "<br>" (List.map f l)
@@ -116,6 +115,21 @@ let rl_link conf ip (father, mother) len1 len2 =
     (Driver.Iper.to_string father)
     (Driver.Iper.to_string mother)
     len1 len2
+
+let paths_link conf base root a =
+  let { Implex.ip; multiplicity; levels; _ } = a in
+  if multiplicity <= 2 || multiplicity > max_rl_paths then num conf multiplicity
+  else
+    let anc = Util.pget conf base ip in
+    Printf.sprintf
+      {|<a href="%sm=RL&%s&%s&%s&l1=%s&l2=0&dag=on&sp=0&im=0">%s</a>|}
+      (Util.commd conf :> string)
+      (Util.acces conf base anc :> string)
+      (Util.acces_n conf base (Adef.escaped "1") (Util.pget conf base root)
+        :> string)
+      (Util.acces_n conf base (Adef.escaped "2") anc :> string)
+      (String.concat "," (List.map string_of_int levels))
+      (num conf multiplicity)
 
 let junction_link conf href j =
   Printf.sprintf {|<a href="%s">%s</a>|}
@@ -255,7 +269,6 @@ let print_generations conf href generations st =
           [
             "generation (column)";
             "period (column)";
-            "theoretical (column)";
             "known (column)";
             "completeness (column)";
             "distinct (column)";
@@ -271,14 +284,13 @@ let print_generations conf href generations st =
     (fun g ->
       let { Implex.gen; paths; present; fresh; loops; period } = g in
       Output.printf conf
-        {|<tr><td>%d</td><td class="text-nowrap">%s</td><td>%s</td><td>%s</td><td>%s</td>
+        {|<tr><td>%d</td><td class="text-nowrap">%s</td><td>%s</td><td>%s</td>
 <td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
 <td>%s</td><td>%s</td></tr>|}
         gen
         (match period with
         | Some (a, b) -> Printf.sprintf "%d–%d" a b
         | None -> "—")
-        (sosa conf (pow2 gen))
         (num conf paths)
         (ratio conf (ldexp (float paths) (-gen)))
         (num conf present) (num conf fresh)
@@ -341,7 +353,7 @@ let print_implexes conf base coefficient root shown href data st =
                    (List.map
                       (fun s -> sosa conf (Sosa.inc s i))
                       (List.tl occurrences))))
-            (num conf a.Implex.multiplicity)
+            (paths_link conf base root a)
             (percent conf a.Implex.weight)
             (lines
                (fun ip -> optional conf (inbreeding conf base coefficient ip))
@@ -556,7 +568,7 @@ let print_ancestors conf base root n index ancestors =
     (th conf "graph (column)");
   List.iter
     (fun a ->
-      let { Implex.ip; first_gen; multiplicity; weight } = a in
+      let { Implex.ip; first_gen; weight; _ } = a in
       Output.printf conf
         {|<tr><td>%s</td><td class="text-end">%d</td><td class="text-end">%d</td>
 <td class="text-end">%s</td><td class="text-end">%s</td>
@@ -565,7 +577,8 @@ let print_ancestors conf base root n index ancestors =
         (match Driver.Iper.Table.find_opt index ip with
         | Some x -> List.length x.Implex.occurrences
         | None -> 1)
-        (num conf multiplicity) (percent conf weight)
+        (paths_link conf base root a)
+        (percent conf weight)
         (relation_link conf root ip))
     top;
   Output.print_sstring conf "</tbody></table></div>"
