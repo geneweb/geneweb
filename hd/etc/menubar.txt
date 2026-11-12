@@ -230,8 +230,8 @@
                   <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=DIFF&f=%history_file;&new=0&old=1" %laD;><i class="fa fa-clock-rotate-left fa-fw me-2" aria-hidden="true"></i>[*last diff]</a>
                 %end;
               %end;
-              %( WIZARD | Copy wikitext button %)
-              %if;(iswiz=1 and self!="? ?")
+              %(Copy wikitext button %)
+              %if;(self!="? ?" and (is_visible or (friend and is_semi_public)))
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
                    data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw me-2" aria-hidden="true"></i>%nn;
