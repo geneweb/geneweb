@@ -943,6 +943,22 @@ let print_mod_ok conf base wl pgl ~remains changed p ofn osn oocc =
         !deleted_relation;
       Output.print_sstring conf "</ul>\n";
       Output.print_sstring conf "</p>\n");
+  (match
+     List.filter
+       (fun t -> t.t_ident = "" <> (t.t_place = ""))
+       (fst (reconstitute_titles conf false 1))
+   with
+  | [] -> ()
+  | l ->
+      Output.printf conf "<p>%s%s</p><ul>"
+        (Utf8.capitalize_fst (transl conf "title or estate missing"))
+        (transl conf ":");
+      List.iter
+        (fun t ->
+          Output.printf conf "<li>%s</li>"
+            (Util.escape_html (t.t_ident ^ t.t_place) :> string))
+        l;
+      Output.print_sstring conf "</ul>");
   Output.print_sstring conf "<p>";
   Output.print_string conf
     (referenced_person_text conf base (Driver.poi base p.key_index));
