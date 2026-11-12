@@ -35,8 +35,11 @@
   entries starting with the typed letters, and finding the persons of an
   entry to rename it, no longer read every person and family of the
   base. A book of `book_max_results` entries or more (1000 by default)
-  is no longer listed in full, only its groups: the datalists of the
-  templm forms (`datalist_*=1`) stay empty for such a book.
+  is no longer listed in full, only its groups.
+- templm no longer has its own books (`m=MOD_DATA`) and uses those of
+  the default templates. The completion of its person and family forms
+  from the books (`datalist_fn`, `datalist_sn`, `datalist_occu`,
+  `datalist_place`, `datalist_src`, `datalist_book`) is removed.
 - A change in a book is done at once, no longer by steps of
   `max_nb_update` (5000) modifications. The editor of an entry shows
   its number of records (persons and families), and a change of an

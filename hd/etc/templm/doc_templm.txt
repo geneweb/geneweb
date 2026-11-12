@@ -32,29 +32,6 @@
   </td>
 </tr>
 <tr>
-  <td>datalist_fn=%bvar.datalist_fn;<br>
-      datalist_sn=%bvar.datalist_sn;<br>
-      datalist_occu=%bvar.datalist_occu;<br>
-      datalist_place=%bvar.datalist_place;<br>
-      datalist_src=%bvar.datalist_src;</td>
-  <td>
-    Saisie semi-automatique sur le formulaire individu et famille :
-    <ul>
-      <li>datalist_xx= : ne fait rien</li>
-      <li>datalist_xx=1 : charge toute la liste en une fois</li>
-      <li>datalist_xx=2 : charge la liste filtrée après la saisie de trois caractères</li>
-    </ul>
-    Listes possibles :
-    <ul>
-      <li>datalist_fn : prénoms</li>
-      <li>datalist_sn : patronymes</li>
-      <li>datalist_place : lieux</li>
-      <li>datalist_src : sources</li>
-      <li>datalist_occu : professions</li>
-    </ul>
-  </td>
-</tr>
-<tr>
   <td>event_age=%bvar.event_age;</td>
   <td>
     Sur la page d’une personne, affiche l’âge des parents à la naissance et

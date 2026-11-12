@@ -62,11 +62,6 @@
 %let;l_on1s; onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 %let;l_on2; onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"%in;
 %let;l_on3; onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"%in;
-%let;l_on4; list="dloccu"%if;(bvar.datalist_occu = 2) onkeyup="ldl(this,'occu',event)"%end;%in;
-%let;l_on5; list="dlplace"%if;(bvar.datalist_place = 2) onkeyup="ldl(this,'place',event)"%end;%in;
-%let;l_on6; list="dlsrc"%if;(bvar.datalist_src = 2) onkeyup="ldl(this,'src',event)"%end;%in;
-%let;l_on7; list="dlsn"%if;(bvar.datalist_sn = 2) onkeyup="tUC(this);ldl(this,'sn',event)"%end;%in;
-%let;l_on8; list="dlfn"%if;(bvar.datalist_fn = 2) onkeyup="tUC1(this);ldl(this,'fn',event)"%end;%in;
 %let;ldmy;%if;([!dates order]0 = "ddmmyyyy")dd%elseif;([!dates order]0 = "mmddyyyy")mm%else;yy%end;%in;
 %define;date(z1,z2,z3,z4)
   %let;l_dd;%if;(z2.day != "" and z2.day < 10)0%end;%z2.day;%in;
@@ -147,13 +142,13 @@
         %/><input id="e_namez1_dl" name="e_namez1_dl" class="e" size="20" maxlength="200" placeholder="[*event/events]0" value="%l1;" list="dlevent" %l5;
         %sp;autocomplete="off" onkeypress="javascript:return oKP3(event,this)" onblur="oB6('z1')" onkeydown="if(event.keyCode == 13)oB6('z1')"
         %/>%l4;%apply;date("e_datez1","event_date",l2,l3)%sp;
-        <input id="e_placez1" name="e_placez1" class="pl" size="70" placeholder="[*place/places]0" value="%event.e_place;" %l_on5;%/>
+        <input id="e_placez1" name="e_placez1" class="pl" size="70" placeholder="[*place/places]0" value="%event.e_place;"%/>
     </dt>
     <dd><textarea id="e_notez1" name="e_notez1" placeholder="[*comment]" rows="1" class="enote" %l_on1s;>%nn;
       %if;(evar.m = "MOD_FAM" and comment != "" and bvar.move_comment = "yes" and event.e_note = "" and (event.e_name = "#marr" or event.e_name= "#nmar" or event.e_name= "#nmen" or event.e_name ="#enga"))%comment;%end;
       %event.e_note;%sq;</textarea></dd>
     <dd>%if;(event.e_src="")
-          <input id="e_srcz1" name="e_srcz1" placeholder="[*source/sources]1" class="esrc" %l_on6; %l_on1;/>
+          <input id="e_srcz1" name="e_srcz1" placeholder="[*source/sources]1" class="esrc" %l_on1;/>
         %else;
           <textarea id="e_srcz1" name="e_srcz1" placeholder="[*source/sources]1" rows="1" class="esrc" %l_on1s;>%event.e_src;%sq;</textarea>
         %end;</dd>
@@ -171,23 +166,14 @@
       %/><input id="%l1;_occ" name="%l1;_occ" class="occ" placeholder="N" autocomplete="off" size="5" maxlength="8"
        onkeypress="javascript:return oKP2(event,'witn','z2','_occ','z1')" onblur="oB2('%l1;')"
        %if;(z3.occ="") value="0" %else; value="%z3.occ;" %end;
-      %/><input id="%l1;_fn" name="%l1;_fn" class="fn ar" size="30" maxlength="200" value="%z3.first_name;" %l_on3; %l_on8;
-      %/><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%z3.surname;" %apply;onjq1(l1,"") %l_on7;
+      %/><input id="%l1;_fn" name="%l1;_fn" class="fn ar" size="30" maxlength="200" value="%z3.first_name;" %l_on3;
+      %/><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%z3.surname;" %apply;onjq1(l1,"")
       %/><span id="%l1;_jq1"> </span>
   </dd>
-%end;
-%define;g_oku(z1,z2,z3)
-  var g_z1 = "list=\"dlz1\"%if;(bvar.datalist_z1 = 2) onkeyup=\"%if;("z2" = "yes")z3(this);%end;ldl(this,'z1',event)\"%end;";
 %end;
 <script>
   <!--
     var g_prefix = "%prefix;";
-    %apply;g_oku("fn",bvar.uppercase,"tUC1")
-    %apply;g_oku("sn",bvar.uppercase,"tUC")
-    %apply;g_oku("place","no","")
-    %apply;g_oku("occu","no","")
-    %apply;g_oku("src","no","")
-    %apply;g_oku("qualifier","no","")
-    %apply;g_oku("alias","no","")
+    var g_fn = "", g_sn = "", g_place = "", g_occu = "", g_src = "", g_qualifier = "", g_alias = "";
   -->
 </script>

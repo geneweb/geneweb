@@ -715,21 +715,6 @@
 # TODO also present in potentially obsolete file anctree_h7.txt
 #css=1
 
-# for templm, automatic completion in individual or family forms
-# for following fields: firstname, surname, occupation, place, source
-# each variable may take two values, (nothing done if not set)
-# 1: load all the list at ones
-# 2: load filtered list by three first characters
-#datalist_fn=2
-#datalist_sn=2
-#datalist_occu=2
-#datalist_place=2
-#datalist_src=2
-
-# for templm, above automatic completion lists are generated from cache,
-# or from associated base books if variable is set.
-#datalist_book=1
-
 # for templm, on individual page, display parents age at birthday,
 # and individual age for each event. (not the case by default)
 #event_age=yes
