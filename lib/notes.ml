@@ -1065,7 +1065,10 @@ let linked_page_add conf pg nenv tag pos ?(suffix = "") v
       pos b c suffix
     |> safe_html
   in
-  let note = Option.value ~default:pg (List.assoc_opt "TITLE" nenv) in
+  let note =
+    Option.value ~default:pg (List.assoc_opt "TITLE" nenv)
+    |> NotesSearch.plain_text
+  in
   let tip =
     Printf.sprintf
       (ftransl_nth conf "added by the note %s"
@@ -1085,7 +1088,8 @@ let linked_page_add conf pg nenv tag pos ?(suffix = "") v
   let item =
     Printf.sprintf
       {|<%s class="linked-page" title="" data-bs-toggle="tooltip"
-        data-bs-html="true" data-bs-title="%s">%s</%s>|}
+        data-bs-html="true" data-bs-custom-class="linked-page-tip"
+        data-bs-title="%s">%s</%s>|}
       el
       (escape_html tip :> string)
       content el
