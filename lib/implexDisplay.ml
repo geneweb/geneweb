@@ -118,7 +118,7 @@ let rl_link conf ip (father, mother) len1 len2 =
 
 let paths_link conf base root a =
   let { Implex.ip; multiplicity; levels; _ } = a in
-  if multiplicity <= 2 || multiplicity > max_rl_paths then num conf multiplicity
+  if multiplicity < 2 || multiplicity > max_rl_paths then num conf multiplicity
   else
     let anc = Util.pget conf base ip in
     Printf.sprintf
@@ -136,7 +136,7 @@ let junction_link conf href j =
     (href (generation j) ("j" ^ Sosa.to_string j))
     (sosa conf j)
 
-let print_summary conf base coefficient root href generations st =
+let print_summary conf base coefficient root generations st =
   let sum f = List.fold_left (fun acc g -> acc + f g) 0 generations in
   let distinct = sum (fun g -> g.Implex.fresh) in
   let known = sum (fun g -> g.Implex.paths) in
@@ -192,9 +192,7 @@ let print_summary conf base coefficient root href generations st =
          (fun j -> Sosa.eq j.Implex.sosa Sosa.one)
          st.Implex.junctions
      with
-    | Some j ->
-        Printf.sprintf {|<a href="%s">%s</a>|} (href 0 "j1")
-          (percent conf j.Implex.direct)
+    | Some j -> percent conf j.Implex.direct
     | None -> "0 %");
   row
     (tr_nth conf "junction/junctions" 1)
@@ -583,7 +581,7 @@ let print_ancestors conf base root n index ancestors =
     top;
   Output.print_sstring conf "</tbody></table></div>"
 
-let print_range conf root page previous lo hi depth total =
+let print_range conf root page previous first lo hi depth total =
   Output.printf conf
     {|<form method="get" action="%s#range" id="range" class="d-flex flex-wrap align-items-center gap-2 mt-3">|}
     conf.command;
@@ -593,15 +591,15 @@ let print_range conf root page previous lo hi depth total =
   Util.hidden_input_s conf "i" (Driver.Iper.to_string root);
   Output.printf conf
     {|<label for="implex_g">%s</label>
-<input type="number" id="implex_g" name="g" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
+<input type="number" id="implex_g" name="g" value="%d" min="%d" max="%d" class="form-control" style="width:8ch">
 <label for="implex_v">%s</label>
-<input type="number" id="implex_v" name="v" value="%d" min="0" max="%d" class="form-control" style="width:8ch">
+<input type="number" id="implex_v" name="v" value="%d" min="%d" max="%d" class="form-control" style="width:8ch">
 <button type="submit" class="btn btn-sm btn-outline-primary">OK</button>%s%s
 <a href="%s&v=%d#range"%s>%s</a></form>|}
     (tr_nth conf "generation/generations" 1)
-    lo depth
+    lo first depth
     (Util.transl conf "to (generation range)")
-    hi depth
+    hi first depth
     (match previous with
     | Some (g, v) ->
         Printf.sprintf {|<a href="%s&v=%d#range">%s</a>|} (page g) v
@@ -612,7 +610,7 @@ let print_range conf root page previous lo hi depth total =
          (page (hi + 1))
          (Util.transl conf "next generations")
      else "")
-    (page 0) depth
+    (page first) depth
     (if total > 2000 then {| class="text-danger"|} else "")
     (Util.cftransl conf "all (%s rows)" [ num conf total ])
 
@@ -625,6 +623,7 @@ let print conf base p =
   let n = Option.value ~default:50 (Util.p_getint conf.env "n") in
   let rows = Hashtbl.create 64 in
   let implexes = Hashtbl.create 64 in
+  let junctions = Hashtbl.create 64 in
   let add tbl gen k =
     Hashtbl.replace tbl gen
       (k + Option.value ~default:0 (Hashtbl.find_opt tbl gen))
@@ -637,17 +636,19 @@ let print conf base p =
     st.Implex.implexes;
   List.iter
     (fun j ->
-      add rows (generation j.Implex.sosa) (1 + List.length j.Implex.links))
+      let gen = generation j.Implex.sosa in
+      add rows gen (1 + List.length j.Implex.links);
+      add junctions gen (1 + List.length j.Implex.links))
     st.Implex.junctions;
   let at tbl gen = Option.value ~default:0 (Hashtbl.find_opt tbl gen) in
+  let first =
+    match st.Implex.implexes with
+    | x :: _ -> generation (List.hd x.Implex.occurrences)
+    | [] -> 0
+  in
   let total = Hashtbl.fold (fun _ k acc -> acc + k) rows 0 in
   let lo =
-    match Util.p_getint conf.env "g" with
-    | Some g -> max 0 g
-    | None -> (
-        match st.Implex.implexes with
-        | x :: _ -> generation (List.hd x.Implex.occurrences)
-        | [] -> 0)
+    match Util.p_getint conf.env "g" with Some g -> max 0 g | None -> first
   in
   let hi =
     match Util.p_getint conf.env "v" with
@@ -657,18 +658,22 @@ let print conf base p =
           if hi >= depth || n >= first_implexes || r > budget then hi
           else extend (hi + 1) (n + at implexes (hi + 1)) (r + at rows (hi + 1))
         in
-        extend lo (at implexes lo) (at rows lo)
+        extend lo (at implexes lo)
+          (Hashtbl.fold
+             (fun gen k acc -> if gen < lo then acc + k else acc)
+             junctions (at rows lo))
   in
   let previous =
     let rec back g n r =
-      if g <= 0 || n >= first_implexes || r > budget then g
+      if g <= first || n >= first_implexes || r > budget then g
       else back (g - 1) (n + at implexes (g - 1)) (r + at rows (g - 1))
     in
-    if lo > 0 then
+    if lo > first then
       Some (back (lo - 1) (at implexes (lo - 1)) (at rows (lo - 1)), lo - 1)
     else None
   in
   let shown gen = lo <= gen && gen <= hi in
+  let shown_junction gen = gen <= hi in
   let page gen =
     Printf.sprintf "%s%s&m=A&t=I&g=%d%s"
       (Util.commd conf :> string)
@@ -678,7 +683,10 @@ let print conf base p =
       | Some n -> "&n=" ^ string_of_int n
       | None -> "")
   in
-  let href gen anchor = (if shown gen then "" else page gen) ^ "#" ^ anchor in
+  let href gen anchor =
+    let shown = if anchor.[0] = 'j' then shown_junction else shown in
+    (if shown gen then "" else page gen) ^ "#" ^ anchor
+  in
   let data = Driver.Iper.Table.create 4096 in
   List.iter (fun a -> Driver.Iper.Table.replace data a.Implex.ip a) ancestors;
   let index = Driver.Iper.Table.create 1024 in
@@ -705,12 +713,12 @@ let print conf base p =
     (Util.mod_ind_link conf base p
        (Adef.safe (DateDisplay.short_dates_text_notag conf base p))
       :> string);
-  print_summary conf base coefficient root href generations st;
+  print_summary conf base coefficient root generations st;
   print_chart conf generations;
   print_generations conf href generations st;
-  print_range conf root page previous lo hi depth total;
+  print_range conf root page previous first lo hi depth total;
   print_implexes conf base coefficient root shown href data st;
-  print_junctions conf base coefficient shown href data index st;
+  print_junctions conf base coefficient shown_junction href data index st;
   print_clusters conf root href st;
   print_ancestors conf base root n index ancestors;
   Hutil.trailer conf
