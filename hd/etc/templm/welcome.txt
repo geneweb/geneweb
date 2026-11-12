@@ -14,10 +14,6 @@
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
 %let;l_on1;onclick="this.focus()"%in;
 
-%define;book_of(xx)
-  [*book of %s:::xx]
-%end;
-
 %define;sosa_rel(xx)
   [<em>Sosa number</em> relative to %t:::xx]
 %end;
@@ -134,7 +130,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 %end;
 <table style="margin:auto;">
   <tr>
-    <td style="text-align:center" colspan=3>
+    <td style="text-align:center" colspan=2>
     <h1>
     %apply;interp([
 af: Genealogiese databasis
@@ -204,21 +200,11 @@ zh: 网络家谱
         <li><a href="%prefix;m=STAT">[*statistics]</a></li>
         <li><a href="%prefix;m=CAL">[*calendar/calendars]1</a></li>
         <li><a href="%prefix;m=ANM">[*anniversaries]</a></li>
-      </ul>
-    </td><td>
-      <ul>
         %if;has_history;%nl;
           <li><a href="%prefix;m=HIST;k=20">[*history of updates]</a></li>
         %end;%nl;
         %if;(not base.has_notes)
           <li><a href="%prefix;m=MOD_NOTES">[*add base notes]</a></li>
-        %end;
-        %if;(wizard)
-          <li><a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a></li>
-          <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
-          <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([place/places]1)</a></li>
-          <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
-          <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
         %end;
       </ul>
     </td>
@@ -244,7 +230,7 @@ zh: 网络家谱
         %end;
         </td>
         </tr><tr>
-        <td colspan="3">
+        <td colspan="2">
         %if;(bvar.propose_place_surnames != "no")%nl;
           <form method="get" action="%prefix;">
             %hidden;
