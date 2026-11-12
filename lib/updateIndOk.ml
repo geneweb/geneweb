@@ -1055,6 +1055,7 @@ let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string := [] in
+  let () = deleted_relation := [] in
   let o_p =
     match p_getenv o_conf.env "i" with
     | Some ip ->
