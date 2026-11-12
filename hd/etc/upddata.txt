@@ -229,11 +229,9 @@
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
       <div class="book-row">
-        <a class="btn btn-outline-primary d-inline-flex align-items-center gap-1" id="book-persons"
-          target="_blank" rel="noopener" href="%prefix;m=L&data=%e.data;&parents=on"
-          title="[*list of linked persons]"><i class="fa fa-list"></i>%nn;
-          <span class="badge text-bg-secondary" id="book-count"></span>%nn;
-          <span class="visually-hidden">[*list of linked persons]</span></a>
+        <a class="btn btn-primary text-nowrap" id="book-persons" target="_blank" rel="noopener"
+          href="%prefix;m=L&data=%e.data;&parents=on"
+          data-one="[*linked persons %s:::{n}]0" data-many="[*linked persons %s:::{n}]1"></a>
         %if;(e.data="src" or e.data="occu" or e.data="place")
           <textarea class="form-control" id="nx_input" name="nx_input" rows="1"
             maxlength="1000" aria-label="[*modify]" required></textarea>

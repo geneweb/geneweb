@@ -10,7 +10,6 @@
       this.text = form.querySelector('.book-input-text');
       this.persons = document.getElementById('book-persons');
       this.personsHref = this.persons.href;
-      this.count = document.getElementById('book-count');
       this.extra = form.querySelector('.book-extra');
       this.warn = form.querySelector('.book-warn');
       this.field.addEventListener('input', () => {
@@ -106,7 +105,11 @@
       this.original = a.dataset.v ?? a.dataset.entry;
       this.form.elements.key.value = li.id.slice(1);
       this.persons.href = `${this.personsHref}&key=${li.id.slice(1)}`;
-      this.count.textContent = a.dataset.n;
+      const n = a.dataset.n;
+      const label = this.persons.dataset[n === '1' ? 'one' : 'many'].replace('{n}', n);
+      this.persons.textContent = n;
+      this.persons.title = label;
+      this.persons.setAttribute('aria-label', label);
       this.text.textContent = this.original;
       this.field.value = value || this.original;
       this.changed();
