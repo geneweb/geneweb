@@ -483,12 +483,9 @@
 #   chk_data_max_results=        # No limit (may cause timeout on large bases)
 #chk_data_max_results=500
 
-# This variable allows to set up the maximum number of updates
-# that can be done at a single time.
-# Default value if not specified is 5000 (which means that it will
-# take at most 5 s to realize a set of modifications (such as the
-# “set of places”, “set of sources”…
-# If specified, the value will be limited to 5000.
+# Maximum number of records modified at a single time by the spellings to
+# group (m=PLACE_TERMS, m=SOURCE_TERMS, m=OCCU_TERMS): applying the same
+# change again goes on. Default value and maximum: 5000.
 #max_nb_update=5000
 
 # Use a distant CDN (Content Delivery Network) to load CSS/JS files instead

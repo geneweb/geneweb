@@ -183,7 +183,6 @@
             return;
           }
           notify('success', toast(data.label, data.before, data.after));
-          if (!data.complete) return;
           const here = this.a === a;
           const all = this.entries();
           const next = all[all.indexOf(a) + 1];
