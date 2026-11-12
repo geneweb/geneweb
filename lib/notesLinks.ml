@@ -96,11 +96,19 @@ let misc_notes_link s i =
       if j > i + 4 then
         let b = String.sub s (i + 2) (j - i - 4) in
         let spe, b =
+          (* a prefix (w:, image:) is recognised only in the first field,
+             i.e. before the first '/' or ';' *)
+          let lim =
+            let first c =
+              Option.value (String.index_opt b c) ~default:(String.length b)
+            in
+            min (first '/') (first ';')
+          in
           match String.index_opt b ':' with
-          | Some i ->
+          | Some i when i < lim ->
               ( Some (String.sub b 0 i),
                 String.sub b (i + 1) (String.length b - i - 1) )
-          | None -> (None, b)
+          | Some _ | None -> (None, b)
         in
         let b, text =
           match String.index_opt b ';' with
