@@ -44,10 +44,11 @@ let print_list conn conf base =
       match get_person_from_data conf base with
       | [ (_, [ p ]) ] ->
           let url =
-            if conf.wizard && (data = "title" || data = "domain") then
-              Printf.sprintf "%sm=MOD_IND&i=%s#titles"
+            if conf.wizard then
+              Printf.sprintf "%sm=MOD_IND&i=%s%s"
                 (commd conf :> string)
                 (Driver.Iper.to_string (Driver.get_iper p))
+                (if data = "title" || data = "domain" then "#titles" else "")
             else (Adef.(commd conf ^^^ Util.acces conf base p) :> string)
           in
           Connection.http_redirect_temporarily conn url
