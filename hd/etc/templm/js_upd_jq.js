@@ -1,33 +1,5 @@
 /* $Id: js_upd_jq.js,v 7.00 2016/01/26 10:49:18 mr Exp $ */
 
-var ldlLen = 0;
-var ldlTim;
-var ldlVal = "";
-function ldl(z1,z2,z3)
-{
-  var a1 = "o" + z2;
-  var a2 = z1.value.length;
-  var a3 = document.getElementById(a1).value;
-  var a4 = z1.value.slice(0,3);
-  var a5 = z1.value.charAt(a2 - 1).toUpperCase();
-  var key = z3.keyCode ? z3.keyCode : z3.which ? z3.which : z3.charCode;
-  var charKey = String.fromCharCode(key).toUpperCase();
-  if(a3 > 20 && ldlVal == a4)ldlVal = "";
-  if(ldlVal != a4 && a2 != ldlLen && a2 > 2 && charKey == a5)
-  {
-    clearTimeout(ldlTim);
-    ldlVal = a4;
-    ldlLen = a2;
-    ldlTim = setTimeout(
-    function()
-    {
-      var b1 = encodeURI(z1.value);
-      var b2 = "#dl" + z2;
-      var b3 = g_prefix + "m=MOD_DATA;data=" + z2 + ";s=" + b1 + ";datalist=on;";
-      $(b2).load(b3);
-    },1000);
-  }
-}
 function jq1(z1,z2)
 {
   var e7 = document.getElementById(z1 + "_occ");

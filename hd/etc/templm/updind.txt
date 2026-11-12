@@ -77,9 +77,9 @@
         value="%if;(relation.z3.link and relation.z3.occ = "")0%else;%relation.z3.occ;%end;"
         onkeypress="javascript:return oKP2(event,'r',z1,'_fath_occ','')"
         onblur="oB3('%l1;')"%/></td>
-    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3; %l_on8;%/></td>
+    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3;%/></td>
     <td><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%relation.z3.surname;"
-         %apply;onjq1(l1,z4) %l_on7;%/></td>
+         %apply;onjq1(l1,z4)%/></td>
     <td style="width:auto"><span id="%l1;_jq1"></span></td>
 %end;
 %(<!-- End define -->%)
@@ -158,8 +158,8 @@
     <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if;(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
   </legend>
   <div class="w1">
-    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3; %l_on8;%/></label>
-    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2; %l_on7;%/></label>
+    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3;%/></label>
+    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2;%/></label>
   </div>
   <div class="w1">
     <label>[public name]<input name="public_name" size="30" value="%public_name;" id="public_name" %/></label>
@@ -186,25 +186,25 @@
     %if;has_first_names_aliases;
       %foreach;first_name_alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[first name alias]0 %cnt1;<input id="first_name_alias%cnt;" name="first_name_alias%cnt;" size="30" value="%first_name_alias;" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',%cnt1;,'[first name alias]0')"> + </a>
+        <label>[first name alias]0 %cnt1;<input id="first_name_alias%cnt;" name="first_name_alias%cnt;" size="30" value="%first_name_alias;"%/></label><a href="javascript:addItem('first_name_alias',%cnt1;,'[first name alias]0')"> + </a>
       %end;
     %else;
-      <label>[first name alias]0 1<input id="first_name_alias0" name="first_name_alias0" size="30" value="" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',1,'[first name alias]0')"> + </a>
+      <label>[first name alias]0 1<input id="first_name_alias0" name="first_name_alias0" size="30" value=""%/></label><a href="javascript:addItem('first_name_alias',1,'[first name alias]0')"> + </a>
     %end;
     <span id="new_first_name_alias"></span>
     %if;has_surnames_aliases;
       %foreach;surname_alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[surname alias]0 %cnt1;<input id="surname_alias%cnt;" name="surname_alias%cnt;" size="30" value="%surname_alias;" %l_on7;%/></label><a href="javascript:addItem('surname_alias',%cnt1;,'[surname alias]0')"> + </a>
+        <label>[surname alias]0 %cnt1;<input id="surname_alias%cnt;" name="surname_alias%cnt;" size="30" value="%surname_alias;"%/></label><a href="javascript:addItem('surname_alias',%cnt1;,'[surname alias]0')"> + </a>
       %end;
     %else;
-      <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value="" %l_on7;%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
+      <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value=""%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
     %end;
     <span id="new_surname_alias"></span>
   </div>
   <div class="w1">
     %if;(occupation="")
-    <label>%lpcP; [occupation/occupations]0<input name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on4; %l_on1;/></label>
+    <label>%lpcP; [occupation/occupations]0<input name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on1;/></label>
     %else;
     <label>%lpcP; [occupation/occupations]0<textarea name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on1s;>%occupation;</textarea></label>
     %end;
@@ -212,7 +212,7 @@
   <div class="w1">
     <label>[source/sources]0 [person/persons]0
     %if;(sources="")
-      <input name="src" maxlength="800" id="src" %l_on6; %l_on1s; value="%sources;"/>
+      <input name="src" maxlength="800" id="src" %l_on1s; value="%sources;"/>
     %else;
       <textarea name="src" rows="1" maxlength="800" id="src" %l_on1s;>%sources;</textarea>
     %end;

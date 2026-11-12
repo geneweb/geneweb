@@ -61,7 +61,7 @@
   %if;("z1"="marr") %lfa3; %end;
 %end;
 %define;place(z1,z2)
-  <label>[place/places]0<input id=z1_place name=z1_place size=44 maxlength=200 value="%z2_place;" onblur="fillPlaceFam(this)" %l_on5;%/></label>
+  <label>[place/places]0<input id=z1_place name=z1_place size=44 maxlength=200 value="%z2_place;" onblur="fillPlaceFam(this)"%/></label>
 %end;
 %define;date_place(xx,z1,z2,z3,z4,z5)
   %let;l_d;%xx.create.z1_day;%in;
@@ -83,7 +83,7 @@
     <input id=z2_mm name=z2_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" list="dlmonth" onkeypress="javascript:return oKPmm(event,'z2','_mm','_dd');" onkeydown="javascript:return oKD1(event,'z2_mm','z2_yy')"%/>%nn;
     <input id=z2_dd name=z2_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" onkeypress="javascript:return oKPdd(event,'z2','_dd','_pl');" onkeydown="javascript:return oKD1(event,'z2_dd','z2_mm')"%/>%nn;
   %end;
-    <input id=z2_pl name=z2_pl size=44 maxlength=200 class="pl" value="%xx.create.z1_place;" onblur="fillPlaceFam(this)" %l_on5;%/></span>%nn;
+    <input id=z2_pl name=z2_pl size=44 maxlength=200 class="pl" value="%xx.create.z1_place;" onblur="fillPlaceFam(this)"%/></span>%nn;
 %end;
 %define;link_create1(z1,z2,z3,xx)
   %let;l1;%if;("z2"="1")M%else;F%end;%in;
@@ -106,28 +106,28 @@
     <tr>
       <td>%apply;link_create1("pa","z1","0","parent")<div id="pa1_jq1"> </div></td>
       <td><input id="pa1_fn" name="pa1_fn" size="30" maxlength="200" placeholder="[first name/first names]0" value="%parent.first_name;" %lfa1;
-           %sp;onkeypress="javascript:return cF2(event,'pa',1,'_fn');" %l_on3; %l_on8;%/><br
+           %sp;onkeypress="javascript:return cF2(event,'pa',1,'_fn');" %l_on3;%/><br
        %/><input id="pa1_sn" name="pa1_sn" class="ar" size="30" maxlength="200" placeholder="[surname/surnames]0" value="%parent.surname;"
-           onkeypress="javascript:return cF2(event,'pa',1,'_sn');" %apply;onjq1a("pa1") %l_on7;%/></td>
+           onkeypress="javascript:return cF2(event,'pa',1,'_sn');" %apply;onjq1a("pa1")%/></td>
       <td class="jq2"><div id="pa1_jq2"></div><div id="pa1_jq3"></div>
         <span id="dppa1" class="%l1;">%nn;
           %apply;date_place("parent","birth","pa1b","pa","1","b_yy")
           %apply;date_place("parent","death","pa1d","pa","1","d_yy")</span>
       </td>
-      <td class="jq4"><div id="pa1_jq4"></div><input id="pa1_occupation" name="pa1_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
+      <td class="jq4"><div id="pa1_jq4"></div><input id="pa1_occupation" name="pa1_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;"%/></td>
     </tr>
   %else;
     <tr>
       <td>%apply;link_create1("pa","z1","1","parent")<div id="pa2_jq1"> </div></td>
       <td><input id="pa2_fn" name="pa2_fn" size="30" maxlength="200" placeholder="[first name/first names]0" value="%parent.first_name;"
-           onkeypress="javascript:return cF2(event,'pa',2,'_fn');" %l_on3; %l_on8;%/><br
+           onkeypress="javascript:return cF2(event,'pa',2,'_fn');" %l_on3;%/><br
        %/><input id="pa2_sn" name="pa2_sn" class="ar" size="30" maxlength="200" placeholder="[surname/surnames]0" value="%parent.surname;"
-           onkeypress="javascript:return cF2(event,'pa',2,'_sn');" %apply;onjq1a("pa2") %l_on7;%/></td>
+           onkeypress="javascript:return cF2(event,'pa',2,'_sn');" %apply;onjq1a("pa2")%/></td>
       <td class="jq2"><div id="pa2_jq2"></div><div id="pa2_jq3"></div>
         <span id="dppa2" class="%l1;">%nn;
           %apply;date_place("parent","birth","pa2b","pa","2","b_yy")
           %apply;date_place("parent","death","pa2d","pa","2","d_yy")</span></td>
-      <td class="jq4"><div id="pa2_jq4"></div><input id="pa2_occupation" name="pa2_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;" %l_on4;%/></td>
+      <td class="jq4"><div id="pa2_jq4"></div><input id="pa2_occupation" name="pa2_occu" class="occu %l1;" size="40" maxlength="200" value="%parent.create.occupation;"%/></td>
     </tr>
   %end;
 %end;
@@ -137,14 +137,14 @@
   <tr id="chz1">
     <td>%apply;link_create2("ch","z1","child")<div id="chz1_jq1"> </div></td>
     <td><input id="chz1_fn" name="chz1_fn" size="30" maxlength="200" value="%child.first_name;"
-         onkeypress="javascript:return cF2(event,'ch',z1,'_fn');" %apply;onjq1a1("chz1") %l_on8;%/><br
+         onkeypress="javascript:return cF2(event,'ch',z1,'_fn');" %apply;onjq1a1("chz1")%/><br
      %/><input type="hidden" id="chz1_sn" name="chz1_sn" class="ar" value="%child.surname;"
          onkeypress="javascript:return cF2(event,'ch',z1,'_sn');" %apply;onjq1a("chz1")%/></td>
     <td class="jq2"><div id="chz1_jq2"> </div><div id="chz1_jq3"> </div>
       <span id="dpchz1" class="%l2;">%nn;
         %apply;date_place("child","birth","chz1b","ch","z1","b_yy")
         %apply;date_place("child","death","chz1d","ch","z1","d_yy")</span></td>
-    <td class="jq4"><div id="chz1_jq4"> </div><input id="chz1_occupation" name="chz1_occu" class="occu %l2;" size="40" maxlength="200" value="%child.create.occupation" %l_on4;%/></td>
+    <td class="jq4"><div id="chz1_jq4"> </div><input id="chz1_occupation" name="chz1_occu" class="occu %l2;" size="40" maxlength="200" value="%child.create.occupation"%/></td>
   </tr>
 %end;
 %( <!-- End define --> %)
@@ -252,7 +252,7 @@
   <legend>[*source/sources]1</legend>
     <label>
     %if;(fsources="")
-    <input id="src" name="src" placeholder="[*source/sources]1 [family/families]0" maxlength="800" %lfa6; %l_on6; %l_on1s; value="%fsources;"/></label>
+    <input id="src" name="src" placeholder="[*source/sources]1 [family/families]0" maxlength="800" %lfa6; %l_on1s; value="%fsources;"/></label>
     %else;
     <textarea id="src" name="src" placeholder="[*source/sources]1 [family/families]0" rows="1" maxlength="800" %lfa6; %l_on1s;>%fsources;</textarea></label>
     %end;
