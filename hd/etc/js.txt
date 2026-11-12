@@ -833,11 +833,6 @@ function setupAutofocusInput() {
 document.addEventListener('DOMContentLoaded', setupAutofocusInput);
 </script>
 %end;
-
-%if;(e.m="MOD_DATA")
-<script src="%etc_prefix;js/updateField.js?hash=%apply;hash%with;%etc_prefix;js/updateField.js%end;"></script>
-<script>document.addEventListener('DOMContentLoaded', () => updateData.init());</script>
-%end;
 %if;(e.m="RM")
 <script>
 document.addEventListener('DOMContentLoaded', () => {
