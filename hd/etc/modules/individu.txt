@@ -68,11 +68,15 @@
     %end;
     %( Nobility title format:
          “13ᵉ prince de Monaco (Rainier III, 9 mai 1949–6 avril 2005)” %)
-    %if;has_nobility_titles;
-      %foreach;nobility_title;%nn;
-        %if;not is_first;,%sp;%end;
-        %nobility_title;%nn;
-      %end;
+    %( HEAD: titles added by notes, after the nobility titles %)
+    %if;(has_nobility_titles or (has_linked_page.HEAD and linked_page.HEAD!=""))
+      <div>%nn;
+        %foreach;nobility_title;%nn;
+          %if;not is_first;,%sp;%end;
+          %nobility_title;%nn;
+        %end;%nn;
+        %if;(has_linked_page.HEAD and linked_page.HEAD!="")%if;has_nobility_titles;,%sp;%end;%linked_page.HEAD;%end;
+      </div>
       %( Currently unused because it lacks concatenation of places in hyperlinks
       %foreach;nob_title;%nn;
         %if;not is_first;,%sp;%end;
@@ -93,7 +97,6 @@
         %end;
       %end;%)
     %end;
-    %if;(has_linked_page.HEAD and linked_page.HEAD!="") %linked_page.HEAD;%end;
     %if;has_first_names_aliases;
       <div>%reset_count;
         %apply;link(first_name,"P","")/%sq;
@@ -285,14 +288,14 @@
         %end;
       </li>
     %end;
-    %if;has_occupation;
+    %( OCCU: occupations added by notes, after the occupations %)
+    %if;(has_occupation or (has_linked_page.OCCU and linked_page.OCCU!=""))
       <li class="mt-1" title="[*occupation/occupations]0">
         %if;not roglo;<span class="fa-li"><i class="fas fa-user-tie"></i></span>%end;
-        %apply;updfield%with;occu%and;%apply;capitalize(occupation)%end;</li>%nl;
-    %end;
-    %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li>%if;not roglo;<span class="fa-li"><i class="far fa-file-lines"></i></span>%end;
-      %apply;capitalize(linked_page.OCCU)</li>%nl;
+        %if;has_occupation;%apply;updfield%with;occu%and;%apply;capitalize(occupation)%end;%end;%nn;
+        %if;(has_linked_page.OCCU and linked_page.OCCU!="")%nn;
+          %if;has_occupation;,%sp;%linked_page.OCCU;%else;%apply;capitalize(linked_page.OCCU)%end;
+        %end;</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
       <li class="mt-1" title="[*consanguinity]">%nn;

@@ -497,11 +497,11 @@
           %if;xx.has_cremation_place; - %xx.cremation_place;%end;</li>%nl;
         %end;
       %end;
-      %if;xx.has_occupation;
-        <li>%apply;capitalize(xx.occupation)</li>%nl;
-      %end;
-      %if;(xx.has_linked_page.OCCU and xx.linked_page.OCCU!="")
-        <li>%apply;capitalize(xx.linked_page.OCCU)</li>%nl;
+      %if;(xx.has_occupation or (xx.has_linked_page.OCCU and xx.linked_page.OCCU!=""))
+        <li>%if;xx.has_occupation;%apply;capitalize(xx.occupation)%end;%nn;
+          %if;(xx.has_linked_page.OCCU and xx.linked_page.OCCU!="")%nn;
+            %if;xx.has_occupation;,%sp;%xx.linked_page.OCCU;%else;%apply;capitalize(xx.linked_page.OCCU)%end;
+          %end;</li>%nl;
       %end;
       %if;(xx.has_consanguinity and b.show_consang!="no")
         <li>[*consanguinity] : %xx.consanguinity;</li>%nl;

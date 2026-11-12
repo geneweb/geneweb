@@ -1037,6 +1037,39 @@ let linked_pages_nbr conf base ip =
   | None -> 0
   | Some ht -> ( try Hashtbl.find ht key with Not_found -> 0)
 
+let linked_page_add conf pg tag pos ?(suffix = "") v (str : Adef.safe_string) =
+  let v =
+    let v = String.trim v in
+    let v =
+      if String.starts_with ~prefix:"<li>" v then
+        String.trim (String.sub v 4 (String.length v - 4))
+      else v
+    in
+    if String.ends_with ~suffix:"</li>" v then
+      String.trim (String.sub v 0 (String.length v - 5))
+    else v
+  in
+  let a, b, c =
+    match (String.index_opt v '{', String.index_opt v '}') with
+    | Some i, Some j when i < j ->
+        ( String.sub v 0 i,
+          String.sub v (i + 1) (j - i - 1),
+          String.sub v (j + 1) (String.length v - j - 1) )
+    | _ -> ("", v, "")
+  in
+  let content =
+    Printf.sprintf {|%s<a href="%sm=NOTES&f=%s#p_%d">%s</a>%s%s|} a
+      (commd conf :> string)
+      (Mutil.encode pg :> string)
+      pos b c suffix
+    |> safe_html
+  in
+  if tag = "NOTE" then
+    let item = "<li>" ^ Utf8.capitalize_fst (content :> string) ^ "</li>" in
+    Adef.safe ((str :> string) ^ item)
+  else if (str :> string) = "" then content
+  else Adef.(str ^^^ ", " ^<^ content)
+
 let linked_page_text_family conf base ifam s (str : Adef.safe_string)
     (pg, (_, il)) : Adef.safe_string =
   match pg with
@@ -1111,26 +1144,7 @@ let linked_page_text_family conf base ifam s (str : Adef.safe_string)
               | (_, ind) :: _ -> ind.Def.NLDB.lnPos
               | [] -> 0
             in
-            let a, b, c =
-              try
-                let i = String.index v '{' in
-                let j = String.index v '}' in
-                ( String.sub v 0 i,
-                  String.sub v (i + 1) (j - i - 1),
-                  String.sub v (j + 1) (String.length v - j - 1) )
-              with Not_found -> ("", v, "")
-            in
-            let str1 =
-              Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s%s" a
-                (Util.commd conf :> string)
-                (Mutil.encode pg :> string)
-                lnPos b c annot_suffix
-              |> Util.safe_html
-            in
-            if (str :> string) = "" then str1
-            else if Util.start_with (str1 :> string) 0 "<li>" then
-              Adef.safe ((str :> string) ^ (str1 :> string))
-            else Adef.safe ((str :> string) ^ ", " ^ (str1 :> string))
+            linked_page_add conf pg s lnPos ~suffix:annot_suffix v str
           with Not_found -> str))
   | _ -> str
 
