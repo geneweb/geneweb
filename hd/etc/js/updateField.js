@@ -448,10 +448,18 @@
       const base = norm(this.prefix ?? '');
       for (const ul of document.querySelectorAll('#main-content ul')) {
         let shown = false;
+        let head = null;
         for (const li of ul.children) {
           const a = li.querySelector('a[data-entry]');
+          if (!a) {
+            head = li;
+            head.hidden = true;
+            continue;
+          }
           li.hidden = n !== base && !norm(a.dataset.v ?? a.dataset.entry).includes(n);
-          shown ||= !li.hidden;
+          if (li.hidden) continue;
+          shown = true;
+          if (head) head.hidden = false;
         }
         ul.hidden = ul.previousElementSibling.hidden = !shown;
       }
