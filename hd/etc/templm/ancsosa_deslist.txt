@@ -215,7 +215,7 @@
       <div class="inot"><table><tbody><tr><td>
         %if;z1.has_linked_page.BNOTE;&gt;&gt; %z1.linked_page.BNOTE;<br>%end;
         %if;z1.has_notes;%z1.notes;%end;
-        %if;z1.has_linked_page.NOTE;&gt;&gt; %z1.linked_page.NOTE;%end;
+        %if;z1.has_linked_page.NOTE;<ul>%z1.linked_page.NOTE;</ul>%end;
       </td></tr></tbody></table></div>
     %end;
   %end;

@@ -1146,43 +1146,19 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
             match text.Def.NLDB.lnTxt with
             | Some "" -> str
             | Some _ | None ->
-                let str1 =
-                  let v =
-                    let text = text.Def.NLDB.lnTxt in
-                    match text with
-                    | Some text ->
-                        let rec loop i len =
-                          if i = String.length text then Buff.get len
-                          else if text.[i] = '*' then
-                            loop (i + 1) (Buff.mstore len v)
-                          else loop (i + 1) (Buff.store len text.[i])
-                        in
-                        loop 0 0
-                    | None -> v
-                  in
-                  let a, b, c =
-                    try
-                      let i = String.index v '{' in
-                      let j = String.index v '}' in
-                      let a = String.sub v 0 i in
-                      let b = String.sub v (i + 1) (j - i - 1) in
-                      let c = String.sub v (j + 1) (String.length v - j - 1) in
-                      (a, b, c)
-                    with Not_found -> ("", v, "")
-                  in
-                  Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
-                    (commd conf :> string)
-                    (Mutil.encode pg :> string)
-                    text.Def.NLDB.lnPos b c
-                  |> Util.safe_html
+                let v =
+                  match text.Def.NLDB.lnTxt with
+                  | Some text ->
+                      let rec loop i len =
+                        if i = String.length text then Buff.get len
+                        else if text.[i] = '*' then
+                          loop (i + 1) (Buff.mstore len v)
+                        else loop (i + 1) (Buff.store len text.[i])
+                      in
+                      loop 0 0
+                  | None -> v
                 in
-                (* see FIXME above: if str1 starts with <li> then no ", " *)
-                (* is <li> is within str1, we are toast *)
-                (* template: no punctuation at the end of linked_page.XXX *)
-                if (str :> string) = "" then str1
-                else if Util.start_with (str1 :> string) 0 "<li>" then
-                  str ^>^ (str1 :> string)
-                else str ^^^ ", " ^<^ str1
+                Notes.linked_page_add conf pg s text.Def.NLDB.lnPos v str
           with Not_found -> str)
         l str
   | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes | Def.NLDB.PgWizard _

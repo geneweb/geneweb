@@ -1240,7 +1240,7 @@
         %end;
         %notes;
         %if;(has_linked_page.NOTE)
-          %linked_page.NOTE;
+          <ul>%linked_page.NOTE;</ul>
         %end;
       </div>
     %end;

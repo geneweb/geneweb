@@ -28,6 +28,11 @@
   each witness in the person and family forms and rendered like the
   other notes: wiki syntax, allowed tags, and links indexed in the notes
   database.
+- The texts that a note linking a person adds to the person page (header
+  tags of the note) are placed with the data they complete: `HEAD`
+  follows the nobility titles after a comma, `OCCU` the occupations, and
+  each `NOTE` is an item of a list after the individual notes, a leading
+  `<li>` of the text being no longer needed.
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)
 - The books of first names, surnames, places, sources… (`m=MOD_DATA`)

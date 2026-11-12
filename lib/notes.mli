@@ -203,6 +203,22 @@ val json_gallery_items_for_key :
 
 val safe_gallery : Config.config -> Geneweb_db.Driver.base -> string -> string
 
+val linked_page_add :
+  Config.config ->
+  string ->
+  string ->
+  int ->
+  ?suffix:string ->
+  string ->
+  Adef.safe_string ->
+  Adef.safe_string
+(** [linked_page_add conf pg tag pos ?suffix v str] appends to [str] the text
+    [v] of the header tag [tag] of the note [pg] for a person linked at position
+    [pos] of the note: its part between braces, or the whole text, links to that
+    position, followed by [suffix]. A NOTE text becomes a capitalized list item
+    (a leading [<li>] of [v] is dropped), any other text is appended after a
+    comma. *)
+
 val get_linked_page_family :
   Config.config ->
   Geneweb_db.Driver.base ->
