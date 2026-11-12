@@ -180,6 +180,7 @@ body {
               <a class="dropdown-item" onclick="return insertTags('%[%[%[x:x/x%]%]%]','','')">%[%[%[directory:filename/[text]%]%]%]</a>
               <a class="dropdown-item" onclick="return insertTags('TITLE=','','')">TITLE=</a>
               <a class="dropdown-item" onclick="return insertTags('HEAD=','','')">HEAD=</a>
+              <a class="dropdown-item" onclick="return insertTags('SUBHEAD=','','')">SUBHEAD=</a>
               <a class="dropdown-item" onclick="return insertTags('DEATH=','','')">DEATH=</a>
               <a class="dropdown-item" onclick="return insertTags('OCCU=','','')">OCCU=</a>
               <a class="dropdown-item" onclick="return insertTags('BNOTE=','','')">BNOTE=</a>
