@@ -32,7 +32,9 @@
   tags of the note) are placed with the data they complete: `HEAD`
   follows the nobility titles after a comma, `OCCU` the occupations, and
   each `NOTE` is an item of a list after the individual notes, a leading
-  `<li>` of the text being no longer needed.
+  `<li>` of the text being no longer needed. The new tag `SUBHEAD` adds
+  a line under the titles, for memberships or distinctions that are not
+  nobility titles.
 - Add OpenID Connect (SSO) login support, configured per base via the
   `oidc_*` variables in the `.gwf` file (#2893)
 - The books of first names, surnames, places, sources… (`m=MOD_DATA`)
