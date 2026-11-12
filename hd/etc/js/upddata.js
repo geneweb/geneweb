@@ -349,7 +349,12 @@
         trigger: 'focus',
         placement: 'bottom',
         content: btn.nextElementSibling.innerHTML,
-        allowList: { ...bootstrap.Tooltip.Default.allowList, kbd: [] }
+        allowList: { ...bootstrap.Tooltip.Default.allowList, kbd: [] },
+        popperConfig: config => ({
+          ...config,
+          modifiers: [...config.modifiers,
+            { name: 'preventOverflow', options: { padding: 16 } }]
+        })
       });
     },
 
