@@ -1037,7 +1037,8 @@ let linked_pages_nbr conf base ip =
   | None -> 0
   | Some ht -> ( try Hashtbl.find ht key with Not_found -> 0)
 
-let linked_page_add conf pg tag pos ?(suffix = "") v (str : Adef.safe_string) =
+let linked_page_add conf pg nenv tag pos ?(suffix = "") v
+    (str : Adef.safe_string) =
   let v =
     let v = String.trim v in
     let v =
@@ -1064,11 +1065,33 @@ let linked_page_add conf pg tag pos ?(suffix = "") v (str : Adef.safe_string) =
       pos b c suffix
     |> safe_html
   in
-  if tag = "NOTE" then
-    let item = "<li>" ^ Utf8.capitalize_fst (content :> string) ^ "</li>" in
-    Adef.safe ((str :> string) ^ item)
-  else if (str :> string) = "" then content
-  else Adef.(str ^^^ ", " ^<^ content)
+  let note = Option.value ~default:pg (List.assoc_opt "TITLE" nenv) in
+  let tip =
+    Printf.sprintf
+      (ftransl_nth conf "added by the note %s"
+         (match tag with
+         | "HEAD" -> 0
+         | "SUBHEAD" -> 1
+         | "OCCU" -> 2
+         | "NOTE" -> 3
+         | _ -> 4))
+      ("<b>" ^ (escape_html note :> string) ^ "</b>")
+    |> Utf8.capitalize_fst
+  in
+  let el, sep, content =
+    if tag = "NOTE" then ("li", "", Utf8.capitalize_fst (content :> string))
+    else ("span", ", ", (content :> string))
+  in
+  let item =
+    Printf.sprintf
+      {|<%s class="linked-page" title="" data-bs-toggle="tooltip"
+        data-bs-html="true" data-bs-title="%s">%s</%s>|}
+      el
+      (escape_html tip :> string)
+      content el
+  in
+  if (str :> string) = "" then Adef.safe item
+  else Adef.safe ((str :> string) ^ sep ^ item)
 
 let linked_page_text_family conf base ifam s (str : Adef.safe_string)
     (pg, (_, il)) : Adef.safe_string =
@@ -1144,7 +1167,7 @@ let linked_page_text_family conf base ifam s (str : Adef.safe_string)
               | (_, ind) :: _ -> ind.Def.NLDB.lnPos
               | [] -> 0
             in
-            linked_page_add conf pg s lnPos ~suffix:annot_suffix v str
+            linked_page_add conf pg nenv s lnPos ~suffix:annot_suffix v str
           with Not_found -> str))
   | _ -> str
 

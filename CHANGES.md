@@ -29,7 +29,9 @@
   other notes: wiki syntax, allowed tags, and links indexed in the notes
   database.
 - The texts that a note linking a person adds to the person page (header
-  tags of the note) are placed with the data they complete: `HEAD`
+  tags of the note) are marked: hovering one highlights it and names the
+  note in a tooltip, and its link opens the note at the person, also
+  highlighted. They are placed with the data they complete: `HEAD`
   follows the nobility titles after a comma, `OCCU` the occupations, and
   each `NOTE` is an item of a list after the individual notes, a leading
   `<li>` of the text being no longer needed. The new tag `SUBHEAD` adds
