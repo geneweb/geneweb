@@ -223,3 +223,12 @@
     (concurrent
       (run gzip -9 -k -f %{input})
       (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets upddata.js.gz upddata.js.br)
+  (deps (:input upddata.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
