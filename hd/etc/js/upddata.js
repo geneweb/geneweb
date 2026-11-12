@@ -11,7 +11,10 @@
       this.persons = document.getElementById('book-persons');
       this.personsHref = this.persons.href;
       this.extra = form.querySelector('.book-extra');
-      this.field.addEventListener('input', () => this.changed());
+      this.field.addEventListener('input', () => {
+        this.changed();
+        this.fit();
+      });
       if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
         autosize(this.field);
       }
@@ -105,30 +108,47 @@
       this.changed();
       bootstrap.Tooltip.getInstance(a)?.hide();
       li.scrollIntoView({ block: 'nearest' });
-      const form = this.form;
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const w = Math.min(Math.max(li.offsetWidth + 8 * rem, 24 * rem),
-        innerWidth - 2 * rem);
-      form.style.width = w + 'px';
-      form.hidden = false;
-      if (this.field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
-        autosize.update(this.field);
-      }
-      const cs = getComputedStyle(this.field);
-      const fr = form.getBoundingClientRect();
-      const ir = this.field.getBoundingClientRect();
-      const ar = a.getBoundingClientRect();
-      const left = ar.left - (ir.left - fr.left)
-        - parseFloat(cs.borderLeftWidth) - parseFloat(cs.paddingLeft);
-      const top = ar.top - (ir.top - fr.top)
-        - parseFloat(cs.borderTopWidth) - parseFloat(cs.paddingTop);
-      form.style.left = scrollX + Math.min(Math.max(left, rem), innerWidth - w - rem) + 'px';
-      form.style.top = scrollY + top + 'px';
-      form.scrollIntoView({ block: 'nearest' });
+      this.place(li.querySelector('.book-src') ?? a);
       const at = !value && pos !== null && pos !== undefined
         && a.textContent.trim() === this.original ? pos : this.field.value.length;
       this.field.focus({ preventScroll: true });
       this.field.setSelectionRange(at, at);
+    },
+    place(anchor) {
+      const { form, field } = this;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      form.style.width = innerWidth - 2 * rem + 'px';
+      form.hidden = false;
+      this.min = Math.max(anchor.closest('li').offsetWidth
+        + form.offsetWidth - field.offsetWidth, innerWidth / 3);
+      const cs = getComputedStyle(field);
+      const fr = form.getBoundingClientRect();
+      const ir = field.getBoundingClientRect();
+      const ar = anchor.getBoundingClientRect();
+      this.left = ar.left - (ir.left - fr.left)
+        - parseFloat(cs.borderLeftWidth) - parseFloat(cs.paddingLeft);
+      const top = ar.top - (ir.top - fr.top)
+        - parseFloat(cs.borderTopWidth) - parseFloat(cs.paddingTop);
+      form.style.top = scrollY + top + 'px';
+      this.fit();
+      form.scrollIntoView({ block: 'nearest' });
+    },
+    fit() {
+      const { form, field } = this;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const cs = getComputedStyle(field);
+      const ctx = (this.ctx ??= document.createElement('canvas').getContext('2d'));
+      ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const need = Math.ceil(ctx.measureText(field.value).width) + 2
+        + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
+        + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
+        + form.offsetWidth - field.offsetWidth;
+      const w = Math.min(Math.max(this.min, need), innerWidth - 2 * rem);
+      form.style.width = w + 'px';
+      form.style.left = scrollX + Math.min(Math.max(this.left, rem), innerWidth - w - rem) + 'px';
+      if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
+        autosize.update(field);
+      }
     },
     close() {
       const a = this.a;

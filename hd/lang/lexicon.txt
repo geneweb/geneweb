@@ -12076,20 +12076,20 @@ es: si no se marca ninguna, ambas entradas se concatenarán
 fr: en cas de non selection, les deux entrées seront concaténées
 
     help modify data
-co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
-de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihres Baumes werden sofort korrigiert.
-en: Be careful! Modifications in the “book” update the corresponding elements in the entire database.
-es: Pulse en «el elemento de la lista» que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
-fi: Napsauta ”Päivitä” ja koko sukupuusi päivitetään automaattisesti.
-fr: Toute modification d’une entrée du dictionnaire impacte l’ensemble des données liées.
-it: Clicca su «l’elemento della lista» che vuoi correggere : l’insieme delle schede del tuo albero saranno istantaneamente corrette.
-nl: Klik op het “lijstelement” dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd worden.
-no: Klikk «Oppdater» for å editere og hele ditt slektstre vil automatisk bli oppdatert.
-oc: Clicatz sus l’element de modificar e totas las fichas del seu arbre seràn corregidas sulpic.
-pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas.
-ru: Нажмите «Изменить» для редактирования и всё фамильное дерево будет обновлено
-sv: Hjälp att modifiera data.
-tr: Dikkatli ol. “Kitapta” yapılan değişiklikler, tüm veritabanındaki ilgili öğeyi günceller.
+co: Ogni mudifica tocca tutti i dati di a basa.
+de: Jede Änderung wirkt sich auf alle Daten der Datenbank aus.
+en: Any change applies to all the data in the database.
+es: Cualquier modificación afecta a todos los datos de la base.
+fi: Jokainen muutos koskee kaikkia tietokannan tietoja.
+fr: Toute modification se répercute sur l’ensemble des données de la base.
+it: Ogni modifica riguarda tutti i dati della base.
+nl: Elke wijziging heeft gevolgen voor alle gegevens van de database.
+no: Enhver endring påvirker alle data i databasen.
+oc: Tota modificacion toca totas las donadas de la basa.
+pt: Qualquer alteração afeta todos os dados da base.
+ru: Любое изменение затрагивает все данные базы.
+sv: Varje ändring påverkar alla data i databasen.
+tr: Her değişiklik veri tabanındaki tüm verileri etkiler.
 
     help surname branch
 co: per ottene l’alburu di e ghjembe patronimiche, ci vole à cliccà nant’à u numeru di ghjembe

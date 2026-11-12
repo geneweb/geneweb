@@ -314,43 +314,6 @@ and eval_simple_var conf base env xx = function
   | [ "permalink" ] ->
       Templ.VVstring
         (Permalink.script conf (Permalink.query conf base) :> string)
-  | [ "p_list" ] ->
-      let data =
-        match p_getenv conf.env "data" with Some data -> data | _ -> ""
-      in
-      let istr =
-        match get_env "key" env with Vstring istr -> istr | _ -> "0"
-      in
-      let conf =
-        {
-          conf with
-          env =
-            ("key", Adef.encoded istr)
-            :: ("data", Adef.encoded data)
-            :: conf.env;
-        }
-      in
-      let istr, p_list = List.hd (get_person_from_data conf base) in
-      let n = List.length p_list in
-      let b = Buffer.create 1024 in
-      Printf.bprintf b
-        {|<a class="btn btn-sm btn-outline-primary text-nowrap align-self-center ms-3"
-   href="%sm=L&data=%s&parents=on&key=%s&k=%s&nb=%d|}
-        (commd conf :> string)
-        (Mutil.encode data :> string)
-        (Driver.Istr.to_string istr)
-        (Mutil.encode (Driver.sou base istr) :> string)
-        n;
-      List.iteri
-        (fun i p ->
-          Printf.bprintf b "&i%d=%s" i
-            (Driver.Iper.to_string (Driver.get_iper p)))
-        p_list;
-      Printf.bprintf b {|" title="%s"><i class="fa fa-user me-1"></i>%d %s</a>|}
-        (Utf8.capitalize_fst (transl conf "list of linked persons"))
-        n
-        (transl_nth conf "person/persons" (if n > 1 then 1 else 0));
-      str_val (Buffer.contents b)
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))
