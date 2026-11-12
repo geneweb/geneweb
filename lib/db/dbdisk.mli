@@ -69,6 +69,9 @@ type dict_index = {
   (* The same, each with its number of records ([dict_count]), read in
      order. *)
   dict_entries_count : Dict.t -> string -> (int * int) list;
+  (* The same for the entries displayed exactly as a prefix (the group of the
+     prefix itself in [dict_groups]). *)
+  dict_exact_count : Dict.t -> string -> (int * int) list;
   (* Records using a string: 2 * iper for a person, 2 * ifam + 1 for a
      family. *)
   dict_refs : Dict.t -> int -> int list;

@@ -88,6 +88,9 @@ let dict_count base d istr = base.func.dict_index.dict_count d istr
 let dict_entries_count base d prefix =
   base.func.dict_index.dict_entries_count d prefix
 
+let dict_exact_count base d prefix =
+  base.func.dict_index.dict_exact_count d prefix
+
 let dict_has base d = base.func.dict_index.dict_has d
 
 let dict_records base d istr =

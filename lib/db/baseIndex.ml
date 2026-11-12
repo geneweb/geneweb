@@ -642,18 +642,21 @@ let with_reader bdir ~particles src k =
   in
   (* the rank of an entry read in order is known: no search per entry, as
      [dict_count] does (12 s for the 800,000 places of Roglo) *)
-  let dict_entries_count d p =
+  let entries_count d k1 k2 =
     let f, c = view d in
-    let k2 = after_prefix p in
-    let lo = f.lower_bound p in
+    let lo = f.lower_bound k1 in
     let a = f.istrs_counts lo (f.lower_bound k2) in
     entries_with
       ~file:(fun r ->
         let i, n = a.(r - lo) in
         (i, records_count c.delta n i))
       ~extra:(fun i -> (i, records_count c.delta (file_count f (f.rank i)) i))
-      f c p k2
+      f c k1 k2
   in
+  let dict_entries_count d p = entries_count d p (after_prefix p) in
+  (* the key of an entry displayed as [p] is [p], or [p] followed by a null
+     byte and the rest of the key (suburb, particle, whole place) *)
+  let dict_exact_count d p = entries_count d p (p ^ "\001") in
   let dict_refs d i =
     let f, c = view d in
     refs f c i
@@ -681,6 +684,7 @@ let with_reader bdir ~particles src k =
       dict_groups;
       dict_entries;
       dict_entries_count;
+      dict_exact_count;
       dict_refs;
       dict_count;
       dict_first;
