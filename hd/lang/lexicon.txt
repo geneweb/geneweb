@@ -4418,26 +4418,26 @@ pt: este nome próprio ou apelido não contém nenhum carácter alfanumérico: a
 sv: detta för- eller efternamn innehåller inget alfanumeriskt tecken: sökningen hittar inte personerna som bär det, och deras historik och porträtt kan förväxlas med andras. Byt till ett platshållarnamn, till exempel Nn.
 
     book keyboard help
-de: Bei der Eingabe: ↑ ↓ vorheriger oder nächster Eintrag, Alt + ← → Nachbarspalte, Eingabe bestätigt, Esc schließt
-en: While editing: ↑ ↓ previous or next entry, Alt + ← → neighbouring column, Enter validates, Esc closes
-es: Al editar: ↑ ↓ entrada anterior o siguiente, Alt + ← → columna vecina, Intro valida, Esc cierra
-fr: Dans la saisie : ↑ ↓ entrée précédente ou suivante, Alt + ← → colonne voisine, Entrée valide, Échap ferme
-it: Durante la modifica: ↑ ↓ voce precedente o successiva, Alt + ← → colonna vicina, Invio conferma, Esc chiude
-nl: Tijdens het bewerken: ↑ ↓ vorige of volgende ingang, Alt + ← → naburige kolom, Enter bevestigt, Esc sluit
-pl: Podczas edycji: ↑ ↓ poprzedni lub następny wpis, Alt + ← → sąsiednia kolumna, Enter zatwierdza, Esc zamyka
-pt: Ao editar: ↑ ↓ entrada anterior ou seguinte, Alt + ← → coluna vizinha, Enter valida, Esc fecha
-sv: Vid redigering: ↑ ↓ föregående eller nästa post, Alt + ← → intilliggande kolumn, Enter bekräftar, Esc stänger
+de: vorheriger oder nächster Eintrag/Nachbarspalte/bestätigt/schließt
+en: previous or next entry/neighbouring column/validates/closes
+es: entrada anterior o siguiente/columna vecina/valida/cierra
+fr: entrée précédente ou suivante/colonne voisine/valide/ferme
+it: voce precedente o successiva/colonna vicina/conferma/chiude
+nl: vorige of volgende ingang/naburige kolom/bevestigt/sluit
+pl: poprzedni lub następny wpis/sąsiednia kolumna/zatwierdza/zamyka
+pt: entrada anterior ou seguinte/coluna vizinha/valida/fecha
+sv: föregående eller nästa post/intilliggande kolumn/bekräftar/stänger
 
-    book search here
-de: Klicken, um ab hier zu suchen
-en: Click to search from here
-es: Haga clic para buscar desde aquí
-fr: Cliquer pour rechercher à partir d’ici
-it: Fare clic per cercare da qui
-nl: Klik om vanaf hier te zoeken
-pl: Kliknij, aby szukać od tego miejsca
-pt: Clique para pesquisar a partir daqui
-sv: Klicka för att söka härifrån
+    book keyboard keys
+de: Eingabe/Esc
+en: Enter/Esc
+es: Intro/Esc
+fr: Entrée/Échap
+it: Invio/Esc
+nl: Enter/Esc
+pl: Enter/Esc
+pt: Enter/Esc
+sv: Enter/Esc
 
     book of %s
 co: libru di i %s

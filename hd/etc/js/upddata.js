@@ -233,7 +233,9 @@
         this.stableTooltips();
         this.removeLoadingOverlay();
         this.autoSelectLink();
-        this.searchToggle();
+        this.helpPopover();
+        this.searchFocus();
+        this.alignBar();
         BookEdit.init();
       } catch (e) {
         console.error('updateData init failed:', e);
@@ -303,32 +305,32 @@
       });
     },
 
-    searchToggle() {
-      const here = document.getElementById('book-here');
-      const form = here?.nextElementSibling;
-      if (!form) return;
-      const input = form.elements.s;
-      const close = () => {
-        form.hidden = true;
-        here.classList.remove('invisible');
-      };
-      here.addEventListener('click', () => {
-        here.classList.add('invisible');
-        form.hidden = false;
-        input.focus();
+    helpPopover() {
+      const btn = document.getElementById('book-help');
+      if (!btn) return;
+      new bootstrap.Popover(btn, {
+        html: true,
+        trigger: 'focus',
+        placement: 'bottom',
+        content: btn.nextElementSibling.innerHTML,
+        allowList: { ...bootstrap.Tooltip.Default.allowList, kbd: [] }
+      });
+    },
+
+    searchFocus() {
+      const input = document.getElementById('book-filter');
+      input?.addEventListener('focus', () => {
         input.setSelectionRange(input.value.length, input.value.length);
       });
-      input.addEventListener('keydown', ev => {
-        if (ev.key !== 'Escape') return;
-        ev.preventDefault();
-        input.value = input.defaultValue;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        close();
-        here.focus();
-      });
-      input.addEventListener('blur', () => {
-        if (input.value === input.defaultValue) close();
-      });
+    },
+
+    alignBar() {
+      const list = document.getElementById('main-content');
+      const bar = document.getElementById('book-bar');
+      if (!list || !bar) return;
+      const fit = () => { bar.style.maxWidth = `max(40rem, ${list.offsetWidth}px)`; };
+      fit();
+      addEventListener('resize', fit);
     },
 
     removeLoadingOverlay() {

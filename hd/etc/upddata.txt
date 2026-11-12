@@ -49,87 +49,96 @@
       %apply;books()
     </ul>
   %else;
-    <nav class="sticky-sm-top bg-body-tertiary border-bottom p-2" id="fixed-nav" aria-label="[*hierarchical navigation]">
-      <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-2">
-        <h1 class="visually-hidden">%title;</h1>
-        <div class="dropdown">
-          <button class="btn btn-link link-body-emphasis text-decoration-none dropdown-toggle d-inline-flex align-items-center column-gap-1 fs-4 fw-medium p-0"
-            type="button" data-bs-toggle="dropdown" aria-expanded="false">%title;</button>
-          <ul class="dropdown-menu">
-            %apply;books()
-          </ul>
-        </div>
-        <span class="text-body-secondary">%subtitle;</span>
-        <div class="d-flex align-items-center gap-3 ms-auto">
-          %if;(nb_results<nb_max)
-            <div class="d-none d-lg-block">[*book keyboard help]</div>
-          %end;
-          %if;(e.data="place")
-            %if;rev_order;
-              <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=a">%nn;
-                <i class="fa fa-arrow-down-a-z fa-fw me-1"></i>[*alphabetic order]</a>
-            %else;
-              <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=r">%nn;
-                <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
+    <nav class="sticky-sm-top bg-body-tertiary border-bottom mb-1 px-2 py-1" id="fixed-nav" aria-label="[*hierarchical navigation]">
+      <div class="mx-auto" id="book-bar">
+        <div class="d-flex flex-wrap align-items-center column-gap-4 row-gap-2">
+          <h1 class="visually-hidden">%title;</h1>
+          <div class="dropdown">
+            <button class="btn btn-link link-body-emphasis text-decoration-none dropdown-toggle d-inline-flex align-items-center column-gap-1 fs-4 fw-medium p-0"
+              type="button" data-bs-toggle="dropdown" aria-expanded="false">%title;</button>
+            <ul class="dropdown-menu">
+              %apply;books()
+            </ul>
+          </div>
+          <form class="book-search d-flex gap-1" role="search" method="get" action="%action;">
+            %hidden;
+            <input type="hidden" name="m" value="MOD_DATA">
+            <input type="hidden" name="data" value="%e.data;">
+            %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
+            <input type="text" class="form-control font-monospace" name="s" id="book-filter"
+              accesskey="R" autocomplete="off" value="%escape.current_s;"
+              placeholder="[*search/case sensitive]0" aria-label="[*search/case sensitive]0">
+            <button type="submit" class="btn btn-primary" title="[*search/case sensitive]0"
+              aria-label="[*search/case sensitive]0"><i class="fa fa-magnifying-glass"></i></button>
+          </form>
+          <span class="text-body-secondary">%subtitle;</span>
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            %if;(nb_results<nb_max)
+              <a class="btn btn-sm btn-outline-secondary d-none d-lg-inline-block" id="book-help" role="button" tabindex="0"
+                data-bs-title="[*help and shortcuts]" aria-label="[*help and shortcuts]"><i class="fa fa-info fa-fw"></i></a>
+              <template>
+                <ul class="list-unstyled mb-0">
+                  <li><kbd>↑</kbd> <kbd>↓</kbd> [book keyboard help]0</li>
+                  <li class="mt-1"><kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> [book keyboard help]1</li>
+                  <li class="mt-1"><kbd>[book keyboard keys]0</kbd> [book keyboard help]2</li>
+                  <li class="mt-1"><kbd>[book keyboard keys]1</kbd> [book keyboard help]3</li>
+                </ul>
+              </template>
             %end;
-            <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
-              <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
-          %elseif;(e.data="src")
-            <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=SOURCE_TERMS">%nn;
-              <i class="fa fa-object-group fa-fw me-1"></i>[*sources to group]</a>
-          %elseif;(e.data="occu")
-            <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=OCCU_TERMS">%nn;
-              <i class="fa fa-object-group fa-fw me-1"></i>[*occupations to group]</a>
-          %end;
+            %if;(e.data="place")
+              %if;rev_order;
+                <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=a">%nn;
+                  <i class="fa fa-arrow-down-a-z fa-fw me-1"></i>[*alphabetic order]</a>
+              %else;
+                <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=r">%nn;
+                  <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
+              %end;
+              <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
+                <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
+            %elseif;(e.data="src")
+              <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=SOURCE_TERMS">%nn;
+                <i class="fa fa-object-group fa-fw me-1"></i>[*sources to group]</a>
+            %elseif;(e.data="occu")
+              <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=OCCU_TERMS">%nn;
+                <i class="fa fa-object-group fa-fw me-1"></i>[*occupations to group]</a>
+            %end;
+          </div>
         </div>
-      </div>
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <ol class="breadcrumb flex-nowrap flex-shrink-0 align-items-center mb-0" style="--bs-breadcrumb-divider: '›';">
-          %if;(e.s!="")
-            <li class="breadcrumb-item">
-              <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;%rv;"
-                title="[*back to index and books]" aria-label="[*back to index and books]">%nn;
-                <i class="fa fa-arrow-down-a-z"></i><span class="d-none d-md-inline ms-1">[*alphabetical index]</span></a>
-            </li>
-            %foreach;substring.s.6;
+        <div class="d-flex align-items-center gap-2 mt-2">
+          <ol class="breadcrumb flex-nowrap flex-shrink-0 align-items-center mb-0" style="--bs-breadcrumb-divider: '›';">
+            %if;(e.s!="")
               <li class="breadcrumb-item">
-                <a class="sub-char btn btn-sm btn-outline-primary fs-6 font-monospace text-nowrap"
-                  href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;%rv;">%visual_spaces.escape.substr;</a>
+                <a class="sub-char btn btn-sm btn-outline-primary fs-6 text-nowrap" href="%prefix;m=MOD_DATA&data=%e.data;%rv;"
+                  title="[*back to index and books]" aria-label="[*back to index and books]">%nn;
+                  <i class="fa fa-arrow-down-a-z"></i><span class="d-none d-md-inline ms-1">[*alphabetical index]</span></a>
               </li>
+              %foreach;substring.s.6;
+                <li class="breadcrumb-item">
+                  <a class="sub-char btn btn-sm btn-outline-primary fs-6 font-monospace text-nowrap"
+                    href="%prefix;m=MOD_DATA&data=%e.data;&s=%encode.substr;%rv;">%visual_spaces.escape.substr;</a>
+                </li>
+              %end;
+              %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
             %end;
-            %if;(len_s>6)<li class="breadcrumb-item">…</li>%end;
-          %end;
-          <li class="breadcrumb-item" aria-current="page">
-            <span class="d-inline-block position-relative">
-            <button type="button" class="btn btn-sm btn-primary fs-6 text-nowrap%if;(e.s!="") font-monospace%end;"
-              id="book-here" accesskey="R" title="[*book search here] (R)">%nn;
-              %if;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%else;%visual_spaces.escape.current_s;%end;</button>
-            <form class="position-absolute top-0 start-0 z-3" role="search" method="get" action="%action;" hidden>
-              %hidden;
-              <input type="hidden" name="m" value="MOD_DATA">
-              <input type="hidden" name="data" value="%e.data;">
-              %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
-              <input type="text" class="form-control form-control-sm fs-6 font-monospace border-primary"
-                name="s" id="book-filter" autocomplete="off" value="%escape.current_s;"
-                style="width: %expr(len_s+12)ch;" placeholder="[*search/case sensitive]0"
-                aria-label="[*search/case sensitive]0">
-            </form>
-            </span>
-          </li>
-        </ol>
-        %if;(nb_results<nb_max)
-        <div class="d-flex flex-nowrap flex-sm-wrap overflow-x-auto gap-1 p-1">
-          %foreach;entry;
-            %if;(entry_ini!=e.s)
-              <a class="sup-char btn btn-sm fs-6 text-nowrap%if;script; %script_class;%end;"
-                href="#_%escape.entry_ini;"
-                title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">%nn;
-                <span class="font-monospace">%visual_spaces.escape.entry_ini_display;</span>%nn;
-                <span class="ms-1 %if;(entry_count>=nb_max)fw-bold text-warning-emphasis%end;">%entry_nb;</span></a>
+            <li class="breadcrumb-item" aria-current="page">
+              <span class="btn btn-sm btn-primary fs-6 text-nowrap pe-none%if;(e.s!="") font-monospace%end;">%nn;
+                %if;(e.s="")<i class="fa fa-arrow-down-a-z me-1"></i>[*alphabetical index]%else;%visual_spaces.escape.current_s;%end;</span>
+            </li>
+          </ol>
+          %if;(nb_results<nb_max)
+          <div class="d-flex flex-nowrap flex-sm-wrap overflow-x-auto gap-1 p-1">
+            %foreach;entry;
+              %if;(entry_ini!=e.s)
+                <a class="sup-char btn btn-sm fs-6 text-nowrap%if;script; %script_class;%end;"
+                  href="#_%escape.entry_ini;"
+                  title="%entry_label;%if;script; (%script_title;)%end;" aria-label="%entry_label;">%nn;
+                  <span class="font-monospace">%visual_spaces.escape.entry_ini_display;</span>%nn;
+                  <span class="ms-1 %if;(entry_count>=nb_max)fw-bold text-warning-emphasis%end;">%entry_nb;</span></a>
+              %end;
             %end;
+          </div>
           %end;
         </div>
-        %end;
       </div>
     </nav>
     <div id="notfound-warning" class="alert alert-danger py-2 mt-2 d-none" role="alert">

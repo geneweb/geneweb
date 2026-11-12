@@ -808,6 +808,10 @@ html {
   padding-inline-start: calc(.75rem + var(--bs-border-width));
 }
 
+.book-search {
+  width: min(100%, 13rem);
+}
+
 #main-content li.book-current {
   background-color: var(--bs-warning-bg-subtle);
   outline: 2px solid var(--bs-primary);
