@@ -14159,6 +14159,17 @@ pt: listar por nome, local e data
 sv: index
 tr: ad, yer ve tarihe göre listele
 
+    linked persons %s
+de: die verknüpfte Person bearbeiten/Liste der %s verknüpften Personen
+en: edit the linked person/list of the %s linked persons
+es: modificar la persona vinculada/lista de las %s personas vinculadas
+fr: modifier la personne liée/liste des %s personnes liées
+it: modificare la persona collegata/elenco delle %s persone collegate
+nl: de gekoppelde persoon bewerken/lijst van de %s gekoppelde personen
+pl: edytuj powiązaną osobę/lista %s powiązanych osób
+pt: modificar a pessoa ligada/lista das %s pessoas ligadas
+sv: redigera den länkade personen/lista över de %s länkade personerna
+
     list of linked persons
 af: lys van gekoppelde persone
 bg: списък на свързаните лица
