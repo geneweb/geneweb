@@ -836,6 +836,9 @@ val escape_html : string -> Adef.escaped_string
 (** [escape_html str] replaces '&', '"', '\'', '<' and '>' with their
     corresponding character entities (using entity number) *)
 
+val unescape_html : string -> string
+(** Inverse of [escape_html]: decodes the five entities it produces. *)
+
 val event_symbol : Config.config -> string -> string
 (** [event_symbol conf name] is the compact event marker for [name] (one of
     ["birth"], ["baptism"], ["marriage"], ["death"], ["burial"]) used by the m=L

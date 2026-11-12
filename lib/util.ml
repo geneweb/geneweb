@@ -199,6 +199,40 @@ let escape_html s : Adef.escaped_string =
     s
   |> Adef.escaped
 
+(* Inverse of [escape_html]: decodes the five entities it produces. *)
+let unescape_html s =
+  let len = String.length s in
+  let b = Buffer.create len in
+  let rec loop i =
+    if i >= len then ()
+    else if s.[i] = '&' && i + 4 < len && s.[i + 1] = '#' && s.[i + 4] = ';'
+    then (
+      match String.sub s (i + 2) 2 with
+      | "34" ->
+          Buffer.add_char b '"';
+          loop (i + 5)
+      | "38" ->
+          Buffer.add_char b '&';
+          loop (i + 5)
+      | "39" ->
+          Buffer.add_char b '\'';
+          loop (i + 5)
+      | "60" ->
+          Buffer.add_char b '<';
+          loop (i + 5)
+      | "62" ->
+          Buffer.add_char b '>';
+          loop (i + 5)
+      | _ ->
+          Buffer.add_char b '&';
+          loop (i + 1))
+    else (
+      Buffer.add_char b s.[i];
+      loop (i + 1))
+  in
+  loop 0;
+  Buffer.contents b
+
 let esc x = (escape_html x :> Adef.safe_string)
 
 (** [escape_attribute str] only escapes double quote and ampersand. Since we
