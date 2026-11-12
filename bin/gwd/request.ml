@@ -661,12 +661,7 @@ let treat_request =
              | "KILL_ANC" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ MergeIndDisplay.print_kill_ancestors
-             | "L" ->
-                 w_base @@ fun conf base ->
-                 Perso.interp_templ "list"
-                   (UpdateDataDisplay.list_env conf base)
-                   base
-                   (Driver.empty_person base Driver.Iper.dummy)
+             | "L" -> w_base @@ UpdateDataDisplay.print_list conn
              | "LB" -> w_base @@ BirthDeathDisplay.print_birth
              | "LD" -> w_base @@ BirthDeathDisplay.print_death
              | "LINKED" -> w_base @@ w_person @@ NotesDisplay.print_what_links_p
