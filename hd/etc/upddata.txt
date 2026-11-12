@@ -167,7 +167,7 @@
         <ul class="list-unstyled src-list-bg">
           %foreach;value;
             %if;new_head;<li class="book-head">%escape.rev_head;</li>%end;
-            <li class="%if;(e.data="src")px-2%else;pe-2%end;" id="k%entry_key;">
+            <li class="%if;(e.data="src")px-2 position-relative%else;pe-2%end;" id="k%entry_key;">
               %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                 <div class="alert alert-warning mt-2">[*book blank name]</div>
               %end;
@@ -190,12 +190,12 @@
                   </span>
                 %end;
                 <div class="flex-grow-1">
-                  <a role="button" class="btn-link%if;(e.data!="src") d-block%end;"
-                     title="[*modify]" data-bs-toggle="tooltip" data-placement="bottom"
+                  <a role="button" class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
+                     %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
                      href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;"
                      data-entry="%escape.printable.entry_value;"%nn;
                      %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
-                     %if;(e.data="src")<i class="fa fa-pen-to-square"></i></a>%end;
+                     %if;(e.data="src")</a>%end;
                      %if;(e.data="place" and suburb!="")
                        %if;(first)
                          %escape.other;<br><span class="ms-4">%escape.suburb;</span>
@@ -205,11 +205,10 @@
                          <span class="visually-hidden">)</span>
                        %end;
                      %else;
-                       %if;(e.data!="src")%escape.entry_value;%else;<span class="ms-3">%entry_value;</span>%end;
+                       %if;(e.data!="src")%escape.entry_value;%else;<span class="book-src ms-3">%entry_value;</span>%end;
                      %end;
                      %if;(e.data!="src")</a>%end;
                 </div>
-                %if;is_modified;%p_list;%end;
               </div>
             </li>
           %end;
@@ -224,30 +223,30 @@
       %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
-      <div class="d-flex align-items-start gap-2">
-        <a class="btn btn-outline-secondary" id="book-persons" target="_blank" rel="noopener"
+      <div class="book-row">
+        <a class="btn btn-outline-primary" id="book-persons" target="_blank" rel="noopener"
           href="%prefix;m=L&data=%e.data;&parents=on"
           title="[*list of linked persons]" aria-label="[*list of linked persons]"><i class="fa fa-list"></i></a>
         %if;(e.data="src" or e.data="occu" or e.data="place")
-          <textarea class="form-control no-clear-button" id="nx_input" name="nx_input" rows="1"
+          <textarea class="form-control" id="nx_input" name="nx_input" rows="1"
             maxlength="1000" aria-label="[*modify]" required></textarea>
         %else;
-          <input type="text" class="form-control no-clear-button" id="nx_input" name="nx_input"
+          <input type="text" class="form-control p-1" id="nx_input" name="nx_input"
             maxlength="200" aria-label="[*modify]" required>
         %end;
         <button type="submit" class="btn btn-primary" title="[*validate/delete]0">OK</button>
-        <button type="button" class="btn-close mt-2" title="[*close]" aria-label="[*close]"></button>
-      </div>
-      <div class="book-extra px-1" hidden>
-        <div class="book-input-text text-body-secondary mt-1"></div>
-        %if;(e.data="fn" or e.data="sn")
-          <div class="form-check mt-1">
-            <input class="form-check-input" type="checkbox" id="book-alias"
-              name="%if;(e.data="fn")first_name%else;surname%end;_aliases" value="yes">
-            <label class="form-check-label" for="book-alias">%if;(e.data="fn")[*add the previous name as a first name alias]%else;[*add the previous name as a surname alias]%end;</label>
-          </div>
-        %end;
-        <div class="form-text"><i class="fa fa-hat-wizard text-danger me-1"></i>[*help modify data]</div>
+        <button type="button" class="btn-close" title="[*close]" aria-label="[*close]"></button>
+        <div class="book-extra" hidden>
+          <div class="book-input-text text-body-secondary"></div>
+          %if;(e.data="fn" or e.data="sn")
+            <div class="form-check mt-1">
+              <input class="form-check-input" type="checkbox" id="book-alias"
+                name="%if;(e.data="fn")first_name%else;surname%end;_aliases" value="yes">
+              <label class="form-check-label" for="book-alias">%if;(e.data="fn")[*add the previous name as a first name alias]%else;[*add the previous name as a surname alias]%end;</label>
+            </div>
+          %end;
+          <div class="text-small"><i class="fa fa-hat-wizard fa-xs text-danger me-1"></i>[*help modify data]</div>
+        </div>
       </div>
     </form>
   %else;
