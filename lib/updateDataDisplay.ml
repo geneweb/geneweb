@@ -7,6 +7,7 @@ let src = Logs.Src.create ~doc:"UpdateDataDisplay" "UPDT"
 module Log = (val Logs.src_log src : Logs.LOG)
 module Sosa = Geneweb_sosa
 module Driver = Geneweb_db.Driver
+module Connection = Geneweb_http.Connection
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
@@ -31,12 +32,25 @@ let translate_title conf len =
 let thousands conf n =
   Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int n)
 
-let list_env conf base =
+let print_list conn conf base =
+  let print conf =
+    Perso.interp_templ "list" conf base
+      (Driver.empty_person base Driver.Iper.dummy)
+  in
   match
     (p_getenv conf.env "data", p_getenv conf.env "key", p_getenv conf.env "i0")
   with
-  | Some _, Some _, None -> (
+  | Some data, Some _, None -> (
       match get_person_from_data conf base with
+      | [ (_, [ p ]) ] ->
+          let url =
+            if conf.wizard && (data = "title" || data = "domain") then
+              Printf.sprintf "%sm=MOD_IND&i=%s#titles"
+                (commd conf :> string)
+                (Driver.Iper.to_string (Driver.get_iper p))
+            else (Adef.(commd conf ^^^ Util.acces conf base p) :> string)
+          in
+          Connection.http_redirect_temporarily conn url
       | (istr, pl) :: _ ->
           let ipers =
             List.mapi
@@ -45,15 +59,16 @@ let list_env conf base =
                   Adef.encoded (Driver.Iper.to_string (Driver.get_iper p)) ))
               pl
           in
-          {
-            conf with
-            env =
-              ("nb", Adef.encoded (string_of_int (List.length pl)))
-              :: ("k", Mutil.encode (Driver.sou base istr))
-              :: List.rev_append ipers conf.env;
-          }
-      | [] -> conf)
-  | _ -> conf
+          print
+            {
+              conf with
+              env =
+                ("nb", Adef.encoded (string_of_int (List.length pl)))
+                :: ("k", Mutil.encode (Driver.sou base istr))
+                :: List.rev_append ipers conf.env;
+            }
+      | [] -> print conf)
+  | _ -> print conf
 
 let print_json conf json =
   Output.header conf "Content-type: application/json";
