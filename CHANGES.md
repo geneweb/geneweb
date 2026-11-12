@@ -38,7 +38,10 @@
   is no longer listed in full, only its groups: the datalists of the
   templm forms (`datalist_*=1`) stay empty for such a book.
 - A change in a book is done at once, no longer by steps of
-  `max_nb_update` (5000) modifications.
+  `max_nb_update` (5000) modifications. The editor of an entry shows
+  its number of records (persons and families), and a change of an
+  entry used by more than `book_bulk_confirm` records (150 by default)
+  asks to be validated again.
 - chk_data (`m=CHK_DATA`), the place and source terms (`m=PLACE_TERMS`,
   `m=SOURCE_TERMS`) and the unknown persons (`m=UNKNOWN`) read the index
   of the dictionaries too: they no longer read every person and family

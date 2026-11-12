@@ -470,6 +470,7 @@ let build_list_long conf base list : (string * (Driver.istr * string) list) list
 type book = {
   count : int;
   groups : (string * int * (Driver.istr * string) list) list;
+  records : (Driver.istr, int) Hashtbl.t;
 }
 
 let book_max_results conf =
@@ -481,9 +482,18 @@ let book_max_results conf =
   | Some n when n > 0 -> n
   | Some _ | None -> 1000
 
+let book_bulk_confirm conf =
+  match
+    Option.bind
+      (List.assoc_opt "book_bulk_confirm" conf.base_env)
+      int_of_string_opt
+  with
+  | Some n when n > 0 -> n
+  | Some _ | None -> 150
+
 let book conf base =
   match dict conf with
-  | None -> { count = 0; groups = [] }
+  | None -> { count = 0; groups = []; records = Hashtbl.create 1 }
   | Some d ->
       let d =
         if d = Dict.Place && rev_order conf base then Dict.Place_last else d
@@ -509,10 +519,15 @@ let book conf base =
       let count = Driver.dict_size base d p - List.length hidden in
       if count < book_max_results conf then
         let entry = book_entry conf base in
+        let records = Hashtbl.create 256 in
         let list =
           List.filter_map
-            (fun istr -> if Driver.Istr.is_empty istr then None else entry istr)
-            (Driver.dict_entries base d p)
+            (fun (istr, n) ->
+              if Driver.Istr.is_empty istr then None
+              else (
+                Hashtbl.replace records istr n;
+                entry istr))
+            (Driver.dict_entries_count base d p)
         in
         {
           count = List.length list;
@@ -520,6 +535,7 @@ let book conf base =
             List.map
               (fun (ini, l) -> (ini, List.length l, l))
               (build_list_long conf base list);
+          records;
         }
       else
         let groups =
@@ -535,4 +551,5 @@ let book conf base =
             List.sort
               (fun (g1, _, _) (g2, _, _) -> Gutil.alphabetic_order g1 g2)
               groups;
+          records = Hashtbl.create 1;
         }

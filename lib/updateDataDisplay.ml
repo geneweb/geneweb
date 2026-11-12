@@ -126,130 +126,159 @@ let print_mod_ok conf base =
     let new_input =
       Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
     in
-    let new_istr = Driver.insert_string base new_input in
-    let new_istr_s = Driver.Istr.to_string new_istr in
     let ajax = p_getenv conf.env "ajax" <> None in
-    let new_ini = ini_of_update_data ini (nav_key conf base new_input) in
-    let o_param = if rev_param conf then "&o=r" else "" in
-    let print_o () = Output.print_sstring conf o_param in
-    let list = get_person_from_data conf base in
-    let list =
-      List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list
+    let records istr =
+      Option.fold ~none:0
+        ~some:(fun d -> Driver.dict_count base d istr)
+        (dict conf)
     in
-    let nb_pers =
-      List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
+    let old_records =
+      records (Driver.Istr.of_string (List.assoc "key" conf.env :> string))
     in
-    let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
-    if nb_pers <> 0 && data_modified then (
-      let nb = update_person_list conf base new_input list in
-      if ajax then
+    if
+      ajax
+      && old_records > book_bulk_confirm conf
+      && p_getenv conf.env "confirm" <> Some "on"
+    then
+      print_json conf
+        (`Assoc
+           [
+             ("success", `Bool false);
+             ("confirm", `Int old_records);
+             ( "message",
+               `String
+                 (Printf.sprintf
+                    (ftransl conf "book bulk change %d")
+                    old_records) );
+           ])
+    else
+      let new_istr = Driver.insert_string base new_input in
+      let new_istr_s = Driver.Istr.to_string new_istr in
+      let new_ini = ini_of_update_data ini (nav_key conf base new_input) in
+      let o_param = if rev_param conf then "&o=r" else "" in
+      let print_o () = Output.print_sstring conf o_param in
+      let list = get_person_from_data conf base in
+      let list =
+        List.map (fun (istr, perl) -> (Driver.sou base istr, perl)) list
+      in
+      let nb_pers =
+        List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
+      in
+      let data_modified =
+        List.for_all (fun (old, _) -> new_input <> old) list
+      in
+      if nb_pers <> 0 && data_modified then (
+        let nb = update_person_list conf base new_input list in
+        if ajax then
+          print_json conf
+            (`Assoc
+               [
+                 ("success", `Bool true);
+                 ( "label",
+                   `String
+                     (Printf.sprintf "%s%s %d %s"
+                        (Utf8.capitalize_fst
+                           (transl conf "modification successful"))
+                        (transl conf ":") nb
+                        (transl_nth conf "modification/modifications"
+                           (if nb > 1 then 1 else 0))) );
+                 ( "before",
+                   `String (match list with (s, _) :: _ -> s | [] -> "") );
+                 ("after", `String new_input);
+                 ("key", `String new_istr_s);
+                 ("records", `Int (records new_istr));
+                 ( "entry",
+                   match book_entry conf base new_istr with
+                   | Some (_, s) -> `String s
+                   | None -> `Null );
+                 ( "url",
+                   `String
+                     (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s%s#k%s"
+                        (commd conf :> string)
+                        (Mutil.encode data :> string)
+                        (Mutil.encode new_ini :> string)
+                        o_param new_istr_s) );
+               ])
+        else
+          let title _ =
+            transl conf "modification successful"
+            |> Utf8.capitalize_fst |> Output.print_sstring conf
+          in
+          Hutil.header conf title;
+          Output.print_sstring conf "<p>";
+          transl conf "modification successful"
+          |> Utf8.capitalize_fst |> Output.print_sstring conf;
+          Output.print_sstring conf (transl conf ":");
+          Output.print_sstring conf " ";
+          Output.print_sstring conf (string_of_int nb);
+          Output.print_sstring conf " ";
+          if List.assoc_opt "history" conf.base_env = Some "yes" then (
+            Output.print_sstring conf "<a href=\"";
+            Output.print_string conf (commd conf);
+            Output.print_sstring conf "m=HIST&k=20\">";
+            Output.print_sstring conf
+              (transl_nth conf "modification/modifications"
+                 (if nb > 1 then 1 else 0));
+            Output.print_sstring conf ".</a>")
+          else (
+            Output.print_sstring conf
+              (transl_nth conf "modification/modifications"
+                 (if nb > 1 then 1 else 0));
+            Output.print_sstring conf ".");
+          Output.print_sstring conf "</p>";
+          Output.print_sstring conf {|<a href="|};
+          Output.print_string conf (commd conf);
+          Output.print_sstring conf {|m=MOD_DATA&data=|};
+          Output.print_string conf (Mutil.encode data);
+          Output.print_sstring conf {|&s=|};
+          Output.print_string conf (Mutil.encode new_ini);
+          print_o ();
+          Output.print_sstring conf ("#k" ^ new_istr_s);
+          Output.print_sstring conf {|" id="reference">|};
+          Output.print_sstring conf
+            (Utf8.capitalize_fst (transl conf "new modification"));
+          Output.print_sstring conf " ";
+          Output.print_sstring conf (transl conf "at new location");
+          Output.print_sstring conf {|</a>|};
+          if not (String.starts_with ~prefix:ini new_ini) then (
+            Output.print_sstring conf {| / <a href="|};
+            Output.print_string conf (commd conf);
+            Output.print_sstring conf {|m=MOD_DATA&data=|};
+            Output.print_string conf (Mutil.encode data);
+            Output.print_sstring conf {|&s=|};
+            Output.print_string conf (Mutil.encode ini);
+            print_o ();
+            Output.print_sstring conf {|">|};
+            Output.print_sstring conf (transl conf "at old location");
+            Output.print_sstring conf {|</a>|});
+          Output.print_sstring conf ".";
+          Hutil.trailer conf)
+      else if ajax then
         print_json conf
           (`Assoc
              [
-               ("success", `Bool true);
-               ( "label",
-                 `String
-                   (Printf.sprintf "%s%s %d %s"
-                      (Utf8.capitalize_fst
-                         (transl conf "modification successful"))
-                      (transl conf ":") nb
-                      (transl_nth conf "modification/modifications"
-                         (if nb > 1 then 1 else 0))) );
-               ( "before",
-                 `String (match list with (s, _) :: _ -> s | [] -> "") );
-               ("after", `String new_input);
-               ("key", `String new_istr_s);
-               ( "entry",
-                 match book_entry conf base new_istr with
-                 | Some (_, s) -> `String s
-                 | None -> `Null );
-               ( "url",
-                 `String
-                   (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s%s#k%s"
-                      (commd conf :> string)
-                      (Mutil.encode data :> string)
-                      (Mutil.encode new_ini :> string)
-                      o_param new_istr_s) );
+               ("success", `Bool false);
+               ( "message",
+                 `String (Utf8.capitalize_fst (transl conf "no modification"))
+               );
              ])
-      else
-        let title _ =
-          transl conf "modification successful"
-          |> Utf8.capitalize_fst |> Output.print_sstring conf
-        in
-        Hutil.header conf title;
-        Output.print_sstring conf "<p>";
-        transl conf "modification successful"
-        |> Utf8.capitalize_fst |> Output.print_sstring conf;
-        Output.print_sstring conf (transl conf ":");
-        Output.print_sstring conf " ";
-        Output.print_sstring conf (string_of_int nb);
-        Output.print_sstring conf " ";
-        if List.assoc_opt "history" conf.base_env = Some "yes" then (
-          Output.print_sstring conf "<a href=\"";
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf "m=HIST&k=20\">";
-          Output.print_sstring conf
-            (transl_nth conf "modification/modifications"
-               (if nb > 1 then 1 else 0));
-          Output.print_sstring conf ".</a>")
-        else (
-          Output.print_sstring conf
-            (transl_nth conf "modification/modifications"
-               (if nb > 1 then 1 else 0));
-          Output.print_sstring conf ".");
-        Output.print_sstring conf "</p>";
-        Output.print_sstring conf {|<a href="|};
+      else (
+        Hutil.header conf (fun _ ->
+            transl conf "no modification"
+            |> Utf8.capitalize_fst |> Output.print_sstring conf);
+        Output.print_sstring conf {|<p><a href="|};
         Output.print_string conf (commd conf);
         Output.print_sstring conf {|m=MOD_DATA&data=|};
         Output.print_string conf (Mutil.encode data);
         Output.print_sstring conf {|&s=|};
-        Output.print_string conf (Mutil.encode new_ini);
+        Output.print_string conf (Mutil.encode ini);
         print_o ();
         Output.print_sstring conf ("#k" ^ new_istr_s);
         Output.print_sstring conf {|" id="reference">|};
         Output.print_sstring conf
           (Utf8.capitalize_fst (transl conf "new modification"));
-        Output.print_sstring conf " ";
-        Output.print_sstring conf (transl conf "at new location");
-        Output.print_sstring conf {|</a>|};
-        if not (String.starts_with ~prefix:ini new_ini) then (
-          Output.print_sstring conf {| / <a href="|};
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf {|m=MOD_DATA&data=|};
-          Output.print_string conf (Mutil.encode data);
-          Output.print_sstring conf {|&s=|};
-          Output.print_string conf (Mutil.encode ini);
-          print_o ();
-          Output.print_sstring conf {|">|};
-          Output.print_sstring conf (transl conf "at old location");
-          Output.print_sstring conf {|</a>|});
-        Output.print_sstring conf ".";
+        Output.print_sstring conf {|</a></p>|};
         Hutil.trailer conf)
-    else if ajax then
-      print_json conf
-        (`Assoc
-           [
-             ("success", `Bool false);
-             ( "message",
-               `String (Utf8.capitalize_fst (transl conf "no modification")) );
-           ])
-    else (
-      Hutil.header conf (fun _ ->
-          transl conf "no modification"
-          |> Utf8.capitalize_fst |> Output.print_sstring conf);
-      Output.print_sstring conf {|<p><a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf {|m=MOD_DATA&data=|};
-      Output.print_string conf (Mutil.encode data);
-      Output.print_sstring conf {|&s=|};
-      Output.print_string conf (Mutil.encode ini);
-      print_o ();
-      Output.print_sstring conf ("#k" ^ new_istr_s);
-      Output.print_sstring conf {|" id="reference">|};
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "new modification"));
-      Output.print_sstring conf {|</a></p>|};
-      Hutil.trailer conf)
 
 type 'a env =
   | Vbool of bool
@@ -320,6 +349,7 @@ and eval_simple_str_var conf base env _xx = function
       | _ -> "")
   | "current_s" -> Option.value ~default:"" (p_getenv_notrim conf.env "s")
   | "entry_count" -> eval_int_env "entry_count" env
+  | "entry_records" -> eval_int_env "entry_records" env
   | "entry_label" -> (
       match get_env "entry_count" env with
       | Vint n ->
@@ -546,6 +576,11 @@ let print_foreach conf base print_ast _eval_expr =
           List.sort alphabetic l |> List.map (fun (k, s) -> (k, s, ""))
       | _ -> []
     in
+    let records =
+      match get_env "list" env with
+      | Vlist_data b -> Hashtbl.find_opt b.records
+      | _ -> fun _ -> None
+    in
     let max = List.length l in
     let rec loop i l prev prev_head =
       match l with
@@ -557,6 +592,8 @@ let print_foreach conf base print_ast _eval_expr =
               |> add "entry_value" (Vstring s)
               |> add "entry_value_rev" (Vstring (unfold_place_long false s))
               |> add "entry_key" (Vstring (Driver.Istr.to_string k))
+              |> add "entry_records"
+                   (Vint (Option.value ~default:0 (records k)))
               |> add "first" (Vbool (Place.without_suburb s <> prev))
               |> add "rev_head" (Vstring head)
               |> add "new_head" (Vbool (head <> "" && head <> prev_head)))

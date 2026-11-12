@@ -468,6 +468,10 @@
 # Limits the results of all books (m=MOD_DATA) accessible by wizard
 #book_max_results=1000
 
+# A change in a book (m=MOD_DATA) of an entry used by more records (persons
+# and families) than this number asks for a confirmation before it is done.
+#book_bulk_confirm=150
+
 # Number of rows of a page of the lists of spellings to group (places,
 # sources, occupations: m=PLACE_TERMS, m=SOURCE_TERMS, m=OCCU_TERMS) and of
 # places to complete. The wizard can change it on the page. From 1 to 5000.

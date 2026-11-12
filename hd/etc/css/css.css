@@ -819,7 +819,8 @@ html {
   grid-column: 2;
 }
 
-#book-edit .book-extra > :last-child {
+#book-edit .book-extra > :last-child,
+#book-edit .book-warn {
   grid-column: 1 / -1;
 }
 
