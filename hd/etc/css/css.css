@@ -786,6 +786,14 @@ html {
     background-color: #b4df8c99 !important;
 }
 
+/* the person given by the anchor of a list of persons (#i…) */
+li > a:target {
+  background-color: var(--bs-warning-bg-subtle);
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 1px;
+  border-radius: var(--bs-border-radius-sm);
+}
+
 #book {
   scroll-padding-top: 4rem;
 }

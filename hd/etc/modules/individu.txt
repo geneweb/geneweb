@@ -8,7 +8,7 @@
 %define;updfield(xx,yy)
   %if;(wizard or "place" in "xx")<span data-updfield="xx"
     %if;("place" in "xx")%if;(xx_raw!=xx) data-updraw="%xx_raw;"%end;%end;
-    %if;("xx"="occu") data-updraw="%occupation_raw;"%end;>%end;yy
+    %if;("xx"="occu") data-updraw="%occupation_raw;"%end;>%end;yy%nn;
     %if;(wizard or "place" in "xx")</span>%end;
 %end;
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
@@ -28,13 +28,15 @@
     [*godfather/godmother/godparents]s
   %end; [and]%sp;
 %end;
-%define;link(xxx,zzz)
+%( link(name, mode, extra parameters): the name to the list of mode P or N,
+   at the person (#i) %)
+%define;link(xxx,zzz,yyy)
   %if;(not cancel_links)<a href="%prefix;m=zzz&v=%sq;
     %if;("xxx"=first_name)%first_name_key;%sq;
     %elseif;("xxx"=surname)%surname_key;%sq;
     %( how to get (first/sur)_name_alias_keys? %)
     %else;xxx%sq;
-    %end;">%sq;
+    %end;yyy#i%index;">%sq;
   %end;xxx%if;(not cancel_links)</a>%end;
 %end;
 %define;detailed_names()
@@ -50,7 +52,7 @@
       %incr_count;
     %end;
     %if;has_public_name;
-      <span class="d-block fw-bold">%apply;updfield%with;first_name%and;%apply;link(first_name,"P")%end; %apply;link(surname,"N")</span>
+      <span class="d-block fw-bold">%apply;updfield%with;first_name%and;%apply;link(first_name,"P","")%end; %apply;link(surname,"N","")</span>
     %end;
     %if;has_aliases;
       <div>%reset_count;
@@ -94,24 +96,24 @@
     %if;(has_linked_page.HEAD and linked_page.HEAD!="") %linked_page.HEAD;%end;
     %if;has_first_names_aliases;
       <div>%reset_count;
-        %apply;link(first_name,"P")/%sq;
+        %apply;link(first_name,"P","")/%sq;
         %apply;lazy_print("")
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;updfield%with;first_name_alias%count;%and;%apply;link(first_name_alias,"P")%end;
+          %apply;updfield%with;first_name_alias%count;%and;%apply;link(first_name_alias,"P","&fna=1")%end;%nn;
           %incr_count;
         %end;
       </div>
     %end;
     %if;has_surnames_aliases;
       <div>%reset_count;
-        %apply;link(surname,"N")/%sq;
+        %apply;link(surname,"N","")/%sq;
         %apply;lazy_print("")
         %foreach;surname_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;updfield%with;surname_alias%count;%and;%apply;link(surname_alias,"N")%end;
+          %apply;updfield%with;surname_alias%count;%and;%apply;link(surname_alias,"N","&sna=1")%end;%nn;
           %incr_count;
         %end;
       </div>
