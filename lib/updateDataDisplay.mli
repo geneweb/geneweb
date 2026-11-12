@@ -7,9 +7,9 @@ val print_list :
 (** [print_list conn conf base] prints the list of persons (m=L). Opened from a
     book without persons ([data] and [key], no [i0]), it lists the persons
     linked to the entry [key] ([i0], [i1]..., [nb] and the entry text [k]); when
-    a single person is linked, it redirects to their page instead, or for a
-    wizard on the books of titles and estates to the titles of their edit form.
-*)
+    a single person is linked, it redirects instead to their edit form for a
+    wizard (to its titles for the books of titles and estates), to their page
+    otherwise. *)
 
 val print_mod_ok : Config.config -> Geneweb_db.Driver.base -> unit
 (** Updates persons linked to the updated data. With [ajax], answers in JSON
