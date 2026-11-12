@@ -596,6 +596,11 @@ val dict_entries_count : base -> Dict.t -> string -> (istr * int) list
     each with its {!dict_count}, read in order: much faster than calling
     {!dict_count} for each entry. *)
 
+val dict_exact_count : base -> Dict.t -> string -> (istr * int) list
+(** [dict_exact_count base dict prefix] The entries displayed exactly as
+    [prefix], the group of [prefix] itself in {!dict_groups}, each with its
+    {!dict_count}. *)
+
 val dict_records : base -> Dict.t -> istr -> iper list * ifam list
 (** [dict_records base dict istr] The persons and the families using [istr] in
     the fields of [dict]. *)

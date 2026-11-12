@@ -27,6 +27,7 @@ type dict_index = {
   dict_groups : Dict.t -> string -> (string * int) list;
   dict_entries : Dict.t -> string -> int list;
   dict_entries_count : Dict.t -> string -> (int * int) list;
+  dict_exact_count : Dict.t -> string -> (int * int) list;
   dict_refs : Dict.t -> int -> int list;
   dict_count : Dict.t -> int -> int;
   dict_first : Dict.t -> string -> int option;
