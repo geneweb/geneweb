@@ -38,20 +38,14 @@ let get_person_from_data conf base =
       if PersSet.is_empty acc then [] else [ (istr, PersSet.elements acc) ]
 
 (* The book of places ordered from the last term ("France, Manche,
-   Granville"): asked by [o=r], or by default by [dico_inverted=yes] in the
-   .gwf, [o=a] asking for the alphabetic order. It reads the section
+   Granville"), asked by [o=r]. It reads the section
    [Dict.Place_last] of the index; an index written before it has none, and
    the book stays in the alphabetic order until "gwc -reindex" writes it. *)
-let order_param conf =
-  match p_getenv conf.env "o" with
-  | Some ("r" | "a") as o -> o
-  | Some _ | None -> None
+let rev_param conf = p_getenv conf.env "o" = Some "r"
 
 let rev_order conf base =
   p_getenv conf.env "data" = Some "place"
-  && (match order_param conf with
-    | Some o -> o = "r"
-    | None -> List.assoc_opt "dico_inverted" conf.base_env = Some "yes")
+  && rev_param conf
   && Driver.dict_has base Dict.Place_last
 
 (* the text the navigation by 1, 2... characters runs on *)

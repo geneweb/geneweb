@@ -130,8 +130,7 @@ let print_mod_ok conf base =
     let new_istr_s = Driver.Istr.to_string new_istr in
     let ajax = p_getenv conf.env "ajax" <> None in
     let new_ini = ini_of_update_data ini (nav_key conf base new_input) in
-    let order = order_param conf in
-    let o_param = match order with Some o -> "&o=" ^ o | None -> "" in
+    let o_param = if rev_param conf then "&o=r" else "" in
     let print_o () = Output.print_sstring conf o_param in
     let list = get_person_from_data conf base in
     let list =
@@ -224,9 +223,7 @@ let print_mod_ok conf base =
           Util.hidden_input conf "m" (Adef.encoded "MOD_DATA_OK");
           Util.hidden_input conf "data" (Mutil.encode data);
           Util.hidden_input conf "s" (Mutil.encode ini);
-          Option.iter
-            (fun o -> Util.hidden_input conf "o" (Adef.encoded o))
-            order;
+          if rev_param conf then Util.hidden_input conf "o" (Adef.encoded "r");
           Output.print_sstring conf
             {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
           Output.print_string conf (Util.escape_html (only_printable new_input));

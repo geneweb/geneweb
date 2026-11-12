@@ -40,9 +40,9 @@
 <div class="container-fluid px-4">
   %let;len_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
-  %( rv: explicit order of the book of places (o=r from the last term,
-     o=a alphabetic, default dico_inverted), carried by every MOD_DATA link %)
-  %let;rv;%if;(e.data="place")%if;(e.o="r")&o=r%elseif;(e.o="a")&o=a%end;%end;%in;
+  %( rv: book of places in the order from the last term, carried by every
+     MOD_DATA link %)
+  %let;rv;%if;(e.data="place" and e.o="r")&o=r%end;%in;
   %if;(e.data="")
     <h1 class="h3 mt-3">[*book/books]1</h1>
     <ul class="list-unstyled row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
@@ -64,7 +64,7 @@
             %hidden;
             <input type="hidden" name="m" value="MOD_DATA">
             <input type="hidden" name="data" value="%e.data;">
-            %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
+            %if;(rv!="")<input type="hidden" name="o" value="r">%end;
             <input type="text" class="form-control font-monospace" name="s" id="book-filter"
               accesskey="R" autocomplete="off" value="%escape.current_s;"
               placeholder="[*search/case sensitive]0" aria-label="[*search/case sensitive]0">
@@ -86,13 +86,9 @@
               </template>
             %end;
             %if;(e.data="place")
-              %if;rev_order;
-                <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=a">%nn;
-                  <i class="fa fa-arrow-down-a-z fa-fw me-1"></i>[*alphabetic order]</a>
-              %else;
-                <a class="btn btn-sm btn-outline-secondary text-nowrap" href="%prefix;m=MOD_DATA&data=place&o=r">%nn;
-                  <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
-              %end;
+              <a class="btn btn-sm btn-outline-secondary text-nowrap%if;(rv!="") active%end;" role="button"
+                href="%prefix;m=MOD_DATA&data=place%if;(rv="")&o=r%end;" aria-pressed="%if;(rv!="")true%else;false%end;">%nn;
+                <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
               <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
                 <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
             %elseif;(e.data="src")
@@ -220,7 +216,7 @@
       %hidden;
       <input type="hidden" name="m" value="MOD_DATA_OK">
       <input type="hidden" name="data" value="%e.data;">
-      %if;(rv!="")<input type="hidden" name="o" value="%if;(e.o="r")r%else;a%end;">%end;
+      %if;(rv!="")<input type="hidden" name="o" value="r">%end;
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
       <div class="book-row">
