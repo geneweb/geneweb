@@ -793,6 +793,9 @@ html {
   outline-offset: 1px;
   border-radius: var(--bs-border-radius-sm);
 }
+.linked-page-tip .tooltip-inner {
+  text-align: start;
+}
 
 /* the person given by the anchor of a list of persons (#i…) or of a note
    (#p_…, from the texts added by the note to the person page) */
