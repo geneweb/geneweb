@@ -294,6 +294,12 @@ let parse_cmd () =
   if !reindex && inputs <> [] then
     raise_bad "-reindex rebuilds an existing base and takes no input file.";
   let bname = parse_output inputs !output in
+  if not (Mutil.good_name bname) then (
+    Fmt.epr
+      "gwc: the database name %S contains a forbidden character.@.Allowed \
+       characters: a..z, A..Z, 0..9, -@."
+      bname;
+    exit 2);
   (* derive only now, once all options (incl. -bd) are known *)
   (if !bases_dir = None then
      match inputs with
