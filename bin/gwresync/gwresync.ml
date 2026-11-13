@@ -740,9 +740,9 @@ let main () =
       NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
       if !changes then (
         if !verbosity >= 1 then (
-          Printf.printf "Committing patches...\n";
+          Printf.printf "Committing patches in memory...\n";
           flush stdout);
-        Gwdb.commit_patches base);
+        Gwdb.commit_patches ~write_to_disk:false base);
       if !verbosity >= 1 then (
         Printf.printf "Rebuilding indexes and caches...\n";
         flush stdout);
