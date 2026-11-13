@@ -58,7 +58,9 @@ let insert_string base s =
 let find_opt_string_istr base s =
   base.Dbdisk.func.Dbdisk.find_opt_string_istr @@ Utf8.normalize s
 
-let commit_patches base = base.Dbdisk.func.Dbdisk.commit_patches ()
+let commit_patches ?write_to_disk base =
+  base.Dbdisk.func.Dbdisk.commit_patches ?write_to_disk ()
+
 let commit_notes base s = base.Dbdisk.func.Dbdisk.commit_notes s
 let person_of_key base = base.Dbdisk.func.Dbdisk.person_of_key
 let persons_of_name base = base.Dbdisk.func.Dbdisk.persons_of_name

@@ -1195,35 +1195,15 @@ let opendb bname =
       x)
     else npb_init ()
   in
-  let commit_patches =
-    if perm = RDONLY then fun () -> raise (Def.HttpExn (Forbidden, __LOC__))
-    else fun () ->
-      let tm = Unix.time () |> Unix.gmtime |> Ext_unix.sprintf_date in
-      (* read real person number (considering pending patches) *)
-      let nbp =
-        Hashtbl.fold
-          (fun ip p acc ->
-            try
-              match try Some (persons.get_nopending ip) with _ -> None with
-              | Some old ->
-                  if is_empty_name old && not (is_empty_name p) then acc + 1
-                  else if (not (is_empty_name old)) && is_empty_name p then
-                    acc - 1
-                  else acc
-              | None -> if not (is_empty_name p) then acc + 1 else acc
-            with _ -> if not (is_empty_name p) then acc + 1 else acc)
-          (snd pending.h_person) (nbp_read ())
-      in
-      let tmp_nbp_fname = nbp_fname ^ "_tmp" in
-      let oc = Secure.open_out_bin tmp_nbp_fname in
-      output_value oc nbp;
-      close_out oc;
+  let commit_patches ?(write_to_disk = true) () =
+    if perm = RDONLY then raise (Def.HttpExn (Forbidden, __LOC__))
+    else
       let aux (n, ht) (n', ht') =
         n := !n';
         Hashtbl.iter (Hashtbl.replace ht) ht';
         Hashtbl.clear ht'
       in
-      (* commit every pending patch *)
+      (* commit every pending patch into memory *)
       aux patches.h_person pending.h_person;
       aux patches.h_ascend pending.h_ascend;
       aux patches.h_union pending.h_union;
@@ -1231,20 +1211,41 @@ let opendb bname =
       aux patches.h_couple pending.h_couple;
       aux patches.h_descend pending.h_descend;
       aux patches.h_string pending.h_string;
-      (* update "patches" file *)
-      let tmp_fname = Filename.concat bname "1patches" in
-      let fname = Filename.concat bname "patches" in
-      let tm_oc = Secure.open_out_bin tm_fname in
-      output_string tm_oc tm;
-      close_out tm_oc;
-      let oc_tmp = Secure.open_out_bin tmp_fname in
-      output_string oc_tmp magic_patch;
-      Dutil.output_value_no_sharing oc_tmp (patches : patches_ht);
-      close_out oc_tmp;
-      move_with_backup tmp_nbp_fname nbp_fname;
-      move_with_backup tmp_fname fname;
-      commit_synchro ();
-      Sys.remove tm_fname
+      if write_to_disk then (
+        let tm = Unix.time () |> Unix.gmtime |> Ext_unix.sprintf_date in
+        (* read real person number (considering pending patches) *)
+        let nbp =
+          Hashtbl.fold
+            (fun ip p acc ->
+              try
+                match try Some (persons.get_nopending ip) with _ -> None with
+                | Some old ->
+                    if is_empty_name old && not (is_empty_name p) then acc + 1
+                    else if (not (is_empty_name old)) && is_empty_name p then
+                      acc - 1
+                    else acc
+                | None -> if not (is_empty_name p) then acc + 1 else acc
+              with _ -> if not (is_empty_name p) then acc + 1 else acc)
+            (snd patches.h_person) (nbp_read ())
+        in
+        let tmp_nbp_fname = nbp_fname ^ "_tmp" in
+        let oc = Secure.open_out_bin tmp_nbp_fname in
+        output_value oc nbp;
+        close_out oc;
+        (* update "patches" file *)
+        let tmp_fname = Filename.concat bname "1patches" in
+        let fname = Filename.concat bname "patches" in
+        let tm_oc = Secure.open_out_bin tm_fname in
+        output_string tm_oc tm;
+        close_out tm_oc;
+        let oc_tmp = Secure.open_out_bin tmp_fname in
+        output_string oc_tmp magic_patch;
+        Dutil.output_value_no_sharing oc_tmp (patches : patches_ht);
+        close_out oc_tmp;
+        move_with_backup tmp_nbp_fname nbp_fname;
+        move_with_backup tmp_fname fname;
+        commit_synchro ();
+        Sys.remove tm_fname)
   in
   let patch_person i p =
     assert (i <> -1);
@@ -1594,7 +1595,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       patch_name = (fun _ -> assert false);
       find_opt_string_istr = (fun _ -> assert false);
       insert_string = (fun _ -> assert false);
-      commit_patches = (fun _ -> assert false);
+      commit_patches = (fun ?write_to_disk:_ () -> assert false);
       commit_notes = (fun _ -> assert false);
       cleanup = (fun _ -> ());
       nb_of_real_persons = (fun _ -> assert false);

@@ -1216,8 +1216,11 @@ struct
 
   let insert_string = Util.wrap_base Legacy.insert_string Current.insert_string
 
-  let commit_patches =
-    Util.wrap_base Legacy.commit_patches Current.commit_patches
+  let commit_patches ?write_to_disk base =
+    Util.wrap_base
+      (Legacy.commit_patches ?write_to_disk)
+      (Current.commit_patches ?write_to_disk)
+      base
 
   let commit_notes = Util.wrap_base Legacy.commit_notes Current.commit_notes
   let new_iper = Util.wrap_base Legacy.new_iper Current.new_iper

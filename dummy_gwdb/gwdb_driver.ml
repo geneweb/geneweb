@@ -299,7 +299,7 @@ let find_opt_string_istr base s =
   in
   loop 0
 
-let commit_patches _base = ()
+let commit_patches ?write_to_disk:_ _base = ()
 let commit_notes _base _fname _s = () (* TODO *)
 let new_iper base = Array.length base.persons
 let new_ifam base = Array.length base.families
