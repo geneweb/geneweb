@@ -231,7 +231,7 @@
                 %end;
               %end;
               %(Copy wikitext button %)
-              %if;(self!="? ?" and (is_visible or (friend and is_semi_public)))
+              %if;(self!="? ?" and (is_visible or friend))
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
                    data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw me-2" aria-hidden="true"></i>%nn;

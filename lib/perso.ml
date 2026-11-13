@@ -3386,12 +3386,12 @@ and eval_nobility_title_field_var (id, pl) = function
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found
 
-and eval_bool_event_field base (p, p_auth) (_, date, place, note, src, w, isp) =
-  function
+and eval_bool_event_field conf base (p, p_auth)
+    (_, date, place, note, src, w, isp) = function
   | "has_date" -> p_auth && date <> Date.cdate_None
   | "has_place" -> p_auth && Driver.sou base place <> ""
   | "has_note" -> p_auth && Driver.sou base note <> ""
-  | "has_src" -> p_auth && Driver.sou base src <> ""
+  | "has_src" -> GWPARAM.p_auth_sp conf base p && Driver.sou base src <> ""
   | "has_witnesses" -> p_auth && Array.length w > 0
   | "has_spouse" -> p_auth && isp <> None
   | "computable_age" ->
@@ -3458,7 +3458,9 @@ and eval_str_event_field conf base (p, p_auth)
         Driver.sou base place |> Util.string_of_place conf |> safe_val
       else null_val
   | "note" -> note |> get_note conf base ~p p_auth
-  | "src" -> src |> get_note_or_source conf base ~p p_auth false
+  | "src" ->
+      src
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | _ -> raise Not_found
 
 and eval_event_field_var conf base env (p, p_auth)
@@ -3501,7 +3503,7 @@ and eval_event_field_var conf base env (p, p_auth)
   | [ s ] -> (
       try
         bool_val
-          (eval_bool_event_field base (p, p_auth)
+          (eval_bool_event_field conf base (p, p_auth)
              (name, date, place, note, src, w, isp)
              s)
       with Not_found ->
@@ -3620,7 +3622,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_baptism_place" ->
       p_auth && Driver.sou base (Driver.get_baptism_place p) <> ""
   | "has_baptism_source" ->
-      p_auth && Driver.sou base (Driver.get_baptism_src p) <> ""
+      GWPARAM.p_auth_sp conf base p
+      && Driver.sou base (Driver.get_baptism_src p) <> ""
   | "has_baptism_note" ->
       p_auth && (not conf.no_note)
       && Driver.sou base (Driver.get_baptism_note p) <> ""
@@ -3630,7 +3633,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_birth_place" ->
       p_auth && Driver.sou base (Driver.get_birth_place p) <> ""
   | "has_birth_source" ->
-      p_auth && Driver.sou base (Driver.get_birth_src p) <> ""
+      GWPARAM.p_auth_sp conf base p
+      && Driver.sou base (Driver.get_birth_src p) <> ""
   | "has_birth_note" ->
       p_auth && (not conf.no_note)
       && Driver.sou base (Driver.get_birth_note p) <> ""
@@ -3645,7 +3649,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_burial_place" ->
       p_auth && Driver.sou base (Driver.get_burial_place p) <> ""
   | "has_burial_source" ->
-      p_auth && Driver.sou base (Driver.get_burial_src p) <> ""
+      GWPARAM.p_auth_sp conf base p
+      && Driver.sou base (Driver.get_burial_src p) <> ""
   | "has_burial_note" ->
       p_auth && (not conf.no_note)
       && Driver.sou base (Driver.get_burial_note p) <> ""
@@ -3682,7 +3687,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_death_place" ->
       p_auth && Driver.sou base (Driver.get_death_place p) <> ""
   | "has_death_source" ->
-      p_auth && Driver.sou base (Driver.get_death_src p) <> ""
+      GWPARAM.p_auth_sp conf base p
+      && Driver.sou base (Driver.get_death_src p) <> ""
   | "has_death_note" ->
       p_auth && (not conf.no_note)
       && Driver.sou base (Driver.get_death_note p) <> ""
@@ -3804,8 +3810,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_parents" -> Driver.get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
-      if hide_person conf base p then false
-      else Driver.sou base (Driver.get_psources p) <> ""
+      GWPARAM.p_auth_sp conf base p
+      && Driver.sou base (Driver.get_psources p) <> ""
   | "has_public_name" ->
       if hide_person conf base p then false
       else Driver.sou base (Driver.get_public_name p) <> ""
@@ -3828,7 +3834,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           Array.length (Driver.get_children (Driver.foi base ifam)) > 1
       | None -> false)
   | "has_sources" ->
-      p_auth
+      (* consenting friends see the sources of persons whose names they see *)
+      GWPARAM.p_auth_sp conf base p
       && (Driver.sou base (Driver.get_psources p) <> ""
          || Driver.sou base (Driver.get_birth_src p) <> ""
          || Driver.sou base (Driver.get_baptism_src p) <> ""
@@ -3839,8 +3846,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                 let fam = Driver.foi base ifam in
                 let isp = Gutil.spouse (Driver.get_iper p) fam in
                 let sp = Driver.poi base isp in
-                (* On sait que p_auth vaut vrai. *)
-                let m_auth = authorized_age conf base sp in
+                let m_auth = GWPARAM.p_auth_sp conf base sp in
                 m_auth
                 && (Driver.sou base (Driver.get_marriage_src fam) <> ""
                    || Driver.sou base (Driver.get_fsources fam) <> ""))
@@ -3930,7 +3936,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "birth_place_norm" -> place_norm conf base p p_auth Driver.get_birth_place
   | "birth_note" -> Driver.get_birth_note p |> get_note conf base ~p p_auth
   | "birth_source" ->
-      Driver.get_birth_src p |> get_note_or_source conf base ~p p_auth false
+      Driver.get_birth_src p
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | "baptism_place" ->
       if p_auth then
         Driver.get_baptism_place p |> Driver.sou base
@@ -3946,7 +3953,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       place_norm conf base p p_auth Driver.get_baptism_place
   | "baptism_note" -> Driver.get_baptism_note p |> get_note conf base ~p p_auth
   | "baptism_source" ->
-      Driver.get_baptism_src p |> get_note_or_source conf base ~p p_auth false
+      Driver.get_baptism_src p
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | "burial_place" ->
       if p_auth then
         Driver.get_burial_place p |> Driver.sou base
@@ -3961,7 +3969,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "burial_place_norm" -> place_norm conf base p p_auth Driver.get_burial_place
   | "burial_note" -> Driver.get_burial_note p |> get_note conf base ~p p_auth
   | "burial_source" ->
-      Driver.get_burial_src p |> get_note_or_source conf base ~p p_auth false
+      Driver.get_burial_src p
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | "child_name" ->
       let force_surname =
         match Driver.get_parents p with
@@ -4029,7 +4038,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "death_place_norm" -> place_norm conf base p p_auth Driver.get_death_place
   | "death_note" -> Driver.get_death_note p |> get_note conf base ~p p_auth
   | "death_source" ->
-      Driver.get_death_src p |> get_note_or_source conf base ~p p_auth false
+      Driver.get_death_src p
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | "died" -> string_of_died conf p p_auth |> safe_val
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep Driver.get_father |> safe_val
@@ -4295,7 +4305,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Buried cod -> date_aux conf p_auth cod
       | Cremated _ | UnknownBurial -> raise Not_found)
   | "psources" ->
-      Driver.get_psources p |> get_note_or_source conf base ~p p_auth false
+      Driver.get_psources p
+      |> get_note_or_source conf base ~p (GWPARAM.p_auth_sp conf base p) false
   | "slash_burial_date" ->
       if p_auth then
         match Driver.get_burial p with
@@ -5507,7 +5518,7 @@ let print_foreach conf base print_ast eval_expr =
     loop (Vslistlm []) l
   in
 
-  let print_foreach_source env al ((p, p_auth) as ep) =
+  let print_foreach_source env al ((p, _) as ep) =
     let rec insert_loop typ fld ifo src = function
       | (typ1, _, _, src1) :: srcl when src = src1 ->
           (typ1 ^ ", " ^ typ, "", "", src1) :: srcl
@@ -5519,7 +5530,8 @@ let print_foreach conf base print_ast eval_expr =
       else insert_loop (Util.translate_eval typ) fld ifo src srcl
     in
     let srcl =
-      if p_auth then
+      (* consenting friends see the sources of persons whose names they see *)
+      if GWPARAM.p_auth_sp conf base p then
         let srcl = [] in
         let srcl =
           insert
@@ -5548,7 +5560,7 @@ let print_foreach conf base print_ast eval_expr =
               let fam = Driver.foi base ifam in
               let isp = Gutil.spouse (Driver.get_iper p) fam in
               let sp = Driver.poi base isp in
-              let m_auth = authorized_age conf base sp in
+              let m_auth = GWPARAM.p_auth_sp conf base sp in
               if m_auth then
                 let lab =
                   if Array.length (Driver.get_family p) = 1 then ""
