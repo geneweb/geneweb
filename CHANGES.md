@@ -182,7 +182,17 @@
   divorce, a separation or an annulment that the dates leave unordered
   stays after the events of the relation.
 
+## Gwc
+- `gwc` builds the notes links database (`notes_links`) and the linked
+  pages cache itself once the base is created, so running `update_nldb`
+  after `gwc` is no longer needed. Use `-nonldb` to skip this step.
+  `update_nldb` remains available to rebuild them on an existing base and
+  shares the same code (new option `-q`). Both now scan the witness notes
+  of events, and index exactly the fields gwd indexes when a person or a
+  family is saved.
+
 ## Gwsetup
+- The base cleanup (gwu + gwc) no longer runs `update_nldb` afterwards.
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
   IPv6 loopback only on Windows.
 - Remove the `.gwf` parameters editor: it only handled the variables of
