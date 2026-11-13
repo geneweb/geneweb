@@ -32,6 +32,9 @@
       <ul class="ms-4 ps-3">%linked_page.NOTE;</ul>
     %end;
   %end;
+  %if;(has_linked_page.NOTE and linked_page.NOTE!="")
+    <ul class="ms-3">%apply;capitalize(linked_page.NOTE)</ul>
+  %end;
   %if;(count2>0 and has_families)
     %( On remet les compteurs à zéro, on démarre à 1 - synchro avec unions.txt %)
     %reset_count;
