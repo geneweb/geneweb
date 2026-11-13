@@ -738,9 +738,38 @@ let main () =
         in
         if consang_patched then changes := true);
       NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
-      if !changes then
+      if !changes then (
         if !verbosity >= 1 then (
-          Printf.printf "Changes staged\n";
-          flush stdout))
+          Printf.printf "Committing patches...\n";
+          flush stdout);
+        Gwdb.commit_patches base);
+      if !verbosity >= 1 then (
+        Printf.printf "Rebuilding indexes and caches...\n";
+        flush stdout);
+      Gwdb.sync ~save_mem:false
+        ~tasks:
+          [
+            (fun () -> Geneweb.Caches.write_caches base);
+            (fun () ->
+              let conf =
+                Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)
+              in
+              Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
+            (fun () ->
+              Geneweb.Util.rewrite_visited
+                (Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)));
+          ]
+        base;
+      if !verbosity >= 1 then (
+        Printf.printf "gwresync completed successfully.\n";
+        flush stdout);
+      if !fast then (
+        Gwdb.clear_strings_array base;
+        Gwdb.clear_persons_array base;
+        Gwdb.clear_families_array base;
+        Gwdb.clear_ascends_array base;
+        Gwdb.clear_couples_array base;
+        Gwdb.clear_unions_array base;
+        Gwdb.clear_descends_array base))
 
 let () = main ()
