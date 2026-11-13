@@ -29,7 +29,16 @@ type file_info = {
 
 val link :
   ?no_warn:bool ->
+  ?nldb:bool ->
+  ?verbose:bool ->
+  ?progress:bool ->
   (file_info -> unit -> Gwcomp.gw_syntax option) ->
   string ->
   bool
-(** Link .gwo files and create a database. *)
+(** Link .gwo files and create a database.
+
+    - [nldb] (default [true]): also build the notes links database and the
+      linked pages cache (what [update_nldb] does), once the base and the wizard
+      notes are written.
+    - [verbose] (default [false]): details of the notes links scan.
+    - [progress] (default [false]): progress bars for the notes links scan. *)

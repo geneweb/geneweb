@@ -1633,8 +1633,21 @@ let output_command_line bdir =
   Printf.fprintf oc "\n";
   close_out oc
 
-(** Link .gwo files and create a database. *)
-let link ?(no_warn = false) next_family_fun bdir =
+(** Build the notes links database (and the linked pages cache) of the freshly
+    created base. Wizard notes must already be on disk. *)
+let build_nldb ~verbose ~progress base bdir =
+  if verbose then (
+    Printf.eprintf "*** building notes links database\n";
+    flush stderr);
+  Driver.load_strings_array base;
+  UpdateNldb.compute ~verbose ~progress base bdir;
+  Driver.clear_strings_array base
+
+(** Link .gwo files and create a database. When [nldb] is [true] (default), the
+    notes links database is built right after the base, which spares a separate
+    run of [update_nldb]. *)
+let link ?(no_warn = false) ?(nldb = true) ?(verbose = false)
+    ?(progress = false) next_family_fun bdir =
   let tmp_dir = Filename.concat bdir "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
@@ -1719,6 +1732,7 @@ let link ?(no_warn = false) next_family_fun bdir =
       ignore @@ ConsangAll.compute base true;
       Driver.sync base);
     output_wizard_notes bdir gen.g_wiznotes;
+    if nldb then build_nldb ~verbose ~progress base bdir;
     output_command_line bdir;
     Mutil.rm_rf tmp_dir;
     true)

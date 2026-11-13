@@ -3,4 +3,4 @@
  (name update_nldb)
  (public_name update_nldb)
  (modules update_nldb)
- (libraries unix str geneweb))
+ (libraries geneweb))

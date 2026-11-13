@@ -1202,10 +1202,10 @@ let cleanup_1 conn conf =
     exec_f conf ~path:(!bin_dir // "gwc") [ tmp_gw; "-nofail"; "-o"; in_base ]
   in
   (try Sys.remove tmp_gw with Sys_error _ -> ());
-  let rc2 = exec_f conf ~path:(!bin_dir // "update_nldb") [ in_base ] in
+  (* gwc builds the notes links database itself: no update_nldb needed. *)
   Printf.eprintf "\n";
   flush stderr;
-  if Command.is_failure rc1 || Command.is_failure rc2 then
+  if Command.is_failure rc1 then
     let conf = { conf with comm = "gwc" } in
     print_file "err_standard.htm" conn conf
   else print_file "create_ok.htm" conn conf
