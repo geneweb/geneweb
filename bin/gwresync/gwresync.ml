@@ -481,6 +481,173 @@ end = struct
     !has_loop
 end
 
+module Consanguinity : sig
+  val compute : base:Gwdb.base -> scratch:bool -> verbosity:int -> bool
+end = struct
+  let compute ~base ~scratch ~verbosity =
+    ConsangAll.compute ~verbosity base scratch
+end
+
+module NotesIndexing : sig
+  val compute : base:Gwdb.base -> bdir:string -> verbosity:int -> unit
+end = struct
+  let notes_links s =
+    let slen = String.length s in
+    let rec loop list_nt list_ind pos i =
+      if i = slen then (list_nt, list_ind)
+      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
+      else
+        match Geneweb.NotesLinks.misc_notes_link s i with
+        | Geneweb.NotesLinks.WLpage (j, _, lfname, _, _) ->
+            let list_nt =
+              if List.mem lfname list_nt then list_nt else lfname :: list_nt
+            in
+            loop list_nt list_ind pos j
+        | Geneweb.NotesLinks.WLperson (j, key, _, text) ->
+            let list_ind =
+              let link = { Def.NLDB.lnTxt = text; lnPos = pos } in
+              (key, link) :: list_ind
+            in
+            loop list_nt list_ind (pos + 1) j
+        | Geneweb.NotesLinks.WLwizard (j, _, _) ->
+            loop list_nt list_ind (pos + 1) j
+        | Geneweb.NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
+    in
+    loop [] [] 1 0
+
+  let compute ~base ~bdir ~verbosity =
+    let bdir =
+      if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
+    in
+    let nb_ind = Gwdb.nb_of_persons base in
+    let nb_fam = Gwdb.nb_of_families base in
+    let db = ref [] in
+    if verbosity >= 1 then (
+      Printf.eprintf "--- database notes\n";
+      flush stderr);
+    let list = notes_links (Gwdb.base_notes_read base "") in
+    if list <> ([], []) then
+      db := Geneweb.NotesLinks.add_in_db !db Def.NLDB.PgNotes list;
+    if verbosity >= 1 then (
+      Printf.eprintf "--- wizard notes\n";
+      flush stderr);
+    (try
+       let wiznotes_dir = Filename.concat bdir (Gwdb.base_wiznotes_dir base) in
+       let files = Sys.readdir wiznotes_dir in
+       for i = 0 to Array.length files - 1 do
+         let file = files.(i) in
+         if Filename.check_suffix file ".txt" then
+           let wizid = Filename.chop_suffix file ".txt" in
+           let wfile = Filename.concat wiznotes_dir file in
+           let content = Mutil.read_file_content wfile in
+           let list = notes_links content in
+           if list <> ([], []) then
+             db :=
+               Geneweb.NotesLinks.add_in_db !db (Def.NLDB.PgWizard wizid) list
+       done
+     with Sys_error _ -> ());
+    if verbosity >= 1 then (
+      Printf.eprintf "--- misc notes\n";
+      flush stderr);
+    let ndir = Filename.concat bdir (Gwdb.base_notes_dir base) in
+    let rec loop dir name =
+      try
+        let cdir = Filename.concat ndir dir in
+        let files = Sys.readdir cdir in
+        for i = 0 to Array.length files - 1 do
+          let file = files.(i) in
+          if Filename.check_suffix file ".txt" then
+            let fnotes = Filename.chop_suffix file ".txt" in
+            let file_rel = Filename.concat dir fnotes in
+            let list = notes_links (Gwdb.base_notes_read base file_rel) in
+            if list <> ([], []) then
+              let entry_name =
+                if name = "" then fnotes
+                else
+                  Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep
+                    fnotes
+              in
+              db :=
+                Geneweb.NotesLinks.add_in_db !db (Def.NLDB.PgMisc entry_name)
+                  list
+            else
+              loop (Filename.concat dir file)
+                (if name = "" then file
+                else
+                  Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep
+                    file)
+        done
+      with Sys_error _ -> ()
+    in
+    loop Filename.current_dir_name "";
+    let buffer = Buffer.create 1024 in
+    let add_string istr =
+      Buffer.add_string buffer (Gwdb.sou base istr);
+      Buffer.add_char buffer ' '
+    in
+    if verbosity >= 1 then (
+      ProgrBar.full := '*';
+      Printf.eprintf "--- individual notes\n";
+      flush stderr;
+      ProgrBar.start ());
+    Gwdb.Collection.iteri
+      (fun i p ->
+        if verbosity >= 1 then ProgrBar.run i nb_ind;
+        Buffer.reset buffer;
+        add_string (Gwdb.get_notes p);
+        add_string (Gwdb.get_occupation p);
+        add_string (Gwdb.get_birth_note p);
+        add_string (Gwdb.get_birth_src p);
+        add_string (Gwdb.get_baptism_note p);
+        add_string (Gwdb.get_baptism_src p);
+        add_string (Gwdb.get_death_note p);
+        add_string (Gwdb.get_death_src p);
+        add_string (Gwdb.get_burial_note p);
+        add_string (Gwdb.get_burial_src p);
+        add_string (Gwdb.get_psources p);
+        List.iter
+          (fun pe ->
+            add_string (Gwdb.get_pevent_note pe);
+            add_string (Gwdb.get_pevent_src pe))
+          (Gwdb.get_pevents p);
+        match notes_links (Buffer.contents buffer) with
+        | [], [] -> ()
+        | list ->
+            db :=
+              Geneweb.NotesLinks.add_in_db !db
+                (Def.NLDB.PgInd (Gwdb.get_iper p))
+                list)
+      (Gwdb.persons base);
+    if verbosity >= 1 then (
+      ProgrBar.finish ();
+      Printf.eprintf "--- families notes\n";
+      flush stderr;
+      ProgrBar.start ());
+    Gwdb.Collection.iteri
+      (fun i fam ->
+        if verbosity >= 1 then ProgrBar.run i nb_fam;
+        Buffer.reset buffer;
+        add_string (Gwdb.get_comment fam);
+        add_string (Gwdb.get_fsources fam);
+        add_string (Gwdb.get_marriage_note fam);
+        add_string (Gwdb.get_marriage_src fam);
+        List.iter
+          (fun fe ->
+            add_string (Gwdb.get_fevent_note fe);
+            add_string (Gwdb.get_fevent_src fe))
+          (Gwdb.get_fevents fam);
+        match notes_links (Buffer.contents buffer) with
+        | [], [] -> ()
+        | list ->
+            db :=
+              Geneweb.NotesLinks.add_in_db !db
+                (Def.NLDB.PgFam (Gwdb.get_ifam fam))
+                list)
+      (Gwdb.families base);
+    if verbosity >= 1 then ProgrBar.finish ();
+    Gwdb.write_nldb base !db
+end
+
 let bname = ref ""
 let fast = ref false
 let cutoff_year = ref (None : int option)
@@ -557,11 +724,20 @@ let main () =
       in
       if fix_count > 0 then changes := true;
       let has_loop = CycleCheck.detect_loop ~base in
-      if has_loop then
+      if has_loop then (
         if !verbosity >= 1 then (
           Printf.printf
             "Loop detected, consanguinity calculation will be skipped.\n";
+          flush stdout))
+      else if not !no_consang then (
+        if !verbosity >= 1 then (
+          Printf.printf "Computing consanguinity...\n";
           flush stdout);
+        let consang_patched =
+          Consanguinity.compute ~base ~scratch:false ~verbosity:!verbosity
+        in
+        if consang_patched then changes := true);
+      NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
       if !changes then
         if !verbosity >= 1 then (
           Printf.printf "Changes staged\n";
