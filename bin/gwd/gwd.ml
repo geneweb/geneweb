@@ -256,43 +256,50 @@ let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
 
 (* NB: Lexicon will be impacted by plugins even if the base
    does not activate this plugin in .gwf file. *)
+let lexicon_cache : (string, (string, string) Hashtbl.t) Hashtbl.t =
+  Hashtbl.create 0
+
 let load_lexicon =
-  let lexicon_cache = Hashtbl.create 0 in
-  fun lang ->
-    let process_lexicon ht fname =
-      let fname =
-        (* Search gw/lang/<fname>, then the installation-wide
+ fun lang ->
+  let process_lexicon ht fname =
+    let fname =
+      (* Search gw/lang/<fname>, then the installation-wide
            bases/lang/<fname> - deliberately NOT base- or
            template-specific: unlike templates/CSS/JS, a lexicon
            override is expected to apply uniformly across every base
            and template on the installation, and keeping it that way
            avoids needing a base/template-aware cache key here. *)
-        let f = Util.search_in_assets (Filename.concat "lang" fname) in
-        if Sys.file_exists f then f
-        else
-          let bf =
-            Filename.concat (Secure.base_dir ()) (Filename.concat "lang" fname)
-          in
-          if Sys.file_exists bf then bf else fname
-      in
-      if Sys.file_exists fname then
-        Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
-      else Log.warn (fun k -> k "File %s unavailable\n" fname)
-    in
-    let fname = !lexicon_fname ^ lang in
-    match Hashtbl.find_opt lexicon_cache fname with
-    | Some lex -> lex
-    | None ->
-        let lex =
-          Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
-            (fun () ->
-              let ht = Hashtbl.create 0 in
-              process_lexicon ht "lexicon.txt";
-              List.iter (process_lexicon ht) !lexicon_list;
-              ht)
+      let f = Util.search_in_assets (Filename.concat "lang" fname) in
+      if Sys.file_exists f then f
+      else
+        let bf =
+          Filename.concat (Secure.base_dir ()) (Filename.concat "lang" fname)
         in
-        Hashtbl.add lexicon_cache fname lex;
-        lex
+        if Sys.file_exists bf then bf else fname
+    in
+    if Sys.file_exists fname then
+      Mutil.input_lexicon lang ht (fun () -> Secure.open_in fname)
+    else Log.warn (fun k -> k "File %s unavailable\n" fname)
+  in
+  let fname = !lexicon_fname ^ lang in
+  match Hashtbl.find_opt lexicon_cache fname with
+  | Some lex -> lex
+  | None ->
+      let lex =
+        (* The reload generation is part of the magic: after m=RELOAD
+             the marshalled file no longer matches and is rebuilt from
+             the .txt sources by the first worker that needs it. *)
+        Mutil.read_or_create_value ~wait:true
+          ~magic:(Mutil.random_magic ^ "-" ^ Reload.generation ())
+          fname
+          (fun () ->
+            let ht = Hashtbl.create 0 in
+            process_lexicon ht "lexicon.txt";
+            List.iter (process_lexicon ht) !lexicon_list;
+            ht)
+      in
+      Hashtbl.add lexicon_cache fname lex;
+      lex
 
 let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
@@ -1316,6 +1323,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
     | _ -> [ "a"; "e"; "i"; "o"; "u"; "y" ]
   in
   let lexicon_lang = if lang = "" then default_lang else lang in
+  ignore (Reload.check ());
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
   (* Il sera mis à jour par effet de bord dans request.ml       *)
@@ -2293,6 +2301,9 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
   GWPARAM.init ();
   (* FIXME: this line MUST be after plugin loading as plugins can modified
      [lexicon_list]. We shouldn't modify this list in [load_plugin]. *)
+  Reload.init ();
+  Reload.on_reload (fun () -> Hashtbl.reset lexicon_cache);
+  Reload.on_reload Util.clear_asset_caches;
   cache_lexicon ();
   List.iter
     (fun dbn ->
