@@ -31,6 +31,21 @@
 
   var G = window.GWPERMA;
   if (!G || !G.q) return;
+
+  // link to the other base: the key form of the query, the indexes
+  // differing from one base to the other
+  var alt = document.getElementById("gw-alt-base");
+  if (alt) {
+    var u = new URL(alt.href);
+    var q = G.q.split("&").filter(function (kv) {
+      return !/^(w|file)=/.test(kv);
+    }).join("&");
+    if (/[?&]i=/.test(u.search) && !/(^|&)i=/.test(q))
+      alt.title = alt.title.slice(0, alt.title.lastIndexOf("\n"));
+    u.search = "?w=" + (u.searchParams.get("w") || "") + "&" + q;
+    alt.href = u.href;
+  }
+
   if (document.getElementById("gw-perma")) return;
 
   var t = G.t || {};
