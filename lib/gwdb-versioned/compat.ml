@@ -422,7 +422,7 @@ module type Driver_S = sig
   (** Modify/add string with a giving id. If string already exists return its id.
     Modification stay blocked until call of [commit_patches]. *)
 
-  val commit_patches : base -> unit
+  val commit_patches : ?write_to_disk:bool -> base -> unit
   (** Commit blocked modifications (patches) and update database files in order to
     apply modifications on the disk.  *)
 
