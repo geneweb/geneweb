@@ -692,6 +692,25 @@ td .rm-cell {
   color: rgb(255,255,255);
 }
 
+.implex-help {
+  text-decoration: underline dotted var(--bs-border-color);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.implex-tip .tooltip-inner {
+  text-align: left;
+}
+.implex-note {
+  border-left: 2px solid var(--bs-border-color);
+  padding-left: .5rem;
+}
+
+.ancmenu-legend {
+  padding: 3px .75rem;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
 html {
@@ -1372,8 +1391,13 @@ div.anchor_upd {
 }
 
 /* Tom select */
+#v + .ts-wrapper .ts-dropdown {
+  font-variant-numeric: tabular-nums;
+}
+
 #v + .ts-wrapper .ts-dropdown-content {
   max-height: calc(100vh - 220px);
+  scrollbar-gutter: stable;
 }
 
 #fname + .ts-wrapper .ts-dropdown-content {
