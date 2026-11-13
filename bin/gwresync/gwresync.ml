@@ -422,6 +422,65 @@ end = struct
           with End_of_file -> !changes)
 end
 
+module Integrity : sig
+  val perform_fixes : base:Gwdb.base -> fast:bool -> verbosity:int -> int
+end = struct
+  let perform_fixes ~base ~fast:_ ~verbosity =
+    let person_fixes =
+      [
+        Geneweb.Fixbase.fix_invalid_occurrence_number;
+        Geneweb.Fixbase.fix_person_parents;
+        Geneweb.Fixbase.fix_nbds;
+        Geneweb.Fixbase.fix_person_unions;
+        Geneweb.Fixbase.fix_person_events_witnesses;
+      ]
+    in
+    let family_fixes =
+      [
+        Geneweb.Fixbase.fix_family_parents;
+        Geneweb.Fixbase.fix_family_children;
+        Geneweb.Fixbase.fix_family_spouses;
+        Geneweb.Fixbase.fix_family_events_witnesses;
+        Geneweb.Fixbase.fix_family_divorce;
+      ]
+    in
+    let progress = if verbosity >= 2 then ProgrBar.run else fun _ _ -> () in
+    let report =
+      if verbosity >= 2 then
+        Some
+          (fun s ->
+            print_endline @@ "\t" ^ Geneweb.Fixbase.string_of_patch base s;
+            flush stdout)
+      else None
+    in
+    if verbosity >= 2 then ProgrBar.start ();
+    let fix_count =
+      Geneweb.Fixbase.perform_fixes ~report ~progress ~base ~person_fixes
+        ~family_fixes
+    in
+    if verbosity >= 2 then ProgrBar.finish ();
+    if verbosity >= 1 && fix_count > 0 then (
+      Printf.printf "%d fixes performed\n" fix_count;
+      flush stdout);
+    fix_count
+end
+
+module CycleCheck : sig
+  val detect_loop : base:Gwdb.base -> bool
+end = struct
+  let detect_loop ~base =
+    let has_loop = ref false in
+    Consang.check_noloop base (function
+      | Def.OwnAncestor p ->
+          Printf.printf
+            "\nError: loop in database, %s is his/her own ancestor.\n"
+            (Gutil.designation base p);
+          flush stdout;
+          has_loop := true
+      | _ -> assert false);
+    !has_loop
+end
+
 let bname = ref ""
 let fast = ref false
 let cutoff_year = ref (None : int option)
@@ -468,6 +527,14 @@ let main () =
       if !verbosity >= 1 then (
         Printf.printf "Base opened: %s\n" (Gwdb.bname base);
         flush stdout);
+      if !fast then (
+        Gwdb.load_persons_array base;
+        Gwdb.load_families_array base;
+        Gwdb.load_ascends_array base;
+        Gwdb.load_couples_array base;
+        Gwdb.load_unions_array base;
+        Gwdb.load_descends_array base;
+        Gwdb.load_strings_array base);
       let changes = ref false in
       Option.iter
         (fun y ->
@@ -485,9 +552,19 @@ let main () =
           Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
             ~verbosity:!verbosity
         then changes := true;
+      let fix_count =
+        Integrity.perform_fixes ~base ~fast:!fast ~verbosity:!verbosity
+      in
+      if fix_count > 0 then changes := true;
+      let has_loop = CycleCheck.detect_loop ~base in
+      if has_loop then
+        if !verbosity >= 1 then (
+          Printf.printf
+            "Loop detected, consanguinity calculation will be skipped.\n";
+          flush stdout);
       if !changes then
         if !verbosity >= 1 then (
-          Printf.printf "Privacy changes staged\n";
+          Printf.printf "Changes staged\n";
           flush stdout))
 
 let () = main ()
