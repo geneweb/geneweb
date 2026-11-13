@@ -797,8 +797,9 @@ html {
   text-align: start;
 }
 
-/* the person given by the anchor of a list of persons (#i…) or of a note
-   (#p_…, from the texts added by the note to the person page) */
+/* the person given by the anchor of a list of persons or of title holders
+   (#i…) or of a note (#p_…, from the texts added by the note to the person
+   page) */
 li > a:target,
 a[id^="p_"]:target {
   background-color: var(--bs-warning-bg-subtle);

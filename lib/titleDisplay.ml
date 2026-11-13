@@ -50,7 +50,9 @@ let give_access_someone conf base (x, t) list =
   if List.mem x list then Output.print_sstring conf "<em>"
   else
     Output.print_string conf
-      ({|<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|">|});
+      ({|<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|" id="i|}
+      ^ Driver.Iper.to_string (Driver.get_iper x)
+      ^ {|">|});
   (match (t.t_name, Driver.get_public_name x, Driver.get_qualifiers x) with
   | Tmain, pn, nn :: _ when Driver.sou base pn <> "" ->
       Output.print_string conf (escape_html @@ Driver.sou base pn);
