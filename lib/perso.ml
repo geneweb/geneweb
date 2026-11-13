@@ -242,6 +242,8 @@ let string_of_title ?(safe = false) ?(link = true) conf base
         ^<^ Mutil.encode (Driver.sou base title)
         ^^^ "&p="
         ^<^ Mutil.encode (Driver.sou base place)
+        ^>^ "#i"
+        ^ Driver.Iper.to_string (Driver.get_iper p)
       in
       geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
     else s
