@@ -35,6 +35,7 @@ type dict_index = {
   (* Whether the index has the section of a dictionary: an index written
      before a dictionary was defined has not. *)
   dict_has : Dict.t -> bool;
+  dict_version : unit -> string option;
 }
 
 type perm = RDONLY | RDRW

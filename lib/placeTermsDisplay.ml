@@ -380,7 +380,7 @@ let print_clusters conf base =
   else
     let ok = begins_ok conf in
     let all =
-      PlaceTerms.clusters (PlaceTerms.build_summary conf base)
+      PlaceTerms.summary_clusters conf base
       |> List.filter (fun (_, (l : PlaceTerms.entry list)) ->
           match l with e :: _ -> ok e.term | [] -> false)
     in
@@ -1151,7 +1151,7 @@ let print_src_clusters conf base =
   print_spans_clusters conf (src_page_of conf) ~shown ~clusters:(fun () ->
       List.map
         (fun (c : SourceTerms.cluster) -> (c.ckey, c.spellings, c.total))
-        (SourceTerms.clusters (SourceTerms.load conf base) part))
+        (SourceTerms.load_clusters conf base part))
 
 let print_src_cluster conf base key =
   let part = src_part conf in
@@ -1238,7 +1238,7 @@ let occu_page conf base =
         ~clusters:(fun () ->
           List.map
             (fun (c : OccuTerms.cluster) -> (c.ckey, c.spellings, c.total))
-            (OccuTerms.clusters (OccuTerms.load base))))
+            (OccuTerms.load_clusters base)))
     ~cluster:(print_occu_cluster conf base)
     ~items:(occu_items base)
 

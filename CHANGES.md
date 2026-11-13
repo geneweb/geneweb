@@ -72,6 +72,12 @@
   `town (county)`, `[suburb] - town` or `(county)`. New pages
   `m=OCCU_TERMS` and `m=OCCU_TERMS_OK` group the spellings of the
   occupations, each item of a comma-separated list on its own.
+- The lists of spellings to group (`m=PLACE_TERMS`, `m=SOURCE_TERMS`,
+  `m=OCCU_TERMS`) are kept by each gwd process and computed again only
+  when the base is modified or its index rewritten: the next pages of a
+  list, another "starting with" or another page size no longer read the
+  whole dictionary. The uses of the places are kept the same way for
+  the pages of a term, of a cluster and of the places to complete.
 - The book of places (`m=MOD_DATA&data=place`) can be sorted from the
   last term of the places (country, county, town): toggle button on the
   page (`o=r`). This order reads a new section of the index of the
