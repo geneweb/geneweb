@@ -1,0 +1,6 @@
+(executable
+  (name gwresync)
+  (public_name geneweb.gwresync)
+  (modules gwresync)
+  (libraries unix str %%%GWDB_PKG%%% geneweb)
+)

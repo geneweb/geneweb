@@ -16,6 +16,7 @@ bin/populate-xss-gwb/dune
 bin/gwu/dune
 bin/setup/dune
 bin/update_nldb/dune
+bin/gwresync/dune
 bin/init-search-indexes/dune
 bin/index-dumper/dune
 lib/util/dune

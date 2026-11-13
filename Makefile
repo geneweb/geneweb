@@ -65,6 +65,7 @@ GENERATED_FILES_DEP = \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
+	bin/gwresync/dune \
 	bin/init-search-indexes/dune \
 	bin/index-dumper/dune
 
@@ -121,6 +122,7 @@ distrib:
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu;
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup;
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb;
+	cp $(BUILD_DISTRIB_DIR)gwresync/gwresync.exe $(DISTRIB_DIR)/gw/gwresync;
 	cp $(BUILD_DISTRIB_DIR)init-search-indexes/init_search_indexes.exe $(DISTRIB_DIR)/gw/init-search-indexes;
 	cp $(BUILD_DISTRIB_DIR)index-dumper/index_dumper.exe $(DISTRIB_DIR)/gw/index-dumper;
 	mkdir $(DISTRIB_DIR)/gw/setup
