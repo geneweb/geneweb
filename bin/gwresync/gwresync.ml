@@ -1,5 +1,426 @@
-(* Open Gwdb *)
-open Gwdb
+module Privacy : sig
+  val apply_cutoff_date :
+    base:Gwdb.base -> cutoff_year:int -> verbosity:int -> bool
+
+  val apply_list :
+    base:Gwdb.base -> access:Def.access -> file:string -> verbosity:int -> bool
+end = struct
+  let nb_gen_by_century = 3
+  let nb_years_by_gen = 30
+
+  let oldest_year_of p =
+    let open Date in
+    let open Def in
+    match od_of_cdate (Gwdb.get_birth p) with
+    | Some (Dgreg (d, _)) -> Some d.year
+    | _ -> (
+        match od_of_cdate (Gwdb.get_baptism p) with
+        | Some (Dgreg (d, _)) -> Some d.year
+        | _ -> (
+            match date_of_death (Gwdb.get_death p) with
+            | Some (Dgreg (d, _)) -> Some d.year
+            | _ -> None))
+
+  let most_recent_year_of p =
+    let open Date in
+    let open Def in
+    match date_of_death (Gwdb.get_death p) with
+    | Some (Dgreg (d, _)) -> Some d.year
+    | _ -> (
+        match od_of_cdate (Gwdb.get_baptism p) with
+        | Some (Dgreg (d, _)) -> Some d.year
+        | _ -> (
+            match od_of_cdate (Gwdb.get_birth p) with
+            | Some (Dgreg (d, _)) -> Some d.year
+            | _ -> None))
+
+  let compute_ndgen cutoff_year y = (cutoff_year - y) * nb_gen_by_century / 100
+
+  let mark_descendants base scanned old cutoff_year =
+    let rec loop p ndgen =
+      let p_key_index = Gwdb.get_iper p in
+      if Gwdb.Marker.get scanned p_key_index < ndgen then
+        let ndgen =
+          match most_recent_year_of p with
+          | Some y ->
+              Gwdb.Marker.set scanned p_key_index max_int;
+              compute_ndgen cutoff_year y
+          | None ->
+              Gwdb.Marker.set scanned p_key_index ndgen;
+              ndgen
+        in
+        if ndgen > 0 then (
+          let ndgen' = ndgen - 1 in
+          Gwdb.Marker.set old p_key_index true;
+          Array.iter
+            (fun ifam ->
+              let fam = Gwdb.foi base ifam in
+              let sp = Gutil.spouse p_key_index fam in
+              if Gwdb.Marker.get scanned sp < ndgen then
+                let ndgen'' =
+                  Option.fold ~none:ndgen
+                    ~some:(compute_ndgen cutoff_year)
+                    (most_recent_year_of (Gwdb.poi base sp))
+                in
+                if ndgen'' > 0 then (
+                  Gwdb.Marker.set old sp true;
+                  Array.iter
+                    (fun c ->
+                      loop (Gwdb.poi base c) (min ndgen' (max 0 (ndgen'' - 1))))
+                    (Gwdb.get_children fam)))
+            (Gwdb.get_family p))
+    in
+    loop
+
+  let mark_ancestors base scanned cutoff_year changes p =
+    let rec loop p =
+      let i = Gwdb.get_iper p in
+      if not (Gwdb.Marker.get scanned i) then (
+        Gwdb.Marker.set scanned i true;
+        (match oldest_year_of p with
+        | Some y when y >= cutoff_year -> ()
+        | _ ->
+            if
+              Gwdb.get_access p <> Def.Public
+              && (not (Gwdb.is_quest_string (Gwdb.get_first_name p)))
+              && not (Gwdb.is_quest_string (Gwdb.get_surname p))
+            then (
+              let gen_p =
+                { (Gwdb.gen_person_of_person p) with Def.access = Def.Public }
+              in
+              Gwdb.patch_person base gen_p.Def.key_index gen_p;
+              changes := true));
+        Option.iter
+          (fun ifam ->
+            let cpl = Gwdb.foi base ifam in
+            loop (Gwdb.poi base (Gwdb.get_father cpl));
+            loop (Gwdb.poi base (Gwdb.get_mother cpl)))
+          (Gwdb.get_parents p))
+    in
+    loop p
+
+  module DatesStore : sig
+    type t
+
+    val of_base : Gwdb.base -> verbosity:int -> t
+
+    val fold :
+      ('a -> iper:Gwdb.iper -> estimated_year:int -> 'a) -> 'a -> t -> 'a
+  end = struct
+    type computed_date = FoundDate of int | EstimatedDate of int | NoDate
+    type computation = Result of computed_date | Ongoing | Todo
+
+    let result date = Result date
+    let estimated_date year = EstimatedDate year
+    let date_of_result = function Result d -> Some d | Todo | Ongoing -> None
+
+    module Store = struct
+      type siblings = Gwdb.iper array
+
+      type t = {
+        iper_collection : Gwdb.iper Gwdb.Collection.t;
+        iper_store : (Gwdb.iper, computation) Gwdb.Marker.t;
+        ifam_store : (Gwdb.ifam, siblings option) Gwdb.Marker.t;
+      }
+
+      let get { iper_store; _ } iper = Gwdb.Marker.get iper_store iper
+      let set { iper_store; _ } iper comp = Gwdb.Marker.set iper_store iper comp
+      let get_siblings { ifam_store; _ } ifam = Gwdb.Marker.get ifam_store ifam
+
+      let set_siblings { ifam_store; _ } ifam siblings =
+        Gwdb.Marker.set ifam_store ifam siblings
+
+      let create iper_collection ifam_collection =
+        let iper_store = Gwdb.iper_marker iper_collection Todo in
+        let ifam_store = Gwdb.ifam_marker ifam_collection None in
+        { iper_collection; iper_store; ifam_store }
+
+      let fold f acc t =
+        Gwdb.Collection.fold
+          (fun acc iper -> f acc iper (get t iper))
+          acc t.iper_collection
+    end
+
+    type t = Store.t
+
+    let fold f acc store =
+      Store.fold
+        (fun acc iper comp ->
+          match comp with
+          | Result (EstimatedDate estimated_year) -> f acc ~iper ~estimated_year
+          | Result _ -> acc
+          | Ongoing | Todo -> assert false)
+        acc store
+
+    let is_ongoing store iper = Store.get store iper = Ongoing
+
+    let add_not_ongoing_to_queue store search_queue iper =
+      if not (is_ongoing store iper) then Queue.push iper search_queue
+
+    let add_parents_to_queue search_queue store parents =
+      let father = Option.map Gwdb.get_father parents in
+      let mother = Option.map Gwdb.get_mother parents in
+      Option.iter (add_not_ongoing_to_queue store search_queue) father;
+      Option.iter (add_not_ongoing_to_queue store search_queue) mother
+
+    let spouses_of_families iper families =
+      Array.map (Gutil.spouse iper) families
+
+    let siblings_of_family store parents =
+      let ifam = Gwdb.get_ifam parents in
+      match Store.get_siblings store ifam with
+      | Some siblings -> siblings
+      | None ->
+          let children = Gwdb.get_children parents in
+          Store.set_siblings store ifam (Some children);
+          children
+
+    let add_one_gen_to_date = function
+      | NoDate as d -> d
+      | FoundDate d | EstimatedDate d -> estimated_date (d + nb_years_by_gen)
+
+    let best_date_year_opt d1 d2 =
+      match (d1, d2) with
+      | (FoundDate d1 | EstimatedDate d1), (FoundDate d2 | EstimatedDate d2) ->
+          if d1 > d2 then Some d1 else Some d2
+      | (FoundDate d | EstimatedDate d), _ | _, (FoundDate d | EstimatedDate d)
+        ->
+          Some d
+      | NoDate, NoDate -> None
+
+    let year_opt_of_date = function
+      | FoundDate d | EstimatedDate d -> Some d
+      | NoDate -> None
+
+    let best_estimated_date_of_years d1 d2 =
+      match (d1, d2) with
+      | Some d1, Some d2 -> Option.map estimated_date (best_date_year_opt d1 d2)
+      | Some d, _ | _, Some d -> Option.map estimated_date (year_opt_of_date d)
+      | None, None -> None
+
+    let best_estimated_date_of_dates d1 d2 =
+      let date_opt = Option.map estimated_date (best_date_year_opt d1 d2) in
+      Option.value ~default:NoDate date_opt
+
+    let best_date_of_parents store parents =
+      let father = Option.map Gwdb.get_father parents in
+      let mother = Option.map Gwdb.get_mother parents in
+      let date_opt =
+        match (father, mother) with
+        | Some ifath, Some imoth ->
+            let ifath_year_opt = date_of_result (Store.get store ifath) in
+            let imoth_year_opt = date_of_result (Store.get store imoth) in
+            let date_opt =
+              best_estimated_date_of_years ifath_year_opt imoth_year_opt
+            in
+            Option.map add_one_gen_to_date date_opt
+        | Some ifath, None ->
+            let d = date_of_result (Store.get store ifath) in
+            Option.map add_one_gen_to_date d
+        | None, Some imoth ->
+            let d = date_of_result (Store.get store imoth) in
+            Option.map add_one_gen_to_date d
+        | None, None -> None
+      in
+      Option.value ~default:NoDate date_opt
+
+    let best_date_of_ipers_opt store ipers =
+      Array.fold_left
+        (fun best_date iper ->
+          let computation = Store.get store iper in
+          let date_opt = date_of_result computation in
+          let best_year_opt =
+            best_date_year_opt best_date (Option.value ~default:NoDate date_opt)
+          in
+          Option.value ~default:best_date
+            (Option.map estimated_date best_year_opt))
+        NoDate ipers
+
+    let rec compute_stack' base store (ancestor_stack, to_compute_again)
+        progress_was_made =
+      if Stack.is_empty ancestor_stack then (
+        List.iter (fun iper -> Stack.push iper ancestor_stack) to_compute_again;
+        progress_was_made)
+      else
+        let iper = Stack.pop ancestor_stack in
+        let person = Gwdb.poi base iper in
+        let parents = Option.map (Gwdb.foi base) (Gwdb.get_parents person) in
+        let families = Array.map (Gwdb.foi base) (Gwdb.get_family person) in
+        let spouses = spouses_of_families iper families in
+        let siblings = Option.map (siblings_of_family store) parents in
+        let date_parents = best_date_of_parents store parents in
+        let date_spouses = best_date_of_ipers_opt store spouses in
+        let date_siblings_opt =
+          Option.map (best_date_of_ipers_opt store) siblings
+        in
+        let date_siblings = Option.value ~default:NoDate date_siblings_opt in
+        let date =
+          best_estimated_date_of_dates date_siblings
+            (best_estimated_date_of_dates date_parents date_spouses)
+        in
+        let to_compute_again =
+          if date = NoDate then iper :: to_compute_again
+          else (
+            Store.set store iper (result date);
+            to_compute_again)
+        in
+        let progress_was_made = progress_was_made || date <> NoDate in
+        compute_stack' base store
+          (ancestor_stack, to_compute_again)
+          progress_was_made
+
+    let compute_stack base store ancestor_stack =
+      compute_stack' base store (ancestor_stack, []) false
+
+    let rec find_person_date base search_queue ancestor_stack_queue
+        ancestor_stack (store : t) iper =
+      Store.set store iper Ongoing;
+      let person = Gwdb.poi base iper in
+      match oldest_year_of person with
+      | Some date ->
+          Store.set store iper (result (FoundDate date));
+          find_person_date_of_queue base search_queue ancestor_stack_queue
+            ancestor_stack store
+      | None ->
+          let parents = Option.map (Gwdb.foi base) (Gwdb.get_parents person) in
+          add_parents_to_queue search_queue store parents;
+          Stack.push iper ancestor_stack;
+          find_person_date_of_queue base search_queue ancestor_stack_queue
+            ancestor_stack store
+
+    and find_person_date_of_queue base search_queue ancestor_stack_queue
+        ancestor_stack store =
+      if Queue.is_empty search_queue then
+        Queue.push ancestor_stack ancestor_stack_queue
+      else
+        let iper = Queue.pop search_queue in
+        match Store.get store iper with
+        | Todo ->
+            find_person_date base search_queue ancestor_stack_queue
+              ancestor_stack store iper
+        | Result _ | Ongoing ->
+            find_person_date_of_queue base search_queue ancestor_stack_queue
+              ancestor_stack store
+
+    let find_person_date base store ancestor_stack_queue iper =
+      let search_queue = Queue.create () in
+      let ancestor_stack = Stack.create () in
+      Queue.push iper search_queue;
+      find_person_date_of_queue base search_queue ancestor_stack_queue
+        ancestor_stack store
+
+    let of_base base ~verbosity =
+      let n = Gwdb.nb_of_persons base in
+      let ipers_collection = Gwdb.ipers base in
+      let ifams_collection = Gwdb.ifams base in
+      let store = Store.create ipers_collection ifams_collection in
+      let ancestor_stack_queue = Queue.create () in
+      if verbosity >= 1 then ProgrBar.start ();
+      Gwdb.Collection.iteri
+        (fun i iper ->
+          find_person_date base store ancestor_stack_queue iper;
+          if verbosity >= 1 then ProgrBar.run i n)
+        ipers_collection;
+      let rec work_until_no_progress ancestor_stack_queue n_ancestor_stack_queue
+          progress =
+        if Queue.is_empty ancestor_stack_queue then
+          if progress then
+            work_until_no_progress n_ancestor_stack_queue (Queue.create ())
+              false
+          else
+            Queue.iter
+              (Stack.iter (fun iper -> Store.set store iper (result NoDate)))
+              n_ancestor_stack_queue
+        else
+          let ancestor_stack = Queue.pop ancestor_stack_queue in
+          let stack_progress = compute_stack base store ancestor_stack in
+          if not (Stack.is_empty ancestor_stack) then
+            Queue.push ancestor_stack n_ancestor_stack_queue;
+          let progress = progress || stack_progress in
+          work_until_no_progress ancestor_stack_queue n_ancestor_stack_queue
+            progress
+      in
+      work_until_no_progress ancestor_stack_queue (Queue.create ()) false;
+      if verbosity >= 1 then ProgrBar.finish ();
+      store
+  end
+
+  let apply_cutoff_date ~base ~cutoff_year ~verbosity =
+    let changes = ref false in
+    let nb = Gwdb.nb_of_persons base in
+    let ipers = Gwdb.ipers base in
+    let old = Gwdb.iper_marker ipers false in
+    let scanned = Gwdb.iper_marker ipers (-1) in
+    if verbosity >= 1 then ProgrBar.start ();
+    Gwdb.Collection.iteri
+      (fun i ip ->
+        if verbosity >= 1 then ProgrBar.run i nb;
+        if Gwdb.Marker.get scanned ip < 0 then
+          let p = Gwdb.poi base ip in
+          mark_descendants base scanned old cutoff_year p 0)
+      ipers;
+    if verbosity >= 1 then ProgrBar.finish ();
+    let scanned_anc = Gwdb.iper_marker ipers false in
+    if verbosity >= 1 then ProgrBar.start ();
+    Gwdb.Collection.iteri
+      (fun i ip ->
+        if verbosity >= 1 then ProgrBar.run i nb;
+        if Gwdb.Marker.get old ip && not (Gwdb.Marker.get scanned_anc ip) then
+          let p = Gwdb.poi base ip in
+          mark_ancestors base scanned_anc cutoff_year changes p)
+      ipers;
+    if verbosity >= 1 then ProgrBar.finish ();
+    let store = DatesStore.of_base base ~verbosity in
+    let changed_by_dates =
+      DatesStore.fold
+        (fun ch ~iper ~estimated_year ->
+          let p = Gwdb.poi base iper in
+          match Gwdb.get_access p with
+          | Def.IfTitles ->
+              let access =
+                if estimated_year > cutoff_year then Def.Private else Def.Public
+              in
+              let gen_p = { (Gwdb.gen_person_of_person p) with Def.access } in
+              Gwdb.patch_person base gen_p.Def.key_index gen_p;
+              true
+          | Def.Private | Def.Public -> ch)
+        false store
+    in
+    !changes || changed_by_dates
+
+  let access_some_aux base access key changes =
+    let ip_opt =
+      match Gutil.person_ht_find_all base key with
+      | [ ip ] -> Some ip
+      | _ -> Gutil.person_of_string_dot_key base key
+    in
+    match ip_opt with
+    | Some ip ->
+        let p = Gwdb.poi base ip in
+        if Gwdb.get_access p <> access then (
+          let gen_p = { (Gwdb.gen_person_of_person p) with Def.access } in
+          Gwdb.patch_person base gen_p.Def.key_index gen_p;
+          changes := true)
+    | None ->
+        Printf.eprintf "Bad key %s\n" key;
+        flush stderr
+
+  let apply_list ~base ~access ~file ~verbosity:_ =
+    if file = "" || not (Sys.file_exists file) then false
+    else
+      let changes = ref false in
+      let ic = open_in file in
+      Fun.protect
+        ~finally:(fun () -> close_in_noerr ic)
+        (fun () ->
+          try
+            while true do
+              let line = String.trim (input_line ic) in
+              if line <> "" then access_some_aux base access line changes
+            done;
+            !changes
+          with End_of_file -> !changes)
+end
 
 let bname = ref ""
 let fast = ref false
@@ -46,6 +467,27 @@ let main () =
       let base = Gwdb.open_base !bname in
       if !verbosity >= 1 then (
         Printf.printf "Base opened: %s\n" (Gwdb.bname base);
-        flush stdout))
+        flush stdout);
+      let changes = ref false in
+      Option.iter
+        (fun y ->
+          if
+            Privacy.apply_cutoff_date ~base ~cutoff_year:y ~verbosity:!verbosity
+          then changes := true)
+        !cutoff_year;
+      if !whitelist_file <> "" then
+        if
+          Privacy.apply_list ~base ~access:Def.Public ~file:!whitelist_file
+            ~verbosity:!verbosity
+        then changes := true;
+      if !blacklist_file <> "" then
+        if
+          Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
+            ~verbosity:!verbosity
+        then changes := true;
+      if !changes then
+        if !verbosity >= 1 then (
+          Printf.printf "Privacy changes staged\n";
+          flush stdout))
 
 let () = main ()
