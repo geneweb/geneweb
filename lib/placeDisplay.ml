@@ -473,6 +473,16 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
   Templ.output conf ifun Templ.Env.empty
     (Driver.empty_person base Driver.Iper.dummy)
     "buttons_places";
+  (* without index, every person and family is read *)
+  if not (Driver.dict_has base Geneweb_db.Dict.Place) then (
+    Output.printf conf "<div class=\"alert alert-warning py-2 mt-2\">%s"
+      (Utf8.capitalize_fst (transl conf "places: no index"));
+    if conf.wizard then
+      Output.printf conf " %s"
+        (Printf.sprintf
+           (ftransl conf "places: no index, reindex %s")
+           (Util.escape_html conf.bname :> string));
+    Output.print_sstring conf "</div>\n");
   let link_to_ind =
     match List.assoc_opt "place_surname_link_to_ind" conf.base_env with
     | Some "yes" -> true

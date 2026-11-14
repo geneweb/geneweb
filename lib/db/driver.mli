@@ -631,9 +631,9 @@ val dict_select :
 (** [dict_select base dict select] Iterators, in increasing order, over the
     persons and over the families using an entry of [dict] whose string id
     satisfies [select], marked with one byte per person and per family from the
-    index of the dictionaries. On a base of an earlier format, without index,
-    [select] is not called and they iterate over all the persons and families.
-*)
+    index of the dictionaries. On a base without index (of an earlier format, or
+    whose {i base.inx} is missing), [select] is not called and they iterate over
+    all the persons and families. *)
 
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 (** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not

@@ -602,7 +602,10 @@ let families ?(select = fun _ -> true) base =
 let ifam_marker c i = Collection.Marker.make (fun i -> i) c i
 
 let dict_select base d select =
-  if base_format base <> current_base_format then
+  if
+    base_format base <> current_base_format
+    || not (base.func.dict_index.dict_has d)
+  then
     ( (fun f -> Collection.iter f (ipers base)),
       fun f -> Collection.iter f (ifams base) )
   else

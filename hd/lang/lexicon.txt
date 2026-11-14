@@ -18650,6 +18650,26 @@ de: zu vervollständigende Orte
 en: places to complete
 fr: lieux à compléter
 
+    places: no index
+de: Diese Datenbank hat keinen Index ihrer Wörterbücher: Um die Orte aufzulisten, werden alle Personen und Familien gelesen, was bei einer großen Datenbank langsam sein kann.
+en: This base has no index of its dictionaries: to list the places, every person and family is read, which may be slow on a large base.
+es: Esta base no tiene índice de sus diccionarios: para listar los lugares se leen todas las personas y familias, lo que puede ser lento en una base grande.
+fr: Cette base n’a pas d’index de ses dictionnaires : pour lister les lieux, toutes les personnes et familles sont lues, ce qui peut être lent sur une grande base.
+it: Questa base non ha un indice dei suoi dizionari: per elencare i luoghi vengono lette tutte le persone e le famiglie, il che può essere lento su una base grande.
+nl: Deze database heeft geen index van haar woordenboeken: om de plaatsen te tonen worden alle personen en gezinnen gelezen, wat traag kan zijn bij een grote database.
+pt: Esta base não tem índice dos seus dicionários: para listar os lugares, todas as pessoas e famílias são lidas, o que pode ser lento numa base grande.
+sv: Denna databas saknar index över sina ordlistor: för att lista orterna läses alla personer och familjer, vilket kan gå långsamt i en stor databas.
+
+    places: no index, reindex %s
+de: Um ihn hinzuzufügen: gwc -reindex %s (eine Datenbank in einem älteren Format als GnWb0025 muss neu erstellt werden: gwu, dann gwc).
+en: To add it: gwc -reindex %s (a base of a format earlier than GnWb0025 must be rebuilt: gwu then gwc).
+es: Para añadirlo: gwc -reindex %s (una base de un formato anterior a GnWb0025 debe reconstruirse: gwu y luego gwc).
+fr: Pour l’ajouter : gwc -reindex %s (une base d’un format antérieur à GnWb0025 doit être reconstruite : gwu puis gwc).
+it: Per aggiungerlo: gwc -reindex %s (una base in un formato anteriore a GnWb0025 deve essere ricostruita: gwu poi gwc).
+nl: Om hem toe te voegen: gwc -reindex %s (een database in een ouder formaat dan GnWb0025 moet opnieuw worden opgebouwd: gwu en daarna gwc).
+pt: Para o adicionar: gwc -reindex %s (uma base num formato anterior a GnWb0025 deve ser reconstruída: gwu e depois gwc).
+sv: För att lägga till det: gwc -reindex %s (en databas i ett äldre format än GnWb0025 måste byggas om: gwu och sedan gwc).
+
     plugins
 co: moduli d’estensione
 de: Plugins
