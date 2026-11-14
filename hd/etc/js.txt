@@ -13,10 +13,10 @@
                        sha512-e+7khtwPXnlvjbSjbxVllU8uzgqxAQhYZ1II5AyKC8G/IGlMsYo+YaUUea4Dnfv6adjq7+dOMPXFKOPTPfHJAQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
-      <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/js/tom-select.complete.min.js"
-              integrity="sha256-/xuwMq7lcOSlC8tEFkJsHCEM/2U2rqAn3Fhp+pCz0qY=
-                         sha384-A/OhuVi7Pu3OK0LZqDw5rUUVpqZdcqxIyZTjfjxT0v8Y3VsdpFvQChtHCOSobZTL
-                         sha512-iYRFjWzVbUrSMW1pEM3z1uQlMBLr66Up/W6q/IFWb7PR1pvTz22ntvG5rQUSxH99kUsaafhb6qPbSm3j6AQvrQ=="
+      <script src="https://cdn.jsdelivr.net/npm/tom-select@2.7.0/dist/js/tom-select.complete.min.js"
+              integrity="sha256-XBMV/o5ix7k0LL+CxNVFS4Orl9UHoumAPbrvckM0OLw=
+                         sha384-6MTvOa3EHHoM7xZpNAMYb7CudHNfwio+DW1LFx1HBz6Udh5eW8hJjh4HKUsg7MoO
+                         sha512-dR0t4vgiB6Ug8gozVyrON1G9TvEmbI3RkA0ihJBCR+skOij/Ji7MYdBz4KjbCIfy3941U3UX6dr7r3d2qSCnDg=="
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
@@ -36,7 +36,7 @@
   %else;
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.9"></script>
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
-      <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.6.0"></script>
+      <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.7.0"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
       <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
