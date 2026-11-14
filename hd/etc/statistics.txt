@@ -204,6 +204,20 @@ function kpi(row, label, value, color) {
   row.appendChild(d);
 }
 
+/* Chart.js caps a vertical axis at half the chart width and right-aligns its
+   labels: a longer label loses its beginning. Cut its end to fit instead. */
+function fitLabel(scale, l) {
+  var ctx = scale.ctx, max = scale.maxWidth - 12;
+  ctx.save();
+  ctx.font = Chart.helpers.toFont(scale.options.ticks.font).string;
+  if (ctx.measureText(l).width > max) {
+    while (l.length > 1 && ctx.measureText(l + "\u2026").width > max) l = l.slice(0, -1);
+    l += "\u2026";
+  }
+  ctx.restore();
+  return l;
+}
+
 function topBar(id, entries, color, href) {
   if (!entries || !entries.length) return;
   var lb = %[%], dt = %[%];
@@ -215,8 +229,7 @@ function topBar(id, entries, color, href) {
       indexAxis:"y",
       plugins:{legend:{display:false}},
       scales:{x:{beginAtZero:true},y:{ticks:{autoSkip:false,
-        callback:function(v) { var l = this.getLabelForValue(v);
-          return l.length > 28 ? l.slice(0, 27) + "\u2026" : l; }}}},
+        callback:function(v) { return fitLabel(this, this.getLabelForValue(v)); }}}},
       onClick: function(e, el) {
         if (el.length && href) window.location = href + encodeURIComponent(entries%[el%[0%].index%].n);
       }
