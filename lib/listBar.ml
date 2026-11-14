@@ -5,10 +5,14 @@ let esc s = (Util.escape_html s :> string)
 let enc s = (Mutil.encode s :> string)
 let page_sizes = [ 25; 50; 100; 200; 500; 1000 ]
 
+(* [n=all]: every row on one page *)
+let all_rows conf = p_getenv conf.env "n" = Some "all"
+
 let page_size ?(gwf_key = "terms_page_size") conf =
   let ok n = n >= 1 && n <= 5000 in
   match p_getint conf.env "n" with
   | Some n when ok n -> n
+  | _ when all_rows conf -> max_int
   | Some _ | None -> (
       match
         Option.bind (List.assoc_opt gwf_key conf.base_env) int_of_string_opt
@@ -22,7 +26,11 @@ let slice ?gwf_key conf total =
     | Some f when f >= 1 && f <= total -> f
     | Some _ | None -> 1
   in
-  (from, min total (from + page_size ?gwf_key conf - 1))
+  if all_rows conf then (1, total)
+  else (from, min total (from + page_size ?gwf_key conf - 1))
+
+let n_param ?gwf_key conf =
+  if all_rows conf then "all" else string_of_int (page_size ?gwf_key conf)
 
 let take (from, upto) l = List.filteri (fun i _ -> i >= from - 1 && i < upto) l
 
@@ -57,13 +65,16 @@ let begins_ok conf =
       let b = fold_case b in
       fun s -> String.starts_with ~prefix:b (fold_case s)
 
-let print_list_bar ?gwf_key ?(begins = true) conf ~href ~hidden counts =
+let print_list_bar ?gwf_key ?(begins = true) ?(offer_all = false) conf ~href
+    ~hidden counts =
   let n = page_size ?gwf_key conf in
+  let all = all_rows conf in
+  let n_s = n_param ?gwf_key conf in
   let bw = begins_with conf in
   let url ?(bw = bw) from =
-    Printf.sprintf "%s%s&n=%d&from=%d" href
+    Printf.sprintf "%s%s&n=%s&from=%d" href
       (match bw with Some b -> "&bw=" ^ enc b | None -> "")
-      n from
+      n_s from
   in
   let button label href =
     Printf.sprintf
@@ -93,7 +104,7 @@ let print_list_bar ?gwf_key ?(begins = true) conf ~href ~hidden counts =
       Output.print_sstring conf
         (button
            (esc (Utf8.capitalize_fst (transl conf "all")))
-           (Printf.sprintf "%s&all=on&n=%d" href n));
+           (Printf.sprintf "%s&all=on&n=%s" href n_s));
       Output.print_sstring conf "</form>\n"
   | Some (total, (from, upto)) ->
       Output.printf conf
@@ -106,7 +117,11 @@ let print_list_bar ?gwf_key ?(begins = true) conf ~href ~hidden counts =
           Output.printf conf "<option value=\"%d\"%s>%d</option>\n" k
             (if k = n then " selected" else "")
             k)
-        (List.sort_uniq compare (n :: page_sizes));
+        (List.sort_uniq compare (if all then page_sizes else n :: page_sizes));
+      if offer_all || all then
+        Output.printf conf "<option value=\"all\"%s>%s</option>\n"
+          (if all then " selected" else "")
+          (esc (Utf8.capitalize_fst (transl conf "all")));
       Output.print_sstring conf "</select>\n";
       if from > 1 then
         Output.print_sstring conf
@@ -120,4 +135,11 @@ let print_list_bar ?gwf_key ?(begins = true) conf ~href ~hidden counts =
           (button
              (esc (Utf8.capitalize_fst (transl conf "next")))
              (url (upto + 1)));
+      (* every row, when they do not all fit on this page *)
+      if offer_all && (from > 1 || upto < total) then
+        Output.print_sstring conf
+          (button
+             (esc (Utf8.capitalize_fst (transl conf "all")))
+             (Printf.sprintf "%s%s&n=all" href
+                (match bw with Some b -> "&bw=" ^ enc b | None -> "")));
       Output.print_sstring conf "</form>\n"

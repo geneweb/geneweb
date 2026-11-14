@@ -103,11 +103,11 @@
   surnames (`m=P`, `m=N`) count the bearers of a name without listing
   them, when no access restriction applies.
 - The places and surnames (`m=PS`) are sent by pages of
-  `places_page_size` rows (100 by default, changed on the page): places
-  in the long display, groups of places in the short one. Only the
-  persons and families of the places of the page are read. The long
-  display no longer falls back to the short one on long lists:
-  `short_place_threshold` is removed.
+  `places_page_size` rows (100 by default, changed on the page, or all
+  of them on one page: `n=all`): places in the long display, groups of
+  places in the short one. Only the persons and families of the places
+  of the page are read. The long display no longer falls back to the
+  short one on long lists: `short_place_threshold` is removed.
   The page opens empty, without reading the base: the places are
   listed once a place (`k`) or all of them (`go=on`) is asked. The
   places of the statistics page lead to `m=PS` for that place.

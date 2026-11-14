@@ -522,12 +522,13 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
      "starting with" in the bar; an empty page has no bar *)
   if chosen then (
     (* the other display keeps [n], from the first row *)
-    Output.printf conf "<p>\n<a href=\"%s&n=%d\">%s</a>\n"
+    Output.printf conf "<p>\n<a href=\"%s&n=%s\">%s</a>\n"
       (href (if long then "short" else "long"))
-      (ListBar.page_size ~gwf_key:page_size_key conf)
+      (ListBar.n_param ~gwf_key:page_size_key conf)
       (Utf8.capitalize
          (transl conf (if long then "short display" else "long display")));
-    ListBar.print_list_bar ~gwf_key:page_size_key ~begins:false conf
+    ListBar.print_list_bar ~gwf_key:page_size_key ~begins:false ~offer_all:true
+      conf
       ~href:(href (if long then "long" else "short"))
       ~hidden
       (Some (total, sl)));
