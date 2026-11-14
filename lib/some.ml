@@ -343,7 +343,7 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
               if
                 Driver.Istr.equal (get_field p) istr
                 && ((not (is_hide_names conf p))
-                   || Util.authorized_age conf base p)
+                   || GWPARAM.p_auth_sp conf base p)
               then iper :: iperl
               else iperl)
             [] iperl
@@ -384,7 +384,7 @@ let collect_surname_suggestions conf base iperl known =
   List.iter
     (fun ip ->
       let p = pget conf base ip in
-      if (not (is_hide_names conf p)) || authorized_age conf base p then begin
+      if (not (is_hide_names conf p)) || GWPARAM.p_auth_sp conf base p then begin
         List.iter
           (fun istr -> try_add (Driver.sou base istr))
           (Driver.get_surnames_aliases p);
@@ -1678,7 +1678,7 @@ let print_surname_details conf base _alias_cache query_string surnames_groups =
     else fun surname ->
       let all_misc = Gutil.person_not_a_key_find_all base surname in
       let is_person_visible p =
-        (not (Util.is_hide_names conf p)) || Util.authorized_age conf base p
+        (not (Util.is_hide_names conf p)) || GWPARAM.p_auth_sp conf base p
       in
       let rec build_alias_list acc = function
         | [] -> acc
@@ -1908,7 +1908,7 @@ let search_surname_print conf base alias_cache not_found_fun x =
           (fun ip acc ->
             let p = pget conf base ip in
             if
-              ((not (is_hide_names conf p)) || authorized_age conf base p)
+              ((not (is_hide_names conf p)) || GWPARAM.p_auth_sp conf base p)
               && List.mem (Name.lower (Driver.p_surname base p)) queries_lower
             then p :: acc
             else acc)

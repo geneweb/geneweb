@@ -515,6 +515,8 @@ let p_auth ?(view = As_is) conf base p =
   wizard
   || ((not conf.Config.semi_public) && friend)
   || myself || access = Def.Public
+  || Driver.Istr.is_quest (Driver.get_first_name p)
+     && Driver.Istr.is_quest (Driver.get_surname p)
   || conf.Config.public_if_titles && access = Def.IfTitles
      && Driver.nobtitles base conf.allowed_titles conf.denied_titles p <> []
   || friend && conf.Config.consent

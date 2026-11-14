@@ -902,7 +902,7 @@ let visible_in_search conf base p =
   && (not (empty_or_quest (Driver.get_first_name p)))
   && Name.lower (Driver.sou base (Driver.get_surname p)) <> ""
   && Name.lower (Driver.sou base (Driver.get_first_name p)) <> ""
-  && (not (is_hide_names conf p && not (authorized_age conf base p)))
+  && (not (is_hide_names conf p && not (GWPARAM.p_auth_sp conf base p)))
   && not (is_restricted conf base (Driver.get_iper p))
 
 let visible_in_search_ip conf base ip =
