@@ -117,9 +117,9 @@
   For wizards, each place and group of places of `m=PS` links to the
   book of places, at the entries starting with it (order from the last
   term).
-  In the short display, following a group keeps the place searched:
-  "Chateaumeillant" found under "Cher" leads to "Chateaumeillant, Cher",
-  no longer to every place of the Cher.
+  In the short display, a place found by a deeper term is shown down to
+  that term ("Chateaumeillant, Cher", not "Cher"), and following a group
+  keeps the place searched.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.

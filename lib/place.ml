@@ -268,14 +268,13 @@ let get_all ?(only = fun _ -> true) conf base ~add_birth ~add_baptism ~add_death
     ht;
   array
 
-let find_in conf x ini =
-  (* look at possibility to have ini=aaa, bbb or aaa (bbb) *)
+(* The parts of a query [ini] (split on commas, or "aaaa (bbbb)") and the
+   test of a part against a term, honouring [word] and [case]. *)
+let query conf ini =
   let word = p_getenv conf.env "word" = Some "on" in
   (* full words *)
   let case = p_getenv conf.env "case" = Some "on" in
   (* case sensitive *)
-  let any = p_getenv conf.env "any" = Some "on" in
-  (* anywhere in place list *)
   let low s = if not case then Name.lower s else s in
   let inil = String.split_on_char ',' ini in
   let inil =
@@ -290,19 +289,29 @@ let find_in conf x ini =
       | None -> [ ini ]
     else inil
   in
-  List.fold_left
-    (fun acc ini ->
-      let ini = low ini in
-      acc
-      &&
-      if any || List.length inil > 1 then
-        List.fold_left
-          (fun r p ->
-            r || if word then low p = ini else Mutil.contains (low p) ini)
-          false x
-      else
-        match x with
-        | [] -> false
-        | x :: _ when word -> low x = ini
-        | x :: _ -> Mutil.contains (low x) ini)
-    true inil
+  let matches p ini =
+    let ini = low ini in
+    if word then low p = ini else Mutil.contains (low p) ini
+  in
+  (inil, matches)
+
+let find_in conf x ini =
+  let any = p_getenv conf.env "any" = Some "on" in
+  (* anywhere in place list *)
+  let inil, matches = query conf ini in
+  List.for_all
+    (fun ini ->
+      if any || List.length inil > 1 then List.exists (fun p -> matches p ini) x
+      else match x with [] -> false | x :: _ -> matches x ini)
+    inil
+
+let match_depth conf x ini =
+  let any = p_getenv conf.env "any" = Some "on" in
+  let inil, matches = query conf ini in
+  if any || List.length inil > 1 then
+    List.fold_left
+      (fun (i, d) p ->
+        (i + 1, if List.exists (matches p) inil then i + 1 else d))
+      (0, 0) x
+    |> snd
+  else match x with x :: _ when List.exists (matches x) inil -> 1 | _ -> 0

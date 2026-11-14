@@ -122,3 +122,9 @@ val find_in : config -> string list -> string -> bool
     sensitive) and ["any"] (match any component) request parameters, and splits
     [ini] on commas or a parenthesised tail so a multi-part query can match
     across components. *)
+
+val match_depth : config -> string list -> string -> int
+(** [match_depth conf components ini] The number of leading [components] down to
+    the deepest one matched by a part of the query [ini], as in {!find_in}; [0]
+    if none matches. m=PS shows a place found by a deeper term
+    ("Châteaumeillant" in "Cher, Châteaumeillant") at that depth. *)

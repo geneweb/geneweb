@@ -169,6 +169,16 @@ let drill_k conf label =
       String.concat ", " l
   | Some _ | None -> label
 
+(* The number of terms of a place in a group of the short display: [keep],
+   or more, down to the term found by the place searched [k]
+   ("Châteaumeillant" searched in any term shows "Châteaumeillant, Cher",
+   not "Cher"). *)
+let short_depth conf keep =
+  match p_getenv conf.env "k" with
+  | Some k when String.trim k <> "" ->
+      fun pl -> max keep (Place.match_depth conf pl k)
+  | Some _ | None -> fun _ -> keep
+
 let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
@@ -178,22 +188,24 @@ let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
+  let depth = short_depth conf keep in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
   (* build new list of (places, ipl) *)
   (* accumulate snl according to keep *)
   let new_l =
     let rec loop prev_pl acc_snl acc_l = function
-      | ((pl, _sub), snl) :: l when prev_pl = strip_pl keep pl ->
-          loop (strip_pl keep pl) (get_ip_list snl :: acc_snl) acc_l l
+      | ((pl, _sub), snl) :: l when prev_pl = strip_pl (depth pl) pl ->
+          loop (strip_pl (depth pl) pl) (get_ip_list snl :: acc_snl) acc_l l
       | ((pl, _sub), snl) :: l when acc_snl <> [] ->
           let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
-          loop (strip_pl keep pl)
+          loop
+            (strip_pl (depth pl) pl)
             [ get_ip_list snl ]
             ((prev_pl, acc_snl) :: acc_l)
             l
       | ((pl, _sub), snl) :: l ->
-          loop (strip_pl keep pl) [ get_ip_list snl ] acc_l l
+          loop (strip_pl (depth pl) pl) [ get_ip_list snl ] acc_l l
       | [] ->
           let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
           (prev_pl, acc_snl) :: acc_l
@@ -224,9 +236,9 @@ let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
   let new_l =
     let rec loop prev acc_snl acc_l new_l =
       match (new_l, prev) with
-      | (pl, snl) :: l, prev when prev = strip_pl keep pl ->
+      | (pl, snl) :: l, prev when prev = strip_pl (depth pl) pl ->
           loop pl ((pl, snl) :: acc_snl) acc_l l
-      | (pl, snl) :: l, prev when prev <> strip_pl keep pl ->
+      | (pl, snl) :: l, prev when prev <> strip_pl (depth pl) pl ->
           loop pl
             [ (pl, snl) ]
             (if acc_snl <> [] then acc_snl :: acc_l else acc_l)
@@ -401,9 +413,10 @@ let print_html_places_surnames_long conf base link_to_ind ~dict_link
 let page_size_key = "places_page_size"
 
 (* A row of m=PS: a place with its suburbs in the long display, the group of
-   its [keep] first terms (country first) in the short one. *)
-let row_key ~long keep ((pl, _sub) : string list * string) =
-  if long then pl else strip_pl keep pl
+   its first terms (country first) in the short one: [depth pl] terms, see
+   {!short_depth}. *)
+let row_key ~long depth ((pl, _sub) : string list * string) =
+  if long then pl else strip_pl (depth pl) pl
 
 (* The rows in the order of the display ([a_sort]: reversed), or by their
    number of uses ([f_sort], fewest first with [up]). *)
@@ -424,7 +437,7 @@ let sort_rows conf (rows : (string list * int) list) =
 (* The rows of the places of the index of the dictionaries kept by [filter],
    each with its number of uses ({!Driver.dict_count}: every event and
    record, without reading them), and the row of each place string. *)
-let index_rows base ~long keep fold filter =
+let index_rows base ~long depth fold filter =
   let rows : (string list, int ref) Hashtbl.t = Hashtbl.create 2048 in
   let row_of : (Driver.istr, string list) Hashtbl.t = Hashtbl.create 2048 in
   List.iter
@@ -433,7 +446,7 @@ let index_rows base ~long keep fold filter =
       if s <> "" then
         let key = fold s in
         if filter key then (
-          let r = row_key ~long keep key in
+          let r = row_key ~long depth key in
           Hashtbl.replace row_of istr r;
           match Hashtbl.find_opt rows r with
           | Some w -> w := !w + count
@@ -447,6 +460,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let fold = Place.fold_place_long inverted in
+  let depth = short_depth conf keep in
   let get_all ?only () =
     Place.get_all ?only conf base ~add_birth ~add_baptism ~add_death ~add_burial
       ~add_marriage ([], "") [] fold filter
@@ -490,7 +504,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       not (add_birth || add_baptism || add_death || add_burial || add_marriage)
     then (0, (1, 0), [||])
     else if Driver.dict_has base Geneweb_db.Dict.Place then
-      let rows, row_of = index_rows base ~long keep fold filter in
+      let rows, row_of = index_rows base ~long depth fold filter in
       let total, sl, page = page rows in
       let only istr =
         match Hashtbl.find_opt row_of istr with
@@ -504,7 +518,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       Array.iter
         (fun (key, snl) ->
           let n = List.fold_left (fun n (_, l) -> n + List.length l) 0 snl in
-          let r = row_key ~long keep key in
+          let r = row_key ~long depth key in
           match Hashtbl.find_opt weights r with
           | Some w -> w := !w + n
           | None -> Hashtbl.add weights r (ref n))
@@ -515,7 +529,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       let arry =
         Array.of_list
           (List.filter
-             (fun (key, _) -> Hashtbl.mem page (row_key ~long keep key))
+             (fun (key, _) -> Hashtbl.mem page (row_key ~long depth key))
              (Array.to_list arry))
       in
       (total, sl, arry)
