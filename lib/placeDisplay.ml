@@ -98,7 +98,51 @@ let strip_pl keep pll =
     in
     loop [] 1 pll
 
-let print_html_places_surnames_short conf _base _link_to_ind
+(* For wizards, a link from a place of m=PS to the book of places
+   (m=MOD_DATA), at the entries starting with it: [dict_link pl] for the
+   place or the group of places [pl] (its terms, country first). The book
+   is read from the last term ("France, Manche, Granville", [o=r]), so that
+   a group of places is one interval of it; a base recording its places
+   country first ([places_inverted]) is read in the alphabetic order. An
+   index without the order from the last term only links whole places
+   ([~leaf:true]), the book listing them as written. No link without index:
+   the book needs it. *)
+let dict_link conf base =
+  if not (conf.wizard && Driver.dict_has base Geneweb_db.Dict.Place) then
+    fun ~leaf:_ _ -> ""
+  else
+    let inverted = Place.places_inverted conf in
+    let rev =
+      (not inverted) && Driver.dict_has base Geneweb_db.Dict.Place_last
+    in
+    let book =
+      Utf8.capitalize_fst
+        (Printf.sprintf
+           (ftransl conf "book of %s")
+           (transl_nth conf "place/places" 1))
+    in
+    fun ~leaf pl ->
+      let s =
+        if pl = [] then None
+        else if inverted || rev then Some (String.concat ", " pl)
+        else if leaf then Some (Place.places_to_string false pl)
+        else None
+      in
+      match s with
+      | None -> ""
+      | Some s ->
+          Printf.sprintf
+            "<a href=\"%sm=MOD_DATA&data=place%s&s=%s\" title=\"%s%s “%s”\"><i \
+             class=\"fa fa-wand-magic-sparkles fa-fw ms-1\" \
+             aria-hidden=\"true\"></i></a>"
+            (commd conf :> string)
+            (if rev then "&o=r" else "")
+            (Mutil.encode s :> string)
+            (Util.escape_html book :> string)
+            (transl conf ":")
+            (Util.escape_html s :> string)
+
+let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
@@ -180,6 +224,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
             (if long then "long" else "short")
             (string_of_int (keep + 1))
             str2 str;
+          Output.print_sstring conf (dict_link ~leaf:false pl);
           if len < Place.max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place%s&k=%s&nb=%d"
               (commd conf :> string)
@@ -217,7 +262,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
   loop true new_l;
   Output.print_sstring conf "<p>"
 
-let print_html_places_surnames_long conf base link_to_ind
+let print_html_places_surnames_long conf base link_to_ind ~dict_link
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k =
@@ -290,27 +335,31 @@ let print_html_places_surnames_long conf base link_to_ind
     Output.print_sstring conf "</li>\n"
   in
 
+  (* number of leading terms shared by two places *)
+  let rec common l1 l2 =
+    match (l1, l2) with
+    | x1 :: l1, x2 :: l2 when x1 = x2 -> 1 + common l1 l2
+    | _ -> 0
+  in
   let rec loop prev = function
     | ((pl, sub), snl) :: l ->
-        let rec loop1 prev (pl, sub) =
-          match (prev, pl) with
-          | [], l2 ->
-              List.iter
-                (fun x ->
-                  Output.printf conf "<li>%s<ul>\n"
-                    (pps_call conf opt true keep k [ x ]))
-                l2
-          | x1 :: l1, x2 :: l2 ->
-              if x1 = x2 then loop1 l1 (l2, sub)
-              else (
-                List.iter
-                  (fun _ -> Output.print_sstring conf "</ul></li>\n")
-                  (x1 :: l1);
-                loop1 [] (x2 :: l2, sub))
-          | l1, [] ->
-              List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") l1
-        in
-        loop1 prev (pl, sub);
+        (* close the levels of [prev] not shared with [pl], open those of
+           [pl]: each level is linked to the book of places with the terms
+           above it *)
+        let c = common prev pl in
+        List.iteri
+          (fun i _ -> if i >= c then Output.print_sstring conf "</ul></li>\n")
+          prev;
+        let n = List.length pl in
+        List.iteri
+          (fun i x ->
+            if i >= c then
+              Output.printf conf "<li>%s%s<ul>\n"
+                (pps_call conf opt true keep k [ x ])
+                (dict_link
+                   ~leaf:(i = n - 1)
+                   (List.filteri (fun j _ -> j <= i) pl)))
+          pl;
         print_sn_list (pl, sub) snl;
         loop pl l
     | [] -> List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") prev
@@ -532,9 +581,11 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       ~href:(href (if long then "long" else "short"))
       ~hidden
       (Some (total, sl)));
-  if arry <> [||] then
-    if long then print_html_places_surnames_long conf base link_to_ind arry
-    else print_html_places_surnames_short conf base link_to_ind arry;
+  (if arry <> [||] then
+     let dict_link = dict_link conf base in
+     if long then
+       print_html_places_surnames_long conf base link_to_ind ~dict_link arry
+     else print_html_places_surnames_short conf base link_to_ind ~dict_link arry);
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
