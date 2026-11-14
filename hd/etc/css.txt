@@ -16,10 +16,10 @@
   %if;(bvar.use_cdn="yes")
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     %if;(fanchart="")
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-            integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=
-                       sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB
-                       sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css"
+            integrity="sha256-nKrJd6CvDCIpq9OX7uM0WJnEAg2ioaC3EcHMVD/jcZ0=
+                       sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX
+                       sha512-ZuV2yPmu5OcwTgfUHURSM2QYEMPA9UIPpMr/U9gJEdRB+1VcCJaUc/GJrO9WwZVNR3JB7mgzkRtRwor+BcaPAA=="
             crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
@@ -36,7 +36,7 @@
     %end;
   %else;
     %if;(fanchart="")
-      <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.8">
+      <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.9">
     %end;
     <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")

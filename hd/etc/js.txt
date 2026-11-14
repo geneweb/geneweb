@@ -7,10 +7,10 @@
 %let;upd_notes;%if;(e.m="MOD_NOTES" or e.m="MOD_NOTES_OK" or e.m="MOD_WIZNOTES" or e.m="MOD_WIZNOTES_OK")1%end;%in;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=
-                       sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI
-                       sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"
+            integrity="sha256-StKtMKffH6CmFcTP6xrv++kgGajf8CYsmUZKy9Vtylw=
+                       sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu
+                       sha512-e+7khtwPXnlvjbSjbxVllU8uzgqxAQhYZ1II5AyKC8G/IGlMsYo+YaUUea4Dnfv6adjq7+dOMPXFKOPTPfHJAQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.0/dist/js/tom-select.complete.min.js"
@@ -34,7 +34,7 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.8"></script>
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.9"></script>
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.6.0"></script>
     %end;
