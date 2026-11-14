@@ -4,6 +4,8 @@
 
 <form class="mx-1" name="evt_url" method="get" action="%action;">
   <input type="hidden" name="m" value="PS">
+  %( le formulaire liste les lieux même avec un champ vide %)
+  <input type="hidden" name="go" value="on">
   %if;(e.lang!="" and e.lang!=default_lang)
     <input type="hidden" name="lang" value="%e.lang;">
   %end;
@@ -91,7 +93,7 @@
   </div>
 </form>
 <div class="d-flex mt-2">
-  <a href="%url_set.k_bw_from;" title="[*all the places]">[*all the places]</a>
+  <a href="%apply;url_set%with;k/bw/from/go%and;///on%end;" title="[*all the places]">[*all the places]</a>
   <div class="ms-4">
     <a role="button" class="ms-auto"
       href="%apply;url_set%with;f_sort/up/a_sort/from%and;on/%if;(e.up!="on")on%end;%end;"

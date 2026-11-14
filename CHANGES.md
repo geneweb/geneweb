@@ -109,6 +109,10 @@
   and families of the places of the page are read. The long display no
   longer falls back to the short one on long lists:
   `short_place_threshold` is removed.
+  The page opens empty, without reading the base: the places are
+  listed once a place (`k`), a beginning or all of them (`go=on`) is
+  asked. The places of the statistics page lead to `m=PS` for that
+  place.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.

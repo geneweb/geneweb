@@ -30,6 +30,7 @@ val begins_ok : Config.config -> string -> bool
 
 val print_list_bar :
   ?gwf_key:string ->
+  ?all_param:string ->
   Config.config ->
   href:string ->
   hidden:(unit -> unit) ->
@@ -39,4 +40,4 @@ val print_list_bar :
     and next slices. [href] is the page without [bw], [n] and [from]; [hidden]
     emits its fields. Changing [bw] or [n] goes back to the first row. [counts]
     is the number of rows and the slice shown; without it (nothing computed
-    yet), a button shows all the rows ([all=on]). *)
+    yet), a button shows all the rows ([all_param=on], [all] by default). *)

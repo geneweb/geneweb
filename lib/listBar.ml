@@ -57,7 +57,7 @@ let begins_ok conf =
       let b = fold_case b in
       fun s -> String.starts_with ~prefix:b (fold_case s)
 
-let print_list_bar ?gwf_key conf ~href ~hidden counts =
+let print_list_bar ?gwf_key ?(all_param = "all") conf ~href ~hidden counts =
   let n = page_size ?gwf_key conf in
   let bw = begins_with conf in
   let url ?(bw = bw) from =
@@ -92,7 +92,7 @@ let print_list_bar ?gwf_key conf ~href ~hidden counts =
       Output.print_sstring conf
         (button
            (esc (Utf8.capitalize_fst (transl conf "all")))
-           (Printf.sprintf "%s&all=on&n=%d" href n));
+           (Printf.sprintf "%s&%s=on&n=%d" href all_param n));
       Output.print_sstring conf "</form>\n"
   | Some (total, (from, upto)) ->
       Output.printf conf
