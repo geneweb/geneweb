@@ -1004,7 +1004,7 @@ let search_firstname alias_cache conf base query opts =
     in
     (* Persons read from the index are filtered here: the first-name
        display (display_firstname_results) does not go through
-       handle_search_results and its p_auth filter. *)
+       handle_search_results and its p_auth_sp filter. *)
     let exact_ips =
       List.concat_map
         (fun istr -> Driver.spi_find (Driver.persons_of_first_name base) istr)
