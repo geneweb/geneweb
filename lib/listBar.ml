@@ -57,7 +57,7 @@ let begins_ok conf =
       let b = fold_case b in
       fun s -> String.starts_with ~prefix:b (fold_case s)
 
-let print_list_bar ?gwf_key ?(all_param = "all") conf ~href ~hidden counts =
+let print_list_bar ?gwf_key ?(begins = true) conf ~href ~hidden counts =
   let n = page_size ?gwf_key conf in
   let bw = begins_with conf in
   let url ?(bw = bw) from =
@@ -76,15 +76,16 @@ let print_list_bar ?gwf_key ?(all_param = "all") conf ~href ~hidden counts =
     conf.command;
   Util.hidden_env conf;
   hidden ();
-  Output.printf conf
-    "<label for=\"bw\" class=\"text-nowrap\">%s</label>\n\
-     <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
-     id=\"bw\" name=\"bw\" value=\"%s\" size=\"20\">\n\
-     <button type=\"submit\" class=\"btn btn-sm btn-outline-secondary\"><i \
-     class=\"fa fa-magnifying-glass\"></i></button>\n"
-    (esc (Utf8.capitalize_fst (transl conf "starting with")))
-    (esc (Option.value ~default:"" bw));
-  if bw <> None then
+  if begins then
+    Output.printf conf
+      "<label for=\"bw\" class=\"text-nowrap\">%s</label>\n\
+       <input type=\"text\" class=\"form-control form-control-sm w-auto\" \
+       id=\"bw\" name=\"bw\" value=\"%s\" size=\"20\">\n\
+       <button type=\"submit\" class=\"btn btn-sm btn-outline-secondary\"><i \
+       class=\"fa fa-magnifying-glass\"></i></button>\n"
+      (esc (Utf8.capitalize_fst (transl conf "starting with")))
+      (esc (Option.value ~default:"" bw));
+  if begins && bw <> None then
     Output.print_sstring conf
       (button "<i class=\"fa fa-xmark\"></i>" (url ~bw:None 1));
   match counts with
@@ -92,7 +93,7 @@ let print_list_bar ?gwf_key ?(all_param = "all") conf ~href ~hidden counts =
       Output.print_sstring conf
         (button
            (esc (Utf8.capitalize_fst (transl conf "all")))
-           (Printf.sprintf "%s&%s=on&n=%d" href all_param n));
+           (Printf.sprintf "%s&all=on&n=%d" href n));
       Output.print_sstring conf "</form>\n"
   | Some (total, (from, upto)) ->
       Output.printf conf

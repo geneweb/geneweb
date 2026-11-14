@@ -370,11 +370,6 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let fold = Place.fold_place_long inverted in
-  (* [bw]: the places whose terms, country first, start with it *)
-  let filter =
-    let ok = ListBar.begins_ok conf in
-    fun ((pl, _) as key) -> filter key && ok (String.concat ", " pl)
-  in
   let get_all ?only () =
     Place.get_all ?only conf base ~add_birth ~add_baptism ~add_death ~add_burial
       ~add_marriage ([], "") [] fold filter
@@ -407,15 +402,11 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
      persons and families of the places of the page are read. On a base of
      an earlier format, without index, every place is read, then a page of
      them kept. The page opens empty, without reading anything: the places
-     are listed once the user has chosen them, by a place ([k]), a
-     beginning ([bw]) or all of them ([go=on]). *)
+     are listed once the user has chosen them: a place ([k]) or all of
+     them ([go=on]). *)
   let k = p_getenv conf.env "k" in
   let go = p_getenv conf.env "go" = Some "on" in
-  let chosen =
-    go
-    || ListBar.begins_with conf <> None
-    || match k with Some k -> k <> "" | None -> false
-  in
+  let chosen = go || match k with Some k -> k <> "" | None -> false in
   let total, sl, arry =
     if not chosen then (0, (1, 0), [||])
     else if
@@ -489,7 +480,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
     | _ -> false
   in
   let max_rlm = p_getenv conf.env "max_rlm_nbr" in
-  (* the page without [bw], [n] and [from], in [display] *)
+  (* the page without [n] and [from], in [display] *)
   let href display =
     Printf.sprintf "%sm=PS%s&display=%s&keep=%d%s%s%s"
       (commd conf :> string)
@@ -502,16 +493,6 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       | Some m -> "&max_rlm_nbr=" ^ (Mutil.encode m :> string)
       | None -> "")
   in
-  (* the other display keeps [bw] and [n], from the first row *)
-  if chosen then
-    Output.printf conf "<p>\n<a href=\"%s%s&n=%d\">%s</a>\n"
-      (href (if long then "short" else "long"))
-      (match ListBar.begins_with conf with
-      | Some b -> "&bw=" ^ (Mutil.encode b :> string)
-      | None -> "")
-      (ListBar.page_size ~gwf_key:page_size_key conf)
-      (Utf8.capitalize
-         (transl conf (if long then "short display" else "long display")));
   let hidden () =
     let h n v = Util.hidden_input_s conf n v in
     h "m" "PS";
@@ -537,10 +518,19 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
     if go then h "go" "on";
     Option.iter (h "max_rlm_nbr") max_rlm
   in
-  ListBar.print_list_bar ~gwf_key:page_size_key ~all_param:"go" conf
-    ~href:(href (if long then "long" else "short"))
-    ~hidden
-    (if chosen then Some (total, sl) else None);
+  (* the place is chosen by the field [k] of the form above: no field
+     "starting with" in the bar; an empty page has no bar *)
+  if chosen then (
+    (* the other display keeps [n], from the first row *)
+    Output.printf conf "<p>\n<a href=\"%s&n=%d\">%s</a>\n"
+      (href (if long then "short" else "long"))
+      (ListBar.page_size ~gwf_key:page_size_key conf)
+      (Utf8.capitalize
+         (transl conf (if long then "short display" else "long display")));
+    ListBar.print_list_bar ~gwf_key:page_size_key ~begins:false conf
+      ~href:(href (if long then "long" else "short"))
+      ~hidden
+      (Some (total, sl)));
   if arry <> [||] then
     if long then print_html_places_surnames_long conf base link_to_ind arry
     else print_html_places_surnames_short conf base link_to_ind arry;

@@ -93,7 +93,7 @@
   </div>
 </form>
 <div class="d-flex mt-2">
-  <a href="%apply;url_set%with;k/bw/from/go%and;///on%end;" title="[*all the places]">[*all the places]</a>
+  <a href="%apply;url_set%with;k/from/go%and;//on%end;" title="[*all the places]">[*all the places]</a>
   <div class="ms-4">
     <a role="button" class="ms-auto"
       href="%apply;url_set%with;f_sort/up/a_sort/from%and;on/%if;(e.up!="on")on%end;%end;"

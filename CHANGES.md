@@ -104,15 +104,13 @@
   them, when no access restriction applies.
 - The places and surnames (`m=PS`) are sent by pages of
   `places_page_size` rows (100 by default, changed on the page): places
-  in the long display, groups of places in the short one, chosen by
-  their beginning, country first ("starting with"). Only the persons
-  and families of the places of the page are read. The long display no
-  longer falls back to the short one on long lists:
+  in the long display, groups of places in the short one. Only the
+  persons and families of the places of the page are read. The long
+  display no longer falls back to the short one on long lists:
   `short_place_threshold` is removed.
   The page opens empty, without reading the base: the places are
-  listed once a place (`k`), a beginning or all of them (`go=on`) is
-  asked. The places of the statistics page lead to `m=PS` for that
-  place.
+  listed once a place (`k`) or all of them (`go=on`) is asked. The
+  places of the statistics page lead to `m=PS` for that place.
   On a base without index (of an earlier format, or whose `base.inx`
   is missing), `m=PS` warns that every person is read; wizards are
   told how to add the index.
