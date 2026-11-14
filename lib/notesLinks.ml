@@ -65,21 +65,25 @@ let misc_notes_link s i =
       in
       if j > i + 6 then
         let b = String.sub s (i + 3) (j - i - 6) in
-        (* anchor does not contains the leading '#' *)
-        let fname, anchor, text =
-          match String.rindex_opt b '/' with
-          | None -> (b, "", b)
+        (* [[[fname#anchor/text]]], "#anchor" and "/text" being optional.
+           File names cannot contain '/', so the first '/' starts the text
+           (which may itself contain '/' or '#').
+           anchor does not contain the leading '#' *)
+        let target, text =
+          match String.index_opt b '/' with
+          | None -> (b, None)
           | Some k ->
-              (* anchor_start = k implies empty anchor *)
-              let fname_len, anchor_start =
-                match String.rindex_from_opt b k '#' with
-                | None -> (k, k)
-                | Some j -> (j, min (j + 1) k)
-              in
-              ( String.sub b 0 fname_len,
-                String.sub b anchor_start (k - anchor_start),
-                String.sub b (k + 1) (String.length b - k - 1) )
+              ( String.sub b 0 k,
+                Some (String.sub b (k + 1) (String.length b - k - 1)) )
         in
+        let fname, anchor =
+          match String.index_opt target '#' with
+          | None -> (target, "")
+          | Some k ->
+              ( String.sub target 0 k,
+                String.sub target (k + 1) (String.length target - k - 1) )
+        in
+        let text = match text with Some t -> t | None -> target in
         match check_file_name fname with
         | Some pg_path -> WLpage (j, pg_path, fname, anchor, text)
         | None -> wlnone j
