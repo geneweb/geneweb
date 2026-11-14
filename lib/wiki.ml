@@ -370,12 +370,21 @@ let syntax_links conf wi s =
       | NotesLinks.WLwizard (j, wiz, name) ->
           let name = bold_italic_syntax name in
           let t =
+            (* [[w:wizard#anchor/text]]: the anchor must not be url-encoded *)
+            let wiz, anchor =
+              match String.index_opt wiz '#' with
+              | Some i ->
+                  ( String.sub wiz 0 i,
+                    String.sub wiz (i + 1) (String.length wiz - i - 1) )
+              | None -> (wiz, "")
+            in
             let s = if name <> "" then name else wiz in
+            let anchor = if anchor = "" then "" else "#" ^ encode anchor in
             if cancel_links then s
             else
-              Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
+              Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s%s\">%s</a>"
                 (commd conf :> string)
-                (encode wiz) s
+                (encode wiz) anchor s
           in
           Buffer.add_string buff t;
           loop ?stop_at_brace quot_lev next_pos j
