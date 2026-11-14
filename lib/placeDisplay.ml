@@ -27,6 +27,7 @@ let get_opt conf =
         "a_sort";
         "lower";
         "word";
+        "case";
         "any";
       ]
   in
@@ -318,14 +319,65 @@ let print_html_places_surnames_long conf base link_to_ind
   loop [] l;
   Output.print_sstring conf "</ul>\n"
 
+(* ---- pages of m=PS ---- *)
+
+let page_size_key = "places_page_size"
+
+(* A row of m=PS: a place with its suburbs in the long display, the group of
+   its [keep] first terms (country first) in the short one. *)
+let row_key ~long keep ((pl, _sub) : string list * string) =
+  if long then pl else strip_pl keep pl
+
+(* The rows in the order of the display ([a_sort]: reversed), or by their
+   number of uses ([f_sort], fewest first with [up]). *)
+let sort_rows conf (rows : (string list * int) list) =
+  let a_sort = p_getenv conf.env "a_sort" = Some "on" in
+  let f_sort = p_getenv conf.env "f_sort" = Some "on" in
+  let up = p_getenv conf.env "up" = Some "on" in
+  let alpha r1 r2 = sort_place_utf8 (r1, "") (r2, "") in
+  List.sort
+    (fun (r1, w1) (r2, w2) ->
+      if f_sort then
+        let c = if up then compare w1 w2 else compare w2 w1 in
+        if c <> 0 then c else alpha r1 r2
+      else if a_sort then alpha r2 r1
+      else alpha r1 r2)
+    rows
+
+(* The rows of the places of the index of the dictionaries kept by [filter],
+   each with its number of uses ({!Driver.dict_count}: every event and
+   record, without reading them), and the row of each place string. *)
+let index_rows base ~long keep fold filter =
+  let rows : (string list, int ref) Hashtbl.t = Hashtbl.create 2048 in
+  let row_of : (Driver.istr, string list) Hashtbl.t = Hashtbl.create 2048 in
+  List.iter
+    (fun (istr, count) ->
+      let s = Driver.sou base istr in
+      if s <> "" then
+        let key = fold s in
+        if filter key then (
+          let r = row_key ~long keep key in
+          Hashtbl.replace row_of istr r;
+          match Hashtbl.find_opt rows r with
+          | Some w -> w := !w + count
+          | None -> Hashtbl.add rows r (ref count)))
+    (Driver.dict_entries_count base Geneweb_db.Dict.Place "");
+  (Hashtbl.fold (fun r w acc -> (r, !w) :: acc) rows [], row_of)
+
 let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage lim filter =
+    ~add_burial ~add_marriage filter =
   let inverted = Place.places_inverted conf in
-  let arry =
-    Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage ([], "") []
-      (Place.fold_place_long inverted)
-      filter
+  let long = p_getenv conf.env "display" = Some "long" in
+  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
+  let fold = Place.fold_place_long inverted in
+  (* [bw]: the places whose terms, country first, start with it *)
+  let filter =
+    let ok = ListBar.begins_ok conf in
+    fun ((pl, _) as key) -> filter key && ok (String.concat ", " pl)
+  in
+  let get_all ?only () =
+    Place.get_all ?only conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage ([], "") [] fold filter
       (fun prev p ->
         (* add one ip to a list flagged by surname *)
         let value = (Driver.get_surname p, Driver.get_iper p) in
@@ -343,18 +395,51 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
         in
         loop [] v)
   in
-  let short =
-    p_getenv conf.env "display" = Some "long" && Array.length arry > lim
+  let page rows =
+    let rows = sort_rows conf rows in
+    let total = List.length rows in
+    let sl = ListBar.slice ~gwf_key:page_size_key conf total in
+    let page = Hashtbl.create 256 in
+    List.iter (fun (r, _) -> Hashtbl.replace page r ()) (ListBar.take sl rows);
+    (total, sl, page)
   in
-  let conf =
-    if short then
-      {
-        conf with
-        env =
-          ("display", Adef.encoded "short")
-          :: List.remove_assoc "display" conf.env;
-      }
-    else conf
+  (* The places come from the index of the dictionaries, in rows; only the
+     persons and families of the places of the page are read. On a base of
+     an earlier format, without index, every place is read, then a page of
+     them kept. *)
+  let total, sl, arry =
+    if not (add_birth || add_baptism || add_death || add_burial || add_marriage)
+    then (0, (1, 0), [||])
+    else if Driver.dict_has base Geneweb_db.Dict.Place then
+      let rows, row_of = index_rows base ~long keep fold filter in
+      let total, sl, page = page rows in
+      let only istr =
+        match Hashtbl.find_opt row_of istr with
+        | Some r -> Hashtbl.mem page r
+        | None -> false
+      in
+      (total, sl, get_all ~only ())
+    else
+      let arry = get_all () in
+      let weights : (string list, int ref) Hashtbl.t = Hashtbl.create 2048 in
+      Array.iter
+        (fun (key, snl) ->
+          let n = List.fold_left (fun n (_, l) -> n + List.length l) 0 snl in
+          let r = row_key ~long keep key in
+          match Hashtbl.find_opt weights r with
+          | Some w -> w := !w + n
+          | None -> Hashtbl.add weights r (ref n))
+        arry;
+      let total, sl, page =
+        page (Hashtbl.fold (fun r w acc -> (r, !w) :: acc) weights [])
+      in
+      let arry =
+        Array.of_list
+          (List.filter
+             (fun (key, _) -> Hashtbl.mem page (row_key ~long keep key))
+             (Array.to_list arry))
+      in
+      (total, sl, arry)
   in
   let title _ =
     Output.printf conf "%s / %s"
@@ -362,8 +447,6 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
   let opt = get_opt conf in
-  let long = p_getenv conf.env "display" = Some "long" in
-  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   Hutil.header conf title;
   let ifun =
     Templ.
@@ -379,37 +462,63 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
   Templ.output conf ifun Templ.Env.empty
     (Driver.empty_person base Driver.Iper.dummy)
     "buttons_places";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let link_to_ind =
     match List.assoc_opt "place_surname_link_to_ind" conf.base_env with
     | Some "yes" -> true
     | _ -> false
   in
-  let t =
-    if short then
-      Printf.sprintf "%s" (Utf8.capitalize (transl conf "v7 list too long"))
-    else ""
-  in
-  let href =
-    Printf.sprintf "href=\"%sm=PS%s&display=%s&keep=%s%s\" title=\"%s\""
+  let k = p_getenv conf.env "k" in
+  let max_rlm = p_getenv conf.env "max_rlm_nbr" in
+  (* the page without [bw], [n] and [from], in [display] *)
+  let href display =
+    Printf.sprintf "%sm=PS%s&display=%s&keep=%d%s%s"
       (commd conf :> string)
-      opt
-      (if long then "short" else "long")
-      (string_of_int keep)
-      (match p_getenv conf.env "k" with
-      | Some ini -> "&k=" ^ (Mutil.encode ini :> string)
+      opt display keep
+      (match k with Some k -> "&k=" ^ (Mutil.encode k :> string) | None -> "")
+      (match max_rlm with
+      | Some m -> "&max_rlm_nbr=" ^ (Mutil.encode m :> string)
       | None -> "")
-      t
   in
-  Output.printf conf "<p>\n<a %s>%s</a>" href
+  (* the other display keeps [bw] and [n], from the first row *)
+  Output.printf conf "<p>\n<a href=\"%s%s&n=%d\">%s</a>\n"
+    (href (if long then "short" else "long"))
+    (match ListBar.begins_with conf with
+    | Some b -> "&bw=" ^ (Mutil.encode b :> string)
+    | None -> "")
+    (ListBar.page_size ~gwf_key:page_size_key conf)
     (Utf8.capitalize
        (transl conf (if long then "short display" else "long display")));
-  if short then Output.printf conf " (%s)\n" t;
-  Output.printf conf "<p>\n";
+  let hidden () =
+    let h n v = Util.hidden_input_s conf n v in
+    h "m" "PS";
+    h "display" (if long then "long" else "short");
+    h "keep" (string_of_int keep);
+    List.iter
+      (fun n -> if p_getenv conf.env n = Some "on" then h n "on")
+      [
+        "bi";
+        "ba";
+        "de";
+        "bu";
+        "ma";
+        "f_sort";
+        "up";
+        "a_sort";
+        "lower";
+        "word";
+        "case";
+        "any";
+      ];
+    Option.iter (h "k") k;
+    Option.iter (h "max_rlm_nbr") max_rlm
+  in
+  ListBar.print_list_bar ~gwf_key:page_size_key conf
+    ~href:(href (if long then "long" else "short"))
+    ~hidden
+    (Some (total, sl));
   if arry <> [||] then
     if long then print_html_places_surnames_long conf base link_to_ind arry
     else print_html_places_surnames_short conf base link_to_ind arry;
-  Output.printf conf "</form>\n";
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
@@ -418,14 +527,10 @@ let print_all_places_surnames conf base =
   let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
-  let lim =
-    try int_of_string @@ List.assoc "short_place_threshold" conf.base_env
-    with _ -> 500
-  in
   let filter =
     match p_getenv conf.env "k" with
     | Some ini when ini <> "" -> fun (x, _) -> Place.find_in conf x ini
     | Some _ | None -> fun _ -> true
   in
   print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage lim filter
+    ~add_burial ~add_marriage filter

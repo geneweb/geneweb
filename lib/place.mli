@@ -83,6 +83,7 @@ val max_rlm_nbr : config -> int
     a built-in default. *)
 
 val get_all :
+  ?only:(istr -> bool) ->
   config ->
   base ->
   add_birth:bool ->
@@ -109,6 +110,8 @@ val get_all :
     - [mk_value] folds each matching person into an accumulator ([None] the
       first time a key is seen), and [fn] finalises the accumulator into the
       stored value.
+    - [only], when given, keeps only the place strings it accepts, before they
+      are read and folded: m=PS gives the places of a page.
     - [dummy_key] / [dummy_value] seed the result array before it is filled.
     - Only persons and families passing {!Util.authorized_age} are counted, and
       the [add_*] flags select which events contribute. *)

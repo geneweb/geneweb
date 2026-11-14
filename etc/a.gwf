@@ -614,9 +614,10 @@
 # will be:
 #   My name is Bond, James Bond.
 
-# On Places/suname page do not display "Full display" list of places
-# ff more than short_place_threshold places.
-#short_place_threshold=500
+# Number of rows of a page of the places/surnames list (m=PS): places in
+# the long display, groups of places in the short one. The user can change
+# it on the page. From 1 to 5000.
+#places_page_size=100
 
 # Maximum number to see an identical ancestor in the surname list.
 #max_ancestor_implex=5

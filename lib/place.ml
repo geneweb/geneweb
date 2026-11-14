@@ -203,8 +203,8 @@ let normalize_place inverted s =
 let places_inverted conf =
   List.assoc_opt "places_inverted" conf.base_env = Some "yes"
 
-let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-    ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
+let get_all ?(only = fun _ -> true) conf base ~add_birth ~add_baptism ~add_death
+    ~add_burial ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
     (fold_place : string -> 'a) (filter : 'a -> bool)
     (mk_value : 'b option -> Driver.person -> 'b) (fn : 'b -> 'c) :
     ('a * 'c) array =
@@ -214,8 +214,12 @@ let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     match Hashtbl.find_opt keys istr with
     | Some key -> key
     | None ->
-        let key = fold_place (Driver.sou base istr) in
-        let key = if filter key then Some key else None in
+        let key =
+          if only istr then
+            let key = fold_place (Driver.sou base istr) in
+            if filter key then Some key else None
+          else None
+        in
         Hashtbl.add keys istr key;
         key
   in

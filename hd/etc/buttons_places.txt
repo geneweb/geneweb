@@ -91,15 +91,15 @@
   </div>
 </form>
 <div class="d-flex mt-2">
-  <a href="%url_set.k;" title="[*all the places]">[*all the places]</a>
+  <a href="%url_set.k_bw_from;" title="[*all the places]">[*all the places]</a>
   <div class="ms-4">
     <a role="button" class="ms-auto"
-      href="%apply;url_set%with;f_sort/up/a_sort%and;on/%if;(e.up!="on")on%end;%end;"
+      href="%apply;url_set%with;f_sort/up/a_sort/from%and;on/%if;(e.up!="on")on%end;%end;"
       %sp;title="[*sort by/branch/alphabetic order]0 [frequency]">
       <i class="fas fa-arrow-down-%if;(e.up!="on")9-1%else;1-9%end; fa-lg"></i>%nn;
     </a>%nn;
     <a role="button" class="ms-auto"
-      href="%apply;url_set%with;a_sort/f_sort/up%and;%if;(e.a_sort!="on")on%end;%end;"
+      href="%apply;url_set%with;a_sort/f_sort/up/from%and;%if;(e.a_sort!="on")on%end;%end;"
       %sp;title="[*sort by/branch/alphabetic order]0 [sort by/branch/alphabetic order]2">
       <i class="fas fa-arrow-down-%if;(e.a_sort!="on")a-z%else;z-a%end; fa-lg"></i>%nn;
     </a>%nn;
@@ -108,13 +108,13 @@
     <span class="mx-2" title="[*place filter]">[*filter][:]</span>
     <a role="button" class="btn-link ms-auto
       %if;(ekeep="" or ekeep<2) disabled text-body-secondary" aria-disabled="true" tabindex="-1%end;"
-      href="%apply;url_set%with;keep%and;%if;(ekeep!="")%expr(ekeep-1)%else;1%end;%end;"
+      href="%apply;url_set%with;keep/from%and;%if;(ekeep!="")%expr(ekeep-1)%else;1%end;%end;"
       title="[*place filter]">
       <i class="fas fa-minus fa-lg"></i>
     </a>
     <span title="[*place filter]">%if;(e.keep="")1%else;%e.keep;%end;</span>
     <a role="button" class="ms-auto"
-      href="%apply;url_set%with;keep%and;%if;(ekeep!="")%expr(ekeep+1)%else;1%end;%end;"
+      href="%apply;url_set%with;keep/from%and;%if;(ekeep!="")%expr(ekeep+1)%else;1%end;%end;"
       title="[*place filter]">
       <i class="fas fa-plus fa-lg"></i>
     </a>

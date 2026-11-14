@@ -102,6 +102,13 @@
   display falls back to the short one. The lists of first names and
   surnames (`m=P`, `m=N`) count the bearers of a name without listing
   them, when no access restriction applies.
+- The places and surnames (`m=PS`) are sent by pages of
+  `places_page_size` rows (100 by default, changed on the page): places
+  in the long display, groups of places in the short one, chosen by
+  their beginning, country first ("starting with"). Only the persons
+  and families of the places of the page are read. The long display no
+  longer falls back to the short one on long lists:
+  `short_place_threshold` is removed.
 - The configuration page (`m=H&v=conf`) no longer displays the OIDC client
   secret: `oidc_client_secret` is masked for every visitor (wizard
   included) and `oidc_client_secret_file` for non-wizards.
