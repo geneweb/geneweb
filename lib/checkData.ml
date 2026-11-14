@@ -872,38 +872,46 @@ let fix_message matched fixed =
   if matched = fixed then Printf.sprintf "‹%s›" matched
   else Printf.sprintf "‹%s› → ‹%s›" matched fixed
 
+let cp1252 =
+  [
+    (0x20AC, 0x80);
+    (0x201A, 0x82);
+    (0x0192, 0x83);
+    (0x201E, 0x84);
+    (0x2026, 0x85);
+    (0x2020, 0x86);
+    (0x2021, 0x87);
+    (0x02C6, 0x88);
+    (0x2030, 0x89);
+    (0x0160, 0x8A);
+    (0x2039, 0x8B);
+    (0x0152, 0x8C);
+    (0x017D, 0x8E);
+    (0x2018, 0x91);
+    (0x2019, 0x92);
+    (0x201C, 0x93);
+    (0x201D, 0x94);
+    (0x2022, 0x95);
+    (0x2013, 0x96);
+    (0x2014, 0x97);
+    (0x02DC, 0x98);
+    (0x2122, 0x99);
+    (0x0161, 0x9A);
+    (0x203A, 0x9B);
+    (0x0153, 0x9C);
+    (0x017E, 0x9E);
+    (0x0178, 0x9F);
+  ]
+
 let cp1252_byte code =
-  if code >= 0x80 && code <= 0xBF then Some code
+  if code >= 0x80 && code <= 0xBF then Some code else List.assoc_opt code cp1252
+
+let cp1252_fix byte =
+  if byte >= 0xA0 then Some (utf8_of_code byte)
   else
-    match code with
-    | 0x20AC -> Some 0x80
-    | 0x201A -> Some 0x82
-    | 0x0192 -> Some 0x83
-    | 0x201E -> Some 0x84
-    | 0x2026 -> Some 0x85
-    | 0x2020 -> Some 0x86
-    | 0x2021 -> Some 0x87
-    | 0x02C6 -> Some 0x88
-    | 0x2030 -> Some 0x89
-    | 0x0160 -> Some 0x8A
-    | 0x2039 -> Some 0x8B
-    | 0x0152 -> Some 0x8C
-    | 0x017D -> Some 0x8E
-    | 0x2018 -> Some 0x91
-    | 0x2019 -> Some 0x92
-    | 0x201C -> Some 0x93
-    | 0x201D -> Some 0x94
-    | 0x2022 -> Some 0x95
-    | 0x2013 -> Some 0x96
-    | 0x2014 -> Some 0x97
-    | 0x02DC -> Some 0x98
-    | 0x2122 -> Some 0x99
-    | 0x0161 -> Some 0x9A
-    | 0x203A -> Some 0x9B
-    | 0x0153 -> Some 0x9C
-    | 0x017E -> Some 0x9E
-    | 0x0178 -> Some 0x9F
-    | _ -> None
+    List.find_map
+      (fun (c, b) -> if b = byte then Some (utf8_of_code c) else None)
+      cp1252
 
 let mojibake_at s i =
   let cont j =
@@ -977,7 +985,7 @@ let has_mojibake s =
     i < len
     && (mojibake_at_byte s i <> None || is_replacement_char s i || loop (i + 1))
   in
-  loop 0 || decomposed_spans s <> []
+  (not (String.is_valid_utf_8 s)) || loop 0 || decomposed_spans s <> []
 
 let find_mojibake_positions s =
   let len = String.length s in
@@ -992,7 +1000,17 @@ let find_mojibake_positions s =
             fix_message (String.sub s i (j - i)) (utf8_of_code code)
           in
           loop j (span_messages i j message acc)
-      | None -> loop (i + 1) acc
+      | None ->
+          let d = String.get_utf_8_uchar s i in
+          if Uchar.utf_decode_is_valid d then
+            loop (i + Uchar.utf_decode_length d) acc
+          else
+            let b = Char.code s.[i] in
+            let hex = Printf.sprintf "0x%02X" b in
+            let message =
+              fix_message hex (Option.value ~default:hex (cp1252_fix b))
+            in
+            loop (i + 1) (span_messages i (i + 1) message acc)
   in
   loop 0
     (List.fold_left
@@ -1012,8 +1030,17 @@ let fix_mojibake s =
             Buffer.add_utf_8_uchar buf (Uchar.of_int code);
             loop j
         | None ->
-            Buffer.add_char buf s.[i];
-            loop (i + 1)
+            let d = String.get_utf_8_uchar s i in
+            if Uchar.utf_decode_is_valid d then (
+              let n = Uchar.utf_decode_length d in
+              Buffer.add_substring buf s i n;
+              loop (i + n))
+            else (
+              Buffer.add_string buf
+                (Option.value
+                   ~default:(String.make 1 s.[i])
+                   (cp1252_fix (Char.code s.[i])));
+              loop (i + 1))
     in
     loop 0
   in
