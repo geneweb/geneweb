@@ -1996,12 +1996,16 @@ let relation_txt conf sex fam =
   | Residence -> ftransl_nth conf "residence%t to" is
   | NoMention -> "%t" ^^ ftransl conf "with"
 
-let relation_date conf fam : Adef.safe_string =
+(* The marriage year is shown only if both spouses are visible, as in
+   DateDisplay.short_marriage_date_text. *)
+let relation_date conf base p sp fam : Adef.safe_string =
   Adef.safe
   @@
-  match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
-  | None -> ""
-  | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
+  if not (authorized_age conf base p && authorized_age conf base sp) then ""
+  else
+    match Date.cdate_to_dmy_opt (Driver.get_marriage fam) with
+    | None -> ""
+    | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
 
 let child_of_parent ?(link = false) conf base p =
   let text ?sn x =
@@ -2083,7 +2087,7 @@ let husband_wife ?(buf : Buffer.t option) conf base p all =
                let txt =
                  (translate_eval (sep i)
                   ^<^ gen_person_text conf base sp
-                  ^^^ relation_date conf fam
+                  ^^^ relation_date conf base p sp fam
                    :> string)
                in
                (i + 1, txt :: acc))
