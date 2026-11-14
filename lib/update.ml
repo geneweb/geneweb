@@ -181,7 +181,10 @@ let add_escaped_string buf (s : Adef.escaped_string) =
     - p : person [Retour] : unit [Rem] : Not visible. *)
 let print_person_parents_and_spouses conf base ?(alias = None) ?(snalias = None)
     p =
-  if not (GWPARAM.p_auth conf base p) then ()
+  (* Same visibility test as Util.visible_in_search: the name is shown to
+     consenting friends (p_auth_sp); dates stay under p_auth
+     (short_dates_text, relation_date). *)
+  if not (GWPARAM.p_auth_sp conf base p) then ()
   else
     let buf = Buffer.create 256 in
     Buffer.add_string buf "<a href=\"";
