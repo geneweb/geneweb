@@ -11,13 +11,13 @@
   %permalink;
   %include;css
   %if;(b.use_cdn="yes")
-    <link href="https://cdn.datatables.net/v/bs5/dt-3.0.0-beta.1/rr-2.0.0-beta.1/datatables.min.css" rel="stylesheet"
-      integrity="sha256-8uN1X2ILNuzlJ5FROilYFGockHHjtcY11iepqC8V+eY=
-                 sha384-2cyCsKgI4+4wf4wYf3NouEk6d/RtdGCSZUexLPNwS7IK9hiqEWi5HJutNTRcKGzI
-                 sha512-2rH2vLc6M+lbAxF9dPQkeH1xCThJI8fTni4iohBqfGZCKxC1Chiw/xJ5Uij6Seef2cHKQDdVB8+FA4+X/vc4XA=="
+    <link href="https://cdn.datatables.net/v/bs5/dt-3.1.5/rr-2.1.1/datatables.min.css" rel="stylesheet"
+      integrity="sha256-Oj+/T3DHAcXwHOGcV6avfLriGnCq53XyjNg024SHl9A=
+                 sha384-QII3GEjmm6cQyuGxJtpqgqJqHZa4yQGQTt71C745WDoGBSL05LiXeLCsgEghhmgl
+                 sha512-zWAvU9bgy2uBT4K4zYqbaqw4yPQne7ALXcM/koT/33De1ho6RRYpCnVeJjck1Tgbr+RsuBW92VjiIzLbF+tD9g=="
       crossorigin="anonymous" referrerpolicy="no-referrer">
   %else;
-    <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=dt-3.0.0+rr-2.0.0-beta.1">
+    <link rel="stylesheet" href="%etc_prefix;css/datatables.min.css?version=dt-3.1.5+rr-2.1.1">
   %end;
   <style>
 html { scrollbar-gutter: stable; }
@@ -321,10 +321,10 @@ li.in { background-color: #FFE8CC; }
 %include;js
 %query_time;
 %if;(b.use_cdn="yes")
-  <script src="https://cdn.datatables.net/v/bs5/dt-3.0.0-beta.1/rr-2.0.0-beta.1/datatables.min.js"
-    integrity="sha256-PS1xCu1en7kgEJ2VwdR1Adx0wg+s67YPA4Cq1zlWq98=
-               sha384-VWibGBgfcDJ7Qtht0Cb7opkjtHfvi69xPCGei0rukalknLpxVh6uvlaOx3m3pfJ7
-               sha512-MudHr1io3GS94n+c4mu2U6RFQr4fgT4GTbyQzQQUl871gKF7zJUEDFv/sfJ0hSDbv+KhRe+IIo0Jgp5HRAXpdw=="
+  <script src="https://cdn.datatables.net/v/bs5/dt-3.1.5/rr-2.1.1/datatables.min.js"
+    integrity="sha256-1IYW2cGbCDpqdUWSKa7PQ8J1Fbjcm4xAc7qOtQuAi7o=
+               sha384-xcWkpGwQRZi/C8KxLAa5/kFOC8HkKncq1WDLRgYwa1oEmbdnudkG8BBkbYSHCcKo
+               sha512-Xahd6XuEr/jT8hiRijEQCKNL2WvCqyLPrCsefo2D5DrfAk4GOcb6vpBt1m0FNI6XPoHsVhrMGYbhSahBrVeNRQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5sortable@0.14.0/dist/html5sortable.min.js"
     integrity="sha256-Pdhnnt/Bc9u+ysgXiOXZBrGT8dwi4mZOdzMhxvWIbd8=
@@ -332,7 +332,7 @@ li.in { background-color: #FFE8CC; }
                sha512-B/yiMlkxhtHzzJxPa5kNOO/+8cq0Fj4ndMUxVo2kGunCCH8g8XrPnzqg+sOon3hQ8RaEY2YytH+PIseTtfstjg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 %else;
-  <script src="%etc_prefix;js/datatables.min.js?version=dt-3.0.0+rr-2.0.0-beta.1"></script>
+  <script src="%etc_prefix;js/datatables.min.js?version=dt-3.1.5+rr-2.1.1"></script>
   <script src="%etc_prefix;js/html5sortable.min.js?version=0.14.0"></script>
 %end;
 <script src="%etc_prefix;js/maphilight.js?hash=%apply;hash%with;%etc_prefix;js/maphilight.js%end;"></script>
