@@ -516,3 +516,37 @@ page-ext copynotesdb
   * as per issue #140 may have problem to reference directly a section in a note
   * try suggested syntax in [[Jean Pierre/Galichet]] individual note.
 end page-ext
+
+# extended page "photo_trop_grande" not referenced
+page-ext photo_trop_grande
+  TITLE=Une rose
+  TYPE=gallery
+  {
+    "title": "Une rose",
+    "chronicle": "",
+    "images": [
+      {
+        "img": "jean_pierre.0.galichet/20180527_124241.jpg",
+        "desc": "ajout de liens dans une photo trop grande",
+        "map": [
+          {
+            "shape": "rect",
+            "coords": "1229,1099.33,1440,1287.33",
+            "fn": "marie elisabeth",
+            "sn": "loche",
+            "gw": "[[marie elisabeth/loche]]"
+          },
+          {
+            "shape": "rect",
+            "coords": "1678,810.33,2177,1271.33",
+            "fn": "jean pierre",
+            "sn": "galichet",
+            "oc": "0",
+            "gw": "[[jean pierre/galichet]]"
+          }
+        ],
+        "groups": []
+      }
+    ]
+  }
+end page-ext
