@@ -826,15 +826,15 @@ fr:  
 he: ,
 is: .
 it: .
-lt: &nbsp;
-lv: &nbsp;
+lt:  
+lv:  
 nl: .
 no: .
 oc:  
 pl: .
 pt: .
 ro: .
-ru: &nbsp;
+ru:  
 sk:  
 sl: .
 sv: .
@@ -3568,33 +3568,33 @@ pt: lista das genealogias disponíveis
 sv: lista över tillgängliga släktdatabaser
 tr: Mevcut şecere listesi
 
-    average age at death
-bg: средна продължителност на живота
-co: età mediana di trapassu
-cs: priemerny vek umrtia
-da: gennemsnitlig alder ved død
-de: Durchschnittliches Sterbealter
-en: average age at death
-eo: meza aĝo dum la morto
-es: edad promedio de deceso
-et: keskmine eluiga
-fi: keskimääräinen kuolinikä
-fr: âge moyen de décès
-he: גיל פטירה ממוצע
-it: età media di morte
-lt: vidutinis mirties amžius
-lv: vidējais dzīves ilgums
-nl: gemiddelde leeftijd bij overlijden
-no: gjennomsnittsalder ved død
-oc: atge mejan de décès
-pl: średni wiek śmierci
-pt: idade média ao morrer
-ro: virsta media la deces
-ru: средняя продолжительность жизни
-sk: priemerný vek v čase úmrtia
-sl: povprečna starost ob smrti
-sv: medelålder vid dödstillfället
-tr: ortalama ölüm yaşı
+    average age at death/average age
+bg: средна продължителност на живота/средна възраст
+co: età media di trapassu/età media
+cs: priemerny vek umrtia/průměrný věk
+da: gennemsnitlig alder ved død/gennemsnitsalder
+de: Durchschnittliches Sterbealter/Durchschnittsalter
+en: average age at death/average age
+eo: meza aĝo dum la morto/meza aĝo
+es: edad promedio de deceso/edad promedio
+et: keskmine eluiga/keskmine vanus
+fi: keskimääräinen kuolinikä/keski-ikä
+fr: âge moyen au décès/âge moyen
+he: גיל פטירה ממוצע/גיל ממוצע
+it: età media di morte/età media
+lt: vidutinis mirties amžius/vidutinis amžius
+lv: vidējais dzīves ilgums/vidējais vecums
+nl: gemiddelde leeftijd bij overlijden/gemiddelde leeftijd
+no: gjennomsnittsalder ved død/gjennomsnittsalder
+oc: atge mejan de décès/atge mejan
+pl: średni wiek śmierci/średni wiek
+pt: idade média ao morrer/idade média
+ro: virsta media la deces/virsta medie
+ru: средняя продолжительность жизни/средний возраст
+sk: priemerný vek v čase úmrtia/priemerný vek
+sl: povprečna starost ob smrti/povprečna starost
+sv: medelålder vid dödstillfället/medelålder
+tr: ortalama ölüm yaşı/ortalama yaş
 
     back
 af: terug
@@ -25925,7 +25925,7 @@ sv: år/månad/dag
 tr: yıl/ay/gün
 
     years old
-af: jaar.
+af: jaar
 ar: سنة
 bg: години
 br: bloaz
@@ -25933,19 +25933,19 @@ ca: anys
 co: anni
 cs: let
 da: år
-de: Jahre alt
+de: Jahre
 en: years
 eo: jaroj
 es: años
 et: aastat
-fi: vuotta vanha
+fi: vuotta
 fr: ans
 he: שנים
 is: ára
 it: anni
 lt: metų
 lv: gadi
-nl: jaar oud
+nl: jaar
 no: år
 oc: ans
 pl: lat
@@ -26089,3 +26089,69 @@ de: vergrößern/verkleinern
 en: zoom/unzoom
 es: acercar/alejar
 fr: zoomer/dézoomer
+
+    (space before percent)
+af:
+ar:
+bg:
+br:  
+ca:  
+co:  
+cs:  
+da:  
+de:  
+en:
+eo:
+es:  
+et:
+fi:  
+fr: 
+he:
+is:
+it:
+lt:  
+lv:
+nl:
+no:  
+oc:  
+pl:
+pt:
+ro:  
+ru:  
+sk:  
+sl:  
+sv:  
+tr:
+zh:
+
+    same-sex married/not married
+af: getroud (selfde geslag)/ongetroud (selfde geslag)
+bg: в брак (еднополови)/без брак (еднополови)
+br: euredet (memes reizh)/nann euredet (memes reizh)
+ca: casats (mateix sexe)/no casats (mateix sexe)
+co: maritati (listessu sessu)/micca maritati (listessu sessu)
+cs: manželé (stejného pohlaví)/svobodní (stejného pohlaví)
+da: gift (samme køn)/ikke gift (samme køn)
+de: verheiratet (gleichgeschlechtlich)/nicht verheiratet (gleichgeschlechtlich)
+en: married (same sex)/not married (same sex)
+eo: edziĝintaj (samseksaj)/ne edziĝintaj (samseksaj)
+es: casados (mismo sexo)/no casados (mismo sexo)
+et: abielus (samasoolised)/pole abielus (samasoolised)
+fi: vihitty (samaa sukupuolta)/eivät naimisissa (samaa sukupuolta)
+fr: mariés (même sexe)/non mariés (même sexe)
+he: נשואים (חד־מיניים)/לא נשואים (חד־מיניים)
+is: gift (samkynja)/ógift (samkynja)
+it: sposati (stesso sesso)/non sposati (stesso sesso)
+lt: susituokę (tos pačios lyties)/nesusituokę (tos pačios lyties)
+lv: precējušies (viendzimuma)/nav precējušies (viendzimuma)
+nl: gehuwd (zelfde geslacht)/niet gehuwd (zelfde geslacht)
+no: gift (likekjønnet)/ugift (likekjønnet)
+oc: maridats (meteis sèxe)/pas maridats (meteis sèxe)
+pl: małżeństwo (tej samej płci)/bez ślubu (tej samej płci)
+pt: casados (mesmo sexo)/não casados (mesmo sexo)
+ro: casatorit (acelasi sex)/necasatorit (acelasi sex)
+ru: в браке (однополые)/не в браке (однополые)
+sk: manželia (rovnakého pohlavia)/slobodní (rovnakého pohlavia)
+sl: poroka (istospolni)/brez poroke (istospolni)
+sv: gifta (samkönade)/ogifta (samkönade)
+tr: evli (eşcinsel)/evli değil (eşcinsel)

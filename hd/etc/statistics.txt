@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <title>Statistics</title>
+  <title>[*statistics] — %bname;</title>
   %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,7 +52,7 @@
 <!-- Births & Deaths + Marriages by decade -->
 <div class="row mb-3">
   <div class="col-md-6"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">[*birth/births]1 &amp; [*death/deaths]1</h2>
+    <h2 class="h6 card-title text-body-secondary">[*birth/births]1 [and] [death/deaths]1</h2>
     <canvas id="ch-bd-decade" height="150"></canvas>
   </div></div></div>
   <div class="col-md-6"><div class="card"><div class="card-body">
@@ -76,7 +76,7 @@
 <!-- Average age at death by period of death -->
 <div class="row mb-3">
   <div class="col-12"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">[*average age at death]</h2>
+    <h2 class="h6 card-title text-body-secondary">[*average age at death/average age]0</h2>
     <canvas id="ch-life-exp" height="90"></canvas>
   </div></div></div>
 </div>
@@ -117,15 +117,15 @@
 <!-- Top places -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*birth/births]1)</h2>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([birth/births]1)</h2>
     <canvas id="ch-bp" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*marriage/marriages]1)</h2>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([marriage/marriages]1)</h2>
     <canvas id="ch-mp" height="300"></canvas>
   </div></div></div>
   <div class="col-md-4"><div class="card"><div class="card-body">
-    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([*death/deaths]1)</h2>
+    <h2 class="h6 card-title text-body-secondary">Top [*place/places]1 ([death/deaths]1)</h2>
     <canvas id="ch-dp" height="300"></canvas>
   </div></div></div>
 </div>
@@ -169,13 +169,23 @@ var GW = {
   pl: "%prefix;m=PS&s=",
   mo: %["[*(month)]0","[*(month)]1","[*(month)]2","[*(month)]3","[*(month)]4","[*(month)]5","[*(month)]6","[*(month)]7","[*(month)]8","[*(month)]9","[*(month)]10","[*(month)]11",%],
   L: {
-    pe:"[*person/persons]1", fa:"[*family/families]1", le:"[*life expectancy]",
+    pe:"[*person/persons]1", fa:"[*family/families]1", le:"[*average age at death/average age]1",
     md:"[*median]", so:"[*source/sources]1", al:"[*alive]0", di:"[*died]0",
     bi:"[*birth/births]1", de:"[*death/deaths]1",
     db:"[*date of birth]", pb:"[*where born]",
     dd:"[*date of death]", pd:"[*where dead]",
     pa:"[*parents]", oc:"[*occupation/occupations]0",
-    im:"[*image/images]0"
+    im:"[*image/images]0", yr:"[years old]",
+    ds:"[(decimal separator)]", ts:"[(thousand separator)]", pc:"[(space before percent)]\u0025"
+  },
+  rt: {
+    married:"[*married]", not_married:"[*not married]", engaged:"[*engaged]",
+    no_sexes_check_not_married:"[*same-sex married/not married]1",
+    no_mention:"[*no mention]",
+    no_sexes_check_married:"[*same-sex married/not married]0",
+    marriage_bann:"[*marriage bann]", marriage_contract:"[*marriage contract]",
+    marriage_license:"[*marriage licence]", pacs:"[*PACS]",
+    residence:"[*residence]", unknown:"[*unknown]"
   }
 };
 
@@ -191,7 +201,13 @@ var C = {
 Chart.defaults.animation = false;
 Chart.defaults.plugins.legend.labels.boxWidth = 12;
 
-function fmt(n) { return n == null ? "\u2014" : n.toLocaleString(); }
+function fmt(n) {
+  return n == null ? "\u2014" : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, GW.L.ts);
+}
+
+function years(n, d) {
+  return n == null ? "\u2014" : n.toFixed(d).replace(".", GW.L.ds) + " " + GW.L.yr;
+}
 
 function kpi(row, label, value, color) {
   var d = document.createElement("div");
@@ -269,10 +285,10 @@ fetch(GW.url).then(function(r) {
   var row = document.getElementById("kpi-row");
   kpi(row, L.pe, fmt(c.total), C.mB);
   kpi(row, L.fa, fmt(c.families), C.gB);
-  kpi(row, "\u2642 "+L.le, a.life_men != null ? a.life_men.toFixed(1) : "\u2014", C.mB);
-  kpi(row, "\u2640 "+L.le, a.life_women != null ? a.life_women.toFixed(1) : "\u2014", C.fB);
-  kpi(row, L.md, a.median_life+" a.", C.pB);
-  kpi(row, L.so, q.sources+"\u0025", C.oB);
+  kpi(row, "\u2642 "+L.le, years(a.life_men, 1), C.mB);
+  kpi(row, "\u2640 "+L.le, years(a.life_women, 1), C.fB);
+  kpi(row, L.md, years(a.median_life, 0), C.pB);
+  kpi(row, L.so, q.sources + L.pc, C.oB);
 
   new Chart(document.getElementById("ch-sex"), {
     type:"doughnut",
@@ -296,7 +312,7 @@ fetch(GW.url).then(function(r) {
   var rtL=%[%], rtD=%[%], rtC=%[%];
   var pal = %[C.m,C.g,C.o,C.f,C.n,C.p,"rgba(255,205,86,0.7)","rgba(100,181,246,0.7)","rgba(174,213,129,0.7)","rgba(240,98,146,0.7)","rgba(206,147,216,0.7)"%];
   for (var i=0; i<rt.labels.length; i++) {
-    if (rt.values%[i%]>0) { rtL.push(rt.labels%[i%]+" "+fmt(rt.values%[i%])); rtD.push(rt.values%[i%]); rtC.push(pal%[i%]); }
+    if (rt.values%[i%]>0) { rtL.push((GW.rt%[rt.labels%[i%]%] || rt.labels%[i%])+" "+fmt(rt.values%[i%])); rtD.push(rt.values%[i%]); rtC.push(pal%[i%]); }
   }
   new Chart(document.getElementById("ch-relations"), {
     type:"doughnut",
