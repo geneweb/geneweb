@@ -142,6 +142,33 @@ let dict_link conf base =
             (transl conf ":")
             (Util.escape_html s :> string)
 
+(* The [k] of a link from a group [label] of the short display to its
+   details: the group added to the place searched, so that the search is
+   kept ("Chateaumeillant" found in "Chateaumeillant, Cher" leads to
+   "Chateaumeillant, Cher", not to every place of the Cher). With several
+   comma-separated parts, each must match a term of the place
+   ({!Place.find_in}); a part already there is not repeated. *)
+let drill_k conf label =
+  match p_getenv conf.env "k" with
+  | Some k when String.trim k <> "" ->
+      let parts s =
+        List.filter_map
+          (fun p ->
+            let p = String.trim p in
+            if p = "" then None else Some p)
+          (String.split_on_char ',' s)
+      in
+      let l =
+        List.fold_left
+          (fun acc p ->
+            if List.exists (fun q -> Name.lower q = Name.lower p) acc then acc
+            else acc @ [ p ])
+          []
+          (parts k @ parts label)
+      in
+      String.concat ", " l
+  | Some _ | None -> label
+
 let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
@@ -223,7 +250,8 @@ let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
             opt
             (if long then "long" else "short")
             (string_of_int (keep + 1))
-            str2 str;
+            (Mutil.encode (drill_k conf str) :> string)
+            str;
           Output.print_sstring conf (dict_link ~leaf:false pl);
           if len < Place.max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place%s&k=%s&nb=%d"
