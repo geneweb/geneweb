@@ -341,6 +341,39 @@ let print_send_image conf base mode p =
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
+let send_portrait conf base p mode ext content =
+  let dir = !GWPARAM.portraits_d conf.bname in
+  let name = Image.default_image_filename mode base p in
+  let written =
+    try
+      Filesystem.create_dir ~parent:true dir;
+      if mode = "blasons" then remove_blason_stop conf base p;
+      (match
+         if mode = "portraits" then Image.get_portrait conf base p
+         else Image.get_blason conf base p true
+       with
+      | Some (`Path old) ->
+          if move_file_to_save dir old = 0 then
+            failwith "cannot save the previous file"
+      | Some (`Url url) ->
+          (* TODO update person to supress url image *)
+          let saved = Filename.concat dir "saved" in
+          Filesystem.create_dir ~parent:true saved;
+          write_file (Filename.concat saved name ^ ".url") url
+      | None -> ());
+      if content <> "" then
+        write_file (Filename.concat dir (name ^ ext)) content;
+      Ok ()
+    with (Sys_error _ | Failure _ | Unix.Unix_error _) as e ->
+      Error (Printexc.to_string e)
+  in
+  if written = Ok () then
+    History.record conf base
+      (U_Send_image
+         (Util.string_gen_person base (Driver.gen_person_of_person p)))
+      (if mode = "blasons" then "sb" else "si");
+  written
+
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
   let mode =
@@ -392,95 +425,66 @@ let effective_send_c_ok conf base p file file_name =
           | _ -> (typ, content))
     else (GIF, content (* we dont care which type, content = "" *))
   in
-  let keydir = Image.default_image_filename mode base p in
-  let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
-  in
-  Filesystem.create_dir ~parent:true dir;
-  let fname =
-    Filename.concat dir
-      (if mode = "portraits" || mode = "blasons" then
-         keydir ^ extension_of_type typ
-       else file_name)
-  in
-  if mode = "blasons" then remove_blason_stop conf base p;
-  (* move pre-existing file to saved *)
-  if mode = "portraits" || mode = "blasons" then
-    match
-      if mode = "portraits" then Image.get_portrait conf base p
-      else Image.get_blason conf base p true
-    with
-    | Some (`Path portrait) ->
-        if move_file_to_save dir portrait = 0 then
-          incorrect conf "effective send (portrait/blason)"
-    | Some (`Url url) -> (
-        let fname =
-          if mode = "portraits" then
-            Image.default_image_filename "portraits" base p
-          else Image.default_image_filename "blasons" base p
-        in
-        let dir = Filename.concat dir "saved" in
-        Filesystem.create_dir ~parent:true dir;
-        let fname = Filename.concat dir fname ^ ".url" in
-        try write_file fname url
-        with _ ->
-          incorrect conf
-            (Printf.sprintf "effective send (effective send url portrait %s)"
-               fname)
-        (* TODO update person to supress url image *))
-    | _ -> ()
-  else if content <> "" then
-    if Sys.file_exists fname then
+  if mode = "portraits" || mode = "blasons" then (
+    (match send_portrait conf base p mode (extension_of_type typ) content with
+    | Ok () -> ()
+    | Error e -> incorrect conf ("effective send (portrait/blason): " ^ e));
+    file_name)
+  else
+    let dir =
+      Filename.concat
+        (!GWPARAM.images_d conf.bname)
+        (Image.default_image_filename mode base p)
+    in
+    Filesystem.create_dir ~parent:true dir;
+    let fname = Filename.concat dir file_name in
+    if content <> "" && Sys.file_exists fname then
       if move_file_to_save dir fname = 0 then
         incorrect conf "effective send (image)";
-  let fname =
-    if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
-  in
-  if content <> "" then
-    try write_file fname content
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing content file %s)" fname)
-  else if image_url <> "" then
-    try write_file fname image_url
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .url file %s)" fname)
-  else ();
-  if note <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".txt" in
-    try write_file fname (note :> string)
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
-  else ();
-  if source <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".src" in
-    try write_file fname (source :> string)
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
-  else ();
-  let changed =
-    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
-  in
-  History.record conf base changed
-    (match mode with
-    | "portraits" -> "si"
-    | "blasons" -> "sb"
-    | "carrousel" ->
-        let image = file_name <> "" || image_url <> "" in
-        if image && note <> Adef.safe "" && source <> Adef.safe "" then "s3"
-        else if image then "sf"
-        else if note <> Adef.safe "" then "so"
-        else if source <> Adef.safe "" then "ss"
-        else "sx"
-    | "note" -> "so"
-    | "source" -> "ss"
-    | _ -> "s?");
-  file_name
+    let fname =
+      if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
+    in
+    if content <> "" then
+      try write_file fname content
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing content file %s)" fname)
+    else if image_url <> "" then
+      try write_file fname image_url
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .url file %s)" fname)
+    else ();
+    if note <> Adef.safe "" then
+      let fname = Filename.remove_extension fname ^ ".txt" in
+      try write_file fname (note :> string)
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .txt file %s)" fname)
+    else ();
+    if source <> Adef.safe "" then
+      let fname = Filename.remove_extension fname ^ ".src" in
+      try write_file fname (source :> string)
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .txt file %s)" fname)
+    else ();
+    let changed =
+      U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
+    in
+    History.record conf base changed
+      (match mode with
+      | "carrousel" ->
+          let image = file_name <> "" || image_url <> "" in
+          if image && note <> Adef.safe "" && source <> Adef.safe "" then "s3"
+          else if image then "sf"
+          else if note <> Adef.safe "" then "so"
+          else if source <> Adef.safe "" then "ss"
+          else "sx"
+      | "note" -> "so"
+      | "source" -> "ss"
+      | _ -> "s?");
+    file_name
 
 (* Delete *)
 let print_delete_image conf base p =

@@ -33,8 +33,9 @@ val print_folder_images_json : config -> string option -> unit
 (** [print_folder_images_json conf folder] sends a JSON array of image paths
     found in [albums_d/folder], as `albums/folder/file.jpg`… Only regular files
     whose extension is in [Image.ext_list_1] are included, sorted
-    alphabetically. If [folder] is [None] or contains unsafe path components, an
-    empty array is returned. Response [Content-type: application/json]. *)
+    alphabetically. [folder] may hold several levels separated by [/]. If it is
+    [None] or refused by [Image.safe_subpath], an empty array is returned.
+    Response [Content-type: application/json]. *)
 
 val print_album_image : config -> unit
 (** [print_album_image conf] serves the album image whose path is given by the

@@ -26155,3 +26155,108 @@ sk: manželia (rovnakého pohlavia)/slobodní (rovnakého pohlavia)
 sl: poroka (istospolni)/brez poroke (istospolni)
 sv: gifta (samkönade)/ogifta (samkönade)
 tr: evli (eşcinsel)/evli değil (eşcinsel)
+
+    upload conflict
+ca: ja existeix un fitxer amb aquest nom
+da: en fil med dette navn findes allerede
+de: eine Datei mit diesem Namen existiert bereits
+en: a file with this name already exists
+es: ya existe un archivo con este nombre
+fr: un fichier de ce nom existe déjà
+it: esiste già un file con questo nome
+nl: er bestaat al een bestand met deze naam
+no: en fil med dette navnet finnes allerede
+pl: plik o tej nazwie już istnieje
+pt: já existe um ficheiro com este nome
+ru: файл с таким именем уже существует
+sv: en fil med detta namn finns redan
+
+    invalid file name
+ca: nom de fitxer no vàlid
+da: ugyldigt filnavn
+de: ungültiger Dateiname
+en: invalid file name
+es: nombre de archivo no válido
+fr: nom de fichier invalide
+it: nome del file non valido
+nl: ongeldige bestandsnaam
+no: ugyldig filnavn
+pl: nieprawidłowa nazwa pliku
+pt: nome de ficheiro inválido
+ru: недопустимое имя файла
+sv: ogiltigt filnamn
+
+    invalid subdirectory
+ca: subdirectori no vàlid
+da: ugyldig undermappe
+de: ungültiges Unterverzeichnis
+en: invalid subdirectory
+es: subdirectorio no válido
+fr: sous-répertoire invalide
+it: sottocartella non valida
+nl: ongeldige submap
+no: ugyldig undermappe
+pl: nieprawidłowy podkatalog
+pt: subdiretório inválido
+ru: недопустимая вложенная папка
+sv: ogiltig undermapp
+
+    file too big (max %s)
+ca: fitxer massa gran (màxim: %s)
+da: filen er for stor (maksimum: %s)
+de: Datei zu groß (Maximum: %s)
+en: file too big (maximum: %s)
+es: archivo demasiado grande (máximo: %s)
+fr: fichier trop volumineux (maximum : %s)
+it: file troppo grande (massimo: %s)
+nl: bestand te groot (maximum: %s)
+no: filen er for stor (maksimum: %s)
+pl: plik jest za duży (maksimum: %s)
+pt: ficheiro demasiado grande (máximo: %s)
+ru: файл слишком большой (максимум: %s)
+sv: filen är för stor (max: %s)
+
+    %d MB
+ca: %d MB
+da: %d MB
+de: %d MB
+en: %d MB
+es: %d MB
+fr: %d Mo
+it: %d MB
+nl: %d MB
+no: %d MB
+pl: %d MB
+pt: %d MB
+ru: %d МБ
+sv: %d MB
+
+    file type not accepted here
+ca: aquest tipus de fitxer no s’accepta per a aquesta destinació
+da: denne filtype accepteres ikke til denne destination
+de: dieser Dateityp wird für dieses Ziel nicht akzeptiert
+en: this type of file is not accepted for this destination
+es: este tipo de archivo no se acepta para este destino
+fr: ce type de fichier n’est pas accepté pour cette destination
+it: questo tipo di file non è accettato per questa destinazione
+nl: dit bestandstype wordt niet geaccepteerd voor deze bestemming
+no: denne filtypen godtas ikke for dette målet
+pl: ten typ pliku nie jest akceptowany w tym miejscu docelowym
+pt: este tipo de ficheiro não é aceite para este destino
+ru: этот тип файла не принимается для данного назначения
+sv: den här filtypen accepteras inte för det här målet
+
+    sending images forbidden
+ca: l’enviament de fitxers està desactivat en aquesta base
+da: afsendelse af filer er deaktiveret for denne base
+de: das Senden von Dateien ist für diese Datenbank deaktiviert
+en: sending files is disabled on this base
+es: el envío de archivos está desactivado en esta base
+fr: l’envoi de fichiers est désactivé sur cette base
+it: l’invio di file è disattivato su questa base
+nl: het verzenden van bestanden is uitgeschakeld voor deze database
+no: sending av filer er deaktivert for denne basen
+pl: wysyłanie plików jest wyłączone w tej bazie
+pt: o envio de ficheiros está desativado nesta base
+ru: отправка файлов отключена для этой базы
+sv: sändning av filer är avstängd för den här basen

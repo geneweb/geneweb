@@ -211,6 +211,19 @@
 - A file sent by a form is stored byte for byte: two bytes were added at
   its end. The text fields of such a form (name, note and source of an
   image) keep their `+` and `%` characters.
+- New requests for wizards, answering in JSON: `m=UPLOAD_OK` stores a
+  file as the portrait, the coat of arms or an image of a person, or in
+  the images and albums directories of the base and their
+  subdirectories; `m=UPLOAD_LIST` lists the files and subdirectories of
+  such a destination. Besides JPEG, PNG and GIF images, PDF, DOCX, ODT
+  and TXT documents are accepted where they make sense. A file is
+  limited to `max_images_size` (20 000 000 bytes by default) for an
+  image and to the new variable `max_documents_size` (100 000 000 bytes
+  by default) for a document. A name already taken is refused unless a
+  replacement is asked, the previous file then moving to `saved/`.
+- `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
+  downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
+  (`folder=a/b`).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

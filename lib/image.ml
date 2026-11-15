@@ -17,6 +17,44 @@ let key_dir_basename first_name surname occ =
   let s = sp2_ (Name.lower surname) in
   Format.sprintf "%s.%d.%s" f occ s
 
+let safe_name s =
+  let s = Mutil.normalize_utf_8 s in
+  let len = String.length s in
+  let reserved =
+    let stem =
+      String.lowercase_ascii
+        (match String.index_opt s '.' with
+        | Some i -> String.sub s 0 i
+        | None -> s)
+    in
+    List.mem stem [ "con"; "prn"; "aux"; "nul" ]
+    || String.length stem = 4
+       && (String.starts_with ~prefix:"com" stem
+          || String.starts_with ~prefix:"lpt" stem)
+       && stem.[3] >= '1'
+       && stem.[3] <= '9'
+  in
+  let forbidden c = c < ' ' || c = '\127' || String.contains "/\\:*?\"<>|" c in
+  if
+    len = 0 || len > 200
+    || s.[0] = '.'
+    || s.[len - 1] = '.'
+    || s.[len - 1] = ' '
+    || reserved || String.exists forbidden s
+  then None
+  else Some s
+
+let safe_subpath s =
+  let rec loop acc segments =
+    match segments with
+    | [] -> Some (List.rev acc)
+    | segment :: segments -> (
+        match safe_name segment with
+        | Some segment -> loop (segment :: acc) segments
+        | None -> None)
+  in
+  loop [] (String.split_on_char '/' s)
+
 (** [default_portrait_filename_of_key fn sn occ] is the default filename of the
     corresponding person's portrait. WITHOUT its file extenssion. e.g:
     default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is

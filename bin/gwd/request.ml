@@ -11,6 +11,7 @@ module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Connection = Geneweb_http.Connection
+module Upload = Geneweb_upload.Upload
 
 let src = Logs.Src.create ~doc:"Request" "REQ "
 
@@ -29,7 +30,7 @@ let this_request_updates_database conf =
       | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
       | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" | "PLACE_TERMS_OK"
-      | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
+      | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" | "UPLOAD_OK" ) ->
       true
   | _ -> false
 
@@ -952,6 +953,9 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ w_index
                  @@ UnknownPersons.print_ok
              | "UPD" -> w_wizard @@ w_lock @@ w_base @@ UpdateField.print
+             | "UPLOAD_LIST" -> w_wizard @@ w_base @@ Upload.print_list
+             | "UPLOAD_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ Upload.print_upload
              | "VIEW_WIZNOTES" when conf.authorized_wizards_notes ->
                  w_wizard @@ w_base @@ WiznotesDisplay.print_view
              | "WIZNOTES" when conf.authorized_wizards_notes ->
