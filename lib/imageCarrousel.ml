@@ -63,10 +63,6 @@ let error_too_big_image conf base p len max_len =
   Output.flush conf;
   raise Done
 
-let raw_get conf key =
-  try List.assoc key conf.env
-  with Not_found -> incorrect conf ("raw_get" ^ key)
-
 let insert_saved fname =
   let l = String.split_on_char Filename.dir_sep.[0] fname |> List.rev in
   let l = List.rev @@ match l with h :: t -> h :: "saved" :: t | _ -> l in
@@ -817,7 +813,9 @@ let print_main_c conf base =
                           match Util.p_getenv conf.env "image_url" with
                           | Some url when url <> "" -> ""
                           | _ -> (
-                              try (raw_get conf "file" :> string) with _ -> "")
+                              match List.assoc_opt "file" conf.env with
+                              | Some file -> (file :> string)
+                              | None -> "")
                       in
                       effective_send_c_ok conf base p file file_name
                   | "DEL_IMAGE_C_OK" -> effective_delete_c_ok conf base p

@@ -293,6 +293,15 @@
   their stored order, with `event_key`. The `has_secondary_pevents`,
   `nb_pevents` and `family.nb_fevents` variables of the person page are
   removed.
+- Carrousel page: one zone receives the files dropped from the desktop,
+  pasted from the clipboard (Ctrl+V: screenshot, copied image or files)
+  or chosen with the file picker, several at once. They wait on a wall
+  where each one gets its destination (portrait, coat of arms, image of
+  the person, images or albums of the base and their subdirectories) and
+  its name, a name already taken being replaced, skipped or renamed,
+  then are sent together. It replaces the three file inputs of the page
+  and uses Dropzone 6.3.5. An image dragged from another tab fills the
+  URL field.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment

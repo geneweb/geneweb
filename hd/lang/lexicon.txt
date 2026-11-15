@@ -26260,3 +26260,153 @@ pl: wysyłanie plików jest wyłączone w tej bazie
 pt: o envio de ficheiros está desativado nesta base
 ru: отправка файлов отключена для этой базы
 sv: sändning av filer är avstängd för den här basen
+
+    upload zone
+ca: deixeu anar fitxers aquí, enganxeu-los (Ctrl+V) o feu clic per triar-los
+da: slip filer her, indsæt dem (Ctrl+V) eller klik for at vælge dem
+de: Dateien hier ablegen, einfügen (Strg+V) oder klicken, um sie auszuwählen
+en: drop files here, paste them (Ctrl+V) or click to choose them
+es: suelte archivos aquí, péguelos (Ctrl+V) o haga clic para elegirlos
+fr: déposez des fichiers ici, collez-les (Ctrl+V) ou cliquez pour les choisir
+it: trascinate qui i file, incollateli (Ctrl+V) o fate clic per sceglierli
+nl: sleep bestanden hierheen, plak ze (Ctrl+V) of klik om ze te kiezen
+no: slipp filer her, lim dem inn (Ctrl+V) eller klikk for å velge dem
+pl: upuść pliki tutaj, wklej je (Ctrl+V) lub kliknij, aby je wybrać
+pt: largue ficheiros aqui, cole-os (Ctrl+V) ou clique para os escolher
+ru: перетащите файлы сюда, вставьте их (Ctrl+V) или нажмите, чтобы выбрать
+sv: släpp filer här, klistra in dem (Ctrl+V) eller klicka för att välja dem
+
+    upload destination
+ca: destinació
+da: destination
+de: Ziel
+en: destination
+es: destino
+fr: destination
+it: destinazione
+nl: bestemming
+no: mål
+pl: miejsce docelowe
+pt: destino
+ru: назначение
+sv: mål
+
+    upload dest/portrait/blason/person/images/albums
+ca: retrat/escut d’armes/imatge de la persona/imatges/àlbums
+da: portræt/våbenskjold/billede af personen/billeder/album
+de: Porträt/Wappen/Bild der Person/Bilder/Alben
+en: portrait/coat of arms/image of the person/images/albums
+es: retrato/escudo de armas/imagen de la persona/imágenes/álbumes
+fr: portrait/blason/image de la personne/images/albums
+it: ritratto/stemma/immagine della persona/immagini/album
+nl: portret/wapen/afbeelding van de persoon/afbeeldingen/albums
+no: portrett/våpenskjold/bilde av personen/bilder/album
+pl: portret/herb/obraz osoby/obrazy/albumy
+pt: retrato/brasão/imagem da pessoa/imagens/álbuns
+ru: портрет/герб/изображение персоны/изображения/альбомы
+sv: porträtt/vapensköld/bild av personen/bilder/album
+
+    subdirectory
+ca: subdirectori
+da: undermappe
+de: Unterverzeichnis
+en: subdirectory
+es: subdirectorio
+fr: sous-répertoire
+it: sottocartella
+nl: submap
+no: undermappe
+pl: podkatalog
+pt: subdiretório
+ru: вложенная папка
+sv: undermapp
+
+    replace/skip/rename
+ca: substitueix/omet/canvia el nom
+da: erstat/spring over/omdøb
+de: ersetzen/überspringen/umbenennen
+en: replace/skip/rename
+es: reemplazar/omitir/renombrar
+fr: remplacer/ignorer/renommer
+it: sostituisci/ignora/rinomina
+nl: vervangen/overslaan/hernoemen
+no: erstatt/hopp over/gi nytt navn
+pl: zastąp/pomiń/zmień nazwę
+pt: substituir/ignorar/renomear
+ru: заменить/пропустить/переименовать
+sv: ersätt/hoppa över/byt namn
+
+    will replace
+ca: substituirà el fitxer existent
+da: erstatter den eksisterende fil
+de: ersetzt die vorhandene Datei
+en: will replace the existing file
+es: reemplazará el archivo existente
+fr: remplacera le fichier existant
+it: sostituirà il file esistente
+nl: vervangt het bestaande bestand
+no: erstatter den eksisterende filen
+pl: zastąpi istniejący plik
+pt: substituirá o ficheiro existente
+ru: заменит существующий файл
+sv: ersätter den befintliga filen
+
+    upload slot taken
+ca: ja triat per a un altre fitxer
+da: allerede valgt til en anden fil
+de: bereits für eine andere Datei gewählt
+en: already chosen for another file
+es: ya elegido para otro archivo
+fr: déjà choisi pour un autre fichier
+it: già scelto per un altro file
+nl: al gekozen voor een ander bestand
+no: allerede valgt for en annen fil
+pl: już wybrane dla innego pliku
+pt: já escolhido para outro ficheiro
+ru: уже выбрано для другого файла
+sv: redan valt för en annan fil
+
+    upload send/finish
+ca: envia/acaba
+da: send/afslut
+de: senden/fertig
+en: send/finish
+es: enviar/terminar
+fr: envoyer/terminer
+it: invia/termina
+nl: verzenden/voltooien
+no: send/fullfør
+pl: wyślij/zakończ
+pt: enviar/terminar
+ru: отправить/завершить
+sv: skicka/slutför
+
+    file size units
+ca: B/KB/MB/GB
+da: B/KB/MB/GB
+de: B/KB/MB/GB
+en: B/KB/MB/GB
+es: B/KB/MB/GB
+fr: o/Ko/Mo/Go
+it: B/KB/MB/GB
+nl: B/KB/MB/GB
+no: B/KB/MB/GB
+pl: B/KB/MB/GB
+pt: B/KB/MB/GB
+ru: Б/КБ/МБ/ГБ
+sv: B/KB/MB/GB
+
+    dropped url hint
+ca: l’adreça de la imatge s’ha posat al camp URL
+da: billedets adresse er sat ind i URL-feltet
+de: die Adresse des Bildes wurde in das URL-Feld eingetragen
+en: the address of the image was put in the URL field
+es: la dirección de la imagen se ha colocado en el campo URL
+fr: l’adresse de l’image a été placée dans le champ URL
+it: l’indirizzo dell’immagine è stato inserito nel campo URL
+nl: het adres van de afbeelding is in het URL-veld geplaatst
+no: adressen til bildet er satt inn i URL-feltet
+pl: adres obrazu został wstawiony w polu URL
+pt: o endereço da imagem foi colocado no campo URL
+ru: адрес изображения помещён в поле URL
+sv: bildens adress har lagts i URL-fältet

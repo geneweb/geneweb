@@ -241,3 +241,12 @@
     (concurrent
       (run gzip -9 -k -f %{input})
       (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets upload.js.gz upload.js.br)
+  (deps (:input upload.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
