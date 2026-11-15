@@ -695,6 +695,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "as_friend" ] -> VVbool conf.as_friend
   | [ "friend" ] -> VVbool conf.friend
+  | [ "user"; "consent" ] -> VVbool conf.consent
   | [ "manitou" ] -> VVbool conf.manitou
   | [ "oidc" ] -> VVbool conf.oidc
   | [ "plugin"; plugin ] ->
