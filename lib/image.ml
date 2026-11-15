@@ -76,6 +76,7 @@ let default_image_filename mode base p =
 
 let ext_list_1 = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 let ext_list_2 = [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".url"; ".stop" |]
+let ext_list_doc = [| ".pdf"; ".docx"; ".odt" |]
 
 let read_url_file f =
   try
@@ -562,11 +563,14 @@ let get_carrousel_img_aux conf base p old =
         Array.fold_left
           (fun acc f1 ->
             let ext = Filename.extension f1 in
-            if
-              f1 <> ""
-              && f1.[0] <> '.'
-              && (Array.mem ext ext_list_1 || ext = ".url")
-            then
+            if f1 = "" || f1.[0] = '.' then acc
+            else if Array.mem ext ext_list_doc then
+              ( carrousel_file_path conf base p f1 old,
+                "",
+                get_carrousel_img_src f1,
+                get_carrousel_img_note f1 )
+              :: acc
+            else if Array.mem ext ext_list_1 || ext = ".url" then
               match get_carrousel_img f1 with
               | None -> acc
               | Some (`Path path) ->

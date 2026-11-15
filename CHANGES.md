@@ -302,6 +302,12 @@
   then are sent together. It replaces the three file inputs of the page
   and uses Dropzone 6.3.5. An image dragged from another tab fills the
   URL field.
+- The documents (PDF, DOCX, ODT) of the directory of a person are listed
+  with its images: on the carrousel page, where they can be viewed,
+  annotated, deleted and restored like an image, and on the person page
+  (image slider and documents module), with a file icon and a link. The
+  new `carrousel_doc` variable of the `img_in_carrousel` loops tells a
+  document from an image.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
