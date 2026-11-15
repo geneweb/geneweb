@@ -1151,7 +1151,7 @@ let reference_flags with_id conf base p (s : Adef.safe_string) =
   in
   let iper = Driver.get_iper p in
   (* let is_hidden = is_empty_string (get_surname p) !! *)
-  if (not (GWPARAM.p_auth conf base p)) || cgl then s
+  if (not (GWPARAM.p_auth_sp conf base p)) || cgl then s
   else
     let excl =
       match p_getenv conf.env "m" with
