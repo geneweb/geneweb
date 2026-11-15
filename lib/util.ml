@@ -1274,11 +1274,10 @@ let rec skip_spaces s i =
 
 let create_env s =
   let s = (s : Adef.encoded_string :> string) in
-  let use_amp = not (Mutil.contains s "content-disposition") in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [ String.sub s beg (i - beg) ]
-    else if s.[i] = ';' || (s.[i] = '&' && use_amp) then
+    else if s.[i] = ';' || s.[i] = '&' then
       let next_i = skip_spaces s (succ i) in
       String.sub s beg (i - beg) :: get_assoc next_i next_i
     else get_assoc beg (succ i)

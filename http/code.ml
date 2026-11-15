@@ -5,6 +5,7 @@ type status =
   | Unauthorized
   | Forbidden
   | Not_Found
+  | Payload_Too_Large
   | Service_Unavailable
 
 let status_code s =
@@ -15,6 +16,7 @@ let status_code s =
   | Unauthorized -> 401
   | Forbidden -> 403
   | Not_Found -> 404
+  | Payload_Too_Large -> 413
   | Service_Unavailable -> 503
 
 let pp ppf s =
@@ -25,6 +27,7 @@ let pp ppf s =
   | Unauthorized -> Fmt.pf ppf "401 Unauthorized"
   | Forbidden -> Fmt.pf ppf "403 Forbidden"
   | Not_Found -> Fmt.pf ppf "404 Not Found"
+  | Payload_Too_Large -> Fmt.pf ppf "413 Payload Too Large"
   | Service_Unavailable -> Fmt.pf ppf "503 Service Unavailable"
 
 let to_string = Fmt.to_to_string pp

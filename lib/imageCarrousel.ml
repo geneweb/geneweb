@@ -6,9 +6,7 @@ let src = Logs.Src.create ~doc:"ImageCarrousel" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
-module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
-module Header = Geneweb_http.Header
 
 let cp = Filesystem.copy_file ~perm:0o666
 
@@ -349,11 +347,11 @@ let effective_send_c_ok conf base p file file_name =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
   let image_url =
-    try (List.assoc "image_url" conf.env :> string) with Not_found -> ""
+    Option.value ~default:"" (Util.p_getenv conf.env "image_url")
   in
   let image_name =
     let user_provided_name =
-      try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
+      Option.value ~default:"" (Util.p_getenv conf.env "image_name")
     in
     if user_provided_name = "" && image_url <> "" then
       extract_filename_from_url image_url
@@ -374,28 +372,16 @@ let effective_send_c_ok conf base p file file_name =
           (Util.only_printable_or_nl (Mutil.strip_all_trailing_spaces v))
     | None -> Adef.safe ""
   in
-  let strm = Stream.of_string file in
-  let request, content = Server.get_request_and_content strm in
   let content =
-    if mode = "note" || mode = "source" || image_url <> "" then ""
-    else
-      let s =
-        let rec loop len (strm__ : _ Stream.t) =
-          match Stream.peek strm__ with
-          | Some x ->
-              Stream.junk strm__;
-              loop (Buff.store len x) strm
-          | _ -> Buff.get len
-        in
-        loop 0 strm
-      in
-      (content :> string) ^ s
+    if mode = "note" || mode = "source" || image_url <> "" then "" else file
   in
   let typ, content =
     if content <> "" then
       match image_type content with
       | None ->
-          let ct = Header.extract_param "Content-Type: " '\n' request in
+          let ct =
+            Option.value ~default:"" (Util.p_getenv conf.env "file_type")
+          in
           dump_bad_image conf content;
           incorrect_content_type conf base p ct
       | Some (typ, content) -> (
@@ -804,7 +790,9 @@ let print_main_c conf base =
                         with Not_found -> "portraits"
                       in
                       let file_name =
-                        try List.assoc "file_name" conf.env |> Mutil.decode
+                        try
+                          List.assoc "file_name" conf.env
+                          |> Mutil.decode |> String.lowercase_ascii
                         with Not_found -> ""
                       in
                       let file_name =
@@ -817,7 +805,7 @@ let print_main_c conf base =
                         (Mutil.decode (Adef.encoded file_name) :> string)
                       in
                       let file =
-                        if mode = "note" || mode = "source" then "file_name"
+                        if mode = "note" || mode = "source" then ""
                         else
                           match Util.p_getenv conf.env "image_url" with
                           | Some url when url <> "" -> ""
