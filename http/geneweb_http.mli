@@ -8,6 +8,7 @@ module Code : sig
     | Unauthorized (* 401 *)
     | Forbidden (* 403 *)
     | Not_Found (* 404 *)
+    | Payload_Too_Large (* 413 *)
     | Service_Unavailable (* 503 *)
 
   val status_code : status -> int
@@ -102,6 +103,7 @@ module Server : sig
     ?addr:string ->
     port:int ->
     ?timeout:int ->
+    ?max_request_size:int ->
     max_pending_requests:int ->
     n_workers:int ->
     handler ->
@@ -117,6 +119,11 @@ module Server : sig
       pending requests that the server can store. If the queue is full, new
       requests are ignored until space becomes available.
 
+      A request whose [Content-Length] exceeds [max_request_size] bytes is
+      answered with [413 Payload Too Large] and logged; its content is not read
+      and [callback] is not invoked. Without [max_request_size], there is no
+      limit.
+
       When a client connects, [callback] is invoked with the arguments
       [(addr, request) path query] where:
       - [addr] is the client address,
@@ -128,8 +135,18 @@ module Server : sig
 
   (* To print an http header line *)
 
-  val get_request_and_content : char Stream.t -> string list * string
-  (** Returns the request from a stream read from a socket. *)
+  exception Payload_too_large of int
+  (** Raised by [get_request_and_content] with the [Content-Length] of the
+      refused request. *)
+
+  val get_request_and_content :
+    ?max_content:int -> char Stream.t -> string list * string
+  (** [get_request_and_content ?max_content strm] returns the header lines and
+      the content of the request read from the stream [strm] of a socket.
+
+      @raise Payload_too_large
+        if the [Content-Length] of the request exceeds [max_content] bytes. The
+        content is then left unread. *)
 
   val stop_server : string ref
   (** Name of the file whose presence tells the server to stop (at least one

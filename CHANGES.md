@@ -301,6 +301,13 @@
   or another base are left alone. The image paths of a gallery in the
   carrousel folder of the person follow its renaming too. Run
   `update_nldb` once on existing bases to index them.
+- New option `--max-request-size` (in bytes, 128 MiB by default): a
+  request whose content is larger is answered `413 Payload Too Large`
+  without being read. A request of any size was read into memory until
+  now.
+- A file sent by a form is stored byte for byte: two bytes were added at
+  its end. The text fields of such a form (name, note and source of an
+  image) keep their `+` and `%` characters.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
