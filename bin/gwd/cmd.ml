@@ -41,6 +41,7 @@ type t = {
   port : int;
   connection_timeout : int;
   max_pending_requests : int;
+  max_request_size : int;
   n_workers : int;
   cgi : bool;
   daemon : bool;
@@ -397,6 +398,7 @@ let default_interface = "::"
 let default_port = 2317
 let default_connection_timeout = 120
 let default_max_pending_requests = 150
+let default_max_request_size = 134_217_728
 let default_n_workers = 20
 
 let interface =
@@ -441,6 +443,16 @@ let max_pending_requests =
     & value
     & opt (some int) None
     & info [ "max-pending-requests" ] ~docs:http_section ~doc)
+
+let max_request_size =
+  let doc =
+    "Refuse the requests whose content exceeds $(docv) bytes, without reading \
+     them. This bounds the size of the files sent to the server."
+  in
+  C.Arg.(
+    value
+    & opt int default_max_request_size
+    & info [ "max-request-size" ] ~docs:http_section ~docv:"BYTES" ~doc)
 
 let max_clients =
   let doc = "Maximum number of clients treated at the same time (UNIX only)." in
@@ -666,6 +678,7 @@ let t =
   and+ port = port
   and+ connection_timeout = connection_timeout
   and+ max_pending_requests = max_pending_requests
+  and+ max_request_size = max_request_size
   and+ _ : int = max_clients
   and+ n_workers = n_workers
   and+ cgi = parse_cgi_flags
@@ -707,6 +720,7 @@ let t =
     port;
     connection_timeout;
     max_pending_requests;
+    max_request_size;
     n_workers;
     cgi;
     daemon;
@@ -748,6 +762,7 @@ let legacy_arguments =
     ("-login_tmout", "--login-timeout");
     ("-max_clients", "--max-clients");
     ("-max_pending_requests", "--max-pending-requests");
+    ("-max_request_size", "--max-request-size");
     ("-min_disp_req", "--min-disp-req");
     ("-no_host_address", "--no-reverse-host");
     ("-no-fork", "--no-fork");

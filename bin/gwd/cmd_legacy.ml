@@ -42,6 +42,7 @@ let lexicon_list : string list ref = ref []
 let login_timeout = ref Cmd.default_login_timeout
 let n_workers = ref Cmd.default_n_workers
 let max_pending_requests = ref Cmd.default_max_pending_requests
+let max_request_size = ref Cmd.default_max_request_size
 let no_host_address = ref false
 let only_addresses : string list ref = ref []
 let redirected_addr : string option ref = ref None
