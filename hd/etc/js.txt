@@ -20,10 +20,10 @@
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
-       <script src="https://cdn.jsdelivr.net/npm/regex@4.4.0/dist/regex.min.js"
-               integrity="sha256-ZEJ/IHdQ3RcAglQ8BH6pHVaHDIVl8rPFjigQN7zKMw0=
-                          sha384-WGmRZZCBcsKBkTrk3hdnP4+wYopCyO9L0GKMBmHnlDLHnyajWYiE/52P3ai/1/1L
-                          sha512-Bb1WXpqE5T4DNZzNLvoK3ABggd1ycVuM5kKvKamvvjc0bD7/9AAWJx1J4lra90R9qGFRH6zbQEFuUk253WNmBw=="
+       <script src="https://cdn.jsdelivr.net/npm/regex@6.1.0/dist/regex.min.js"
+               integrity="sha256-4x27hX6AsffpLRm7OxygszbS1h+eAzIsncgEMcdH+9k=
+                          sha384-r08gg+8aeAdDQinzCUSEuINUGRFo1m5b7yX3DjLO1K/UoB96bk1u3S4XdGOSlF7Z
+                          sha512-jnJULRe2dV5oN2LwUy2iZBBOi+HrZEWCNlpNekNdHki5gC+GYwMzwtZkFxKK5MEte+BHfZusQDblZWqkgvNldw=="
                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="STATS")
@@ -39,7 +39,7 @@
       <script src="%etc_prefix;js/tom-select.complete.min.js?version=2.7.0"></script>
     %end;
     %if;(e.m="MOD_DATA" and e.s="")
-      <script src="%etc_prefix;js/regex.min.js?version=4.4.0"></script>
+      <script src="%etc_prefix;js/regex.min.js?version=6.1.0"></script>
     %end;
     %if;(e.m="STATS")
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
