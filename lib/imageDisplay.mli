@@ -6,9 +6,13 @@ val print_image_file : config -> string -> (unit, string) result
     Returns [Error msg] if the extension is not supported or the file cannot be
     read. *)
 
-val print_source : config -> string -> unit
+val print_source : config -> Geneweb_db.Driver.base -> string -> unit
 (** Display an image of given filename in images folder Filename may contain
-    sub-folders, but cannot point outside images *)
+    sub-folders, but cannot point outside images. A file of the directory of a
+    person ([first_name.occ.surname], see [Image.key_dir_basename]) is refused
+    to a visitor who may not see the images of that person
+    ([Image.has_access_to_carrousel]), as a private file is. A directory that
+    matches no person is not checked. *)
 
 val print : config -> Geneweb_db.Driver.base -> unit
 (** Searches image's filename in the environement [conf.env] and sends HTTP

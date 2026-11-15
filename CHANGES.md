@@ -221,6 +221,9 @@
   image and to the new variable `max_documents_size` (100 000 000 bytes
   by default) for a document. A name already taken is refused unless a
   replacement is asked, the previous file then moving to `saved/`.
+- `m=IM`, `m=DOC` and `m=IM_C` refuse a file of the directory of a
+  person to a visitor who may not see that person, as they do for a
+  file under `private/`. Wizards and friends keep full access.
 - `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
   downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
   (`folder=a/b`).

@@ -196,6 +196,13 @@ val get_blason_owner :
 
 (* -- Carrousel -- *)
 
+val has_access_to_carrousel :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** [has_access_to_carrousel conf base p] is true if the images and documents of
+    the directory of [p] may be shown: always to wizards and friends, otherwise
+    when images are allowed, the age of [p] is authorized and the names of [p]
+    are not hidden. *)
+
 val get_carrousel_imgs :
   config ->
   Geneweb_db.Driver.base ->

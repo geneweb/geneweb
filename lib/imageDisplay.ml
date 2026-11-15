@@ -195,10 +195,46 @@ let print_blason_aux conf base p =
       Output.print_sstring conf "</body></html>"
   | None -> Hutil.incorrect_request conf
 
-let print_source conf f =
-  let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
-  if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
+let person_of_dir base dir =
+  let len = String.length dir in
+  let name i j =
+    String.map (fun c -> if c = '_' then ' ' else c) (String.sub dir i (j - i))
+  in
+  let rec digits i =
+    if i < len && dir.[i] >= '0' && dir.[i] <= '9' then digits (i + 1) else i
+  in
+  let rec loop i =
+    match String.index_from_opt dir i '.' with
+    | Some i ->
+        let j = digits (i + 1) in
+        if j > i + 1 && j < len && dir.[j] = '.' then
+          Option.bind
+            (int_of_string_opt (String.sub dir (i + 1) (j - i - 1)))
+            (Driver.person_of_key base (name 0 i) (name (j + 1) len))
+        else loop (i + 1)
+    | None -> None
+  in
+  Option.map (Driver.poi base) (loop 0)
+
+let print_source conf base f =
+  let f = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
+  let fname = Filename.concat (!GWPARAM.images_d conf.bname) f in
+  let person =
+    match
+      String.split_on_char '/'
+        (String.map (fun c -> if c = '\\' then '/' else c) f)
+    with
+    | dir :: _ :: _ -> person_of_dir base dir
+    | [ _ ] | [] -> None
+  in
+  let visible =
+    Image.is_not_private_img conf fname
+    &&
+    match person with
+    | Some p -> Image.has_access_to_carrousel conf base p
+    | None -> true
+  in
+  if conf.wizard || conf.friend || visible then
     Result.fold ~ok:ignore
       ~error:(fun e ->
         Log.err (fun k -> k "%s" e);
@@ -208,7 +244,7 @@ let print_source conf f =
 
 let print conf base =
   match Util.p_getenv conf.env "s" with
-  | Some f -> print_source conf f
+  | Some f -> print_source conf base f
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_portrait conf base p
@@ -216,7 +252,7 @@ let print conf base =
 
 let print_blason conf base =
   match Util.p_getenv conf.env "s" with
-  | Some f -> print_source conf f
+  | Some f -> print_source conf base f
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_blason_aux conf base p

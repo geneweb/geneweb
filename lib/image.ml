@@ -260,7 +260,6 @@ let has_access_to_blason conf base p =
 
 (* TODO: privacy settings should be in db not in url *)
 
-(** [has_access_to_carrousel conf base p] is true iif ???. *)
 let has_access_to_carrousel conf base p =
   (conf.wizard || conf.friend)
   || (not conf.no_image)
