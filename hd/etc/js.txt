@@ -33,6 +33,13 @@
                          sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA=="
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
+    %if;(e.m="SND_IMAGE_C")
+      <script src="https://cdn.jsdelivr.net/npm/dropzone@6.3.5/dist/dropzone-min.js"
+              integrity="sha256-3+sEImMiCQfpEG8A/MGWKSRtDQCsMqTt0/nEcVbfQ9g=
+                         sha384-wHTterC8uaPhGVKg8kmSlqcmI8CCFkOI+Mn51O3udobTBX0vQLs6a18vJqh0AnW3
+                         sha512-NZCgbh90lReD8KQDLV+lbRSO66u4strAupcLSgUW6fAvuX/9b99pokttorCT2ygzZ6T9EdQBoRve+0NSiFj6xg=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
   %else;
     <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=5.3.9"></script>
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
@@ -43,6 +50,9 @@
     %end;
     %if;(e.m="STATS" or e.m="GWD_STATS")
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
+    %end;
+    %if;(e.m="SND_IMAGE_C")
+      <script src="%etc_prefix;js/dropzone-min.js?version=6.3.5"></script>
     %end;
   %end;
   %( autocomplete.js serves the welcome page and form fields: from the RPC
