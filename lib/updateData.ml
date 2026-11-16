@@ -593,3 +593,34 @@ let book conf base =
           if count < book_max_results conf then
             listed (Driver.dict_entries_count base d p)
           else { count; groups = index (); records = Hashtbl.create 1 })
+
+(* The entries of a group in the order of the page, each with the last term
+   heading it in the order from the last term ("" otherwise) *)
+let book_order conf base l =
+  let alphabetic (_, s1) (_, s2) =
+    let rss1 = Place.without_suburb s1 in
+    let rss2 = Place.without_suburb s2 in
+    if rss1 = rss2 then Gutil.alphabetic_order s1 s2
+    else Gutil.alphabetic_order rss1 rss2
+  in
+  if rev_order conf base then
+    List.rev_map (fun ((_, s) as x) -> (Dict.last_terms s, x)) l
+    |> List.sort (fun (t1, x1) (t2, x2) ->
+        match compare_terms t1 t2 with 0 -> alphabetic x1 x2 | c -> c)
+    |> List.map (fun (t, (k, s)) ->
+        (k, s, match t with [] -> "" | t :: _ -> t))
+  else List.sort alphabetic l |> List.map (fun (k, s) -> (k, s, ""))
+
+(* The place of [istr] in the page: its group, the entry before it in the
+   group and its heading; [None] when it is not listed in the page *)
+let book_place conf base istr =
+  List.find_map
+    (fun (ini, _, l) ->
+      let rec loop prev = function
+        | (k, _, head) :: l ->
+            if Driver.Istr.equal k istr then Some (ini, prev, head)
+            else loop (Some k) l
+        | [] -> None
+      in
+      loop None (book_order conf base l))
+    (book conf base).groups

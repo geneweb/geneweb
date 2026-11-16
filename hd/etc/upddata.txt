@@ -226,6 +226,10 @@
       %if;(rv!="")<input type="hidden" name="o" value="r">%end;
       <input type="hidden" name="key">
       <input type="hidden" name="s" value="%escape.current_s;">
+      %if;(range_from!="")
+        <input type="hidden" name="from" value="%escape.range_from;">
+        <input type="hidden" name="to" value="%escape.range_to;">
+      %end;
       <div class="book-row">
         <a class="btn btn-primary text-nowrap" id="book-persons" target="_blank" rel="noopener"
           href="%prefix;m=L&data=%e.data;&parents=on"
