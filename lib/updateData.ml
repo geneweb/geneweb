@@ -498,16 +498,17 @@ let book_range conf =
   | Some a, Some b -> Some (a, b)
   | _ -> None
 
-(* The groups of an index cut into the pages listed by one click: consecutive
-   groups of less than [book_max_results] entries in all. A group of more
-   entries is a page of its own, which opens its own index. *)
+(* The groups of an index cut into the pages listed by one click: groups of
+   less than [book_max_results] entries in all, in order. A group of more
+   entries is a page of its own, which opens its own index, left out of the
+   page around it. *)
 let book_pages conf groups =
   let max = book_max_results conf in
   let close cur acc = if cur = [] then acc else List.rev cur :: acc in
   let rec loop acc cur sum = function
     | [] -> List.rev (close cur acc)
     | ((_, n, _) as g) :: l ->
-        if n >= max then loop ([ g ] :: close cur acc) [] 0 l
+        if n >= max then loop ([ g ] :: acc) cur sum l
         else if sum + n >= max then loop (close cur acc) [ g ] n l
         else loop acc (g :: cur) (sum + n) l
   in
@@ -579,10 +580,12 @@ let book conf base =
                 if g = b then List.rev (x :: acc) else until (x :: acc) l
             | [] -> List.rev acc
           in
+          let max = book_max_results conf in
           listed
             (List.concat_map
-               (fun (g, _, _) ->
-                 if g = p then Driver.dict_exact_count base d p
+               (fun (g, n, _) ->
+                 if a <> b && n >= max then []
+                 else if g = p then Driver.dict_exact_count base d p
                  else Driver.dict_entries_count base d g)
                (until [] (from (index ()))))
       | None ->
