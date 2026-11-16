@@ -273,7 +273,6 @@
         this.autoSelectLink();
         this.helpPopover();
         this.searchFocus();
-        this.alignBar();
         this.balanceIndex();
         BookEdit.init();
       } catch (e) {
@@ -366,15 +365,6 @@
       input?.addEventListener('focus', () => {
         input.setSelectionRange(input.value.length, input.value.length);
       });
-    },
-
-    alignBar() {
-      const list = document.getElementById('main-content');
-      const bar = document.getElementById('book-bar');
-      if (!list || !bar) return;
-      const fit = () => { bar.style.maxWidth = `max(40rem, ${list.offsetWidth}px)`; };
-      fit();
-      addEventListener('resize', fit);
     },
 
     balanceIndex() {
