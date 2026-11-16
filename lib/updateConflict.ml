@@ -158,6 +158,82 @@ let by_name name = Printf.sprintf {|[name="%s"]|} name
 let by_prefix prefix = Printf.sprintf {|[name^="%s"]|} prefix
 let deleted conf = Util.transl_nth conf "edit conflict" 8
 
+let kept o x =
+  let d_o, d_x = Difference.f o x in
+  let m = Array.make (Array.length o) (-1) in
+  let rec loop i j =
+    if i < Array.length o then
+      if d_o.(i) then loop (i + 1) j
+      else if d_x.(j) then loop i (j + 1)
+      else (
+        m.(i) <- j;
+        loop (i + 1) (j + 1))
+  in
+  loop 0 0;
+  m
+
+let merge_lines conf r ~name ~what o a b =
+  let lines s = Array.of_list (String.split_on_char '\n' s) in
+  let al = lines a and bl = lines b in
+  let ol = match o with Some o -> lines o | None -> al in
+  let ma = kept ol al and mb = kept ol bl in
+  let sync =
+    List.filter_map Fun.id
+      (List.init (Array.length ol) (fun i ->
+           if ma.(i) >= 0 && mb.(i) >= 0 then Some (i, ma.(i), mb.(i)) else None))
+  in
+  let sub l i j = Array.to_list (Array.sub l i (j - i)) in
+  let text l = String.concat "\n" l in
+  let one_line = Array.length al <= 1 && Array.length bl <= 1 in
+  let where first count =
+    let lines =
+      if count <= 1 then
+        Printf.sprintf "%s %d" (Util.transl_nth conf "edit conflict" 18) first
+      else
+        Printf.sprintf "%s %d–%d"
+          (Util.transl_nth conf "edit conflict" 19)
+          first
+          (first + count - 1)
+    in
+    if what = "" then cap lines
+    else if one_line then what
+    else what ^ " — " ^ lines
+  in
+  let rec loop (oi, ai, bi) acc n points =
+    let (oj, aj, bj), rest =
+      match points with
+      | p :: rest -> (p, Some rest)
+      | [] -> ((Array.length ol, Array.length al, Array.length bl), None)
+    in
+    let oc = sub ol oi oj and ac = sub al ai aj and bc = sub bl bi bj in
+    let chunk =
+      if ac = bc then ac
+      else if Option.is_some o && oc = ac then bc
+      else if Option.is_some o && oc = bc then ac
+      else
+        let around l =
+          let l =
+            match rest with
+            | Some _ -> List.rev_append (List.rev l) [ al.(aj) ]
+            | None -> l
+          in
+          text (match acc with line :: _ -> line :: l | [] -> l)
+        in
+        note_conflict r ~selector:(by_name name)
+          ~text:(name, around ac, around bc)
+          (where (n + 1) (List.length ac))
+          (text ac) (text bc);
+        ac
+    in
+    if Option.is_some o && oc <> ac then
+      note_change r (where (n + 1) (List.length ac)) (text oc) (text ac);
+    let acc = List.rev_append chunk acc and n = n + List.length chunk in
+    match rest with
+    | Some rest -> loop (oj + 1, aj + 1, bj + 1) (al.(aj) :: acc) (n + 1) rest
+    | None -> text (List.rev acc)
+  in
+  loop (0, 0, 0) [] 0 sync
+
 let date_text conf d =
   match Date.od_of_cdate d with
   | Some d -> (DateDisplay.string_of_date_aux ~link:false conf d :> string)
@@ -309,7 +385,13 @@ let event_fields conf r k name (date, place, reason, note, src, witnesses) =
   in
   let place = text_field "e_place" "place/places" 0 place in
   let reason = silent reason in
-  let note = text_field "e_note" "note/notes" 0 note in
+  let note =
+    let o, a, b = note in
+    merge_lines conf r
+      ~name:(Printf.sprintf "e_note%d" k)
+      ~what:(what (Util.transl_nth conf "note/notes" 0))
+      o a b
+  in
   let src = text_field "e_src" "source/sources" 0 src in
   let witnesses =
     let o, a, b = witnesses in
@@ -547,7 +629,10 @@ let merge_person conf ~snapshot a b =
       (fun d1 d2 -> death_kind d1 = death_kind d2)
       o a b
   in
-  let notes = text "notes" (label conf "note/notes" 1) (fun p -> p.notes) in
+  let notes =
+    let o, a, b = t (fun p -> p.notes) in
+    merge_lines conf r ~name:"notes" ~what:(label conf "note/notes" 1) o a b
+  in
   let psources =
     text "src" (label conf "source/sources" 1) (fun p -> p.psources)
   in
@@ -643,7 +728,10 @@ let merge_family conf ~snapshot (a_fam, a_cpl, a_des) (b_fam, b_cpl, b_des) =
           b_des.children
   in
   let comment =
-    text "comment" (cap (Util.transl conf "comment")) (fun f -> f.comment)
+    let o, a, b = t (fun f -> f.comment) in
+    merge_lines conf r ~name:"comment"
+      ~what:(cap (Util.transl conf "comment"))
+      o a b
   in
   let fsources =
     text "src" (label conf "source/sources" 1) (fun f -> f.fsources)
@@ -688,74 +776,7 @@ let note_of_snapshot conf fname s =
   | Some (f, s) when String.equal f fname -> Some s
   | Some _ | None -> None
 
-let kept o x =
-  let d_o, d_x = Difference.f o x in
-  let m = Array.make (Array.length o) (-1) in
-  let rec loop i j =
-    if i < Array.length o then
-      if d_o.(i) then loop (i + 1) j
-      else if d_x.(j) then loop i (j + 1)
-      else (
-        m.(i) <- j;
-        loop (i + 1) (j + 1))
-  in
-  loop 0 0;
-  m
-
 let merge_note conf o a b =
   let r = { changes = []; conflicts = [] } in
-  let lines s = Array.of_list (String.split_on_char '\n' s) in
-  let al = lines a and bl = lines b in
-  let ol = match o with Some o -> lines o | None -> al in
-  let ma = kept ol al and mb = kept ol bl in
-  let sync =
-    List.filter_map Fun.id
-      (List.init (Array.length ol) (fun i ->
-           if ma.(i) >= 0 && mb.(i) >= 0 then Some (i, ma.(i), mb.(i)) else None))
-  in
-  let sub l i j = Array.to_list (Array.sub l i (j - i)) in
-  let text l = String.concat "\n" l in
-  let where first count =
-    if count <= 1 then
-      Printf.sprintf "%s %d" (label conf "edit conflict" 18) first
-    else
-      Printf.sprintf "%s %d–%d"
-        (label conf "edit conflict" 19)
-        first
-        (first + count - 1)
-  in
-  let rec loop (oi, ai, bi) acc n points =
-    let (oj, aj, bj), rest =
-      match points with
-      | p :: rest -> (p, Some rest)
-      | [] -> ((Array.length ol, Array.length al, Array.length bl), None)
-    in
-    let oc = sub ol oi oj and ac = sub al ai aj and bc = sub bl bi bj in
-    let chunk =
-      if ac = bc then ac
-      else if Option.is_some o && oc = ac then bc
-      else if Option.is_some o && oc = bc then ac
-      else
-        let around l =
-          let l =
-            match rest with
-            | Some _ -> List.rev_append (List.rev l) [ al.(aj) ]
-            | None -> l
-          in
-          text (match acc with line :: _ -> line :: l | [] -> l)
-        in
-        note_conflict r ~selector:{|[name="notes"]|}
-          ~text:("notes", around ac, around bc)
-          (where (n + 1) (List.length ac))
-          (text ac) (text bc);
-        ac
-    in
-    if Option.is_some o && oc <> ac then
-      note_change r (where (n + 1) (List.length ac)) (text oc) (text ac);
-    let acc = List.rev_append chunk acc and n = n + List.length chunk in
-    match rest with
-    | Some rest -> loop (oj + 1, aj + 1, bj + 1) (al.(aj) :: acc) (n + 1) rest
-    | None ->
-        (text (List.rev acc), review_json ~kind:"merge" (Option.is_some o) r)
-  in
-  loop (0, 0, 0) [] 0 sync
+  let s = merge_lines conf r ~name:"notes" ~what:"" o a b in
+  (s, review_json ~kind:"merge" (Option.is_some o) r)

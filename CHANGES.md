@@ -227,7 +227,8 @@
   another form or by the renaming of a person that it links: the form is
   displayed again on the whole note, the entry merged line by line with
   the text saved meanwhile, and the lines changed on both sides are to
-  be checked as in the person and family forms. A form opened on a
+  be checked as in the person and family forms, whose notes, comments
+  and notes of events are merged line by line likewise. A form opened on a
   section of a note is displayed again on the whole note. The note
   forms of the base are watched like the person and family forms.
 - A person form is no longer refused with "the base has changed" when,

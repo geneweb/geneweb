@@ -140,7 +140,7 @@
       state: () => (shows(c.saved) ? 'saved' : shows(c.restore) ? 'mine' : 'edited'),
       toSaved: () => fill(c.saved),
       toMine: () => fill(c.restore),
-      current: () => current(c.restore),
+      current: fields.some(f => f.tagName === 'TEXTAREA') ? null : () => current(c.restore),
     };
   };
 
