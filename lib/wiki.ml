@@ -907,15 +907,32 @@ let print_mod_view_header conf can_edit (mode : Adef.encoded_string)
   Output.printf conf {|</h1>%s
 </div>|} edit_btn
 
-let print_mod_view_form_start conf can_edit mode fname has_v v s is_new_note =
-  Output.printf conf {|<form method="POST" action="%s">|} conf.command;
+let print_mod_view_form_start conf can_edit mode fname has_v v stored
+    is_new_note =
+  Output.printf conf {|<form method="POST" action="%s" id="updnotes">|}
+    conf.command;
   Util.hidden_env conf;
   if can_edit then Util.hidden_input conf "m" ("MOD_" ^<^ mode ^>^ "_OK");
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
   if fname <> "" && not is_new_note then
     Util.hidden_input conf "f" (Mutil.encode fname);
-  if can_edit then
-    Util.hidden_input conf "digest" (Mutil.digest s |> Mutil.encode)
+  if can_edit then (
+    Util.hidden_input conf "digest" (Mutil.digest stored |> Mutil.encode);
+    if not is_new_note then
+      Output.printf conf {|<input type="hidden" name="snapshot" value="%s">|}
+        (UpdateConflict.note_snapshot conf fname stored))
+
+let print_review conf (mode : Adef.encoded_string) review =
+  let str s = Templ.Vstring (Adef.encoded s) in
+  let env =
+    Templ.Env.(
+      empty
+      |> add "review" (str (Util.escape_html review :> string))
+      |> add "snapshot" (str "on")
+      |> add "kind" (str (if (mode :> string) = "NOTES" then "note" else ""))
+      |> add "modify" (str ("MOD_" ^ (mode :> string))))
+  in
+  Templ.output_simple conf env "upd_review"
 
 let print_new_note_input conf =
   let note_lbl = Utf8.capitalize_fst (transl_nth conf "note/notes" 0) in
@@ -972,8 +989,10 @@ let print_mod_view_editor conf can_edit sub_part is_new_note =
 </div>
 </form>|}
 
-let print_mod_view_page conf can_edit mode fname title env s =
+let print_mod_view_page ?stored ?(review = "") conf can_edit mode fname title
+    env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
+  let stored = Option.value ~default:s stored in
   let mode_pref = Mutil.encode (if can_edit then "MOD_" else "VIEW_") in
   let has_v, v =
     match p_getint conf.env "v" with Some v -> (true, v) | None -> (false, 0)
@@ -993,7 +1012,8 @@ let print_mod_view_page conf can_edit mode fname title env s =
     mode sfn has_v v title;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^^^ mode) sfn v has_next;
-  print_mod_view_form_start conf can_edit mode fname has_v v s is_new_note;
+  if can_edit && not is_new_note then print_review conf mode review;
+  print_mod_view_form_start conf can_edit mode fname has_v v stored is_new_note;
   if is_new_note then print_new_note_input conf;
   print_mod_view_editor conf can_edit sub_part is_new_note;
   Output.print_sstring conf {|</div>|};
@@ -1110,7 +1130,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   print_sub_part conf wi ~has_next conf.wizard edit_mode fname v lines;
   Hutil.trailer conf
 
-let do_mod_ok conf edit_mode fname read_string commit =
+let mod_ok conf edit_mode fname read_string commit ~conflict =
   let new_fname = Util.p_getenv conf.env "new_f" in
   let fname =
     match new_fname with
@@ -1126,7 +1146,7 @@ let do_mod_ok conf edit_mode fname read_string commit =
       if Sys.file_exists new_fn_path then Update.error_same_file conf
   | _ -> ());
   match edit_mode fname with
-  | Some _ ->
+  | Some mode ->
       let old_string =
         let e, s = read_string fname in
         List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
@@ -1139,26 +1159,64 @@ let do_mod_ok conf edit_mode fname read_string commit =
       let digest =
         match Util.p_getenv conf.env "digest" with Some s -> s | None -> ""
       in
-      if digest <> Mutil.digest old_string then Update.error_digest conf
-      else begin
+      if
+        digest <> Mutil.digest old_string
+        || Option.is_some (Util.p_getenv conf.env "return")
+      then (
+        conflict mode fname old_string sub_part;
+        None)
+      else
         let s =
           match Util.p_getint conf.env "v" with
           | Some v -> insert_sub_part old_string v sub_part
           | None -> sub_part
         in
-        if s <> old_string then commit fname s
-      end;
-      fname
+        if s <> old_string then commit fname s;
+        Some fname
   | None ->
       Hutil.incorrect_request conf;
-      ""
+      Some ""
+
+let do_mod_ok conf edit_mode fname read_string commit =
+  Option.value ~default:""
+    (mod_ok conf edit_mode fname read_string commit ~conflict:(fun _ _ _ _ ->
+         Update.error_digest conf))
+
+let print_conflict conf mode fname stored entry =
+  let o =
+    UpdateConflict.note_of_snapshot conf fname
+      (Option.value ~default:"" (Util.p_getenv conf.env "snapshot"))
+  in
+  let entry =
+    match Util.p_getint conf.env "v" with
+    | Some v -> insert_sub_part (Option.value ~default:stored o) v entry
+    | None -> entry
+  in
+  let merged, review = UpdateConflict.merge_note conf o stored entry in
+  Notif.warning ~mode:Notif.Dismissible
+    (Utf8.capitalize_fst (transl_nth conf "edit conflict" 0));
+  let conf =
+    Notif.inject_pending { conf with env = List.remove_assoc "v" conf.env }
+  in
+  let title _ =
+    if fname = "" then
+      Output.print_sstring conf (Utf8.capitalize_fst (transl conf "base notes"))
+    else Output.print_string conf (Util.escape_html fname)
+  in
+  print_mod_view_page ~stored ~review conf true (Adef.encoded mode) fname title
+    [] merged
 
 let print_mod_ok conf wi edit_mode fname read_string commit string_filter
     title_is_1st =
-  let fname_resolved = do_mod_ok conf edit_mode fname read_string commit in
-  match edit_mode fname_resolved with
-  | Some em ->
-      let _, s = read_string fname_resolved in
-      let sub_part = string_filter s in
-      print_ok conf wi em fname_resolved title_is_1st sub_part
-  | None -> Hutil.incorrect_request conf
+  match
+    mod_ok conf edit_mode fname read_string commit
+      ~conflict:(print_conflict conf)
+  with
+  | Some fname_resolved -> (
+      match edit_mode fname_resolved with
+      | Some em ->
+          let _, s = read_string fname_resolved in
+          let sub_part = string_filter s in
+          print_ok conf wi em fname_resolved title_is_1st sub_part
+      | None -> Hutil.incorrect_request conf)
+  | None -> ()

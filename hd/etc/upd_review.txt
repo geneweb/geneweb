@@ -1,0 +1,26 @@
+<!-- $Id: upd_review.txt v7.1 16/11/2026 $ -->
+%( Changes saved in a record while its form was open, and differences to
+   check, filled by js/updateConflict.js from the review of UpdateConflict;
+   the script also watches the record of the open form (m=CHK_DIGEST).
+   Included by the person and family forms (upd_utils.txt) and by the note
+   forms (Wiki), which bind review, snapshot, kind (ind, fam, note, or empty
+   for no watch) and modify (the request of the form). %)
+%if;(review!="")
+  <div id="review" class="alert alert-warning" role="alert"
+    data-review="%review;" data-kept="[*edit conflict]1"
+    data-red="[*edit conflict]10" data-reread="[*edit conflict]11"
+    data-families="[*edit conflict]12" data-saved="[*edit conflict]2"
+    data-check="[*edit conflict]3" data-mine="[*edit conflict]4"
+    data-current="[*edit conflict]14" data-hand="[*edit conflict]20"
+    data-restore="[*edit conflict]5" data-restore-saved="[*edit conflict]13"
+    data-checked="[*edit conflict]6" data-pending="[*edit conflict]7"
+    data-nosnap="[*edit conflict]9" data-colon="[:]">
+    <h5 class="alert-heading mb-0">[*edit conflict]0</h5>
+  </div>
+%end;
+%if;(review!="" or snapshot!="")
+  <script defer src="%etc_prefix;js/updateConflict.js?hash=%apply;hash%with;%etc_prefix;js/updateConflict.js%end;"
+    data-prefix="%prefix;" data-kind="%kind;" data-modify="%modify;"
+    data-changed="[*edit conflict]15" data-reload="[*edit conflict]16"
+    data-merge="[*edit conflict]17"></script>
+%end;

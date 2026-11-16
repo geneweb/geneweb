@@ -4,6 +4,15 @@ let print conf base =
   let salt = Option.get conf.secret_salt in
   let digest =
     match Util.p_getenv conf.env "t" with
+    | Some "note" ->
+        let f = Option.value ~default:"" (Util.p_getenv conf.env "f") in
+        if f = "" || NotesLinks.check_file_name f <> None then
+          let env, s = Notes.read_notes base f in
+          Some
+            (Mutil.digest
+               (List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env
+               ^ s))
+        else None
     | Some "fam" ->
         Option.map
           (fun (ifam, _) ->

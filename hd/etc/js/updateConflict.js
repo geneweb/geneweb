@@ -1,19 +1,22 @@
-// Edit conflicts of the person and family forms (UpdateConflict,
-// upd_utils.txt). While a form is open, checks on return to its tab and every
-// ten minutes whether its record was saved meanwhile (m=CHK_DIGEST), and then
-// offers to reload the form or to add the changes to the entry. On a form
-// redisplayed on an edit conflict, lists the changes saved in the record and
-// the differences to check, marks the fields of these differences, and holds
-// the form until each one is checked.
+// Edit conflicts of the person, family and note forms (UpdateConflict,
+// upd_review.txt). While a form is open, checks on return to its tab and
+// every ten minutes whether its record was saved meanwhile (m=CHK_DIGEST),
+// and then offers to reload the form or to add the changes to the entry. On a
+// form redisplayed on an edit conflict, lists the changes saved in the record
+// and the differences to check, marks the fields of these differences, and
+// holds the form until each one is checked.
 (() => {
   'use strict';
   const d = document.currentScript.dataset;
-  const form = document.getElementById('updind') || document.getElementById('updfam');
+  const form = document.getElementById('updind') || document.getElementById('updfam')
+    || document.getElementById('updnotes');
   if (!form) return;
 
   const field = name => form.elements.namedItem(name);
-  if (field('snapshot') && field('digest') && field('i')) {
-    const url = d.prefix + 'm=CHK_DIGEST&t=' + d.kind + '&i=' + encodeURIComponent(field('i').value)
+  const key = d.kind === 'note' ? 'f' : 'i';
+  const id = () => (field(key) ? field(key).value : '');
+  if (d.kind && field('snapshot') && field('digest') && (d.kind === 'note' || field('i'))) {
+    const url = d.prefix + 'm=CHK_DIGEST&t=' + d.kind + '&' + key + '=' + encodeURIComponent(id())
       + '&digest=' + encodeURIComponent(field('digest').value);
     const entry = () => new URLSearchParams(new FormData(form)).toString();
     let initial = entry();
@@ -44,8 +47,7 @@
           HTMLFormElement.prototype.submit.call(form);
         } else {
           const ip = field('ip');
-          location.href = d.prefix + (d.kind === 'fam' ? 'm=MOD_FAM' : 'm=MOD_IND')
-            + '&i=' + encodeURIComponent(field('i').value)
+          location.href = d.prefix + 'm=' + d.modify + '&' + key + '=' + encodeURIComponent(id())
             + (ip && ip.value ? '&ip=' + encodeURIComponent(ip.value) : '');
         }
       });
@@ -80,7 +82,7 @@
   const line = (parent, label, text) => {
     const div = add(parent, 'div', 'small');
     add(div, 'span', 'text-body-secondary', label + t.colon + ' ');
-    return add(div, 'span', '', text || '—');
+    return add(div, 'span', 'review-value', text || '—');
   };
   const norm = v => (v || '').replace(/\r\n/g, '\n');
   const shows = pairs => pairs.every(([name, value]) => {
@@ -97,14 +99,50 @@
     if (input.tagName === 'SELECT') return input.selectedOptions[0]?.textContent.trim() || '';
     return input.value;
   }).filter(Boolean).join(', ') || '—';
+  const changed = target => {
+    target.dispatchEvent(new Event('input', { bubbles: true }));
+    target.dispatchEvent(new Event('change', { bubbles: true }));
+  };
   const fill = pairs => pairs.forEach(([name, value]) => {
     const input = form.elements.namedItem(name);
     if (!input) return;
     input.value = value;
-    const target = input instanceof RadioNodeList ? input[0] : input;
-    target.dispatchEvent(new Event('input', { bubbles: true }));
-    target.dispatchEvent(new Event('change', { bubbles: true }));
+    changed(input instanceof RadioNodeList ? input[0] : input);
   });
+  // A difference of input values, or of lines in a text area: the lines of
+  // each side come with their unchanged neighbours, to be found and swapped.
+  const view = (c, fields) => {
+    if (!fields.length) return null;
+    if (c.text) {
+      const area = fields[0];
+      const { saved, mine } = c.text;
+      const swap = (from, to) => {
+        const value = norm(area.value);
+        if (!value.includes(from)) return;
+        area.value = value.replace(from, () => to);
+        changed(area);
+      };
+      return {
+        state: () => {
+          const value = norm(area.value);
+          const onSaved = value.includes(saved);
+          const onMine = value.includes(mine);
+          if (onSaved && onMine) return saved.includes(mine) ? 'saved' : 'mine';
+          return onSaved ? 'saved' : onMine ? 'mine' : 'edited';
+        },
+        toSaved: () => swap(mine, saved),
+        toMine: () => swap(saved, mine),
+        current: null,
+      };
+    }
+    if (!c.restore.length) return null;
+    return {
+      state: () => (shows(c.saved) ? 'saved' : shows(c.restore) ? 'mine' : 'edited'),
+      toSaved: () => fill(c.saved),
+      toMine: () => fill(c.restore),
+      current: () => current(c.restore),
+    };
+  };
 
   add(box, 'p', 'mt-2 mb-0', review.kind === 'families' ? t.families
     : t.kept + ' ' + (review.conflicts.length ? t.red : t.reread));
@@ -116,9 +154,9 @@
     review.changes.forEach(c => {
       const item = add(list, 'li');
       add(item, 'span', 'fw-bold', c.what + t.colon + ' ');
-      if (c.before) add(item, 'del', 'text-body-secondary', c.before);
+      if (c.before) add(item, 'del', 'text-body-secondary review-value', c.before);
       if (c.before && c.after) item.append(' → ');
-      if (c.after) add(item, 'ins', '', c.after);
+      if (c.after) add(item, 'ins', 'review-value', c.after);
     });
   }
 
@@ -132,16 +170,16 @@
     const mine = line(row, t.mine, c.mine);
     const edited = line(row, t.current, '');
     edited.parentNode.classList.add('d-none');
+    const hand = add(row, 'div', 'small fst-italic d-none', t.hand);
     const actions = add(row, 'div', 'd-flex flex-wrap align-items-center gap-2 mt-1');
-    const buttons = [];
-    if (c.restore.length && fields.length) {
-      [[t.restoreSaved, c.saved], [t.restore, c.restore]].forEach(([text, pairs]) => {
+    const v = view(c, fields);
+    const buttons = v ? [[t.restoreSaved, 'saved', v.toSaved], [t.restore, 'mine', v.toMine]]
+      .map(([text, state, apply]) => {
         const button = add(actions, 'button', 'btn btn-sm btn-outline-primary', text);
         button.type = 'button';
-        button.addEventListener('click', () => fill(pairs));
-        buttons.push([button, pairs]);
-      });
-    }
+        button.addEventListener('click', apply);
+        return [button, state];
+      }) : [];
     const check = add(actions, 'div', 'form-check mb-0 ms-2');
     const input = add(check, 'input', 'form-check-input');
     input.type = 'checkbox';
@@ -153,16 +191,18 @@
     });
     const strike = ['text-decoration-line-through', 'opacity-50'];
     const refresh = () => {
-      if (!buttons.length) return;
-      const onSaved = shows(c.saved);
-      const onMine = shows(c.restore);
-      buttons.forEach(([button, pairs]) => { button.disabled = shows(pairs); });
+      if (!v) return;
+      const state = v.state();
+      // Lines edited by hand can no longer be found to be swapped.
+      const blocked = state === 'edited' && !v.current;
+      buttons.forEach(([button, shown]) => { button.disabled = blocked || state === shown; });
+      hand.classList.toggle('d-none', !blocked);
       strike.forEach(s => {
-        saved.classList.toggle(s, !onSaved);
-        mine.classList.toggle(s, !onMine);
+        saved.classList.toggle(s, state !== 'saved');
+        mine.classList.toggle(s, state !== 'mine');
       });
-      edited.parentNode.classList.toggle('d-none', onSaved || onMine);
-      if (!onSaved && !onMine) edited.textContent = current(c.restore);
+      edited.parentNode.classList.toggle('d-none', state !== 'edited' || !v.current);
+      if (state === 'edited' && v.current) edited.textContent = v.current();
     };
     refresh();
     return { input, refresh };

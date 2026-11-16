@@ -17,29 +17,12 @@
   <a class="nav-item nav-link p-0" href="#anchor" title="label"><i class="fa fa-icon fa-fw" aria-hidden="true"></i>%if;("extra"!="")<i class="fa fa-extra" aria-hidden="true"></i>%end;<span class="d-none d-bp-inline-flex ms-1">label</span></a>
 %end;
 
-%( Changes saved in the record while the form was open, and differences to
-   check: filled by js/updateConflict.js from the review of UpdateConflict,
-   which also watches the record of an open form (m=CHK_DIGEST). %)
+%( Review of an edit conflict and watch of the record of the form: see
+   upd_review.txt. %)
 %define;review()
-  %if;(review!="")
-    <div id="review" class="alert alert-warning" role="alert"
-      data-review="%review;" data-kept="[*edit conflict]1"
-      data-red="[*edit conflict]10" data-reread="[*edit conflict]11"
-      data-families="[*edit conflict]12" data-saved="[*edit conflict]2"
-      data-check="[*edit conflict]3" data-mine="[*edit conflict]4"
-      data-current="[*edit conflict]14"
-      data-restore="[*edit conflict]5" data-restore-saved="[*edit conflict]13"
-      data-checked="[*edit conflict]6" data-pending="[*edit conflict]7"
-      data-nosnap="[*edit conflict]9" data-colon="[:]">
-      <h5 class="alert-heading mb-0">[*edit conflict]0</h5>
-    </div>
-  %end;
-  %if;(review!="" or snapshot!="")
-    <script defer src="%etc_prefix;js/updateConflict.js?hash=%apply;hash%with;%etc_prefix;js/updateConflict.js%end;"
-      data-prefix="%prefix;" data-kind="%if;is_upd_ind;ind%else;fam%end;"
-      data-changed="[*edit conflict]15" data-reload="[*edit conflict]16"
-      data-merge="[*edit conflict]17"></script>
-  %end;
+  %let;kind;%if;is_upd_ind;ind%else;fam%end;%in;
+  %let;modify;%if;is_upd_ind;MOD_IND%else;MOD_FAM%end;%in;
+  %include;upd_review
 %end;
 
 %define;card_header(xx,yy)

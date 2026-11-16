@@ -217,6 +217,14 @@
   every ten minutes, whether its record was saved meanwhile by another
   form. It then offers to reload the form, or, once the entry is
   started, to add the changes to it at once, as on saving.
+- The note forms (notes of the base, other notes and wizard notes) are
+  no longer refused either when the note was saved meanwhile, by
+  another form or by the renaming of a person that it links: the form is
+  displayed again on the whole note, the entry merged line by line with
+  the text saved meanwhile, and the lines changed on both sides are to
+  be checked as in the person and family forms. A form opened on a
+  section of a note is displayed again on the whole note. The note
+  forms of the base are watched like the person and family forms.
 - A person form is no longer refused with "the base has changed" when,
   meanwhile, the form of another person added or removed it as a
   witness, a godparent or a relation.

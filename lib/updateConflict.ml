@@ -71,6 +71,7 @@ type conflict = {
   mine : string;
   restore : (string * string) list;
   saved : (string * string) list;
+  text : (string * string * string) option;
 }
 
 type change = { field : string; before : string; after : string }
@@ -83,9 +84,10 @@ type review = {
 let note_change r field before after =
   r.changes <- { field; before; after } :: r.changes
 
-let note_conflict r ?(selector = "") ?(restore = []) ?(saved = []) what base
-    mine =
-  r.conflicts <- { what; selector; base; mine; restore; saved } :: r.conflicts
+let note_conflict r ?(selector = "") ?(restore = []) ?(saved = []) ?text what
+    base mine =
+  r.conflicts <-
+    { what; selector; base; mine; restore; saved; text } :: r.conflicts
 
 let merge r ?(selector = "") ?(restore = fun _ -> []) ~what ~text eq o a b =
   (match o with
@@ -136,6 +138,16 @@ let review_json ~kind known r =
                       ("mine", str c.mine);
                       ("restore", pairs c.restore);
                       ("saved", pairs c.saved);
+                      ( "text",
+                        match c.text with
+                        | Some (name, saved, mine) ->
+                            `Assoc
+                              [
+                                ("name", str name);
+                                ("saved", str saved);
+                                ("mine", str mine);
+                              ]
+                        | None -> `Null );
                     ])
                 r.conflicts) );
        ])
@@ -668,3 +680,82 @@ let added_families conf base ip seen =
           (Util.gen_person_text ~html:false conf base sp :> string))
     families;
   review_json ~kind:"families" true r
+
+let note_snapshot conf fname s = seal conf "note" (fname, s)
+
+let note_of_snapshot conf fname s =
+  match (unseal conf "note" s : (string * string) option) with
+  | Some (f, s) when String.equal f fname -> Some s
+  | Some _ | None -> None
+
+let kept o x =
+  let d_o, d_x = Difference.f o x in
+  let m = Array.make (Array.length o) (-1) in
+  let rec loop i j =
+    if i < Array.length o then
+      if d_o.(i) then loop (i + 1) j
+      else if d_x.(j) then loop i (j + 1)
+      else (
+        m.(i) <- j;
+        loop (i + 1) (j + 1))
+  in
+  loop 0 0;
+  m
+
+let merge_note conf o a b =
+  let r = { changes = []; conflicts = [] } in
+  let lines s = Array.of_list (String.split_on_char '\n' s) in
+  let al = lines a and bl = lines b in
+  let ol = match o with Some o -> lines o | None -> al in
+  let ma = kept ol al and mb = kept ol bl in
+  let sync =
+    List.filter_map Fun.id
+      (List.init (Array.length ol) (fun i ->
+           if ma.(i) >= 0 && mb.(i) >= 0 then Some (i, ma.(i), mb.(i)) else None))
+  in
+  let sub l i j = Array.to_list (Array.sub l i (j - i)) in
+  let text l = String.concat "\n" l in
+  let where first count =
+    if count <= 1 then
+      Printf.sprintf "%s %d" (label conf "edit conflict" 18) first
+    else
+      Printf.sprintf "%s %d–%d"
+        (label conf "edit conflict" 19)
+        first
+        (first + count - 1)
+  in
+  let rec loop (oi, ai, bi) acc n points =
+    let (oj, aj, bj), rest =
+      match points with
+      | p :: rest -> (p, Some rest)
+      | [] -> ((Array.length ol, Array.length al, Array.length bl), None)
+    in
+    let oc = sub ol oi oj and ac = sub al ai aj and bc = sub bl bi bj in
+    let chunk =
+      if ac = bc then ac
+      else if Option.is_some o && oc = ac then bc
+      else if Option.is_some o && oc = bc then ac
+      else
+        let around l =
+          let l =
+            match rest with
+            | Some _ -> List.rev_append (List.rev l) [ al.(aj) ]
+            | None -> l
+          in
+          text (match acc with line :: _ -> line :: l | [] -> l)
+        in
+        note_conflict r ~selector:{|[name="notes"]|}
+          ~text:("notes", around ac, around bc)
+          (where (n + 1) (List.length ac))
+          (text ac) (text bc);
+        ac
+    in
+    if Option.is_some o && oc <> ac then
+      note_change r (where (n + 1) (List.length ac)) (text oc) (text ac);
+    let acc = List.rev_append chunk acc and n = n + List.length chunk in
+    match rest with
+    | Some rest -> loop (oj + 1, aj + 1, bj + 1) (al.(aj) :: acc) (n + 1) rest
+    | None ->
+        (text (List.rev acc), review_json ~kind:"merge" (Option.is_some o) r)
+  in
+  loop (0, 0, 0) [] 0 sync
