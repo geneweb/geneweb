@@ -930,6 +930,13 @@ a[id^="p_"]:target {
   border-color: var(--bs-primary);
 }
 
+.book-n
+{
+  font-size: .875em;
+  font-variant-numeric: tabular-nums;
+  color: var(--bs-secondary-color);
+}
+
 .sub-char.btn:hover, .sub-char.btn:focus-visible
 {
   outline: 2px solid #fff;

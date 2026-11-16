@@ -220,7 +220,10 @@
       const head = li.previousElementSibling;
       const other = document.getElementById('k' + data.key);
       if (data.place === null || (other && other !== li)) {
-        if (other) other.querySelector('a[data-entry]').dataset.n = data.records;
+        if (other) {
+          other.querySelector('a[data-entry]').dataset.n = data.records;
+          other.querySelector('.book-n').textContent = data.records;
+        }
         li.remove();
       } else if (this.insert(li, data.place)) {
         li.id = 'k' + data.key;
@@ -229,6 +232,7 @@
         a.href = u;
         a.dataset.entry = data.entry;
         a.dataset.n = data.records;
+        li.querySelector('.book-n').textContent = data.records;
         if (data.after === data.entry) delete a.dataset.v;
         else a.dataset.v = data.after;
         (a.nextElementSibling ?? a).textContent = data.entry;
