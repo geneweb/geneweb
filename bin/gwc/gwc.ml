@@ -82,9 +82,9 @@ let iterator_gwo_files bar inputs file_info =
     in
     next
 
-let generate_database ~no_warn ~bdir bar gwo_files =
+let generate_database ~no_warn ~nldb ~verbose ~progress ~bdir bar gwo_files =
   let iterator = iterator_gwo_files bar gwo_files in
-  match Db1link.link ~no_warn iterator bdir with
+  match Db1link.link ~no_warn ~nldb ~verbose ~progress iterator bdir with
   | exception Db1link.Critical_import_error msg ->
       Fmt.epr "CRITICAL ERROR: %s@." msg;
       exit 2
@@ -120,6 +120,7 @@ let set_base_dir s = bases_dir := Some s
 let just_comp = ref false
 let kill_gwo = ref false
 let no_warn = ref false
+let no_nldb = ref false
 let ngrams_arg = ref None
 let reindex = ref false
 let prog = ref false
@@ -219,6 +220,9 @@ let speclist =
       "<bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or \
        '500')" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
+    ( "-nonldb",
+      Arg.Set no_nldb,
+      " Do not build the notes links database (run update_nldb later)" );
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
@@ -385,7 +389,8 @@ let () =
     let (), duration =
       with_timer @@ fun () ->
       ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter @@ fun bar ->
-      generate_database ~no_warn:!no_warn ~bdir bar gwo_files
+      generate_database ~no_warn:!no_warn ~nldb:(not !no_nldb)
+        ~verbose:!Gwcomp.verbose ~progress:!prog ~bdir bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
     if !kill_gwo then cleanup gwo_files)
