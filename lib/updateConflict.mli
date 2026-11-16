@@ -43,3 +43,51 @@ val family_of_snapshot :
   * Update.key gen_descend)
   option
 (** Same as {!person_of_snapshot} for a family sealed by {!family_snapshot}. *)
+
+val merge_person :
+  Config.config ->
+  snapshot:string ->
+  (Driver.iper, Update.key, string) gen_person ->
+  (Driver.iper, Update.key, string) gen_person ->
+  (Driver.iper, Update.key, string) gen_person * string
+(** [merge_person conf ~snapshot a b] merges the person [b], posted by a form
+    displayed on the state sealed in [snapshot], with the person [a] as stored
+    now, field by field and event by event ({!Event.align_pevents}). A field
+    changed on one side only takes the value of that side; a field changed on
+    both sides to different values is a conflict, which keeps the value of [a].
+    Without a readable snapshot, any difference is a conflict. The fields that
+    the form derives from the events (birth, baptism, death and burial dates,
+    places, notes and sources) are merged without conflict, the form deriving
+    them again.
+
+    Returns the merged person and its review in JSON:
+    [{"kind", "snapshot", "changes", "conflicts"}], where [kind] is ["merge"],
+    [snapshot] tells whether the snapshot was read, [changes] lists the fields
+    changed since the snapshot ([what], [before], [after]) and [conflicts] the
+    differences to check ([what], [base], [mine], the [selector] of the inputs
+    of the field in the form, and the pairs of input name and value giving back
+    the value of [b], [restore], or of [a], [saved]). *)
+
+val merge_family :
+  Config.config ->
+  snapshot:string ->
+  (Update.key, Driver.ifam, string) gen_family
+  * Update.key Adef.gen_couple
+  * Update.key gen_descend ->
+  (Update.key, Driver.ifam, string) gen_family
+  * Update.key Adef.gen_couple
+  * Update.key gen_descend ->
+  ((Update.key, Driver.ifam, string) gen_family
+  * Update.key Adef.gen_couple
+  * Update.key gen_descend)
+  * string
+(** Same as {!merge_person} for a family: its events are aligned by
+    {!Event.align_fevents}, and its children are merged as a set, keeping the
+    children added and dropping those removed on either side. *)
+
+val added_families :
+  Config.config -> Driver.base -> Driver.iper -> int -> string
+(** [added_families conf base ip seen] is the review, in the JSON of
+    {!merge_person} with the [kind] ["families"], of the families of [ip] beyond
+    its [seen] first ones: those added since a form creating a family of [ip]
+    was displayed. *)

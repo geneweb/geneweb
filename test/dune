@@ -29,7 +29,7 @@
   notes_corpus_test
   update_order_test
   update_conflict_test)
- (libraries alcotest geneweb geneweb.oidc fmt unix))
+ (libraries alcotest geneweb geneweb.oidc fmt unix yojson))
 
 (test
  (package geneweb)

@@ -17,6 +17,25 @@
   <a class="nav-item nav-link p-0" href="#anchor" title="label"><i class="fa fa-icon fa-fw" aria-hidden="true"></i>%if;("extra"!="")<i class="fa fa-extra" aria-hidden="true"></i>%end;<span class="d-none d-bp-inline-flex ms-1">label</span></a>
 %end;
 
+%( Changes saved in the record while the form was open, and differences to
+   check: filled by js/updateConflict.js from the review of UpdateConflict. %)
+%define;review()
+  %if;(review!="")
+    <div id="review" class="alert alert-warning" role="alert"
+      data-review="%review;" data-kept="[*edit conflict]1"
+      data-red="[*edit conflict]10" data-reread="[*edit conflict]11"
+      data-families="[*edit conflict]12" data-saved="[*edit conflict]2"
+      data-check="[*edit conflict]3" data-mine="[*edit conflict]4"
+      data-current="[*edit conflict]14"
+      data-restore="[*edit conflict]5" data-restore-saved="[*edit conflict]13"
+      data-checked="[*edit conflict]6" data-pending="[*edit conflict]7"
+      data-nosnap="[*edit conflict]9" data-colon="[:]">
+      <h5 class="alert-heading mb-0">[*edit conflict]0</h5>
+    </div>
+    <script defer src="%etc_prefix;js/updateConflict.js?hash=%apply;hash%with;%etc_prefix;js/updateConflict.js%end;"></script>
+  %end;
+%end;
+
 %define;card_header(xx,yy)
   <h3 class="card-header pt-2 pb-1 text-center" id="xx">[*yy]1</h3>
 %end;

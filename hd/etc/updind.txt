@@ -398,6 +398,7 @@
   <div class="row">
     %apply;nav()
   </div>
+  %apply;review()
   <div class="row">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">

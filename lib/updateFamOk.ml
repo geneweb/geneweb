@@ -1182,21 +1182,29 @@ let print_add o_conf base =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
   let redisp = Option.is_some (p_getenv conf.env "return") in
+  let ip = Option.map Driver.Iper.of_string (p_getenv conf.env "ip") in
   let digest =
-    match p_getenv conf.env "ip" with
+    match ip with
     | Some ip ->
-        string_of_int
-          (Array.length
-             (Driver.get_family (Driver.poi base (Driver.Iper.of_string ip))))
+        string_of_int (Array.length (Driver.get_family (Driver.poi base ip)))
     | None -> ""
   in
   let sdigest = get conf "digest" in
-  if digest <> "" && sdigest <> "" && digest <> sdigest then
-    Update.error_digest conf
+  let seen = int_of_string_opt sdigest in
+  if digest <> "" && Option.is_some seen && digest <> sdigest then (
+    Notif.warning ~mode:Notif.Dismissible
+      (Utf8.capitalize_fst (transl_nth conf "edit conflict" 0));
+    UpdateFam.print_update_fam
+      ~grandparents:(reconstitute_grandparents conf)
+      ~review:
+        (UpdateConflict.added_families conf base (Option.get ip)
+           (Option.get seen))
+      (Notif.inject_pending conf)
+      base (sfam, scpl, sdes) digest)
   else if ext || redisp then
     UpdateFam.print_update_fam
       ~grandparents:(reconstitute_grandparents conf)
-      conf base (sfam, scpl, sdes) ""
+      conf base (sfam, scpl, sdes) digest
   else if forbidden_disconnected conf scpl sdes then
     print_error_disconnected conf
   else
@@ -1370,7 +1378,21 @@ let print_mod_aux conf base callback =
       | None, None ->
           let sfam, sdes = strip_family sfam sdes in
           callback sfam scpl sdes
-  else Update.error_digest conf
+  else
+    let fcd, review =
+      let sfam, sdes = strip_family sfam sdes in
+      UpdateConflict.merge_family conf
+        ~snapshot:(Option.value ~default:"" (p_getenv conf.env "snapshot"))
+        ini_sfam (sfam, scpl, sdes)
+    in
+    Notif.warning ~mode:Notif.Dismissible
+      (Utf8.capitalize_fst (transl_nth conf "edit conflict" 0));
+    UpdateFam.print_update_fam
+      ~grandparents:(reconstitute_grandparents conf)
+      ~snapshot:(UpdateConflict.family_snapshot conf ini_sfam)
+      ~review
+      (Notif.inject_pending conf)
+      base fcd digest
 
 let family_structure base ifam =
   let fam = Driver.foi base ifam in
