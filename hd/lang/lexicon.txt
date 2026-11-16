@@ -4473,6 +4473,17 @@ pl: Ta zmiana dotyczy %d rekordów bazy: zatwierdź ponownie, aby potwierdzić.
 pt: Esta alteração afeta %d fichas da base: valide de novo para confirmar.
 sv: Denna ändring påverkar %d poster i databasen: bekräfta igen för att fortsätta.
 
+    book reference sources
+de: mit Referenzquellen abgleichen/Gemeinden/Weiler und Flurnamen/keine Übereinstimmung in den Referenzquellen/wie in der Eingabe/unterscheidet sich nur in Akzenten, Groß- und Kleinschreibung oder Satzzeichen/in der Eingabe ersetzen
+en: compare with reference sources/municipalities/hamlets and named places/no match in the reference sources/same as the entry/differs only in accents, case or punctuation/replace in the entry
+es: cotejar con las fuentes de referencia/comunas/aldeas y parajes/ninguna coincidencia en las fuentes de referencia/igual que la entrada/solo difiere en acentos, mayúsculas o puntuación/reemplazar en la entrada
+fr: confronter aux référentiels/communes/lieux-dits/aucune correspondance dans les référentiels/identique à la saisie/ne diffère que par les accents, la casse ou la ponctuation/remplacer dans la saisie
+it: confrontare con le fonti di riferimento/comuni/località/nessuna corrispondenza nelle fonti di riferimento/uguale all’inserimento/differisce solo per accenti, maiuscole o punteggiatura/sostituire nell’inserimento
+nl: vergelijken met referentiebronnen/gemeenten/gehuchten en veldnamen/geen overeenkomst in de referentiebronnen/gelijk aan de invoer/verschilt alleen in accenten, hoofdletters of leestekens/in de invoer vervangen
+pl: porównaj ze źródłami referencyjnymi/gminy/przysiółki i nazwy terenowe/brak dopasowania w źródłach referencyjnych/tak jak we wpisie/różni się tylko akcentami, wielkością liter lub interpunkcją/zastąp we wpisie
+pt: confrontar com as fontes de referência/comunas/lugares/nenhuma correspondência nas fontes de referência/igual à introdução/difere apenas nos acentos, maiúsculas ou pontuação/substituir na introdução
+sv: jämför med referenskällor/kommuner/byar och ortnamn/ingen träff i referenskällorna/samma som inmatningen/skiljer sig bara i accenter, versaler eller skiljetecken/ersätt i inmatningen
+
     book of %s
 co: libru di i %s
 de: %s-Lexikon
@@ -25560,40 +25571,6 @@ fr: largeur
 pt: largura
 sv: bredd
 tr: genişlik
-
-    wikidata
-af: soek %s op die vrye en oop kennisbasis Wikidata
-bg: търсене на %s върху свободната и отворена знание база Wikidata
-br: klask %s war an diazez evit an diazez eus an doare bennak Wikidata
-ca: cerca %s a la base de coneixements lliure i oberta Wikidata
-co: ricercà %s nant’à a basa di cunnuscenza libera è di rigalu Wikidata
-cs: hledat %s na volné a otevřené znalostní bázi Wikidata
-da: søg %s på den frie og åbne vidensbase Wikidata
-de: suche %s in die freie und offene Wissensdatenbank Wikidata
-en: search %s on the free and open knowledge base Wikidata
-eo: serĉi %s sur la libera kaj malfermita scienca datumbazo Wikidata
-es: buscar %s en la base de conocimientos libre y abierta Wikidata
-et: otsi %s vaba ja avatud teadmiste alusel Wikidata
-fi: hae %s vapaasta ja avoimesta tietämyskannasta Wikidata
-fr: rechercher %s sur la base de connaissances libre et gratuite Wikidata
-he: חיפוש %s בבסיס הידע החופשי והפתוח של ויקידאטה
-is: leitaðu að %s á fríu og opið kunnskapsgrundvelli Wikidata
-it: cerca %s sulla base di conoscenze libera e aperta di Wikidata
-lt: ieškokite %s laisvoje ir atviroje žinių bazėje Wikidata
-lv: meklē %s uz brīvo un atvērto zināšanu bāzi Wikidata
-nl: zoek %s op de vrije en open kennisbasis Wikidata
-no: søk %s på den frie og åpne kunnskapsbasen Wikidata
-oc: recèrca %s sus la basa de coneissenças liura e dubèrta Wikidata
-pl: szukaj %s w wolnej i otwartej bazie wiedzy Wikidata
-pt: pesquisar %s na base de conhecimento livre e aberta do Wikidata
-pt-br: pesquisar %s na base de conhecimento livre e aberta do Wikidata
-ro: căutare %s pe baza de cunoștințe liberă și deschisă Wikidata
-ru: поиск %s в свободной и открытой базе знаний Wikidata
-sk: hľadať %s na voľnej a otvorenej znalostnej databáze Wikidata
-sl: iskanje %s na prosti in odprti bazi znanja Wikidata
-sv: sök %s på den fria och öppna kunskapsdatabasen Wikidata
-tr: %s’yi özgür ve açık bilgi tabanında arayın Wikidata
-zh: 在自由和开放的知识库Wikidata上搜索%s
 
     will
 co: testamentu
