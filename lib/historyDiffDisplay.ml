@@ -889,59 +889,22 @@ let print_foreach conf base print_ast _eval_expr =
     in
     loop bef.gen_f bef.gen_c aft.gen_f aft.gen_c
   and print_foreach_fevent env xx al =
-    let rec loop m_auth bef_fevents aft_fevents =
-      match (bef_fevents, aft_fevents) with
-      | [], [] -> ()
-      | [], aft_evt :: l ->
-          let env =
-            Templ.Env.add "fevent" (Vfevent (None, Some aft_evt, m_auth)) env
-          in
-          List.iter (print_ast env xx) al;
-          loop m_auth [] l
-      | bef_evt :: l, [] ->
-          let env =
-            Templ.Env.add "fevent" (Vfevent (Some bef_evt, None, m_auth)) env
-          in
-          List.iter (print_ast env xx) al;
-          loop m_auth l []
-      | bef_evt :: l1, aft_evt :: l2 ->
-          let env =
-            Templ.Env.add "fevent"
-              (Vfevent (Some bef_evt, Some aft_evt, m_auth))
-              env
-          in
-          List.iter (print_ast env xx) al;
-          loop m_auth l1 l2
-    in
     match get_env "fam" env with
-    | Vfam (bef, aft, m_auth) -> (
-        match (bef, aft) with
-        | Some b, Some a -> loop m_auth b.fevents a.fevents
-        | None, Some a -> loop m_auth [] a.fevents
-        | Some b, None -> loop m_auth b.fevents []
-        | None, None -> ())
+    | Vfam (bef, aft, m_auth) ->
+        let fevents = Option.fold ~none:[] ~some:(fun f -> f.fevents) in
+        List.iter
+          (fun (b, a) ->
+            let env = Templ.Env.add "fevent" (Vfevent (b, a, m_auth)) env in
+            List.iter (print_ast env xx) al)
+          (Event.align_fevents (fevents bef) (fevents aft))
     | _ -> ()
   and print_foreach_pevent env xx al =
     let bef, aft, _p_auth = xx in
-    let rec loop bef_pevents aft_pevents =
-      match (bef_pevents, aft_pevents) with
-      | [], [] -> ()
-      | [], aft_evt :: l ->
-          let env = Templ.Env.add "pevent" (Vpevent (None, Some aft_evt)) env in
-          List.iter (print_ast env xx) al;
-          loop [] l
-      | bef_evt :: l, [] ->
-          let env = Templ.Env.add "pevent" (Vpevent (Some bef_evt, None)) env in
-          List.iter (print_ast env xx) al;
-          loop l []
-      | bef_evt :: l1, aft_evt :: l2 ->
-          let env =
-            Templ.Env.add "pevent" (Vpevent (Some bef_evt, Some aft_evt)) env
-          in
-          List.iter (print_ast env xx) al;
-          loop l1 l2
-    in
-    loop bef.gen_p.pevents aft.gen_p.pevents
+    List.iter
+      (fun (b, a) ->
+        let env = Templ.Env.add "pevent" (Vpevent (b, a)) env in
+        List.iter (print_ast env xx) al)
+      (Event.align_pevents bef.gen_p.pevents aft.gen_p.pevents)
   and print_foreach_history_line env xx al =
     match get_env "history_file" env with
     | Vstring fname ->

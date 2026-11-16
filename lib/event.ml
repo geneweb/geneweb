@@ -75,6 +75,87 @@ let compare get_name get_date e1 e2 =
 let pevent_key e = Hasher.SHA256.(feeder_to_hasher (gen_pers_event iper istr)) e
 let fevent_key e = Hasher.SHA256.(feeder_to_hasher (gen_fam_event iper istr)) e
 
+let align ~name ~score l1 l2 =
+  let a1 = Array.of_list l1 and a2 = Array.of_list l2 in
+  let ranks a =
+    let seen = Hashtbl.create 8 in
+    Array.map
+      (fun e ->
+        let k = name e in
+        let r = Option.value ~default:0 (Hashtbl.find_opt seen k) in
+        Hashtbl.replace seen k (r + 1);
+        r)
+      a
+  in
+  let r1 = ranks a1 and r2 = ranks a2 in
+  let candidates = ref [] in
+  Array.iteri
+    (fun i e1 ->
+      Array.iteri
+        (fun j e2 ->
+          if name e1 = name e2 then
+            candidates :=
+              (-score e1 e2, abs (r1.(i) - r2.(j)), i, j) :: !candidates)
+        a2)
+    a1;
+  let p1 = Array.make (Array.length a1) None in
+  let p2 = Array.make (Array.length a2) None in
+  List.iter
+    (fun (_, _, i, j) ->
+      if Option.is_none p1.(i) && Option.is_none p2.(j) then (
+        p1.(i) <- Some j;
+        p2.(j) <- Some i))
+    (List.sort Stdlib.compare !candidates);
+  let n2 = Array.length a2 in
+  let removed = Array.make (n2 + 1) [] in
+  let next = ref n2 in
+  for i = Array.length a1 - 1 downto 0 do
+    match p1.(i) with
+    | Some j -> next := j
+    | None -> removed.(!next) <- i :: removed.(!next)
+  done;
+  let with_removed j acc =
+    List.fold_right (fun i acc -> (Some a1.(i), None) :: acc) removed.(j) acc
+  in
+  let acc = ref (with_removed n2 []) in
+  for j = n2 - 1 downto 0 do
+    acc :=
+      with_removed j ((Option.map (Array.get a1) p2.(j), Some a2.(j)) :: !acc)
+  done;
+  !acc
+
+let count_true l = List.fold_left (fun n b -> if b then n + 1 else n) 0 l
+
+let align_pevents l1 l2 =
+  align
+    ~name:(fun e -> e.epers_name)
+    ~score:(fun e1 e2 ->
+      count_true
+        [
+          e1.epers_date = e2.epers_date;
+          e1.epers_place = e2.epers_place;
+          e1.epers_reason = e2.epers_reason;
+          e1.epers_note = e2.epers_note;
+          e1.epers_src = e2.epers_src;
+          e1.epers_witnesses = e2.epers_witnesses;
+        ])
+    l1 l2
+
+let align_fevents l1 l2 =
+  align
+    ~name:(fun e -> e.efam_name)
+    ~score:(fun e1 e2 ->
+      count_true
+        [
+          e1.efam_date = e2.efam_date;
+          e1.efam_place = e2.efam_place;
+          e1.efam_reason = e2.efam_reason;
+          e1.efam_note = e2.efam_note;
+          e1.efam_src = e2.efam_src;
+          e1.efam_witnesses = e2.efam_witnesses;
+        ])
+    l1 l2
+
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events
 

@@ -2173,8 +2173,7 @@ let load_secret_salt ~predictable_mode () =
         let s = generate_secret_salt () in
         (try
            Secure.with_open_out_gen
-             [ Open_wronly; Open_creat; Open_trunc; Open_text ]
-             0o600 fname
+             [ Open_wronly; Open_creat; Open_trunc; Open_text ] 0o600 fname
              (fun oc -> output_string oc (s ^ "\n"))
          with Sys_error e ->
            Log.warn (fun k -> k "failure saving %s:@ %s" fname e));

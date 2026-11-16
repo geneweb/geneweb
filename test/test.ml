@@ -17,6 +17,7 @@ let () =
          Calendar_test.v;
          Dag2html_test.v;
          Dict_test.v;
+         Event_align_test.v;
          Merge_test.v;
          Notes_corpus_test.v;
          Notes_rename_test.v;
