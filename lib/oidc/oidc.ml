@@ -379,15 +379,20 @@ let logout_url provider ~client_id ~post_logout_redirect_uri =
       let uri = Uri.add_query_params' base params in
       Some (Uri.to_string uri)
 
-(* CSPRNG from /dev/urandom; fails closed (raises) if unavailable *)
+external win32_random_bytes : int -> string = "geneweb_win32_random_bytes"
+
+(* CSPRNG of the system, /dev/urandom or BCryptGenRandom on Windows; fails
+   closed (raises) if unavailable *)
 let random_bytes len =
-  let ic = open_in_bin "/dev/urandom" in
-  Fun.protect
-    ~finally:(fun () -> close_in_noerr ic)
-    (fun () ->
-      let b = Bytes.create len in
-      really_input ic b 0 len;
-      Bytes.to_string b)
+  if Sys.win32 then win32_random_bytes len
+  else
+    let ic = open_in_bin "/dev/urandom" in
+    Fun.protect
+      ~finally:(fun () -> close_in_noerr ic)
+      (fun () ->
+        let b = Bytes.create len in
+        really_input ic b 0 len;
+        Bytes.to_string b)
 
 let generate_random_hex len =
   let hex = Buffer.create (len * 2) in

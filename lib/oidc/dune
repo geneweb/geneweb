@@ -1,4 +1,7 @@
 (library
  (name geneweb_oidc)
  (public_name geneweb.oidc)
- (libraries unix uri yojson digestif base64))
+ (libraries unix uri yojson digestif base64)
+ (foreign_stubs
+  (language c)
+  (names random_stubs)))

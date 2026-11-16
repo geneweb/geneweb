@@ -2111,16 +2111,17 @@ let null_reopen flags fd =
     Unix.dup2 fd2 fd;
     Unix.close fd2)
 
-(* [generate_secret_salt ?random ()] generates a secret salt.
-   If the [random] argument is [false], the salt is always the same.
-   The default is [true]. *)
+(* [generate_secret_salt ?random ()] generates a secret salt of 256 random
+   bits, or exits when the system offers no secure random source. If the
+   [random] argument is [false], the salt is always the same. The default is
+   [true]. *)
 let generate_secret_salt ?(random = true) () =
   if not random then "UNPREDICTABLE"
   else
     try Geneweb_oidc.Oidc.generate_token ()
-    with Sys_error _ | End_of_file ->
-      Random.self_init ();
-      string_of_int (Random.bits ())
+    with Sys_error _ | End_of_file | Failure _ ->
+      Log.err (fun k -> k "No secure random source for the secret salt.");
+      exit 1
 
 let retrieve_secret_salt () =
   match Unix.getenv "SECRET_SALT" with
