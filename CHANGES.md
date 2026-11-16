@@ -212,6 +212,12 @@
 - A person form is no longer refused with "the base has changed" when,
   meanwhile, the form of another person added or removed it as a
   witness, a godparent or a relation.
+- The forms opened before a restart of gwd are no longer refused with
+  "the base has changed": the secret salt of the form digests is kept
+  in `cnt/gwd_secret_salt.txt` of the bases directory, created at the
+  first start, instead of changing at each start. OpenID Connect
+  sessions now survive a restart too. Deleting the file invalidates
+  the open forms and the sessions.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

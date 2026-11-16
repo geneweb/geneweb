@@ -2156,6 +2156,30 @@ let retrieve_secret_salt () =
       exit 1
   | s -> s
 
+(* [load_secret_salt ~predictable_mode ()] reads the secret salt saved in the
+   cnt directory, or generates and saves it: the forms opened before a restart
+   of gwd keep a valid digest. *)
+let load_secret_salt ~predictable_mode () =
+  if predictable_mode then generate_secret_salt ~random:false ()
+  else
+    let fname = Filename.concat !GWPARAM.cnt_dir "gwd_secret_salt.txt" in
+    let saved =
+      try Secure.with_open_in_text fname In_channel.input_line
+      with Sys_error _ -> None
+    in
+    match Option.map String.trim saved with
+    | Some s when s <> "" -> s
+    | Some _ | None ->
+        let s = generate_secret_salt () in
+        (try
+           Secure.with_open_out_gen
+             [ Open_wronly; Open_creat; Open_trunc; Open_text ]
+             0o600 fname
+             (fun oc -> output_string oc (s ^ "\n"))
+         with Sys_error e ->
+           Log.warn (fun k -> k "failure saving %s:@ %s" fname e));
+        s
+
 let daemonize ~daemon k =
   if daemon then
     match Unix.fork () with
@@ -2229,9 +2253,7 @@ let geneweb_server ~predictable_mode ~loaded_plugins ~trusted_proxies ?interface
         create_cnt_dir ();
         (* A secret salt is added to the environment to ensure that workers
            use the same salt for digests on both Unix and Windows platforms. *)
-        let secret_salt =
-          generate_secret_salt ~random:(not predictable_mode) ()
-        in
+        let secret_salt = load_secret_salt ~predictable_mode () in
         Unix.putenv "SECRET_SALT" secret_salt;
         secret_salt
   in
