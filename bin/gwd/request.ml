@@ -917,6 +917,19 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "RL" -> w_base @@ RelationLink.print
              | "RM" -> w_base @@ RelationMatrixDisplay.print conn
+             | "RELOAD" ->
+                 w_wizard @@ w_base
+                 @@ fun conf _base ->
+                 if not conf.manitou then
+                   GWPARAM.output_error conf Code.Forbidden
+                 else (
+                   Reload.request ();
+                   let title _ = Output.print_sstring conf "RELOAD" in
+                   Hutil.header conf title;
+                   Output.print_sstring conf
+                     "<p>Reload requested: every gwd worker will reload \
+                      lexicons and template lookups on its next request.</p>";
+                   Hutil.trailer conf)
              | "RLM" -> w_base @@ RelationDisplay.print_multi conn
              | "S" | "SN" ->
                  w_base @@ fun conf base ->
