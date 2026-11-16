@@ -192,6 +192,20 @@ let print_mod_ok conf base =
                    match book_entry conf base new_istr with
                    | Some (_, s) -> `String s
                    | None -> `Null );
+                 ( "place",
+                   match book_place conf base new_istr with
+                   | Some (ini, prev, head) ->
+                       `Assoc
+                         [
+                           ("ini", `String ini);
+                           ( "prev",
+                             Option.fold ~none:`Null
+                               ~some:(fun k ->
+                                 `String (Driver.Istr.to_string k))
+                               prev );
+                           ("head", `String head);
+                         ]
+                   | None -> `Null );
                  ( "url",
                    `String
                      (Printf.sprintf "%sm=MOD_DATA&data=%s&s=%s%s#k%s"
@@ -597,23 +611,9 @@ let print_foreach conf base print_ast _eval_expr =
 
     process_items 0 substrings
   and print_foreach_value env xx al =
-    let alphabetic (_, s1) (_, s2) =
-      let rss1 = Place.without_suburb s1 in
-      let rss2 = Place.without_suburb s2 in
-      if rss1 = rss2 then Gutil.alphabetic_order s1 s2
-      else Gutil.alphabetic_order rss1 rss2
-    in
-    (* in the order from the last term, a heading before each last term *)
     let l =
       match get_env "list_value" env with
-      | Vlist_value l when rev_order conf base ->
-          List.rev_map (fun ((_, s) as x) -> (Dict.last_terms s, x)) l
-          |> List.sort (fun (t1, x1) (t2, x2) ->
-              match compare_terms t1 t2 with 0 -> alphabetic x1 x2 | c -> c)
-          |> List.map (fun (t, (k, s)) ->
-              (k, s, match t with [] -> "" | t :: _ -> t))
-      | Vlist_value l ->
-          List.sort alphabetic l |> List.map (fun (k, s) -> (k, s, ""))
+      | Vlist_value l -> book_order conf base l
       | _ -> []
     in
     let records =

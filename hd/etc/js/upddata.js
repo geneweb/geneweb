@@ -216,29 +216,59 @@
     },
     update(a, data) {
       const li = a.closest('li');
+      const ul = li.parentElement;
+      const head = li.previousElementSibling;
       const other = document.getElementById('k' + data.key);
-      if (data.entry === null || (other && other !== li)) {
+      if (data.place === null || (other && other !== li)) {
         if (other) other.querySelector('a[data-entry]').dataset.n = data.records;
-        const ul = li.parentElement;
         li.remove();
-        if (!ul.querySelector('a[data-entry]')) {
-          ul.previousElementSibling.remove();
-          ul.remove();
-        }
-        if (!document.querySelector('#main-content a[data-entry]')) {
-          location.href = data.url;
-        }
+      } else if (this.insert(li, data.place)) {
+        li.id = 'k' + data.key;
+        const u = new URL(a.href);
+        u.searchParams.set('key', data.key);
+        a.href = u;
+        a.dataset.entry = data.entry;
+        a.dataset.n = data.records;
+        if (data.after === data.entry) delete a.dataset.v;
+        else a.dataset.v = data.after;
+        (a.nextElementSibling ?? a).textContent = data.entry;
+      } else {
+        location.reload();
         return;
       }
-      li.id = 'k' + data.key;
-      const u = new URL(a.href);
-      u.searchParams.set('key', data.key);
-      a.href = u;
-      a.dataset.entry = data.entry;
-      a.dataset.n = data.records;
-      if (data.after === data.entry) delete a.dataset.v;
-      else a.dataset.v = data.after;
-      (a.nextElementSibling ?? a).textContent = data.entry;
+      if (head?.classList.contains('book-head')
+        && !head.nextElementSibling?.querySelector('a[data-entry]')) {
+        head.remove();
+      }
+      if (!ul.querySelector('a[data-entry]')) {
+        ul.previousElementSibling.remove();
+        ul.remove();
+      }
+      if (!document.querySelector('#main-content a[data-entry]')) {
+        location.href = data.url;
+      }
+    },
+    insert(li, { ini, prev, head }) {
+      const ul = document.getElementById('_' + ini)?.nextElementSibling;
+      let at = prev && document.getElementById('k' + prev);
+      if (!ul || (prev && !at)) return false;
+      if (head) {
+        const next = at ? at.nextElementSibling : ul.firstElementChild;
+        let h = at;
+        while (h && !h.classList.contains('book-head')) h = h.previousElementSibling;
+        if (next?.classList.contains('book-head') && next.textContent === head) at = next;
+        else if (h?.textContent !== head) {
+          const n = document.createElement('li');
+          n.className = 'book-head';
+          n.textContent = head;
+          if (at) at.after(n);
+          else ul.prepend(n);
+          at = n;
+        }
+      }
+      if (at) at.after(li);
+      else ul.prepend(li);
+      return true;
     },
     filter(q) {
       const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
