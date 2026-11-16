@@ -220,8 +220,8 @@ let print_merge conf base =
       let fam1 = Driver.foi base ifam1 in
       let fam2 = Driver.foi base (Driver.Ifam.of_string f2) in
       let sfam, sdes = reconstitute conf base ifam1 fam1 fam2 in
+      let ini_sfam = UpdateFam.string_family_of base ifam1 in
       let digest =
-        let ini_sfam = UpdateFam.string_family_of base ifam1 in
         let salt = Option.get conf.secret_salt in
         Update.digest_family ~salt ini_sfam
       in
@@ -230,7 +230,9 @@ let print_merge conf base =
           (UpdateFam.person_key base)
           (Driver.gen_couple_of_family (Driver.foi base sfam.fam_index))
       in
-      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
+      UpdateFam.print_update_fam
+        ~snapshot:(UpdateConflict.family_snapshot conf ini_sfam)
+        conf base (sfam, scpl, sdes) digest
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =

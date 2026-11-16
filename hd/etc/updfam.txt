@@ -237,6 +237,7 @@
   <p class="my-0">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">
+    %if;(snapshot!="")<input type="hidden" name="snapshot" value="%snapshot;">%nl;%end;
     %if;(evar_ip!="")<input type="hidden" name="ip" value="%evar_ip;">%nl;%end;
     %if;(evar_i!="")<input type="hidden" name="i" value="%evar_i;">%nl;%end;
     %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")

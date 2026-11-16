@@ -299,6 +299,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "origin_file" ] ->
       safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
   | "parent" :: sl -> eval_parent conf base env cpl sl
+  | [ "snapshot" ] -> eval_string_env "snapshot" env
   | [ "wcnt" ] -> eval_int_env "wcnt" env
   | "witness" :: sl -> eval_witness conf base env fam sl
   | [ "has_fevents" ] -> bool_val (fam.fevents <> [])
@@ -523,7 +524,8 @@ let print_foreach print_ast _eval_expr =
   in
   print_foreach
 
-let print_update_fam ?(grandparents = []) conf base fcd digest =
+let print_update_fam ?(grandparents = []) ?(snapshot = "") conf base fcd digest
+    =
   match p_getenv conf.env "m" with
   | Some
       ( "ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM"
@@ -532,6 +534,7 @@ let print_update_fam ?(grandparents = []) conf base fcd digest =
       let env =
         Templ.Env.empty
         |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "snapshot" (Vstring snapshot)
         |> Templ.Env.add "is_upd_fam" (Vbool true)
       in
       let env =
@@ -691,7 +694,9 @@ let print_mod conf base =
       let sfam = string_family_of base ifam in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_family ~salt sfam in
-      print_update_fam conf base sfam digest
+      print_update_fam
+        ~snapshot:(UpdateConflict.family_snapshot conf sfam)
+        conf base sfam digest
   | None -> Hutil.incorrect_request conf
 
 let print_del conf base =

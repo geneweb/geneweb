@@ -15,7 +15,9 @@ let print_merge conf base =
       let sp = UpdateInd.string_person_of base p1 in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_person ~salt sp in
-      UpdateInd.print_update_ind conf base p digest;
+      UpdateInd.print_update_ind
+        ~snapshot:(UpdateConflict.person_snapshot conf sp)
+        conf base p digest;
       MergeIndOk.merge_carrousel conf base p1 p2 p
   | _ -> Hutil.incorrect_request conf
 

@@ -24,6 +24,7 @@
   geneweb_util
   geneweb_templ
   yojson
+  base64
   markup
   re
   uucp
