@@ -55,10 +55,11 @@ val merge_person :
     now, field by field and event by event ({!Event.align_pevents}). A field
     changed on one side only takes the value of that side; a field changed on
     both sides to different values is a conflict, which keeps the value of [a].
-    Without a readable snapshot, any difference is a conflict. The fields that
-    the form derives from the events (birth, baptism, death and burial dates,
-    places, notes and sources) are merged without conflict, the form deriving
-    them again.
+    Without a readable snapshot, any difference is a conflict. The notes of the
+    person and of its events are merged line by line, as by {!merge_note}. The
+    fields that the form derives from the events (birth, baptism, death and
+    burial dates, places, notes and sources) are merged without conflict, the
+    form deriving them again.
 
     Returns the merged person and its review in JSON:
     [{"kind", "snapshot", "changes", "conflicts"}], where [kind] is ["merge"],
@@ -82,8 +83,9 @@ val merge_family :
   * Update.key gen_descend)
   * string
 (** Same as {!merge_person} for a family: its events are aligned by
-    {!Event.align_fevents}, and its children are merged as a set, keeping the
-    children added and dropping those removed on either side. *)
+    {!Event.align_fevents}, its comment is merged line by line, and its children
+    are merged as a set, keeping the children added and dropping those removed
+    on either side. *)
 
 val added_families :
   Config.config -> Driver.base -> Driver.iper -> int -> string
