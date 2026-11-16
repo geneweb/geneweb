@@ -26,7 +26,6 @@
   notes_corpus_test
   notes_rename_test
   anomaly_test
-  notes_corpus_test
   update_order_test
   update_conflict_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix yojson))
@@ -36,6 +35,7 @@
  (deps
   (:dict ./dict.txt))
  (name search_test)
+ (modules search_test)
  (libraries fmt qcheck qcheck-alcotest geneweb_util geneweb_search)
  (action
   (run %{test} %{dict})))
@@ -43,6 +43,7 @@
 (test
  (package geneweb)
  (name heap_test)
+ (modules heap_test)
  (libraries qcheck qcheck-alcotest geneweb_search))
 
 (test
