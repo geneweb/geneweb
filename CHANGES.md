@@ -209,6 +209,9 @@
   the birth or after the burial, in the chronology too. In a family, a
   divorce, a separation or an annulment that the dates leave unordered
   stays after the events of the relation.
+- A person form is no longer refused with "the base has changed" when,
+  meanwhile, the form of another person added or removed it as a
+  witness, a godparent or a relation.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

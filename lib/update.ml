@@ -1091,7 +1091,9 @@ let feed_key (s1, s2, i, c, s3) =
     string s1 <+> string s2 <+> int i <+> feed_create c <+> string s3)
 
 let digest_person ~salt =
-  let feeder p = Hasher.SHA256.((gen_person iper feed_key string) p) in
+  let feeder p =
+    Hasher.SHA256.((gen_person iper feed_key string) { p with related = [] })
+  in
   Hasher.SHA256.feeder_to_hasher ~salt feeder
 
 let digest_family ~salt =

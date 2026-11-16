@@ -213,7 +213,10 @@ val digest_person :
     - Concurrent edits of the same person.
     - Cross-site Request Forgery (CSRF) attacks. [salt] is a secret value
       generated at server startup; it is mandatory so that the compiler rejects
-      any call site that would omit it. *)
+      any call site that would omit it.
+
+    The persons referring to [per] ([related]) are left out: the form does not
+    edit them, and they change with the forms of other persons. *)
 
 val digest_family :
   salt:string ->
