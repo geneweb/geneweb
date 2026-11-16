@@ -231,6 +231,7 @@ and eval_simple_var conf base env p = function
   | [ "permalink" ] ->
       VVstring (Permalink.script conf (Permalink.query conf base) :> string)
   | [ "qualifier" ] -> eval_string_env "qualifier" env
+  | [ "snapshot" ] -> eval_string_env "snapshot" env
   | "relation" :: sl ->
       let r =
         match get_env "cnt" env with
@@ -628,12 +629,13 @@ let print_foreach print_ast _eval_expr =
   print_foreach
 
 (* S: check on `m` should be made beforehand; what about plugins?  *)
-let print_update_ind conf base p digest =
+let print_update_ind ?(snapshot = "") conf base p digest =
   match p_getenv conf.env "m" with
   | Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") ->
       let env =
         Templ.Env.empty
         |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "snapshot" (Vstring snapshot)
         |> Templ.Env.add "next_pevent" (Vcnt (ref (List.length p.pevents + 1)))
         |> Templ.Env.add "is_upd_ind" (Vbool true)
       in
@@ -685,7 +687,9 @@ let print_mod conf base =
       let sp = string_person_of base p in
       let salt = Option.get conf.secret_salt in
       let digest = Update.digest_person ~salt sp in
-      print_update_ind conf base sp digest
+      print_update_ind
+        ~snapshot:(UpdateConflict.person_snapshot conf sp)
+        conf base sp digest
 
 let print_del conf base =
   match Util.find_person_in_env conf base "" with

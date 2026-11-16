@@ -1353,8 +1353,8 @@ let print_mod_aux conf base callback =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, ext = reconstitute_family conf base nsck in
   let redisp = Option.is_some (p_getenv conf.env "return") in
+  let ini_sfam = UpdateFam.string_family_of base sfam.fam_index in
   let digest =
-    let ini_sfam = UpdateFam.string_family_of base sfam.fam_index in
     let salt = Option.get conf.secret_salt in
     Update.digest_family ~salt ini_sfam
   in
@@ -1362,6 +1362,7 @@ let print_mod_aux conf base callback =
     if ext || redisp then
       UpdateFam.print_update_fam
         ~grandparents:(reconstitute_grandparents conf)
+        ~snapshot:(UpdateConflict.family_snapshot conf ini_sfam)
         conf base (sfam, scpl, sdes) digest
     else
       match check_family conf sfam scpl with

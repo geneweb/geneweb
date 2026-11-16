@@ -30,6 +30,7 @@ let () =
          Source_test.v;
          Surname_index_test.v;
          Templ_test.v;
+         Update_conflict_test.v;
          Update_order_test.v;
          Userkey_test.v;
          Util_test.v;

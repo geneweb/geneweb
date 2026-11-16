@@ -1059,7 +1059,10 @@ let print_mod_aux conf base callback =
   let salt = Option.get conf.secret_salt in
   let digest = Update.digest_person ~salt ini_ps in
   if digest = get conf "digest" then
-    if ext || redisp then UpdateInd.print_update_ind conf base p digest
+    if ext || redisp then
+      UpdateInd.print_update_ind
+        ~snapshot:(UpdateConflict.person_snapshot conf ini_ps)
+        conf base p digest
     else
       let p = strip_person p in
       match check_person conf base p with

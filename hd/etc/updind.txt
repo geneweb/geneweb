@@ -401,6 +401,9 @@
   <div class="row">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">
+    %if;(snapshot!="")
+      <input type="hidden" name="snapshot" value="%snapshot;">
+    %end;
     <input type="hidden" name="i" value="%index;">
     %if;(mrg=1)
       %if;(evar_i2 != "")
