@@ -31,6 +31,26 @@ val pevent_key : Geneweb_db.Driver.pers_event -> string
 val fevent_key : Geneweb_db.Driver.fam_event -> string
 (** Same as {!pevent_key} for a family event. *)
 
+val align_pevents :
+  ('p, 's) Def.gen_pers_event list ->
+  ('p, 's) Def.gen_pers_event list ->
+  (('p, 's) Def.gen_pers_event option * ('p, 's) Def.gen_pers_event option) list
+(** [align_pevents l1 l2] pairs the events of [l1] (before) with the events of
+    [l2] (after) whatever their positions, so that an event inserted or moved
+    does not shift the comparison of the others. Only events of the same name
+    are paired: first those sharing the most fields (date, place, reason, note,
+    source, witnesses), then in their order among the events of that name. An
+    event of [l1] left without partner gives [(Some e, None)] (removed), an
+    event of [l2] [(None, Some e)] (added). The result follows the order of
+    [l2], each removed event coming before the partner of the next paired event
+    of [l1], or at the end. *)
+
+val align_fevents :
+  ('p, 's) Def.gen_fam_event list ->
+  ('p, 's) Def.gen_fam_event list ->
+  (('p, 's) Def.gen_fam_event option * ('p, 's) Def.gen_fam_event option) list
+(** Same as {!align_pevents} for family events. *)
+
 val sort_events :
   ('a -> 'b event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list
 (** Sort events (both personal and familial) by their date and their name *)

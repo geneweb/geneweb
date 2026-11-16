@@ -213,6 +213,10 @@
   first start, instead of changing at each start. OpenID Connect
   sessions now survive a restart too. Deleting the file invalidates
   the open forms and the sessions.
+- The history of changes (`m=HIST_DIFF`) and the summary shown after
+  saving a form pair the events before and after a change by their
+  content rather than by their position: an inserted, removed or moved
+  event no longer shows as a change of every event after it.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
