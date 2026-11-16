@@ -212,6 +212,7 @@
                      %end;
                      %if;(e.data!="src")</a>%end;
                 </div>
+                <span class="book-n">%entry_records;</span>
               </div>
             </li>
           %end;
