@@ -48,6 +48,16 @@
     </div>
   </div>
 %end;
+%if;has_free_family_order;
+  %apply;order_open%with;update_order_fam%and;m=CHG_FAM_ORD_OK&%access;%and;[*reorder families]%end;
+  %foreach;family;
+    %apply;order_item%with;%family.index;%and;%spouse;%and;
+      %if;(on_marriage_date!="")<li class="list-inline-item">%on_marriage_date;</li>%end;
+      %if;(marriage_place!="")<li class="list-inline-item">%marriage_place;</li>%end;
+    %end;
+  %end;
+  %apply;order_close()
+%end;
 %if;has_free_event_order;
   %apply;order_open%with;update_order_pevt%and;m=CHG_EVT_IND_ORD_OK&%access;%and;[*reorder events]%end;
   %foreach;pevent;%apply;order_event()%end;
