@@ -566,6 +566,7 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_families
              | "CHK_DATA" ->
                  w_wizard @@ w_base @@ w_index @@ CheckDataDisplay.print
+             | "CHK_DIGEST" -> w_wizard @@ w_base @@ UpdateCheck.print
              | "CHK_DATA_L" ->
                  w_wizard @@ w_base @@ w_index
                  @@ CheckDataDisplay.print_redirect_to_list conn

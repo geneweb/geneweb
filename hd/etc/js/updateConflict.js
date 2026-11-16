@@ -1,12 +1,72 @@
-// Review of the person and family forms redisplayed on an edit conflict
-// (UpdateConflict, upd_utils.txt): lists the changes saved in the record
-// while the form was open and the differences to check, marks the fields of
-// these differences, and holds the form until each one is checked.
+// Edit conflicts of the person and family forms (UpdateConflict,
+// upd_utils.txt). While a form is open, checks on return to its tab and every
+// ten minutes whether its record was saved meanwhile (m=CHK_DIGEST), and then
+// offers to reload the form or to add the changes to the entry. On a form
+// redisplayed on an edit conflict, lists the changes saved in the record and
+// the differences to check, marks the fields of these differences, and holds
+// the form until each one is checked.
 (() => {
   'use strict';
-  const box = document.getElementById('review');
-  const form = box && box.closest('form');
+  const d = document.currentScript.dataset;
+  const form = document.getElementById('updind') || document.getElementById('updfam');
   if (!form) return;
+
+  const field = name => form.elements.namedItem(name);
+  if (field('snapshot') && field('digest') && field('i')) {
+    const url = d.prefix + 'm=CHK_DIGEST&t=' + d.kind + '&i=' + encodeURIComponent(field('i').value)
+      + '&digest=' + encodeURIComponent(field('digest').value);
+    const entry = () => new URLSearchParams(new FormData(form)).toString();
+    let initial = entry();
+    document.addEventListener('DOMContentLoaded', () => { initial = entry(); });
+    let last = Date.now();
+    let warned = false;
+    const warn = () => {
+      warned = true;
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-warning sticky-top d-flex flex-wrap align-items-center gap-2';
+      alert.setAttribute('role', 'alert');
+      alert.append(d.changed);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn-sm btn-primary ms-auto';
+      const edited = () => entry() !== initial;
+      const label = () => { button.textContent = edited() ? d.merge : d.reload; };
+      label();
+      form.addEventListener('input', label);
+      form.addEventListener('change', label);
+      button.addEventListener('click', () => {
+        if (edited()) {
+          const redisplay = document.createElement('input');
+          redisplay.type = 'hidden';
+          redisplay.name = 'return';
+          redisplay.value = 'on';
+          form.append(redisplay);
+          HTMLFormElement.prototype.submit.call(form);
+        } else {
+          const ip = field('ip');
+          location.href = d.prefix + (d.kind === 'fam' ? 'm=MOD_FAM' : 'm=MOD_IND')
+            + '&i=' + encodeURIComponent(field('i').value)
+            + (ip && ip.value ? '&ip=' + encodeURIComponent(ip.value) : '');
+        }
+      });
+      alert.append(button);
+      form.prepend(alert);
+    };
+    const check = () => {
+      if (warned || document.visibilityState !== 'visible' || Date.now() - last < 60000) return;
+      last = Date.now();
+      fetch(url, { headers: { Accept: 'application/json' } })
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => { if (data && data.changed && !warned) warn(); })
+        .catch(() => {});
+    };
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('focus', check);
+    setInterval(check, 600000);
+  }
+
+  const box = document.getElementById('review');
+  if (!box) return;
   const t = box.dataset;
   const review = JSON.parse(t.review);
 
