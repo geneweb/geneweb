@@ -16,9 +16,6 @@
 %include;hed
 <a class="visually-hidden-focusable" href="#main-content">[*skip to main content]</a>
 %include;home
-%define;wikidata(x)
-  [*wikidata:::x]%nn;
-%end;
 %define;book(xx,yy,zz)
   <li><a class="%if;(e.data="")btn btn-outline-primary w-100 text-start%else;dropdown-item%end;%if;(e.data="xx") active%end;"
     href="%prefix;m=MOD_DATA&data=xx"><i class="fa fa-zz fa-fw me-2"></i>[*book of %s:::yy]</a></li>
@@ -170,28 +167,11 @@
         <ul class="list-unstyled src-list-bg">
           %foreach;value;
             %if;new_head;<li class="book-head">%escape.rev_head;</li>%end;
-            <li class="%if;(e.data="src")px-2 position-relative%else;pe-2%end;" id="k%entry_key;">
+            <li class="px-2%if;(e.data="src") position-relative%end;" id="k%entry_key;">
               %if;(is_modified and entry_blank and (e.data="fn" or e.data="sn"))
                 <div class="alert alert-warning mt-2">[*book blank name]</div>
               %end;
               <div class="d-flex align-items-baseline gap-1">
-                %if;(e.data!="src")
-                  <span class="d-inline-flex flex-column">
-                    <a href="https://www.wikidata.org/w/index.php?search=%nn;
-                      %if;(e.data!="place")%encode.entry_value;%nn;
-                      %else;
-                        %if;(not first and suburb!="")%encode.printable.suburb;%else;%encode.other;%end;
-                      %end;"
-                      role="button" class="btn btn-link py-0 px-2"
-                      title="%apply;wikidata%with;%if;(e.data!="place")%escape.entry_value;%else;%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;%end;%end;"
-                      target="_blank" rel="noreferrer noopener" tabindex="-1"><i class="fab fa-wikipedia-w fa-sm"></i></a>
-                    %if;(first and suburb!="")
-                      <a href="https://www.wikidata.org/w/index.php?search=%encode.printable.suburb;"
-                        role="button" class="btn btn-link py-0 px-2" title="%apply;wikidata(escape.printable.suburb)"
-                        target="_blank" rel="noreferrer noopener" tabindex="-1"><i class="fab fa-wikipedia-w fa-sm"></i></a>
-                    %end;
-                  </span>
-                %end;
                 <div class="flex-grow-1">
                   <a role="button" class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
                      %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
@@ -242,6 +222,8 @@
           <input type="text" class="form-control p-1" id="nx_input" name="nx_input"
             maxlength="200" aria-label="[*modify]" required>
         %end;
+        <button type="button" class="btn btn-outline-primary" id="book-ref" aria-expanded="false"
+          title="[*book reference sources]0" aria-label="[*book reference sources]0"><i class="fa fa-globe"></i></button>
         <button type="submit" class="btn btn-primary" title="[*validate/delete]0">OK</button>
         <button type="button" class="btn-close" title="[*close]" aria-label="[*close]"></button>
         <div class="book-extra" hidden>
@@ -257,6 +239,11 @@
         </div>
         <div class="book-warn alert alert-warning py-1 px-2 mt-1 mb-0" role="alert" hidden></div>
       </div>
+      <div class="book-ref card shadow-lg small px-3 py-2" aria-live="polite" hidden
+        data-cities="[*book reference sources]1" data-places="[*book reference sources]2"
+        data-none="[*book reference sources]3" data-same="[*book reference sources]4"
+        data-near="[*book reference sources]5" data-use="[*book reference sources]6"%nn;
+        %if;(b.places_inverted="yes") data-inverted%end;></div>
     </form>
   %else;
     <p class="text-body-secondary text-center mt-3">[*too much results]

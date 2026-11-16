@@ -828,7 +828,7 @@ a[id^="p_"]:target {
 
 #book-edit .book-row {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
   column-gap: .5rem;
 }
@@ -849,6 +849,32 @@ a[id^="p_"]:target {
 #book-edit .book-input-text,
 #book-edit .form-check {
   margin-inline-start: calc(.75rem + var(--bs-border-width));
+}
+
+#book-edit .book-ref {
+  position: absolute;
+  top: 100%;
+  margin-top: .25rem;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.book-ref-cols {
+  column-width: 24rem;
+  column-gap: 2rem;
+}
+
+.book-ref-cols > div {
+  break-after: avoid;
+}
+
+.book-ref-cols li {
+  break-inside: avoid;
+}
+
+.book-near {
+  text-decoration: underline wavy var(--bs-warning);
+  text-underline-offset: .2em;
 }
 
 .book-search {

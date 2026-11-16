@@ -1,5 +1,90 @@
 (() => {
   const { notify, toast } = InplaceEdit;
+  const GEO = 'https://data.geopf.fr/geocodage/search';
+  const DICOTOPO = 'https://dicotopo.cths.fr';
+  const WIKIDATA = 'https://www.wikidata.org/w/api.php';
+  const GIVEN = 'P31=Q202444|P31=Q12308941|P31=Q11879590|P31=Q3409032|P31=Q3409027';
+  // the classes of the Wikidata items of a book (haswbstatement filter)
+  const CLASSES = {
+    fn: GIVEN, fna: GIVEN, sn: 'P31=Q101352', sna: 'P31=Q101352',
+    occu: 'P31=Q28640|P31=Q12737077', title: 'P31=Q355567'
+  };
+  const getJSON = (url, params) =>
+    fetch(`${url}?${new URLSearchParams(params)}`, { referrerPolicy: 'no-referrer' })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status));
+  const fold = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const paren = t => {
+    const m = /^(.+?)\s*\(([^()]+)\)$/.exec(t);
+    return m ? [m[1], m[2]] : [t];
+  };
+  // a place: its suburb, its town (the first term, the last one when the
+  // places of the base are inverted) and all its terms
+  const placeParts = (value, inverted) => {
+    const m = /^\[([^\]]*)\]\s*[-\u2013\u2014]\s*/.exec(value);
+    const terms = (m ? value.slice(m[0].length) : value).split(',')
+      .map(t => t.trim()).filter(Boolean);
+    return {
+      suburb: m ? m[1].trim() : '',
+      town: paren((inverted ? terms.at(-1) : terms[0]) ?? '')[0],
+      terms: terms.flatMap(paren)
+    };
+  };
+  const text = html => html
+    ? new DOMParser().parseFromString(html, 'text/html').body.textContent.trim() : '';
+  // "Crotoy (Le)" written "Le Crotoy"
+  const article = s => s.replace(/^(.+) \((L[’']|Le|La|Les)\)$/,
+    (_, n, a) => /[’']$/.test(a) ? a + n : `${a} ${n}`);
+  // the places and old forms of the Dictionnaire topographique de la France
+  // named as [q], exact words first, of the department [dep] if known
+  const dicotopo = (q, dep) => {
+    const words = fold(q).split(' ').filter(Boolean);
+    if (!words.length) return Promise.resolve([]);
+    const query = words
+      .map(w => `label.folded:${w.length > 3 ? `(${w}^2 OR ${w}~1)` : w}`)
+      .concat(dep ? [`dep-id:${dep}`] : []).join(' ');
+    const seen = new Set();
+    return getJSON(`${DICOTOPO}/api/1.0/search`, { query, 'page[size]': 12 })
+      .then(r => r.data
+        .filter(({ attributes: a }) => !seen.has(a['place-id']) && seen.add(a['place-id']))
+        .map(({ type, attributes: a }) => ({
+          name: article(a['place-label']), term: q,
+          details: [a['commune-label'], a.dpt, a.region],
+          note: text((a.descriptions ?? a['place-desc'] ?? [])[0]),
+          forms: type === 'place-old-label'
+            ? [text(a['rich-date'] ? `${a['rich-label']} (${a['rich-date']})` : a['rich-label'])]
+            : (a['old-labels'] ?? []).map(text),
+          link: { href: `${DICOTOPO}/places/${a['place-id']}`, title: 'DicoTopo', icon: 'fa fa-book' }
+        })));
+  };
+  const geo = (q, type) => q.length < 3 ? Promise.resolve([])
+    : getJSON(GEO, { q, type, limit: 6 }).then(r => r.features.map(f => f.properties));
+  const wikidata = (q, cls, lang) => {
+    if (!q) return Promise.resolve([]);
+    const items = cls
+      ? getJSON(WIKIDATA, {
+          action: 'query', list: 'search', srsearch: `${q} haswbstatement:${cls}`,
+          srnamespace: 0, srlimit: 8, format: 'json', origin: '*'
+        }).then(r => {
+          const ids = r.query.search.map(e => e.title);
+          return ids.length ? getJSON(WIKIDATA, {
+            action: 'wbgetentities', ids: ids.join('|'), props: 'labels|descriptions',
+            languages: lang, languagefallback: 1, format: 'json', origin: '*'
+          }).then(r => ids.map(id => ({
+            id,
+            label: r.entities[id].labels?.[lang]?.value,
+            description: r.entities[id].descriptions?.[lang]?.value
+          }))) : [];
+        })
+      : getJSON(WIKIDATA, {
+          action: 'wbsearchentities', search: q, language: lang, uselang: lang,
+          type: 'item', limit: 8, format: 'json', origin: '*'
+        }).then(r => r.search);
+    return items.then(l => l.filter(e => e.label).map(e => ({
+      name: e.label, term: q, details: [e.description],
+      link: { href: `https://www.wikidata.org/wiki/${e.id}`, title: 'Wikidata', icon: 'fab fa-wikipedia-w' }
+    })));
+  };
   const BookEdit = {
     a: null,
     init() {
@@ -12,6 +97,15 @@
       this.personsHref = this.persons.href;
       this.extra = form.querySelector('.book-extra');
       this.warn = form.querySelector('.book-warn');
+      this.ref = form.querySelector('.book-ref');
+      this.refButton = document.getElementById('book-ref');
+      this.refButton.addEventListener('click', () => this.lookup());
+      this.ref.addEventListener('keydown', ev => {
+        if (ev.key !== 'Escape') return;
+        this.hideRef();
+        this.field.focus();
+      });
+      addEventListener('resize', () => { if (this.a) this.fit(); });
       this.field.addEventListener('input', () => {
         this.changed();
         this.fit();
@@ -111,6 +205,7 @@
       this.persons.title = label;
       this.persons.setAttribute('aria-label', label);
       this.text.textContent = this.original;
+      this.hideRef();
       this.field.value = value || this.original;
       this.changed();
       bootstrap.Tooltip.getInstance(a)?.hide();
@@ -156,6 +251,20 @@
       if (field.tagName === 'TEXTAREA' && typeof autosize === 'function') {
         autosize.update(field);
       }
+      this.spread();
+    },
+    // the reference sources across the width of the window, under the field
+    spread() {
+      if (this.ref.hidden) return;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const left = this.form.getBoundingClientRect().left + this.form.clientLeft;
+      this.ref.style.left = rem - left + 'px';
+      this.ref.style.width = document.documentElement.clientWidth - 2 * rem + 'px';
+    },
+    hideRef() {
+      this.ref.hidden = true;
+      this.ref.replaceChildren();
+      this.refButton.setAttribute('aria-expanded', 'false');
     },
     close() {
       const a = this.a;
@@ -273,6 +382,131 @@
       if (at) at.after(li);
       else ul.prepend(li);
       return true;
+    },
+    lookup() {
+      const a = this.a;
+      const value = this.field.value.trim();
+      if (!a || !value) return;
+      if (!this.ref.hidden && value === this.searched) {
+        this.hideRef();
+        return;
+      }
+      this.searched = value;
+      const lang = document.documentElement.lang || 'en';
+      const { cities, places } = this.ref.dataset;
+      const data = this.form.elements.data.value;
+      let terms = [value];
+      let groups;
+      if (data === 'place' || data === 'domain') {
+        const p = placeParts(value, 'inverted' in this.ref.dataset);
+        const context = e => (e.context ?? '').split(', ').slice(1);
+        terms = [p.suburb, ...p.terms].filter(Boolean);
+        const folded = new Set(terms.map(fold));
+        const communes = geo(p.town, 'municipality');
+        // the department of the town: the one named in the entry, else the
+        // one of the only municipality of this name
+        const topo = communes.catch(() => []).then(c => {
+          const same = c.filter(e => fold(e.name) === fold(p.town));
+          const dep = c.find(e => folded.has(fold(context(e)[0] ?? '')))
+            ?? (same.length === 1 ? same[0] : null);
+          return dicotopo(p.suburb || p.town, dep?.depcode);
+        });
+        groups = Promise.allSettled([
+          topo,
+          communes,
+          geo(p.suburb ? `${p.suburb} ${p.town}` : p.town, 'locality'),
+          wikidata(p.town, null, lang)
+        ]).then(r => {
+          if (r.every(e => e.status === 'rejected')) throw r[0].reason;
+          return r.map(e => e.value ?? []);
+        }).then(([d, c, l, w]) => [
+          { head: 'DicoTopo', items: d },
+          { head: cities, items: c.map(e => ({
+            name: e.name, term: p.town,
+            details: [e.postcode, ...context(e), `Insee ${e.citycode}`]
+          })) },
+          { head: places, items: l.map(e => ({
+            name: e.name, term: p.suburb || p.town,
+            details: [e.city, e.postcode, ...context(e)]
+          })) },
+          { head: 'Wikidata', items: w }
+        ]);
+      } else {
+        groups = wikidata(value, CLASSES[data], lang)
+          .then(items => [{ head: 'Wikidata', items }]);
+      }
+      const icon = this.refButton.firstElementChild;
+      icon.className = 'spinner-border spinner-border-sm';
+      groups
+        .then(g => { if (this.a === a) this.show(g, terms); })
+        .catch(err => {
+          console.error('reference sources', err);
+          if (this.a === a) notify('danger', this.form.dataset.error);
+        })
+        .finally(() => { icon.className = 'fa fa-globe'; });
+    },
+    show(groups, terms) {
+      const { same, near, use, none } = this.ref.dataset;
+      const exact = new Set(terms);
+      const folded = new Set(terms.map(fold));
+      const el = (tag, text = '', cls = '') => {
+        const e = document.createElement(tag);
+        e.textContent = text;
+        e.className = cls;
+        return e;
+      };
+      const mark = (e, s) => {
+        const label = exact.has(s) ? same : folded.has(fold(s)) ? near : '';
+        if (label) {
+          e.classList.add(label === same ? 'fw-bold' : 'book-near');
+          e.title = [e.title, label].filter(Boolean).join(' – ');
+        }
+        return e;
+      };
+      const nodes = groups.filter(g => g.items.length).flatMap(g => {
+        const ul = el('ul', '', 'list-unstyled mb-0');
+        for (const c of g.items) {
+          const b = el('button', c.name, 'btn btn-link btn-sm p-0 align-baseline');
+          b.type = 'button';
+          b.title = use;
+          b.addEventListener('click', () => this.use(c.term, c.name));
+          const li = el('li');
+          li.append(mark(b, c.name), ...c.details.filter(Boolean)
+            .flatMap(d => [' · ', mark(el('span', d), d)]));
+          if (c.link) {
+            const w = el('a', '', 'ms-2');
+            w.href = c.link.href;
+            w.target = '_blank';
+            w.rel = 'noreferrer noopener';
+            w.title = c.link.title;
+            w.append(el('i', '', c.link.icon));
+            li.append(w);
+          }
+          if (c.note) li.append(el('div', c.note, 'text-body-secondary'));
+          if (c.forms?.length) {
+            const f = el('div', '', 'fst-italic');
+            f.append(...c.forms.flatMap((s, i) => [i ? ', ' : '', mark(el('span', s), paren(s)[0])]));
+            li.append(f);
+          }
+          ul.append(li);
+        }
+        return [el('div', g.head, 'fw-semibold mt-1'), ul];
+      });
+      const cols = el('div', '', 'book-ref-cols');
+      cols.append(...(nodes.length ? nodes : [el('div', none)]));
+      this.ref.replaceChildren(cols);
+      this.ref.hidden = false;
+      this.refButton.setAttribute('aria-expanded', 'true');
+      this.spread();
+      this.ref.scrollIntoView({ block: 'nearest' });
+    },
+    use(term, name) {
+      const v = this.field.value;
+      const i = v.indexOf(term);
+      if (i < 0) return;
+      this.field.value = v.slice(0, i) + name + v.slice(i + term.length);
+      this.field.dispatchEvent(new Event('input'));
+      this.field.focus();
     },
     filter(q) {
       const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
