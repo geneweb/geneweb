@@ -91,3 +91,24 @@ val added_families :
     {!merge_person} with the [kind] ["families"], of the families of [ip] beyond
     its [seen] first ones: those added since a form creating a family of [ip]
     was displayed. *)
+
+val note_snapshot : Config.config -> string -> string -> string
+(** [note_snapshot conf fname s] seals the text [s] of the note [fname] as
+    stored, its header lines included, like {!person_snapshot}. *)
+
+val note_of_snapshot : Config.config -> string -> string -> string option
+(** [note_of_snapshot conf fname s] is the text sealed in [s] by
+    {!note_snapshot}; [None] when [s] is not readable or holds another note than
+    [fname]. *)
+
+val merge_note :
+  Config.config -> string option -> string -> string -> string * string
+(** [merge_note conf o a b] merges line by line the text [b] of a note, posted
+    by a form displayed on the text [o] ({!note_of_snapshot}), with its text [a]
+    as stored now: between the lines kept on both sides, a block of lines
+    changed on one side only takes that side, a block changed on both sides to
+    different lines keeps the lines of [a] and is a difference to check. Without
+    [o], any difference is to be checked. Returns the merged text and its review
+    in the JSON of {!merge_person}, whose differences carry [text]: the name of
+    the text area, and the lines of [a] and of [b] with the unchanged line
+    before and after them, to swap them in the text area. *)

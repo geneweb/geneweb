@@ -138,6 +138,35 @@ let test_merge_family () =
     (List.map (fun (fn, _, _, _, _) -> fn) (Array.to_list des.children));
   (check (pair int int)) "no conflict" (1, 0) (counts review)
 
+let test_merge_note () =
+  let c = conf "salt" in
+  let merge o a b = UpdateConflict.merge_note c o a b in
+  let o = "a\nb\nc\nd" in
+  let s, review = merge (Some o) "a\nB\nc\nd" "a\nb\nc\nD" in
+  (check string) "both changes" "a\nB\nc\nD" s;
+  (check (pair int int)) "no conflict" (1, 0) (counts review);
+  let s, review = merge (Some o) "a\nX\nc\nd" "a\nY\nc\nd" in
+  (check string) "conflict keeps theirs" "a\nX\nc\nd" s;
+  (check (pair int int)) "one conflict" (1, 1) (counts review);
+  let text =
+    Yojson.Safe.Util.(
+      Yojson.Safe.from_string review
+      |> member "conflicts" |> index 0 |> member "text")
+  in
+  (check (pair string string))
+    "lines to swap" ("a\nX\nc", "a\nY\nc")
+    Yojson.Safe.Util.
+      (to_string (member "saved" text), to_string (member "mine" text));
+  let _, review = merge None "a\nX" "a\nY" in
+  (check (pair int int)) "no snapshot" (0, 1) (counts review);
+  (check bool) "snapshot of the note" true
+    (UpdateConflict.note_of_snapshot c "f"
+       (UpdateConflict.note_snapshot c "f" o)
+     = Some o
+    && UpdateConflict.note_of_snapshot c "g"
+         (UpdateConflict.note_snapshot c "f" o)
+       = None)
+
 let v =
   [
     ( "update-conflict",
@@ -146,5 +175,6 @@ let v =
         test_case "family snapshot" `Quick test_family_snapshot;
         test_case "person merge" `Quick test_merge_person;
         test_case "family merge" `Quick test_merge_family;
+        test_case "note merge" `Quick test_merge_note;
       ] );
   ]

@@ -86,6 +86,8 @@ val print_sub_part :
     navigation button. *)
 
 val print_mod_view_page :
+  ?stored:string ->
+  ?review:string ->
   config (* conf *) ->
   bool (* can_edit *) ->
   Adef.encoded_string (* mode *) ->
@@ -95,8 +97,11 @@ val print_mod_view_page :
   (string * string) list (* env *) ->
   string (* s *) ->
   unit
-(** [print_mod_view_page conf can_edit mode fname title env s] Prints an
-    editable part *)
+(** [print_mod_view_page ?stored ?review conf can_edit mode fname title env s]
+    Prints an editable part. The form carries the digest and the snapshot
+    ({!UpdateConflict.note_snapshot}) of [stored], the text as stored, [env] and
+    [s] by default; [review] ({!UpdateConflict.merge_note}, none by default)
+    lists above it the changes saved meanwhile. *)
 
 val print_mod_ok :
   config (* conf *) ->
@@ -114,7 +119,10 @@ val print_mod_ok :
   bool (* title_is_1st *) ->
   unit
 (** [print_mod_ok conf wi edit_mode fname read_string commit string_filter
-     title_is_1st] Commits the changes of a page *)
+     title_is_1st] Commits the changes of a page. When the page was saved
+    meanwhile by another form, or with [return] posted, nothing is written: the
+    form is displayed again on the whole page, the entry merged with the page as
+    stored ({!UpdateConflict.merge_note}). *)
 
 (*S: shouldn't the following functions be defined elsewhere? *)
 
