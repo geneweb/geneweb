@@ -208,6 +208,15 @@
 
 (rule
   (package geneweb)
+  (targets updateConflict.js.gz updateConflict.js.br)
+  (deps (:input updateConflict.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets updateField.js.gz updateField.js.br)
   (deps (:input updateField.js))
   (action

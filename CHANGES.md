@@ -204,6 +204,15 @@
   the birth or after the burial, in the chronology too. In a family, a
   divorce, a separation or an annulment that the dates leave unordered
   stays after the events of the relation.
+- A person or family form whose record was saved by another form while
+  it was open is no longer refused with "the base has changed", which
+  lost the entry. The form is displayed again, the entry kept and merged
+  field by field and event by event with the changes saved meanwhile,
+  which are listed above it. A field changed on both sides shows the
+  saved value, marked in red, with the entry beside it and a button to
+  restore it; the form can be saved again once each difference is
+  checked. A form creating a family is displayed again likewise when
+  another family was added meanwhile to the same person.
 - A person form is no longer refused with "the base has changed" when,
   meanwhile, the form of another person added or removed it as a
   witness, a godparent or a relation.

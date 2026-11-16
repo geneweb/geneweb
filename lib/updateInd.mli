@@ -11,15 +11,18 @@ val string_person_of :
 
 val print_update_ind :
   ?snapshot:string ->
+  ?review:string ->
   config ->
   Geneweb_db.Driver.base ->
   (Geneweb_db.Driver.iper, Update.key, string) gen_person ->
   string ->
   unit
-(** [print_update_ind ?snapshot conf base p digest] renders the person form
-    [updind.txt] filled with [p]. [digest] and [snapshot] (from
+(** [print_update_ind ?snapshot ?review conf base p digest] renders the person
+    form [updind.txt] filled with [p]. [digest] and [snapshot] (from
     {!UpdateConflict.person_snapshot}, none by default) are posted back to
-    detect and resolve the changes saved meanwhile by other forms. *)
+    detect and resolve the changes saved meanwhile by other forms; [review]
+    (from {!UpdateConflict.merge_person}, none by default) lists them above the
+    form. *)
 
 val print_del : config -> Geneweb_db.Driver.base -> unit
 (** Displays a page for validating the deletion of a person *)

@@ -1068,7 +1068,19 @@ let print_mod_aux conf base callback =
       match check_person conf base p with
       | Some err -> error_person conf err
       | None -> callback p
-  else Update.error_digest conf
+  else
+    let p, review =
+      UpdateConflict.merge_person conf
+        ~snapshot:(Option.value ~default:"" (p_getenv conf.env "snapshot"))
+        ini_ps (strip_person p)
+    in
+    Notif.warning ~mode:Notif.Dismissible
+      (Utf8.capitalize_fst (transl_nth conf "edit conflict" 0));
+    UpdateInd.print_update_ind
+      ~snapshot:(UpdateConflict.person_snapshot conf ini_ps)
+      ~review
+      (Notif.inject_pending conf)
+      base p digest
 
 let print_mod ?prerr o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)

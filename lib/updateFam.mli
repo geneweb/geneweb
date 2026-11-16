@@ -21,6 +21,7 @@ val string_family_of :
 val print_update_fam :
   ?grandparents:(string * Update.key) list ->
   ?snapshot:string ->
+  ?review:string ->
   config ->
   Driver.base ->
   (Update.key, Driver.ifam, string) gen_family
@@ -28,15 +29,17 @@ val print_update_fam :
   * Update.key gen_descend ->
   string ->
   unit
-(** [print_update_fam ?grandparents ?snapshot conf base (fam, cpl, des) digest]
-    renders the family form [updfam.txt] filled with [fam], its couple [cpl] and
-    its children [des], for [m] among [ADD_FAM], [ADD_PAR], [MOD_FAM], their
-    [_OK] redisplays and the family merge modes; any other [m] yields the
+(** [print_update_fam ?grandparents ?snapshot ?review conf base (fam, cpl, des)
+     digest] renders the family form [updfam.txt] filled with [fam], its couple
+    [cpl] and its children [des], for [m] among [ADD_FAM], [ADD_PAR], [MOD_FAM],
+    their [_OK] redisplays and the family merge modes; any other [m] yields the
     incorrect-request page. [digest] and [snapshot] (from
     {!UpdateConflict.family_snapshot}, none by default) are posted back to
-    detect and resolve the changes saved meanwhile by other forms.
-    [grandparents] binds the input prefix ["pa<k><j>"] of parent [j] of the
-    family parent [k] to its key, to redisplay these blocks. *)
+    detect and resolve the changes saved meanwhile by other forms; [review]
+    (from {!UpdateConflict.merge_family} or {!UpdateConflict.added_families},
+    none by default) lists them above the form. [grandparents] binds the input
+    prefix ["pa<k><j>"] of parent [j] of the family parent [k] to its key, to
+    redisplay these blocks. *)
 
 val print_add : config -> Driver.base -> unit
 (** [print_add conf base] handles [m=ADD_FAM]: empty family form, or with

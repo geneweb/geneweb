@@ -234,6 +234,7 @@
   <div class="row">
     %apply;nav()
   </div>
+  %apply;review()
   <p class="my-0">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">
