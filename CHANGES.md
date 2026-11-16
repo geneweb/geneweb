@@ -213,6 +213,10 @@
   restore it; the form can be saved again once each difference is
   checked. A form creating a family is displayed again likewise when
   another family was added meanwhile to the same person.
+- An open person or family form checks, when its tab is shown again and
+  every ten minutes, whether its record was saved meanwhile by another
+  form. It then offers to reload the form, or, once the entry is
+  started, to add the changes to it at once, as on saving.
 - A person form is no longer refused with "the base has changed" when,
   meanwhile, the form of another person added or removed it as a
   witness, a godparent or a relation.

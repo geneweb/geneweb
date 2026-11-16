@@ -18,7 +18,8 @@
 %end;
 
 %( Changes saved in the record while the form was open, and differences to
-   check: filled by js/updateConflict.js from the review of UpdateConflict. %)
+   check: filled by js/updateConflict.js from the review of UpdateConflict,
+   which also watches the record of an open form (m=CHK_DIGEST). %)
 %define;review()
   %if;(review!="")
     <div id="review" class="alert alert-warning" role="alert"
@@ -32,7 +33,12 @@
       data-nosnap="[*edit conflict]9" data-colon="[:]">
       <h5 class="alert-heading mb-0">[*edit conflict]0</h5>
     </div>
-    <script defer src="%etc_prefix;js/updateConflict.js?hash=%apply;hash%with;%etc_prefix;js/updateConflict.js%end;"></script>
+  %end;
+  %if;(review!="" or snapshot!="")
+    <script defer src="%etc_prefix;js/updateConflict.js?hash=%apply;hash%with;%etc_prefix;js/updateConflict.js%end;"
+      data-prefix="%prefix;" data-kind="%if;is_upd_ind;ind%else;fam%end;"
+      data-changed="[*edit conflict]15" data-reload="[*edit conflict]16"
+      data-merge="[*edit conflict]17"></script>
   %end;
 %end;
 
