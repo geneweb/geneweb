@@ -218,6 +218,10 @@
   first start, instead of changing at each start. OpenID Connect
   sessions now survive a restart too. Deleting the file invalidates
   the open forms and the sessions.
+- On Windows, the secret salt and the OpenID Connect state, nonce and
+  tokens are drawn from the secure random generator of the system
+  (BCryptGenRandom). The salt was a 30-bit number seeded by the clock,
+  and OpenID Connect could not log in.
 - The history of changes (`m=HIST_DIFF`) and the summary shown after
   saving a form pair the events before and after a change by their
   content rather than by their position: an inserted, removed or moved
