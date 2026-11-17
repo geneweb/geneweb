@@ -27,7 +27,9 @@
   notes_rename_test
   anomaly_test
   update_order_test
-  update_conflict_test)
+  update_conflict_test
+  collation_test
+  book_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix yojson))
 
 (test
