@@ -160,22 +160,7 @@ let trim_trailing_spaces s =
   in
   if len' = 0 then "" else if len' = len then s else String.sub s 0 len'
 
-let alphabetic_utf_8 n1 n2 =
-  let rec loop i1 i2 =
-    if i1 >= String.length n1 && i2 >= String.length n2 then i1 - i2
-    else if i1 >= String.length n1 then -1
-    else if i2 >= String.length n2 then 1
-    else
-      let cv1, ii1 = Name.unaccent_utf_8 false n1 i1 in
-      let cv2, ii2 = Name.unaccent_utf_8 false n2 i2 in
-      let c =
-        if cv1 = cv2 then
-          compare (String.sub n1 i1 (ii1 - i1)) (String.sub n2 i2 (ii2 - i2))
-        else compare cv1 cv2
-      in
-      if c = 0 then loop ii1 ii2 else c
-  in
-  if n1 = n2 then 0 else loop 0 0
+let alphabetic_utf_8 n1 n2 = Collation.compare n1 n2
 
 let alphabetic_value =
   let tab = Array.make 256 0 in
