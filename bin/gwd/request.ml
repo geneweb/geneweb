@@ -27,9 +27,9 @@ let this_request_updates_database conf =
       | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" | "MOD_NOTES"
       | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" | "OK_ADD"
       | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
-      | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA" | "PORTRAIT_MOVE_TO_BLASON"
-      | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK" | "PLACE_TERMS_OK"
-      | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
+      | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA_OK"
+      | "PORTRAIT_MOVE_TO_BLASON" | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
+      | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
       true
   | _ -> false
 
@@ -672,8 +672,8 @@ let treat_request =
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
-             | "MOD_DATA" ->
-                 w_wizard @@ w_base @@ w_index @@ UpdateDataDisplay.print_mod
+             | "MOD_DATA" when conf.wizard || conf.friend ->
+                 w_base @@ w_index @@ UpdateDataDisplay.print_mod
              | "PLACE_TERMS" ->
                  w_wizard @@ w_base @@ w_index @@ PlaceTermsDisplay.print
              | "PLACE_TERMS_OK" ->

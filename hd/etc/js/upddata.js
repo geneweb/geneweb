@@ -97,6 +97,9 @@
   const BookEdit = {
     a: null,
     init() {
+      const filter = document.getElementById('book-filter');
+      this.prefix = filter?.value;
+      filter?.addEventListener('input', () => this.filter(filter.value));
       const form = document.getElementById('book-edit');
       if (!form) return;
       this.form = form;
@@ -152,9 +155,6 @@
           this.move(ev.key === 'ArrowUp' ? -1 : 1);
         }
       });
-      const filter = document.getElementById('book-filter');
-      this.prefix = filter?.value;
-      filter?.addEventListener('input', () => this.filter(filter.value));
       const p = new URLSearchParams(location.search);
       const a = document.getElementById('k' + p.get('key'))
         ?.querySelector('a[data-entry]');

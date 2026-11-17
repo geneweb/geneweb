@@ -15,6 +15,7 @@
 <main class="container" id="welcome">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
+%define;book_of_cap(xx)[*book of %s:::xx]%end;
 %define;connect_with(xx)[*connect with %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
@@ -46,8 +47,8 @@
 %end;
 %define;book_button(xxx,yyy,zzz)
   <a class="btn btn-outline-success" data-bs-toggle="tooltip"
-    href="%prefix;m=MOD_DATA&data=xxx" title="[*modify] %apply;book_of%with;[yyy]1%end;%sp;
-      ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1
+    href="%prefix;m=MOD_DATA&data=xxx" title="%if;wizard;[*modify] %apply;book_of%with;[yyy]1%end;%sp;
+      ([wizard/wizards/friend/friends/exterior]0)%else;%apply;book_of_cap%with;[yyy]1%end;%end;"><i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1
   </a>
 %end;
 %if;(e.i!="" or e.p!="" or e.n!="" or e.pn!="")
@@ -480,7 +481,7 @@ fr: Mon compte associatif
   </div>
 %end;
 
-%if;(nb_persons.v!=0 and (((not roglo) and wizard) or (roglo and (not friend) and user.ident!=""
+%if;(nb_persons.v!=0 and (friend or ((not roglo) and wizard) or (roglo and user.ident!=""
     and (user.ident in b.superwizard or b.superwizard="all"))))
   <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
     <h2 class="h4 text-md-center">
@@ -499,12 +500,14 @@ fr: Mon compte associatif
       %apply;book_button("src","source/sources","box-archive")
       %apply;book_button("title","title/titles","crown")
       %apply;book_button("domain","domain/domains","chess-rook")
-      <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ms-2"
-        title="[*data typographic checker]"><i class="fas fa-spell-check" aria-hidden="true"></i>
-      </a>
-      <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success ms-2"
-        title="[*unknown persons]"><i class="fas fa-user-xmark" aria-hidden="true"></i>
-      </a>
+      %if;wizard;
+        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ms-2"
+          title="[*data typographic checker]"><i class="fas fa-spell-check" aria-hidden="true"></i>
+        </a>
+        <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success ms-2"
+          title="[*unknown persons]"><i class="fas fa-user-xmark" aria-hidden="true"></i>
+        </a>
+      %end;
     </div>
   </div>
 %end;
