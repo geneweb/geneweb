@@ -233,8 +233,8 @@ let ascii =
       | None -> [ c lsl 4 ])
 
 (* Standard tailorings of the Common Locale Data Repository (CLDR 50,
-   common/collation/<language>.xml) for the languages of GeneWeb whose order
-   differs from the common one *)
+   common/collation/<language>.xml) for the languages of GeneWeb and the
+   European languages with digraphs whose order differs from the common one *)
 let rules =
   [
     ("af", {|&N<<<ŉ|});
@@ -250,6 +250,16 @@ let rules =
        &S<š<<<Š
        &Z<ž<<<Ž|}
     );
+    ( "cy",
+      {|&C<ch<<<Ch<<<CH
+       &D<dd<<<Dd<<<DD
+       &F<ff<<<Ff<<<FF
+       &G<ng<<<Ng<<<NG
+       &L<ll<<<Ll<<<LL
+       &P<ph<<<Ph<<<PH
+       &R<rh<<<Rh<<<RH
+       &T<th<<<Th<<<TH|}
+    );
     ( "da",
       {|[caseFirst upper]
        &D<<đ<<<Đ<<ð<<<Ð
@@ -258,6 +268,16 @@ let rules =
        &Y<<ü<<<Ü<<ű<<<Ű
        &[before 1]ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA
        &oe<<œ<<<Œ|}
+    );
+    ( "dsb",
+      {|&C<č<<<Č<ć<<<Ć
+       &E<ě<<<Ě
+       &H<ch<<<cH<<<Ch<<<CH
+       &[before 1] L<ł<<<Ł
+       &N<ń<<<Ń
+       &R<ŕ<<<Ŕ
+       &S<š<<<Š<ś<<<Ś
+       &Z<ž<<<Ž<ź<<<Ź|}
     );
     ( "eo",
       {|&C<ĉ<<<Ĉ
@@ -280,6 +300,71 @@ let rules =
        &Y<<ü<<<Ü
        &Z\u0335<<ʒ<<<Ʒ
        &[before 1]ǀ<å<<<Å<ä<<<Ä<<æ<<<Æ<ö<<<Ö<<ø<<<Ø|}
+    );
+    ( "fo",
+      {|&D<<đ<<<Đ<<ð<<<Ð
+       &t<<<þ/h
+       &T<<<Þ/H
+       &Y<<ü<<<Ü<<ű<<<Ű
+       &[before 1]ǀ<æ<<<Æ<<ä<<<Ä<<ę<<<Ę<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<<œ<<<Œ<å<<<Å<<<aa<<<Aa<<<AA|}
+    );
+    ( "hr",
+      {|[reorder Latn Cyrl]
+       &C<č<<<Č<ć<<<Ć
+       &D<dž<<<ǆ<<<Dž<<<ǅ<<<DŽ<<<Ǆ<đ<<<Đ
+       &L<lj<<<ǉ<<<Lj<<<ǈ<<<LJ<<<Ǉ
+       &N<nj<<<ǌ<<<Nj<<<ǋ<<<NJ<<<Ǌ
+       &S<š<<<Š
+       &Z<ž<<<Ž|}
+    );
+    ( "hsb",
+      {|&C<č<<<Č<ć<<<Ć
+       &E<ě<<<Ě
+       &H<ch<<<cH<<<Ch<<<CH
+       &[before 1] L<ł<<<Ł
+       &R<ř<<<Ř
+       &S<š<<<Š
+       &Z<ž<<<Ž<ź<<<Ź|}
+    );
+    ( "hu",
+      {|&C<cs<<<Cs<<<CS
+       &D<dz<<<Dz<<<DZ
+       &DZ<dzs<<<Dzs<<<DZS
+       &G<gy<<<Gy<<<GY
+       &L<ly<<<Ly<<<LY
+       &N<ny<<<Ny<<<NY
+       &S<sz<<<Sz<<<SZ
+       &T<ty<<<Ty<<<TY
+       &Z<zs<<<Zs<<<ZS
+       &O<ö<<<Ö<<ő<<<Ő
+       &U<ü<<<Ü<<ű<<<Ű
+       &cs<<<ccs/cs
+       &Cs<<<Ccs/cs
+       &CS<<<CCS/CS
+       &dz<<<ddz/dz
+       &Dz<<<Ddz/dz
+       &DZ<<<DDZ/DZ
+       &dzs<<<ddzs/dzs
+       &Dzs<<<Ddzs/dzs
+       &DZS<<<DDZS/DZS
+       &gy<<<ggy/gy
+       &Gy<<<Ggy/gy
+       &GY<<<GGY/GY
+       &ly<<<lly/ly
+       &Ly<<<Lly/ly
+       &LY<<<LLY/LY
+       &ny<<<nny/ny
+       &Ny<<<Nny/ny
+       &NY<<<NNY/NY
+       &sz<<<ssz/sz
+       &Sz<<<Ssz/sz
+       &SZ<<<SSZ/SZ
+       &ty<<<tty/ty
+       &Ty<<<Tty/ty
+       &TY<<<TTY/TY
+       &zs<<<zzs/zs
+       &Zs<<<Zzs/zs
+       &ZS<<<ZZS/ZS|}
     );
     ( "is",
       {|&[before 1]b<á<<<Á
@@ -318,6 +403,14 @@ let rules =
        &U<ū<<<Ū
        &Z<ž<<<Ž|}
     );
+    ( "mt",
+      {|[caseFirst upper]
+       &[before 1]c<ċ<<<Ċ
+       &[before 1]g<ġ<<<Ġ
+       &[before 1]h<għ<<<gĦ<<<Għ<<<GĦ
+       &[before 1]i<ħ<<<Ħ
+       &[before 1]z<ż<<<Ż|}
+    );
     ( "no",
       {|&D<<đ<<<Đ<<ð<<<Ð
        &t<<<þ/h
@@ -355,6 +448,19 @@ let rules =
        &D<đ<<<Đ
        &S<š<<<Š
        &Z<ž<<<Ž|});
+    ( "sq",
+      {|&[before 1]D<ç<<<Ç
+       &[before 1]E<dh<<<Dh<<<DH
+       &[before 1]F<ë<<<Ë
+       &[before 1]H<gj<<<Gj<<<GJ
+       &[before 1]M<ll<<<Ll<<<LL
+       &[before 1]O<nj<<<Nj<<<NJ
+       &[before 1]S<rr<<<Rr<<<RR
+       &[before 1]T<sh<<<Sh<<<SH
+       &[before 1]U<th<<<Th<<<TH
+       &[before 1]Y<xh<<<Xh<<<XH
+       &[before 1]Ʒ<zh<<<Zh<<<ZH|}
+    );
     ( "sv",
       {|&D<<đ<<<Đ<<ð<<<Ð
        &t<<<þ/h
@@ -443,8 +549,8 @@ let root_char t s i =
            (fun u ->
              let l = Uchar.to_int (lower u) in
              match Hashtbl.find_opt weights l with
-             | Some (p, w)
-               when t.cyrillic_first && Uucp.Script.script u = `Cyrl ->
+             | Some (p, w) when t.cyrillic_first && Uucp.Script.script u = `Cyrl
+               ->
                  (List.map (fun w -> w - 0x8000) p, w)
              | Some w -> w
              | None -> (
