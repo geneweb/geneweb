@@ -15,8 +15,9 @@ val compare : string -> string -> int
 
 val set_lang : string -> unit
 (** [set_lang lang] makes [compare] follow the alphabet of the language [lang]
-    (ISO 639-1 code, region ignored), as tailored by the Common Locale Data
-    Repository (CLDR): Breton, Czech, Danish, Esperanto, Estonian, Finnish,
-    Icelandic, Latvian, Lithuanian, Norwegian, Polish, Romanian, Slovak,
-    Slovenian, Spanish, Swedish, Turkish, Afrikaans, and Bulgarian and Russian
-    (Cyrillic first). Other languages follow the common order. *)
+    (ISO 639 code, region ignored), as tailored by the Common Locale Data
+    Repository (CLDR): Afrikaans, Albanian, Breton, Croatian, Czech, Danish,
+    Esperanto, Estonian, Faroese, Finnish, Hungarian, Icelandic, Latvian,
+    Lithuanian, Lower and Upper Sorbian, Maltese, Norwegian, Polish, Romanian,
+    Slovak, Slovenian, Spanish, Swedish, Turkish, Welsh, and Bulgarian and
+    Russian (Cyrillic first). Other languages follow the common order. *)

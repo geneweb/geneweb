@@ -76,7 +76,17 @@ let tailorings () =
   tailored "tr"
     [ "Iğdır"; "Ilgaz"; "ılık"; "Irmak"; "Ismail"; "Işık"; "İsmail" ];
   tailored "ru" [ "Иван"; "Ivan" ];
-  tailored "br" [ "Cudennec"; "Chever"; "C’hoarzh"; "Daniel" ]
+  tailored "br" [ "Cudennec"; "Chever"; "C’hoarzh"; "Daniel" ];
+  tailored "hu" [ "Czuczor"; "Csaba"; "Dózsa"; "Dzsida"; "Esterházy" ];
+  tailored "hu" [ "kasza"; "kassza"; "kaszt" ];
+  tailored "hu" [ "dzs"; "Dzs"; "DZS" ];
+  tailored "hr"
+    [ "Drašković"; "Džamonja"; "Đurić"; "Lovro"; "Ljubica"; "Marko" ];
+  tailored "cy" [ "Lyn"; "Lloyd"; "Roberts"; "Rhys" ];
+  tailored "sq" [ "Cani"; "Çela"; "Dushi"; "Dhimitri"; "Elena" ];
+  tailored "mt" [ "Ġorġ"; "Grech"; "Għajn"; "Hamrun"; "Ħal"; "Ilma" ];
+  tailored "hsb" [ "Hanka"; "Chróst"; "Ivan" ];
+  tailored "fo" [ "Zakarias"; "Ærting"; "Øster"; "Aaberg" ]
 
 (* The letters followed by "a" of CollationTest_NON_IGNORABLE_SHORT.txt
    (UCA 17.0.0) made of the letters and marks of the table, in its order,

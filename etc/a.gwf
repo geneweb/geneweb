@@ -20,9 +20,10 @@
 #default_lang=fr
 
 # Alphabetical order of the lists and dictionaries: the language whose
-# alphabet is followed (af, br, cs, da, eo, es, et, fi, is, lt, lv, no, pl, ro,
-# sk, sl, sv, tr, and bg, ru for Cyrillic first), any other language following
-# the common order of Unicode. Default is the language of the base.
+# alphabet is followed (af, br, cs, cy, da, dsb, eo, es, et, fi, fo, hr, hsb,
+# hu, is, lt, lv, mt, no, pl, ro, sk, sl, sq, sv, tr, and bg, ru for Cyrillic
+# first), any other language following the common order of Unicode. Default
+# is the language of the base.
 #collation=sv
 
 # Select a default Sosa reference while navigating with an individual’ key
