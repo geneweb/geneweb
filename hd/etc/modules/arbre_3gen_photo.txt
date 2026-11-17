@@ -60,7 +60,7 @@
       %if;(father.has_parents and mother.has_image)%father.image_small_size;
       %elseif;(mother.has_parents and father.has_image)%mother.image_small_size;%end;>?</span>%)
   %end;
-  %apply;short_display_person_tree("xx")
+  %apply;person_tree_box("xx")
 %end;
 %if;has_parents;
   <table class="mt-2 mt-md-0 mx-auto px-0 text-center%if;(op_m=2) small%end;" style="line-height:0.9rem">
@@ -184,7 +184,7 @@
       <tr>
         <td colspan="5"></td>
         <td colspan="9">%nn;
-          %apply;short_display_person_tree("self")
+          %apply;person_tree_box("self")
         </td>
         <td colspan="5"></td>
       </tr>

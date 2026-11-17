@@ -153,8 +153,8 @@
   %( ancestor %)
   <td %if;(xx.same!="")colspan="8"%else;%apply;td_missing_events_rowspan("xx")%end;
     class="text-start align-middle" id="%xx.index;">
-    %apply;image_MF("xx")
-    %apply;short_display_person("xx")
+    %apply;person_sex_icon("xx")
+    %apply;person_name_dates("xx")
     %if;(xx.same!="" and e.repeat="on")
       %sp;->
       [same ancestor as n° Sosa]
@@ -218,8 +218,8 @@
         %foreach;xx.family;
           %if;(family_cnt=1)
             <td class="text-start align-middle">
-              %apply;image_MF("spouse")
-              %apply;short_display_person("spouse")
+              %apply;person_sex_icon("spouse")
+              %apply;person_name_dates("spouse")
             </td>
           %end;
         %end;
@@ -229,8 +229,8 @@
     %else;
       <td class="text-start align-middle">
         %if;xx.has_families;
-          %apply;image_MF("xx.spouse")
-          %apply;short_display_person("xx.spouse")
+          %apply;person_sex_icon("xx.spouse")
+          %apply;person_name_dates("xx.spouse")
         %end;
       </td>
     %end;
@@ -469,8 +469,8 @@
     %if;(family_cnt!=1)
       <tr>
         <td class="text-start align-middle">
-          %apply;image_MF("spouse")
-          %apply;short_display_person("spouse")
+          %apply;person_sex_icon("spouse")
+          %apply;person_name_dates("spouse")
         </td>
 
         %reset_count;

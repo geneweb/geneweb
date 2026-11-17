@@ -19,8 +19,8 @@
           <h2 class="h3">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h2>
         %end;
         <ul>
-          %apply;descendancy_grand_fathers("father","parhigh", bi)
-          %apply;descendancy_grand_mothers("father","parhigh", bi)
+          %apply;grandparent_families("father", "father", bi)
+          %apply;grandparent_families("father", "mother", bi)
         </ul>
       </td>
       %end;
@@ -30,8 +30,8 @@
           <h2 class="h3">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h2>
         %end;
         <ul>
-          %apply;descendancy_grand_fathers("mother","parhigh", bi)
-          %apply;descendancy_grand_mothers("mother","parhigh", bi)
+          %apply;grandparent_families("mother", "father", bi)
+          %apply;grandparent_families("mother", "mother", bi)
         </ul>
       %end;
       </td>
@@ -46,8 +46,8 @@
       <div class="col-%if;(not has_siblings)6%else;4%end;">
         <h2 class="h3">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h2>
         <ul class="list-unstyled small">
-          %apply;descendancy_grand_fathers("father","parhigh", bi)
-          %apply;descendancy_grand_mothers("father","parhigh", bi)
+          %apply;grandparent_families("father", "father", bi)
+          %apply;grandparent_families("father", "mother", bi)
         </ul>
       </div>
     %end;
@@ -55,8 +55,8 @@
       %if;(has_parents and has_siblings)
         <h2 class="h3">[*parents], [full siblings]</h2>
         <ul class="list-unstyled small">
-          %apply;descendancy_grand_fathers("self","parhigh", bi)
-          %apply;descendancy_grand_mothers("self","parhigh", bi)
+          %apply;grandparent_families("self", "father", bi)
+          %apply;grandparent_families("self", "mother", bi)
         </ul>
       %end;
     </div>
@@ -64,8 +64,8 @@
       <div class="col-%if;(not has_siblings)6%else;4%end;">
         <h2 class="h3">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h2>
         <ul class="list-unstyled small">
-          %apply;descendancy_grand_fathers("mother","parhigh", bi)
-          %apply;descendancy_grand_mothers("mother","parhigh", bi)
+          %apply;grandparent_families("mother", "father", bi)
+          %apply;grandparent_families("mother", "mother", bi)
        </ul>
       </div>
     %end;

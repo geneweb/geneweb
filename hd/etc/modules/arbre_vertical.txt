@@ -73,7 +73,7 @@
               %end;
             %end;
           %in;
-          %apply;short_display_person_tree("cell.person")%nn;
+          %apply;person_tree_box("cell.person")%nn;
           %if;(cell_person_dead!="" and cell.person!=self and cell.person!=self.mother and cell.person!=self.father)
             <div class="text-danger" title="[*falsely alive]">†</div>
           %end;

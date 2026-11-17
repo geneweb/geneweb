@@ -86,7 +86,7 @@
           %foreach;xx.family;
             %if;(spouse.first_name!="?" and spouse.surname!="?")
               %if;(family_cnt>1),%sp;%end;
-              %apply;image_MF("spouse")
+              %apply;person_sex_icon("spouse")
               %apply;link(spouse.access, spouse, spouse.index)
             %end;
           %end;
@@ -129,7 +129,7 @@
               %and;%ancestor.first_name;
               %and;%ancestor.surname_begin;
               %and;%ancestor.access;
-              %and;%apply;image_MF("ancestor")
+              %and;%apply;person_sex_icon("ancestor")
               %and;%ancestor.nobility_title;
               %and;%apply;ancestor_missing_birth("ancestor")
               %and;%apply;ancestor_missing_death("ancestor")
@@ -292,7 +292,7 @@
                 <td class="text-center"> x </td>
                 <td> &nbsp; </td>
                 <td>
-                  %apply;image_MF("ancestor")
+                  %apply;person_sex_icon("ancestor")
                   %apply;link(ancestor.access, ancestor, ancestor.index)
                   %ancestor.title;
                 </td>
@@ -309,7 +309,7 @@
                   <td> &nbsp; </td>
                   <td class="text-center"> x </td>
                   <td>
-                    %apply;image_MF("ancestor.mother")
+                    %apply;person_sex_icon("ancestor.mother")
                     %apply;link(ancestor.mother.access, ancestor.mother, ancestor.mother.index)
                     %ancestor.mother.title;
                   </td>
@@ -326,7 +326,7 @@
                   <td> &nbsp; </td>
                   <td class="text-center"> x </td>
                   <td>
-                    %apply;image_MF("ancestor.father")
+                    %apply;person_sex_icon("ancestor.father")
                     %apply;link(ancestor.father.access, ancestor.father, ancestor.father.index)
                     %ancestor.father.title;
                   </td>

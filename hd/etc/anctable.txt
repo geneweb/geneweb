@@ -66,7 +66,7 @@
     %end;>
     <div class="d-flex justify-content-between">
       <div class="align-self-center">
-        %apply;image_MF("ancestor")
+        %apply;person_sex_icon("ancestor")
         %apply;link%with;%ancestor.access;%and;%if;(e.fn=1)%ancestor.first_name; %ancestor.surname;%else;%ancestor;%end;%and;%ancestor.index;%end;
         %if;(e.tt=1 and ancestor.title!=""), %ancestor.title;%end;
         %if;(ancestor.same!="" and e.repeat="on" and e.num!="on")
@@ -95,7 +95,7 @@
     %foreach;ancestor.family;
       %if;(family_cnt=1)
         <td class="align-middle%apply;incomplete("spouse")">
-          %apply;image_MF("spouse")
+          %apply;person_sex_icon("spouse")
           %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
         </td>
       %end;
@@ -209,7 +209,7 @@
                          %end;
                        %end;"%nn;
               %end;>
-              %apply;image_MF("spouse")
+              %apply;person_sex_icon("spouse")
               %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
             </td>
           %end;

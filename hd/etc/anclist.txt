@@ -69,11 +69,11 @@
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 0)
     <ul class="fa-ul">
-      <li><span class="fa-li"><i class="fa fa-person male fa-fw me-1"></i></span><a href="%prefix;
-        %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
+      <li><span class="fa-li"><i class="fa fa-person male fa-fw me-1"></i></span>%nn;
+        %apply;person_link("xx.father", "")%xx.father.title;%xx.father.dates;%nl;
         %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw me-1"></i></span><a href="%prefix;
-        %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
+      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw me-1"></i></span>%nn;
+        %apply;person_link("xx.mother", "")%xx.mother.title;%xx.mother.dates;%nl;
         %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
   %end;

@@ -5,7 +5,7 @@
     <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
              %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;" title="[*navigation]"></a>
   %end;
-  %if;(xxx.has_sosa)%apply;display_sosa("xxx")<br>%end;
+  %if;(xxx.has_sosa)%apply;person_sosa_icon("xxx")<br>%end;
   %if;(cancel_links or xxx.is_restricted)
     %if;(xxx.public_name!="")%xxx.public_name;
     %else;%xxx.first_name;
@@ -14,7 +14,7 @@
     <a class="normal_anchor"
       href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;%end;%nn;
             %else;%apply;url_set("i/m/t", xxx.index)%end;"
-      title=" %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
+      %if;xxx.is_name_visible; title="%apply;person_key("xxx")"%end;>
       %if;(xxx.public_name!="")%xxx.public_name;
       %else;%xxx.first_name;
       %end; <span class="text-nowrap">%xxx.surname;</span>
@@ -23,7 +23,7 @@
   %if;(wizard and not cancel_links)
     <a class="normal_anchor"
       href="%prefix;m=MOD_IND&%xxx.access;"
-      title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
+      title="%apply;person_mod_label("xxx")">
   %end;
     <span class="fst-italic">%nn;
       %if;(xxx.dates!="")%xxx.dates;%nn;

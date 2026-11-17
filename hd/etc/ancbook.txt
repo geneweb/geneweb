@@ -66,7 +66,7 @@
 
 %define;display_siblings(xx, count)
   <tr %if;(count != 1) class="table_content_siblings" %end;>
-    <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;image_MF("xx") %xx;</td>
+    <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;person_sex_icon("xx") %xx;</td>
     %apply;display_date("xx", 1)
     <td>
       %foreach;xx.family;
@@ -91,7 +91,7 @@
 %define;display_children(xx, count)
   <tr%if;(count % 2 = 0) class="table_content_odd"%end;>
     <td>
-      %apply;image_MF("xx")
+      %apply;person_sex_icon("xx")
       %xx;
     </td>
     %apply;display_date("xx", 0)
@@ -183,7 +183,7 @@
     <header class="d-flex justify-content-between align-items-center">
       <h2 id="ind_%xx.index;" class="d-flex align-items-center mb-0 px-2">
         <span class="highlight me-2">%xx;</span>
-        %apply;image_MF("xx")
+        %apply;person_sex_icon("xx")
       </h2>
       %if;(evar.sosa = "on" and xx.has_sosa)
         <span>
@@ -408,14 +408,14 @@
           %if;(has_relation_him and has_relation_her)
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_him") %relation_him; %sp;
+                %apply;person_sex_icon("relation_him") %relation_him; %sp;
                 (%apply;relation_type_txt(relation_type, relation_him.sex))
               </td>
               %apply;display_date("relation_him", 0)
             </tr>
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_her") %relation_her; %sp;
+                %apply;person_sex_icon("relation_her") %relation_her; %sp;
                 (%apply;relation_type_txt(relation_type, relation_her.sex))
               </td>
               %apply;display_date("relation_her", 0)
@@ -423,7 +423,7 @@
           %elseif;has_relation_him;
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_him") %relation_him; %sp;
+                %apply;person_sex_icon("relation_him") %relation_him; %sp;
                 (%apply;capitalize(relation_type))
               </td>
               %apply;display_date("relation_him", 0)
@@ -431,7 +431,7 @@
           %elseif;has_relation_her;
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_her") %relation_her; %sp;
+                %apply;person_sex_icon("relation_her") %relation_her; %sp;
                 (%apply;capitalize(relation_type))
               </td>
               %apply;display_date("relation_her", 0)
@@ -441,7 +441,7 @@
         %foreach;xx.related;
           <tr class="table_content_relations">
             <td class="borderna">
-              %apply;image_MF("related") %related;  %sp;
+              %apply;person_sex_icon("related") %related;  %sp;
               %if;(related = [foster son/foster daughter/foster child]0)
                 (%apply;capitalize([foster son/foster daughter/foster child]2))
               %elseif;(related = [foster son/foster daughter/foster child]1)
@@ -459,7 +459,7 @@
               %foreach;witness;
                 <tr>
                   <td class="borderna">
-                    %apply;image_MF("witness") %witness; %sp;
+                    %apply;person_sex_icon("witness") %witness; %sp;
                     ([*witness/witnesses]0)
                   </td>
                   %apply;display_date("witness", 0)
@@ -471,10 +471,10 @@
         %foreach;xx.event_witness_relation;
           <tr class="table_content_relations">
             <td class="borderna">
-              %apply;image_MF("event_witness_relation.person") %event_witness_relation.person; %sp;
+              %apply;person_sex_icon("event_witness_relation.person") %event_witness_relation.person; %sp;
               %if;(event_witness_relation.event.spouse != "")
                 [and]
-                %apply;image_MF("event_witness_relation.event.spouse") %event_witness_relation.event.spouse; %sp;
+                %apply;person_sex_icon("event_witness_relation.event.spouse") %event_witness_relation.event.spouse; %sp;
               %end;
               (%apply;capitalize(event_witness_relation_kind) :%sp;
               %event_witness_relation.event.name;)
@@ -535,7 +535,7 @@
                       <p class="m-0">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br>
+                          %apply;person_name_dates("event_witness")<br>
                         %end;
                       </p>
                     %end;

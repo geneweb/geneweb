@@ -102,14 +102,14 @@
   %end;
 %end;
 
-%define;image_sosa(xxx,yyy)
+%define;person_sosa_img(xxx,yyy)
   <img src="%images_prefix;sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy">%nn;
 %end;
 
-%define;display_sosa(xx)
+%define;person_sosa_icon(xx)
   %if;(xx.has_sosa and b.display_sosa="yes")
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+    %apply;person_sosa_img%with;%sosa_ref.first_name_key_strip;%sp;
     %sosa_ref.surname_key_strip;
     %and;%xx.sosa;%end;
     %if;not cancel_links;</a>%end;%sp;
@@ -149,7 +149,7 @@
                     <p style="margin:0;">
                       %foreach;event_witness;
                         <span>%apply;capitalize(event_witness_kind) :</span>
-                        %apply;short_display_person("event_witness")<br>
+                        %apply;person_name_dates("event_witness")<br>
                       %end;
                     </p>
                   %end;
@@ -215,7 +215,7 @@
                             %if;event.has_witnesses;
                               %foreach;event_witness;
                                 <span>%apply;capitalize(event_witness_kind) :</span>
-                                %apply;short_display_person("event_witness")<br>
+                                %apply;person_name_dates("event_witness")<br>
                               %end;
                             %end;
                             %if;event.has_note;<div>%event.note;</div>%end;
@@ -322,7 +322,7 @@
                   %if;event.has_witnesses;
                       %foreach;event_witness;
                         <span>%apply;capitalize(event_witness_kind)[:]</span>
-                        %apply;short_display_person("event_witness")<br>
+                        %apply;person_name_dates("event_witness")<br>
                       %end;
                   %end;
                   %if;event.has_note;<div>%event.note;</div>%end;
@@ -396,7 +396,7 @@
                     %if;event.has_witnesses;
                       %foreach;event_witness;
                         <span>%apply;capitalize(event_witness_kind)[:]</span>
-                        %apply;short_display_person("event_witness")<br>
+                        %apply;person_name_dates("event_witness")<br>
                       %end;
                     %end;
                     %if;event.has_note;<div>%event.note;</div>%end;

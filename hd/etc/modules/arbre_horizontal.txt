@@ -5,21 +5,17 @@
   %url_set(xx,yy)
 %end;
 
-%define;access_ind(nnn)
-  %if;(cancel_links or nnn.is_restricted)
-    %nnn;
-  %else;
-    <a %apply;ext_link("nnn") href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;%nn;
-  %end;
+%define;ah_person(nnn)
+  %apply;person_link("nnn", "")%nnn.title;%nn;
   <span class="text-nowrap small">%nnn.dates;</span>%nn;
 %end;
 
 %define;access(num,nnn)
-  %if;(evars=1)num%end; %apply;display_sosa("nnn")%nn;
+  %if;(evars=1)num%end; %apply;person_sosa_icon("nnn")%nn;
   %if;("num" = 1)
     %nnn;%nnn.title;%nnn.dates;<br>
   %else;
-    %apply;access_ind("nnn")<br>
+    %apply;ah_person("nnn")<br>
   %end;
 %end;
 

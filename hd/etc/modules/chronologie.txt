@@ -139,7 +139,7 @@
         %end;
       %end;
       <span class="text-nowrap">%nn;
-      %apply;short_display_person("event_witness")%nn;
+      %apply;person_name_dates("event_witness")%nn;
       </span>%nn;
       %if;(event_witness_note!="") (%event_witness_note;)%end;
       %if;(count=k_cnt).
@@ -170,7 +170,7 @@
   %apply;add_in_sorted_list%with;%apply;sort_key("ccc.birth_date")
     %and;%count2;
     %and;%if;(ccc.birth_date!="")%ccc.birth_date;%else;([missing date]0)%end;
-    %and;%apply;a_of_b%with;[birth/births]0%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")
+    %and;%apply;a_of_b%with;[birth/births]0%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;person_name_dates("ccc")
     %and;
     %and;
     %and;%apply;age_marker("age_at_child_birth")
@@ -185,7 +185,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("ccc.death_date")
       %and;%count2;
       %and;%if;(ccc.death_date!="")%ccc.death_date;%else;([missing date]0)%end;
-      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age.short;)%end;
+      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;person_name_dates("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age.short;)%end;
       %and;
       %and;
       %and;%apply;age_marker("age_at_child_death")
@@ -202,7 +202,7 @@
         %apply;add_in_sorted_list%with;%apply;sort_key("ccc.marriage_date")
           %and;%count2;
           %and;%if;(ccc.marriage_date!="")%ccc.marriage_date;%else;([missing date]0)%end;
-          %and;%apply;a_of_b%with;[marriage/marriages]0%and;%if;(ccc.public_name!="")%ccc.public_name;%else;%ccc.first_name;%end; [with] %apply;short_display_person("ccc.spouse")%end;
+          %and;%apply;a_of_b%with;[marriage/marriages]0%and;%if;(ccc.public_name!="")%ccc.public_name;%else;%ccc.first_name;%end; [with] %apply;person_name_dates("ccc.spouse")%end;
           %and;
           %and;
           %and;%apply;age_marker("age_at_child_marriage")
@@ -279,7 +279,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("related.baptism_date")
         %and;%count2;%nn;
         %and;%related.baptism_date;%nn;
-        %and;%related_type;[:]%sp;%apply;short_display_person("related")%nn;
+        %and;%related_type;[:]%sp;%apply;person_name_dates("related")%nn;
         %and;%related.baptism_place;%nn;
         %and;%nn;
         %and;%apply;age_marker("age_at_related_baptism")
@@ -299,9 +299,9 @@
             %event_witness_relation_kind;
             %and;%event_witness_relation.event.name;
           %end;
-          %and;%apply;short_display_person("event_witness_relation.person")%sp;
+          %and;%apply;person_name_dates("event_witness_relation.person")%sp;
             %if;(event_witness_relation.event.spouse!="")
-              %sp;[and]%sp;%apply;short_display_person("event_witness_relation.event.spouse")
+              %sp;[and]%sp;%apply;person_name_dates("event_witness_relation.event.spouse")
             %end;
         %end;
       %and;%event_witness_relation.event.place;
@@ -315,7 +315,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("father.birth_date")
       %and;%count2;
       %and;%if;(father.birth_date!="")%father.birth_date;%else;([missing date]0)%end;%nn;
-      %and;[birth of the father/birth of the mother]0 %apply;short_display_person("father")
+      %and;[birth of the father/birth of the mother]0 %apply;person_name_dates("father")
       %and;
       %and;
       %and;%apply;age_marker("age_at_father_birth")
@@ -324,7 +324,7 @@
     %apply;add_in_sorted_list%with;%apply;sort_key("mother.birth_date")
       %and;%count2;
       %and;%if;(mother.birth_date!="")%mother.birth_date;%else;([missing date]0)%end;%nn;
-      %and;[birth of the father/birth of the mother]1 %apply;short_display_person("mother")
+      %and;[birth of the father/birth of the mother]1 %apply;person_name_dates("mother")
       %and;
       %and;
       %and;%apply;age_marker("age_at_mother_birth")
@@ -334,7 +334,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("parent_marriage_date")
         %and;%count2;
         %and;%parent_marriage_date;
-        %and;[marriage of the parents] %apply;short_display_person("father") [and] %apply;short_display_person("mother")
+        %and;[marriage of the parents] %apply;person_name_dates("father") [and] %apply;person_name_dates("mother")
         %and;
         %and;
         %and;%apply;age_marker("age_at_parent_marriage")
@@ -345,7 +345,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("father.death_date")
         %and;%count2;
         %and;%if;(father.death_date!="")%father.death_date;%else;([missing date]0)%end;%nn;
-        %and;[death of the father/death of the mother]0 %apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age.short;)%end;
+        %and;[death of the father/death of the mother]0 %apply;person_name_dates("father")%if;(father.computable_death_age)%sp;(%father.death_age.short;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_father_death")
@@ -356,7 +356,7 @@
       %apply;add_in_sorted_list%with;%apply;sort_key("mother.death_date")
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;([missing date]0)%end;
-        %and;[death of the father/death of the mother]1 %apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age.short;)%end;
+        %and;[death of the father/death of the mother]1 %apply;person_name_dates("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age.short;)%end;
         %and;
         %and;
         %and;%apply;age_marker("age_at_mother_death")
@@ -381,7 +381,7 @@
         %apply;add_in_sorted_list%with;%apply;sort_key("spouse.birth_date")
           %and;%count2;
           %and;%spouse.birth_date;
-          %and;%if;spouse.is_male;[birth of the husband/birth of the wife]0%else;[birth of the husband/birth of the wife]1%end; %apply;short_display_person("spouse")
+          %and;%if;spouse.is_male;[birth of the husband/birth of the wife]0%else;[birth of the husband/birth of the wife]1%end; %apply;person_name_dates("spouse")
           %and;
           %and;
           %and;%apply;age_marker("age_at_spouse_birth")
@@ -391,7 +391,7 @@
         %apply;add_in_sorted_list%with;%apply;sort_key("spouse.death_date")
           %and;%count2;
           %and;%if;(spouse.death_date!="")%spouse.death_date;%else;([missing date]0)%end;%nn;
-          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end; %apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age.short;)%end;%nn;
+          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end; %apply;person_name_dates("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age.short;)%end;%nn;
           %and;%nn;
           %and;%nn;
           %and;%apply;age_marker("age_at_spouse_death")
@@ -426,7 +426,7 @@
               %incr_count2;
               %if;(item.2=count2)
                 %apply;capitalize(event.name)
-                %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
+                %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;person_name_dates%with;event.spouse%end;</span>%end;
                 %if;event.has_witnesses;
                   %if;not cancel_links;<a %apply;event_tree(index)><img src="%images_prefix;gui_create.png" class="ms-2 mb-1" height="16" alt="Tree"></a>%end;
                 %end;
@@ -435,12 +435,12 @@
                   <div class="small text-body-secondary">
                   %foreach;relation;
                     %if;(has_relation_him and has_relation_her and relation_type=[godfather/godmother/godparents]2)
-                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]0[:] %apply;short_display_person("relation_him").</span>
-                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]1[:] %apply;short_display_person("relation_her").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]0[:] %apply;person_name_dates("relation_him").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">[*godfather/godmother/godparents]1[:] %apply;person_name_dates("relation_her").</span>
                     %elseif;(has_relation_him and relation_type=[godfather/godmother/godparents]0)
-                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_him").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;person_name_dates("relation_him").</span>
                     %elseif;(has_relation_her and relation_type=[godfather/godmother/godparents]1)
-                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;short_display_person("relation_her").</span>
+                      <span class="text-nowrap" data-dup="r%relation_type;">%apply;capitalize(relation_type)[:] %apply;person_name_dates("relation_her").</span>
                     %end;
                   %end;
                   </div>

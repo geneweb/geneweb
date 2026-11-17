@@ -82,7 +82,7 @@
     %apply;add_in_sorted_listc(index)
     <div class="d-flex justify-content-between">
       <div class="align-self-center">%nn;
-        %apply;image_MF("self")%nn;
+        %apply;person_sex_icon("self")%nn;
         %apply;link%with;%access;%and;%if;(e.fn=1)%first_name; %surname;%else;%self;%end;%end;
         %if;(e.tt=1 and title!=""), %title;%end;
       </div>
@@ -132,7 +132,7 @@
       %end;>%nn;
       %apply;add_in_sorted_list(spouse.index)
       %if;(nb_families>1)<span class="me-1">%apply;letter(family_cnt)</span>%end;
-      %apply;image_MF("spouse")
+      %apply;person_sex_icon("spouse")
       %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%end;
       %if;(e.tt=1 and spouse.title!=""), %spouse.title;%end;
     </td>
@@ -217,7 +217,7 @@
         %else;<div></div>
         %end;
         <div class="align-self-center p-1">
-          %apply;image_MF("spouse")
+          %apply;person_sex_icon("spouse")
           %apply;link%with;%spouse.access;%and;%if;(e.fn=1)%spouse.first_name; %spouse.surname;%else;%spouse;%end;%end;
           %if;(e.tt=1 and spouse.title!=""), %spouse.title;%end;
         </div>
@@ -295,7 +295,7 @@
 %( d’Aboville %)
 %define;list_row(prefx)
   %if;("prefx"!="")<span class="font-monospace">prefx</span>%end;
-  %apply;image_MF("self")
+  %apply;person_sex_icon("self")
   %apply;link%with;%access;%and;%first_name; %surname;%end;%nn;
   %if;(title!=""), %title;%end;
   %dates;
@@ -306,7 +306,7 @@
       %end;
       <small>&%if;(nb_families>1)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>%nn;
       %if;(wizard and not cancel_links)</a>%end;
-      %sp;%apply;image_MF("spouse")
+      %sp;%apply;person_sex_icon("spouse")
       %apply;link%with;%spouse.access;%and;%spouse.first_name; %spouse.surname;%end;
       %if;(spouse.title!=""), %spouse.title;%end;
       %spouse.dates;
