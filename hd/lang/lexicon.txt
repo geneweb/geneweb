@@ -10219,6 +10219,16 @@ sv: ort
 tr: alan
 zh: 地点
 
+    event before %s not shown/events before %s not shown
+de: Ereignis vor %s nicht dargestellt/Ereignisse vor %s nicht dargestellt
+en: event before %s not shown/events before %s not shown
+es: evento anterior a %s no representado/eventos anteriores a %s no representados
+fr: événement antérieur à %s non représenté/événements antérieurs à %s non représentés
+it: evento anteriore al %s non rappresentato/eventi anteriori al %s non rappresentati
+nl: gebeurtenis vóór %s niet weergegeven/gebeurtenissen vóór %s niet weergegeven
+pt: evento anterior a %s não representado/eventos anteriores a %s não representados
+sv: händelse före %s visas inte/händelser före %s visas inte
+
     event/events
 co: evenimentu/evenimenti/evenimentu(i)
 de: Ereignis/Ereignisse

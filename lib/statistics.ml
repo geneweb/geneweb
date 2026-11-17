@@ -18,6 +18,16 @@ let marriage_age_span = marriage_age_max - marriage_age_min + 1
 let children_max = 20
 let remarriage_max = 4
 let relation_kind_count = 11
+
+(* Unless the base sets [stats_year_min], the charts by decade start
+   once the earlier events reach this many per thousand of the dated
+   ones, so that a few isolated old dates do not stretch them over
+   centuries. *)
+let decades_lead_permille = 1
+
+let stats_year_min conf =
+  Option.bind (List.assoc_opt "stats_year_min" conf.base_env) int_of_string_opt
+
 let top_n = 20
 
 type acc = {
@@ -39,6 +49,9 @@ type acc = {
   births_by_year : int array;
   deaths_by_year : int array;
   marriages_by_year : int array;
+  mutable births_before_min : int;
+  mutable deaths_before_min : int;
+  mutable marriages_before_min : int;
   births_by_month : int array;
   deaths_by_month : int array;
   marriages_by_month : int array;
@@ -97,6 +110,9 @@ let make_acc () =
     births_by_year = Array.make year_span 0;
     deaths_by_year = Array.make year_span 0;
     marriages_by_year = Array.make year_span 0;
+    births_before_min = 0;
+    deaths_before_min = 0;
+    marriages_before_min = 0;
     births_by_month = Array.make 12 0;
     deaths_by_month = Array.make 12 0;
     marriages_by_month = Array.make 12 0;
@@ -253,7 +269,8 @@ let person_pass conf base a by_cache auth_cache =
             a.has_birth_date <- a.has_birth_date + 1;
             if auth then begin
               let iy = yi d.year in
-              if iy >= 0 && iy < year_span then
+              if iy < 0 then a.births_before_min <- a.births_before_min + 1
+              else if iy < year_span then
                 a.births_by_year.(iy) <- a.births_by_year.(iy) + 1;
               if d.month >= 1 && d.month <= 12 then
                 a.births_by_month.(d.month - 1) <-
@@ -268,7 +285,8 @@ let person_pass conf base a by_cache auth_cache =
           (match ddmy with
           | Some d ->
               let iy = yi d.year in
-              if iy >= 0 && iy < year_span then
+              if iy < 0 then a.deaths_before_min <- a.deaths_before_min + 1
+              else if iy < year_span then
                 a.deaths_by_year.(iy) <- a.deaths_by_year.(iy) + 1;
               if d.month >= 1 && d.month <= 12 then
                 a.deaths_by_month.(d.month - 1) <-
@@ -357,7 +375,8 @@ let family_pass _conf a by_cache auth_cache base =
         (match mdmy with
         | Some d ->
             let iy = yi d.year in
-            if iy >= 0 && iy < year_span then
+            if iy < 0 then a.marriages_before_min <- a.marriages_before_min + 1
+            else if iy < year_span then
               a.marriages_by_year.(iy) <- a.marriages_by_year.(iy) + 1;
             if d.month >= 1 && d.month <= 12 then
               a.marriages_by_month.(d.month - 1) <-
@@ -494,32 +513,56 @@ let add_str_array buf arr =
     arr;
   Buffer.add_char buf ']'
 
-let decades_from_year_array arr =
-  let first = ref (-1) in
+(* Sums by decade of the yearly counts [arrs], from the first decade shown
+   to the last dated event. The first decade shown is the one of [start]
+   if given, otherwise the decades before are left out as long as their
+   events, with the [before] ones dated before [year_min], stay within
+   [decades_lead_permille] of all. Returns the decade labels, the sums of
+   each array and the number of events left out. *)
+let decades ?start ~before arrs =
+  let count i = List.fold_left (fun s arr -> s + arr.(i)) 0 arrs in
+  let total = ref before in
   let last = ref (-1) in
   for i = 0 to year_span - 1 do
-    if arr.(i) > 0 then begin
-      if !first = -1 then first := i;
-      last := i
-    end
+    let c = count i in
+    total := !total + c;
+    if c > 0 then last := i
   done;
-  if !first = -1 then ([||], [||])
+  if !last < 0 then ([||], List.map (fun _ -> [||]) arrs, before)
   else
-    let d0 = (!first + year_min) / 10 * 10 in
+    let limit = !total * decades_lead_permille / 1000 in
+    let rec first i acc =
+      let c = count i in
+      let acc = acc + c in
+      if c > 0 && acc > limit then i else first (i + 1) acc
+    in
+    let i0 =
+      match start with
+      | Some y ->
+          let rec first_dated i =
+            if i >= !last || count i > 0 then i else first_dated (i + 1)
+          in
+          first_dated (min !last (max 0 (y - year_min)))
+      | None -> first 0 before
+    in
+    let d0 = (i0 + year_min) / 10 * 10 in
     let d1 = (!last + year_min) / 10 * 10 in
     let nd = ((d1 - d0) / 10) + 1 in
     let labels = Array.init nd (fun i -> string_of_int (d0 + (i * 10))) in
-    let values =
-      Array.init nd (fun i ->
-          let base_y = d0 + (i * 10) - year_min in
-          let s = ref 0 in
-          for j = 0 to 9 do
-            let idx = base_y + j in
-            if idx >= 0 && idx < year_span then s := !s + arr.(idx)
-          done;
-          !s)
+    let sum arr di =
+      let base_y = d0 + (di * 10) - year_min in
+      let s = ref 0 in
+      for j = 0 to 9 do
+        let idx = base_y + j in
+        if idx >= 0 && idx < year_span then s := !s + arr.(idx)
+      done;
+      !s
     in
-    (labels, values)
+    let left_out = ref before in
+    for i = 0 to d0 - year_min - 1 do
+      left_out := !left_out + count i
+    done;
+    (labels, List.map (fun arr -> Array.init nd (sum arr)) arrs, !left_out)
 
 let avg n s = if n = 0 then Float.nan else float_of_int s /. float_of_int n
 let pct total n = if total = 0 then 0 else ((n * 100) + (total / 2)) / total
@@ -538,35 +581,22 @@ let relation_kind_label = function
   | 10 -> "residence"
   | _ -> "unknown"
 
-let emit_json buf base a =
-  let ml, mv = decades_from_year_array a.marriages_by_year in
-  let bd_first = ref year_span in
-  let bd_last = ref (-1) in
-  for i = 0 to year_span - 1 do
-    if a.births_by_year.(i) > 0 || a.deaths_by_year.(i) > 0 then begin
-      if i < !bd_first then bd_first := i;
-      if i > !bd_last then bd_last := i
-    end
-  done;
-  let bd_labels, bd_births, bd_deaths =
-    if !bd_last < 0 then ([||], [||], [||])
-    else
-      let d0 = (!bd_first + year_min) / 10 * 10 in
-      let d1 = (!bd_last + year_min) / 10 * 10 in
-      let nd = ((d1 - d0) / 10) + 1 in
-      let labels = Array.init nd (fun i -> string_of_int (d0 + (i * 10))) in
-      let sum arr di =
-        let base_y = d0 + (di * 10) - year_min in
-        let s = ref 0 in
-        for j = 0 to 9 do
-          let idx = base_y + j in
-          if idx >= 0 && idx < year_span then s := !s + arr.(idx)
-        done;
-        !s
-      in
-      let births = Array.init nd (sum a.births_by_year) in
-      let deaths = Array.init nd (sum a.deaths_by_year) in
-      (labels, births, deaths)
+let emit_json ?start buf base a =
+  let ml, mv, m_left_out =
+    match
+      decades ?start ~before:a.marriages_before_min [ a.marriages_by_year ]
+    with
+    | labels, [ values ], left_out -> (labels, values, left_out)
+    | _ -> assert false
+  in
+  let bd_labels, bd_births, bd_deaths, bd_left_out =
+    match
+      decades ?start
+        ~before:(a.births_before_min + a.deaths_before_min)
+        [ a.births_by_year; a.deaths_by_year ]
+    with
+    | labels, [ births; deaths ], left_out -> (labels, births, deaths, left_out)
+    | _ -> assert false
   in
   let median = median_from_histograms a.age_death_men a.age_death_women in
   let n_total_nz = if a.n_total > 0 then a.n_total else 1 in
@@ -611,7 +641,7 @@ let emit_json buf base a =
   add_int_array buf bd_births;
   Buffer.add_string buf {|,"deaths":|};
   add_int_array buf bd_deaths;
-  Buffer.add_char buf '}';
+  Printf.bprintf buf {|,"left_out":%d}|} bd_left_out;
   Buffer.add_string buf {|,"births_by_month":|};
   add_int_array buf a.births_by_month;
   Buffer.add_string buf {|,"deaths_by_month":|};
@@ -620,7 +650,7 @@ let emit_json buf base a =
   add_str_array buf ml;
   Buffer.add_string buf {|,"values":|};
   add_int_array buf mv;
-  Buffer.add_char buf '}';
+  Printf.bprintf buf {|,"left_out":%d}|} m_left_out;
   Buffer.add_string buf {|,"marriages_by_month":|};
   add_int_array buf a.marriages_by_month;
   Buffer.add_string buf {|,"marriage_day_of_week":|};
@@ -771,7 +801,7 @@ let print_json conf base =
   portrait_pass conf a;
   family_pass conf a by_cache auth_cache base;
   let buf = Buffer.create 16384 in
-  emit_json buf base a;
+  emit_json ?start:(stats_year_min conf) buf base a;
   Output.header conf "Content-type: application/json; charset=utf-8";
   Output.header conf "Connection: close";
   Output.print_sstring conf (Buffer.contents buf);

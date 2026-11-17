@@ -183,6 +183,11 @@
 # families not connected to the rest on the database).
 #propose_add_family=no
 
+# First year of the charts by decade of the statistics page (m=STATS);
+# the events before it are counted in a note under the chart. By default
+# the charts start once the earlier events reach 1 per thousand of all.
+#stats_year_min=1500
+
 # Reduce place on person pages: collapse repeated comma-separated places
 # ("Town, County, State, Country"). The first occurrence is shown in full;
 # later identical places are reduced to their first comma-segment,
