@@ -69,7 +69,7 @@
         </form>
         <span class="text-body-secondary">%subtitle;</span>
         <div class="d-flex align-items-center gap-3 ms-auto">
-          %if;(nb_results<nb_max)
+          %if;(wizard and nb_results<nb_max)
             <a class="btn btn-sm btn-outline-secondary d-none d-lg-inline-block" id="book-help" role="button" tabindex="0"
               data-bs-title="[*help and shortcuts]" aria-label="[*help and shortcuts]"><i class="fa fa-info fa-fw"></i></a>
             <template>
@@ -85,6 +85,9 @@
             <a class="btn btn-sm btn-outline-secondary text-nowrap%if;(rv!="") active%end;" role="button"
               href="%prefix;m=MOD_DATA&data=place%if;(rv="")&o=r%end;" aria-pressed="%if;(rv!="")true%else;false%end;">%nn;
               <i class="fa fa-arrow-left-long fa-fw me-1"></i>[*order from the last term]</a>
+          %end;
+          %if;(not wizard)
+          %elseif;(e.data="place")
             <a class="btn btn-sm btn-outline-primary text-nowrap" href="%prefix;m=PLACE_TERMS">%nn;
               <i class="fa fa-object-group fa-fw me-1"></i>[*spelling clusters]</a>
           %elseif;(e.data="src")
@@ -173,9 +176,14 @@
               %end;
               <div class="d-flex align-items-baseline gap-1">
                 <div class="flex-grow-1">
-                  <a role="button" class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
-                     %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
-                     href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;%if;(range_from!="")&from=%encode.range_from;&to=%encode.range_to;%end;"
+                  <a class="btn-link%if;(e.data!="src") d-block%else; stretched-link%end;"
+                     %if;wizard;role="button"
+                       %if;(e.data!="src")title="[*modify]" data-bs-toggle="tooltip"%else;aria-label="[*modify]"%end;
+                       href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.current_s;%rv;%if;(range_from!="")&from=%encode.range_from;&to=%encode.range_to;%end;"
+                     %else;
+                       %if;(e.data="src")aria-label="%escape.printable.entry_value;"%end;
+                       href="%prefix;m=L&data=%e.data;&key=%entry_key;&parents=on"
+                     %end;
                      data-entry="%escape.printable.entry_value;" data-n="%entry_records;"%nn;
                      %if;(entry_value.original!=entry_value) data-v="%escape.entry_value.original;"%end;>%nn;
                      %if;(e.data="src")</a>%end;
@@ -199,6 +207,7 @@
         </ul>
       %end;
     </div>
+    %if;wizard;
     <form id="book-edit" class="card shadow-lg p-1" method="post" action="%action;"
       data-error="[*error]" hidden>
       %hidden;
@@ -245,6 +254,7 @@
         data-near="[*book reference sources]5" data-use="[*book reference sources]6"%nn;
         %if;(b.places_inverted="yes") data-inverted%end;></div>
     </form>
+    %end;
   %else;
     <p class="text-body-secondary text-center mt-3">[*too much results]
       (> %if;(b.book_max_results!="")<abbr title="book_max_results">%b.book_max_results;</abbr>%else;%nb_max;%end;).
