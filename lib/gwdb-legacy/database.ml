@@ -1203,6 +1203,20 @@ let opendb bname =
         Hashtbl.iter (Hashtbl.replace ht) ht';
         Hashtbl.clear ht'
       in
+      let nbp_delta =
+        Hashtbl.fold
+          (fun ip p acc ->
+            try
+              match try Some (persons.get_nopending ip) with _ -> None with
+              | Some old ->
+                  if is_empty_name old && not (is_empty_name p) then acc + 1
+                  else if (not (is_empty_name old)) && is_empty_name p then
+                    acc - 1
+                  else acc
+              | None -> if not (is_empty_name p) then acc + 1 else acc
+            with _ -> if not (is_empty_name p) then acc + 1 else acc)
+          (snd pending.h_person) 0
+      in
       (* commit every pending patch into memory *)
       aux patches.h_person pending.h_person;
       aux patches.h_ascend pending.h_ascend;
@@ -1214,20 +1228,7 @@ let opendb bname =
       if write_to_disk then (
         let tm = Unix.time () |> Unix.gmtime |> Ext_unix.sprintf_date in
         (* read real person number (considering pending patches) *)
-        let nbp =
-          Hashtbl.fold
-            (fun ip p acc ->
-              try
-                match try Some (persons.get_nopending ip) with _ -> None with
-                | Some old ->
-                    if is_empty_name old && not (is_empty_name p) then acc + 1
-                    else if (not (is_empty_name old)) && is_empty_name p then
-                      acc - 1
-                    else acc
-                | None -> if not (is_empty_name p) then acc + 1 else acc
-              with _ -> if not (is_empty_name p) then acc + 1 else acc)
-            (snd patches.h_person) (nbp_read ())
-        in
+        let nbp = nbp_read () + nbp_delta in
         let tmp_nbp_fname = nbp_fname ^ "_tmp" in
         let oc = Secure.open_out_bin tmp_nbp_fname in
         output_value oc nbp;
