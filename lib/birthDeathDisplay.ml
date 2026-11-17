@@ -95,25 +95,29 @@ let print_death conf base =
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
             let sure d = d.Adef.prec = Sure in
-            match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
-            | None -> (None, ages_sum, ages_nb)
-            | Some d1 ->
-                if sure d1 && sure d && d1 <> d then
-                  let a = Date.time_elapsed d1 d in
-                  let ages_sum =
-                    match Driver.get_sex p with
-                    | Male -> (fst ages_sum + a.year, snd ages_sum)
-                    | Female -> (fst ages_sum, snd ages_sum + a.year)
-                    | Neuter -> ages_sum
-                  in
-                  let ages_nb =
-                    match Driver.get_sex p with
-                    | Male -> (fst ages_nb + 1, snd ages_nb)
-                    | Female -> (fst ages_nb, snd ages_nb + 1)
-                    | Neuter -> ages_nb
-                  in
-                  (Some a, ages_sum, ages_nb)
-                else (None, ages_sum, ages_nb)
+            (* p may be listed only through p_auth_sp: its birth date,
+               hence its age, must not leak *)
+            if not (authorized_age conf base p) then (None, ages_sum, ages_nb)
+            else
+              match Date.cdate_to_gregorian_dmy_opt (Driver.get_birth p) with
+              | None -> (None, ages_sum, ages_nb)
+              | Some d1 ->
+                  if sure d1 && sure d && d1 <> d then
+                    let a = Date.time_elapsed d1 d in
+                    let ages_sum =
+                      match Driver.get_sex p with
+                      | Male -> (fst ages_sum + a.year, snd ages_sum)
+                      | Female -> (fst ages_sum, snd ages_sum + a.year)
+                      | Neuter -> ages_sum
+                    in
+                    let ages_nb =
+                      match Driver.get_sex p with
+                      | Male -> (fst ages_nb + 1, snd ages_nb)
+                      | Female -> (fst ages_nb, snd ages_nb + 1)
+                      | Neuter -> ages_nb
+                    in
+                    (Some a, ages_sum, ages_nb)
+                  else (None, ages_sum, ages_nb)
           in
           Output.print_sstring conf (Printf.sprintf "<li>%s<b>" is_friend);
           Output.print_string conf (referenced_person_text conf base p);

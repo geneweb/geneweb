@@ -16,7 +16,7 @@ val select_person :
     [conf.env]. These variables affect the selection: k - allows to modify
     default value (20) of selected persons by,bm,bd - allows to set reference
     date (all dates after the reference one aren't selected) Returns also the
-    number of selected persons. Persons not allowed by [Util.authorized_age] are
+    number of selected persons. Persons not allowed by [GWPARAM.p_auth_sp] are
     skipped. *)
 
 val select_families :
@@ -38,7 +38,7 @@ val select_family :
   bool ->
   (Geneweb_db.Driver.family * Adef.dmy * Adef.calendar) list * int
 (** Same as [select_person] but dealing with families; a family is skipped
-    unless both parents are allowed by [Util.authorized_age]. *)
+    unless both parents are allowed by [GWPARAM.p_auth_sp]. *)
 
 val death_date : Geneweb_db.Driver.person -> Adef.date option
 (** Returns person's death date (if exists) *)
