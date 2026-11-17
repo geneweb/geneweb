@@ -69,7 +69,9 @@ end)
 let select_person conf base get_date find_oldest =
   let get_date p =
     match get_date p with
-    | Some d when authorized_age conf base p -> Some (0, d)
+    (* Consenting friends see SemiPublic persons listed (name and the
+       selected date); their other dates stay hidden at display time. *)
+    | Some d when GWPARAM.p_auth_sp conf base p -> Some (0, d)
     | Some _ | None -> None
   in
   (select
@@ -90,7 +92,7 @@ module FQ_oldest = Pqueue.Make (struct
 end)
 
 let select_families conf base limits get_date find_oldest =
-  let auth ip = authorized_age conf base (Driver.poi base ip) in
+  let auth ip = GWPARAM.p_auth_sp conf base (Driver.poi base ip) in
   let get_date fam =
     match get_date fam with
     | Some _ as d
