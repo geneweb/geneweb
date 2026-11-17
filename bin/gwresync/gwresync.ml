@@ -556,7 +556,7 @@ end = struct
         let files = Sys.readdir cdir in
         for i = 0 to Array.length files - 1 do
           let file = files.(i) in
-          if Filename.check_suffix file ".txt" then
+          if Filename.check_suffix file ".txt" then (
             let fnotes = Filename.chop_suffix file ".txt" in
             let file_rel = Filename.concat dir fnotes in
             let list = notes_links (Gwdb.base_notes_read base file_rel) in
@@ -569,13 +569,13 @@ end = struct
               in
               db :=
                 Geneweb.NotesLinks.add_in_db !db (Def.NLDB.PgMisc entry_name)
-                  list
-            else
-              loop (Filename.concat dir file)
-                (if name = "" then file
-                else
-                  Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep
-                    file)
+                  list)
+          else
+            loop (Filename.concat dir file)
+              (if name = "" then file
+              else
+                Printf.sprintf "%s%c%s" name Geneweb.NotesLinks.char_dir_sep
+                  file)
         done
       with Sys_error _ -> ()
     in
@@ -702,74 +702,78 @@ let main () =
         Gwdb.load_unions_array base;
         Gwdb.load_descends_array base;
         Gwdb.load_strings_array base);
-      let changes = ref false in
-      Option.iter
-        (fun y ->
-          if
-            Privacy.apply_cutoff_date ~base ~cutoff_year:y ~verbosity:!verbosity
-          then changes := true)
-        !cutoff_year;
-      if !whitelist_file <> "" then
-        if
-          Privacy.apply_list ~base ~access:Def.Public ~file:!whitelist_file
-            ~verbosity:!verbosity
-        then changes := true;
-      if !blacklist_file <> "" then
-        if
-          Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
-            ~verbosity:!verbosity
-        then changes := true;
-      let fix_count =
-        Integrity.perform_fixes ~base ~fast:!fast ~verbosity:!verbosity
-      in
-      if fix_count > 0 then changes := true;
-      let has_loop = CycleCheck.detect_loop ~base in
-      if has_loop then (
-        if !verbosity >= 1 then (
-          Printf.printf
-            "Loop detected, consanguinity calculation will be skipped.\n";
-          flush stdout))
-      else if not !no_consang then (
-        if !verbosity >= 1 then (
-          Printf.printf "Computing consanguinity...\n";
-          flush stdout);
-        let consang_patched =
-          Consanguinity.compute ~base ~scratch:false ~verbosity:!verbosity
-        in
-        if consang_patched then changes := true);
-      NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
-      if !changes then (
-        if !verbosity >= 1 then (
-          Printf.printf "Committing patches in memory...\n";
-          flush stdout);
-        Gwdb.commit_patches ~write_to_disk:false base);
-      if !verbosity >= 1 then (
-        Printf.printf "Rebuilding indexes and caches...\n";
-        flush stdout);
-      Gwdb.sync ~save_mem:false
-        ~tasks:
-          [
-            (fun () -> Geneweb.Caches.write_caches base);
-            (fun () ->
-              let conf =
-                Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)
-              in
-              Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
-            (fun () ->
-              Geneweb.Util.rewrite_visited
-                (Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)));
-          ]
-        base;
-      if !verbosity >= 1 then (
-        Printf.printf "gwresync completed successfully.\n";
-        flush stdout);
-      if !fast then (
-        Gwdb.clear_strings_array base;
-        Gwdb.clear_persons_array base;
-        Gwdb.clear_families_array base;
-        Gwdb.clear_ascends_array base;
-        Gwdb.clear_couples_array base;
-        Gwdb.clear_unions_array base;
-        Gwdb.clear_descends_array base))
+      Fun.protect
+        ~finally:(fun () ->
+          if !fast then (
+            Gwdb.clear_strings_array base;
+            Gwdb.clear_persons_array base;
+            Gwdb.clear_families_array base;
+            Gwdb.clear_ascends_array base;
+            Gwdb.clear_couples_array base;
+            Gwdb.clear_unions_array base;
+            Gwdb.clear_descends_array base))
+        (fun () ->
+          let changes = ref false in
+          Option.iter
+            (fun y ->
+              if
+                Privacy.apply_cutoff_date ~base ~cutoff_year:y
+                  ~verbosity:!verbosity
+              then changes := true)
+            !cutoff_year;
+          if !whitelist_file <> "" then
+            if
+              Privacy.apply_list ~base ~access:Def.Public ~file:!whitelist_file
+                ~verbosity:!verbosity
+            then changes := true;
+          if !blacklist_file <> "" then
+            if
+              Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
+                ~verbosity:!verbosity
+            then changes := true;
+          let fix_count =
+            Integrity.perform_fixes ~base ~fast:!fast ~verbosity:!verbosity
+          in
+          if fix_count > 0 then changes := true;
+          let has_loop = CycleCheck.detect_loop ~base in
+          if has_loop then (
+            if !verbosity >= 1 then (
+              Printf.printf
+                "Loop detected, consanguinity calculation will be skipped.\n";
+              flush stdout))
+          else if not !no_consang then (
+            if !verbosity >= 1 then (
+              Printf.printf "Computing consanguinity...\n";
+              flush stdout);
+            let consang_patched =
+              Consanguinity.compute ~base ~scratch:false ~verbosity:!verbosity
+            in
+            if consang_patched then changes := true);
+          NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
+          if !changes then (
+            if !verbosity >= 1 then (
+              Printf.printf "Committing patches in memory...\n";
+              flush stdout);
+            Gwdb.commit_patches ~write_to_disk:false base);
+          if !verbosity >= 1 then (
+            Printf.printf "Rebuilding indexes and caches...\n";
+            flush stdout);
+          Gwdb.sync ~save_mem:false
+            ~tasks:
+              [
+                (fun () -> Geneweb.Caches.write_caches base);
+                (fun () ->
+                  let conf =
+                    Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)
+                  in
+                  Geneweb.Sosa_cache.write_static_sosa_cache ~conf ~base);
+                (fun () ->
+                  Geneweb.Util.rewrite_visited
+                    (Geneweb.Util.minimal_wiz_conf ~bname:(Gwdb.bname base)));
+              ]
+            base;
+          if !verbosity >= 1 then (
+            Printf.printf "gwresync completed successfully.\n";
+            flush stdout)))
 
 let () = main ()
