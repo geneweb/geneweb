@@ -54,10 +54,12 @@
   <div class="col-md-6"><div class="card"><div class="card-body">
     <h2 class="h6 card-title text-body-secondary">[*birth/births]1 [and] [death/deaths]1</h2>
     <canvas id="ch-bd-decade" height="150"></canvas>
+    <p id="ch-bd-left-out" class="small text-body-secondary mt-2 mb-0" hidden></p>
   </div></div></div>
   <div class="col-md-6"><div class="card"><div class="card-body">
     <h2 class="h6 card-title text-body-secondary">[*marriage/marriages]1</h2>
     <canvas id="ch-mar-decade" height="150"></canvas>
+    <p id="ch-mar-left-out" class="small text-body-secondary mt-2 mb-0" hidden></p>
   </div></div></div>
 </div>
 
@@ -176,6 +178,7 @@ var GW = {
     dd:"[*date of death]", pd:"[*where dead]",
     pa:"[*parents]", oc:"[*occupation/occupations]0",
     im:"[*image/images]0", yr:"[years old]",
+    lo:%["[event before %s not shown/events before %s not shown:::{y}]0", "[event before %s not shown/events before %s not shown:::{y}]1"%],
     ds:"[(decimal separator)]", ts:"[(thousand separator)]", pc:"[(space before percent)]\u0025"
   },
   rt: {
@@ -320,7 +323,15 @@ fetch(GW.url).then(function(r) {
     options:{plugins:{legend:{position:"bottom"}}}
   });
 
+  function leftOut(id, d) {
+    if (!d.left_out || !d.labels.length) return;
+    var el = document.getElementById(id);
+    el.textContent = fmt(d.left_out) + " " + L.lo%[d.left_out > 1 ? 1 : 0%].replace("{y}", d.labels%[0%]);
+    el.hidden = false;
+  }
+
   var bd = D.births_deaths_by_decade;
+  leftOut("ch-bd-left-out", bd);
   if (bd.labels.length) {
     new Chart(document.getElementById("ch-bd-decade"), {
       type:"bar",
@@ -353,6 +364,7 @@ fetch(GW.url).then(function(r) {
   topBar("ch-mp", D.top_marriage_places, C.g, GW.pl);
 
   var md = D.marriages_by_decade;
+  leftOut("ch-mar-left-out", md);
   if (md.labels.length) {
     new Chart(document.getElementById("ch-mar-decade"), {
       type:"bar",

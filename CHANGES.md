@@ -109,6 +109,11 @@
 - The random person link (`rnd=1`) is resolved server-side, among the
   persons visible to the user, and honors `access_by_key`. On the A, C, D,
   F, LINKED and R tools it keeps the current tool.
+- The charts by decade of the statistics page (`m=STATS`) start at the
+  year set by the new base parameter `stats_year_min`, or else once the
+  earlier events reach one per thousand of all, instead of the first
+  dated event. A note under the chart tells how many events before its
+  first decade are not shown, those before 500 included.
 - The statistics lists (`m=LB`, `LD`, `LM`, `OA`, `OE`) and the age pyramid
   (`m=POP_PYR`) are open to visitors. The lists only show the persons and
   families visible to them; the pyramid counts the whole base.
