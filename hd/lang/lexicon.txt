@@ -4474,15 +4474,15 @@ pt: Esta alteração afeta %d fichas da base: valide de novo para confirmar.
 sv: Denna ändring påverkar %d poster i databasen: bekräfta igen för att fortsätta.
 
     book reference sources
-de: mit Referenzquellen abgleichen/Gemeinden/Weiler und Flurnamen/keine Übereinstimmung in den Referenzquellen/wie in der Eingabe/unterscheidet sich nur in Akzenten, Groß- und Kleinschreibung oder Satzzeichen/in der Eingabe ersetzen
-en: compare with reference sources/municipalities/hamlets and named places/no match in the reference sources/same as the entry/differs only in accents, case or punctuation/replace in the entry
-es: cotejar con las fuentes de referencia/comunas/aldeas y parajes/ninguna coincidencia en las fuentes de referencia/igual que la entrada/solo difiere en acentos, mayúsculas o puntuación/reemplazar en la entrada
-fr: confronter aux référentiels/communes/lieux-dits/aucune correspondance dans les référentiels/identique à la saisie/ne diffère que par les accents, la casse ou la ponctuation/remplacer dans la saisie
-it: confrontare con le fonti di riferimento/comuni/località/nessuna corrispondenza nelle fonti di riferimento/uguale all’inserimento/differisce solo per accenti, maiuscole o punteggiatura/sostituire nell’inserimento
-nl: vergelijken met referentiebronnen/gemeenten/gehuchten en veldnamen/geen overeenkomst in de referentiebronnen/gelijk aan de invoer/verschilt alleen in accenten, hoofdletters of leestekens/in de invoer vervangen
-pl: porównaj ze źródłami referencyjnymi/gminy/przysiółki i nazwy terenowe/brak dopasowania w źródłach referencyjnych/tak jak we wpisie/różni się tylko akcentami, wielkością liter lub interpunkcją/zastąp we wpisie
-pt: confrontar com as fontes de referência/comunas/lugares/nenhuma correspondência nas fontes de referência/igual à introdução/difere apenas nos acentos, maiúsculas ou pontuação/substituir na introdução
-sv: jämför med referenskällor/kommuner/byar och ortnamn/ingen träff i referenskällorna/samma som inmatningen/skiljer sig bara i accenter, versaler eller skiljetecken/ersätt i inmatningen
+de: mit Referenzquellen abgleichen/Gemeinden/Weiler und Flurnamen/keine Übereinstimmung in den Referenzquellen/wie in der Eingabe/unterscheidet sich nur in Akzenten, Groß- und Kleinschreibung oder Satzzeichen/in die Eingabe einfügen
+en: compare with reference sources/municipalities/hamlets and named places/no match in the reference sources/same as the entry/differs only in accents, case or punctuation/insert in the entry
+es: cotejar con las fuentes de referencia/comunas/aldeas y parajes/ninguna coincidencia en las fuentes de referencia/igual que la entrada/solo difiere en acentos, mayúsculas o puntuación/insertar en la entrada
+fr: confronter aux référentiels/communes/lieux-dits/aucune correspondance dans les référentiels/identique à la saisie/ne diffère que par les accents, la casse ou la ponctuation/insérer dans la saisie
+it: confrontare con le fonti di riferimento/comuni/località/nessuna corrispondenza nelle fonti di riferimento/uguale all’inserimento/differisce solo per accenti, maiuscole o punteggiatura/inserire nell’inserimento
+nl: vergelijken met referentiebronnen/gemeenten/gehuchten en veldnamen/geen overeenkomst in de referentiebronnen/gelijk aan de invoer/verschilt alleen in accenten, hoofdletters of leestekens/in de invoer invoegen
+pl: porównaj ze źródłami referencyjnymi/gminy/przysiółki i nazwy terenowe/brak dopasowania w źródłach referencyjnych/tak jak we wpisie/różni się tylko akcentami, wielkością liter lub interpunkcją/wstaw do wpisu
+pt: confrontar com as fontes de referência/comunas/lugares/nenhuma correspondência nas fontes de referência/igual à introdução/difere apenas nos acentos, maiúsculas ou pontuação/inserir na introdução
+sv: jämför med referenskällor/kommuner/byar och ortnamn/ingen träff i referenskällorna/samma som inmatningen/skiljer sig bara i accenter, versaler eller skiljetecken/infoga i inmatningen
 
     book of %s
 co: libru di i %s

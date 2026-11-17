@@ -860,7 +860,7 @@ a[id^="p_"]:target {
 }
 
 .book-ref-cols {
-  column-width: 24rem;
+  columns: 22rem 3;
   column-gap: 2rem;
 }
 
@@ -870,6 +870,15 @@ a[id^="p_"]:target {
 
 .book-ref-cols li {
   break-inside: avoid;
+}
+
+.book-pick {
+  cursor: pointer;
+  border-radius: var(--bs-border-radius-sm);
+}
+
+.book-pick:hover {
+  background-color: var(--bs-primary-bg-subtle);
 }
 
 .book-near {
