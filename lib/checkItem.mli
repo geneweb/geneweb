@@ -62,3 +62,9 @@ val person_warnings :
     and [CheckItem.check_siblings] on they children
     using [auth_warning] for filtering.
 *)
+
+val can_have_unnamed_spouse_duplicate :
+  Gwdb.base -> Gwdb.person -> Gwdb.ifam array -> bool
+(** [can_have_unnamed_spouse_duplicate base p families] returns [true] if [p]
+    has exactly two families, with exactly one unnamed ('? ?') spouse and
+    one named spouse. *)

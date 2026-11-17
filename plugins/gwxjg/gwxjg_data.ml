@@ -1256,6 +1256,17 @@ and mk_warning conf base =
             get_fam ifam2;
             unsafe_mk_person conf base p;
           ]
+    | PossibleDuplicateFamQuestString (ifam1, ifam2, p) ->
+        let named_spouse =
+          Geneweb.Warning.named_spouse_of_quest_string_warning base p ifam1
+            ifam2
+        in
+        Jingoo.Jg_types.Tset
+          [
+            Jingoo.Jg_types.Tsafe "PossibleDuplicateFamQuestString";
+            unsafe_mk_person conf base p;
+            unsafe_mk_person conf base named_spouse;
+          ]
 
 let module_OPT =
   let map =
