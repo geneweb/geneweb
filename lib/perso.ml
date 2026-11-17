@@ -211,6 +211,14 @@ let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 let hide_person conf base p =
   (not (Util.authorized_age conf base p)) || Util.is_hide_names conf p
 
+(* True when [%xx;] (simple_person_text, then gen_person_text) prints the
+   real name: first_name, occ and surname may then be shown as well,
+   e.g. in a link tooltip.  The [is_hide_names] test of simple_person_text
+   needs no repeating: it only applies to Private persons, for whom
+   [p_auth_sp] is [p_auth]. *)
+let is_name_visible conf base p =
+  (not (is_hidden p)) && GWPARAM.p_auth_sp conf base p
+
 let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
@@ -3867,6 +3875,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_semi_public" -> GWPARAM.is_semi_public p
   | "is_related" -> GWPARAM.is_related conf base p
   | "is_restricted" -> is_hidden p
+  | "is_name_visible" -> is_name_visible conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
