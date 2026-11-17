@@ -531,23 +531,12 @@ let print_foreach conf base print_ast _eval_expr =
     List.iteri
       (fun i (ini_k, n, list_v) ->
         let display_ini =
-          let should_truncate =
-            (String.length current_s > 6 && max > 6)
-            || (String.length current_s > 4 && max > 10)
+          let len =
+            if String.is_valid_utf_8 ini_k then Utf8.length ini_k else 0
           in
-          if should_truncate && String.length ini_k > String.length current_s
-          then
-            let suffix =
-              String.sub ini_k (String.length current_s)
-                (String.length ini_k - String.length current_s)
-            in
-            if String.length current_s >= 2 then
-              let utf8_len = Utf8.length current_s in
-              if utf8_len >= 2 then
-                let last_two = Utf8.sub current_s (utf8_len - 2) 2 in
-                "…" ^ last_two ^ suffix
-              else ini_k
-            else ini_k
+          if len > 5 then
+            let b = Utf8.get ini_k (len - 4) in
+            "…" ^ String.sub ini_k b (String.length ini_k - b)
           else ini_k
         in
         let script_info =
