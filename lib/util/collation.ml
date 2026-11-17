@@ -697,19 +697,30 @@ let next s i =
   let n = try Utf8.nbc s.[i] with Invalid_argument _ -> 1 in
   min (String.length s) (i + n)
 
-(* the primary and secondary weights of the character at [i] in [s], and the
-   position of the next one; the letters of other scripts after these ones,
-   by code point, the other characters by their transliteration *)
+let rec marks s i =
+  if i < String.length s && Char.code (String.unsafe_get s i) >= 0x80 then
+    let d = String.get_utf_8_uchar s i in
+    if Uunf.ccc (Uchar.utf_decode_uchar d) > 0 then
+      marks s (i + Uchar.utf_decode_length d)
+    else i
+  else i
+
+(* the primary and secondary weights of the character at [i] in [s] and of
+   the combining marks following it, decomposed together (NFD), and the
+   position of the next character; the letters of other scripts after these
+   ones, by code point, the other characters by their transliteration *)
 let root_char t s i =
   let c = Char.code (String.unsafe_get s i) in
-  if c < 0x80 then (ascii.(c), [ 0x20 ], i + 1)
+  let j = next s i in
+  let k = marks s j in
+  if c < 0x80 && k = j then (ascii.(c), [ 0x20 ], j)
   else
-    let j = next s i in
     let ch = String.sub s i (j - i) in
     let u = Uchar.utf_decode_uchar (String.get_utf_8_uchar s i) in
     let us =
-      if Hashtbl.mem weights (Uchar.to_int (lower u)) then [ u ]
-      else decompose ch
+      if Hashtbl.mem weights (Uchar.to_int (lower u)) then
+        u :: decompose (String.sub s j (k - j))
+      else decompose (String.sub s i (k - i))
     in
     let p, w =
       List.split
@@ -735,7 +746,7 @@ let root_char t s i =
                      (p, List.map (fun _ -> 0x20) p)))
            us
     in
-    (List.concat p, List.concat w, j)
+    (List.concat p, List.concat w, k)
 
 let matches s i k =
   let n = String.length k in
