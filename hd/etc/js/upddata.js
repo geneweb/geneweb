@@ -59,15 +59,24 @@
   };
   const geo = (q, type) => q.length < 3 ? Promise.resolve([])
     : getJSON(GEO, { q, type, limit: 6 }).then(r => r.features.map(f => f.properties));
+  // one request at a time, retried once a second later when refused for
+  // too many requests (HTTP 429)
+  let queue = Promise.resolve();
+  const wdJSON = params => {
+    const run = () => getJSON(WIKIDATA, params);
+    queue = queue.catch(() => {}).then(run).catch(e => e === 429
+      ? new Promise(ok => setTimeout(ok, 1000)).then(run) : Promise.reject(e));
+    return queue;
+  };
   const wikidata = (q, cls, lang) => {
     if (!q) return Promise.resolve([]);
     const items = cls
-      ? getJSON(WIKIDATA, {
+      ? wdJSON({
           action: 'query', list: 'search', srsearch: `${q} haswbstatement:${cls}`,
           srnamespace: 0, srlimit: 8, format: 'json', origin: '*'
         }).then(r => {
           const ids = r.query.search.map(e => e.title);
-          return ids.length ? getJSON(WIKIDATA, {
+          return ids.length ? wdJSON({
             action: 'wbgetentities', ids: ids.join('|'), props: 'labels|descriptions',
             languages: lang, languagefallback: 1, format: 'json', origin: '*'
           }).then(r => ids.map(id => ({
@@ -76,7 +85,7 @@
             description: r.entities[id].descriptions?.[lang]?.value
           }))) : [];
         })
-      : getJSON(WIKIDATA, {
+      : wdJSON({
           action: 'wbsearchentities', search: q, language: lang, uselang: lang,
           type: 'item', limit: 8, format: 'json', origin: '*'
         }).then(r => r.search);
@@ -257,13 +266,18 @@
       }
       this.spread();
     },
-    // the reference sources across the width of the window, under the field
+    // the reference sources under the field, as wide as the editor, across
+    // the width of the window when they hold more than a few lines
     spread() {
       if (this.ref.hidden) return;
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const style = this.ref.style;
+      style.left = -this.form.clientLeft + 'px';
+      style.width = this.form.offsetWidth + 'px';
+      if (this.ref.scrollHeight <= 12 * rem) return;
       const left = this.form.getBoundingClientRect().left + this.form.clientLeft;
-      this.ref.style.left = rem - left + 'px';
-      this.ref.style.width = document.documentElement.clientWidth - 2 * rem + 'px';
+      style.left = rem - left + 'px';
+      style.width = document.documentElement.clientWidth - 2 * rem + 'px';
     },
     hideRef() {
       this.ref.hidden = true;
@@ -435,8 +449,16 @@
           { head: 'Wikidata', items: w }
         ]);
       } else {
-        groups = wikidata(value, CLASSES[data], lang)
-          .then(items => [{ head: 'Wikidata', items }]);
+        // each first name, each occupation without its dates, apart
+        const parts = data === 'fn' || data === 'fna' ? value.split(/\s+/)
+          : data === 'occu' ? value.replace(/\s*\([^()]*\d[^()]*\)/g, '').split(',')
+          : [value];
+        terms = [...new Set(parts.map(t => t.trim()).filter(Boolean))];
+        groups = Promise.allSettled(terms.map(t => wikidata(t, CLASSES[data], lang)
+          .then(items => ({ head: `Wikidata · ${t}`, items })))).then(r => {
+          if (r.every(e => e.status === 'rejected')) throw r[0].reason;
+          return r.filter(e => e.value).map(e => e.value);
+        });
       }
       const icon = this.refButton.firstElementChild;
       icon.className = 'spinner-border spinner-border-sm';
