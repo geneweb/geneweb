@@ -1,11 +1,12 @@
 (* Weights of the default table of the Unicode collation algorithm (DUCET,
    allkeys.txt 10.0.0), primary then secondary, of the lowercase letters
    without canonical decomposition and of the combining marks of
-   U+0000..U+052F and U+1E00..U+1EFF *)
+   U+0000..U+052F and U+1E00..U+1EFF; the primary weights are multiplied by
+   16, so that a tailoring can insert letters between two of them *)
 let weights =
   let t = Hashtbl.create 512 in
   List.iter
-    (fun (c, p, s) -> Hashtbl.replace t c (p, s))
+    (fun (c, p, s) -> Hashtbl.replace t c (List.map (fun w -> w lsl 4) p, s))
     [
       (0x0061, [ 0x1CAD ], [ 0x20 ]);
       (0x0062, [ 0x1CC6 ], [ 0x20 ]);
@@ -512,7 +513,165 @@ let ascii =
         Hashtbl.find_opt weights (Char.code (Char.lowercase_ascii (Char.chr c)))
       with
       | Some (p, _) -> p
-      | None -> [ c ])
+      | None -> [ c lsl 4 ])
+
+(* Standard tailorings of the Common Locale Data Repository (CLDR 50,
+   common/collation/<language>.xml) for the languages of GeneWeb whose order
+   differs from the common one *)
+let rules =
+  [
+    ("af", {|&N<<<ŉ|});
+    ("bg", {|[reorder Cyrl]|});
+    ( "br",
+      {|&C<ch<<<Ch<<<CH<c''h=c\u02BCh=c\u2019h<<<C''h=C\u02BCh=C\u2019h<<<C''H=C\u02BCH=C\u2019H
+       &ker<<ꝃ<<<Ꝃ|}
+    );
+    ( "cs",
+      {|&C<č<<<Č
+       &H<ch<<<cH<<<Ch<<<CH
+       &R<ř<<<Ř
+       &S<š<<<Š
+       &Z<ž<<<Ž|}
+    );
+    ( "da",
+      {|[caseFirst upper]
+       &D<<đ<<<Đ<<ð<<<Ð
+       &th<<<þ
+       &TH<<<Þ
+       &Y<<ü<<<Ü<<ű<<<Ű
+       &[before 1]ǀ<æ<<<Æ<<ä<<<Ä<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<å<<<Å<<<aa<<<Aa<<<AA
+       &oe<<œ<<<Œ|}
+    );
+    ( "eo",
+      {|&C<ĉ<<<Ĉ
+       &G<ĝ<<<Ĝ
+       &H<ĥ<<<Ĥ
+       &J<ĵ<<<Ĵ
+       &S<ŝ<<<Ŝ
+       &U<ŭ<<<Ŭ|}
+    );
+    ("es", {|&N<ñ<<<Ñ|});
+    ( "et",
+      {|&[before 1]T<š<<<Š<z<<<Z<ž<<<Ž
+       &[before 1]X<õ<<<Õ<ä<<<Ä<ö<<<Ö<ü<<<Ü|}
+    );
+    ( "fi",
+      {|&D\u0335<<đ<<<Đ
+       &G\u0335<<ǥ<<<Ǥ
+       &N\u0335<<ŋ<<<Ŋ
+       &T\u0335<<ŧ<<<Ŧ
+       &Y<<ü<<<Ü
+       &Z\u0335<<ʒ<<<Ʒ
+       &[before 1]ǀ<å<<<Å<ä<<<Ä<<æ<<<Æ<ö<<<Ö<<ø<<<Ø|}
+    );
+    ( "is",
+      {|&[before 1]b<á<<<Á
+       &d<<đ<<<Đ<ð<<<Ð
+       &[before 1]f<é<<<É
+       &[before 1]j<í<<<Í
+       &[before 1]p<ó<<<Ó
+       &[before 1]v<ú<<<Ú
+       &[before 1]z<ý<<<Ý
+       &[before 1]ǀ<æ<<<Æ<<ä<<<Ä<ö<<<Ö<<ø<<<Ø<å<<<Å|}
+    );
+    ( "lt",
+      {|&̀=̇̀
+       &́=̇́
+       &̃=̇̃
+       &A<<ą<<<Ą
+       &C<č<<<Č
+       &E<<ę<<<Ę<<ė<<<Ė
+       &I<<į<<<Į<<y<<<Y
+       &S<š<<<Š
+       &U<<ų<<<Ų<<ū<<<Ū
+       &Z<ž<<<Ž|}
+    );
+    ( "lv",
+      {|&A<ā<<<Ā
+       &C<č<<<Č
+       &E<ē<<<Ē
+       &G<ģ<<<Ģ
+       &I<y<<<Y<ī<<<Ī
+       &K<ķ<<<Ķ
+       &L<ļ<<<Ļ
+       &N<ņ<<<Ņ
+       &O<ō<<<Ō
+       &R<ŗ<<<Ŗ
+       &S<š<<<Š
+       &U<ū<<<Ū
+       &Z<ž<<<Ž|}
+    );
+    ( "no",
+      {|&D<<đ<<<Đ<<ð<<<Ð
+       &t<<<þ/h
+       &T<<<Þ/H
+       &Y<<ü<<<Ü<<ű<<<Ű
+       &[before 1]ǀ<æ<<<Æ<<ä<<<Ä<<ę<<<Ę<ø<<<Ø<<ö<<<Ö<<ő<<<Ő<<œ<<<Œ<å<<<Å<<aa<<<Aa<<<AA|}
+    );
+    ( "pl",
+      {|&A<ą<<<Ą
+       &C<ć<<<Ć
+       &E<ę<<<Ę
+       &L<ł<<<Ł
+       &N<ń<<<Ń
+       &O<ó<<<Ó
+       &S<ś<<<Ś
+       &Z<ź<<<Ź<ż<<<Ż|}
+    );
+    ( "ro",
+      {|&A<ă<<<Ă<â<<<Â
+       &I<î<<<Î
+       &S<ş=ș<<<Ş=Ș
+       &T<ţ=ț<<<Ţ=Ț|}
+    );
+    ("ru", {|[reorder Cyrl]|});
+    ( "sk",
+      {|&A<ä<<<Ä
+       &C<č<<<Č
+       &H<ch<<<cH<<<Ch<<<CH
+       &O<ô<<<Ô
+       &R<ř<<<Ř
+       &S<š<<<Š
+       &Z<ž<<<Ž|}
+    );
+    ("sl", {|&C<č<<<Č<ć<<<Ć
+       &D<đ<<<Đ
+       &S<š<<<Š
+       &Z<ž<<<Ž|});
+    ( "sv",
+      {|&D<<đ<<<Đ<<ð<<<Ð
+       &t<<<þ/h
+       &T<<<Þ/H
+       &Y<<ü<<<Ü<<ű<<<Ű
+       &[before 1]ǀ<å<<<Å<ä<<<Ä<<æ<<<Æ<<ę<<<Ę<ö<<<Ö<<ø<<<Ø<<ő<<<Ő<<œ<<<Œ<<ô<<<Ô|}
+    );
+    ( "tr",
+      {|&C<ç<<<Ç
+       &G<ğ<<<Ğ
+       &[before 1]i<ı<<<I
+       &i<<<İ
+       &O<ö<<<Ö
+       &S<ş<<<Ş
+       &U<ü<<<Ü|}
+    );
+  ]
+
+type tailoring = {
+  items : (string, int list * int list) Hashtbl.t;
+  mutable contractions : string list;
+  mutable upper_first : bool;
+  mutable cyrillic_first : bool;
+}
+
+let root =
+  {
+    items = Hashtbl.create 1;
+    contractions = [];
+    upper_first = false;
+    cyrillic_first = false;
+  }
+
+let current = ref root
 
 let decompose s =
   let n = Uunf.create `NFD in
@@ -533,15 +692,18 @@ let decompose s =
 let lower u =
   match Uucp.Case.Map.to_lower u with `Uchars (u :: _) -> u | _ -> u
 
+let next s i =
+  let n = try Utf8.nbc s.[i] with Invalid_argument _ -> 1 in
+  min (String.length s) (i + n)
+
 (* the primary and secondary weights of the character at [i] in [s], and the
    position of the next one; the letters of other scripts after these ones,
    by code point, the other characters by their transliteration *)
-let char s i =
+let root_char t s i =
   let c = Char.code (String.unsafe_get s i) in
   if c < 0x80 then (ascii.(c), [ 0x20 ], i + 1)
   else
-    let n = try Utf8.nbc s.[i] with Invalid_argument _ -> 1 in
-    let j = min (String.length s) (i + n) in
+    let j = next s i in
     let ch = String.sub s i (j - i) in
     let p, w =
       List.split
@@ -549,10 +711,13 @@ let char s i =
            (fun u ->
              let l = Uchar.to_int (lower u) in
              match Hashtbl.find_opt weights l with
+             | Some (p, w) when t.cyrillic_first && l >= 0x400 && l < 0x530 ->
+                 (List.map (fun w -> w - 0x8000) p, w)
              | Some w -> w
              | None -> (
                  match Uucp.Gc.general_category u with
-                 | `Lu | `Ll | `Lt | `Lm | `Lo -> ([ 0x10000 + l ], [ 0x20 ])
+                 | `Lu | `Ll | `Lt | `Lm | `Lo ->
+                     ([ (0x10000 + l) lsl 4 ], [ 0x20 ])
                  | `Mn | `Mc | `Me -> ([], [])
                  | _ ->
                      let tr, _ = Name.unaccent_utf_8 false ch 0 in
@@ -566,13 +731,150 @@ let char s i =
     in
     (List.concat p, List.concat w, j)
 
+let matches s i k =
+  let n = String.length k in
+  i + n <= String.length s
+  &&
+  let rec loop j = j >= n || (s.[i + j] = k.[j] && loop (j + 1)) in
+  loop 0
+
+(* as [root_char], the contractions and letters of the tailoring [t] first *)
+let char t s i =
+  if t == root then root_char t s i
+  else
+    match List.find_opt (matches s i) t.contractions with
+    | Some k ->
+        let p, w = Hashtbl.find t.items k in
+        (p, w, i + String.length k)
+    | None -> (
+        let j = next s i in
+        let ch = String.sub s i (j - i) in
+        match Hashtbl.find_opt t.items ch with
+        | Some (p, w) -> (p, w, j)
+        | None -> (
+            match
+              Hashtbl.find_opt t.items
+                (if j - i = 1 then String.lowercase_ascii ch
+                 else Utf8.cmap_utf_8 Uucp.Case.Map.to_lower ch)
+            with
+            | Some (p, w) -> (p, w, j)
+            | None -> root_char t s i))
+
+let weights_of t s =
+  let rec loop i p w =
+    if i >= String.length s then
+      (List.concat (List.rev p), List.concat (List.rev w))
+    else
+      let p', w', i = char t s i in
+      loop i (p' :: p) (w' :: w)
+  in
+  loop 0 [] []
+
+let unescape r =
+  let n = String.length r in
+  let b = Buffer.create n in
+  let rec loop i =
+    if i < n then
+      match r.[i] with
+      | '\\' when i + 5 < n && r.[i + 1] = 'u' ->
+          Uutf.Buffer.add_utf_8 b
+            (Uchar.of_int (int_of_string ("0x" ^ String.sub r (i + 2) 4)));
+          loop (i + 6)
+      | '\'' when i + 1 < n && r.[i + 1] = '\'' ->
+          Buffer.add_char b '\'';
+          loop (i + 2)
+      | c ->
+          Buffer.add_char b c;
+          loop (i + 1)
+  in
+  loop 0;
+  Buffer.contents b
+
+(* The tailoring of the rules [r]: resets [&x], [&[before 1]x], relations
+   [<] (primary), [<<] (secondary), [<<<] and [=] (same weights, the case
+   being compared apart), expansions [y/x], options [[caseFirst upper]] and
+   [[reorder Cyrl]] *)
+let tailor r =
+  let t =
+    {
+      items = Hashtbl.create 64;
+      contractions = [];
+      upper_first = false;
+      cyrillic_first = false;
+    }
+  in
+  let r = Mutil.normalize_utf_8 (unescape r) in
+  let n = String.length r in
+  let blank c = c = ' ' || c = '\n' || c = '\t' || c = '\r' in
+  let rec skip i = if i < n && blank r.[i] then skip (i + 1) else i in
+  let word i =
+    let i = skip i in
+    let j = ref i in
+    while !j < n && not (blank r.[!j] || String.contains "&<=/[" r.[!j]) do
+      incr j
+    done;
+    (String.sub r i (!j - i), !j)
+  in
+  let bump p d =
+    match List.rev p with w :: l -> List.rev ((w + d) :: l) | [] -> [ d ]
+  in
+  let rec loop i base cur sec =
+    let i = skip i in
+    if i < n then
+      match r.[i] with
+      | '[' ->
+          let j = String.index_from r i ']' in
+          (match String.sub r i (j - i + 1) with
+          | "[caseFirst upper]" -> t.upper_first <- true
+          | "[reorder Cyrl]" -> t.cyrillic_first <- true
+          | _ -> ());
+          loop (j + 1) base cur sec
+      | '&' ->
+          let i = skip (i + 1) in
+          let before = i < n && r.[i] = '[' in
+          let i = if before then String.index_from r i ']' + 1 else i in
+          let x, i = word i in
+          let p, w = weights_of t x in
+          let x = ((if before then bump p (-16) else p), w) in
+          loop i x x 0
+      | c ->
+          let k =
+            if c = '=' then 1
+            else if i + 2 < n && r.[i + 1] = '<' && r.[i + 2] = '<' then 3
+            else if i + 1 < n && r.[i + 1] = '<' then 2
+            else 1
+          in
+          let y, i = word (i + k) in
+          let x, i = if i < n && r.[i] = '/' then word (i + 1) else ("", i) in
+          let ((p, w) as v), base, sec =
+            match (c, k) with
+            | '<', 1 ->
+                let p = bump (fst cur) 1 in
+                let v = (p, List.map (fun _ -> 0x20) p) in
+                (v, v, 0)
+            | '<', 2 ->
+                ((fst base, snd base @ [ 0x200 + sec + 1 ]), base, sec + 1)
+            | _ -> (cur, base, sec)
+          in
+          let xp, xw = weights_of t x in
+          Hashtbl.replace t.items y (p @ xp, w @ xw);
+          if Utf8.length y > 1 then t.contractions <- y :: t.contractions;
+          loop i base v sec
+  in
+  loop 0 ([], []) ([], []) 0;
+  t.contractions <-
+    List.sort
+      (fun a b -> Int.compare (String.length b) (String.length a))
+      t.contractions;
+  t
+
 (* The sort key of [s] (Unicode collation algorithm, 7.3): its primary,
    secondary and tertiary weights, the tertiary being the case of each
    character, then [s] itself, so that only equal strings have equal keys *)
-let key s =
+let key t s =
   let rec loop i p w c =
     if i < String.length s then
-      let p', w', j = char s i in
+      let p', w', j = char t s i in
       let upper =
         match s.[i] with
         | 'A' .. 'Z' -> true
@@ -583,7 +885,8 @@ let key s =
               Uucp.Case.is_upper u || Uucp.Gc.general_category u = `Lt
             with Invalid_argument _ -> false)
       in
-      loop j (p' :: p) (w' :: w) ((if upper then 8 else 2) :: c)
+      let case = if not upper then 2 else if t.upper_first then 1 else 8 in
+      loop j (p' :: p) (w' :: w) (case :: c)
     else (List.concat (List.rev p), List.concat (List.rev w), List.rev c)
   in
   let p, w, c = loop 0 [] [] [] in
@@ -597,7 +900,7 @@ let key s =
   Buffer.add_string b s;
   Buffer.contents b
 
-(* the sort keys already computed *)
+(* the sort keys already computed, for the tailoring [!current] *)
 let keys = Hashtbl.create 1024
 
 let compare a b =
@@ -606,8 +909,31 @@ let compare a b =
     | Some k -> k
     | None ->
         if Hashtbl.length keys >= 100_000 then Hashtbl.reset keys;
-        let k = key s in
+        let k = key !current s in
         Hashtbl.add keys s k;
         k
   in
   if a = b then 0 else String.compare (key_of a) (key_of b)
+
+let tailorings = Hashtbl.create 4
+
+let set_lang lang =
+  let lang =
+    match String.index_opt lang '-' with
+    | Some i -> String.sub lang 0 i
+    | None -> lang
+  in
+  let t =
+    match List.assoc_opt lang rules with
+    | None -> root
+    | Some r -> (
+        match Hashtbl.find_opt tailorings lang with
+        | Some t -> t
+        | None ->
+            let t = tailor r in
+            Hashtbl.replace tailorings lang t;
+            t)
+  in
+  if t != !current then (
+    current := t;
+    Hashtbl.reset keys)

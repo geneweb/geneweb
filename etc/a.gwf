@@ -19,6 +19,12 @@
 # Default is "fr" for french.
 #default_lang=fr
 
+# Alphabetical order of the lists and dictionaries: the language whose
+# alphabet is followed (af, br, cs, da, eo, es, et, fi, is, lt, lv, no, pl, ro,
+# sk, sl, sv, tr, and bg, ru for Cyrillic first), any other language following
+# the common order of Unicode. Default is the language of the base.
+#collation=sv
+
 # Select a default Sosa reference while navigating with an individual’ key
 # (“first_name.occurrence surname”) for eg.:
 # default_sosa_ref=john.3 smith

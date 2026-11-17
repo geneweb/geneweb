@@ -1301,6 +1301,10 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
     | Some x when x <> "" -> x
     | _ -> !default_lang
   in
+  Collation.set_lang
+    (match List.assoc_opt "collation" base_env with
+    | Some x when x <> "" -> x
+    | _ -> base_lang);
   let browser_lang = http_preferred_language request in
   let default_lang = if browser_lang = "" then base_lang else browser_lang in
   let vowels =
