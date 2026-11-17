@@ -48,8 +48,8 @@
       .then(r => r.data
         .filter(({ attributes: a }) => !seen.has(a['place-id']) && seen.add(a['place-id']))
         .map(({ type, attributes: a }) => ({
-          name: article(a['place-label']), term: q,
-          details: [a['commune-label'], a.dpt, a.region],
+          name: article(a['place-label']),
+          picks: [a['commune-label'], a.region], details: [a.dpt],
           note: text((a.descriptions ?? a['place-desc'] ?? [])[0]),
           forms: type === 'place-old-label'
             ? [text(a['rich-date'] ? `${a['rich-label']} (${a['rich-date']})` : a['rich-label'])]
@@ -81,7 +81,7 @@
           type: 'item', limit: 8, format: 'json', origin: '*'
         }).then(r => r.search);
     return items.then(l => l.filter(e => e.label).map(e => ({
-      name: e.label, term: q, details: [e.description],
+      name: e.label, details: [e.description],
       link: { href: `https://www.wikidata.org/wiki/${e.id}`, title: 'Wikidata', icon: 'fab fa-wikipedia-w' }
     })));
   };
@@ -100,6 +100,10 @@
       this.ref = form.querySelector('.book-ref');
       this.refButton = document.getElementById('book-ref');
       this.refButton.addEventListener('click', () => this.lookup());
+      this.ref.addEventListener('click', ev => {
+        const v = ev.target.closest('[data-v]')?.dataset.v;
+        if (v) this.insert(v);
+      });
       this.ref.addEventListener('keydown', ev => {
         if (ev.key !== 'Escape') return;
         this.hideRef();
@@ -422,12 +426,11 @@
         }).then(([d, c, l, w]) => [
           { head: 'DicoTopo', items: d },
           { head: cities, items: c.map(e => ({
-            name: e.name, term: p.town,
-            details: [e.postcode, ...context(e), `Insee ${e.citycode}`]
+            name: e.name, picks: context(e),
+            details: [e.postcode, `Insee ${e.citycode}`]
           })) },
           { head: places, items: l.map(e => ({
-            name: e.name, term: p.suburb || p.town,
-            details: [e.city, e.postcode, ...context(e)]
+            name: e.name, picks: [e.city, ...context(e)], details: [e.postcode]
           })) },
           { head: 'Wikidata', items: w }
         ]);
@@ -447,66 +450,84 @@
     },
     show(groups, terms) {
       const { same, near, use, none } = this.ref.dataset;
-      const exact = new Set(terms);
-      const folded = new Set(terms.map(fold));
-      const el = (tag, text = '', cls = '') => {
+      const fold1 = c => {
+        const f = c.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+        return f.length !== 1 ? c : /[\p{L}\p{N}]/u.test(f) ? f : ' ';
+      };
+      // folded code unit by code unit, so that offsets are those of [s]
+      const fold0 = s => Array.prototype.map.call(s, fold1).join('');
+      const keys = terms.filter(t => t.length > 2).map(t => [t, fold0(t)])
+        .filter(([, k]) => k.trim());
+      const el = (tag, cls = '', ...kids) => {
         const e = document.createElement(tag);
-        e.textContent = text;
         e.className = cls;
+        e.append(...kids);
         return e;
       };
-      const mark = (e, s) => {
-        const label = exact.has(s) ? same : folded.has(fold(s)) ? near : '';
-        if (label) {
-          e.classList.add(label === same ? 'fw-bold' : 'book-near');
-          e.title = [e.title, label].filter(Boolean).join(' – ');
+      // [s] with the terms of the entry in bold, waved when written otherwise
+      const hl = s => {
+        const f = fold0(s);
+        const hits = [];
+        for (const [t, k] of keys) {
+          for (let i = f.indexOf(k); i >= 0; i = f.indexOf(k, i + k.length)) {
+            hits.push([i, i + k.length, s.slice(i, i + k.length) === t]);
+          }
         }
+        hits.sort((x, y) => x[0] - y[0] || y[1] - x[1]);
+        const out = [];
+        let at = 0;
+        for (const [i, j, exact] of hits) {
+          if (i < at) continue;
+          const b = el('b', exact ? '' : 'book-near', s.slice(i, j));
+          b.title = exact ? same : near;
+          out.push(s.slice(at, i), b);
+          at = j;
+        }
+        out.push(s.slice(at));
+        return out;
+      };
+      const pick = (tag, cls, s, v = s) => {
+        const e = el(tag, cls, ...hl(s));
+        e.dataset.v = v;
+        e.title = use;
+        if (tag === 'button') e.type = 'button';
         return e;
       };
       const nodes = groups.filter(g => g.items.length).flatMap(g => {
-        const ul = el('ul', '', 'list-unstyled mb-0');
+        const ul = el('ul', 'list-unstyled mb-0');
         for (const c of g.items) {
-          const b = el('button', c.name, 'btn btn-link btn-sm p-0 align-baseline');
-          b.type = 'button';
-          b.title = use;
-          b.addEventListener('click', () => this.use(c.term, c.name));
-          const li = el('li');
-          li.append(mark(b, c.name), ...c.details.filter(Boolean)
-            .flatMap(d => [' · ', mark(el('span', d), d)]));
+          const li = el('li', '',
+            pick('button', 'btn btn-link btn-sm p-0 align-baseline', c.name),
+            ...(c.picks ?? []).filter(Boolean).flatMap(s => [' · ', pick('span', 'book-pick', s)]),
+            ...c.details.filter(Boolean).flatMap(s => [' · ', ...hl(s)]));
           if (c.link) {
-            const w = el('a', '', 'ms-2');
+            const w = el('a', 'ms-2', el('i', c.link.icon));
             w.href = c.link.href;
             w.target = '_blank';
             w.rel = 'noreferrer noopener';
             w.title = c.link.title;
-            w.append(el('i', '', c.link.icon));
             li.append(w);
           }
-          if (c.note) li.append(el('div', c.note, 'text-body-secondary'));
+          if (c.note) li.append(el('div', 'text-body-secondary', ...hl(c.note)));
           if (c.forms?.length) {
-            const f = el('div', '', 'fst-italic');
-            f.append(...c.forms.flatMap((s, i) => [i ? ', ' : '', mark(el('span', s), paren(s)[0])]));
-            li.append(f);
+            li.append(el('div', 'fst-italic', ...c.forms.flatMap((s, i) =>
+              [i ? ', ' : '', pick('span', 'book-pick', s, paren(s)[0])])));
           }
           ul.append(li);
         }
-        return [el('div', g.head, 'fw-semibold mt-1'), ul];
+        return [el('div', 'fw-semibold mt-1', g.head), ul];
       });
-      const cols = el('div', '', 'book-ref-cols');
-      cols.append(...(nodes.length ? nodes : [el('div', none)]));
-      this.ref.replaceChildren(cols);
+      this.ref.replaceChildren(el('div', 'book-ref-cols', ...(nodes.length ? nodes : [none])));
       this.ref.hidden = false;
       this.refButton.setAttribute('aria-expanded', 'true');
       this.spread();
       this.ref.scrollIntoView({ block: 'nearest' });
     },
-    use(term, name) {
-      const v = this.field.value;
-      const i = v.indexOf(term);
-      if (i < 0) return;
-      this.field.value = v.slice(0, i) + name + v.slice(i + term.length);
-      this.field.dispatchEvent(new Event('input'));
-      this.field.focus();
+    insert(v) {
+      const f = this.field;
+      f.setRangeText(v, f.selectionStart, f.selectionEnd, 'end');
+      f.dispatchEvent(new Event('input'));
+      f.focus();
     },
     filter(q) {
       const norm = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
