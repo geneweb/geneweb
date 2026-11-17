@@ -14,14 +14,14 @@
 %if;((op_m=1 or op_m=3 or op_m=4 or (op_m=5 and op_ph=0)) and has_parents)
   <h2 class="h3">[*parents]</h2>
   <ul>
-  %apply;li_SD("father")
+  %apply;li_asc("father")
   %if;(op_m=1 or op_m=3)
-    %apply;short_display_person("father")%nn;
+    %apply;person_name_dates("father")%nn;
     %if;(op_m=3 and father.has_occupation), %father.occupation;%nl;%end;
   %elseif;(op_m=4)
-    %apply;long_display_person("father")%sp;
+    %apply;person_summary("father", "")%sp;
   %elseif;(op_m=5)
-    %apply;display_horizontal("father")
+    %apply;person_summary("father", "h")
   %end;
   %if;(op_m=4 or op_m=5)
     <br>
@@ -35,16 +35,16 @@
     %end;
   %end;
   </li>
-  %apply;li_SD("mother")
+  %apply;li_asc("mother")
   %if;(op_m=1 or op_m=3)
-    %apply;short_display_person("mother")%nn;
+    %apply;person_name_dates("mother")%nn;
     %if;(op_m=3 and mother.has_occupation), %mother.occupation;%nl;%end;
   %end;
   %if;(op_m=4 or op_m=5)
     %if;(op_m=4)
-      %apply;long_display_person("mother")%sp;
+      %apply;person_summary("mother", "")%sp;
     %elseif;(op_m=5)
-      %apply;display_horizontal("mother")
+      %apply;person_summary("mother", "h")
     %end;
     %foreach;father.family;
       %if;(spouse.access=mother.access)
@@ -121,7 +121,7 @@
     </tr>
     <tr>
       <td class="text-start align-top pt-2">
-        %apply;display_vertical("father")
+        %apply;person_summary_list("father")
       </td>
       <td class="align-top pt-2">
         %foreach;father.family;
@@ -133,7 +133,7 @@
         %end;
       </td>
       <td class="text-start align-top pt-2">
-        %apply;display_vertical("mother")
+        %apply;person_summary_list("mother")
       </td>
     </tr>
   </table>
@@ -164,7 +164,7 @@
           <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ms-2 pb-2">?</span>
         %end;
         <div class="ms-2 align-self-center">
-          %apply;short_display_person_tree("parent")
+          %apply;person_tree_box("parent")
           <br>%if;parent.computable_age;%sp;%parent.age;%end;
           %if;parent.computable_death_age;%sp;%parent.death_age;%end;
         </div>

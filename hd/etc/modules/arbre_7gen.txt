@@ -61,15 +61,6 @@
   </td>
 %end;
 
-%define;short_display_person_v(xx)
-  %apply;display_sosa("xx")
-  %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
-  %end;
-  %xx.title;%xx.dates;
-%end;
-
 %( Arbre 7 générations 3+1+3 %)
 %if;(has_parents or has_children)
 %let;gpcol;40%%%in;
@@ -117,7 +108,7 @@
                  %family_cnt;
                %end;
                %( <a href="%prefix;%spouse.access;"> %spouse;</a><br>%spouse.dates;&nbsp; %)
-               %apply;short_display_person("spouse")
+               %apply;person_name_dates("spouse")
              </td>
            </tr>
              %end;

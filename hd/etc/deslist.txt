@@ -59,7 +59,7 @@
 </h1>
 
 %define;link(xx)
-  <strong>%if;(e.cgl="on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;</strong>
+  <strong>%apply;person_link("xx", "")</strong>
   %xx.title;%xx.dates;
 %end;
 
@@ -114,9 +114,9 @@
           %sp;[in (year)] %event_witness_relation.event.date.year;%nn;
         %end;
       %and;
-        %apply;short_display_person("event_witness_relation.person")
+        %apply;person_name_dates("event_witness_relation.person")
         %if;(event_witness_relation.event.spouse!="") [and]%sp;
-          %apply;short_display_person("event_witness_relation.event.spouse")
+          %apply;person_name_dates("event_witness_relation.event.spouse")
         %end;
       %end;
     %end;
@@ -152,7 +152,7 @@
           %if;event.has_witnesses;
             %foreach;event_witness;
               <span>%apply;capitalize(event_witness_kind)[:]</span>
-              %apply;short_display_person("event_witness")<br>
+              %apply;person_name_dates("event_witness")<br>
             %end;
           %end;
           %if;event.has_note;<div>%event.note;</div>%end;
@@ -284,8 +284,7 @@
       %end;
     </div>
     <b class="person-entry" id="person-%ctr;%apply;letter(family_cnt)">
-      %if;(e.cgl="on" or spouse.is_restricted)%spouse;
-      %else;<a href="%prefix;%spouse.access;">%spouse;</a>%end;
+      %apply;person_link("spouse", "")
     </b>%nn;
     %apply;somebody_long_info("spouse")
     %apply;somebody_spouse_parent()

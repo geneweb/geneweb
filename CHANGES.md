@@ -317,8 +317,30 @@
   their stored order, with `event_key`. The `has_secondary_pevents`,
   `nb_pevents` and `family.nb_fevents` variables of the person page are
   removed.
+- The links to a person carry its key (first name.occurrence surname)
+  as tooltip, unless its name is hidden: new `is_name_visible` person
+  variable, true when `%xx;` shows the name.
+- The person display macros of perso_utils.txt are rebuilt on a single
+  `person(xx, options)` macro, the options being letters (sex icon,
+  Sosa, link coloured by sex, dates, title…), with shortcuts:
+  `person_name`, `person_name_dates`, `person_name_dates_icon`,
+  `person_name_dates_plain`, `person_firstname_dates`,
+  `person_tree_box`, `person_summary` (with option `h` for the former
+  `display_horizontal`), `person_summary_list`, `person_sex_icon`,
+  `person_sosa_icon`; list bullets `li_asc`, `li_asc_both`, `li_desc`;
+  siblings `sibling_item*`, `half_siblings_list`; `children_list` and
+  `grandparent_families`. The bullet of a related person or a witness
+  in the relations module now depends on its own children, and the
+  bullet of a grandchild in the grandparents module no longer always
+  shows children. The horizontal ancestor tree no longer prints
+  `%apply;ext_link?` in its links.
 
 ## Deprecated features
+- The former names of the person display macros of perso_utils.txt
+  (`short_display_person`, `very_short_display_person`, `image_MF`,
+  `display_sosa`, `li_SD`, `li_SDC`, `long_display_person`,
+  `display_horizontal`, `display_vertical`…) are kept as aliases of the
+  new ones for the templates of a base, and will be removed.
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment
   variable is deprecated (#2936). Use the `--cgi` option. Note that a CGI
   binary invoked directly by the web server receives no command line

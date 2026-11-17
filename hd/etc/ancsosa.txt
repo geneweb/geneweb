@@ -84,7 +84,7 @@
           %if;(ancestor.same="" and ancestor.is_descendant)
             %lazy_force;
             <li>[Sosa] %ancestor.anc_sosa; -%sp;
-              <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
+              %apply;person_link("ancestor", "")%nn;
               %ancestor.title;%ancestor.dates;
             </li>
           %end;

@@ -34,7 +34,7 @@
               <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ms-2 pb-2">?</span>
             %end;
             <div class="ms-2 align-self-center">%nn;
-              %apply;short_display_person_tree("child")
+              %apply;person_tree_box("child")
             </div>
           </div>
         %end;
@@ -95,27 +95,27 @@
         %if;(b.full_siblings!="no")%nn;
           %if;(op_m=1)%nn;
             %if;(b.always_surname="yes")%nn;
-              %apply;short_display_siblings()
+              %apply;sibling_item()
             %else;%nn;
-              %apply;short_display_siblings_noname()
+              %apply;sibling_item_firstname()
             %end;%nn;
           %elseif;(op_m=3)%nn;
-            %apply;long_display_siblings()
+            %apply;sibling_item_unions()
           %elseif;(op_m=4)%nn;
-            %apply;display_sibling()
+            %apply;sibling_item_photo()
           %end;%nn;
         %else;%nn;
           %if;(index!=cur)%nn;
             %if;(op_m=1)%nn;
               %if;(b.always_surname="yes")%nn;
-                %apply;short_display_siblings()%nn;
+                %apply;sibling_item()%nn;
               %else;%nn;
-                %apply;short_display_siblings_noname()%nn;
+                %apply;sibling_item_firstname()%nn;
               %end;%nn;
             %elseif;(op_m=3)%nn;
-              %apply;long_display_siblings()%nn;
+              %apply;sibling_item_unions()%nn;
             %elseif;(op_m=4)%nn;
-              %apply;display_sibling()%nn;
+              %apply;sibling_item_photo()%nn;
             %end;
           %end;
         %end;
@@ -148,20 +148,20 @@
 %if;(op_m=1 and has_parents and (half_father!=0 or half_mother!=0))
   <h2 class="h3">[*half-brothers/half-sisters/half-siblings]2</h2>
   %if;(half_father!=0)
-      %apply;on_side%with;%apply;very_short_display_person("father")%end;
+      %apply;on_side%with;%apply;person_name("father")%end;
       %if;(father.nb_families>1 and half_father!=0)
         %foreach;father.family;
           %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
             <ul class="ps-4">
-              %apply;li_SD("spouse")
-                [with] %apply;very_short_display_person("spouse")
+              %apply;li_asc("spouse")
+                [with] %apply;person_name("spouse")
                 %if;has_children;
                   <ul class="ps-4">
                     %foreach;child;
                       %if;(b.always_surname="yes")
-                        %apply;short_display_siblings()
+                        %apply;sibling_item()
                       %else;
-                        %apply;short_display_siblings_noname()
+                        %apply;sibling_item_firstname()
                       %end;
                     %end;
                   </ul>
@@ -173,17 +173,17 @@
       %end;
   %end;
   %if;(half_mother!=0)
-      %apply;on_side%with;%apply;very_short_display_person("mother")%end;
+      %apply;on_side%with;%apply;person_name("mother")%end;
       %if;(mother.nb_families>1 and half_mother!=0)
         %foreach;mother.family;
           %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
             <ul>
-              %apply;li_SD("spouse")
-                [with] %apply;very_short_display_person("spouse")
+              %apply;li_asc("spouse")
+                [with] %apply;person_name("spouse")
                 %if;has_children;
                   <ul>
                     %foreach;child;
-                      %apply;short_display_siblings()
+                      %apply;sibling_item()
                     %end;
                   </ul>
                 %end;
@@ -200,13 +200,13 @@
       <tr>
         %if;(half_father!=0)
           <td class="w-50 align-top">
-            %apply;on_side%with;%apply;very_short_display_person("father")%end;
+            %apply;on_side%with;%apply;person_name("father")%end;
           </td>
           <td class="w-auto align-top">&nbsp;</td>
         %end;
         %if;(half_mother!=0)
           <td class="w-50 align-top">
-            %apply;on_side%with;%apply;very_short_display_person("mother")%end;
+            %apply;on_side%with;%apply;person_name("mother")%end;
           </td>
         %end;
       </tr>
@@ -216,13 +216,13 @@
             %foreach;father.family;
               %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
                 <ul>
-                  %apply;li_SD("spouse")
-                    [with] %apply;very_short_display_person("spouse")
+                  %apply;li_asc("spouse")
+                    [with] %apply;person_name("spouse")
                   </li>
                   %if;has_children;
                     <li class="list-unstyled"><ul>
                       %foreach;child;
-                        %apply;long_display_siblings()
+                        %apply;sibling_item_unions()
                       %end;
                     </ul></li>
                   %end;
@@ -237,13 +237,13 @@
             %foreach;mother.family;
               %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
                 <ul class="list-unstyled">
-                  %apply;li_SD("spouse")
-                    [with] %apply;very_short_display_person("spouse")
+                  %apply;li_asc("spouse")
+                    [with] %apply;person_name("spouse")
                   </li>
                   %if;has_children;
                     <li><ul>
                       %foreach;child;
-                        %apply;long_display_siblings()
+                        %apply;sibling_item_unions()
                       %end;
                     </ul></li>
                     %end;
@@ -263,7 +263,7 @@
         %if;(parent.nb_families>1)
           <td style="width:47%%">
             %apply;display_shared_parent%with;
-            %apply;short_display_person("parent")%end;
+            %apply;person_name_dates("parent")%end;
           </td>
         %end;
         %if;(not is_last)
@@ -276,7 +276,7 @@
         <td style="vertical-align: top">
           %foreach;father.family;
             %if;(spouse.index!=mother.index)
-              %apply;list_half_siblings()
+              %apply;half_siblings_list()
             %end;
           %end;
         </td>
@@ -285,7 +285,7 @@
         <td style="vertical-align: top">
           %foreach;mother.family;
             %if;(spouse.index!=father.index)
-              %apply;list_half_siblings()
+              %apply;half_siblings_list()
             %end;
           %end;
         </td>

@@ -76,8 +76,8 @@
     %end;
     </div>
     <div class="d-flex flex-column justify-content-center overflow-hidden ms-2">
-    %(%if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
-      %apply;image_MF("xxx")%)
+    %(%if;(xxx.has_sosa)%apply;person_sosa_icon("xxx")%end;
+      %apply;person_sex_icon("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
       <a class="normal_anchor" href="%prefix;%xxx.access;"
         title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx.first_name; %xxx.surname;%end;%end;%personinfo;">%nn;

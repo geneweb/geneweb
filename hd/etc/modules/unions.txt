@@ -35,7 +35,7 @@
   %foreach;event_witness;
     %if;(event_witness_kind = [kindx]0)
       %incr_count;
-      %apply;short_display_person("event_witness")
+      %apply;person_name_dates("event_witness")
       %if;(count=k_cnt).
       %else;
         %if;(count=k_cnt-1)%sp;[and]%sp;%else;,%sp;%end;
@@ -159,15 +159,15 @@
     %reset_count;
     %foreach;family;
       %incr_count;
-      %apply;li_SD("spouse")
+      %apply;li_asc("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
-        %apply;short_display_person("spouse")
+        %apply;person_name_dates("spouse")
         %let;prev_count;%count;%in;
         %if;(has_witnesses)
           %sp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;%nn;
+            %apply;person_name_dates("witness")%if;(witness_kind!="") (%witness_kind;)%end;%nn;
           %end;
           %if;(not cancel_links)
             <a %apply;relations_tree(index)>%nn;
@@ -200,11 +200,11 @@
           %let;prev_count;%count;%in;
           <ul>
             %foreach;child;
-              %apply;li_SDC("child")
+              %apply;li_desc("child")
                 %if;(bvar.always_surname="yes")
-                  %apply;short_display_person("child")
+                  %apply;person_name_dates("child")
                 %else;
-                  %apply;short_display_person_noname("child")
+                  %apply;person_firstname_dates("child")
                 %end;
               </li>
             %end;
@@ -233,14 +233,14 @@
       %if;(child.has_image)%incr_count2;%end;
     %end;
     <ul class="ps-4 py-0%if;(wizard and not cancel_links) fa-ul ms-0%end; mb-0">
-    %if;not (wizard and not cancel_links)%apply;li_SD("spouse")
+    %if;not (wizard and not cancel_links)%apply;li_asc("spouse")
     %else;<li><span class="fa-li%if;(spouse.has_blason and spouse.has_portrait) pt-1%end;">%apply;marr_wrench_to_bullet("spouse")</span>%end;
     %if;(spouse.has_blason and spouse.has_portrait)
       <img src="%spouse.blason_url;" %spouse.blason_extra_small_size; alt="[blason/blasons]0 [spouse/spouses]0"
         class="%if;(op_m=3)align-self-center mx-1%end; me-2" title="[*blason/blasons]0 [spouse/spouses]0">%nn;
     %end;
     <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
-    %apply;short_display_person("spouse")
+    %apply;person_name_dates("spouse")
     %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
       %if;(not cancel_links)
          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[see] [note/notes]0 %count">%nn;
@@ -252,12 +252,12 @@
     %end;
     %if;(sp_img="" and spouse.has_parents)
       <span>%apply;a_of_b%with;, %if;spouse.is_male;[son/daughter/child]0%else;[son/daughter/child]1%end;
-      %and;%apply;short_display_person("spouse.father") [and] %apply;short_display_person("spouse.mother")</span>%end;
+      %and;%apply;person_name_dates("spouse.father") [and] %apply;person_name_dates("spouse.mother")</span>%end;
     %end;
     %if;(w_img="" and has_witnesses)
       <span data-dup="f%spouse.index;">%sp;([witness/witnesses]w[:]
         %foreach;witness;
-          %if;not is_first;, %end;%apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+          %if;not is_first;, %end;%apply;person_name_dates("witness")%if;(witness_kind!="") (%witness_kind;)%end;
         %end;)</span>%nn;
     %end;
     %if;(sp_img="" and has_children)<span%if;(marr_note!="") data-dup-alt="f%spouse.index;" hidden%end;>, %apply;havingchildren(nb_children)[:]</span>%end;
@@ -266,11 +266,11 @@
       %if;(marr_note!="" and has_children)<span data-dup="f%spouse.index;">%apply;capitalize%with;%apply;havingchildren(nb_children)%end;[:]</span>%end;
       %foreach;child;
         <ul>
-          %apply;li_SDC("child")%nn;
+          %apply;li_desc("child")%nn;
           %if;(bvar.always_surname="yes")
-            %apply;short_display_person("child")
+            %apply;person_name_dates("child")
           %else;
-            %apply;short_display_person_noname("child")
+            %apply;person_firstname_dates("child")
           %end;
           </li>
         </ul>
@@ -310,7 +310,7 @@
                             <img class="small_image rounded align-self-center" src="%images_prefix;img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;">%nn;
                           %end;
                           <div class="ms-2 align-self-center">
-                            %apply;short_display_person_tree("parent")
+                            %apply;person_tree_box("parent")
                           </div>
                         </div>
                       %end;
@@ -339,8 +339,8 @@
                       title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;">%nn;
                   %end;
                   <div class="ms-2 align-self-center">
-                    %if;(count2=0)<ul>%apply;li_SDC("child")%end;%nn;
-                      %apply;short_display_person_noname("child")<br>
+                    %if;(count2=0)<ul>%apply;li_desc("child")%end;%nn;
+                      %apply;person_firstname_dates("child")<br>
                       %if;(child.public_name!="" and child.public_name!=child.first_name)
                         %if;wizard;<span data-index="%child.index;" data-updfield="first_name">%end;%child.first_name;%nn;
                         %if;wizard;</span>%end;<br>
@@ -379,7 +379,7 @@
                   <span class="small_image noimage rounded align-self-center display-3 text-center text-body-secondary ms-2 pb-2">&nbsp;</span>%)
                 %end;
                 <div class="ms-2 align-self-center">%nn;
-                  %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
+                  %apply;person_tree_box("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
                 </div>
               </div>
             %end;
@@ -404,18 +404,18 @@
     %reset_count;
     %foreach;family;
       %incr_count;
-      %apply;li_SD("spouse")
+      %apply;li_asc("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
-        %apply;short_display_person("spouse")
+        %apply;person_name_dates("spouse")
         %if;spouse.has_parents; ([parents][:]
-          %apply;short_display_person("spouse.father")%sp;
-          & %apply;short_display_person("spouse.mother"))%nn;
+          %apply;person_name_dates("spouse.father")%sp;
+          & %apply;person_name_dates("spouse.mother"))%nn;
         %end;
         %if;has_witnesses;
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+            %apply;person_name_dates("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)
@@ -431,11 +431,11 @@
           %let;prev_count;%count;%in;
           <ul>
             %foreach;child;
-              %apply;li_SDC("child")
+              %apply;li_desc("child")
                 %if;(bvar.always_surname="yes")
-                  %apply;short_display_person("child")
+                  %apply;person_name_dates("child")
                 %else;
-                  %apply;short_display_person_noname("child")
+                  %apply;person_firstname_dates("child")
                 %end;
                 %if;child.has_families;
                   %foreach;child.family;
@@ -444,7 +444,7 @@
                       <em>%child;%child.title;%child.dates;</em>
                     %end;%nn;
                     , %apply;loc_long_married("child")%sp;
-                    %apply;short_display_person("spouse")<br>
+                    %apply;person_name_dates("spouse")<br>
                   %end;
                 %end;
               </li>
@@ -463,20 +463,20 @@
     %reset_count;
     %foreach;family;
       %incr_count;
-      %apply;li_SD("spouse")
+      %apply;li_asc("spouse")
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
-        %apply;long_display_person("spouse")
+        %apply;person_summary("spouse", "")
         %if;spouse.has_parents;
           <span style="font-size: 90%%"><em> ([parents][:]
-            %apply;short_display_person("spouse.father") &%sp;
-            %apply;short_display_person("spouse.mother"))</em>%nn;
+            %apply;person_name_dates("spouse.father") &%sp;
+            %apply;person_name_dates("spouse.mother"))</em>%nn;
           </span>%nn;
         %end;
         %if;has_witnesses;
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+            %apply;person_name_dates("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;%nn;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)
@@ -492,8 +492,8 @@
           %let;prev_count;%count;%in;
           <ul>
             %foreach;child;
-              %apply;li_SDC("child")
-                %apply;short_display_person("child")
+              %apply;li_desc("child")
+                %apply;person_name_dates("child")
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
@@ -501,14 +501,14 @@
                       <em>%child;%child.title;%child.dates;</em>%nn;
                     %end;
                     <em>, %apply;loc_long_married("child")</em>
-                    %apply;short_display_person("spouse")
+                    %apply;person_name_dates("spouse")
                     %if;has_children;
                       , %apply;havingchildren(nb_children)[:]
                       <div style="font-size: 90%%">
                         <ul>
                           %foreach;child;
-                            %apply;li_SDC("child")
-                              %apply;short_display_person("child")
+                            %apply;li_desc("child")
+                              %apply;person_name_dates("child")
                               %if;child.has_families;
                                 %foreach;child.family;
                                   %if;(family_cnt!=1)
@@ -516,13 +516,13 @@
                                     <em>%child;%child.title;%child.dates;</em>%nn;
                                   %end;
                                   <em>&nbsp;%apply;loc_long_married("child")</em>
-                                  %apply;short_display_person("spouse")
+                                  %apply;person_name_dates("spouse")
                                   %if;has_children; %apply;havingchildren(nb_children)[:]
                                     <div style="font-size: 90%%">%nn;
                                       <ul>
                                         %foreach;child;
-                                          %apply;li_SDC("child")
-                                            %apply;short_display_person("child")
+                                          %apply;li_desc("child")
+                                            %apply;person_name_dates("child")
                                           </li>
                                         %end;
                                       </ul>
@@ -554,7 +554,7 @@
     %reset_count;
     %foreach;family;
       %incr_count;
-      %apply;li_SD("spouse")
+      %apply;li_asc("spouse")
         %if;spouse.has_image;
           <table style="border-width:%border;">
             <tr>
@@ -574,18 +574,18 @@
               <td style="vertical-align: middle">
         %end;
         <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
-        %apply;display_horizontal("spouse")
+        %apply;person_summary("spouse", "h")
         <span style="font-size: 90%%">
           %if;spouse.has_parents;<em> ([parents][:]
-            %apply;short_display_person_f("spouse.father") &%sp;
-            %apply;short_display_person_f("spouse.mother"))</em>%nn;
+            %apply;person_name_dates_icon("spouse.father") &%sp;
+            %apply;person_name_dates_icon("spouse.mother"))</em>%nn;
           %end;
         </span>%nn;
         %if;has_witnesses;
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+            %apply;person_name_dates("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;%nn;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_marriage_note)
@@ -604,7 +604,7 @@
         %if;has_children; %apply;havingchildren(nb_children)
           <ul>
             %foreach;child;
-              %apply;li_SDC("child")
+              %apply;li_desc("child")
                 %if;child.has_image;
                   <table style="border-width:%border;">
                     <tr>
@@ -623,7 +623,7 @@
                       </td>
                       <td style="vertical-align: middle">
                 %end;
-                %apply;short_display_person_f("child")
+                %apply;person_name_dates_icon("child")
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
@@ -631,7 +631,7 @@
                         src="%images_prefix;1pixel.png" alt="1px">%sp;
                       <em>%child;%child.title;%child.dates;</em>%end;
                     <em>&nbsp;%apply;married_to("child", 0)</em>
-                    %apply;short_display_person_f("spouse")%nn;
+                    %apply;person_name_dates_icon("spouse")%nn;
                     %if;are_separated; [separated]0 %on_separation_date;%end;%nn;
                     %if;are_divorced; [divorced]0 %on_divorce_date;%end;%nn;
                     %if;has_children; %apply;havingchildren(nb_children)
@@ -639,8 +639,8 @@
                       <div style="font-size: 90%%">
                         <ul>
                           %foreach;child;
-                            %apply;li_SDC("child")
-                              %apply;short_display_person_f("child")
+                            %apply;li_desc("child")
+                              %apply;person_name_dates_icon("child")
                               %if;child.has_families;
                                 %foreach;child.family;
                                   %if;(family_cnt!=1)
@@ -648,7 +648,7 @@
                                             src="%images_prefix;1pixel.png" alt="1px">
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
                                   <em>&nbsp;%apply;married_to("child", 0)</em>
-                                  %apply;short_display_person_f("spouse")
+                                  %apply;person_name_dates_icon("spouse")
                                   %if;are_separated; [separated]0 %on_separation_date;%end;
                                   %if;are_divorced; [divorced]0 %on_divorce_date;%end;
                                   %if;has_children;
@@ -657,7 +657,7 @@
                                         %apply;havingchildren(nb_children)[:]
                                         %foreach;child;
                                           %if;(child_cnt!=1), %end;
-                                          %apply;short_display_person_f("child")
+                                          %apply;person_name_dates_icon("child")
                                           %if;(child_cnt=nb_children).%end;
                                         %end;
 

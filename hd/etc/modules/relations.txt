@@ -87,38 +87,38 @@
     %if;(has_relation_him and has_relation_her)
       <li data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%nl;
         <ul class="ps-4">
-          %apply;li_SDC("relation_him")
-            %apply;short_display_person("relation_him")
+          %apply;li_desc("relation_him")
+            %apply;person_name_dates("relation_him")
           </li>
-          %apply;li_SDC("relation_her")
-            %apply;short_display_person("relation_her")
+          %apply;li_desc("relation_her")
+            %apply;person_name_dates("relation_her")
           </li>
         </ul>
       </li>
     %elseif;has_relation_him;
-      %apply;li_SDC("relation_him")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
-        %apply;short_display_person("relation_him")</span>
+      %apply;li_desc("relation_him")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
+        %apply;person_name_dates("relation_him")</span>
       </li>
     %elseif;has_relation_her;
-      %apply;li_SDC("relation_her")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
-        %apply;short_display_person("relation_her")</span>
+      %apply;li_desc("relation_her")<span data-dup="r%relation_type;">%apply;capitalize(relation_type)[:]%sp;
+        %apply;person_name_dates("relation_her")</span>
       </li>
     %end;
   %end;
   %foreach;related;
-    %apply;li_SDC("related")<span data-dup="c%related.index;">%apply;capitalize(related_type)[:]%sp;
-      %apply;short_display_person("related")</span>
+    %apply;li_desc("related")<span data-dup="c%related.index;">%apply;capitalize(related_type)[:]%sp;
+      %apply;person_name_dates("related")</span>
     </li>
   %end;
   %foreach;event_witness_relation;
-    %apply;li_SDC("event_witness_relation.person")<span data-dup="w%event_witness_relation.person.index;">%nn;
+    %apply;li_desc("event_witness_relation.person")<span data-dup="w%event_witness_relation.person.index;">%nn;
       %let;str;%if;(event_witness_relation.event.name_at!="")%event_witness_relation.event.name_at;%else;%event_witness_relation.event.name;%end;
       %if;(event_witness_relation.event.date.year!="") [in (year)] %event_witness_relation.event.date.year;%end;%in;
       %if;(event_witness_relation.event.name_at!="")%apply;witness_at_event(event_witness_relation_kind,str)%sp;%else;%apply;witness_at(event_witness_relation_kind,str)%end;
-      %apply;short_display_person("event_witness_relation.person")
+      %apply;person_name_dates("event_witness_relation.person")
       %if;(event_witness_relation.event.spouse!="")
       %sp;[and]
-      %apply;short_display_person("event_witness_relation.event.spouse")
+      %apply;person_name_dates("event_witness_relation.event.spouse")
       %end;.</span>
     </li>
   %end;
@@ -162,17 +162,17 @@
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        %apply;short_display_person("relation_him")
+        %apply;person_name_dates("relation_him")
         ,%sp;
-        %apply;short_display_person("relation_her").
+        %apply;person_name_dates("relation_her").
       </li>
     %elseif;(has_relation_him and not has_relation_her)
-      %apply;li_SDC("relation_him")%apply;capitalize(relation_type) :%sp;
-      %apply;short_display_person("relation_him").
+      %apply;li_desc("relation_him")%apply;capitalize(relation_type) :%sp;
+      %apply;person_name_dates("relation_him").
       </li>
     %elseif;(has_relation_her and not has_relation_him)
-      %apply;li_SDC("relation_her")%apply;capitalize(relation_type) :%sp;
-      %apply;short_display_person("relation_her").
+      %apply;li_desc("relation_her")%apply;capitalize(relation_type) :%sp;
+      %apply;person_name_dates("relation_her").
       </li>
     %end;
   %end;
@@ -182,8 +182,8 @@
     %if;(related_type!=[godson/goddaughter/godchild]0 and
        related_type!=[godson/goddaughter/godchild]1 and
        related_type!=[godson/goddaughter/godchild]2)
-      %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;short_display_person("related").
+      %apply;li_desc("related")%apply;capitalize(related_type)[:]%sp;
+      %apply;person_name_dates("related").
     </li>
     %end;
   %end;
@@ -205,7 +205,7 @@
       %if;(related_type=[godson/goddaughter/godchild]0 or
          related_type=[godson/goddaughter/godchild]1 or
          related_type=[godson/goddaughter/godchild]2)
-        %apply;short_display_person("related")
+        %apply;person_name_dates("related")
         %incr_count;
         %if;(count=g_cnt).
         %else;
@@ -237,7 +237,7 @@
           %apply;capitalize(event.name) %if;(event.date.year!="")(%event.date.year;)%end;[:]
           %foreach;event_witness;
             %if;not is_first;, %end;%nn;
-            %apply;short_display_person("event_witness")%nn;
+            %apply;person_name_dates("event_witness")%nn;
             %if;(event_witness_kind=[officer/officer/officers]0)%nn;
               %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
           %end;.
@@ -258,14 +258,14 @@
   %end;
   <ul class="ps-4">
     %foreach;event_witness_relation;
-      %apply;li_SDC("event_witness_relation.person")
+      %apply;li_desc("event_witness_relation.person")
         %apply;capitalize(event_witness_relation.event.name)%sp;
           %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;[:]
         %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
-        %apply;short_display_person("event_witness_relation.person")
+        %apply;person_name_dates("event_witness_relation.person")
         %if;(event_witness_relation.event.spouse!="")
         %sp;[and]
-        %apply;short_display_person("event_witness_relation.event.spouse")
+        %apply;person_name_dates("event_witness_relation.event.spouse")
         %end;.
       </li>
     %end;
