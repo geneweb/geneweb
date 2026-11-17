@@ -13,8 +13,10 @@ let () =
          Anomaly_test.v;
          Base_index_test.v;
          Blank_name_test.v;
+         Book_test.v;
          Cache_test.v;
          Calendar_test.v;
+         Collation_test.v;
          Dag2html_test.v;
          Dict_test.v;
          Event_align_test.v;
