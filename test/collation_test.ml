@@ -38,6 +38,7 @@ let root () =
       [ "1789"; "Abel" ];
       [ "Saint Martin"; "Saint-Martin"; "Sainte"; "Saintes" ];
       [ "d’Arc"; "Dame" ];
+      [ "ê"; "ẹ"; "é\u{323}"; "ẹ\u{301}"; "f" ];
     ];
   (check bool) "é <> e + U+0301" true (Collation.compare "é" "e\u{301}" <> 0)
 
@@ -75,7 +76,7 @@ let tailorings () =
 (* The letters followed by "a" of CollationTest_NON_IGNORABLE_SHORT.txt
    (UCA 17.0.0) made of the letters and marks of the table, in its order,
    without the variants told apart by the third level of the DUCET alone
-   (ª º µ ς ϐ…), the titlecase digraphs (ǅ) and the overlay mark U+0334 *)
+   (ª º µ ς ϐ…) and the titlecase digraphs (ǅ) *)
 let ducet =
   {|a A á Á à À ă Ă ắ Ắ ằ Ằ ẵ Ẵ ẳ Ẳ â Â ấ Ấ ầ Ầ ẫ Ẫ ẩ Ẩ ǎ Ǎ å Å ǻ Ǻ ä Ä ǟ Ǟ ã Ã
 ȧ Ȧ ǡ Ǡ ą Ą ā Ā ả Ả ȁ Ȁ ȃ Ȃ ạ Ạ ặ Ặ ậ Ậ ḁ Ḁ æ Æ ǽ Ǽ ǣ Ǣ ɐ Ɐ ɑ Ɑ ɒ Ɒ b B ḃ Ḃ
