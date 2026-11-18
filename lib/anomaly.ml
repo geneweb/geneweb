@@ -646,14 +646,27 @@ let make ?(verbose = false) ~base ~bdir ~producer anomalies =
         Hashtbl.add cache s w;
         w
   in
-  {
-    date = stamp_of_time (Unix.time ());
-    producer;
-    items =
-      List.map
-        (fun a -> { anomaly = a; who = List.map who_of_subject (subjects a) })
-        anomalies;
-  }
+  (* Resolving each anomaly's subjects (person lookup + signature scan) is the
+     heavy phase after the check and the history read; show a progress bar. *)
+  let total = List.length anomalies in
+  let bar = verbose && total > 0 in
+  if bar then (
+    Printf.eprintf "resolve\n";
+    ProgrBar.start ());
+  let last = ref (-1) in
+  let items =
+    List.mapi
+      (fun i a ->
+        (if bar then
+           let pct = (i + 1) * 100 / total in
+           if pct <> !last then (
+             ProgrBar.run pct 100;
+             last := pct));
+        { anomaly = a; who = List.map who_of_subject (subjects a) })
+      anomalies
+  in
+  if bar then ProgrBar.finish ();
+  { date = stamp_of_time (Unix.time ()); producer; items }
 
 (* ---- responsible wizard --------------------------------------------------- *)
 
