@@ -422,8 +422,9 @@ val insert_string : base -> string -> istr
     Modification stay blocked until call of [commit_patches]. *)
 
 val commit_patches : ?write_to_disk:bool -> base -> unit
-(** Commit blocked modifications (patches) and update database files in order to
-    apply modifications on the disk.  *)
+(** Commit pending modifications (patches) into memory, and unless [write_to_disk]
+    is [false] (default is [true]), persist patches and updated real person counts
+    to disk files. Setting [write_to_disk:false] is typically used before a full [sync]. *)
 
 val commit_notes : base -> string -> string -> unit
 (** [commit_notes fname s] Update content of the notes/extended page file [fname] if exists. *)
