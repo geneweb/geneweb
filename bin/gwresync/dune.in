@@ -1,6 +1,14 @@
+(library
+  (name gwresync_lib)
+  (public_name geneweb.gwresync_lib)
+  (wrapped false)
+  (libraries unix str %%%GWDB_PKG%%% geneweb)
+  (modules gwresync_lib)
+)
+
 (executable
   (name gwresync)
   (public_name geneweb.gwresync)
   (modules gwresync)
-  (libraries unix str %%%GWDB_PKG%%% geneweb)
+  (libraries unix str %%%GWDB_PKG%%% geneweb gwresync_lib)
 )
