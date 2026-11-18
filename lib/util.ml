@@ -93,6 +93,8 @@ let read_base_env bname gw_prefix debug =
             (Filename.concat gw_prefix "a.gwf"));
     [])
 
+let query_time conf = Unix.gettimeofday () -. conf.query_start
+
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   let disabled =
     match p_getenv conf.env "cgl" with

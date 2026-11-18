@@ -28,7 +28,7 @@ val check :
   int ->
   Geneweb.Config.config ->
   bool ->
-  int * int * int * (string * float) list
+  Geneweb.Config.connections
 (** [check tm from max_call sec conf suicide] records a request made at time
     [tm] by the client address [from], then saves the robot file.
 
@@ -37,9 +37,10 @@ val check :
     parameter). A blocked client, or one matching a blocked pattern, gets
     {!robot_error}, which raises [Exit].
 
-    Otherwise, returns for the base of [conf]:
-    - the number of connected users: wizards, plus friends and visitors with
-      more than two requests within the window;
-    - the number of distinct wizards;
-    - the number of friends with more than two requests within the window;
-    - each wizard with the time of their last request. *)
+    Otherwise, returns the users connected to the base of [conf] within the last
+    [sec] seconds (see {!Geneweb.Config.connections}). *)
+
+val snapshot : Geneweb.Config.config -> int -> Geneweb.Config.connections
+(** [snapshot conf sec] returns the users connected to the base of [conf] within
+    the last [sec] seconds, like {!check}, but without recording a request nor
+    saving the robot file. The caller should hold {!lock_file}. *)

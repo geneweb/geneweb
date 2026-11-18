@@ -1220,8 +1220,8 @@ let allowed_plugins ~loaded_plugins base_env =
   | Allowed s ->
       List.of_seq @@ SS.to_seq @@ SS.filter (fun p -> SS.mem p s) loaded_set
 
-let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
-    request script_name env =
+let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
+    conn from_addr request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
     let str =
       Printf.sprintf "Requested allowed_tags file (%s) absent"
@@ -1367,7 +1367,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from_addr
       wizard = ar.ar_wizard && (not wizard_just_friend) && not as_friend;
       is_printed_by_template = true;
       debug = !debug;
-      query_start = Unix.gettimeofday ();
+      query_start;
       friend =
         ar.ar_friend || ((wizard_just_friend || as_friend) && ar.ar_wizard);
       oidc = oidc_session;
@@ -1570,17 +1570,33 @@ let no_access conf =
   Output.print_sstring conf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
+(* Size of the received request: header lines (with their line end) and
+   body. The raw bytes are not kept; this is exact up to line ends. *)
+let request_size request =
+  let line_end l = if l <> "" && l.[String.length l - 1] = '\r' then 1 else 2 in
+  let headers =
+    List.fold_left (fun n l -> n + String.length l + line_end l) 2 request
+  in
+  let body =
+    Header.extract_param "content-length: " '\r' request
+    |> String.trim |> int_of_string_opt |> Option.value ~default:0
+  in
+  headers + body
+
+(* Maximum number of requests and size of the observation window (seconds)
+   of the robot module. *)
+let robot_params () =
+  match !robot_xcl with
+  | Some (cnt, sec) -> (cnt, sec)
+  | None -> (max_int, !login_timeout)
+
 let log_and_robot_check conf auth from request script_name contents =
   let lock_file = Robot.lock_file () in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
   let on_exn _exn _bt = () in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
   let tm = Unix.time () in
-  let cnt, sec =
-    match !robot_xcl with
-    | Some (cnt, sec) -> (cnt, sec)
-    | None -> (max_int, !login_timeout)
-  in
+  let cnt, sec = robot_params () in
   let suicide = Util.p_getenv conf.env "suicide" <> None in
   conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide);
   log conf from auth request script_name contents
@@ -1607,9 +1623,12 @@ let conf_and_connection =
     env
     conn
   ->
+    let query_start = Unix.gettimeofday () in
+    (* the channel offset is meaningless on a socket: only differences are *)
+    let out_start = pos_out (Connection.woc conn) in
     let conf, passwd_err, oidc_renew =
-      make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt conn from
-        request script_name env
+      make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
+        conn from request script_name env
     in
     let m = Util.p_getenv env "m" in
     let is_binary =
@@ -1687,15 +1706,21 @@ let conf_and_connection =
                     ~username ~deadline
               | None -> ());
               try
-                let t1 = Unix.gettimeofday () in
                 Request.treat_request conn conf;
                 Output.flush conf;
-                let t2 = Unix.gettimeofday () in
-                if t2 -. t1 > slow_query_threshold then
+                (* same origin as the query time shown by the templates,
+                   but up to the end of the response *)
+                let d = Util.query_time conf in
+                StatsLog.record conf
+                  ~window:(snd (robot_params ()))
+                  ~bytes_in:(request_size request)
+                  ~bytes_out:(pos_out (Connection.woc conn) - out_start)
+                  (if is_binary then None else Some d);
+                if d > slow_query_threshold then
                   Log.warn (fun k ->
                       k "%s slow query (%.3f)"
                         (context conf contents : Adef.encoded_string :> string)
-                        (t2 -. t1))
+                        d)
               with
               | Exit -> ()
               | Def.HttpExn (code, msg) as exn ->

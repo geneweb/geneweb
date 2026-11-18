@@ -86,7 +86,7 @@ let print_status () =
         in
         printf "Blocked individual IPs: %d\n" (List.length individual_ips);
         printf "Blocked IP patterns: %d\n" (List.length patterns);
-        printf "Monitored IPs: %d\n" (W.cardinal xcl.who);
+        printf "Monitored IPs: %d\n" (nb_ips xcl.who);
         printf "Max connections: %d by %s\n" (fst xcl.max_conn)
           (snd xcl.max_conn);
         printf "\nBlocked IPs/Patterns:\n";
@@ -238,7 +238,7 @@ let add_ip patterns_str =
           else printf "Added pattern %s (%d attempts)\n" pattern final_count)
       else if not (List.mem_assoc pattern xcl.excl) then (
         xcl.excl <- (pattern, ref 1) :: xcl.excl;
-        xcl.who <- W.remove pattern xcl.who;
+        xcl.who <- remove_ip pattern xcl.who;
         printf "Added %s to blacklist\n" pattern)
       else printf "IP %s already in blacklist\n" pattern)
     patterns;
