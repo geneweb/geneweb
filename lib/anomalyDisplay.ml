@@ -41,6 +41,24 @@ let hidden_kinds conf =
       |> List.filter_map (fun n -> kind_of_name (String.trim n))
   | None -> default_hidden
 
+(* How many months back "recent" reaches; base parameter, default 6. *)
+let recent_months conf =
+  match List.assoc_opt "anomalies_recent_months" conf.base_env with
+  | Some s -> (
+      match int_of_string_opt (String.trim s) with
+      | Some n when n > 0 -> n
+      | _ -> 6)
+  | None -> 6
+
+(* ["YYYY-MM-DD"], today minus [n] months (local time). *)
+let months_ago n =
+  let tm = Unix.localtime (Unix.time ()) in
+  let t = (tm.Unix.tm_year * 12) + tm.Unix.tm_mon - n in
+  Printf.sprintf "%04d-%02d-%02d"
+    (1900 + (t / 12))
+    (1 + (t mod 12))
+    tm.Unix.tm_mday
+
 let url conf params =
   (Util.commd conf :> string)
   ^ String.concat "&"
@@ -322,6 +340,10 @@ type state = {
   wiz : who_id option;
       (** restrict to the anomalies this wizard — or [Unknown], the ones with no
           identified wizard — is responsible for; [None] shows all *)
+  recent : bool;
+      (** show only the anomalies on persons modified since [cutoff]; [false]
+          (URL [recent=0]) shows every anomaly *)
+  cutoff : string;  (** ["YYYY-MM-DD"], today minus [anomalies_recent_months] *)
 }
 
 let verified st (it : item) = AnomalyWhitelist.mem st.whitelist it.anomaly
@@ -330,12 +352,24 @@ let resp st it = Anomaly.responsible st.rule it
 let of_wizard st it =
   match st.wiz with None -> true | Some who -> (resp st it).by = who
 
+(* An anomaly is "recent" when one of its subjects was modified on or after
+   [cutoff] in the base history: the latest change anoma recorded for them
+   ("YYYY-MM-DD HH:MM:SS", or "" when the history names none). *)
+let last_change (it : item) =
+  List.fold_left
+    (fun acc w ->
+      match w.last with Some c when c.time > acc -> c.time | _ -> acc)
+    "" it.who
+
+let recent_cut cutoff (it : item) = last_change it >= cutoff
+
 (* the query parameter carrying a wizard filter: a login in [wiz], or [una=1]
    for the anomalies with no identified wizard *)
 let wiz_param = function Wizard w -> ("wiz", w) | Unknown -> ("una", "1")
 
-(* the URL of a page, keeping the wizard filter *)
+(* the URL of a page, keeping the wizard filter and the recency mode *)
 let wurl conf st params =
+  let params = if st.recent then params else params @ [ ("recent", "0") ] in
   url conf
     (match st.wiz with
     | Some who -> List.rev (wiz_param who :: List.rev params)
@@ -561,8 +595,37 @@ let print_several conf base st resolve todo =
       several;
     Output.print_sstring conf "</ul>\n")
 
+(* The "modified since" toggle: recent (< N months) vs every date. [link recent]
+   is the URL of the page in that mode. Shown only when something is hidden. *)
+let print_recent_filter conf st ~months ~recent_count ~total link =
+  if total > recent_count then
+    let btn recent label n =
+      Printf.sprintf
+        {|<a class="btn btn-sm %s me-1 mb-1" href="%s">%s <span class="badge bg-light text-dark">%d</span></a>|}
+        (if st.recent = recent then "btn-primary" else "btn-outline-secondary")
+        (link recent) label n
+    in
+    Output.printf conf
+      {|<div class="mb-2"><span class="me-2">%s%s</span>%s%s</div>|}
+      (esc (ctr conf "ANOMALY modified since"))
+      (esc (tr conf ":"))
+      (btn true
+         (esc
+            (Printf.sprintf (Util.ftransl conf "ANOMALY last %d months") months))
+         recent_count)
+      (btn false (esc (ctr conf "ANOMALY any date")) total)
+
 let print_summary conf base st items =
   let resolve = resolver base in
+  let months = recent_months conf in
+  let unverified_all = List.filter (fun it -> not (verified st it)) items in
+  let recent_count =
+    List.length (List.filter (recent_cut st.cutoff) unverified_all)
+  in
+  let total = List.length unverified_all in
+  let items =
+    if st.recent then List.filter (recent_cut st.cutoff) items else items
+  in
   let counts = Hashtbl.create 32 in
   let get k =
     match Hashtbl.find_opt counts k with
@@ -591,6 +654,11 @@ let print_summary conf base st items =
   in
   page conf ~title:"anomalies" (fun () ->
       print_report_info conf st;
+      print_recent_filter conf st ~months ~recent_count ~total (fun recent ->
+          url conf
+            (("m", "ANOMA")
+             :: (match st.wiz with Some who -> [ wiz_param who ] | None -> [])
+            @ if recent then [] else [ ("recent", "0") ]));
       print_wizard_filter conf st unverified (fun wiz ->
           url conf
             (("m", "ANOMA")
@@ -618,6 +686,7 @@ type filters = {
   k : kind;
   all : bool;
   wiz : who_id option;
+  recent : bool;
   amin : int option;
   amax : int option;
   pg : int;
@@ -630,6 +699,7 @@ let filters_url conf f =
          Some ("m", "ANOMA");
          Some ("k", kind_name f.k);
          (if f.all then Some ("all", "1") else None);
+         (if f.recent then None else Some ("recent", "0"));
          Option.map wiz_param f.wiz;
          Option.map (fun m -> ("amin", string_of_int m)) f.amin;
          Option.map (fun m -> ("amax", string_of_int m)) f.amax;
@@ -744,11 +814,13 @@ let print_kind conf base (st : state) items k =
       k;
       all = Util.p_getenv conf.env "all" = Some "1";
       wiz = st.wiz;
+      recent = st.recent;
       amin = Util.p_getint conf.env "amin";
       amax = Util.p_getint conf.env "amax";
       pg = 1;
     }
   in
+  let months = recent_months conf in
   let of_kind =
     List.filter
       (fun (it : item) ->
@@ -757,12 +829,22 @@ let print_kind conf base (st : state) items k =
         && (f.all || not (verified st it)))
       items
   in
+  (* recency toggle counts, within the current wizard scope *)
+  let in_scope = List.filter (of_wizard st) of_kind in
+  let total_scope = List.length in_scope in
+  let recent_scope =
+    List.length (List.filter (recent_cut st.cutoff) in_scope)
+  in
+  (* the anomalies of the viewed period, all wizards (for the wizard filter) *)
+  let visible =
+    if st.recent then List.filter (recent_cut st.cutoff) of_kind else of_kind
+  in
   (* The report is a snapshot (anoma runs on a schedule); re-check each entry of
      the viewed kind against the live base and drop the ones fixed since. *)
   let shown =
     List.filter
       (fun it -> of_wizard st it && Anomaly.still_present base it.anomaly)
-      of_kind
+      visible
   in
   let total = List.length shown in
   let pages = max 1 ((total + page_size - 1) / page_size) in
@@ -780,7 +862,10 @@ let print_kind conf base (st : state) items k =
         "<h2>%s <span class=\"badge bg-secondary\">%d</span></h2>\n"
         (esc (kind_label conf k))
         total;
-      print_wizard_filter conf st of_kind (fun wiz ->
+      print_recent_filter conf st ~months ~recent_count:recent_scope
+        ~total:total_scope (fun recent ->
+          filters_url conf { f with recent; pg = 1 });
+      print_wizard_filter conf st visible (fun wiz ->
           filters_url conf { f with wiz; pg = 1 });
       filter_links conf f;
       list_open conf;
@@ -829,6 +914,8 @@ let print conf base =
             | _ ->
                 if Util.p_getenv conf.env "una" = Some "1" then Some Unknown
                 else None);
+          recent = Util.p_getenv conf.env "recent" <> Some "0";
+          cutoff = months_ago (recent_months conf);
         }
       in
       match kind with

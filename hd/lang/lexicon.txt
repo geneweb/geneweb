@@ -3355,6 +3355,18 @@ fr: mes anomalies
 en: unattributed
 fr: non attribuées
 
+    ANOMALY modified since
+en: modified since
+fr: modifiées depuis
+
+    ANOMALY last %d months
+en: < %d months
+fr: < %d mois
+
+    ANOMALY any date
+en: any date
+fr: toute date
+
     ANOMALY signed by %s
 en: signed by %s
 fr: signé par %s
