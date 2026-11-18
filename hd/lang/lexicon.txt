@@ -19037,6 +19037,34 @@ de: mit einer anderen umbenannten Quelle zusammengeführt
 en: merged with another renamed source
 fr: fusionnée avec une autre source renommée
 
+    min (minutes)
+bg: мин
+co: min
+cs: min
+da: min
+de: Min.
+en: min
+eo: min
+es: min
+et: min
+fi: min
+fr: min
+he: דק׳
+it: min
+lt: min
+lv: min
+nl: min
+no: min
+oc: min
+pl: min
+pt: min
+ro: min
+ru: мин
+sk: min
+sl: min
+sv: min
+tr: dk
+
     order from the last term: reindex the base
 de: Für die Ordnung ab dem letzten Glied muss die Datenbank neu indexiert werden (gwc -reindex).
 en: The order from the last term needs the base to be reindexed (gwc -reindex).

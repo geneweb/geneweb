@@ -116,7 +116,6 @@ let trailer conf =
   Templ.output_simple conf Templ.Env.empty "copyr";
   Output.print_sstring conf "</div>\n";
   Templ.output_simple conf Templ.Env.empty "js";
-  let query_time = Unix.gettimeofday () -. conf.query_start in
-  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-    !GWPARAM.errors_other !GWPARAM.set_vars;
+  Util.time_debug conf (Util.query_time conf) !GWPARAM.nb_errors
+    !GWPARAM.errors_undef !GWPARAM.errors_other !GWPARAM.set_vars;
   Output.print_sstring conf "</body>\n</html>\n"
