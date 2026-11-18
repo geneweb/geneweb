@@ -4,6 +4,10 @@ val portrait_folder : config -> string
 val carrousel_folder : config -> string
 val ext_list_1 : string array
 val ext_list_2 : string array
+
+val ext_list_doc : string array
+(** Extensions of the documents listed with the images of a person. *)
+
 val find_file_without_ext : string -> string
 val is_url : string -> bool
 
@@ -27,6 +31,20 @@ val key_dir_basename : string -> string -> int -> string
     spaces replaced by underscores. Source of truth for any path computation
     involving an individual key. e.g.
     [key_dir_basename "Jean Marc" "DUPONT" 0 = "jean_marc.0.dupont"]. *)
+
+val safe_name : string -> string option
+(** [safe_name s] is the NFC form of [s] when it can name a file or a directory
+    on every system, [None] otherwise. Are refused: an empty name, more than 200
+    bytes, a leading [.], a trailing [.] or space, a slash, a backslash, a
+    double quote, any of [: * ? < > |], a control character, and the names
+    reserved by Windows ([CON], [PRN], [AUX], [NUL], [COM1] to [COM9], [LPT1] to
+    [LPT9]), with or without extension. *)
+
+val safe_subpath : string -> string list option
+(** [safe_subpath s] is the list of the segments of the relative path [s], split
+    on [/], each one checked and normalised by [safe_name]. [None] if a segment
+    is refused, such as an empty one (leading, trailing or double [/]), [.] or
+    [..]. *)
 
 (* TODO this should be removed *)
 val default_image_filename :
@@ -178,11 +196,23 @@ val get_blason_owner :
 
 (* -- Carrousel -- *)
 
+val has_access_to_carrousel :
+  config -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> bool
+(** [has_access_to_carrousel conf base p] is true if the images and documents of
+    the directory of [p] may be shown: always to wizards and friends, otherwise
+    when images are allowed, the age of [p] is authorized and the names of [p]
+    are not hidden. *)
+
 val get_carrousel_imgs :
   config ->
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   (string * string * string * string) list
+(** [get_carrousel_imgs conf base p] lists the images and the documents
+    ([ext_list_doc]) of the directory of [p] as [(name, url, source, note)]:
+    [name] is the path of the file and [url] is empty, or [name] is the name of
+    a [.url] file and [url] its content. The list is empty if the files of [p]
+    are not accessible. *)
 
 val get_carrousel_old_imgs :
   config ->

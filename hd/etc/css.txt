@@ -34,6 +34,13 @@
                        sha512-vCtMyusd4IjT8MY+EQZPbHnV2reghhrISEkeFdH5cH6nWXNbIJxTy48LQrn5gGoBdp41DxxK2jtPPn7uhUiE8g=="
             crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
+    %if;(e.m="SND_IMAGE_C")
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@6.3.5/dist/dropzone.css"
+            integrity="sha256-ZB3j5wMxEjT6y6qA9V4AjRC9HZNNJj77y6d8uvoxkTA=
+                       sha384-asD8pW//1IYJd67ZZn/Eyo31U/YtixrhsNyn90jnZTEIgTpYfE2mkwGYVWHwg2vD
+                       sha512-McTGEdvwrOe82Wj9q44hff23SS4p7yTHioZo/k09PlKHGjs4HksDiZ7HMLzxLl1j9yXLFo4q/cmnCf1TkY6MsA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
   %else;
     %if;(fanchart="")
       <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=5.3.9">
@@ -41,6 +48,9 @@
     <link rel="stylesheet" href="%etc_prefix;css/all.min.css?hash=%apply;hash%with;%etc_prefix;css/all.min.css%end;">
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.7.0">
+    %end;
+    %if;(e.m="SND_IMAGE_C")
+      <link rel="stylesheet" href="%etc_prefix;css/dropzone.css?version=6.3.5">
     %end;
   %end;
 %end;

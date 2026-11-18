@@ -27,13 +27,14 @@ let wflush () = flush !wserver_oc
 let cgi = ref false
 
 let skip_possible_remaining_chars fd =
-  let b = Bytes.create 3 in
+  let b = Bytes.create 4096 in
+  let deadline = Unix.gettimeofday () +. 30.0 in
   try
     let rec loop () =
       match Unix.select [ fd ] [] [] 5.0 with
       | [ _ ], [], [] ->
           let len = Unix.read fd b 0 (Bytes.length b) in
-          if len = Bytes.length b then loop ()
+          if len > 0 && Unix.gettimeofday () < deadline then loop ()
       | _ -> ()
     in
     loop ()
@@ -151,12 +152,18 @@ let get_request strm =
   in
   loop 0 strm
 
-let get_request_and_content strm =
+exception Payload_too_large of int
+
+let get_request_and_content ?max_content strm =
   let request = get_request strm in
   let content =
     match Header.extract_param "content-length: " ' ' request with
     | "" -> ""
-    | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
+    | x -> (
+        let len = int_of_string x in
+        match max_content with
+        | Some limit when len > limit -> raise (Payload_too_large len)
+        | Some _ | None -> String.init len (fun _ -> Stream.next strm))
   in
   (request, content)
 
@@ -179,36 +186,46 @@ let timeout_handler ~timeout _ =
        this is not an error and we must exit normally, even in no-fork mode. *)
     exit 0
 
-let treat_connection callback client_addr client_socket =
+let treat_connection ?max_request_size callback client_addr client_socket =
   printing_state := Nothing;
   deferred_headers := [];
-  let request, path, query =
-    let request, query =
-      let strm = Stream.of_channel (Unix.in_channel_of_descr client_socket) in
-      get_request_and_content strm
-    in
-    let path, query =
-      let url =
-        match Header.extract_param "GET /" ' ' request with
-        | "" -> Header.extract_param "POST /" ' ' request
-        | str -> str
+  let strm = Stream.of_channel (Unix.in_channel_of_descr client_socket) in
+  match get_request_and_content ?max_content:max_request_size strm with
+  | exception Payload_too_large len ->
+      let from =
+        match client_addr with
+        | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
+        | Unix.ADDR_UNIX s -> s
       in
-      match String.index_opt url '?' with
-      | None -> (url, query)
-      | Some i ->
-          let q = String.sub url (i + 1) (String.length url - i - 1) in
-          let multipart =
-            String.starts_with ~prefix:"multipart/form-data"
-              (Header.extract_param "content-type: " '\n' request)
-          in
-          ( String.sub url 0 i,
-            if query = "" then q
-            else if multipart then query
-            else q ^ "&" ^ query )
-    in
-    (request, path, query)
-  in
-  callback () (client_addr, request) path query
+      Log.warn (fun k ->
+          k ~tags:timestamp "Request of %d bytes from %s refused: too large."
+            len from);
+      http Code.Payload_Too_Large;
+      header "Content-type: text/plain; charset=utf-8";
+      header "Connection: close";
+      print_string "Request too large.";
+      wflush ()
+  | request, query ->
+      let path, query =
+        let url =
+          match Header.extract_param "GET /" ' ' request with
+          | "" -> Header.extract_param "POST /" ' ' request
+          | str -> str
+        in
+        match String.index_opt url '?' with
+        | None -> (url, query)
+        | Some i ->
+            let q = String.sub url (i + 1) (String.length url - i - 1) in
+            let multipart =
+              String.starts_with ~prefix:"multipart/form-data"
+                (Header.extract_param "content-type: " '\n' request)
+            in
+            ( String.sub url 0 i,
+              if query = "" then q
+              else if multipart then query
+              else q ^ "&" ^ query )
+      in
+      callback () (client_addr, request) path query
 
 let check_stopping () =
   if Sys.file_exists !stop_server then (
@@ -266,7 +283,7 @@ let with_timeout ~timeout handler f =
     Fun.protect ~finally g)
   else f ()
 
-let accept_connection_unix ~timeout callback socket pid =
+let accept_connection_unix ~timeout ?max_request_size callback socket pid =
   let client_socket, client_addr = My_unix.accept_noeintr socket in
   Log.debug (fun k -> k "Worker %d got a job" pid);
   Unix.setsockopt client_socket Unix.SO_KEEPALIVE true;
@@ -275,19 +292,24 @@ let accept_connection_unix ~timeout callback socket pid =
   wserver_oc := Unix.out_channel_of_descr client_socket;
   Fun.protect ~finally:close_connection @@ fun () ->
   with_timeout ~timeout (timeout_handler ~timeout) @@ fun () ->
-  treat_connection callback client_addr client_socket
+  treat_connection ?max_request_size callback client_addr client_socket
 
-let accept_connections_unix ~timeout ~n_workers callback socket =
+let accept_connections_unix ~timeout ?max_request_size ~n_workers callback
+    socket =
   if n_workers > 0 then
-    Pool.start n_workers (accept_connection_unix ~timeout callback socket)
+    Pool.start n_workers
+      (accept_connection_unix ~timeout ?max_request_size callback socket)
   else
     (* We avoid forking in the case, which is helpful for debugging. *)
     while true do
-      accept_connection_unix ~timeout callback socket (Unix.getpid ())
+      accept_connection_unix ~timeout ?max_request_size callback socket
+        (Unix.getpid ())
     done
 
-let accept_connections ~timeout ~n_workers callback socket =
-  if Sys.unix then accept_connections_unix ~timeout ~n_workers callback socket
+let accept_connections ~timeout ?max_request_size ~n_workers callback socket =
+  if Sys.unix then
+    accept_connections_unix ~timeout ?max_request_size ~n_workers callback
+      socket
   else accept_connections_windows socket
 
 let resolve_addr ?addr port =
@@ -364,7 +386,7 @@ let pp_url ppf s =
   | { ni_hostname; _ } -> Fmt.pf ppf "http://%a (%s)" pp_sockaddr s ni_hostname
   | exception Not_found -> Fmt.pf ppf "http://%a" pp_sockaddr s
 
-let windows_worker callback =
+let windows_worker ?max_request_size callback =
   In_channel.set_binary_mode stdin true;
   let addr = input_value stdin in
   let client_socket = Wsa.Protocol_info.to_socket @@ input_value stdin in
@@ -380,11 +402,13 @@ let windows_worker callback =
     with _ -> ()
   in
   Fun.protect ~finally:shutdown (fun () ->
-      try ignore (treat_connection callback addr client_socket)
+      try
+        ignore (treat_connection ?max_request_size callback addr client_socket)
       with Sys_error _ as e ->
         Log.info (fun k -> k "%s" (Printexc.to_string e)))
 
-let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
+let start ?addr ~port ?(timeout = 0) ?max_request_size ~max_pending_requests
+    ~n_workers callback =
   match Sys.getenv "WSERVER" with
   | exception Not_found -> (
       check_stopping ();
@@ -421,9 +445,10 @@ let start ?addr ~port ?(timeout = 0) ~max_pending_requests ~n_workers callback =
                       k ~tags:timestamp "Ready on %a." pp_url addr));
               if n_workers = 0 then
                 ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
-              accept_connections ~timeout ~n_workers callback socket))
+              accept_connections ~timeout ?max_request_size ~n_workers callback
+                socket))
   | _ ->
-      windows_worker callback;
+      windows_worker ?max_request_size callback;
       exit 0
 
 module Pool = Pool

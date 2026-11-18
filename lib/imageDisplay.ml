@@ -31,12 +31,16 @@ let print_placeholder_gendered_portrait conf p size =
     - len : la taille en octet du fichier
     - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
       dehors de ce module. *)
-let content conf ct len fname =
+let content conf ~inline ct len fname =
   Output.status conf Code.OK;
   Output.header conf "Content-type: %s" ct;
   Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
+  if inline then
+    Output.header conf "Content-disposition: inline; filename=%s"
+      (Filename.basename fname)
+  else
+    Output.header conf {|Content-disposition: attachment; filename="%s"|}
+      (Filename.basename fname);
   (* TODO: Utiliser un cache public pour les images non personelles. *)
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
   Output.header conf "Connection: close";
@@ -44,14 +48,19 @@ let content conf ct len fname =
 
 let allowed_extensions =
   [
-    (".png", "image/png");
-    (".jpg", "image/jpeg");
-    (".jpeg", "image/jpeg");
-    (".pjpeg", "image/jpeg");
-    (".gif", "image/gif");
-    (".pdf", "application/pdf");
-    (".htm", "text/html");
-    (".html", "text/html");
+    (".png", "image/png", true);
+    (".jpg", "image/jpeg", true);
+    (".jpeg", "image/jpeg", true);
+    (".pjpeg", "image/jpeg", true);
+    (".gif", "image/gif", true);
+    (".pdf", "application/pdf", true);
+    (".htm", "text/html", true);
+    (".html", "text/html", true);
+    ( ".docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      false );
+    (".odt", "application/vnd.oasis.opendocument.text", false);
+    (".txt", "text/plain; charset=utf-8", false);
   ]
 
 let error fmt = Format.kasprintf (fun s -> Error s) fmt
@@ -59,19 +68,19 @@ let error fmt = Format.kasprintf (fun s -> Error s) fmt
 let print_image_file conf fname =
   let res =
     List.find_opt
-      (fun (suff, _ctype) ->
+      (fun (suff, _ctype, _inline) ->
         Filename.check_suffix fname suff
         || Filename.check_suffix fname (String.uppercase_ascii suff))
       allowed_extensions
   in
   match res with
   | None -> error "cannot find MIME type from extension of file %s" fname
-  | Some (_suff, ctype) -> (
+  | Some (_suff, ctype, inline) -> (
       try
         Secure.with_open_in_bin fname @@ fun ic ->
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content conf ctype len fname;
+        content conf ~inline ctype len fname;
         let rec loop len =
           if len = 0 then ()
           else
@@ -84,17 +93,14 @@ let print_image_file conf fname =
         Ok ()
       with Sys_error e -> error "cannot print image file %s: %s" fname e)
 
-let safe_folder f =
-  f <> ""
-  && (not (Mutil.contains f ".."))
-  && (not (String.contains f '/'))
-  && not (String.contains f '\\')
-
 let print_folder_images_json conf folder =
   let files =
-    match folder with
-    | Some f when safe_folder f -> (
-        let dir = Filename.concat (!GWPARAM.albums_d conf.bname) f in
+    match Option.bind folder Image.safe_subpath with
+    | Some segments -> (
+        let dir =
+          List.fold_left Filename.concat (!GWPARAM.albums_d conf.bname) segments
+        in
+        let f = String.concat "/" segments in
         let collect entry acc =
           match entry with
           | Filesystem.File path ->
@@ -106,7 +112,7 @@ let print_folder_images_json conf folder =
         in
         try Filesystem.walk_folder collect dir [] |> List.sort String.compare
         with _ -> [])
-    | _ -> []
+    | None -> []
   in
   let json =
     Yojson.Basic.to_string (`List (List.map (fun s -> `String s) files))
@@ -189,10 +195,46 @@ let print_blason_aux conf base p =
       Output.print_sstring conf "</body></html>"
   | None -> Hutil.incorrect_request conf
 
-let print_source conf f =
-  let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  let fname = Filename.concat (!GWPARAM.images_d conf.bname) fname in
-  if (conf.wizard || conf.friend) || Image.is_not_private_img conf fname then
+let person_of_dir base dir =
+  let len = String.length dir in
+  let name i j =
+    String.map (fun c -> if c = '_' then ' ' else c) (String.sub dir i (j - i))
+  in
+  let rec digits i =
+    if i < len && dir.[i] >= '0' && dir.[i] <= '9' then digits (i + 1) else i
+  in
+  let rec loop i =
+    match String.index_from_opt dir i '.' with
+    | Some i ->
+        let j = digits (i + 1) in
+        if j > i + 1 && j < len && dir.[j] = '.' then
+          Option.bind
+            (int_of_string_opt (String.sub dir (i + 1) (j - i - 1)))
+            (Driver.person_of_key base (name 0 i) (name (j + 1) len))
+        else loop (i + 1)
+    | None -> None
+  in
+  Option.map (Driver.poi base) (loop 0)
+
+let print_source conf base f =
+  let f = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
+  let fname = Filename.concat (!GWPARAM.images_d conf.bname) f in
+  let person =
+    match
+      String.split_on_char '/'
+        (String.map (fun c -> if c = '\\' then '/' else c) f)
+    with
+    | dir :: _ :: _ -> person_of_dir base dir
+    | [ _ ] | [] -> None
+  in
+  let visible =
+    Image.is_not_private_img conf fname
+    &&
+    match person with
+    | Some p -> Image.has_access_to_carrousel conf base p
+    | None -> true
+  in
+  if conf.wizard || conf.friend || visible then
     Result.fold ~ok:ignore
       ~error:(fun e ->
         Log.err (fun k -> k "%s" e);
@@ -202,7 +244,7 @@ let print_source conf f =
 
 let print conf base =
   match Util.p_getenv conf.env "s" with
-  | Some f -> print_source conf f
+  | Some f -> print_source conf base f
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_portrait conf base p
@@ -210,7 +252,7 @@ let print conf base =
 
 let print_blason conf base =
   match Util.p_getenv conf.env "s" with
-  | Some f -> print_source conf f
+  | Some f -> print_source conf base f
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_blason_aux conf base p

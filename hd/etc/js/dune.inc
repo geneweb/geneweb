@@ -91,6 +91,15 @@
 
 (rule
   (package geneweb)
+  (targets dropzone-min.js.gz dropzone-min.js.br)
+  (deps (:input dropzone-min.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets fanchart.js.gz fanchart.js.br)
   (deps (:input fanchart.js))
   (action
@@ -228,6 +237,15 @@
   (package geneweb)
   (targets upddata.js.gz upddata.js.br)
   (deps (:input upddata.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
+  (targets upload.js.gz upload.js.br)
+  (deps (:input upload.js))
   (action
     (concurrent
       (run gzip -9 -k -f %{input})

@@ -17,6 +17,44 @@ let key_dir_basename first_name surname occ =
   let s = sp2_ (Name.lower surname) in
   Format.sprintf "%s.%d.%s" f occ s
 
+let safe_name s =
+  let s = Mutil.normalize_utf_8 s in
+  let len = String.length s in
+  let reserved =
+    let stem =
+      String.lowercase_ascii
+        (match String.index_opt s '.' with
+        | Some i -> String.sub s 0 i
+        | None -> s)
+    in
+    List.mem stem [ "con"; "prn"; "aux"; "nul" ]
+    || String.length stem = 4
+       && (String.starts_with ~prefix:"com" stem
+          || String.starts_with ~prefix:"lpt" stem)
+       && stem.[3] >= '1'
+       && stem.[3] <= '9'
+  in
+  let forbidden c = c < ' ' || c = '\127' || String.contains "/\\:*?\"<>|" c in
+  if
+    len = 0 || len > 200
+    || s.[0] = '.'
+    || s.[len - 1] = '.'
+    || s.[len - 1] = ' '
+    || reserved || String.exists forbidden s
+  then None
+  else Some s
+
+let safe_subpath s =
+  let rec loop acc segments =
+    match segments with
+    | [] -> Some (List.rev acc)
+    | segment :: segments -> (
+        match safe_name segment with
+        | Some segment -> loop (segment :: acc) segments
+        | None -> None)
+  in
+  loop [] (String.split_on_char '/' s)
+
 (** [default_portrait_filename_of_key fn sn occ] is the default filename of the
     corresponding person's portrait. WITHOUT its file extenssion. e.g:
     default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is
@@ -38,6 +76,7 @@ let default_image_filename mode base p =
 
 let ext_list_1 = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 let ext_list_2 = [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".url"; ".stop" |]
+let ext_list_doc = [| ".pdf"; ".docx"; ".odt" |]
 
 let read_url_file f =
   try
@@ -221,7 +260,6 @@ let has_access_to_blason conf base p =
 
 (* TODO: privacy settings should be in db not in url *)
 
-(** [has_access_to_carrousel conf base p] is true iif ???. *)
 let has_access_to_carrousel conf base p =
   (conf.wizard || conf.friend)
   || (not conf.no_image)
@@ -524,11 +562,14 @@ let get_carrousel_img_aux conf base p old =
         Array.fold_left
           (fun acc f1 ->
             let ext = Filename.extension f1 in
-            if
-              f1 <> ""
-              && f1.[0] <> '.'
-              && (Array.mem ext ext_list_1 || ext = ".url")
-            then
+            if f1 = "" || f1.[0] = '.' then acc
+            else if Array.mem ext ext_list_doc then
+              ( carrousel_file_path conf base p f1 old,
+                "",
+                get_carrousel_img_src f1,
+                get_carrousel_img_note f1 )
+              :: acc
+            else if Array.mem ext ext_list_1 || ext = ".url" then
               match get_carrousel_img f1 with
               | None -> acc
               | Some (`Path path) ->

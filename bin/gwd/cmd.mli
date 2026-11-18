@@ -34,6 +34,7 @@ type t = {
   port : int;
   connection_timeout : int;
   max_pending_requests : int;
+  max_request_size : int;
   n_workers : int;
   cgi : bool;
   daemon : bool;
@@ -63,5 +64,6 @@ val default_login_timeout : int
 val default_default_lang : string
 val default_verbosity : int
 val default_max_pending_requests : int
+val default_max_request_size : int
 val default_n_workers : int
 val default_port : int

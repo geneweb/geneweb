@@ -209,6 +209,29 @@
   the birth or after the burial, in the chronology too. In a family, a
   divorce, a separation or an annulment that the dates leave unordered
   stays after the events of the relation.
+- New option `--max-request-size` (in bytes, 128 MiB by default): a
+  request whose content is larger is answered `413 Payload Too Large`
+  without being read. A request of any size was read into memory until
+  now.
+- A file sent by a form is stored byte for byte: two bytes were added at
+  its end. The text fields of such a form (name, note and source of an
+  image) keep their `+` and `%` characters.
+- New requests for wizards, answering in JSON: `m=UPLOAD_OK` stores a
+  file as the portrait, the coat of arms or an image of a person, or in
+  the images and albums directories of the base and their
+  subdirectories; `m=UPLOAD_LIST` lists the files and subdirectories of
+  such a destination. Besides JPEG, PNG and GIF images, PDF, DOCX, ODT
+  and TXT documents are accepted where they make sense. A file is
+  limited to `max_images_size` (20 000 000 bytes by default) for an
+  image and to the new variable `max_documents_size` (100 000 000 bytes
+  by default) for a document. A name already taken is refused unless a
+  replacement is asked, the previous file then moving to `saved/`.
+- `m=IM`, `m=DOC` and `m=IM_C` refuse a file of the directory of a
+  person to a visitor who may not see that person, as they do for a
+  file under `private/`. Wizards and friends keep full access.
+- `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
+  downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
+  (`folder=a/b`).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
@@ -278,6 +301,21 @@
   their stored order, with `event_key`. The `has_secondary_pevents`,
   `nb_pevents` and `family.nb_fevents` variables of the person page are
   removed.
+- Carrousel page: one zone receives the files dropped from the desktop,
+  pasted from the clipboard (Ctrl+V: screenshot, copied image or files)
+  or chosen with the file picker, several at once. They wait on a wall
+  where each one gets its destination (portrait, coat of arms, image of
+  the person, images or albums of the base and their subdirectories) and
+  its name, a name already taken being replaced, skipped or renamed,
+  then are sent together. It replaces the three file inputs of the page
+  and uses Dropzone 6.3.5. An image dragged from another tab fills the
+  URL field.
+- The documents (PDF, DOCX, ODT) of the directory of a person are listed
+  with its images: on the carrousel page, where they can be viewed,
+  annotated, deleted and restored like an image, and on the person page
+  (image slider and documents module), with a file icon and a link. The
+  new `carrousel_doc` variable of the `img_in_carrousel` loops tells a
+  document from an image.
 
 ## Deprecated features
 - Inferring the CGI mode of `gwd` from the `QUERY_STRING` environment

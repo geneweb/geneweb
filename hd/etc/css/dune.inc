@@ -46,6 +46,15 @@
 
 (rule
   (package geneweb)
+  (targets dropzone.css.gz dropzone.css.br)
+  (deps (:input dropzone.css))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets fanchart.css.gz fanchart.css.br)
   (deps (:input fanchart.css))
   (action

@@ -1920,88 +1920,101 @@ let misc_request conn conf request fname =
     print_misc_file conn conf misc_fname encoding
   else false
 
-let strip_quotes s =
-  let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
-  let i1 =
-    if String.length s > 0 && s.[String.length s - 1] = '"' then
-      String.length s - 1
-    else String.length s
+let find_sub s sub from =
+  let n = String.length sub in
+  let last = String.length s - n in
+  let rec same i j = j = n || (s.[i + j] = sub.[j] && same i (j + 1)) in
+  let rec loop i =
+    if i > last then None
+    else
+      match String.index_from_opt s i sub.[0] with
+      | Some i when i <= last -> if same i 1 then Some i else loop (i + 1)
+      | Some _ | None -> None
   in
-  String.sub s i0 (i1 - i0)
+  if n = 0 then None else loop from
 
+let multipart_header name lines =
+  List.find_map
+    (fun line ->
+      match String.index_opt line ':' with
+      | Some i when String.lowercase_ascii (String.sub line 0 i) = name ->
+          Some
+            (String.trim (String.sub line (i + 1) (String.length line - i - 1)))
+      | Some _ | None -> None)
+    lines
+
+let multipart_params s =
+  let len = String.length s in
+  let index c i = Option.value ~default:len (String.index_from_opt s i c) in
+  let rec loop acc i =
+    if i >= len then acc
+    else if s.[i] = ';' || s.[i] = ' ' then loop acc (i + 1)
+    else
+      let j = min (index '=' i) (index ';' i) in
+      if j = len || s.[j] = ';' then loop acc j
+      else
+        let key = String.lowercase_ascii (String.sub s i (j - i)) in
+        if j + 1 < len && s.[j + 1] = '"' then
+          let k = index '"' (j + 2) in
+          loop ((key, String.sub s (j + 2) (k - j - 2)) :: acc) (k + 1)
+        else
+          let k = index ';' j in
+          loop ((key, String.trim (String.sub s (j + 1) (k - j - 1))) :: acc) k
+  in
+  loop [] 0
+
+(* A field [var] gives [var] = its value, trimmed and encoded. A file field
+   gives [var] = the raw content of the file, [var_name] = its encoded file
+   name and [var_type] = its encoded Content-Type. *)
 let extract_multipart boundary str =
   let str = (str : Adef.encoded_string :> string) in
-  let rec skip_nl i =
-    if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
-    else if i < String.length str && str.[i] = '\n' then skip_nl (i + 1)
-    else i
-  in
-  let next_line i =
-    let i = skip_nl i in
-    let rec loop s i =
-      if i = String.length str || str.[i] = '\n' || str.[i] = '\r' then (s, i)
-      else loop (s ^ String.make 1 str.[i]) (i + 1)
-    in
-    loop "" i
-  in
+  let len = String.length str in
   let boundary = "--" ^ boundary in
-  let rec loop i =
-    if i = String.length str then []
+  let delim = "\r\n" ^ boundary in
+  let rec loop acc i =
+    if i + 2 <= len && str.[i] = '-' && str.[i + 1] = '-' then acc
     else
-      let s, i = next_line i in
-      if s = boundary then
-        let s, i = next_line i in
-        let s = String.lowercase_ascii s |> Adef.encoded in
-        let env = Util.create_env s in
-        match (Util.p_getenv env "name", Util.p_getenv env "filename") with
-        | Some var, Some filename ->
-            let var = strip_quotes var in
-            let filename = strip_quotes filename in
-            let i = skip_nl i in
-            let i1 =
-              let rec loop i =
-                if i < String.length str then
-                  if
-                    i > String.length boundary
-                    && String.sub str
-                         (i - String.length boundary)
-                         (String.length boundary)
-                       = boundary
-                  then i - String.length boundary
-                  else loop (i + 1)
-                else i
+      match find_sub str "\r\n\r\n" i with
+      | None -> acc
+      | Some j -> (
+          let start = j + 4 in
+          match find_sub str delim start with
+          | None -> acc
+          | Some k ->
+              let headers =
+                String.split_on_char '\n' (String.sub str i (j - i))
               in
-              loop i
-            in
-            let v = String.sub str i (i1 - i) in
-            (var ^ "_name", Mutil.encode filename)
-            :: (var, Adef.encoded v)
-            :: loop i1
-        | Some var, None ->
-            let var = strip_quotes var in
-            let i = skip_nl i in
-            let i1 =
-              let rec loop i =
-                if i < String.length str then
-                  if
-                    i > String.length boundary
-                    && String.sub str
-                         (i - String.length boundary)
-                         (String.length boundary)
-                       = boundary
-                  then i - String.length boundary
-                  else loop (i + 1)
-                else i
+              let params =
+                match multipart_header "content-disposition" headers with
+                | Some v -> multipart_params v
+                | None -> []
               in
-              loop i
-            in
-            let v = String.sub str i (i1 - i) |> String.trim in
-            (var, Adef.encoded v) :: loop i
-        | _ -> loop i
-      else if s = boundary ^ "--" then []
-      else loop i
+              let content = String.sub str start (k - start) in
+              let acc =
+                match
+                  ( List.assoc_opt "name" params,
+                    List.assoc_opt "filename" params )
+                with
+                | Some var, Some filename ->
+                    let ctype =
+                      Option.value ~default:""
+                        (multipart_header "content-type" headers)
+                    in
+                    (var ^ "_type", Mutil.encode ctype)
+                    :: (var, Adef.encoded content)
+                    :: (var ^ "_name", Mutil.encode filename)
+                    :: acc
+                | Some var, None ->
+                    (var, Mutil.encode (String.trim content)) :: acc
+                | None, (Some _ | None) -> acc
+              in
+              loop acc (k + String.length delim))
   in
-  let env = loop 0 in
+  let env =
+    match find_sub str boundary 0 with
+    | Some i -> List.rev (loop [] (i + String.length boundary))
+    | None -> []
+  in
   let str, _ =
     List.fold_left
       (fun (str, sep) (v, x) ->
@@ -2215,6 +2228,7 @@ let geneweb_server ~predictable_mode ~loaded_plugins ~trusted_proxies ?interface
      the encoded string subsystem. *)
   let connection conn x y z = connection conn x y (Adef.encoded z) in
   Server.start ?addr:interface ~port ~timeout:!conn_timeout
+    ~max_request_size:!max_request_size
     ~max_pending_requests:!max_pending_requests ~n_workers:!n_workers
     (connection ~predictable_mode ~cgi:false ~loaded_plugins ~secret_salt
        ~trusted_proxies)
@@ -2399,6 +2413,7 @@ let parse_cmd () =
       login_timeout := o.login_timeout;
       n_workers := o.n_workers;
       max_pending_requests := o.max_pending_requests;
+      max_request_size := o.max_request_size;
       no_host_address := o.no_reverse_host;
       only_addresses := o.allowed_addresses;
       redirected_addr := o.redirect_interface;

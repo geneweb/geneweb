@@ -6,9 +6,7 @@ let src = Logs.Src.create ~doc:"ImageCarrousel" __MODULE__
 
 module Log = (val Logs.src_log src : Logs.LOG)
 module Driver = Geneweb_db.Driver
-module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
-module Header = Geneweb_http.Header
 
 let cp = Filesystem.copy_file ~perm:0o666
 
@@ -64,10 +62,6 @@ let error_too_big_image conf base p len max_len =
   Hutil.trailer conf;
   Output.flush conf;
   raise Done
-
-let raw_get conf key =
-  try List.assoc key conf.env
-  with Not_found -> incorrect conf ("raw_get" ^ key)
 
 let insert_saved fname =
   let l = String.split_on_char Filename.dir_sep.[0] fname |> List.rev in
@@ -250,11 +244,13 @@ let swap_files file old_file =
   let old_file = Filename.remove_extension old_file ^ ".src" in
   swap_files_aux dir src_file old_file
 
+let known_extensions = Array.append Image.ext_list_2 Image.ext_list_doc
+
 (* TODO merge with Image.file_without_extension *)
 let get_extension conf keydir mode saved fname =
   let t_ext = Filename.extension fname in
   let fname =
-    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension fname
+    if Array.mem t_ext known_extensions then Filename.remove_extension fname
     else fname
   in
   let dir =
@@ -266,13 +262,10 @@ let get_extension conf keydir mode saved fname =
     if saved then String.concat Filename.dir_sep [ dir; "saved"; fname ]
     else Filename.concat dir fname
   in
-  if Sys.file_exists (f ^ ".jpg") then ".jpg"
-  else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
-  else if Sys.file_exists (f ^ ".png") then ".png"
-  else if Sys.file_exists (f ^ ".gif") then ".gif"
-  else if Sys.file_exists (f ^ ".url") then ".url"
-  else if Sys.file_exists (f ^ ".stop") then ".stop"
-  else "."
+  Option.value ~default:"."
+    (Mutil.array_find_map
+       (fun ext -> if Sys.file_exists (f ^ ext) then Some ext else None)
+       known_extensions)
 
 (* ************************************************************************ *)
 (*  send, delete, reset and print functions                                 *)
@@ -343,17 +336,50 @@ let print_send_image conf base mode p =
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
+let send_portrait conf base p mode ext content =
+  let dir = !GWPARAM.portraits_d conf.bname in
+  let name = Image.default_image_filename mode base p in
+  let written =
+    try
+      Filesystem.create_dir ~parent:true dir;
+      if mode = "blasons" then remove_blason_stop conf base p;
+      (match
+         if mode = "portraits" then Image.get_portrait conf base p
+         else Image.get_blason conf base p true
+       with
+      | Some (`Path old) ->
+          if move_file_to_save dir old = 0 then
+            failwith "cannot save the previous file"
+      | Some (`Url url) ->
+          (* TODO update person to supress url image *)
+          let saved = Filename.concat dir "saved" in
+          Filesystem.create_dir ~parent:true saved;
+          write_file (Filename.concat saved name ^ ".url") url
+      | None -> ());
+      if content <> "" then
+        write_file (Filename.concat dir (name ^ ext)) content;
+      Ok ()
+    with (Sys_error _ | Failure _ | Unix.Unix_error _) as e ->
+      Error (Printexc.to_string e)
+  in
+  if written = Ok () then
+    History.record conf base
+      (U_Send_image
+         (Util.string_gen_person base (Driver.gen_person_of_person p)))
+      (if mode = "blasons" then "sb" else "si");
+  written
+
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
   let image_url =
-    try (List.assoc "image_url" conf.env :> string) with Not_found -> ""
+    Option.value ~default:"" (Util.p_getenv conf.env "image_url")
   in
   let image_name =
     let user_provided_name =
-      try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
+      Option.value ~default:"" (Util.p_getenv conf.env "image_name")
     in
     if user_provided_name = "" && image_url <> "" then
       extract_filename_from_url image_url
@@ -374,28 +400,16 @@ let effective_send_c_ok conf base p file file_name =
           (Util.only_printable_or_nl (Mutil.strip_all_trailing_spaces v))
     | None -> Adef.safe ""
   in
-  let strm = Stream.of_string file in
-  let request, content = Server.get_request_and_content strm in
   let content =
-    if mode = "note" || mode = "source" || image_url <> "" then ""
-    else
-      let s =
-        let rec loop len (strm__ : _ Stream.t) =
-          match Stream.peek strm__ with
-          | Some x ->
-              Stream.junk strm__;
-              loop (Buff.store len x) strm
-          | _ -> Buff.get len
-        in
-        loop 0 strm
-      in
-      (content :> string) ^ s
+    if mode = "note" || mode = "source" || image_url <> "" then "" else file
   in
   let typ, content =
     if content <> "" then
       match image_type content with
       | None ->
-          let ct = Header.extract_param "Content-Type: " '\n' request in
+          let ct =
+            Option.value ~default:"" (Util.p_getenv conf.env "file_type")
+          in
           dump_bad_image conf content;
           incorrect_content_type conf base p ct
       | Some (typ, content) -> (
@@ -406,95 +420,66 @@ let effective_send_c_ok conf base p file file_name =
           | _ -> (typ, content))
     else (GIF, content (* we dont care which type, content = "" *))
   in
-  let keydir = Image.default_image_filename mode base p in
-  let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
-  in
-  Filesystem.create_dir ~parent:true dir;
-  let fname =
-    Filename.concat dir
-      (if mode = "portraits" || mode = "blasons" then
-         keydir ^ extension_of_type typ
-       else file_name)
-  in
-  if mode = "blasons" then remove_blason_stop conf base p;
-  (* move pre-existing file to saved *)
-  if mode = "portraits" || mode = "blasons" then
-    match
-      if mode = "portraits" then Image.get_portrait conf base p
-      else Image.get_blason conf base p true
-    with
-    | Some (`Path portrait) ->
-        if move_file_to_save dir portrait = 0 then
-          incorrect conf "effective send (portrait/blason)"
-    | Some (`Url url) -> (
-        let fname =
-          if mode = "portraits" then
-            Image.default_image_filename "portraits" base p
-          else Image.default_image_filename "blasons" base p
-        in
-        let dir = Filename.concat dir "saved" in
-        Filesystem.create_dir ~parent:true dir;
-        let fname = Filename.concat dir fname ^ ".url" in
-        try write_file fname url
-        with _ ->
-          incorrect conf
-            (Printf.sprintf "effective send (effective send url portrait %s)"
-               fname)
-        (* TODO update person to supress url image *))
-    | _ -> ()
-  else if content <> "" then
-    if Sys.file_exists fname then
+  if mode = "portraits" || mode = "blasons" then (
+    (match send_portrait conf base p mode (extension_of_type typ) content with
+    | Ok () -> ()
+    | Error e -> incorrect conf ("effective send (portrait/blason): " ^ e));
+    file_name)
+  else
+    let dir =
+      Filename.concat
+        (!GWPARAM.images_d conf.bname)
+        (Image.default_image_filename mode base p)
+    in
+    Filesystem.create_dir ~parent:true dir;
+    let fname = Filename.concat dir file_name in
+    if content <> "" && Sys.file_exists fname then
       if move_file_to_save dir fname = 0 then
         incorrect conf "effective send (image)";
-  let fname =
-    if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
-  in
-  if content <> "" then
-    try write_file fname content
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing content file %s)" fname)
-  else if image_url <> "" then
-    try write_file fname image_url
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .url file %s)" fname)
-  else ();
-  if note <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".txt" in
-    try write_file fname (note :> string)
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
-  else ();
-  if source <> Adef.safe "" then
-    let fname = Filename.remove_extension fname ^ ".src" in
-    try write_file fname (source :> string)
-    with _ ->
-      incorrect conf
-        (Printf.sprintf "effective send (writing .txt file %s)" fname)
-  else ();
-  let changed =
-    U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
-  in
-  History.record conf base changed
-    (match mode with
-    | "portraits" -> "si"
-    | "blasons" -> "sb"
-    | "carrousel" ->
-        let image = file_name <> "" || image_url <> "" in
-        if image && note <> Adef.safe "" && source <> Adef.safe "" then "s3"
-        else if image then "sf"
-        else if note <> Adef.safe "" then "so"
-        else if source <> Adef.safe "" then "ss"
-        else "sx"
-    | "note" -> "so"
-    | "source" -> "ss"
-    | _ -> "s?");
-  file_name
+    let fname =
+      if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
+    in
+    if content <> "" then
+      try write_file fname content
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing content file %s)" fname)
+    else if image_url <> "" then
+      try write_file fname image_url
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .url file %s)" fname)
+    else ();
+    if note <> Adef.safe "" then
+      let fname = Filename.remove_extension fname ^ ".txt" in
+      try write_file fname (note :> string)
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .txt file %s)" fname)
+    else ();
+    if source <> Adef.safe "" then
+      let fname = Filename.remove_extension fname ^ ".src" in
+      try write_file fname (source :> string)
+      with _ ->
+        incorrect conf
+          (Printf.sprintf "effective send (writing .txt file %s)" fname)
+    else ();
+    let changed =
+      U_Send_image (Util.string_gen_person base (Driver.gen_person_of_person p))
+    in
+    History.record conf base changed
+      (match mode with
+      | "carrousel" ->
+          let image = file_name <> "" || image_url <> "" in
+          if image && note <> Adef.safe "" && source <> Adef.safe "" then "s3"
+          else if image then "sf"
+          else if note <> Adef.safe "" then "so"
+          else if source <> Adef.safe "" then "ss"
+          else "sx"
+      | "note" -> "so"
+      | "source" -> "ss"
+      | _ -> "s?");
+    file_name
 
 (* Delete *)
 let print_delete_image conf base p =
@@ -601,8 +586,11 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     else Filename.concat dir fname
   in
   let orig_file =
-    if Filename.extension orig_file = ".url" && Sys.file_exists orig_file then
-      orig_file
+    let ext = Filename.extension orig_file in
+    if
+      (ext = ".url" || Array.mem ext Image.ext_list_doc)
+      && Sys.file_exists orig_file
+    then orig_file
     else Filename.remove_extension orig_file |> Image.find_file_without_ext
   in
   (* FIXME basename *)
@@ -744,7 +732,7 @@ let effective_reset_c_ok conf base p =
   let old_ext = get_extension conf keydir mode true file_name in
   let t_ext = Filename.extension file_name in
   let file_name_no_ext =
-    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension file_name
+    if Array.mem t_ext known_extensions then Filename.remove_extension file_name
     else file_name
   in
   let ext =
@@ -807,7 +795,9 @@ let print_main_c conf base =
                         with Not_found -> "portraits"
                       in
                       let file_name =
-                        try List.assoc "file_name" conf.env |> Mutil.decode
+                        try
+                          List.assoc "file_name" conf.env
+                          |> Mutil.decode |> String.lowercase_ascii
                         with Not_found -> ""
                       in
                       let file_name =
@@ -820,12 +810,14 @@ let print_main_c conf base =
                         (Mutil.decode (Adef.encoded file_name) :> string)
                       in
                       let file =
-                        if mode = "note" || mode = "source" then "file_name"
+                        if mode = "note" || mode = "source" then ""
                         else
                           match Util.p_getenv conf.env "image_url" with
                           | Some url when url <> "" -> ""
                           | _ -> (
-                              try (raw_get conf "file" :> string) with _ -> "")
+                              match List.assoc_opt "file" conf.env with
+                              | Some file -> (file :> string)
+                              | None -> "")
                       in
                       effective_send_c_ok conf base p file file_name
                   | "DEL_IMAGE_C_OK" -> effective_delete_c_ok conf base p
@@ -957,8 +949,8 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
   | Some f, Some p ->
       let k = Image.default_image_filename "portraits" base p in
       let f = Filename.concat k f in
-      ImageDisplay.print_source conf (if saved then insert_saved f else f)
-  | Some f, _ -> ImageDisplay.print_source conf f
+      ImageDisplay.print_source conf base (if saved then insert_saved f else f)
+  | Some f, _ -> ImageDisplay.print_source conf base f
   | _, Some p -> (
       match
         if saved then Image.get_old_portrait_or_blason conf base "portraits" p

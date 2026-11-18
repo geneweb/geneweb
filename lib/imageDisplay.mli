@@ -6,9 +6,13 @@ val print_image_file : config -> string -> (unit, string) result
     Returns [Error msg] if the extension is not supported or the file cannot be
     read. *)
 
-val print_source : config -> string -> unit
+val print_source : config -> Geneweb_db.Driver.base -> string -> unit
 (** Display an image of given filename in images folder Filename may contain
-    sub-folders, but cannot point outside images *)
+    sub-folders, but cannot point outside images. A file of the directory of a
+    person ([first_name.occ.surname], see [Image.key_dir_basename]) is refused
+    to a visitor who may not see the images of that person
+    ([Image.has_access_to_carrousel]), as a private file is. A directory that
+    matches no person is not checked. *)
 
 val print : config -> Geneweb_db.Driver.base -> unit
 (** Searches image's filename in the environement [conf.env] and sends HTTP
@@ -33,8 +37,9 @@ val print_folder_images_json : config -> string option -> unit
 (** [print_folder_images_json conf folder] sends a JSON array of image paths
     found in [albums_d/folder], as `albums/folder/file.jpg`… Only regular files
     whose extension is in [Image.ext_list_1] are included, sorted
-    alphabetically. If [folder] is [None] or contains unsafe path components, an
-    empty array is returned. Response [Content-type: application/json]. *)
+    alphabetically. [folder] may hold several levels separated by [/]. If it is
+    [None] or refused by [Image.safe_subpath], an empty array is returned.
+    Response [Content-type: application/json]. *)
 
 val print_album_image : config -> unit
 (** [print_album_image conf] serves the album image whose path is given by the

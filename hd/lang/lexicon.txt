@@ -26165,3 +26165,258 @@ sk: manželia (rovnakého pohlavia)/slobodní (rovnakého pohlavia)
 sl: poroka (istospolni)/brez poroke (istospolni)
 sv: gifta (samkönade)/ogifta (samkönade)
 tr: evli (eşcinsel)/evli değil (eşcinsel)
+
+    upload conflict
+ca: ja existeix un fitxer amb aquest nom
+da: en fil med dette navn findes allerede
+de: eine Datei mit diesem Namen existiert bereits
+en: a file with this name already exists
+es: ya existe un archivo con este nombre
+fr: un fichier de ce nom existe déjà
+it: esiste già un file con questo nome
+nl: er bestaat al een bestand met deze naam
+no: en fil med dette navnet finnes allerede
+pl: plik o tej nazwie już istnieje
+pt: já existe um ficheiro com este nome
+ru: файл с таким именем уже существует
+sv: en fil med detta namn finns redan
+
+    invalid file name
+ca: nom de fitxer no vàlid
+da: ugyldigt filnavn
+de: ungültiger Dateiname
+en: invalid file name
+es: nombre de archivo no válido
+fr: nom de fichier invalide
+it: nome del file non valido
+nl: ongeldige bestandsnaam
+no: ugyldig filnavn
+pl: nieprawidłowa nazwa pliku
+pt: nome de ficheiro inválido
+ru: недопустимое имя файла
+sv: ogiltigt filnamn
+
+    invalid subdirectory
+ca: subdirectori no vàlid
+da: ugyldig undermappe
+de: ungültiges Unterverzeichnis
+en: invalid subdirectory
+es: subdirectorio no válido
+fr: sous-répertoire invalide
+it: sottocartella non valida
+nl: ongeldige submap
+no: ugyldig undermappe
+pl: nieprawidłowy podkatalog
+pt: subdiretório inválido
+ru: недопустимая вложенная папка
+sv: ogiltig undermapp
+
+    file too big (max %s)
+ca: fitxer massa gran (màxim: %s)
+da: filen er for stor (maksimum: %s)
+de: Datei zu groß (Maximum: %s)
+en: file too big (maximum: %s)
+es: archivo demasiado grande (máximo: %s)
+fr: fichier trop volumineux (maximum : %s)
+it: file troppo grande (massimo: %s)
+nl: bestand te groot (maximum: %s)
+no: filen er for stor (maksimum: %s)
+pl: plik jest za duży (maksimum: %s)
+pt: ficheiro demasiado grande (máximo: %s)
+ru: файл слишком большой (максимум: %s)
+sv: filen är för stor (max: %s)
+
+    %d MB
+ca: %d MB
+da: %d MB
+de: %d MB
+en: %d MB
+es: %d MB
+fr: %d Mo
+it: %d MB
+nl: %d MB
+no: %d MB
+pl: %d MB
+pt: %d MB
+ru: %d МБ
+sv: %d MB
+
+    file type not accepted here
+ca: aquest tipus de fitxer no s’accepta per a aquesta destinació
+da: denne filtype accepteres ikke til denne destination
+de: dieser Dateityp wird für dieses Ziel nicht akzeptiert
+en: this type of file is not accepted for this destination
+es: este tipo de archivo no se acepta para este destino
+fr: ce type de fichier n’est pas accepté pour cette destination
+it: questo tipo di file non è accettato per questa destinazione
+nl: dit bestandstype wordt niet geaccepteerd voor deze bestemming
+no: denne filtypen godtas ikke for dette målet
+pl: ten typ pliku nie jest akceptowany w tym miejscu docelowym
+pt: este tipo de ficheiro não é aceite para este destino
+ru: этот тип файла не принимается для данного назначения
+sv: den här filtypen accepteras inte för det här målet
+
+    sending images forbidden
+ca: l’enviament de fitxers està desactivat en aquesta base
+da: afsendelse af filer er deaktiveret for denne base
+de: das Senden von Dateien ist für diese Datenbank deaktiviert
+en: sending files is disabled on this base
+es: el envío de archivos está desactivado en esta base
+fr: l’envoi de fichiers est désactivé sur cette base
+it: l’invio di file è disattivato su questa base
+nl: het verzenden van bestanden is uitgeschakeld voor deze database
+no: sending av filer er deaktivert for denne basen
+pl: wysyłanie plików jest wyłączone w tej bazie
+pt: o envio de ficheiros está desativado nesta base
+ru: отправка файлов отключена для этой базы
+sv: sändning av filer är avstängd för den här basen
+
+    upload zone
+ca: deixeu anar fitxers aquí, enganxeu-los (Ctrl+V) o feu clic per triar-los
+da: slip filer her, indsæt dem (Ctrl+V) eller klik for at vælge dem
+de: Dateien hier ablegen, einfügen (Strg+V) oder klicken, um sie auszuwählen
+en: drop files here, paste them (Ctrl+V) or click to choose them
+es: suelte archivos aquí, péguelos (Ctrl+V) o haga clic para elegirlos
+fr: déposez des fichiers ici, collez-les (Ctrl+V) ou cliquez pour les choisir
+it: trascinate qui i file, incollateli (Ctrl+V) o fate clic per sceglierli
+nl: sleep bestanden hierheen, plak ze (Ctrl+V) of klik om ze te kiezen
+no: slipp filer her, lim dem inn (Ctrl+V) eller klikk for å velge dem
+pl: upuść pliki tutaj, wklej je (Ctrl+V) lub kliknij, aby je wybrać
+pt: largue ficheiros aqui, cole-os (Ctrl+V) ou clique para os escolher
+ru: перетащите файлы сюда, вставьте их (Ctrl+V) или нажмите, чтобы выбрать
+sv: släpp filer här, klistra in dem (Ctrl+V) eller klicka för att välja dem
+
+    upload destination
+ca: destinació
+da: destination
+de: Ziel
+en: destination
+es: destino
+fr: destination
+it: destinazione
+nl: bestemming
+no: mål
+pl: miejsce docelowe
+pt: destino
+ru: назначение
+sv: mål
+
+    upload dest/portrait/blason/person/images/albums
+ca: retrat/escut d’armes/imatge de la persona/imatges/àlbums
+da: portræt/våbenskjold/billede af personen/billeder/album
+de: Porträt/Wappen/Bild der Person/Bilder/Alben
+en: portrait/coat of arms/image of the person/images/albums
+es: retrato/escudo de armas/imagen de la persona/imágenes/álbumes
+fr: portrait/blason/image de la personne/images/albums
+it: ritratto/stemma/immagine della persona/immagini/album
+nl: portret/wapen/afbeelding van de persoon/afbeeldingen/albums
+no: portrett/våpenskjold/bilde av personen/bilder/album
+pl: portret/herb/obraz osoby/obrazy/albumy
+pt: retrato/brasão/imagem da pessoa/imagens/álbuns
+ru: портрет/герб/изображение персоны/изображения/альбомы
+sv: porträtt/vapensköld/bild av personen/bilder/album
+
+    subdirectory
+ca: subdirectori
+da: undermappe
+de: Unterverzeichnis
+en: subdirectory
+es: subdirectorio
+fr: sous-répertoire
+it: sottocartella
+nl: submap
+no: undermappe
+pl: podkatalog
+pt: subdiretório
+ru: вложенная папка
+sv: undermapp
+
+    replace/skip/rename
+ca: substitueix/omet/canvia el nom
+da: erstat/spring over/omdøb
+de: ersetzen/überspringen/umbenennen
+en: replace/skip/rename
+es: reemplazar/omitir/renombrar
+fr: remplacer/ignorer/renommer
+it: sostituisci/ignora/rinomina
+nl: vervangen/overslaan/hernoemen
+no: erstatt/hopp over/gi nytt navn
+pl: zastąp/pomiń/zmień nazwę
+pt: substituir/ignorar/renomear
+ru: заменить/пропустить/переименовать
+sv: ersätt/hoppa över/byt namn
+
+    will replace
+ca: substituirà el fitxer existent
+da: erstatter den eksisterende fil
+de: ersetzt die vorhandene Datei
+en: will replace the existing file
+es: reemplazará el archivo existente
+fr: remplacera le fichier existant
+it: sostituirà il file esistente
+nl: vervangt het bestaande bestand
+no: erstatter den eksisterende filen
+pl: zastąpi istniejący plik
+pt: substituirá o ficheiro existente
+ru: заменит существующий файл
+sv: ersätter den befintliga filen
+
+    upload slot taken
+ca: ja triat per a un altre fitxer
+da: allerede valgt til en anden fil
+de: bereits für eine andere Datei gewählt
+en: already chosen for another file
+es: ya elegido para otro archivo
+fr: déjà choisi pour un autre fichier
+it: già scelto per un altro file
+nl: al gekozen voor een ander bestand
+no: allerede valgt for en annen fil
+pl: już wybrane dla innego pliku
+pt: já escolhido para outro ficheiro
+ru: уже выбрано для другого файла
+sv: redan valt för en annan fil
+
+    upload send/finish
+ca: envia/acaba
+da: send/afslut
+de: senden/fertig
+en: send/finish
+es: enviar/terminar
+fr: envoyer/terminer
+it: invia/termina
+nl: verzenden/voltooien
+no: send/fullfør
+pl: wyślij/zakończ
+pt: enviar/terminar
+ru: отправить/завершить
+sv: skicka/slutför
+
+    file size units
+ca: B/KB/MB/GB
+da: B/KB/MB/GB
+de: B/KB/MB/GB
+en: B/KB/MB/GB
+es: B/KB/MB/GB
+fr: o/Ko/Mo/Go
+it: B/KB/MB/GB
+nl: B/KB/MB/GB
+no: B/KB/MB/GB
+pl: B/KB/MB/GB
+pt: B/KB/MB/GB
+ru: Б/КБ/МБ/ГБ
+sv: B/KB/MB/GB
+
+    dropped url hint
+ca: l’adreça de la imatge s’ha posat al camp URL
+da: billedets adresse er sat ind i URL-feltet
+de: die Adresse des Bildes wurde in das URL-Feld eingetragen
+en: the address of the image was put in the URL field
+es: la dirección de la imagen se ha colocado en el campo URL
+fr: l’adresse de l’image a été placée dans le champ URL
+it: l’indirizzo dell’immagine è stato inserito nel campo URL
+nl: het adres van de afbeelding is in het URL-veld geplaatst
+no: adressen til bildet er satt inn i URL-feltet
+pl: adres obrazu został wstawiony w polu URL
+pt: o endereço da imagem foi colocado no campo URL
+ru: адрес изображения помещён в поле URL
+sv: bildens adress har lagts i URL-fältet
