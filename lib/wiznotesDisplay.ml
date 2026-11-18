@@ -583,12 +583,33 @@ let print_connected_wizard conf first wddir wz tm_user =
       Output.print_sstring conf (transl conf "since the last click");
       Output.print_sstring conf ")</span>"))
 
-let do_connected_wizards conf base (_, _, _, wl) =
+let print_connected_friends conf fl =
+  if fl <> [] then (
+    let fl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) fl in
+    Output.print_sstring conf {|<h3 id="friends">|};
+    transl_nth conf "wizard/wizards/friend/friends/exterior" 3
+    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    Output.print_sstring conf "</h3><ul>";
+    List.iter
+      (fun (fr, tm_user) ->
+        Output.print_sstring conf {|<li style="list-style-type:disc">|};
+        Output.print_string conf (Util.escape_html fr);
+        let d = conf.ctime -. tm_user in
+        if d <> 0.0 then Output.printf conf " - %.0f s" d;
+        Output.print_sstring conf "</li>")
+      fl;
+    Output.print_sstring conf "</ul>")
+
+let do_connected_wizards conf base cn =
+  let wl = cn.cn_wizard_list and fl = cn.cn_friend_list in
   let title _ =
     transl_nth conf "wizard/wizards/friend/friends/exterior" 1
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
+  Output.printf conf "<p>(%d %s)</p>"
+    (max 1 ((cn.cn_window + 30) / 60))
+    (transl conf "min (minutes)");
   let wiznotes_dir = wiz_dir conf base in
   let denying = wizard_denying wiznotes_dir in
   let wl =
@@ -636,6 +657,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
   in
   if not_everybody then Output.print_sstring conf "<li>...</li>";
   Output.print_sstring conf "</ul>";
+  print_connected_friends conf fl;
   Hutil.trailer conf
 
 let connected_wizards conf base =

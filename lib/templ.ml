@@ -227,15 +227,23 @@ let rec eval_variable (conf : Config.config) = function
       try List.assoc v conf.base_env with Not_found -> "")
   | [ "connections"; "wizards" ] -> (
       match conf.n_connect with
-      | Some (_c, cw, _cf, _) -> if cw > 0 then Printf.sprintf "%d" cw else ""
+      | Some { cn_wizards = cw; _ } ->
+          if cw > 0 then Printf.sprintf "%d" cw else ""
       | None -> "")
   | [ "connections"; "friends" ] -> (
       match conf.n_connect with
-      | Some (_c, _cw, cf, _) -> if cf > 0 then Printf.sprintf "%d" cf else ""
+      | Some { cn_friends = cf; _ } ->
+          if cf > 0 then Printf.sprintf "%d" cf else ""
       | None -> "")
   | [ "connections"; "total" ] -> (
       match conf.n_connect with
-      | Some (c, _cw, _cf, _) -> if c > 0 then Printf.sprintf "%d" c else ""
+      | Some { cn_total = c; _ } -> if c > 0 then Printf.sprintf "%d" c else ""
+      | None -> "")
+  | [ "connections"; "window" ] -> (
+      (* size of the observation window, in minutes (rounded) *)
+      match conf.n_connect with
+      | Some { cn_window = sec; _ } ->
+          Printf.sprintf "%d" (max 1 ((sec + 30) / 60))
       | None -> "")
   | [ "evar"; v; "ns" ] | [ "e"; v; "ns" ] -> (
       try
@@ -370,7 +378,7 @@ and eval_simple_variable conf = function
   | "charset" -> conf.charset
   | "connections" -> (
       match conf.n_connect with
-      | Some (c, cw, cf, _) ->
+      | Some { cn_total = c; cn_wizards = cw; cn_friends = cf; _ } ->
           if c > 0 then
             " - "
             ^ Printf.sprintf "%s %d" (Util.transl conf "connections") c
@@ -386,9 +394,13 @@ and eval_simple_variable conf = function
                else "")
             ^
             if cf > 0 then
-              Printf.sprintf ", %s %d"
+              Printf.sprintf ", %s %s"
                 (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 3)
-                cf
+                (if conf.wizard then
+                   Printf.sprintf "<a href=\"%sm=CONN_WIZ#friends\">%d</a>"
+                     (Util.commd conf :> string)
+                     cf
+                 else string_of_int cf)
             else ""
           else ""
       | None -> "")
@@ -1398,9 +1410,8 @@ and print_simple_variable conf = function
          in order to remove it.
 
          See issue https://github.com/geneweb/geneweb/issues/2231 *)
-      let query_time = Unix.gettimeofday () -. conf.query_start in
-      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-        !GWPARAM.errors_other !GWPARAM.set_vars
+      Util.time_debug conf (Util.query_time conf) !GWPARAM.nb_errors
+        !GWPARAM.errors_undef !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_albums_list" -> (
       let dir = !GWPARAM.albums_d conf.bname in
       let has_image path =

@@ -34,10 +34,12 @@
         %if;(connections.total!="" and b.hide_connections!="yes")
           <div class="d-flex flex-column align-items-center small ms-1 ms-md-3"
             aria-label="[*connection/connections]1" role="status">
-            %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends;
+            %if;(connections.friends!="" and connections.friends>0)<span>%nn;
+              %if;(wizard)<a href="%prefix;m=CONN_WIZ#friends">%end;%nn;
+              %connections.friends;
               %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2
               %else; [wizard/wizards/friend/friends/exterior]3
-              %end;</span>
+              %end;%if;(wizard)</a>%end;</span>
             %end;
             %if;(connections.wizards!="" and connections.wizards>0)
               %if;(wizard)
@@ -52,7 +54,7 @@
             %if;(connections.total>0)<span>%connections.total; %nn;
               %if;(connections.total=1)[connection/connections]0
               %else;[connection/connections]1
-              %end;</span>
+              %end; (%connections.window; [min (minutes)])</span>
             %end;
           </div>
         %end;

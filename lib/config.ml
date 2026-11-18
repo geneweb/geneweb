@@ -38,6 +38,19 @@ type output_conf = {
 
 type env = (string * Adef.encoded_string) list
 
+type connections = {
+  cn_total : int;
+      (** wizards, plus friends and visitors with more than two requests *)
+  cn_wizards : int;  (** distinct wizards *)
+  cn_friends : int;  (** friends with more than two requests *)
+  cn_wizard_list : (string * float) list;
+      (** each wizard with the time of their last request *)
+  cn_friend_list : (string * float) list;
+      (** each named friend with the time of their last request *)
+  cn_window : int;  (** size of the observation window, in seconds *)
+}
+(** Users connected to the base, as counted by the robot module of gwd *)
+
 type config = {
   from : string;
   api_mode : bool;
@@ -99,7 +112,7 @@ type config = {
   right : string;
   auth_file : string;
   border : int;
-  mutable n_connect : (int * int * int * (string * float) list) option;
+  mutable n_connect : connections option;
   today : Adef.dmy;
   today_wd : int;
   time : int * int * int;

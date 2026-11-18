@@ -112,8 +112,48 @@ let summary () =
   let xcl, _ = robot_excl () in
   let n, ip = xcl.max_conn in
   Printf.sprintf "%d blocked, %d monitored%s" (List.length xcl.excl)
-    (W.cardinal xcl.who)
+    (nb_ips xcl.who)
     (if n > 0 then Printf.sprintf ", most active %s (%d req.)" ip n else "")
+
+(* Users connected to the base of [conf], from the clients recorded in [xcl]
+   within the last [sec] seconds. *)
+let connections conf sec xcl =
+  (* keep, for each user name, the time of their most recent access *)
+  let add_named n at l =
+    match List.assoc_opt n l with
+    | Some old_at -> if at > old_at then (n, at) :: List.remove_assoc n l else l
+    | None -> (n, at) :: l
+  in
+  let c, cw, cf, wl, fl =
+    W.fold
+      (fun _ w (c, cw, cf, wl, fl) ->
+        if w.nbase = conf.bname && w.nbase <> "" then
+          match w.utype with
+          | Wizard n ->
+              let at = List.hd w.acc_times in
+              if List.mem_assoc n wl then (c, cw, cf, add_named n at wl, fl)
+              else (c + 1, cw + 1, cf, (n, at) :: wl, fl)
+          | Friend n ->
+              if w.nb_connect > 2 then
+                let fl =
+                  if n = "" then fl else add_named n (List.hd w.acc_times) fl
+                in
+                (c + 1, cw, cf + 1, wl, fl)
+              else (c, cw, cf, wl, fl)
+          | Normal ->
+              if w.nb_connect > 2 then (c + 1, cw, cf, wl, fl)
+              else (c, cw, cf, wl, fl)
+        else (c, cw, cf, wl, fl))
+      xcl.who (0, 0, 0, [], [])
+  in
+  {
+    Config.cn_total = c;
+    cn_wizards = cw;
+    cn_friends = cf;
+    cn_wizard_list = wl;
+    cn_friend_list = fl;
+    cn_window = sec;
+  }
 
 let check tm from max_call sec conf suicide =
   let nfw =
@@ -139,7 +179,8 @@ let check tm from max_call sec conf suicide =
         true
     | None ->
         purge_who tm xcl sec;
-        let r = try (W.find from xcl.who).acc_times with Not_found -> [] in
+        let key = who_key from nfw in
+        let r = try (W.find key xcl.who).acc_times with Not_found -> [] in
         let cnt, tml, tm0 =
           let sec = float sec in
           let rec count cnt tml = function
@@ -155,7 +196,7 @@ let check tm from max_call sec conf suicide =
         in
         let r = List.rev tml in
         xcl.who <-
-          W.add from
+          W.add key
             {
               acc_times = tm :: r;
               oldest_time = tm0;
@@ -175,7 +216,7 @@ let check tm from max_call sec conf suicide =
             else
               Log.info (fun k ->
                   k "ROBOT %s: BLOCKED (covered by existing pattern)\n" from);
-            xcl.who <- W.remove from xcl.who;
+            xcl.who <- remove_ip from xcl.who;
             xcl.max_conn <- (0, "");
             true)
           else false
@@ -193,22 +234,9 @@ let check tm from max_call sec conf suicide =
       close_out oc
   | None -> ());
   if refused then robot_error conf max_call sec;
-  W.fold
-    (fun _ w (c, cw, cf, wl) ->
-      if w.nbase = conf.bname && w.nbase <> "" then
-        match w.utype with
-        | Wizard n ->
-            let at = List.hd w.acc_times in
-            if List.mem_assoc n wl then
-              let old_at = List.assoc n wl in
-              if at > old_at then
-                let wl = List.remove_assoc n wl in
-                (c, cw, cf, (n, at) :: wl)
-              else (c, cw, cf, wl)
-            else (c + 1, cw + 1, cf, (n, at) :: wl)
-        | Friend _ ->
-            if w.nb_connect > 2 then (c + 1, cw, cf + 1, wl) else (c, cw, cf, wl)
-        | Normal ->
-            if w.nb_connect > 2 then (c + 1, cw, cf, wl) else (c, cw, cf, wl)
-      else (c, cw, cf, wl))
-    xcl.who (0, 0, 0, [])
+  connections conf sec xcl
+
+let snapshot conf sec =
+  let xcl, _ = robot_excl () in
+  purge_who (Unix.time ()) xcl sec;
+  connections conf sec xcl

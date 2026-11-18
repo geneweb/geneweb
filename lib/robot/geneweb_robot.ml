@@ -18,6 +18,21 @@ end)
 
 type norfriwiz = Normal | Friend of string | Wizard of string
 
+let who_key ip = function
+  | Normal -> ip
+  | Friend n -> ip ^ " F:" ^ n
+  | Wizard n -> ip ^ " W:" ^ n
+
+let ip_of_key k =
+  match String.index_opt k ' ' with Some i -> String.sub k 0 i | None -> k
+
+let remove_ip ip m = W.filter (fun k _ -> ip_of_key k <> ip) m
+
+module S = Set.Make (String)
+
+let nb_ips m =
+  W.fold (fun k _ s -> S.add (ip_of_key k) s) m S.empty |> S.cardinal
+
 type who = {
   acc_times : float list;
   oldest_time : float;
