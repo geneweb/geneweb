@@ -5774,6 +5774,28 @@ let print_foreach conf base print_ast eval_expr =
               let efam = Vfam (ifam, Driver.foi base ifam, cpl, m_auth) in
               loop env ep efam sl
           | None -> warning_use_has_parents_before_parent loc "mother" ())
+      | "related" :: sl -> (
+          (* inside %foreach;related; : the person bearing the relation
+             (e.g. the godchild) *)
+          match get_env "rel" env with
+          | Vrel (_, Some c) ->
+              let ep = make_ep conf base (Driver.get_iper c) in
+              loop env ep efam sl
+          | _ -> raise Not_found)
+      | "relation_him" :: sl -> (
+          (* inside %foreach;relation; : the male related parent *)
+          match get_env "rel" env with
+          | Vrel ({ r_fath = Some ip; _ }, None) ->
+              let ep = make_ep conf base ip in
+              loop env ep efam sl
+          | _ -> raise Not_found)
+      | "relation_her" :: sl -> (
+          (* inside %foreach;relation; : the female related parent *)
+          match get_env "rel" env with
+          | Vrel ({ r_moth = Some ip; _ }, None) ->
+              let ep = make_ep conf base ip in
+              loop env ep efam sl
+          | _ -> raise Not_found)
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl -> (
           match efam with
