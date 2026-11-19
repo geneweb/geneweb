@@ -232,6 +232,11 @@ In templates: `[witness/witnesses]0` → "witness",
 are filled by `Util.cftransl`.
 
 Avoid duplicating existing entries — search the lexicon first.
+Add new entries as one block anywhere in the file, then run
+`dune exec gwlex -- sort` from the root: it sorts the lexicon in place
+and reports the duplicated keys and languages, to merge by hand.
+`gwlex check --formats` also compares the placeholders of the
+translations with the English ones.
 Prefer a long specific entry over concatenating shorter ones: word
 order differs across languages, making concatenation unreliable.
 The lexicon supports declension for Slavic languages and specific
