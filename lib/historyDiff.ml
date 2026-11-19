@@ -11,12 +11,43 @@ type gen_record = {
   gen_p : (Driver.iper, Driver.iper, string) gen_person;
   gen_f : (Driver.iper, Driver.ifam, string) gen_family list;
   gen_c : Driver.iper array list;
+  gen_s : Driver.iper list;
+}
+
+(* A person as stored in a record: its key, and its index at the time of the
+   record. Indexes change when the base is rebuilt, keys do not: a record is
+   read back through the key, the index only serves for the persons whose key
+   is shared ("?" names), and only if it still holds the same key. *)
+type person_ref = {
+  r_fn : string;
+  r_sn : string;
+  r_oc : int;
+  r_ip : Driver.iper;
+}
+
+(* Records written since GnHd0003: persons by key, families by spouse. *)
+type stored_record = {
+  s_date : Adef.safe_string;
+  s_wizard : Adef.safe_string;
+  s_p : (unit, person_ref, string) gen_person;
+  s_f : (person_ref, unit, string) gen_family list;
+  s_c : person_ref array list;
+  s_s : person_ref list;
+}
+
+(* Records GnHd0002: persons and families by index. *)
+type gen_record_0002 = {
+  date_0002 : Adef.safe_string;
+  wizard_0002 : Adef.safe_string;
+  gen_p_0002 : (Driver.iper, Driver.iper, string) gen_person;
+  gen_f_0002 : (Driver.iper, Driver.ifam, string) gen_family list;
+  gen_c_0002 : Driver.iper array list;
 }
 
 (* Records written before witness notes (GnWb0025): witnesses are pairs. A
-   history file can hold both kinds, older records first. Each newer record
-   is preceded by the marshaled [record_marker], whose bytes cannot be those
-   of an older record. *)
+   history file can hold all kinds, older records first. Each newer record
+   is preceded by a marshaled marker, whose bytes cannot be those of an older
+   record. *)
 type gen_record_0024 = {
   date_0024 : Adef.safe_string;
   wizard_0024 : Adef.safe_string;
@@ -25,11 +56,51 @@ type gen_record_0024 = {
   gen_c_0024 : Driver.iper array list;
 }
 
-let record_marker = "GnHd0002"
+let record_marker = "GnHd0003"
+let record_marker_0002 = "GnHd0002"
+let marker_bytes = Marshal.to_bytes record_marker []
+let marker_bytes_0002 = Marshal.to_bytes record_marker_0002 []
 
-let output_record oc (gr : gen_record) =
+(* A record as read from a file, still marshaled. *)
+type raw = V0003 of bytes | V0002 of bytes | V0024 of bytes
+
+type entry = {
+  e_raw : raw;
+  e_date : Adef.safe_string;
+  e_wizard : Adef.safe_string;
+}
+
+let entry_date e = e.e_date
+let entry_wizard e = e.e_wizard
+let unique_key fn sn = Name.lower fn <> "" && Name.lower sn <> ""
+
+let person_ref base ip =
+  let p = Driver.poi base ip in
+  {
+    r_fn = Driver.sou base (Driver.get_first_name p);
+    r_sn = Driver.sou base (Driver.get_surname p);
+    r_oc = Driver.get_occ p;
+    r_ip = ip;
+  }
+
+let stored_of_record base gr =
+  let r = person_ref base in
+  {
+    s_date = gr.date;
+    s_wizard = gr.wizard;
+    s_p = { (Futil.map_person_ps r Fun.id gr.gen_p) with key_index = () };
+    s_f =
+      List.map
+        (fun f ->
+          { (Futil.map_family_ps r Fun.id Fun.id f) with fam_index = () })
+        gr.gen_f;
+    s_c = List.map (Array.map r) gr.gen_c;
+    s_s = List.map r gr.gen_s;
+  }
+
+let output_record base oc gr =
   output_value oc record_marker;
-  output_value oc gr
+  output_value oc (stored_of_record base gr)
 
 (* The next marshaled value of [ic], as bytes. *)
 let input_marshaled ic =
@@ -41,19 +112,144 @@ let input_marshaled ic =
   really_input ic b Marshal.header_size size;
   b
 
-let input_record ic =
+let input_raw ic =
   let b = input_marshaled ic in
-  if Bytes.equal b (Marshal.to_bytes record_marker []) then
-    (input_value ic : gen_record)
-  else
-    let r : gen_record_0024 = Marshal.from_bytes b 0 in
+  if Bytes.equal b marker_bytes then V0003 (input_marshaled ic)
+  else if Bytes.equal b marker_bytes_0002 then V0002 (input_marshaled ic)
+  else V0024 b
+
+let output_raw oc raw =
+  match raw with
+  | V0003 b ->
+      output_value oc record_marker;
+      output_bytes oc b
+  | V0002 b ->
+      output_value oc record_marker_0002;
+      output_bytes oc b
+  | V0024 b -> output_bytes oc b
+
+let entry_of_raw raw =
+  let e_date, e_wizard =
+    match raw with
+    | V0003 b ->
+        let r : stored_record = Marshal.from_bytes b 0 in
+        (r.s_date, r.s_wizard)
+    | V0002 b ->
+        let r : gen_record_0002 = Marshal.from_bytes b 0 in
+        (r.date_0002, r.wizard_0002)
+    | V0024 b ->
+        let r : gen_record_0024 = Marshal.from_bytes b 0 in
+        (r.date_0024, r.wizard_0024)
+  in
+  { e_raw = raw; e_date; e_wizard }
+
+let known ip = not (Driver.Iper.is_dummy ip)
+
+(* The current index of the person [r], dummy if it is no longer in the
+   base. *)
+let iper_of_ref base r =
+  if unique_key r.r_fn r.r_sn then
+    Option.value ~default:Driver.Iper.dummy
+      (Driver.person_of_key base r.r_fn r.r_sn r.r_oc)
+  else if
+    known r.r_ip && Driver.iper_exists base r.r_ip && person_ref base r.r_ip = r
+  then r.r_ip
+  else Driver.Iper.dummy
+
+let filter_witnesses a =
+  Array.of_seq (Seq.filter (fun (ip, _, _) -> known ip) (Array.to_seq a))
+
+let record_of_stored base s =
+  let ip = iper_of_ref base in
+  let keep ip = if known ip then Some ip else None in
+  let p = Futil.map_person_ps ip Fun.id s.s_p in
+  let key_index =
+    if unique_key p.first_name p.surname then
+      Option.value ~default:Driver.Iper.dummy
+        (Driver.person_of_key base p.first_name p.surname p.occ)
+    else Driver.Iper.dummy
+  in
+  let gen_p =
     {
-      date = r.date_0024;
-      wizard = r.wizard_0024;
-      gen_p = Def_gnwb0024.person ~empty:"" r.gen_p_0024;
-      gen_f = List.map (Def_gnwb0024.family ~empty:"") r.gen_f_0024;
-      gen_c = r.gen_c_0024;
+      p with
+      key_index;
+      rparents =
+        List.map
+          (fun r ->
+            {
+              r with
+              r_fath = Option.bind r.r_fath keep;
+              r_moth = Option.bind r.r_moth keep;
+            })
+          p.rparents;
+      related = List.filter known p.related;
+      pevents =
+        List.map
+          (fun e ->
+            { e with epers_witnesses = filter_witnesses e.epers_witnesses })
+          p.pevents;
     }
+  in
+  let gen_f =
+    List.map
+      (fun f ->
+        let f = Futil.map_family_ps ip (fun () -> Driver.Ifam.dummy) Fun.id f in
+        {
+          f with
+          witnesses = Array.of_seq (Seq.filter known (Array.to_seq f.witnesses));
+          fevents =
+            List.map
+              (fun e ->
+                { e with efam_witnesses = filter_witnesses e.efam_witnesses })
+              f.fevents;
+        })
+      s.s_f
+  in
+  {
+    date = s.s_date;
+    wizard = s.s_wizard;
+    gen_p;
+    gen_f;
+    gen_c =
+      List.map
+        (fun c -> Array.of_seq (Seq.filter known (Seq.map ip (Array.to_seq c))))
+        s.s_c;
+    gen_s = List.map ip s.s_s;
+  }
+
+(* Spouses of an index-based record, from the current families. *)
+let legacy_spouses base ki gen_f =
+  List.map
+    (fun f ->
+      try Gutil.spouse ki (Driver.foi base f.fam_index)
+      with _ -> Driver.Iper.dummy)
+    gen_f
+
+let record_of_raw base raw =
+  match raw with
+  | V0003 b -> record_of_stored base (Marshal.from_bytes b 0)
+  | V0002 b ->
+      let r : gen_record_0002 = Marshal.from_bytes b 0 in
+      {
+        date = r.date_0002;
+        wizard = r.wizard_0002;
+        gen_p = r.gen_p_0002;
+        gen_f = r.gen_f_0002;
+        gen_c = r.gen_c_0002;
+        gen_s = legacy_spouses base r.gen_p_0002.key_index r.gen_f_0002;
+      }
+  | V0024 b ->
+      let r : gen_record_0024 = Marshal.from_bytes b 0 in
+      let gen_p = Def_gnwb0024.person ~empty:"" r.gen_p_0024 in
+      let gen_f = List.map (Def_gnwb0024.family ~empty:"") r.gen_f_0024 in
+      {
+        date = r.date_0024;
+        wizard = r.wizard_0024;
+        gen_p;
+        gen_f;
+        gen_c = r.gen_c_0024;
+        gen_s = legacy_spouses base gen_p.key_index gen_f;
+      }
 
 (* Le nom du fichier historique (à partir de la clé personne). *)
 let history_file fn sn occ =
@@ -61,8 +257,6 @@ let history_file fn sn occ =
   let f = space_to_unders (Name.lower fn) in
   let s = space_to_unders (Name.lower sn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
-
-let unique_key fn sn = Name.lower fn <> "" && Name.lower sn <> ""
 
 (* history directory path *)
 let history_d conf =
@@ -150,7 +344,7 @@ let archive_deleted conf (p : (_, _, string) gen_person) =
     - fname : le chemin du fichier
     - gr : le contenu de la personne [Retour] : Néant [Rem] : Non exporté en
       clair hors de ce module. *)
-let write_history_file conf person_file fname gr =
+let write_history_file conf base person_file fname gr =
   (* On créé toujours les dossiers nécessaires (changement de clé ...). *)
   let () = create_history_dirs conf person_file in
   let ext_flags =
@@ -161,7 +355,7 @@ let write_history_file conf person_file fname gr =
     with Sys_error _ -> None
   with
   | Some oc ->
-      output_record oc gr;
+      output_record base oc gr;
       close_out oc
   | None -> ()
 
@@ -195,14 +389,16 @@ let make_gen_record conf base first gen_p =
   let fam = Driver.get_family p in
   (* On fait en sorte qu'il y a une 'bijection' *)
   (* entre les familles et les enfants.         *)
-  let gen_f, gen_c =
+  let gen_f, gen_c, gen_s =
     Array.fold_right
-      (fun ifam (accu_fam, accu_child) ->
+      (fun ifam (accu_fam, accu_child, accu_spouse) ->
         let fam = Driver.foi base ifam in
         let children = Driver.get_children fam in
         let gen_f = Driver.gen_family_of_family fam in
-        (Util.string_gen_family base gen_f :: accu_fam, children :: accu_child))
-      fam ([], [])
+        ( Util.string_gen_family base gen_f :: accu_fam,
+          children :: accu_child,
+          Gutil.spouse gen_p.key_index fam :: accu_spouse ))
+      fam ([], [], [])
   in
   {
     date;
@@ -210,21 +406,23 @@ let make_gen_record conf base first gen_p =
     gen_p;
     gen_f;
     gen_c;
+    gen_s;
   }
 
 let records conf base changed o p =
   let gr = make_gen_record conf base false p in
   let o_gr = make_gen_record conf base true o in
   let restore f o_f =
-    let gen_f, gen_c =
-      List.combine o_gr.gen_f o_gr.gen_c
-      |> List.filter_map (fun ((g, c) as x) ->
+    let gen_f, rest =
+      List.combine o_gr.gen_f (List.combine o_gr.gen_c o_gr.gen_s)
+      |> List.filter_map (fun ((g, cs) as x) ->
           if Driver.Ifam.equal g.fam_index f.fam_index then
-            Option.map (fun o_f -> (o_f, c)) o_f
+            Option.map (fun o_f -> (o_f, cs)) o_f
           else Some x)
       |> List.split
     in
-    { o_gr with gen_f; gen_c }
+    let gen_c, gen_s = List.split rest in
+    { o_gr with gen_f; gen_c; gen_s }
   in
   let o_gr =
     match changed with
@@ -268,15 +466,15 @@ let record_diff conf base changed =
         let o_gr, gr = records conf base changed o p in
         (match o_gr with
         | Some o_gr when not (Sys.file_exists fname) ->
-            write_history_file conf person_file fname o_gr
+            write_history_file conf base person_file fname o_gr
         | _ -> ());
-        write_history_file conf person_file fname gr
+        write_history_file conf base person_file fname gr
       in
       let print_ind_add p =
         let person_file = history_file p.first_name p.surname p.occ in
         let fname = history_path conf person_file in
         let gr = make_gen_record conf base false p in
-        write_history_file conf person_file fname gr
+        write_history_file conf base person_file fname gr
       in
       let print_ind_mod o p =
         let o_person_file = history_file o.first_name o.surname o.occ in
@@ -337,7 +535,7 @@ let record_diff conf base changed =
                 let gen_p = Driver.gen_person_of_person p in
                 let gen_p = Util.string_gen_person base gen_p in
                 let gr = make_gen_record conf base false gen_p in
-                write_history_file conf person_file fname gr)
+                write_history_file conf base person_file fname gr)
             (Driver.get_children cpl)
       | U_Change_children_name (_, list) ->
           List.iter
@@ -363,41 +561,83 @@ let record_diff conf base changed =
       | _ -> ())
   | _ -> ()
 
-(* avec zip ? *)
-(*
-  let history = ref [] in
+let load_entries conf fname =
   let fname = history_path conf fname in
-  if extract_zfile fname then
-    do {
-      read_history_file fname
-      Sys.remove fname
+  match Secure.open_in_bin fname with
+  | exception Sys_error _ -> []
+  | ic ->
+      Fun.protect
+        ~finally:(fun () -> close_in ic)
+        (fun () ->
+          let rec loop acc =
+            match input_raw ic with
+            | raw -> loop (entry_of_raw raw :: acc)
+            | exception End_of_file -> acc
+          in
+          loop [])
+
+let write_entries conf fname entries =
+  let fname = history_path conf fname in
+  if entries = [] then Mutil.rm fname
+  else
+    let ext_flags =
+      [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
+    in
+    match Secure.open_out_gen ext_flags 0o644 fname with
+    | exception Sys_error _ -> ()
+    | oc ->
+        Fun.protect
+          ~finally:(fun () -> close_out oc)
+          (fun () -> List.iter (fun e -> output_raw oc e.e_raw) entries)
+
+(* The families of [gr] among the current ones of its person, by spouse. *)
+let resolve_families base gr =
+  let ki = gr.gen_p.key_index in
+  if not (known ki) then gr
+  else
+    let fams = Driver.get_family (Driver.poi base ki) in
+    let fam_of sp =
+      if not (known sp) then Driver.Ifam.dummy
+      else
+        Option.value ~default:Driver.Ifam.dummy
+          (Array.find_opt
+             (fun ifam ->
+               Driver.Iper.equal sp (Gutil.spouse ki (Driver.foi base ifam)))
+             fams)
+    in
+    {
+      gr with
+      gen_f =
+        List.map2
+          (fun f sp -> { f with fam_index = fam_of sp })
+          gr.gen_f gr.gen_s;
     }
-  else ();
-  history.val
-*)
 
-(* ************************************************************************ *)
-(*  [Fonc] load_person_history : config -> string -> gen_record list        *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Charge la liste des modifications pour une personne.
-    L'avantage est que les versions les plus récentes se trouvent en tête de
-    liste. [Args] :
-    - conf : configuration de la base
-    - fname : le nom du fichier historique [Retour] :
-    - gen_record list [Rem] : Non exporté en clair hors de ce module. *)
-let load_person_history conf fname =
-  let history = ref [] in
-  let fname = history_path conf fname in
-  (match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-  | Some ic ->
-      (try
-         while true do
-           let v = input_record ic in
-           history := v :: !history
-         done
-       with End_of_file -> ());
-      close_in ic
-  | None -> ());
-  !history
+let load_person_history conf base fname =
+  let history =
+    List.map
+      (fun e ->
+        let by_key =
+          match e.e_raw with V0003 _ -> true | V0002 _ | V0024 _ -> false
+        in
+        (by_key, record_of_raw base e.e_raw))
+      (load_entries conf fname)
+  in
+  (* A record whose person had another key: the file follows the renames of
+     its person, whose latest known index stands for it. *)
+  let fallback =
+    List.find_map
+      (fun (_, gr) ->
+        if known gr.gen_p.key_index then Some gr.gen_p.key_index else None)
+      history
+  in
+  List.map
+    (fun (by_key, gr) ->
+      let gr =
+        match fallback with
+        | Some ki when not (known gr.gen_p.key_index) ->
+            { gr with gen_p = { gr.gen_p with key_index = ki } }
+        | Some _ | None -> gr
+      in
+      if by_key then resolve_families base gr else gr)
+    history
