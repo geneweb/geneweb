@@ -8,31 +8,25 @@ end = struct
   let nb_gen_by_century = 3
   let nb_years_by_gen = 30
 
+  let year_of_cdate = function
+    | Some (Date.Dgreg (d, _)) -> Some d.Date.year
+    | _ -> None
+
   let oldest_year_of p =
-    let open Date in
-    let open Def in
-    match od_of_cdate (Gwdb.get_birth p) with
-    | Some (Dgreg (d, _)) -> Some d.year
-    | _ -> (
-        match od_of_cdate (Gwdb.get_baptism p) with
-        | Some (Dgreg (d, _)) -> Some d.year
-        | _ -> (
-            match date_of_death (Gwdb.get_death p) with
-            | Some (Dgreg (d, _)) -> Some d.year
-            | _ -> None))
+    match year_of_cdate (Date.od_of_cdate (Gwdb.get_birth p)) with
+    | Some _ as y -> y
+    | None -> (
+        match year_of_cdate (Date.od_of_cdate (Gwdb.get_baptism p)) with
+        | Some _ as y -> y
+        | None -> year_of_cdate (Date.date_of_death (Gwdb.get_death p)))
 
   let most_recent_year_of p =
-    let open Date in
-    let open Def in
-    match date_of_death (Gwdb.get_death p) with
-    | Some (Dgreg (d, _)) -> Some d.year
-    | _ -> (
-        match od_of_cdate (Gwdb.get_baptism p) with
-        | Some (Dgreg (d, _)) -> Some d.year
-        | _ -> (
-            match od_of_cdate (Gwdb.get_birth p) with
-            | Some (Dgreg (d, _)) -> Some d.year
-            | _ -> None))
+    match year_of_cdate (Date.date_of_death (Gwdb.get_death p)) with
+    | Some _ as y -> y
+    | None -> (
+        match year_of_cdate (Date.od_of_cdate (Gwdb.get_baptism p)) with
+        | Some _ as y -> y
+        | None -> year_of_cdate (Date.od_of_cdate (Gwdb.get_birth p)))
 
   let compute_ndgen cutoff_year y = (cutoff_year - y) * nb_gen_by_century / 100
 
