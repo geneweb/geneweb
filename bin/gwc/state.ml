@@ -98,6 +98,7 @@ type t = {
   do_consang : bool;
   pr_stats : bool;
   particules_file : string;
+  max_children : int;
 }
 
 let default =
@@ -124,6 +125,7 @@ let default =
     do_consang = false;
     pr_stats = false;
     particules_file = "";
+    max_children = 0;
   }
 
 let add_person_reference state person_reference =

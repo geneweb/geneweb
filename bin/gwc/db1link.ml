@@ -1017,74 +1017,79 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
         ie)
       deo.Def.children
   in
-  (* insert family comment *)
-  let comment = unique_string gen fo.Def.comment in
-  (* insert sources comment *)
-  let fsources =
-    unique_string gen
-      (if fo.fsources = "" then state.State.default_source else fo.fsources)
-  in
-  (* extend arrays if needed *)
-  new_ifam gen;
-  (* family's entry index *)
-  let i = gen.g_fcnt in
-  (* Convert [(_,_,string) gen_family] to [family]. Save all strings in base *)
-  let fam =
-    {
-      Def.marriage = fo.marriage;
-      marriage_place = unique_string gen fo.marriage_place;
-      marriage_note = unique_string gen fo.marriage_note;
-      marriage_src = unique_string gen fo.marriage_src;
-      witnesses = Array.of_list witl;
-      relation = fo.relation;
-      divorce = fo.divorce;
-      fevents;
-      comment;
-      origin_file = unique_string gen fo.origin_file;
-      fsources;
-      fam_index = i;
-    }
-  (* create couple *)
-  and cpl = Adef.couple ifath imoth
-  (* created descandants *)
-  and des = { Def.children } in
-  (* On mets à jour les fevents et events normaux *)
-  let fam =
-    if fevents <> [] then update_family_with_fevents gen fam
-    else update_fevents_with_family gen fam
-  in
-  (* father's union *)
-  let fath_uni = uoi gen.g_base ifath in
-  (* mother's union *)
-  let moth_uni = uoi gen.g_base imoth in
-  (* write start position of family in [g_fam] *)
-  seek_out gen.g_fam_index (sizeof_long * i);
-  output_binary_int gen.g_fam_index (pos_out gen.g_fam);
-  (* write family *)
-  output_item_value gen.g_fam (fam : family);
-  (* add family to array *)
-  gen.g_base.c_families.(gen.g_fcnt) <- fam;
-  (* add couple to array *)
-  gen.g_base.c_couples.(gen.g_fcnt) <- cpl;
-  (* add descendants to array *)
-  gen.g_base.c_descends.(gen.g_fcnt) <- des;
-  gen.g_fcnt <- gen.g_fcnt + 1;
-  (* append this family to father's and mother's union  *)
-  let fath_uni = { Def.family = Array.append fath_uni.family [| i |] } in
-  gen.g_base.c_unions.(ifath) <- fath_uni;
-  let moth_uni = { Def.family = Array.append moth_uni.family [| i |] } in
-  gen.g_base.c_unions.(imoth) <- moth_uni;
-  notice_sex gen fath fath_sex;
-  notice_sex gen moth moth_sex;
-  (* Append familly to the children's ascendant *)
-  Array.iter
-    (fun ix ->
-      let a = gen.g_base.c_ascends.(ix) in
-      (* check if children has no another parents *)
-      check_parents_not_already_defined gen ix fath moth;
-      let a = { a with parents = Some i } in
-      gen.g_base.c_ascends.(ix) <- a)
-    children
+  if
+    state.State.max_children > 0
+    && Array.length children > state.State.max_children
+  then ()
+  else
+    (* insert family comment *)
+    let comment = unique_string gen fo.Def.comment in
+    (* insert sources comment *)
+    let fsources =
+      unique_string gen
+        (if fo.fsources = "" then state.State.default_source else fo.fsources)
+    in
+    (* extend arrays if needed *)
+    new_ifam gen;
+    (* family's entry index *)
+    let i = gen.g_fcnt in
+    (* Convert [(_,_,string) gen_family] to [family]. Save all strings in base *)
+    let fam =
+      {
+        Def.marriage = fo.marriage;
+        marriage_place = unique_string gen fo.marriage_place;
+        marriage_note = unique_string gen fo.marriage_note;
+        marriage_src = unique_string gen fo.marriage_src;
+        witnesses = Array.of_list witl;
+        relation = fo.relation;
+        divorce = fo.divorce;
+        fevents;
+        comment;
+        origin_file = unique_string gen fo.origin_file;
+        fsources;
+        fam_index = i;
+      }
+    (* create couple *)
+    and cpl = Adef.couple ifath imoth
+    (* created descandants *)
+    and des = { Def.children } in
+    (* On mets à jour les fevents et events normaux *)
+    let fam =
+      if fevents <> [] then update_family_with_fevents gen fam
+      else update_fevents_with_family gen fam
+    in
+    (* father's union *)
+    let fath_uni = uoi gen.g_base ifath in
+    (* mother's union *)
+    let moth_uni = uoi gen.g_base imoth in
+    (* write start position of family in [g_fam] *)
+    seek_out gen.g_fam_index (sizeof_long * i);
+    output_binary_int gen.g_fam_index (pos_out gen.g_fam);
+    (* write family *)
+    output_item_value gen.g_fam (fam : family);
+    (* add family to array *)
+    gen.g_base.c_families.(gen.g_fcnt) <- fam;
+    (* add couple to array *)
+    gen.g_base.c_couples.(gen.g_fcnt) <- cpl;
+    (* add descendants to array *)
+    gen.g_base.c_descends.(gen.g_fcnt) <- des;
+    gen.g_fcnt <- gen.g_fcnt + 1;
+    (* append this family to father's and mother's union  *)
+    let fath_uni = { Def.family = Array.append fath_uni.family [| i |] } in
+    gen.g_base.c_unions.(ifath) <- fath_uni;
+    let moth_uni = { Def.family = Array.append moth_uni.family [| i |] } in
+    gen.g_base.c_unions.(imoth) <- moth_uni;
+    notice_sex gen fath fath_sex;
+    notice_sex gen moth moth_sex;
+    (* Append familly to the children's ascendant *)
+    Array.iter
+      (fun ix ->
+        let a = gen.g_base.c_ascends.(ix) in
+        (* check if children has no another parents *)
+        check_parents_not_already_defined gen ix fath moth;
+        let a = { a with parents = Some i } in
+        gen.g_base.c_ascends.(ix) <- a)
+      children
 
 (** Convert [string Def.gen_pers_event_name] to [int Def.gen_pers_event_name].
     If event is [Epers_Name] stores event name as a string in the base. *)

@@ -31,6 +31,7 @@ module State : sig
   val in_file : string ref
   val out_file : string ref
   val month_number_dates : month_number_dates ref
+  val max_children : int ref
 
   type t
 

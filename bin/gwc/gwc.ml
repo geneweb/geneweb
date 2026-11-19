@@ -29,6 +29,9 @@ let pr_stats = ref false
 (** File containing the particles to use *)
 let particules_file = ref ""
 
+(** Maximum number of children a family can have *)
+let max_children = ref 0
+
 let make_state () =
   {
     Gwc_lib.State.default with
@@ -49,6 +52,7 @@ let make_state () =
     do_consang = !do_consang;
     pr_stats = !pr_stats;
     particules_file = !particules_file;
+    max_children = !max_children;
   }
 
 let speclist =
@@ -78,6 +82,10 @@ let speclist =
     ( "-particles",
       Arg.Set_string particules_file,
       "<file> Particles file (default = predefined particles)" );
+    ( "-max-children",
+      Arg.Set_int max_children,
+      "<int> Maximum number of children a family can have, above this \
+       threshold the family is dropped (default: no limit)" );
     ("-q", Arg.Clear Mutil.verbose, " Quiet");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");

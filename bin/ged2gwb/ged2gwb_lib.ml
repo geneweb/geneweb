@@ -50,6 +50,7 @@ type t = {
   particles : string list;
   in_file : string;
   out_file : string;
+  max_children : int;
   mutable charset : charset;
   mutable month_number_dates : month_number_dates;
   mutable bad_dates_warned : bool;
@@ -81,6 +82,7 @@ let do_check = ref true
 let particles = ref Mutil.default_particles
 let in_file = ref ""
 let out_file = ref "a"
+let max_children = ref 0
 
 (* default mutable variable *)
 let charset = ref Ascii
@@ -114,6 +116,7 @@ let make () =
       particles = !particles;
       in_file = !in_file;
       out_file = !out_file;
+      max_children = !max_children;
       charset = !charset;
       month_number_dates = !month_number_dates;
       bad_dates_warned = !bad_dates_warned;
@@ -2431,6 +2434,14 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
   else marr, witn, div
 
 let add_fam_norm gen r adop_list =
+  let chil_fields = find_all_fields "CHIL" r.rsons in
+  if !state.max_children > 0 && List.length chil_fields > !state.max_children then
+    let i = fam_index gen r.rval in
+    let f = { (Mutil.empty_family string_empty) with Def.fam_index = -1 } in
+    let c = Adef.couple 0 0 in
+    let d = { Def.children = [| |] } in
+    gen.g_fam.arr.(i) <- Either.Right (f, c, d)
+  else
   let i = fam_index gen r.rval in
   let (fath, moth, gay) =
     match find_all_fields "HUSB" r.rsons, find_all_fields "WIFE" r.rsons with
@@ -3040,6 +3051,9 @@ let check_parents_children persons ascends unions families couples descends stri
     let u = unions.(i) in
     let fam_to_delete =
       Array.fold_left begin fun acc ifam ->
+        let fam = families.(ifam) in
+        if fam.Def.fam_index = -1 then ifam :: acc
+        else
         let cpl = couples.(ifam) in
         if i <> Adef.father cpl && i <> Adef.mother cpl
         then begin
@@ -3131,7 +3145,8 @@ let check_parents_sex persons families couples strings =
     let imoth = Adef.mother cpl in
     let fath = persons.(ifath) in
     let moth = persons.(imoth) in
-    if fam.Def.relation = Def.NoSexesCheckNotMarried
+    if fam.Def.fam_index = -1
+    || fam.Def.relation = Def.NoSexesCheckNotMarried
     || fam.Def.relation = Def.NoSexesCheckMarried
     then ()
     else if fath.Def.sex = Female || moth.Def.sex = Def.Male then
@@ -3253,6 +3268,10 @@ let finish_base (persons, families, strings, _) =
   done;
   check_parents_sex persons families couples strings ;
   check_parents_children persons ascends unions families couples descends strings ;
+  for i = 0 to Array.length families - 1 do
+    if families.(i).Def.fam_index = -1 then
+      families.(i) <- { families.(i) with fam_index = i }
+  done;
   if !state.try_negative_dates then negative_dates persons ascends unions families couples
 
 let make_base state' =
