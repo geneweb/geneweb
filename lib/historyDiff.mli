@@ -6,9 +6,31 @@ type gen_record = {
   gen_f :
     (Geneweb_db.Driver.iper, Geneweb_db.Driver.ifam, string) Def.gen_family list;
   gen_c : Geneweb_db.Driver.iper array list;
+  gen_s : Geneweb_db.Driver.iper list;
 }
-(** Type that represents one update record stored in the history file for
-    concerned person. *)
+(** One update record of the history file of a person: the person, its families
+    with their children ([gen_c]) and spouses ([gen_s]), in the same order. The
+    files store persons by key, so that a record read back after a rebuild of
+    the base designates the same persons: a person whose key is no longer found
+    is left out of the lists, or is the dummy index in [gen_s], and a family is
+    found back by its spouse (dummy [fam_index] otherwise). A person whose key
+    is shared (["?"] names) is found back by its index only if this index still
+    holds that key and, for a child, a child of the family. Records written
+    before this format (GnHd0003) are read with their indexes as they were. *)
+
+type entry
+(** A record of a history file as stored, without reading its persons. *)
+
+val entry_date : entry -> Adef.safe_string
+val entry_wizard : entry -> Adef.safe_string
+
+val load_entries : Config.config -> string -> entry list
+(** [load_entries conf fname] Records of the history file [fname], the most
+    recent first. *)
+
+val write_entries : Config.config -> string -> entry list -> unit
+(** [write_entries conf fname entries] Rewrites the history file [fname] with
+    [entries], the oldest first, unchanged; removes it if [entries] is empty. *)
 
 val history_file : string -> string -> int -> string
 (** Returns history filename for the person with the given key. Has format :
@@ -52,9 +74,9 @@ val change_records :
     the record before. [None] if [change] has no main person or leaves its
     record unchanged. *)
 
-val output_record : out_channel -> gen_record -> unit
-(** Append a record to a history file. *)
-
-val load_person_history : Config.config -> string -> gen_record list
-(** Load list of modification records for a giving person's history file. The
-    most recent modification is at the head of the list *)
+val record_of_entry :
+  Geneweb_db.Driver.base -> entry list -> entry -> gen_record
+(** [record_of_entry base entries e] The record [e] of the history file whose
+    records are [entries], its persons read in [base]. The file follows the
+    renames of its person: the person of a record stored by key is the one of
+    the most recent record. *)
