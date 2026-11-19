@@ -7,3 +7,9 @@
   (glob_files_rec etc/{*.html,*.txt,*.woff,*.woff2,*.js,*.css,*.gz,*.br})
   (glob_files_rec images/*)
   (glob_files_rec lang/*)))
+
+(rule
+ (alias runtest)
+ (package geneweb)
+ (action
+  (run %{bin:gwlex} check %{dep:lang/lexicon.txt})))
