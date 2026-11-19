@@ -19,7 +19,7 @@ let ifam i = Driver.Ifam.of_string (string_of_int i)
 let istr i = Driver.Istr.of_string (string_of_int i)
 let ids hash l = List.sort compare (List.map hash l)
 
-let with_base bname k =
+let with_base ?(perm = Fun.id) bname k =
   let persons =
     Array.mapi
       (fun key_index (first_name, surname, occ, occupation) ->
@@ -53,8 +53,17 @@ let with_base bname k =
         (jean, ellipsis, 0, 0);
       |]
   in
-  let spouses = [| (3, 4); (9, 10); (11, 12); (15, 16) |] in
-  let children = [| [| 2; 5 |]; [||]; [| 13; 14 |]; [| 17 |] |] in
+  let persons =
+    Array.mapi (fun i _ -> { (persons.(perm i)) with key_index = i }) persons
+  in
+  let spouses =
+    Array.map
+      (fun (f, m) -> (perm f, perm m))
+      [| (3, 4); (9, 10); (11, 12); (15, 16) |]
+  in
+  let children =
+    Array.map (Array.map perm) [| [| 2; 5 |]; [||]; [| 13; 14 |]; [| 17 |] |]
+  in
   let families = [ 0; 1; 2; 3 ] in
   let n = Array.length persons in
   let data =
@@ -279,6 +288,51 @@ let test_key_change () =
   chk "unique key" (None, Some true) (rename 3 "DURAND");
   chk "shared key" (Some "old", Some false) (rename 7 "DURAND")
 
+let test_records_by_key () =
+  with_history_dir "records_test_history" @@ fun _ conf ->
+  let ipers l = String.concat "," (List.map Driver.Iper.to_string l) in
+  let read base file =
+    let entries = HistoryDiff.load_entries conf file in
+    List.map
+      (fun e ->
+        let (gr : HistoryDiff.gen_record) =
+          HistoryDiff.record_of_entry base entries e
+        in
+        String.concat " | "
+          [
+            Driver.Iper.to_string gr.gen_p.key_index;
+            String.concat ";"
+              (List.map (fun c -> ipers (Array.to_list c)) gr.gen_c);
+            ipers gr.gen_s;
+            String.concat ","
+              (List.map (fun f -> Driver.Ifam.to_string f.fam_index) gr.gen_f);
+            gr.gen_p.occupation;
+          ])
+      entries
+  in
+  let file =
+    with_base "history_records_test" @@ fun base ->
+    let o =
+      Util.string_gen_person base
+        (Driver.gen_person_of_person (Driver.poi base (iper jean)))
+    in
+    HistoryDiff.record_diff conf base
+      (U_Modify_person (o, { o with occupation = "farmer" }));
+    let file = HistoryDiff.history_file o.first_name o.surname o.occ in
+    check (list string) "same base"
+      [ "3 | 2,5 | 4 | 0 | farmer"; "3 | 2,5 | 4 | 0 | " ]
+      (read base file);
+    file
+  in
+  let swap a b i = if i = a then b else if i = b then a else i in
+  with_base
+    ~perm:(fun i -> swap jean 13 (swap 5 12 i))
+    "history_records_rebuilt"
+  @@ fun base ->
+  check (list string) "rebuilt base"
+    [ "13 | 2 | 4 | 0 | farmer"; "13 | 2 | 4 | 0 | " ]
+    (read base file)
+
 let test_acces () =
   with_base "index_links_test" @@ fun base ->
   let link access_by_key i =
@@ -312,6 +366,7 @@ let v =
       [
         test_case "archive of deleted persons" `Quick test_archive_deleted;
         test_case "key change" `Quick test_key_change;
+        test_case "records by key" `Quick test_records_by_key;
       ] );
     ("index-links", [ test_case "Util.acces" `Quick test_acces ]);
   ]

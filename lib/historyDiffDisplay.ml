@@ -5,7 +5,6 @@ open Def
 open Util
 open HistoryDiff
 module Driver = Geneweb_db.Driver
-module Gutil = Geneweb_db.Gutil
 
 let escape_html s = (Util.escape_html s :> Adef.safe_string)
 
@@ -23,7 +22,7 @@ let print_clean conf =
       Util.gen_print_tips conf
         ("select the input you want to erase from the history" |> transl conf
        |> Utf8.capitalize_fst |> Adef.safe);
-      let history = load_person_history conf f in
+      let history = load_entries conf f in
       Output.print_sstring conf {|<form method="post" action="|};
       Output.print_sstring conf conf.command;
       Output.print_sstring conf "\">";
@@ -37,9 +36,9 @@ let print_clean conf =
             Output.print_sstring conf {|<input type="checkbox" name="i|};
             Output.print_sstring conf (string_of_int i);
             Output.print_sstring conf {|" value="on">|};
-            Output.print_string conf gr.date;
+            Output.print_string conf (entry_date gr);
             Output.print_sstring conf {| |};
-            Output.print_string conf gr.HistoryDiff.wizard;
+            Output.print_string conf (entry_wizard gr);
             Output.print_sstring conf "</label></li>";
             loop (i + 1) l
       in
@@ -78,22 +77,8 @@ let print_clean_ok conf =
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
-      let history = load_person_history conf f in
-      let new_history = clean_history 0 history [] in
-      let fname = history_path conf f in
-      (if new_history = [] then Mutil.rm fname
-       else
-         let ext_flags =
-           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
-         in
-         match
-           try Some (Secure.open_out_gen ext_flags 0o644 fname)
-           with Sys_error _ -> None
-         with
-         | Some oc ->
-             List.iter (output_record oc) new_history;
-             close_out oc
-         | None -> ());
+      let history = load_entries conf f in
+      write_entries conf f (clean_history 0 history []);
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
@@ -814,12 +799,14 @@ let print_foreach conf base print_ast _eval_expr =
     | _ -> raise Not_found
   and print_foreach_family env xx al =
     let bef, aft, p_auth = xx in
-    let rec loop bef_f bef_c aft_f aft_c =
+    let spouse l =
+      match l with isp :: l -> (isp, l) | [] -> (Driver.Iper.dummy, [])
+    in
+    let rec loop bef_f bef_c bef_s aft_f aft_c aft_s =
       match (bef_f, aft_f) with
       | [], [] -> ()
       | [], gen_f :: l ->
-          let fam = Driver.foi base gen_f.fam_index in
-          let isp = Gutil.spouse aft.gen_p.key_index fam in
+          let isp, s = spouse aft_s in
           let sp = person_of_iper conf base isp in
           let m_auth =
             authorized_age conf base (Driver.poi base isp) && p_auth
@@ -838,10 +825,9 @@ let print_foreach conf base print_ast _eval_expr =
               |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
-          loop [] bef_c l c
+          loop [] bef_c bef_s l c s
       | gen_f :: l, [] ->
-          let fam = Driver.foi base gen_f.fam_index in
-          let isp = Gutil.spouse aft.gen_p.key_index fam in
+          let isp, s = spouse bef_s in
           let sp = person_of_iper conf base isp in
           let m_auth =
             authorized_age conf base (Driver.poi base isp) && p_auth
@@ -860,11 +846,10 @@ let print_foreach conf base print_ast _eval_expr =
               |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
-          loop l c [] aft_c
+          loop l c s [] aft_c aft_s
       | gen_f1 :: l1, gen_f2 :: l2 ->
-          let fam = Driver.foi base gen_f2.fam_index in
-          let isp1 = Gutil.spouse bef.gen_p.key_index fam in
-          let isp2 = Gutil.spouse aft.gen_p.key_index fam in
+          let isp1, s1 = spouse bef_s in
+          let isp2, s2 = spouse aft_s in
           let sp1 = person_of_iper conf base isp1 in
           let sp2 = person_of_iper conf base isp2 in
           let m_auth =
@@ -885,9 +870,9 @@ let print_foreach conf base print_ast _eval_expr =
               |> add "child" vchild)
           in
           List.iter (print_ast env xx) al;
-          loop l1 c1 l2 c2
+          loop l1 c1 s1 l2 c2 s2
     in
-    loop bef.gen_f bef.gen_c aft.gen_f aft.gen_c
+    loop bef.gen_f bef.gen_c bef.gen_s aft.gen_f aft.gen_c aft.gen_s
   and print_foreach_fevent env xx al =
     match get_env "fam" env with
     | Vfam (bef, aft, m_auth) ->
@@ -908,7 +893,7 @@ let print_foreach conf base print_ast _eval_expr =
   and print_foreach_history_line env xx al =
     match get_env "history_file" env with
     | Vstring fname ->
-        let history = load_person_history conf fname in
+        let history = load_entries conf fname in
         let rec loop i list =
           match list with
           | [] -> ()
@@ -917,11 +902,11 @@ let print_foreach conf base print_ast _eval_expr =
                 Templ.Env.empty
                 |> Templ.Env.add "line" (Vint i)
                 |> Templ.Env.add "date"
-                     (Vstring (gr.date : Adef.safe_string :> string))
-                |> Templ.Env.add "date_epoch" (Vstring (date_epoch_str gr.date))
+                     (Vstring (entry_date gr : Adef.safe_string :> string))
+                |> Templ.Env.add "date_epoch"
+                     (Vstring (date_epoch_str (entry_date gr)))
                 |> Templ.Env.add "wizard"
-                     (Vstring
-                        (gr.HistoryDiff.wizard : Adef.safe_string :> string))
+                     (Vstring (entry_wizard gr : Adef.safe_string :> string))
               in
               List.iter (print_ast env xx) al;
               loop (i + 1) l
@@ -980,7 +965,7 @@ let print conf base =
   | Some ("SUM" | "DIFF") -> (
       match p_getenv conf.env "f" with
       | Some file when file <> "" ->
-          let history = load_person_history conf file in
+          let history = load_entries conf file in
           let len = List.length history in
           let before, after =
             match (p_getint conf.env "old", p_getint conf.env "new") with
@@ -994,8 +979,8 @@ let print conf base =
                 (o, n)
             | _ -> (0, 0)
           in
-          let before = List.nth history before in
-          let after = List.nth history after in
+          let before = record_of_entry base history (List.nth history before) in
+          let after = record_of_entry base history (List.nth history after) in
           let p = person_of_gen_p_key base after.gen_p in
           let p_auth = authorized_age conf base p in
           let env =
