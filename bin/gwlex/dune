@@ -1,0 +1,5 @@
+(executable
+ (package geneweb)
+ (name gwlex)
+ (public_name gwlex)
+ (libraries cmdliner geneweb.templ))
