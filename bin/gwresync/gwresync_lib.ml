@@ -327,11 +327,11 @@ end = struct
       let ifams_collection = Gwdb.ifams base in
       let store = Store.create ipers_collection ifams_collection in
       let ancestor_stack_queue = Queue.create () in
-      if verbosity >= 1 then ProgrBar.start ();
+      if verbosity >= 2 then ProgrBar.start ();
       Gwdb.Collection.iteri
         (fun i iper ->
           find_person_date base store ancestor_stack_queue iper;
-          if verbosity >= 1 then ProgrBar.run i n)
+          if verbosity >= 2 then ProgrBar.run i n)
         ipers_collection;
       let rec work_until_no_progress ancestor_stack_queue n_ancestor_stack_queue
           progress =
@@ -353,7 +353,7 @@ end = struct
             progress
       in
       work_until_no_progress ancestor_stack_queue (Queue.create ()) false;
-      if verbosity >= 1 then ProgrBar.finish ();
+      if verbosity >= 2 then ProgrBar.finish ();
       store
   end
 
@@ -363,25 +363,25 @@ end = struct
     let ipers = Gwdb.ipers base in
     let old = Gwdb.iper_marker ipers false in
     let scanned = Gwdb.iper_marker ipers (-1) in
-    if verbosity >= 1 then ProgrBar.start ();
+    if verbosity >= 2 then ProgrBar.start ();
     Gwdb.Collection.iteri
       (fun i ip ->
-        if verbosity >= 1 then ProgrBar.run i nb;
+        if verbosity >= 2 then ProgrBar.run i nb;
         if Gwdb.Marker.get scanned ip < 0 then
           let p = Gwdb.poi base ip in
           mark_descendants base scanned old cutoff_year p 0)
       ipers;
-    if verbosity >= 1 then ProgrBar.finish ();
+    if verbosity >= 2 then ProgrBar.finish ();
     let scanned_anc = Gwdb.iper_marker ipers false in
-    if verbosity >= 1 then ProgrBar.start ();
+    if verbosity >= 2 then ProgrBar.start ();
     Gwdb.Collection.iteri
       (fun i ip ->
-        if verbosity >= 1 then ProgrBar.run i nb;
+        if verbosity >= 2 then ProgrBar.run i nb;
         if Gwdb.Marker.get old ip && not (Gwdb.Marker.get scanned_anc ip) then
           let p = Gwdb.poi base ip in
           mark_ancestors base scanned_anc cutoff_year changes p)
       ipers;
-    if verbosity >= 1 then ProgrBar.finish ();
+    if verbosity >= 2 then ProgrBar.finish ();
     let store = DatesStore.of_base base ~verbosity in
     let changed_by_dates =
       DatesStore.fold
@@ -604,14 +604,14 @@ end = struct
         Buffer.add_string buffer (Gwdb.sou base istr);
         Buffer.add_char buffer ' ')
     in
-    if verbosity >= 1 then (
+    if verbosity >= 2 then (
       ProgrBar.full := '*';
       Printf.eprintf "--- individual notes\n";
       flush stderr;
       ProgrBar.start ());
     Gwdb.Collection.iteri
       (fun i p ->
-        if verbosity >= 1 then ProgrBar.run i nb_ind;
+        if verbosity >= 2 then ProgrBar.run i nb_ind;
         Buffer.reset buffer;
         add_string (Gwdb.get_notes p);
         add_string (Gwdb.get_occupation p);
@@ -638,14 +638,14 @@ end = struct
                   (Def.NLDB.PgInd (Gwdb.get_iper p))
                   list)
       (Gwdb.persons base);
-    if verbosity >= 1 then (
+    if verbosity >= 2 then (
       ProgrBar.finish ();
       Printf.eprintf "--- families notes\n";
       flush stderr;
       ProgrBar.start ());
     Gwdb.Collection.iteri
       (fun i fam ->
-        if verbosity >= 1 then ProgrBar.run i nb_fam;
+        if verbosity >= 2 then ProgrBar.run i nb_fam;
         Buffer.reset buffer;
         add_string (Gwdb.get_comment fam);
         add_string (Gwdb.get_fsources fam);
@@ -665,7 +665,7 @@ end = struct
                   (Def.NLDB.PgFam (Gwdb.get_ifam fam))
                   list)
       (Gwdb.families base);
-    if verbosity >= 1 then ProgrBar.finish ();
+    if verbosity >= 2 then ProgrBar.finish ();
     Gwdb.write_nldb base !db
 end
 
@@ -736,21 +736,33 @@ let main () =
           let changes = ref false in
           Option.iter
             (fun y ->
+              if !verbosity >= 1 then (
+                Printf.printf "Applying cutoff date (%d)...\n" y;
+                flush stdout);
               if
                 Privacy.apply_cutoff_date ~base ~cutoff_year:y
                   ~verbosity:!verbosity
               then changes := true)
             !cutoff_year;
-          if !whitelist_file <> "" then
+          if !whitelist_file <> "" then (
+            if !verbosity >= 1 then (
+              Printf.printf "Applying whitelist...\n";
+              flush stdout);
             if
               Privacy.apply_list ~base ~access:Def.Public ~file:!whitelist_file
                 ~verbosity:!verbosity
-            then changes := true;
-          if !blacklist_file <> "" then
+            then changes := true);
+          if !blacklist_file <> "" then (
+            if !verbosity >= 1 then (
+              Printf.printf "Applying blacklist...\n";
+              flush stdout);
             if
               Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
                 ~verbosity:!verbosity
-            then changes := true;
+            then changes := true);
+          if !verbosity >= 1 then (
+            Printf.printf "Checking integrity and repairing...\n";
+            flush stdout);
           let fix_count = Integrity.perform_fixes ~base ~verbosity:!verbosity in
           if fix_count > 0 then changes := true;
           let has_loop = CycleCheck.detect_loop ~base in
@@ -767,6 +779,9 @@ let main () =
               Consanguinity.compute ~base ~scratch:false ~verbosity:!verbosity
             in
             if consang_patched then changes := true);
+          if !verbosity >= 1 then (
+            Printf.printf "Indexing notes...\n";
+            flush stdout);
           NotesIndexing.compute ~base ~bdir:!bname ~verbosity:!verbosity;
           if !changes then (
             if !verbosity >= 1 then (

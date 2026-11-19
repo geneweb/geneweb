@@ -20,7 +20,6 @@ let trace verbosity cnt max_cnt =
   if verbosity >= 2 then (
     Printf.eprintf "%7d\008\008\008\008\008\008\008" cnt;
     flush stderr)
-  else if verbosity >= 1 then ProgrBar.run (max_cnt - cnt) max_cnt
 
 let consang_array base =
   let patched = ref false in
@@ -71,12 +70,11 @@ let compute ?(verbosity = 2) base from_scratch =
      (* number of persons which need consanguinity to be computed *)
      let max_cnt = !cnt in
      let most = ref None in
-     if verbosity >= 1 then Printf.eprintf "To do: %d persons\n" max_cnt;
+     if verbosity >= 2 then Printf.eprintf "To do: %d persons\n" max_cnt;
      if max_cnt <> 0 then
        if verbosity >= 2 then (
          Printf.eprintf "Computing consanguinity...";
-         flush stderr)
-       else if verbosity >= 1 then ProgrBar.start ();
+         flush stderr);
      let running = ref true in
      while !running do
        running := false;
@@ -131,7 +129,6 @@ let compute ?(verbosity = 2) base from_scratch =
        if verbosity >= 2 then (
          Printf.eprintf " done   \n";
          flush stderr)
-       else if verbosity >= 1 then ProgrBar.finish ()
    with Sys.Break when verbosity > 0 ->
      Printf.eprintf "\n";
      flush stderr;
