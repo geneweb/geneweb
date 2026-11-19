@@ -505,7 +505,21 @@ let signers_of sources =
 
 (* A history line is "YYYY-MM-DD HH:MM:SS [wizard] action (fn.occ sn)", written
    by History.record; times sort as strings. For the persons in [wanted], the
-   first and the last line naming them. The file is read line by line. *)
+   first and the last line naming them. The file is read line by line.
+   Lines written by a mass update (dictionaries m=MOD_DATA, grouping of
+   spellings) are skipped: the wizard who ran it did not edit the person, so
+   such a line must neither attribute the person's anomalies to him nor make
+   them look recent. *)
+let mass_update_actions =
+  [ "mo"; "mq"; "ms"; "fn"; "sn"; "ma"; "mu"; "mx"; "mt"; "md"; "fa"; "sa" ]
+
+let is_mass_update line j =
+  let start = j + 2 in
+  match String.index_from_opt line start ' ' with
+  | Some e when e > start ->
+      List.mem (String.sub line start (e - start)) mass_update_actions
+  | Some _ | None -> false
+
 let history_changes ?(verbose = false) ~history_file wanted =
   let tbl = Hashtbl.create 1024 in
   let parse line =
@@ -513,6 +527,7 @@ let history_changes ?(verbose = false) ~history_file wanted =
     if len > 22 && line.[20] = '[' && line.[len - 1] = ')' then
       match String.index_from_opt line 21 ']' with
       | None -> ()
+      | Some j when is_mass_update line j -> ()
       | Some j -> (
           match String.rindex_opt line '(' with
           | Some k when k > j ->
