@@ -1,0 +1,244 @@
+<!-- $Id: gwdstats.txt v7.1 19/11/2026 08:30:00 $ -->
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <title>[*server statistics] — %bname;</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%message_to_wizard;
+%include;home
+
+<div class="container-fluid px-3 px-lg-5 mt-3">
+<h1 class="h3 mb-3">
+  <i class="fa fa-chart-line me-2"></i>[*server statistics] — %bname;
+</h1>
+
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <div class="btn-group" role="group" aria-label="[*day/week/month]0, [day/week/month]1, [day/week/month]2">
+    <a class="btn btn-outline-primary" id="gs-p-day">[*day/week/month]0</a>
+    <a class="btn btn-outline-primary" id="gs-p-week">[*day/week/month]1</a>
+    <a class="btn btn-outline-primary" id="gs-p-month">[*day/week/month]2</a>
+  </div>
+  <div class="btn-group" role="group">
+    <a class="btn btn-outline-secondary" id="gs-prev" title="[*previous]">
+      <i class="fa fa-chevron-left" aria-hidden="true"></i>
+      <span class="visually-hidden">[*previous]</span></a>
+    <a class="btn btn-outline-secondary" id="gs-today">[*today]</a>
+    <a class="btn btn-outline-secondary" id="gs-next" title="[*next]">
+      <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      <span class="visually-hidden">[*next]</span></a>
+  </div>
+  <input type="date" class="form-control w-auto" id="gs-date" aria-label="[*date/dates]0">
+  <span class="ms-2 fw-bold" id="gs-title"></span>
+</div>
+
+<div id="gs-loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">[*loading/error]0</span>
+  </div>
+</div>
+<div id="gs-error" class="alert alert-danger d-none" role="alert"></div>
+<div id="gs-empty" class="alert alert-info d-none">[*no data]</div>
+
+<div id="gs-content" class="d-none">
+  <div class="row" id="gs-kpi"></div>
+  <div class="row">
+    <div class="col-12 col-xl-6 mb-3"><div class="card"><div class="card-body">
+      <h2 class="h6">[*connection/connections]1</h2>
+      <div style="height:280px"><canvas id="gs-conn"></canvas></div>
+    </div></div></div>
+    <div class="col-12 col-xl-6 mb-3"><div class="card"><div class="card-body">
+      <h2 class="h6">[*traffic]</h2>
+      <div style="height:280px"><canvas id="gs-traffic"></canvas></div>
+    </div></div></div>
+    <div class="col-12 mb-3"><div class="card"><div class="card-body">
+      <h2 class="h6">[*response time]</h2>
+      <div style="height:300px"><canvas id="gs-time"></canvas></div>
+    </div></div></div>
+  </div>
+</div>
+
+%include;trl
+%include;copyr
+</div><!-- container-fluid -->
+%include;js
+
+<script>
+var GS = {
+  url: "%prefix;m=GWD_STATS",
+  L: {
+    conn:"[*connection/connections]1", total:"[*total]", max:"[*maximum]",
+    wiz:"[*wizard/wizards/friend/friends/exterior]1", fri:"[*wizard/wizards/friend/friends/exterior]3",
+    sent:"[*received/sent]1", recv:"[*received/sent]0", kbs:"[kilobytes per second]",
+    bu:%["[B/kB/MB/GB/TB]0","[B/kB/MB/GB/TB]1","[B/kB/MB/GB/TB]2","[B/kB/MB/GB/TB]3","[B/kB/MB/GB/TB]4"%],
+    mean:"[*mean (average)]", rpm:"[*requests per minute]", s:"[s (seconds)]",
+    req:"[*request/requests]1",
+    per:%["[*day/week/month]0","[*day/week/month]1","[*day/week/month]2"%],
+    ds:"[(decimal separator)]", ts:"[(thousand separator)]"
+  }
+};
+
+(function() {
+var C = {
+  b:"rgba(54,162,235,1)", bA:"rgba(54,162,235,0.15)",
+  r:"rgba(255,99,132,1)", g:"rgba(75,192,192,1)", gA:"rgba(75,192,192,0.15)",
+  o:"rgba(255,159,64,1)", p:"rgba(153,102,255,1)", n:"rgba(160,160,160,0.35)"
+};
+Chart.defaults.animation = false;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.datasets.line.spanGaps = false;
+Chart.defaults.datasets.line.pointRadius = 0;
+Chart.defaults.interaction = {mode:"index", intersect:false};
+
+var q = new URLSearchParams(location.search);
+var period = q.get("p") || "day";
+if (%["day","week","month"%].indexOf(period) < 0) period = "day";
+var day = q.get("d") || "";
+
+function num(n, d) {
+  if (n == null) return "—";
+  var s = n.toFixed(d).split(".");
+  s%[0%] = s%[0%].replace(/\B(?=(\d{3})+(?!\d))/g, GS.L.ts);
+  return s.join(GS.L.ds);
+}
+function bytes(n) {
+  var u = GS.L.bu, i = 0;
+  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return num(n, i ? 1 : 0) + " " + u%[i%];
+}
+function href(p, d) {
+  return GS.url + "&p=" + p + (d ? "&d=" + d : "");
+}
+function link(id, url) {
+  var a = document.getElementById(id);
+  if (url) { a.href = url; a.classList.remove("disabled"); a.removeAttribute("aria-disabled"); }
+  else { a.removeAttribute("href"); a.classList.add("disabled"); a.setAttribute("aria-disabled", "true"); }
+}
+function kpi(label, value, color) {
+  var d = document.createElement("div");
+  d.className = "col-6 col-md-4 col-lg-2 mb-2";
+  d.innerHTML = '<div class="card" style="border-left:4px solid ' + color + '">'
+    + '<div class="card-body py-2 px-3">'
+    + '<div class="text-body-secondary small">' + label + '</div>'
+    + '<div class="h5 mb-0 fw-bold">' + value + '</div></div></div>';
+  document.getElementById("gs-kpi").appendChild(d);
+}
+function show(id) {
+  %["gs-loading","gs-error","gs-empty","gs-content"%].forEach(function(x) {
+    document.getElementById(x).classList.toggle("d-none", x !== id);
+  });
+}
+function xTicks(n) { return {maxTicksLimit: period === "day" ? 12 : period === "week" ? 14 : 16, autoSkip:true}; }
+
+%["day","week","month"%].forEach(function(p) {
+  var a = document.getElementById("gs-p-" + p);
+  a.href = href(p, day);
+  if (p === period) { a.classList.add("active"); a.setAttribute("aria-current", "page"); }
+});
+link("gs-today", href(period, ""));
+var inp = document.getElementById("gs-date");
+inp.addEventListener("change", function() { if (inp.value) location = href(period, inp.value); });
+
+fetch(href(period, day) + "&json=1").then(function(r) {
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}).then(function(D) {
+  var L = GS.L, T = D.totals;
+  link("gs-prev", D.prev ? href(period, D.prev) : null);
+  link("gs-next", D.next ? href(period, D.next) : null);
+  inp.value = D.day;
+  if (D.first) inp.min = D.first;
+  var now = new Date();
+  inp.max = new Date(now - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  document.getElementById("gs-title").textContent =
+    L.per%[%["day","week","month"%].indexOf(period)%] + " — " + D.day;
+  if (!T.snapshots) { show("gs-empty"); return; }
+  show("gs-content");
+
+  kpi(L.req, num(T.requests, 0), C.p);
+  kpi(L.mean, num(T.mean, 3) + " " + L.s, C.o);
+  kpi(L.max, num(T.max, 3) + " " + L.s, C.r);
+  kpi(L.sent, bytes(T.bytes_out), C.b);
+  kpi(L.recv, bytes(T.bytes_in), C.g);
+  kpi(L.max + " — " + L.conn, num(T.conn_max, 0), C.n);
+
+  var agg = period !== "day";
+  var connSets = %[
+    {label:L.total, data:D.conn, borderColor:C.b, backgroundColor:C.bA, fill:true, stepped:!agg},
+    {label:L.wiz, data:D.wiz, borderColor:C.o, stepped:!agg},
+    {label:L.fri, data:D.fri, borderColor:C.g, stepped:!agg}
+  %];
+  if (agg) connSets.push({label:L.max, data:D.conn_max, borderColor:C.b, borderDash:%[4,4%], borderWidth:1});
+  new Chart(document.getElementById("gs-conn"), {
+    type:"line",
+    data:{labels:D.labels, datasets:connSets},
+    options:{maintainAspectRatio:false, scales:{x:{ticks:xTicks()}, y:{beginAtZero:true}}}
+  });
+
+  new Chart(document.getElementById("gs-traffic"), {
+    type:"line",
+    data:{labels:D.labels, datasets:%[
+      {label:L.sent, data:D.out_kbs, borderColor:C.b, backgroundColor:C.bA, fill:true},
+      {label:L.recv, data:D.in_kbs, borderColor:C.g, backgroundColor:C.gA, fill:true}
+    %]},
+    options:{maintainAspectRatio:false,
+      scales:{x:{ticks:xTicks()}, y:{beginAtZero:true, title:{display:true, text:L.kbs}}}}
+  });
+
+  /* lower bound: the power of ten below the smallest mean (log axes have
+     no zero), ticks only at 1, 2 and 5 times a power of ten */
+  var pos = D.mean.concat(D.max).filter(function(v) { return v > 0; });
+  var logMin = pos.length
+    ? Math.pow(10, Math.floor(Math.log10(Math.min.apply(null, pos))))
+    : 0.01;
+  /* upper bound: the first 1, 2 or 5 times a power of ten above the max */
+  var logMax = (function(m) {
+    var p = Math.pow(10, Math.floor(Math.log10(m)));
+    return %[1, 2, 5, 10%].map(function(k) { return k * p; })
+      .filter(function(v) { return v >= m * 1.0001; })%[0%];
+  })(pos.length ? Math.max.apply(null, pos) : 1);
+  function isStep(v) {
+    var m = v / Math.pow(10, Math.floor(Math.log10(v) + 1e-9));
+    return %[1, 2, 5%].some(function(k) { return Math.abs(m - k) < 1e-6; });
+  }
+  function logTick(v) {
+    if (!isStep(v)) return "";
+    return num(v, v < 1 ? Math.min(3, Math.ceil(-Math.log10(v) - 1e-9)) : 0);
+  }
+
+  new Chart(document.getElementById("gs-time"), {
+    data:{labels:D.labels, datasets:%[
+      {type:"line", label:L.mean, data:D.mean, borderColor:C.o, yAxisID:"y", order:1},
+      {type:"line", label:L.max, data:D.max, borderColor:C.r, showLine:false,
+       pointRadius:2, yAxisID:"y", order:2},
+      {type:"bar", label:L.rpm, data:D.req_min, backgroundColor:C.n, yAxisID:"y1", order:3}
+    %]},
+    options:{maintainAspectRatio:false, scales:{
+      x:{ticks:xTicks()},
+      /* logarithmic: a single request of several tens of seconds must not
+         flatten a mean of a fraction of a second */
+      y:{type:"logarithmic", position:"left", title:{display:true, text:L.s},
+         min:logMin, max:logMax, ticks:{callback:logTick, autoSkip:false},
+         grid:{color:function(c) {
+           return c.tick && isStep(c.tick.value) ? "rgba(0,0,0,0.1)" : "transparent";
+         }}},
+      y1:{beginAtZero:true, position:"right", grid:{drawOnChartArea:false},
+          title:{display:true, text:L.rpm}}
+    }}
+  });
+}).catch(function(e) {
+  var el = document.getElementById("gs-error");
+  el.textContent = e.message;
+  show("gs-error");
+});
+})();
+</script>
+</body>
+</html>

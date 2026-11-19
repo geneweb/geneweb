@@ -34,6 +34,8 @@ let bfile conf = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb")
 let cnt_file conf suffix =
   Filename.concat (Util.test_cnt_d conf) (conf.bname ^ suffix)
 
+let stats_file conf = cnt_file conf "_stats.txt"
+
 (* accumulator file: "count total max since bytes_in bytes_out" on one line;
    a line without the byte counts (previous format) reads them as 0 *)
 let read_acc fname tm =
@@ -87,7 +89,7 @@ let snapshot conf ~window tm r =
     | Some cn -> (cn.cn_total, cn.cn_wizards, cn.cn_friends)
     | None -> (0, 0, 0)
   in
-  let fname = cnt_file conf "_stats.txt" in
+  let fname = stats_file conf in
   let is_new = not (Sys.file_exists fname) in
   Secure.with_open_out_gen
     [ Open_wronly; Open_creat; Open_append; Open_text ]

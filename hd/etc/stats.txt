@@ -30,6 +30,9 @@
 
 <ul>
   <li><a href="%prefix;m=STATS">[*statistics] — %bname;</a></li>
+  %if;(wizard and bvar.stats_period!="" and bvar.stats_period!="0")
+    <li><a href="%prefix;m=GWD_STATS">[*server statistics] — %bname;</a></li>
+  %end;
   <li><a href="%prefix;m=LB&k=%n;">%apply;births(n)</a></li>
   <li><a href="%prefix;m=LD&k=%n;">%apply;deaths(n)</a></li>
   <li><a href="%prefix;m=LM&k=%n;">%apply;marriages(n)</a></li>

@@ -32,3 +32,6 @@ val record :
     content). Takes a snapshot if one is due. [window] is the robot observation
     window, in seconds. Does nothing when the statistics are disabled or the
     base does not exist; errors are ignored. *)
+
+val stats_file : Geneweb.Config.config -> string
+(** [stats_file conf] is the path of the snapshot file of the base of [conf]. *)

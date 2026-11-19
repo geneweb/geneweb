@@ -638,6 +638,8 @@ let treat_request =
              | "MOD_GALLERY_OK" ->
                  w_wizard @@ w_lock @@ w_base
                  @@ NotesDisplay.print_mod_gallery_ok conn
+             | "GWD_STATS" ->
+                 w_wizard @@ w_base @@ fun conf _ -> StatsChart.print conf
              | "H" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with
