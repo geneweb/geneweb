@@ -400,7 +400,7 @@ end = struct
     in
     !changes || changed_by_dates
 
-  let access_some_aux base access key changes =
+  let access_some_aux ~verbosity base access key changes =
     let ip_opt =
       match Gutil.person_ht_find_all base key with
       | [ ip ] -> Some ip
@@ -414,10 +414,11 @@ end = struct
           Gwdb.patch_person base gen_p.Def.key_index gen_p;
           changes := true)
     | None ->
-        Printf.eprintf "Bad key %s\n" key;
-        flush stderr
+        if verbosity >= 1 then (
+          Printf.eprintf "Bad key %s\n" key;
+          flush stderr)
 
-  let apply_list ~base ~access ~file ~verbosity:_ =
+  let apply_list ~base ~access ~file ~verbosity =
     if file = "" || not (Sys.file_exists file) then false
     else
       let changes = ref false in
@@ -428,16 +429,17 @@ end = struct
           try
             while true do
               let line = String.trim (input_line ic) in
-              if line <> "" then access_some_aux base access line changes
+              if line <> "" then
+                access_some_aux ~verbosity base access line changes
             done;
             !changes
           with End_of_file -> !changes)
 end
 
 module Integrity : sig
-  val perform_fixes : base:Gwdb.base -> fast:bool -> verbosity:int -> int
+  val perform_fixes : base:Gwdb.base -> verbosity:int -> int
 end = struct
-  let perform_fixes ~base ~fast:_ ~verbosity =
+  let perform_fixes ~base ~verbosity =
     let person_fixes =
       [
         Geneweb.Fixbase.fix_invalid_occurrence_number;
@@ -667,39 +669,37 @@ end = struct
     Gwdb.write_nldb base !db
 end
 
-let bname = ref ""
-let fast = ref false
-let cutoff_year = ref (None : int option)
-let whitelist_file = ref ""
-let blacklist_file = ref ""
-let no_consang = ref false
-let verbosity = ref 2
-
-let speclist =
-  [
-    ( "-y",
-      Arg.Int (fun y -> cutoff_year := Some y),
-      "<year> Cutoff year for public/private date estimation." );
-    ( "--whitelist",
-      Arg.String (fun s -> whitelist_file := s),
-      "<file> File containing whitelist person keys." );
-    ( "--blacklist",
-      Arg.String (fun s -> blacklist_file := s),
-      "<file> File containing blacklist person keys." );
-    ("--no-consang", Arg.Set no_consang, " Skip consanguinity calculation.");
-    ("-fast", Arg.Set fast, " Fast mode (load arrays in memory).");
-    ("-q", Arg.Unit (fun () -> verbosity := 1), " Quiet mode.");
-    ("-qq", Arg.Unit (fun () -> verbosity := 0), " Very quiet mode.");
-    ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database.");
-  ]
-
-let anonfun s =
-  if !bname = "" then bname := s
-  else raise (Arg.Bad "Cannot process multiple databases.")
-
-let usage = "Usage: gwresync [options] <base>"
-
 let main () =
+  let bname = ref "" in
+  let fast = ref false in
+  let cutoff_year = ref (None : int option) in
+  let whitelist_file = ref "" in
+  let blacklist_file = ref "" in
+  let no_consang = ref false in
+  let verbosity = ref 2 in
+  let speclist =
+    [
+      ( "-y",
+        Arg.Int (fun y -> cutoff_year := Some y),
+        "<year> Cutoff year for public/private date estimation." );
+      ( "--whitelist",
+        Arg.String (fun s -> whitelist_file := s),
+        "<file> File containing whitelist person keys." );
+      ( "--blacklist",
+        Arg.String (fun s -> blacklist_file := s),
+        "<file> File containing blacklist person keys." );
+      ("--no-consang", Arg.Set no_consang, " Skip consanguinity calculation.");
+      ("-fast", Arg.Set fast, " Fast mode (load arrays in memory).");
+      ("-q", Arg.Unit (fun () -> verbosity := 1), " Quiet mode.");
+      ("-qq", Arg.Unit (fun () -> verbosity := 0), " Very quiet mode.");
+      ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database.");
+    ]
+  in
+  let anonfun s =
+    if !bname = "" then bname := s
+    else raise (Arg.Bad "Cannot process multiple databases.")
+  in
+  let usage = "Usage: gwresync [options] <base>" in
   Arg.parse (Arg.align speclist) anonfun usage;
   if !bname = "" then (
     Printf.eprintf "Missing database name\n";
@@ -751,9 +751,7 @@ let main () =
               Privacy.apply_list ~base ~access:Def.Private ~file:!blacklist_file
                 ~verbosity:!verbosity
             then changes := true;
-          let fix_count =
-            Integrity.perform_fixes ~base ~fast:!fast ~verbosity:!verbosity
-          in
+          let fix_count = Integrity.perform_fixes ~base ~verbosity:!verbosity in
           if fix_count > 0 then changes := true;
           let has_loop = CycleCheck.detect_loop ~base in
           if has_loop then (

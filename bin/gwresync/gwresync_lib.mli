@@ -13,7 +13,7 @@ module Privacy : sig
 end
 
 module Integrity : sig
-  val perform_fixes : base:Gwdb.base -> fast:bool -> verbosity:int -> int
+  val perform_fixes : base:Gwdb.base -> verbosity:int -> int
   (** Perform database integrity checks and repairs. Returns the count of fixes performed. *)
 end
 
