@@ -510,28 +510,32 @@ module NotesIndexing : sig
   val compute : base:Gwdb.base -> bdir:string -> verbosity:int -> unit
 end = struct
   let notes_links s =
-    let slen = String.length s in
-    let rec loop list_nt list_ind pos i =
-      if i = slen then (list_nt, list_ind)
-      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
-      else
-        match Geneweb.NotesLinks.misc_notes_link s i with
-        | Geneweb.NotesLinks.WLpage (j, _, lfname, _, _) ->
-            let list_nt =
-              if List.mem lfname list_nt then list_nt else lfname :: list_nt
-            in
-            loop list_nt list_ind pos j
-        | Geneweb.NotesLinks.WLperson (j, key, _, text) ->
-            let list_ind =
-              let link = { Def.NLDB.lnTxt = text; lnPos = pos } in
-              (key, link) :: list_ind
-            in
-            loop list_nt list_ind (pos + 1) j
-        | Geneweb.NotesLinks.WLwizard (j, _, _) ->
-            loop list_nt list_ind (pos + 1) j
-        | Geneweb.NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
-    in
-    loop [] [] 1 0
+    if not (String.contains s '[') then ([], [])
+    else
+      let slen = String.length s in
+      let rec loop list_nt list_ind pos i =
+        if i >= slen then (list_nt, list_ind)
+        else if s.[i] = '%' && i + 1 < slen then
+          loop list_nt list_ind pos (i + 2)
+        else if s.[i] = '[' then
+          match Geneweb.NotesLinks.misc_notes_link s i with
+          | Geneweb.NotesLinks.WLpage (j, _, lfname, _, _) ->
+              let list_nt =
+                if List.mem lfname list_nt then list_nt else lfname :: list_nt
+              in
+              loop list_nt list_ind pos j
+          | Geneweb.NotesLinks.WLperson (j, key, _, text) ->
+              let list_ind =
+                let link = { Def.NLDB.lnTxt = text; lnPos = pos } in
+                (key, link) :: list_ind
+              in
+              loop list_nt list_ind (pos + 1) j
+          | Geneweb.NotesLinks.WLwizard (j, _, _) ->
+              loop list_nt list_ind (pos + 1) j
+          | Geneweb.NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
+        else loop list_nt list_ind pos (i + 1)
+      in
+      loop [] [] 1 0
 
   let compute ~base ~bdir ~verbosity =
     let bdir =
@@ -600,8 +604,9 @@ end = struct
     loop Filename.current_dir_name "";
     let buffer = Buffer.create 1024 in
     let add_string istr =
-      Buffer.add_string buffer (Gwdb.sou base istr);
-      Buffer.add_char buffer ' '
+      if not (Gwdb.is_empty_string istr) then (
+        Buffer.add_string buffer (Gwdb.sou base istr);
+        Buffer.add_char buffer ' ')
     in
     if verbosity >= 1 then (
       ProgrBar.full := '*';
@@ -628,13 +633,14 @@ end = struct
             add_string (Gwdb.get_pevent_note pe);
             add_string (Gwdb.get_pevent_src pe))
           (Gwdb.get_pevents p);
-        match notes_links (Buffer.contents buffer) with
-        | [], [] -> ()
-        | list ->
-            db :=
-              Geneweb.NotesLinks.add_in_db !db
-                (Def.NLDB.PgInd (Gwdb.get_iper p))
-                list)
+        if Buffer.length buffer > 0 then
+          match notes_links (Buffer.contents buffer) with
+          | [], [] -> ()
+          | list ->
+              db :=
+                Geneweb.NotesLinks.add_in_db !db
+                  (Def.NLDB.PgInd (Gwdb.get_iper p))
+                  list)
       (Gwdb.persons base);
     if verbosity >= 1 then (
       ProgrBar.finish ();
@@ -654,13 +660,14 @@ end = struct
             add_string (Gwdb.get_fevent_note fe);
             add_string (Gwdb.get_fevent_src fe))
           (Gwdb.get_fevents fam);
-        match notes_links (Buffer.contents buffer) with
-        | [], [] -> ()
-        | list ->
-            db :=
-              Geneweb.NotesLinks.add_in_db !db
-                (Def.NLDB.PgFam (Gwdb.get_ifam fam))
-                list)
+        if Buffer.length buffer > 0 then
+          match notes_links (Buffer.contents buffer) with
+          | [], [] -> ()
+          | list ->
+              db :=
+                Geneweb.NotesLinks.add_in_db !db
+                  (Def.NLDB.PgFam (Gwdb.get_ifam fam))
+                  list)
       (Gwdb.families base);
     if verbosity >= 1 then ProgrBar.finish ();
     Gwdb.write_nldb base !db
