@@ -23,8 +23,9 @@
   dune-site
   dune-site.plugins
   ipaddr
-  cmdliner)
- (modules request sites cmd cmd_legacy robot gwd_oidc statsLog))
+  cmdliner
+  yojson)
+ (modules request sites cmd cmd_legacy robot gwd_oidc statsLog statsChart))
 
 (executable
  (package geneweb)

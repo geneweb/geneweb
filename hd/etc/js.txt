@@ -26,7 +26,7 @@
                           sha512-jnJULRe2dV5oN2LwUy2iZBBOi+HrZEWCNlpNekNdHki5gC+GYwMzwtZkFxKK5MEte+BHfZusQDblZWqkgvNldw=="
                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
-    %if;(e.m="STATS")
+    %if;(e.m="STATS" or e.m="GWD_STATS")
       <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
               integrity="sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo=
                          sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ
@@ -41,7 +41,7 @@
     %if;(e.m="MOD_DATA" and e.s="")
       <script src="%etc_prefix;js/regex.min.js?version=6.1.0"></script>
     %end;
-    %if;(e.m="STATS")
+    %if;(e.m="STATS" or e.m="GWD_STATS")
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
   %end;

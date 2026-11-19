@@ -22574,6 +22574,342 @@ sl: statistike
 sv: statistik
 tr: i̇statistik
 
+    server statistics
+bg: статистика на сървъра
+co: statistiche di u servitore
+cs: statistiky serveru
+da: serverstatistik
+de: Serverstatistik
+en: server statistics
+eo: statistikoj de la servilo
+es: estadísticas del servidor
+et: serveri statistika
+fi: palvelimen tilastot
+fr: statistiques du serveur
+he: סטטיסטיקות שרת
+it: statistiche del server
+lt: serverio statistika
+lv: servera statistika
+nl: serverstatistieken
+no: serverstatistikk
+oc: estatisticas del servidor
+pl: statystyki serwera
+pt: estatísticas do servidor
+ro: statisticile serverului
+ru: статистика сервера
+sk: štatistiky servera
+sl: statistika strežnika
+sv: serverstatistik
+tr: sunucu istatistikleri
+
+    day/week/month
+bg: ден/седмица/месец
+co: ghjornu/settimana/mese
+cs: den/týden/měsíc
+da: dag/uge/måned
+de: Tag/Woche/Monat
+en: day/week/month
+eo: tago/semajno/monato
+es: día/semana/mes
+et: päev/nädal/kuu
+fi: päivä/viikko/kuukausi
+fr: jour/semaine/mois
+he: יום/שבוע/חודש
+it: giorno/settimana/mese
+lt: diena/savaitė/mėnuo
+lv: diena/nedēļa/mēnesis
+nl: dag/week/maand
+no: dag/uke/måned
+oc: jorn/setmana/mes
+pl: dzień/tydzień/miesiąc
+pt: dia/semana/mês
+ro: zi/săptămână/lună
+ru: день/неделя/месяц
+sk: deň/týždeň/mesiac
+sl: dan/teden/mesec
+sv: dag/vecka/månad
+tr: gün/hafta/ay
+
+    traffic
+bg: трафик
+co: trafficu
+cs: provoz
+da: trafik
+de: Datenverkehr
+en: traffic
+eo: trafiko
+es: tráfico
+et: liiklus
+fi: liikenne
+fr: trafic
+he: תעבורה
+it: traffico
+lt: srautas
+lv: datplūsma
+nl: verkeer
+no: trafikk
+oc: trafic
+pl: ruch
+pt: tráfego
+ro: trafic
+ru: трафик
+sk: prevádzka
+sl: promet
+sv: trafik
+tr: trafik
+
+    response time
+bg: време за отговор
+co: tempu di risposta
+cs: doba odezvy
+da: svartid
+de: Antwortzeit
+en: response time
+eo: respondotempo
+es: tiempo de respuesta
+et: vastamisaeg
+fi: vasteaika
+fr: temps de réponse
+he: זמן תגובה
+it: tempo di risposta
+lt: atsako laikas
+lv: atbildes laiks
+nl: reactietijd
+no: responstid
+oc: temps de responsa
+pl: czas odpowiedzi
+pt: tempo de resposta
+ro: timp de răspuns
+ru: время ответа
+sk: čas odozvy
+sl: odzivni čas
+sv: svarstid
+tr: yanıt süresi
+
+    request/requests
+bg: заявка/заявки
+co: richiesta/richieste
+cs: požadavek/požadavky
+da: forespørgsel/forespørgsler
+de: Anfrage/Anfragen
+en: request/requests
+eo: peto/petoj
+es: petición/peticiones
+et: päring/päringud
+fi: pyyntö/pyynnöt
+fr: requête/requêtes
+he: בקשה/בקשות
+it: richiesta/richieste
+lt: užklausa/užklausos
+lv: pieprasījums/pieprasījumi
+nl: verzoek/verzoeken
+no: forespørsel/forespørsler
+oc: requèsta/requèstas
+pl: żądanie/żądania
+pt: pedido/pedidos
+ro: cerere/cereri
+ru: запрос/запросы
+sk: požiadavka/požiadavky
+sl: zahteva/zahteve
+sv: förfrågan/förfrågningar
+tr: istek/istekler
+
+    requests per minute
+bg: заявки в минута
+co: richieste per minutu
+cs: požadavků za minutu
+da: forespørgsler pr. minut
+de: Anfragen pro Minute
+en: requests per minute
+eo: petoj po minuto
+es: peticiones por minuto
+et: päringuid minutis
+fi: pyyntöä minuutissa
+fr: requêtes par minute
+he: בקשות לדקה
+it: richieste al minuto
+lt: užklausos per minutę
+lv: pieprasījumi minūtē
+nl: verzoeken per minuut
+no: forespørsler per minutt
+oc: requèstas per minuta
+pl: żądania na minutę
+pt: pedidos por minuto
+ro: cereri pe minut
+ru: запросов в минуту
+sk: požiadaviek za minútu
+sl: zahtev na minuto
+sv: förfrågningar per minut
+tr: dakika başına istek
+
+    received/sent
+bg: получени/изпратени
+co: ricevuti/mandati
+cs: přijato/odesláno
+da: modtaget/sendt
+de: empfangen/gesendet
+en: received/sent
+eo: ricevitaj/senditaj
+es: recibidos/enviados
+et: vastu võetud/saadetud
+fi: vastaanotettu/lähetetty
+fr: reçus/envoyés
+he: התקבלו/נשלחו
+it: ricevuti/inviati
+lt: gauta/išsiųsta
+lv: saņemts/nosūtīts
+nl: ontvangen/verzonden
+no: mottatt/sendt
+oc: recebuts/mandats
+pl: odebrane/wysłane
+pt: recebidos/enviados
+ro: primite/trimise
+ru: получено/отправлено
+sk: prijaté/odoslané
+sl: prejeto/poslano
+sv: mottaget/skickat
+tr: alınan/gönderilen
+
+    mean (average)
+bg: средно
+co: media
+cs: průměr
+da: gennemsnit
+de: Mittelwert
+en: mean
+eo: meznombro
+es: media
+et: keskmine
+fi: keskiarvo
+fr: moyenne
+he: ממוצע
+it: media
+lt: vidurkis
+lv: vidējais
+nl: gemiddelde
+no: gjennomsnitt
+oc: mejana
+pl: średnia
+pt: média
+ro: medie
+ru: среднее
+sk: priemer
+sl: povprečje
+sv: medelvärde
+tr: ortalama
+
+    no data
+bg: няма данни
+co: nisuna dati
+cs: žádná data
+da: ingen data
+de: keine Daten
+en: no data
+eo: neniuj datumoj
+es: sin datos
+et: andmed puuduvad
+fi: ei tietoja
+fr: aucune donnée
+he: אין נתונים
+it: nessun dato
+lt: duomenų nėra
+lv: nav datu
+nl: geen gegevens
+no: ingen data
+oc: cap de donada
+pl: brak danych
+pt: sem dados
+ro: nicio dată
+ru: нет данных
+sk: žiadne údaje
+sl: ni podatkov
+sv: inga data
+tr: veri yok
+
+    kilobytes per second
+bg: КБ/с
+co: Ko/s
+cs: kB/s
+da: kB/s
+de: kB/s
+en: kB/s
+eo: kB/s
+es: kB/s
+et: kB/s
+fi: kB/s
+fr: Ko/s
+he: kB/s
+it: kB/s
+lt: kB/s
+lv: kB/s
+nl: kB/s
+no: kB/s
+oc: Ko/s
+pl: kB/s
+pt: kB/s
+ro: kB/s
+ru: КБ/с
+sk: kB/s
+sl: kB/s
+sv: kB/s
+tr: kB/s
+
+    B/kB/MB/GB/TB
+bg: Б/КБ/МБ/ГБ/ТБ
+co: o/Ko/Mo/Go/To
+cs: B/kB/MB/GB/TB
+da: B/kB/MB/GB/TB
+de: B/kB/MB/GB/TB
+en: B/kB/MB/GB/TB
+eo: B/kB/MB/GB/TB
+es: B/kB/MB/GB/TB
+et: B/kB/MB/GB/TB
+fi: B/kB/MB/GB/TB
+fr: o/Ko/Mo/Go/To
+he: B/kB/MB/GB/TB
+it: B/kB/MB/GB/TB
+lt: B/kB/MB/GB/TB
+lv: B/kB/MB/GB/TB
+nl: B/kB/MB/GB/TB
+no: B/kB/MB/GB/TB
+oc: o/Ko/Mo/Go/To
+pl: B/kB/MB/GB/TB
+pt: B/kB/MB/GB/TB
+ro: B/kB/MB/GB/TB
+ru: Б/КБ/МБ/ГБ/ТБ
+sk: B/kB/MB/GB/TB
+sl: B/kB/MB/GB/TB
+sv: B/kB/MB/GB/TB
+tr: B/kB/MB/GB/TB
+
+    s (seconds)
+bg: с
+co: s
+cs: s
+da: s
+de: s
+en: s
+eo: s
+es: s
+et: s
+fi: s
+fr: s
+he: שנ׳
+it: s
+lt: s
+lv: s
+nl: s
+no: s
+oc: s
+pl: s
+pt: s
+ro: s
+ru: с
+sk: s
+sl: s
+sv: s
+tr: s
+
     statistics and anniversaries
 bg: статистика и годишнини
 co: statistiche è anniversarii
