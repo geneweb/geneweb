@@ -265,12 +265,12 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | title :: l ->
         enum render_title (ordinal ^^^ render_title (l = []) title) l
   in
-  let paren =
-    match (name, dates) with
-    | Tname _, _ -> true
-    | _, (Some _, _) :: _ -> authorized_age conf base p
-    | _ -> false
+  let dates =
+    if authorized_age conf base p then
+      List.filter (function None, None -> false | _ -> true) dates
+    else []
   in
+  let paren = match name with Tname _ -> true | _ -> dates <> [] in
   let acc = if paren then acc ^>^ " (" else acc in
   let acc, first =
     match name with
@@ -279,29 +279,22 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | _ -> (acc, true)
   in
   let acc =
-    if authorized_age conf base p && dates <> [ (None, None) ] then
-      fst
-      @@ List.fold_left
-           (fun (acc, first) (date_start, date_end) ->
-             let acc =
-               if (not first) && name <> Tmain && name <> Tnone then
-                 acc ^>^ ", "
-               else acc
-             in
-             let acc =
-               match date_start with
-               | Some d -> acc ^^^ DateDisplay.string_of_date conf d
-               | None -> acc
-             in
-             let acc = match date_end with Some _ -> acc ^>^ "–" | _ -> acc in
-             let acc =
-               match date_end with
-               | Some d -> acc ^^^ DateDisplay.string_of_date conf d
-               | None -> acc
-             in
-             (acc, false))
-           (acc, first) dates
-    else acc
+    fst
+    @@ List.fold_left
+         (fun (acc, first) (date_start, date_end) ->
+           let acc = if first then acc else acc ^>^ ", " in
+           let acc =
+             match date_start with
+             | Some d -> acc ^^^ DateDisplay.string_of_date conf d
+             | None -> acc
+           in
+           let acc =
+             match date_end with
+             | Some d -> (acc ^>^ "–") ^^^ DateDisplay.string_of_date conf d
+             | None -> acc
+           in
+           (acc, false))
+         (acc, first) dates
   in
   if paren then acc ^>^ ")" else acc
 
@@ -311,48 +304,39 @@ let name_equiv n1 n2 =
   || (n1 = Tnone && n2 = Tmain)
 
 let nobility_titles_list conf base p =
-  let titles =
-    List.fold_right
-      (fun t l ->
-        let t_date_start = Date.od_of_cdate t.t_date_start in
-        let t_date_end = Date.od_of_cdate t.t_date_end in
-        match l with
-        | (nth, name, title, place, dates) :: rl
-          when (not conf.is_rtl) && nth = t.t_nth && name_equiv name t.t_name
-               && Driver.Istr.equal title t.t_ident
-               && Driver.Istr.equal place t.t_place ->
-            (nth, name, title, place, (t_date_start, t_date_end) :: dates) :: rl
-        | _ ->
-            ( t.t_nth,
-              t.t_name,
-              t.t_ident,
-              t.t_place,
-              [ (t_date_start, t_date_end) ] )
-            :: l)
-      (Util.nobtit conf base p) []
+  let group same l =
+    let rec loop acc = function
+      | [] -> List.rev acc
+      | x :: l ->
+          let l1, l2 = List.partition (same x) l in
+          loop ((x, l1) :: acc) l2
+    in
+    if conf.is_rtl then List.map (fun x -> (x, [])) l else loop [] l
   in
-  let titles =
-    List.fold_right
-      (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
-        match l with
-        | (nth, name, title, places, dates) :: rl
-          when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
-               && Driver.Istr.equal title t_ident
-               && dates = t_dates ->
-            (nth, name, title, t_place :: places, dates) :: rl
-        | _ -> (t_nth, t_name, t_ident, [ t_place ], t_dates) :: l)
-      titles []
+  let same_name (n1, m1, _, _, _) (n2, m2, _, _, _) =
+    n1 = n2 && name_equiv m1 m2
   in
-  List.fold_right
-    (fun (t_nth, t_name, t_ident, t_places, t_dates) l ->
-      match (t_places, l) with
-      | [ t_place ], (nth, name, idents, [ place ], dates) :: rl
-        when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
-             && Driver.Istr.equal place t_place
-             && dates = t_dates ->
-          (nth, name, t_ident :: idents, [ place ], dates) :: rl
-      | _ -> (t_nth, t_name, [ t_ident ], t_places, t_dates) :: l)
-    titles []
+  Util.nobtit conf base p
+  |> List.map (fun t ->
+      ( t.t_nth,
+        t.t_name,
+        t.t_ident,
+        t.t_place,
+        (Date.od_of_cdate t.t_date_start, Date.od_of_cdate t.t_date_end) ))
+  |> group (fun ((_, _, i1, p1, _) as t1) ((_, _, i2, p2, _) as t2) ->
+      same_name t1 t2 && Driver.Istr.equal i1 i2 && Driver.Istr.equal p1 p2)
+  |> List.map (fun ((nth, name, ident, place, d), l) ->
+      (nth, name, ident, place, d :: List.map (fun (_, _, _, _, d) -> d) l))
+  |> group (fun ((_, _, i1, _, d1) as t1) ((_, _, i2, _, d2) as t2) ->
+      same_name t1 t2 && Driver.Istr.equal i1 i2 && d1 = d2)
+  |> List.map (fun ((nth, name, ident, place, dates), l) ->
+      (nth, name, ident, place :: List.map (fun (_, _, _, pl, _) -> pl) l, dates))
+  |> group (fun ((_, _, _, p1, d1) as t1) ((_, _, _, p2, d2) as t2) ->
+      match (p1, p2) with
+      | [ p1 ], [ p2 ] -> same_name t1 t2 && Driver.Istr.equal p1 p2 && d1 = d2
+      | _ -> false)
+  |> List.map (fun ((nth, name, ident, places, dates), l) ->
+      (nth, name, ident :: List.map (fun (_, _, i, _, _) -> i) l, places, dates))
 
 (* ********************************************************************** *)
 (*  [Fonc] has_history : config -> string -> bool                         *)
