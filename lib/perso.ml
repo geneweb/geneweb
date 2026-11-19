@@ -1378,9 +1378,6 @@ let make_efam conf base ip ifam =
   in
   (fam, cpl, m_auth)
 
-let mode_local env =
-  match get_env "fam_link" env with Vfam _ -> false | _ -> true
-
 (* for family Driver.sources, p is not provided *)
 let get_note_or_source ?(highlight = false) conf base
     ?(p = Driver.empty_person base Driver.Iper.dummy) auth no_note
@@ -1477,11 +1474,8 @@ and eval_simple_var conf base env ep = function
 and eval_simple_bool_var conf base env =
   let fam_check_aux fn =
     match get_env "fam" env with
-    | Vfam (_, fam, _, _) when mode_local env -> fn fam
-    | _ -> (
-        match get_env "fam_link" env with
-        | Vfam (_, fam, _, _) -> fn fam
-        | _ -> raise Not_found)
+    | Vfam (_, fam, _, _) -> fn fam
+    | _ -> raise Not_found
   in
   let check_relation test =
     fam_check_aux (fun fam -> test @@ Driver.get_relation fam)
@@ -1513,13 +1507,10 @@ and eval_simple_bool_var conf base env =
       match get_env "sosa_ref" env with Vsosa_ref v -> v <> None | _ -> false)
   | "has_comment" | "has_fnotes" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           m_auth && (not conf.no_note)
           && Driver.sou base (Driver.get_comment fam) <> ""
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "has_fsources" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
@@ -1546,35 +1537,23 @@ and eval_simple_bool_var conf base env =
       | _ -> false)
   | "has_witnesses" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           m_auth && Array.length (Driver.get_witnesses fam) > 0
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, _, _, _) -> false
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "is_first" -> (
       match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
   | "is_last" -> (
       match get_env "last" env with Vbool x -> x | _ -> raise Not_found)
   | "is_no_mention" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) when mode_local env ->
-          Driver.get_relation fam = NoMention
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, _) -> Driver.get_relation fam = NoMention
-          | _ -> raise Not_found))
+      | Vfam (_, fam, _, _) -> Driver.get_relation fam = NoMention
+      | _ -> raise Not_found)
   | "is_no_sexes_check" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, _) when mode_local env ->
+      | Vfam (_, fam, _, _) ->
           Driver.get_relation fam = NoSexesCheckNotMarried
           || Driver.get_relation fam = NoSexesCheckMarried
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, _) ->
-              Driver.get_relation fam = NoSexesCheckNotMarried
-              || Driver.get_relation fam = NoSexesCheckMarried
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
   | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
@@ -1620,7 +1599,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> null_val)
   | "divorce_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+      | Vfam (_, fam, _, m_auth) -> (
           match Driver.get_divorce fam with
           | Divorced d -> (
               let d = Date.od_of_cdate d in
@@ -1629,19 +1608,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   DateDisplay.string_of_ondate ~link:false conf d |> safe_val
               | _ -> null_val)
           | _ -> null_val)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> (
-              match Driver.get_divorce fam with
-              | Divorced d -> (
-                  let d = Date.od_of_cdate d in
-                  match d with
-                  | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d
-                      |> safe_val
-                  | _ -> null_val)
-              | _ -> null_val)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "event_key" -> (
       match get_env "event_key" env with
       | Vstring s -> str_val s
@@ -1652,7 +1619,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> raise Not_found)
   | "separation_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+      | Vfam (_, fam, _, m_auth) -> (
           match Driver.get_separation fam with
           | Separated d -> (
               let d = Date.od_of_cdate d in
@@ -1661,57 +1628,27 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   DateDisplay.string_of_ondate ~link:false conf d |> safe_val
               | _ -> null_val)
           | _ -> null_val)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> (
-              match Driver.get_separation fam with
-              | Separated d -> (
-                  let d = Date.od_of_cdate d in
-                  match d with
-                  | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d
-                      |> safe_val
-                  | _ -> null_val)
-              | _ -> null_val)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "on_divorce_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+      | Vfam (_, fam, _, m_auth) -> (
           match Driver.get_divorce fam with
           | Divorced d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
               | x -> x)
           | _ -> null_val)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> (
-              match Driver.get_divorce fam with
-              | Divorced d -> (
-                  match date_aux conf m_auth d with
-                  | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
-                  | x -> x)
-              | _ -> null_val)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "on_separation_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+      | Vfam (_, fam, _, m_auth) -> (
           match Driver.get_separation fam with
           | Separated d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
               | x -> x)
           | _ -> null_val)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> (
-              match Driver.get_separation fam with
-              | Separated d -> (
-                  match date_aux conf m_auth d with
-                  | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
-                  | x -> x)
-              | _ -> null_val)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "slash_divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
@@ -1864,30 +1801,19 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> raise Not_found)
   | "marriage_place" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           if m_auth then
             Driver.get_marriage_place fam
             |> Driver.sou base |> Util.string_of_place conf |> safe_val
           else null_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              if m_auth then
-                Driver.get_marriage_place fam
-                |> Driver.sou base |> Util.string_of_place conf |> safe_val
-              else null_val
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "marriage_place_raw" -> (
       let aux fam =
         Driver.sou base (Driver.get_marriage_place fam) |> str_val
       in
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
-          if m_auth then aux fam else null_val
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) -> if m_auth then aux fam else null_val
-          | _ -> raise Not_found))
+      | Vfam (_, fam, _, m_auth) -> if m_auth then aux fam else null_val
+      | _ -> raise Not_found)
   | "marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
@@ -1964,13 +1890,9 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | _ -> raise Not_found)
   | "on_marriage_date" -> (
       match get_env "fam" env with
-      | Vfam (_, fam, _, m_auth) when mode_local env ->
+      | Vfam (_, fam, _, m_auth) ->
           date_aux conf m_auth (Driver.get_marriage fam)
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (_, fam, _, m_auth) ->
-              date_aux conf m_auth (Driver.get_marriage fam)
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "slash_marriage_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
@@ -2121,14 +2043,14 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "child" :: sl -> (
       match get_env "child" env with
-      | Vind p when mode_local env ->
+      | Vind p ->
           let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
   | "cousin" :: sl -> (
       match get_env "cousin" env with
-      | Vind p when mode_local env ->
+      | Vind p ->
           let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
@@ -2159,20 +2081,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | "family" :: sl -> (
-      (* TODO ???
-         let mode_local =
-         match get_env "fam_link" env with
-         [ Vfam ifam _ (_, _, ip) _ -> False
-         | _ -> True ]
-         in *)
       match get_env "fam" env with
       | Vfam (i, f, c, m) ->
           eval_family_field_var conf base env (i, f, c, m) loc sl
-      | _ -> (
-          match get_env "fam_link" env with
-          | Vfam (i, f, c, m) ->
-              eval_family_field_var conf base env (i, f, c, m) loc sl
-          | _ -> raise Not_found))
+      | _ -> raise Not_found)
   | "father" :: sl -> (
       match Driver.get_parents a with
       | Some ifam ->
@@ -5841,11 +5753,7 @@ let print_foreach conf base print_ast eval_expr =
           | _ -> raise Not_found)
       | _ -> raise Not_found
     in
-    let efam =
-      match get_env "is_link" env with
-      | Vbool _ -> get_env "fam_link" env
-      | _ -> get_env "fam" env
-    in
+    let efam = get_env "fam" env in
     loop env ini_ep efam (s :: sl)
   in
   print_foreach
