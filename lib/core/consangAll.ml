@@ -70,7 +70,7 @@ let compute ?(verbosity = 2) base from_scratch =
      (* number of persons which need consanguinity to be computed *)
      let max_cnt = !cnt in
      let most = ref None in
-     if verbosity >= 2 then Printf.eprintf "To do: %d persons\n" max_cnt;
+     if verbosity >= 1 then Printf.eprintf "To do: %d persons\n" max_cnt;
      if max_cnt <> 0 then
        if verbosity >= 2 then (
          Printf.eprintf "Computing consanguinity...";
