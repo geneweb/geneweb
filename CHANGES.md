@@ -400,6 +400,14 @@ The camlp5 dependency has been removed. The GEDCOM date grammar and the stream
 parsers of `ged2gwb`, its last remaining users, have been rewritten in plain
 OCaml (#2927).
 
+The `gwlex` tool replaces the `lex_utils` script of geneweb-contrib, which
+needed the removed `gwrepl`. `gwlex sort` sorts and normalizes
+`hd/lang/lexicon.txt` in place, `gwlex check` reports its malformed lines,
+duplicated keys or languages and unsorted entries (`--formats` also compares
+the placeholders of the translations with the English ones), `gwlex missing`
+lists the translations to complete for some languages and `gwlex orphans` the
+unused entries and the keys missing from the lexicon.
+
 # GeneWeb version 7.1.0~beta2
 After 20 months of development, this release represents a major evolution of
 GeneWeb with over 1000 commits and 300 merged pull requests. The work has been
