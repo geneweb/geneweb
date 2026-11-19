@@ -247,3 +247,4 @@ let select_all_titles =
   select_all_with_counter Geneweb_db.Dict.Title (fun t -> t.t_ident)
 
 let select_all_places = select_all Geneweb_db.Dict.Domain (fun t -> t.t_place)
+let key t = Hasher.SHA256.(feeder_to_hasher (gen_title istr)) t

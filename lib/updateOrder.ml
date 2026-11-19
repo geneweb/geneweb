@@ -83,6 +83,16 @@ let print_families conf base =
           |> Option.iter (fun (moved, _) ->
               History.record conf base (U_Invert_family (gen_p, moved)) "if"))
 
+let modify_person conf base p update =
+  let o_p = Driver.gen_person_of_person p in
+  let n_p = update o_p in
+  Driver.patch_person base n_p.key_index n_p;
+  Util.commit_patches conf base;
+  History.record conf base
+    (U_Modify_person
+       (Util.string_gen_person base o_p, Util.string_gen_person base n_p))
+    "mp"
+
 let print_events conf events ~key ~name ~cmp ~commit =
   reorder conf
     (List.map (fun e -> (key e, e)) events)
@@ -100,14 +110,7 @@ let print_pevents conf base =
           (Util.string_of_pevent_name conf base e.epers_name :> string))
         ~cmp:CheckItem.compare_pevents
         ~commit:(fun pevents ->
-          let o_p = Driver.gen_person_of_person p in
-          let n_p = { o_p with pevents } in
-          Driver.patch_person base n_p.key_index n_p;
-          Util.commit_patches conf base;
-          History.record conf base
-            (U_Modify_person
-               (Util.string_gen_person base o_p, Util.string_gen_person base n_p))
-            "mp")
+          modify_person conf base p (fun o_p -> { o_p with pevents }))
 
 let print_fevents conf base =
   match Util.find_family_in_env conf base with
@@ -144,3 +147,18 @@ let print_fevents conf base =
                  Util.string_gen_family base o_f,
                  Util.string_gen_family base n_f ))
             "mf")
+
+let print_titles conf base =
+  match Util.find_person_in_env conf base "" with
+  | None -> Hutil.incorrect_request conf
+  | Some p ->
+      let main, titles =
+        List.partition (fun t -> t.t_name = Tmain) (Driver.get_titles p)
+      in
+      reorder conf
+        (List.map (fun t -> (Title.key t, t)) titles)
+        ~cmp:(fun _ _ -> 0)
+        ~refusal:(fun _ -> "")
+        ~commit:(fun l ->
+          modify_person conf base p (fun o_p ->
+              { o_p with titles = List.rev_append (List.rev main) l }))

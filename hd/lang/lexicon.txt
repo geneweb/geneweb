@@ -14056,6 +14056,40 @@ sv: ändra ordningen på familjerna
 tr: ailelerin sırasını değiştir
 zh: 调整家庭顺序
 
+    reorder titles
+af: verander die volgorde van die titels
+bg: промяна на реда на титлите
+br: cheñch urzh an titloù
+ca: reordenar els títols
+co: riurdinà i tituli
+cs: změnit pořadí titulů
+da: ændr rækkefølgen af titlerne
+de: Titel umsortieren
+en: reorder titles
+eo: ŝanĝi la ordon de la titoloj
+es: reordenar los títulos
+et: muuda tiitlite järjekorda
+fi: muuta arvonimien järjestystä
+fr: réordonner les titres
+he: שינוי סדר התארים
+is: breyta röð titla
+it: riordinare i titoli
+lt: keisti titulų tvarką
+lv: mainīt titulu secību
+nl: volgorde van de titels wijzigen
+no: endre rekkefølgen på titlene
+oc: reordenar los títols
+pl: zmień kolejność tytułów
+pt: reordenar os títulos
+pt-br: reordenar os títulos
+ro: reordonează titlurile
+ru: изменить порядок титулов
+sk: zmeniť poradie titulov
+sl: spremeni vrstni red nazivov
+sv: ändra ordningen på titlarna
+tr: unvanların sırasını değiştir
+zh: 调整头衔顺序
+
     reorder images
 de: Bilder umsortieren
 en: reorder images

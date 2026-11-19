@@ -256,8 +256,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
         (fun _ pl -> href title pl (safe_html (Driver.sou base pl)))
         (href title place
            (safe_html
-              (if place_str = "" then title_str
-               else title_str ^ " " ^ place_str)))
+              (if place_str = "" then title_str else title_str ^ " " ^ place_str)))
         places_tl
   in
   let acc =
@@ -1655,6 +1654,10 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "event_key" env with
       | Vstring s -> str_val s
       | _ -> raise Not_found)
+  | "title_key" -> (
+      match get_env "title_key" env with
+      | Vstring s -> str_val s
+      | _ -> raise Not_found)
   | "separation_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
@@ -2574,9 +2577,7 @@ and eval_title_field_var conf base env (_p, (nth, name, titles, places, dates))
       | _ -> VVstring "")
   | [ "title" ] ->
       let titles =
-        List.map
-          (fun t -> (Driver.sou base t |> escape_html :> string))
-          titles
+        List.map (fun t -> (Driver.sou base t |> escape_html :> string)) titles
       in
       VVstring (String.concat ", " titles)
   | [ "places" ] ->
@@ -3768,6 +3769,10 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       CheckItem.free_order
         (CheckItem.compare_unions base)
         (Array.to_list (Driver.get_family p))
+  | "has_free_title_order" -> (
+      match List.filter (fun t -> t.t_name <> Tmain) (Driver.get_titles p) with
+      | _ :: _ :: _ -> true
+      | _ -> false)
   | "has_history" -> has_history conf base p p_auth
   (* Beware: lots of confusion between image and portrait *)
   | "has_image" | "has_portrait" ->
@@ -5407,6 +5412,31 @@ let print_foreach conf base print_ast eval_expr =
         titles
   in
 
+  let print_foreach_stored_title env al ((p, _) as ep) =
+    let main, titles =
+      List.partition (fun t -> t.t_name = Tmain) (Driver.get_titles p)
+    in
+    let print key t =
+      let item =
+        ( t.t_nth,
+          t.t_name,
+          [ t.t_ident ],
+          [ t.t_place ],
+          [ (Date.od_of_cdate t.t_date_start, Date.od_of_cdate t.t_date_end) ]
+        )
+      in
+      let env =
+        Templ.Env.(
+          env
+          |> add "nob_title" (Vtitle (p, item))
+          |> add "title_key" (Vstring key))
+      in
+      List.iter (print_ast env ep) al
+    in
+    List.iter (print "") main;
+    List.iter (fun t -> print (Title.key t) t) titles
+  in
+
   let print_foreach_parent env al ((a, _) as ep) =
     match Driver.get_parents a with
     | Some ifam ->
@@ -5697,6 +5727,7 @@ let print_foreach conf base print_ast eval_expr =
     | "sorted_listd_item" -> print_foreach_sorted_list_item env al ep "listd"
     | "sorted_liste_item" -> print_foreach_sorted_list_item env al ep "liste"
     | "source" -> print_foreach_source env al ep
+    | "stored_title" -> print_foreach_stored_title env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep Witness efam
     | "witness_godparent" ->
