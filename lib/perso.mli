@@ -73,10 +73,11 @@ val nobility_titles_list :
   * (Adef.date option * Adef.date option) list)
   list
 (** [nobility_titles_list conf base p] is the titles of [p] shown on its page,
-    consecutive titles being merged when they differ only by their dates, then
-    by their place, then by their title for a same single place:
-    [(nth, name, titles, places, dates)]. Nothing is merged in a right-to-left
-    language. *)
+    merged when they differ only by their dates, then by their place, then by
+    their title for a same single place: [(nth, name, titles, places, dates)]. A
+    merged title takes the place of its first occurrence, and its parts keep the
+    order of the titles of [p]. Nothing is merged in a right-to-left language.
+*)
 
 val print_isolated : config -> Geneweb_db.Driver.base -> unit
 (** Display persons with no parents and no families, grouped into truly
