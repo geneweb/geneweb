@@ -1,6 +1,6 @@
-(** Order of a list of a person or a family (its families, its events), changed
-    in one request from a window of the menubar (updateOrder.txt,
-    updateOrder.js).
+(** Order of a list of a person or a family (its families, its events, its
+    titles), changed in one request from a window of the menubar
+    (updateOrder.txt, updateOrder.js).
 
     The request names the person or the family by index [i] or by keys, and
     carries [o], the keys of the items in their new order, and [prev], their
@@ -32,3 +32,10 @@ val print_fevents : Config.config -> Geneweb_db.Driver.base -> unit
     fields of the family are derived again from its events with the same-sex
     status of its relation ({!UpdateFamOk.update_family_with_fevents}) and the
     history records a modification of the family (["mf"]). *)
+
+val print_titles : Config.config -> Geneweb_db.Driver.base -> unit
+(** [print_titles conf base] handles [m=CHG_TIT_ORD_OK]: the items are the
+    titles of the person but its main ones, keyed by {!Title.key} and left free
+    of any order rule. The main titles are written first, then the others in
+    their new order, and the history records a modification of the person
+    (["mp"]). *)

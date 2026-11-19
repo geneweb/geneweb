@@ -1,4 +1,4 @@
-<!-- $Id: updateOrder.txt v7.1 06/11/2026 $ -->
+<!-- $Id: updateOrder.txt v7.1 19/11/2026 $ -->
 %( Windows of the menubar (menubar.txt) reordering a list, driven by
    js/updateOrder.js: one item per element of the list, keyed for the
    request of the window (UpdateOrder). The items go between order_open
@@ -33,6 +33,11 @@
     %if;(event.place!="")<li class="list-inline-item">%event.place;</li>%end;
   %end;
 %end;
+%define;order_title_info()
+  %if;(nob_title.nth>0)<li class="list-inline-item">%apply;nth%with;[nth]%and;%nob_title.nth;%end;</li>%end;
+  %if;(nob_title.name!="")<li class="list-inline-item">%nob_title.name;</li>%end;
+  %if;(nob_title.dates!="")<li class="list-inline-item">%nob_title.dates;</li>%end;
+%end;
 %define;order_item(x_key,x_label,x_info)
   <div class="list-group-item d-flex align-items-center gap-2" data-key="x_key">
     <i class="fa fa-grip-vertical text-body-secondary" title="[*move up/down]4" aria-hidden="true"></i>
@@ -61,6 +66,28 @@
 %if;has_free_event_order;
   %apply;order_open%with;update_order_pevt%and;m=CHG_EVT_IND_ORD_OK&%access;%and;[*reorder events]%end;
   %foreach;pevent;%apply;order_event()%end;
+  %apply;order_close()
+%end;
+%if;has_free_title_order;
+  %apply;order_open%with;update_order_tit%and;m=CHG_TIT_ORD_OK&%access;%and;[*reorder titles]%end;
+  %( The main titles stay first: listed without key, they are not part of the
+     request, and pe-none keeps the dragged items from dropping before them %)
+  %foreach;stored_title;
+    %if;(title_key="")
+      <div class="list-group-item d-flex align-items-center gap-2 pe-none">
+        <i class="fa fa-lock text-body-secondary" aria-hidden="true"></i>
+        <div class="flex-grow-1">
+          <div>%nob_title.title;%if;(nob_title.places!="")%sp;%nob_title.places;%end;</div>
+          <ul class="list-inline small text-body-secondary mb-0">
+            <li class="list-inline-item">[*main title]</li>
+            %apply;order_title_info()
+          </ul>
+        </div>
+      </div>
+    %else;
+      %apply;order_item%with;%title_key;%and;%nob_title.title;%if;(nob_title.places!="")%sp;%nob_title.places;%end;%and;%apply;order_title_info()%end;
+    %end;
+  %end;
   %apply;order_close()
 %end;
 %foreach;family;

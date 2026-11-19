@@ -23,10 +23,10 @@ let this_request_updates_database conf =
   | Some
       ( "ADD_FAM" | "BLASON_MOVE_TO_ANC" | "BLASON_STOP" | "CHANGE_WIZ_VIS"
       | "CHG_CHN" | "CHG_EVT_FAM_ORD_OK" | "CHG_EVT_IND_ORD_OK"
-      | "CHG_FAM_ORD_OK" | "DEL_FAM" | "DEL_IMAGE" | "DEL_IND"
-      | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND" | "MOD_NOTES"
-      | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" | "OK_ADD"
-      | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
+      | "CHG_FAM_ORD_OK" | "CHG_TIT_ORD_OK" | "DEL_FAM" | "DEL_IMAGE"
+      | "DEL_IND" | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
+      | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
+      | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA_OK"
       | "PORTRAIT_MOVE_TO_BLASON" | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
       | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
@@ -564,6 +564,8 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_fevents
              | "CHG_FAM_ORD_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_families
+             | "CHG_TIT_ORD_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ UpdateOrder.print_titles
              | "CHK_DATA" ->
                  w_wizard @@ w_base @@ w_index @@ CheckDataDisplay.print
              | "CHK_DIGEST" -> w_wizard @@ w_base @@ UpdateCheck.print

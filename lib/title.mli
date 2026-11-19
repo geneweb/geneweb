@@ -40,3 +40,7 @@ val select_all_with_place :
   Geneweb_db.Driver.base ->
   string ->
   (Geneweb_db.Driver.person * Geneweb_db.Driver.title) list
+
+val key : Geneweb_db.Driver.title -> string
+(** [key t] identifies the title [t] by a hash of its fields in the window
+    reordering the titles of a person ({!UpdateOrder.print_titles}). *)

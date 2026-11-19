@@ -212,6 +212,11 @@
                     data-bs-toggle="modal" data-bs-target="#update_order_pevt">%nn;
                     <i class="fa fa-sort fa-fw me-2" aria-hidden="true"></i>[*reorder events]</button>
                 %end;
+                %if;(update_order=1 and has_free_title_order)
+                  <button type="button" class="dropdown-item load-update-order"
+                    data-bs-toggle="modal" data-bs-target="#update_order_tit">%nn;
+                    <i class="fa fa-award fa-fw me-2" aria-hidden="true"></i>[*reorder titles]</button>
+                %end;
                 %if;(first_name!="?" and surname!="?")
                   <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&%access;">
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
