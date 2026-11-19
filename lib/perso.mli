@@ -68,10 +68,15 @@ val nobility_titles_list :
   Geneweb_db.Driver.person ->
   (int
   * Geneweb_db.Driver.istr Def.gen_title_name
-  * Geneweb_db.Driver.istr
+  * Geneweb_db.Driver.istr list
   * Geneweb_db.Driver.istr list
   * (Adef.date option * Adef.date option) list)
   list
+(** [nobility_titles_list conf base p] is the titles of [p] shown on its page,
+    consecutive titles being merged when they differ only by their dates, then
+    by their place, then by their title for a same single place:
+    [(nth, name, titles, places, dates)]. Nothing is merged in a right-to-left
+    language. *)
 
 val print_isolated : config -> Geneweb_db.Driver.base -> unit
 (** Display persons with no parents and no families, grouped into truly

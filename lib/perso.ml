@@ -212,7 +212,7 @@ let hide_person conf base p =
   (not (Util.authorized_age conf base p)) || Util.is_hide_names conf p
 
 let string_of_title ?(safe = false) ?(link = true) conf base
-    (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
+    (and_txt : Adef.safe_string) p (nth, name, titles, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
   let escape_html = if not safe then Util.escape_html else Adef.escaped in
   let first = nth <= 0 in
@@ -230,12 +230,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     | place :: places_tl -> (place, places_tl)
   in
   let place_str = Driver.sou base place in
-  let title_str = Driver.sou base title in
-  let acc =
-    safe_html
-      (if place_str = "" then title_str else title_str ^ " " ^ place_str)
-  in
-  let href place s =
+  let href title place s =
     if link then
       let href =
         "m=TT&sm=S&t="
@@ -248,21 +243,29 @@ let string_of_title ?(safe = false) ?(link = true) conf base
       geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
     else s
   in
-  let acc = ordinal ^^^ href place acc in
-  let rec loop acc places =
-    let acc =
-      match places with
-      | [] -> acc
-      | [ _ ] -> acc ^^^ " " ^<^ and_txt ^^^ Adef.safe " "
-      | _ -> acc ^>^ ", "
-    in
-    match places with
-    | place :: places ->
-        let acc = acc ^^^ href place (safe_html (Driver.sou base place)) in
-        loop acc places
-    | _ -> acc
+  let rec enum render acc = function
+    | [] -> acc
+    | [ x ] -> acc ^^^ " " ^<^ and_txt ^^^ " " ^<^ render true x
+    | x :: l -> enum render (acc ^^^ ", " ^<^ render false x) l
   in
-  let acc = loop acc places_tl in
+  let render_title last title =
+    let title_str = Driver.sou base title in
+    if not last then href title place (safe_html title_str)
+    else
+      enum
+        (fun _ pl -> href title pl (safe_html (Driver.sou base pl)))
+        (href title place
+           (safe_html
+              (if place_str = "" then title_str
+               else title_str ^ " " ^ place_str)))
+        places_tl
+  in
+  let acc =
+    match titles with
+    | [] -> ordinal
+    | title :: l ->
+        enum render_title (ordinal ^^^ render_title (l = []) title) l
+  in
   let paren =
     match (name, dates) with
     | Tname _, _ -> true
@@ -329,15 +332,27 @@ let nobility_titles_list conf base p =
             :: l)
       (Util.nobtit conf base p) []
   in
+  let titles =
+    List.fold_right
+      (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
+        match l with
+        | (nth, name, title, places, dates) :: rl
+          when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
+               && Driver.Istr.equal title t_ident
+               && dates = t_dates ->
+            (nth, name, title, t_place :: places, dates) :: rl
+        | _ -> (t_nth, t_name, t_ident, [ t_place ], t_dates) :: l)
+      titles []
+  in
   List.fold_right
-    (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
-      match l with
-      | (nth, name, title, places, dates) :: rl
+    (fun (t_nth, t_name, t_ident, t_places, t_dates) l ->
+      match (t_places, l) with
+      | [ t_place ], (nth, name, idents, [ place ], dates) :: rl
         when (not conf.is_rtl) && nth = t_nth && name_equiv name t_name
-             && Driver.Istr.equal title t_ident
+             && Driver.Istr.equal place t_place
              && dates = t_dates ->
-          (nth, name, title, t_place :: places, dates) :: rl
-      | _ -> (t_nth, t_name, t_ident, [ t_place ], t_dates) :: l)
+          (nth, name, t_ident :: idents, [ place ], dates) :: rl
+      | _ -> (t_nth, t_name, [ t_ident ], t_places, t_dates) :: l)
     titles []
 
 (* ********************************************************************** *)
@@ -1230,7 +1245,7 @@ type 'string gen_title = {
 type title_item =
   int
   * Driver.istr gen_title_name
-  * Driver.istr
+  * Driver.istr list
   * Driver.istr list
   * (Adef.date option * Adef.date option) list
 
@@ -2540,7 +2555,7 @@ and eval_item_field_var ell = function
       with Failure _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
+and eval_title_field_var conf base env (_p, (nth, name, titles, places, dates))
     _loc = function
   | [ "is_first" ] ->
       VVbool
@@ -2557,7 +2572,13 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       match name with
       | Tname n -> VVstring (Driver.sou base n |> escape_html :> string)
       | _ -> VVstring "")
-  | [ "title" ] -> VVstring (Driver.sou base title |> escape_html :> string)
+  | [ "title" ] ->
+      let titles =
+        List.map
+          (fun t -> (Driver.sou base t |> escape_html :> string))
+          titles
+      in
+      VVstring (String.concat ", " titles)
   | [ "places" ] ->
       let places =
         List.map
