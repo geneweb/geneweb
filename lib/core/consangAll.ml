@@ -16,11 +16,10 @@
 let relationship base tab ip1 ip2 =
   fst (Consang.relationship_and_links base tab false ip1 ip2)
 
-let trace verbosity cnt max_cnt =
+let trace verbosity cnt =
   if verbosity >= 2 then (
     Printf.eprintf "%7d\008\008\008\008\008\008\008" cnt;
     flush stderr)
-  else if verbosity >= 1 then ProgrBar.run (max_cnt - cnt) max_cnt
 
 let consang_array base =
   let patched = ref false in
@@ -75,8 +74,7 @@ let compute ?(verbosity = 2) base from_scratch =
      if max_cnt <> 0 then
        if verbosity >= 2 then (
          Printf.eprintf "Computing consanguinity...";
-         flush stderr)
-       else if verbosity >= 1 then ProgrBar.start ();
+         flush stderr);
      let running = ref true in
      while !running do
        running := false;
@@ -99,7 +97,7 @@ let compute ?(verbosity = 2) base from_scratch =
                      && cget imoth != Adef.no_consang
                    then (
                      let consang = relationship base tab ifath imoth in
-                     trace verbosity !cnt max_cnt;
+                     trace verbosity !cnt;
                      decr cnt;
                      let cg = Adef.fix_of_float consang in
                      cset i cg;
@@ -117,12 +115,12 @@ let compute ?(verbosity = 2) base from_scratch =
                    else running := true
                    (* if it was then set to person his family's consanguinity *)
                  else (
-                   trace verbosity !cnt max_cnt;
+                   trace verbosity !cnt;
                    decr cnt;
                    cset i pconsang)
              (* if he doesn't then set his consanguinity to 0 *)
              | None ->
-                 trace verbosity !cnt max_cnt;
+                 trace verbosity !cnt;
                  decr cnt;
                  cset i (Adef.fix_of_float 0.0))
          persons
@@ -131,7 +129,6 @@ let compute ?(verbosity = 2) base from_scratch =
        if verbosity >= 2 then (
          Printf.eprintf " done   \n";
          flush stderr)
-       else if verbosity >= 1 then ProgrBar.finish ()
    with Sys.Break when verbosity > 0 ->
      Printf.eprintf "\n";
      flush stderr;

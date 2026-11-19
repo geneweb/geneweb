@@ -422,7 +422,7 @@ module type Driver_S = sig
   (** Modify/add string with a giving id. If string already exists return its id.
     Modification stay blocked until call of [commit_patches]. *)
 
-  val commit_patches : base -> unit
+  val commit_patches : ?write_to_disk:bool -> base -> unit
   (** Commit blocked modifications (patches) and update database files in order to
     apply modifications on the disk.  *)
 
@@ -1216,8 +1216,11 @@ struct
 
   let insert_string = Util.wrap_base Legacy.insert_string Current.insert_string
 
-  let commit_patches =
-    Util.wrap_base Legacy.commit_patches Current.commit_patches
+  let commit_patches ?write_to_disk base =
+    Util.wrap_base
+      (Legacy.commit_patches ?write_to_disk)
+      (Current.commit_patches ?write_to_disk)
+      base
 
   let commit_notes = Util.wrap_base Legacy.commit_notes Current.commit_notes
   let new_iper = Util.wrap_base Legacy.new_iper Current.new_iper

@@ -506,12 +506,14 @@ module Legacy_driver = struct
     Gwdb_legacy.Gwdb_driver.delete_person base iper;
     clear_poi iper
 
-  let commit_patches base =
-    PatchPer.write base;
-    PatchFam.write base;
-    commit_patches base;
-    PatchPer.move_patch_file base;
-    PatchFam.move_patch_file base
+  let commit_patches ?(write_to_disk = true) base =
+    if write_to_disk then (
+      PatchPer.write base;
+      PatchFam.write base);
+    Gwdb_legacy.Gwdb_driver.commit_patches ~write_to_disk base;
+    if write_to_disk then (
+      PatchPer.move_patch_file base;
+      PatchFam.move_patch_file base)
 
   let pwitness_notes_of_pevent (pe : pers_event) =
     match pe.pwitness_notes with

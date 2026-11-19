@@ -385,8 +385,8 @@ type base_func = {
   (* Returns the string id corresponding to the given string, None otherwise *)
   insert_string : string -> int;
   (* Commit pending patches and write a patches' new state inside "patches"
-     file. "nb_persons" is also updated. *)
-  commit_patches : unit -> unit;
+     file (unless write_to_disk is false). "nb_persons" is also updated. *)
+  commit_patches : ?write_to_disk:bool -> unit -> unit;
   (* Update content (second arg) of the notes' file (first arg) if exists. *)
   commit_notes : string -> string -> unit;
   (* Close every opened channel. *)

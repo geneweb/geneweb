@@ -10,6 +10,7 @@
     geneweb
     alcotest
     geneweb.test_utils
+    geneweb.gwresync_lib
     )
   (modules
     test
@@ -22,6 +23,7 @@
     ports_test
     merge_ind_test
     notes_test
+    gwresync_test
   )
   (deps assets/royal92.ged assets/abc.ged)
 )

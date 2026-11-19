@@ -284,8 +284,10 @@ let marital_names base p =
         (fun acc ifam ->
           let couple = base.data.couples.get ifam in
           let other = get_other p.key_index couple in
-          let sn = (base.data.persons.get other).surname in
-          sn :: acc)
+          if other < 0 then acc
+          else
+            let sn = (base.data.persons.get other).surname in
+            sn :: acc)
         [] unions.family
   | Male | Neuter -> []
 

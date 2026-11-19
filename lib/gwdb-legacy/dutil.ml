@@ -18,22 +18,28 @@ let p_first_name base p = Mutil.nominative (sou base p.Dbdisk.first_name)
 let p_surname base p = Mutil.nominative (sou base p.Dbdisk.surname)
 
 let husbands base p =
-  Array.map
-    (fun ifam ->
-      let cpl = coi base ifam in
-      let husband = poi base (Adef.father cpl) in
-      let husband_surname = husband.surname in
-      let husband_surnames_aliases = husband.surnames_aliases in
-      (husband_surname, husband_surnames_aliases))
-    (uoi base p.Dbdisk.key_index).family
+  (uoi base p.Dbdisk.key_index).family |> Array.to_list
+  |> List.filter_map (fun ifam ->
+         let cpl = coi base ifam in
+         let ifath = Adef.father cpl in
+         if ifath < 0 then None
+         else
+           let husband = poi base ifath in
+           let husband_surname = husband.surname in
+           let husband_surnames_aliases = husband.surnames_aliases in
+           Some (husband_surname, husband_surnames_aliases))
+  |> Array.of_list
 
 let father_titles_places base p
     (nobtit : Dbdisk.dsk_person -> Dbdisk.dsk_title list) =
   match (aoi base p.Dbdisk.key_index).parents with
   | Some ifam ->
       let cpl = coi base ifam in
-      let fath = poi base (Adef.father cpl) in
-      nobtit fath
+      let ifath = Adef.father cpl in
+      if ifath < 0 then []
+      else
+        let fath = poi base ifath in
+        nobtit fath
   | None -> []
 
 let dsk_person_misc_names :
