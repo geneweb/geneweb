@@ -25,43 +25,63 @@ let test_commit_patches_in_memory () =
           ~surname:"Doe" ()
       in
       let base = Geneweb_test_utils.Mock_db.build ~bname:bdir db in
-      let iper = Geneweb_test_utils.Mock_db.iper p_id in
-      let p = Gwdb.poi base iper in
-      let gen_p =
-        { (Gwdb.gen_person_of_person p) with Def.access = Def.Private }
-      in
-      Gwdb.patch_person base (Gwdb.get_iper p) gen_p;
-      Gwdb.commit_patches ~write_to_disk:false base;
-      let p_after = Gwdb.poi base iper in
-      Geneweb_test_utils.Check.bool ~pos:__POS__
-        ~msg:"patch is committed in memory" true
-        (Gwdb.get_access p_after = Def.Private);
-      Gwdb.close_base base)
+      Fun.protect
+        ~finally:(fun () -> Gwdb.close_base base)
+        (fun () ->
+          let iper = Geneweb_test_utils.Mock_db.iper p_id in
+          let p = Gwdb.poi base iper in
+          let gen_p =
+            { (Gwdb.gen_person_of_person p) with Def.access = Def.Private }
+          in
+          Gwdb.patch_person base (Gwdb.get_iper p) gen_p;
+          Gwdb.commit_patches ~write_to_disk:false base;
+          let p_after = Gwdb.poi base iper in
+          Geneweb_test_utils.Check.bool ~pos:__POS__
+            ~msg:"Gwdb.commit_patches in-memory commit retains modified access"
+            true
+            (Gwdb.get_access p_after = Def.Private)))
 
 let test_privacy_single_parent () =
-  with_temp_dir (fun bdir ->
-      let db = Geneweb_test_utils.Mock_db.create () in
-      let parent =
-        Geneweb_test_utils.Mock_db.add_person db ~first_name:"Parent"
-          ~surname:"Solo" ()
-      in
-      let child =
-        Geneweb_test_utils.Mock_db.add_person db ~first_name:"Child"
-          ~surname:"Solo" ()
-      in
-      let _fam =
-        Geneweb_test_utils.Mock_db.add_family db ~father:parent
-          ~children:[ child ] ()
-      in
-      let base = Geneweb_test_utils.Mock_db.build ~bname:bdir db in
-      let changed =
-        Gwresync_lib.Privacy.apply_cutoff_date ~base ~cutoff_year:1900
-          ~verbosity:0
-      in
-      Geneweb_test_utils.Check.bool ~pos:__POS__
-        ~msg:"cutoff date runs safely without out-of-bounds error" true
-        (changed || not changed);
-      Gwdb.close_base base)
+  let test_role ~as_mother () =
+    with_temp_dir (fun bdir ->
+        let db = Geneweb_test_utils.Mock_db.create () in
+        let parent =
+          Geneweb_test_utils.Mock_db.add_person db ~first_name:"Parent"
+            ~surname:"Solo" ()
+        in
+        let child =
+          Geneweb_test_utils.Mock_db.add_person db ~first_name:"Child"
+            ~surname:"Solo" ()
+        in
+        let _fam =
+          if as_mother then
+            Geneweb_test_utils.Mock_db.add_family db ~mother:parent
+              ~children:[ child ] ()
+          else
+            Geneweb_test_utils.Mock_db.add_family db ~father:parent
+              ~children:[ child ] ()
+        in
+        let base = Geneweb_test_utils.Mock_db.build ~bname:bdir db in
+        Fun.protect
+          ~finally:(fun () -> Gwdb.close_base base)
+          (fun () ->
+            let changed =
+              Gwresync_lib.Privacy.apply_cutoff_date ~base ~cutoff_year:1900
+                ~verbosity:0
+            in
+            let label =
+              if as_mother then "mother-centric" else "father-centric"
+            in
+            Geneweb_test_utils.Check.bool ~pos:__POS__
+              ~msg:
+                (Printf.sprintf
+                   "Gwresync_lib.Privacy.apply_cutoff_date handles %s single \
+                    parent"
+                   label)
+              false changed))
+  in
+  test_role ~as_mother:false ();
+  test_role ~as_mother:true ()
 
 let v =
   [
