@@ -111,7 +111,7 @@ let http_redirect code url =
 
 let http_redirect_temporarily url = http_redirect Def.Moved_Temporarily url
 let http_redirect_permanently url = http_redirect Def.Moved_Permanently url
-let buff = ref (Bytes.create 80)
+let buff = ref (Bytes.create 1024)
 
 let store len x =
   if len >= Bytes.length !buff then
@@ -143,10 +143,17 @@ let get_request strm =
 
 let get_request_and_content strm =
   let request = get_request strm in
+  let headers = Http.Headers.of_lines request in
+  let max_allowed_content_length = 64 * 1024 * 1024 in
   let content =
-    match Mutil.extract_param "content-length: " ' ' request with
+    match
+      Option.bind (Http.Headers.get headers "content-length") int_of_string_opt
+    with
     | None -> ""
-    | Some x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
+    | Some len when len <= 0 || len > max_allowed_content_length -> ""
+    | Some len -> (
+        try String.init len (fun _ -> Stream.next strm)
+        with Stream.Failure -> "")
   in
   (request, Adef.encoded content)
 
@@ -181,22 +188,25 @@ let treat_connection tmout callback addr fd =
   printing_state := Nothing;
   set_timeout tmout;
   let request, path, query =
-    let request, query =
+    let raw_request, raw_content =
       let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
       get_request_and_content strm
     in
-    let path, query =
-      match Mutil.extract_param "GET /" ' ' request with
-      | None -> (Mutil.extract_param "POST /" ' ' request, query)
-      | Some str -> (
-          match String.index_opt str '?' with
-          | Some i ->
-              ( Some (String.sub str 0 i),
-                String.sub str (i + 1) (String.length str - i - 1)
-                |> Adef.encoded )
-          | None -> (Some str, "" |> Adef.encoded))
+    let parsed_path, query_str =
+      match Http.parse_request_line raw_request with
+      | Some req_line ->
+          let q =
+            match req_line.meth with
+            | Http.POST | Http.PUT | Http.PATCH -> raw_content
+            | _ -> (
+                match req_line.query with
+                | Some q_str -> Adef.encoded (Http.string_of_query q_str)
+                | None -> Adef.encoded "")
+          in
+          (Some (Http.string_of_path req_line.path), q)
+      | None -> (None, raw_content)
     in
-    (request, Option.value ~default:"" path, query)
+    (raw_request, Option.value ~default:"" parsed_path, query_str)
   in
   (timeout_wrapper :=
      fun tmout ->
