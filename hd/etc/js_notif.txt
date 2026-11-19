@@ -28,8 +28,8 @@ var notifIcons={
   c.className='notif-ctr';
   document.body.appendChild(c);
   items.forEach(function(x){
-    var ti=x.title||notifLabels[x.level],
-        ic=notifIcons[x.level]||'fa-circle-info',
+    var ti=x.title||notifLabels%[x.level%],
+        ic=notifIcons%[x.level%]||'fa-circle-info',
         h='<div class="toast show border-'+x.level+'" role="alert">'+
           '<div class="toast-header bg-'+x.level+' text-white">'+
           '<i class="fa '+ic+' me-2"></i><strong class="me-auto">'+ti+'</strong>'+
