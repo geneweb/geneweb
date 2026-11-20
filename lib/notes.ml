@@ -1058,11 +1058,17 @@ let linked_page_add conf pg nenv tag pos ?(suffix = "") v
           String.sub v (j + 1) (String.length v - j - 1) )
     | _ -> ("", v, "")
   in
+
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let content =
-    Printf.sprintf {|%s<a href="%sm=NOTES&f=%s#p_%d">%s</a>%s%s|} a
-      (commd conf :> string)
-      (Mutil.encode pg :> string)
-      pos b c suffix
+    (if cgl then b
+     else
+       Printf.sprintf {|%s<a href="%sm=NOTES&f=%s#p_%d">%s</a>%s%s|} a
+         (commd conf :> string)
+         (Mutil.encode pg :> string)
+         pos b c suffix)
     |> safe_html
   in
   let note =
