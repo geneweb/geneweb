@@ -39,6 +39,9 @@ type t = {
   do_consang : bool;  (** Compute consanguinity *)
   pr_stats : bool;  (** Print base's statistics *)
   particules_file : string;  (** File containing the particles to use *)
+  max_children : int;
+      (** Maximum number of children a family can have, above which family is
+          dropped *)
 }
 
 val default : t

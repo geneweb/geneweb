@@ -135,6 +135,10 @@ let speclist =
       Arg.String
         (fun s -> Ged2gwb_lib.State.particles := Mutil.input_particles s),
       "<FILE> Use the given file as list of particles" );
+    ( "-max-children",
+      Arg.Set_int Ged2gwb_lib.State.max_children,
+      "<int> Maximum number of children a family can have, above this \
+       threshold the family is dropped (default: no limit)" );
   ]
   |> List.sort compare |> Arg.align
 

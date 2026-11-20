@@ -2,9 +2,10 @@
 
 (* TODO use https://gedcom.io/tools/#example-familysearch-gedcom-70-files to test gedcom v7.0 *)
 
-let ged_import filename base_name =
+let ged_import ?(max_children = 0) filename base_name =
   let () = Ged2gwb_lib.State.in_file := filename in
   let () = Ged2gwb_lib.State.out_file := base_name in
+  let () = Ged2gwb_lib.State.max_children := max_children in
   let state = Ged2gwb_lib.State.make () in
   Ged2gwb_lib.make_base state
 
@@ -30,11 +31,13 @@ let gw_export base outfile =
   in
   Gwu_lib.gwu_simple ~export_isolated:true opts
 
-let gw_import filename base_name =
+let gw_import ?(max_children = 0) filename base_name =
   let state = Gwc_lib.State.default in
   (* set file to import *)
   let files = [ (filename, false, "merge", 0) ] in
-  let state = { state with files; force = true; out_file = base_name } in
+  let state =
+    { state with files; force = true; out_file = base_name; max_children }
+  in
   Gwc_lib.make_base ~save_mem:false state;
   Gwdb.open_base base_name
 
@@ -292,6 +295,92 @@ interface web, utilisable aussi bien sur un ordinateur non connecté à Internet
   (Alcotest.check Alcotest.string) "wiki notes" s wiki;
   ()
 
+let test_ged_max_children () =
+  let ged_content =
+    "0 HEAD\n\
+     1 GEDC\n\
+     2 VERS 5.5\n\
+     2 FORM LINEAGE-LINKED\n\
+     1 CHAR UTF-8\n\
+     0 @I1@ INDI\n\
+     1 NAME Father /MaxChildGed/\n\
+     1 SEX M\n\
+     1 FAMS @F1@\n\
+     0 @I2@ INDI\n\
+     1 NAME Mother /MaxChildGed/\n\
+     1 SEX F\n\
+     1 FAMS @F1@\n\
+     0 @I3@ INDI\n\
+     1 NAME Child1 /MaxChildGed/\n\
+     1 SEX M\n\
+     1 FAMC @F1@\n\
+     0 @I4@ INDI\n\
+     1 NAME Child2 /MaxChildGed/\n\
+     1 SEX M\n\
+     1 FAMC @F1@\n\
+     0 @I5@ INDI\n\
+     1 NAME Child3 /MaxChildGed/\n\
+     1 SEX M\n\
+     1 FAMC @F1@\n\
+     0 @F1@ FAM\n\
+     1 HUSB @I1@\n\
+     1 WIFE @I2@\n\
+     1 CHIL @I3@\n\
+     1 CHIL @I4@\n\
+     1 CHIL @I5@\n\
+     0 TRLR\n"
+  in
+  let ged_file = Filename.temp_file "test_max_children" ".ged" in
+  let oc = open_out ged_file in
+  output_string oc ged_content;
+  close_out oc;
+  let base_name = Filename.concat Filename.current_dir_name "max_child_ged" in
+  let base = ged_import ~max_children:2 ged_file base_name in
+  let nb_persons = Gwdb.nb_of_real_persons base in
+  (Alcotest.check Alcotest.int) "all 5 persons imported" 5 nb_persons;
+  for i = 0 to nb_persons - 1 do
+    let p = Gwdb.poi base (Gwdb.iper_of_int i) in
+    (Alcotest.check Alcotest.int)
+      "no family unions for parents" 0
+      (Array.length (Gwdb.get_family p));
+    (Alcotest.check (Alcotest.option Alcotest.int))
+      "no parents link for children" None
+      (Option.map Gwdb.int_of_ifam (Gwdb.get_parents p))
+  done;
+  Gwdb.close_base base;
+  Sys.remove ged_file
+
+let test_gw_max_children () =
+  let gw_content =
+    "fam Test Father + Test Mother\n\
+     beg\n\
+     - m Child1\n\
+     - m Child2\n\
+     - m Child3\n\
+     end\n"
+  in
+  let gw_file = Filename.temp_file "test_max_children" ".gw" in
+  let oc = open_out gw_file in
+  output_string oc gw_content;
+  close_out oc;
+  let base_name = Filename.concat Filename.current_dir_name "max_child_gw" in
+  let base = gw_import ~max_children:2 gw_file base_name in
+  let nb_persons = Gwdb.nb_of_real_persons base in
+  (Alcotest.check Alcotest.int) "all 5 persons imported" 5 nb_persons;
+  (Alcotest.check Alcotest.int)
+    "0 families created" 0 (Gwdb.nb_of_families base);
+  for i = 0 to nb_persons - 1 do
+    let p = Gwdb.poi base (Gwdb.iper_of_int i) in
+    (Alcotest.check Alcotest.int)
+      "no family unions for parents" 0
+      (Array.length (Gwdb.get_family p));
+    (Alcotest.check (Alcotest.option Alcotest.int))
+      "no parents link for children" None
+      (Option.map Gwdb.int_of_ifam (Gwdb.get_parents p))
+  done;
+  Gwdb.close_base base;
+  Sys.remove gw_file
+
 let v =
   [
     ( "gedcom-royal",
@@ -310,5 +399,12 @@ let v =
         (* TODO <br> are inserted at gedcom import, removed at gedcom export, but not at gw export *)
         Alcotest.test_case "Abc <br> in notes" `Quick test_abc_br;
         Alcotest.test_case "Abc base notes" `Quick test_abc_base_notes;
+      ] );
+    ( "max-children",
+      [
+        Alcotest.test_case "GEDCOM max children threshold" `Quick
+          test_ged_max_children;
+        Alcotest.test_case "GW max children threshold" `Quick
+          test_gw_max_children;
       ] );
   ]
