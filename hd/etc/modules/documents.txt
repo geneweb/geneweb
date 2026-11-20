@@ -11,16 +11,24 @@
     <div class="d-flex flex-wrap column-gap-3 row-gap-5 align-items-start">
       %foreach;img_in_carrousel;
         <div class="position-relative align-self-start" style="width: %d_width;px;">
-          <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;"
-            class="d-flex"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            title="%carrousel_img_raw;">
+          %if;(e.cgl!="on")
+            <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;"
+              class="d-flex"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              title="%carrousel_img_raw;">
+              %if;("http" in url_in_env)
+                <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
+              %else;
+                <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
+              %end;
+            </a>
+          %else;
             %if;("http" in url_in_env)
               <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
             %else;
               <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
             %end;
-          </a>
+          %end;
           %if;(carrousel_img_note!="" or carrousel_img_src!="")
             <div class="position-absolute end-0 d-flex gap-1" style="transform: translate(-0.25rem, -20%%);">
               %if;(carrousel_img_note!="")

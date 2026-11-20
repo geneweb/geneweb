@@ -446,6 +446,9 @@ let find_sub s sub =
 
 let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
     ?(sep = Adef.safe " ") conf =
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let mk_link c d sy (s : Adef.safe_string) =
     let s = (s :> string) in
     let pos =
@@ -459,11 +462,14 @@ let string_of_date_aux ?(link = true) ?(on = false) ?(dmy = string_of_dmy)
       | None -> ("", s)
     in
     Adef.safe
-    @@ Printf.sprintf
-         {|%s<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
-         pre
-         (commd conf :> string)
-         c d.Adef.year c d.month c d.day c body
+    @@
+    if cgl then body
+    else
+      Printf.sprintf
+        {|%s<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
+        pre
+        (commd conf :> string)
+        c d.Adef.year c d.month c d.day c body
   in
   function
   | Adef.Dgreg (d, Dgregorian) ->
