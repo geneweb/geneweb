@@ -587,7 +587,8 @@ let latest a b =
   | Some _, None -> a
   | None, _ -> b
 
-let make ?(verbose = false) ~base ~bdir ~producer anomalies =
+let make ?(verbose = false) ?(signatures = true) ~base ~bdir ~producer anomalies
+    =
   let wanted = Hashtbl.create 4096 in
   List.iter
     (fun a ->
@@ -626,35 +627,39 @@ let make ?(verbose = false) ~base ~bdir ~producer anomalies =
           | Person p ->
               let first, last = history p in
               let signers =
-                match resolve p with
-                | Some dp -> signers_of (person_sources base dp)
-                | None -> []
+                if not signatures then []
+                else
+                  match resolve p with
+                  | Some dp -> signers_of (person_sources base dp)
+                  | None -> []
               in
               { signers; first; last }
           | Couple c ->
               let f1, l1 = history c.father and f2, l2 = history c.mother in
               let signers =
-                match (resolve c.father, resolve c.mother) with
-                | Some f, Some m ->
-                    let ip_m = Driver.get_iper m in
-                    Driver.get_family f |> Array.to_list
-                    |> List.filter_map (fun ifam ->
-                        let fam = Driver.foi base ifam in
-                        if
-                          Driver.Iper.equal (Driver.get_mother fam) ip_m
-                          || Driver.Iper.equal (Driver.get_father fam) ip_m
-                        then Some fam
-                        else None)
-                    |> List.concat_map (family_sources base)
-                    |> signers_of
-                    |> fun family_signers ->
-                    (* a union often carries no source of its own: then the
+                if not signatures then []
+                else
+                  match (resolve c.father, resolve c.mother) with
+                  | Some f, Some m ->
+                      let ip_m = Driver.get_iper m in
+                      Driver.get_family f |> Array.to_list
+                      |> List.filter_map (fun ifam ->
+                          let fam = Driver.foi base ifam in
+                          if
+                            Driver.Iper.equal (Driver.get_mother fam) ip_m
+                            || Driver.Iper.equal (Driver.get_father fam) ip_m
+                          then Some fam
+                          else None)
+                      |> List.concat_map (family_sources base)
+                      |> signers_of
+                      |> fun family_signers ->
+                      (* a union often carries no source of its own: then the
                        spouses' signatures *)
-                    if family_signers <> [] then family_signers
-                    else
-                      signers_of
-                        (List.concat_map (person_sources base) [ f; m ])
-                | Some _, None | None, Some _ | None, None -> []
+                      if family_signers <> [] then family_signers
+                      else
+                        signers_of
+                          (List.concat_map (person_sources base) [ f; m ])
+                  | Some _, None | None, Some _ | None, None -> []
               in
               { signers; first = earliest f1 f2; last = latest l1 l2 }
         in
@@ -1256,16 +1261,26 @@ let still_present base a =
           if not (is_unnamed p) then
             match Driver.person_of_key base p.first_name p.surname p.occ with
             | None -> ()
-            | Some ip ->
+            | Some ip -> (
                 let dp = Driver.poi base ip in
                 ignore (CheckItem.person ~onchange:false base warning dp);
-                Array.iter check_family (Driver.get_family dp))
+                (* the families where [dp] is a parent... *)
+                Array.iter check_family (Driver.get_family dp);
+                (* ...and the one where it is a child: a child's anomaly
+                   (e.g. UndefinedSex, sibling spacing) is found by the check of
+                   its parents' family, not of its own unions. *)
+                match Driver.get_parents dp with
+                | Some ifam -> check_family ifam
+                | None -> ()))
         (persons a);
       !found
 
-let write ?(verbose = false) ~base ~bdir ~producer anomalies =
+let write ?(verbose = false) ?(signatures = true) ~base ~bdir ~producer
+    anomalies =
   let dir = Filename.concat bdir "config" in
-  match save dir (make ~verbose ~base ~bdir ~producer anomalies) with
+  match
+    save dir (make ~verbose ~signatures ~base ~bdir ~producer anomalies)
+  with
   | () -> ()
   | exception (Sys_error msg | Failure msg) ->
       Printf.eprintf "Cannot write the anomalies report: %s\n%!" msg

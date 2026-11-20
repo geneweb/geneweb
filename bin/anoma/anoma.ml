@@ -18,6 +18,7 @@ let usage =
 let () =
   let bname = ref "" in
   let fold_only = ref false in
+  let no_check = ref false in
   let speclist =
     Arg.align
       [
@@ -26,6 +27,10 @@ let () =
           Printf.sprintf "<DIR> bases directory (default %S)"
             (Dirs.path Secure.default_base_dir) );
         ("-fold", Arg.Set fold_only, " only merge the pending verifications");
+        ( "-no-check",
+          Arg.Set no_check,
+          " do not scan the sources for [[w:ident]] signatures (much faster; \
+           responsibility then comes from the history only)" );
       ]
   in
   Arg.parse speclist
@@ -48,7 +53,8 @@ let () =
          (Filename.concat (Secure.base_dir ()) bname)
          (fun base ->
            let anomalies = Anomaly.collect ~verbose base in
-           Anomaly.write ~verbose ~base ~bdir ~producer:"anoma" anomalies;
+           Anomaly.write ~verbose ~signatures:(not !no_check) ~base ~bdir
+             ~producer:"anoma" anomalies;
            anomalies)
      in
      Printf.eprintf "%d anomalies written to %s\n%!" (List.length anomalies)

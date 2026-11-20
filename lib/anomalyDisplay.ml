@@ -623,8 +623,13 @@ let print_summary conf base st items =
     List.length (List.filter (recent_cut st.cutoff) unverified_all)
   in
   let total = List.length unverified_all in
+  (* The report carries a modification date only for persons present in the base
+     history. A freshly built base (or one whose report predates its history)
+     has none: then "recent" cannot mean anything, so show everything. *)
+  let datable = List.exists (fun it -> last_change it <> "") items in
   let items =
-    if st.recent then List.filter (recent_cut st.cutoff) items else items
+    if st.recent && datable then List.filter (recent_cut st.cutoff) items
+    else items
   in
   let counts = Hashtbl.create 32 in
   let get k =
@@ -654,11 +659,15 @@ let print_summary conf base st items =
   in
   page conf ~title:"anomalies" (fun () ->
       print_report_info conf st;
-      print_recent_filter conf st ~months ~recent_count ~total (fun recent ->
-          url conf
-            (("m", "ANOMA")
-             :: (match st.wiz with Some who -> [ wiz_param who ] | None -> [])
-            @ if recent then [] else [ ("recent", "0") ]));
+      if datable then
+        print_recent_filter conf st ~months ~recent_count ~total (fun recent ->
+            url conf
+              (("m", "ANOMA")
+               ::
+               (match st.wiz with
+               | Some who -> [ wiz_param who ]
+               | None -> [])
+              @ if recent then [] else [ ("recent", "0") ]));
       print_wizard_filter conf st unverified (fun wiz ->
           url conf
             (("m", "ANOMA")
@@ -829,6 +838,9 @@ let print_kind conf base (st : state) items k =
         && (f.all || not (verified st it)))
       items
   in
+  (* no modification date in the report (no base history) => "recent" is
+     meaningless, show everything (see [print_summary]) *)
+  let datable = List.exists (fun it -> last_change it <> "") of_kind in
   (* recency toggle counts, within the current wizard scope *)
   let in_scope = List.filter (of_wizard st) of_kind in
   let total_scope = List.length in_scope in
@@ -837,7 +849,8 @@ let print_kind conf base (st : state) items k =
   in
   (* the anomalies of the viewed period, all wizards (for the wizard filter) *)
   let visible =
-    if st.recent then List.filter (recent_cut st.cutoff) of_kind else of_kind
+    if st.recent && datable then List.filter (recent_cut st.cutoff) of_kind
+    else of_kind
   in
   (* The report is a snapshot (anoma runs on a schedule); re-check each entry of
      the viewed kind against the live base and drop the ones fixed since. *)
@@ -862,9 +875,10 @@ let print_kind conf base (st : state) items k =
         "<h2>%s <span class=\"badge bg-secondary\">%d</span></h2>\n"
         (esc (kind_label conf k))
         total;
-      print_recent_filter conf st ~months ~recent_count:recent_scope
-        ~total:total_scope (fun recent ->
-          filters_url conf { f with recent; pg = 1 });
+      if datable then
+        print_recent_filter conf st ~months ~recent_count:recent_scope
+          ~total:total_scope (fun recent ->
+            filters_url conf { f with recent; pg = 1 });
       print_wizard_filter conf st visible (fun wiz ->
           filters_url conf { f with wiz; pg = 1 });
       filter_links conf f;

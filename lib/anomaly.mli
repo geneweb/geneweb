@@ -184,6 +184,7 @@ type report = {
 
 val make :
   ?verbose:bool ->
+  ?signatures:bool ->
   base:Geneweb_db.Driver.base ->
   bdir:string ->
   producer:string ->
@@ -192,10 +193,14 @@ val make :
 (** [make ~base ~bdir ~producer anomalies] dates the report and gathers, for
     each subject, the signers in its sources and its first and last line in
     [<bdir>/history] (read once, whole). [~verbose:true] shows a progress bar on
-    stderr while reading the history (no-op when stderr is not a terminal). *)
+    stderr while reading the history (no-op when stderr is not a terminal).
+    [~signatures:false] skips scanning the sources for [[w:ident]] signatures
+    (no per-subject key resolution): much faster, but the report then carries no
+    signers, so responsibility falls back to the history. *)
 
 val write :
   ?verbose:bool ->
+  ?signatures:bool ->
   base:Geneweb_db.Driver.base ->
   bdir:string ->
   producer:string ->
