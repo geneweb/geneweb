@@ -199,8 +199,8 @@
    « xx » pour la personne et des noms préfixés par « p_ » pour le reste.
    ====================================================================== %)
 
-%( Prénom.occ Nom, sans .occ s'il vaut 0 %)
-%define;person_key(xx)%xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
+%( Prénom.occ Nom %)
+%define;person_key(xx)%xx.first_name;.%xx.occ; %xx.surname;%end;
 
 %define;person_mod_label(xx)[*modify::] %apply;person_key("xx")%end;
 
