@@ -18968,6 +18968,14 @@ de: Datenqualität
 en: data quality
 fr: qualité des données
 
+    growth of the database
+de: Wachstum der Datenbank
+en: growth of the database
+es: crecimiento de la base
+fr: évolution de la taille de la base
+it: crescita del database
+nl: groei van de database
+
     description
 af: beskrywing
 bg: описание
@@ -22607,6 +22615,14 @@ sl: statistika strežnika
 sv: serverstatistik
 tr: sunucu istatistikleri
 zh: 服务器统计
+
+    connections by country
+de: Verbindungen nach Land
+en: connections by country
+es: conexiones por país
+fr: connexions par pays
+it: connessioni per paese
+nl: verbindingen per land
 
     day/week/month
 af: dag/week/maand

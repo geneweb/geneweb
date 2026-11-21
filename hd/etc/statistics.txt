@@ -33,6 +33,17 @@
 <!-- KPI cards -->
 <div class="row mb-3" id="kpi-row"></div>
 
+%if;(bvar.stats_growth != "")
+<!-- Growth of the database, milestones from bvar stats_growth -->
+<div class="row mb-3">
+  <div class="col-12"><div class="card"><div class="card-body">
+    <h2 class="h6 card-title text-body-secondary">[*growth of the database]</h2>
+    <canvas id="ch-growth" height="70"></canvas>
+  </div></div></div>
+</div>
+<script type="text/plain" id="growth-data">%bvar.stats_growth;</script>
+%end;
+
 <!-- Demographics -->
 <div class="row mb-3">
   <div class="col-md-4"><div class="card"><div class="card-body">
@@ -275,6 +286,56 @@ function mfBar(id, d) {
   });
 }
 
+/* Growth of the database. bvar stats_growth lists milestones "date:count"
+   separated by spaces or commas; date is YYYY, YYYY-MM or YYYY-MM-DD.
+   The current total is appended as today's point. */
+function growthChart(total) {
+  var src = document.getElementById("growth-data");
+  if (!src) return;
+  var re = /^(\d{4})(?:-(\d{1,2}))?(?:-(\d{1,2}))?:(\d+)$/;
+  var lang = document.documentElement.lang || undefined;
+  function dec(y, m, d) {
+    if (!m) return y + 0.5;
+    var t0 = Date.UTC(y, 0, 1), t1 = Date.UTC(y + 1, 0, 1);
+    var t = d ? Date.UTC(y, m - 1, d) : (Date.UTC(y, m - 1, 1) + Date.UTC(y, m, 1)) / 2;
+    return y + (t - t0) / (t1 - t0);
+  }
+  function lbl(y, m, d) {
+    if (!m) return String(y);
+    if (!d) return GW.mo%[m - 1%] + " " + y;
+    return new Date(y, m - 1, d).toLocaleDateString(lang);
+  }
+  var pts = %[%], items = src.textContent.trim().split(/%[\s,;%]+/);
+  for (var i = 0; i < items.length; i++) {
+    var r = re.exec(items%[i%]);
+    if (!r) continue;
+    var y = +r%[1%], m = r%[2%] ? +r%[2%] : 0, d = r%[3%] ? +r%[3%] : 0;
+    pts.push({x:dec(y, m, d), y:+r%[4%], l:lbl(y, m, d)});
+  }
+  if (!pts.length) return;
+  var now = new Date();
+  var xn = dec(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  pts.sort(function(a, b) { return a.x - b.x; });
+  if (total != null && pts%[pts.length - 1%].x < xn)
+    pts.push({x:xn, y:total, l:now.toLocaleDateString(lang)});
+  new Chart(document.getElementById("ch-growth"), {
+    type:"line",
+    data:{datasets:%[{data:pts, borderColor:C.mB, backgroundColor:C.m,
+      pointRadius:3, fill:false, tension:0}%]},
+    options:{
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{
+          title:function(it) { return it%[0%].raw.l; },
+          label:function(it) { return fmt(it.raw.y) + " " + GW.L.pe; }}}},
+      scales:{
+        x:{type:"linear", ticks:{stepSize:1, precision:0,
+          callback:function(v) { return Number.isInteger(v) ? String(v) : ""; }}},
+        y:{beginAtZero:true, ticks:{callback:function(v) { return fmt(v); }}}
+      }
+    }
+  });
+}
+
 fetch(GW.url).then(function(r) {
   if (!r.ok) throw new Error("HTTP " + r.status);
   return r.text().then(function(t) {
@@ -292,6 +353,7 @@ fetch(GW.url).then(function(r) {
   kpi(row, "\u2640 "+L.le, years(a.life_women, 1), C.fB);
   kpi(row, L.md, years(a.median_life, 0), C.pB);
   kpi(row, L.so, q.sources + L.pc, C.oB);
+  growthChart(c.total);
 
   new Chart(document.getElementById("ch-sex"), {
     type:"doughnut",
