@@ -28,6 +28,8 @@ val display_text : person_text -> string
     a space, or its explicit text. *)
 
 val advances_pos : wiki_link -> bool
+(** Whether a link takes a slot in the [#p_N] anchor numbering shared by
+    [Wiki.syntax_links] and nldb's [lnPos]. *)
 
 val split_query : string -> (string * string) list
 (** [split_query q] is the fields of the query string [q], each with the
@@ -44,8 +46,6 @@ val fold_person_urls :
     mode [m=]: such a URL designates the person [key] (lower-cased). [start] and
     [stop] delimit its query string, after the ['?'] if any. The separators are
     ['&'], ["&amp;"] and the legacy [';']. *)
-(** Whether a link takes a slot in the [#p_N] anchor numbering shared by
-    [Wiki.syntax_links] and nldb's [lnPos]. *)
 
 val fold_links :
   (pos:int -> wiki_link -> 'acc -> 'acc) -> 'acc -> string -> 'acc
