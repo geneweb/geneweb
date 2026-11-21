@@ -600,7 +600,8 @@ let book_order conf base l =
   let alphabetic (_, s1) (_, s2) =
     let rss1 = Place.without_suburb s1 in
     let rss2 = Place.without_suburb s2 in
-    if rss1 = rss2 then Gutil.alphabetic_order s1 s2
+    if rss1 = rss2 then
+      Gutil.alphabetic_order (Place.only_suburb s1) (Place.only_suburb s2)
     else Gutil.alphabetic_order rss1 rss2
   in
   if rev_order conf base then
