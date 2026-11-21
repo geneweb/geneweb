@@ -1,4 +1,4 @@
-<!-- $Id: upd_sign.txt v7.1 08/10/2026 $ -->
+<!-- $Id: upd_sign.txt v7.1 21/11/2026 $ -->
 %let;sig;%[%[w:%user.ident;%]%]%in;
 %let;sdate;%today.day;/%apply;nth%with;/I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII%and;%today.month;%end;/%today.year;%in;
 <div class="d-flex align-items-center gap-1 mt-2" id="sign">
@@ -19,30 +19,66 @@
   const btn = document.querySelector('#sign button');
   const src = document.getElementById('sign_src');
   const keep = document.getElementById('sign_keep');
+  const form = src.form || src.closest('form');
+  const fields = ['src', 'psrc'].map(id => document.getElementById(id)).filter(f => f);
   const save = () => {
     try {
       if (keep.checked && src.value.trim()) localStorage.setItem(key, src.value.trim());
       else localStorage.removeItem(key);
     } catch (e) {}
   };
+  const signature = () =>
+    btn.dataset.sig + ' (' + (src.value.trim() || 'Source?') + ') ' + btn.dataset.date;
+  const changed = f => f.dispatchEvent(new Event('input', { bubbles: true }));
+  /* Append sig to field f unless already there; true if appended. */
+  const add = (f, sig) => {
+    const cur = f.value.trim();
+    if (cur.includes(sig)) return false;
+    f.value = cur ? cur + ', ' + sig : sig;
+    changed(f);
+    return true;
+  };
+  /* Remove the last occurrence of sig (and its comma) from field f. */
+  const del = (f, sig) => {
+    const v = f.value, i = v.lastIndexOf(', ' + sig);
+    if (i >= 0) f.value = v.slice(0, i) + v.slice(i + 2 + sig.length);
+    else if (v.trim() === sig) f.value = '';
+    else return;
+    changed(f);
+  };
+  /* Signatures put in by the automatic mode, per field, so that they
+     can follow the source text and the box. */
+  const auto = new Map();
+  const unsign = () => { auto.forEach((sig, f) => del(f, sig)); auto.clear(); };
+  const resign = () => {
+    unsign();
+    if (!keep.checked || !src.value.trim()) return;
+    const sig = signature();
+    fields.forEach(f => { if (add(f, sig)) auto.set(f, sig); });
+  };
+  const snapshot = () => form ? new URLSearchParams(new FormData(form)).toString() : '';
+
   try { src.value = localStorage.getItem(key) || ''; } catch (e) {}
   keep.checked = src.value !== '';
+  const initial = snapshot();   /* taken before the automatic signature */
+  resign();                     /* sign as soon as the form is loaded */
+
   src.addEventListener('keydown', e => {
     if (e.key === 'Enter') e.preventDefault();
   });
+  src.addEventListener('input', () => { save(); resign(); });
+  keep.addEventListener('change', () => { save(); resign(); });
+  /* Manual signature: permanent, not undone by the box. */
   btn.addEventListener('click', () => {
-    const txt = src.value.trim();
-    const sig = btn.dataset.sig + ' (' + (txt || 'Source?') + ') ' + btn.dataset.date;
-    'src,psrc'.split(',').forEach(id => {
-      const f = document.getElementById(id);
-      if (!f) return;
-      const cur = f.value.trim();
-      f.value = cur ? cur + ', ' + sig : sig;
-      f.dispatchEvent(new Event('input', { bubbles: true }));
-    });
+    const sig = signature();
+    fields.forEach(f => { add(f, sig); auto.delete(f); });
     save();
   });
-  keep.addEventListener('change', save);
-  src.addEventListener('input', save);
+  /* Nothing else changed: do not save a record just for the signature. */
+  if (form) form.addEventListener('submit', () => {
+    const sigs = new Map(auto);
+    unsign();
+    if (snapshot() !== initial) sigs.forEach((sig, f) => { add(f, sig); auto.set(f, sig); });
+  });
 })();
 </script>
