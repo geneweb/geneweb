@@ -233,6 +233,74 @@ let fold_links f acc s =
   in
   loop acc 1 0
 
+let is_url_stop c =
+  match c with
+  | '"' | '\'' | ' ' | '\t' | '\n' | '\r' | '<' | '>' | '(' | ')' | '[' | ']'
+  | '|' ->
+      true
+  | _ -> false
+
+let split_query r =
+  let n = String.length r in
+  let rec loop fstart i sep acc =
+    if i >= n then List.rev ((sep, String.sub r fstart (n - fstart)) :: acc)
+    else if r.[i] = '&' || r.[i] = ';' then
+      let acc = (sep, String.sub r fstart (i - fstart)) :: acc in
+      let sep, next =
+        if r.[i] = ';' then (";", i + 1)
+        else if i + 4 < n && String.sub r i 5 = "&amp;" then ("&amp;", i + 5)
+        else ("&", i + 1)
+      in
+      loop next next sep acc
+    else loop fstart (i + 1) sep acc
+  in
+  loop 0 0 "" []
+
+let query_field items k =
+  List.find_map
+    (fun (_, f) ->
+      match String.index_opt f '=' with
+      | Some e when String.sub f 0 e = k ->
+          Some
+            (Mutil.decode
+               (Adef.encoded (String.sub f (e + 1) (String.length f - e - 1))))
+      | Some _ | None -> None)
+    items
+
+let url_person_key region =
+  let items = split_query region in
+  match (query_field items "p", query_field items "n") with
+  | Some p, Some n when p <> "" && n <> "" -> (
+      match query_field items "oc" with
+      | None -> Some (Name.lower p, Name.lower n, 0)
+      | Some oc ->
+          Option.map
+            (fun oc -> (Name.lower p, Name.lower n, oc))
+            (int_of_string_opt oc))
+  | _ -> None
+
+let fold_person_urls f acc s =
+  let len = String.length s in
+  let rec loop acc i =
+    if i >= len then acc
+    else if is_url_stop s.[i] then loop acc (i + 1)
+    else
+      let a = ref i and j = ref i and eq = ref false in
+      while !j < len && not (is_url_stop s.[!j]) do
+        (match s.[!j] with '?' -> a := !j + 1 | '=' -> eq := true | _ -> ());
+        incr j
+      done;
+      let acc =
+        if !eq && !a < !j then
+          match url_person_key (String.sub s !a (!j - !a)) with
+          | Some key -> f ~start:!a ~stop:!j key acc
+          | None -> acc
+        else acc
+      in
+      loop acc !j
+  in
+  loop acc 0
+
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
   if list_nt = [] && list_ind = [] then db else (who, (list_nt, list_ind)) :: db

@@ -13,8 +13,33 @@ let remains (ofn, osn) (nfn, nsn) text expected =
       check bool text expected
         (Notes.old_name_remains (lk (ofn, osn, 0)) (nfn, nsn, 0) text))
 
+let im_c old_ new_ text expected =
+  test_case text `Quick (fun () ->
+      check string text expected (Notes.rename_person_urls (lk old_) new_ text))
+
 let v =
   [
+    ( "notes-rename-urls",
+      [
+        im_c ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|<img src="m=IM_C&p=jean&n=dupont&s=a.jpg">|}
+          {|<img src="m=IM_C&p=Pierre&n=Durand&s=a.jpg">|};
+        im_c ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|<img src="?b=x&amp;m=IM_C&amp;p=jean&amp;n=dupont&amp;oc=0&amp;s=a.jpg">|}
+          {|<img src="?b=x&amp;m=IM_C&amp;p=Jean&amp;n=Dupont&amp;oc=2&amp;s=a.jpg">|};
+        im_c ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|m=IM_C&p=jean&n=dupont&s=a.jpg|}
+          {|m=IM_C&p=Jean&n=Dupont&s=a.jpg&oc=2|};
+        im_c ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|<img src="m=IM_C;p=jean;n=dupont;s=a.jpg">|}
+          {|<img src="m=IM_C;p=Jean;n=Dupont;s=a.jpg;oc=2">|};
+        im_c ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|<a href="?b=x&m=A&p=jean&n=dupont">Jean</a>|}
+          {|<a href="?b=x&m=A&p=Pierre&n=Durand">Jean</a>|};
+        im_c ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|m=IM_C&p=jean&n=dupont&oc=1&s=a.jpg|}
+          {|m=IM_C&p=jean&n=dupont&oc=1&s=a.jpg|};
+      ] );
     ( "notes-rename-text",
       [
         case ("Jean", "Dupont") ("Pierre", "Dupont") "Jean Dupont"

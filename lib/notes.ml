@@ -378,39 +378,69 @@ let adjust_cache_linked_pages conf ~removed ~added =
         write_cache_linked_pages conf ht
 
 let links_of_text s =
-  NotesLinks.fold_links
-    (fun ~pos link (list_nt, list_ind) ->
-      match link with
-      | NotesLinks.WLpage (_, _, lfname, _, _) ->
-          let list_nt =
-            if List.mem lfname list_nt then list_nt else lfname :: list_nt
-          in
-          (list_nt, list_ind)
-      | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
-          let link =
-            {
-              Def.NLDB.lnTxt = txt;
-              Def.NLDB.lnPos = pos;
-              Def.NLDB.lnFamMarker = fam_marker;
-            }
-          in
-          (list_nt, (key, link) :: list_ind)
-      | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
-          (list_nt, list_ind))
-    ([], []) s
+  let list_nt, list_ind =
+    NotesLinks.fold_links
+      (fun ~pos link (list_nt, list_ind) ->
+        match link with
+        | NotesLinks.WLpage (_, _, lfname, _, _) ->
+            let list_nt =
+              if List.mem lfname list_nt then list_nt else lfname :: list_nt
+            in
+            (list_nt, list_ind)
+        | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
+            let link =
+              {
+                Def.NLDB.lnTxt = txt;
+                Def.NLDB.lnPos = pos;
+                Def.NLDB.lnFamMarker = fam_marker;
+              }
+            in
+            (list_nt, (key, link) :: list_ind)
+        | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
+            (list_nt, list_ind))
+      ([], []) s
+  in
+  (* a URL with p=fn&n=sn designates the person as a [[fn/sn]] link does;
+     it has no anchor in the page *)
+  NotesLinks.fold_person_urls
+    (fun ~start:_ ~stop:_ key (list_nt, list_ind) ->
+      let link = { Def.NLDB.lnTxt = None; lnPos = 0; lnFamMarker = None } in
+      (list_nt, (key, link) :: list_ind))
+    (list_nt, list_ind) s
 
-let update_notes_links_db conf base fnotes s =
+(* During a rename, the nldb is read once, updated in memory by every page
+   rewritten, and written once at the end, with the cache of linked pages. *)
+type links_batch = {
+  mutable nldb : (Driver.iper, Driver.ifam) Def.NLDB.t;
+  mutable removed : Def.NLDB.key list;
+  mutable added : Def.NLDB.key list;
+}
+
+let update_notes_links_db_gen batch conf base fnotes s =
   let list_nt, list_ind = links_of_text s in
   let keys l = List.sort_uniq compare (List.map fst l) in
+  let old_entry =
+    match batch with
+    | None -> NotesLinks.update_db base fnotes (list_nt, list_ind)
+    | Some b ->
+        let old_entry = List.assoc_opt fnotes b.nldb in
+        b.nldb <- NotesLinks.add_in_db b.nldb fnotes (list_nt, list_ind);
+        old_entry
+  in
   let old_keys =
-    match NotesLinks.update_db base fnotes (list_nt, list_ind) with
-    | Some (_, old_ind) -> keys old_ind
-    | None -> []
+    match old_entry with Some (_, old_ind) -> keys old_ind | None -> []
   in
   let new_keys = keys list_ind in
-  adjust_cache_linked_pages conf
-    ~removed:(List.filter (fun k -> not (List.mem k new_keys)) old_keys)
-    ~added:(List.filter (fun k -> not (List.mem k old_keys)) new_keys)
+  let removed = List.filter (fun k -> not (List.mem k new_keys)) old_keys in
+  let added = List.filter (fun k -> not (List.mem k old_keys)) new_keys in
+  match batch with
+  | None -> adjust_cache_linked_pages conf ~removed ~added
+  | Some b ->
+      b.removed <- List.rev_append removed b.removed;
+      b.added <- List.rev_append added b.added
+
+let update_notes_links_db conf base fnotes s =
+  update_notes_links_db_gen None conf base fnotes s
 
 let notes_bearing_text_of_person base (p : _ Def.gen_person) =
   let sl =
@@ -462,23 +492,33 @@ let notes_bearing_text_of_family base (f : _ Def.gen_family) =
   in
   String.concat " " (List.map (Driver.sou base) sl)
 
-let has_links s = Mutil.contains s "[["
+let has_links s = Mutil.contains s "[[" || Mutil.contains s "p="
 
-let update_notes_links_person ?old_text conf base (p : _ Def.gen_person) =
+let update_notes_links_person_gen batch ?old_text conf base
+    (p : _ Def.gen_person) =
   let s = notes_bearing_text_of_person base p in
   match old_text with
   | Some t when links_of_text t = links_of_text s -> ()
   | Some _ | None ->
-      update_notes_links_db conf base (Def.NLDB.PgInd p.Def.key_index) s
+      update_notes_links_db_gen batch conf base (Def.NLDB.PgInd p.Def.key_index)
+        s
 
-let update_notes_links_family ?old_text conf base (f : _ Def.gen_family) =
+let update_notes_links_person ?old_text conf base p =
+  update_notes_links_person_gen None ?old_text conf base p
+
+let update_notes_links_family_gen batch ?old_text conf base
+    (f : _ Def.gen_family) =
   let s = notes_bearing_text_of_family base f in
   match old_text with
   | Some t when links_of_text t = links_of_text s -> ()
   | Some _ | None ->
-      update_notes_links_db conf base (Def.NLDB.PgFam f.Def.fam_index) s
+      update_notes_links_db_gen batch conf base (Def.NLDB.PgFam f.Def.fam_index)
+        s
 
-let commit_notes conf base fnotes s =
+let update_notes_links_family ?old_text conf base f =
+  update_notes_links_family_gen None ?old_text conf base f
+
+let commit_notes_gen batch conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
@@ -490,9 +530,11 @@ let commit_notes conf base fnotes s =
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db conf base pg s
+  update_notes_links_db_gen batch conf base pg s
 
-let commit_wiznotes conf base fnotes s =
+let commit_notes conf base fnotes s = commit_notes_gen None conf base fnotes s
+
+let commit_wiznotes_gen batch conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
@@ -503,7 +545,10 @@ let commit_wiznotes conf base fnotes s =
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Driver.commit_wiznotes base fname s;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
-  update_notes_links_db conf base pg s
+  update_notes_links_db_gen batch conf base pg s
+
+let commit_wiznotes conf base fnotes s =
+  commit_wiznotes_gen None conf base fnotes s
 
 (* Matching person names in note texts.
    A name is compared word by word through Name.lower (case, accent and
@@ -753,12 +798,61 @@ let update_gallery s oldk newk =
       let updated_json = update_map json oldk newk in
       title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
 
+(* [rewrite_url_query newk query] sets the p, n and oc fields of the query
+   string of a URL to the person [newk], keeping the separators. *)
+let rewrite_url_query (nfn, nsn, noc) query =
+  let items = NotesLinks.split_query query in
+  let has_oc = NotesLinks.query_field items "oc" <> None in
+  let enc v = (Mutil.encode v :> string) in
+  let items =
+    List.map
+      (fun (sep, f) ->
+        match String.index_opt f '=' with
+        | Some e -> (
+            match String.sub f 0 e with
+            | "p" -> (sep, "p=" ^ enc nfn)
+            | "n" -> (sep, "n=" ^ enc nsn)
+            | "oc" -> (sep, "oc=" ^ string_of_int noc)
+            | _ -> (sep, f))
+        | None -> (sep, f))
+      items
+  in
+  let items =
+    if has_oc || noc = 0 then items
+    else
+      let sep =
+        match List.find_opt (fun (sep, _) -> sep <> "") items with
+        | Some (sep, _) -> sep
+        | None -> "&"
+      in
+      List.rev ((sep, "oc=" ^ string_of_int noc) :: List.rev items)
+  in
+  String.concat "" (List.map (fun (sep, f) -> sep ^ f) items)
+
+let rename_person_urls oldk newk s =
+  let okey = lower_key oldk in
+  let buf = Buffer.create (String.length s + 16) in
+  let last =
+    NotesLinks.fold_person_urls
+      (fun ~start ~stop key pos ->
+        if key <> okey then pos
+        else (
+          Buffer.add_substring buf s pos (start - pos);
+          Buffer.add_string buf
+            (rewrite_url_query newk (String.sub s start (stop - start)));
+          stop))
+      0 s
+  in
+  Buffer.add_substring buf s last (String.length s - last);
+  Buffer.contents buf
+
 let rewrite_key s oldk newk _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
       update_gallery s oldk newk
     else s
   in
+  let s = rename_person_urls oldk newk s in
   let slen = String.length s in
   let out = Buffer.create (slen + 64) in
   (* the text as displayed: links to the person by their new display text,
@@ -816,7 +910,7 @@ let replace_ind_key_in_str base is oldk newk p =
   let s', remains = rewrite_key s oldk newk design in
   (Driver.insert_string base s', remains)
 
-let update_ind_key_pgind conf base p oldk newk =
+let update_ind_key_pgind batch conf base p oldk newk =
   let oldp = Driver.gen_person_of_person @@ Driver.poi base p in
   let remains = ref false in
   let replace is =
@@ -867,10 +961,10 @@ let update_ind_key_pgind conf base p oldk newk =
     }
   in
   Driver.patch_person base p newp;
-  update_notes_links_person conf base newp;
+  update_notes_links_person_gen (Some batch) conf base newp;
   !remains
 
-let update_ind_key_pgfam conf base f oldk newk =
+let update_ind_key_pgfam batch conf base f oldk newk =
   let oldf = Driver.gen_family_of_family @@ Driver.foi base f in
   let cpl = Driver.foi base f in
   let fath = Driver.poi base (Driver.get_father cpl) in
@@ -906,34 +1000,41 @@ let update_ind_key_pgfam conf base f oldk newk =
     { oldf with marriage_note; marriage_src; comment; fsources; fevents }
   in
   Driver.patch_family base f newf;
-  update_notes_links_family conf base newf;
+  update_notes_links_family_gen (Some batch) conf base newf;
   !remains
 
-let update_ind_key_pgmisc conf base f oldk newk =
+let update_ind_key_pgmisc batch conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_notes_read base fname in
   let newn, remains = rewrite_key oldn oldk newk f in
-  commit_notes conf base f newn;
+  commit_notes_gen (Some batch) conf base f newn;
   remains
 
-let update_ind_key_pgwiz conf base f oldk newk =
+let update_ind_key_pgwiz batch conf base f oldk newk =
   let fname = path_of_fnotes f in
   let oldn = Driver.base_wiznotes_read base fname in
   let newn, remains = rewrite_key oldn oldk newk f in
-  commit_wiznotes conf base f newn;
+  commit_wiznotes_gen (Some batch) conf base f newn;
   remains
 
 let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
-  List.filter
-    (fun pg ->
-      match pg with
-      | Def.NLDB.PgInd p -> update_ind_key_pgind conf base p oldk newk
-      | PgFam f -> update_ind_key_pgfam conf base f oldk newk
-      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
-      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
-      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
-    link_pages
+  let batch = { nldb = Driver.read_nldb base; removed = []; added = [] } in
+  Fun.protect
+    ~finally:(fun () ->
+      if link_pages <> [] then (
+        Driver.write_nldb base batch.nldb;
+        adjust_cache_linked_pages conf ~removed:batch.removed ~added:batch.added))
+    (fun () ->
+      List.filter
+        (fun pg ->
+          match pg with
+          | Def.NLDB.PgInd p -> update_ind_key_pgind batch conf base p oldk newk
+          | PgFam f -> update_ind_key_pgfam batch conf base f oldk newk
+          | PgNotes -> update_ind_key_pgmisc batch conf base "" oldk newk
+          | PgMisc f -> update_ind_key_pgmisc batch conf base f oldk newk
+          | PgWizard f -> update_ind_key_pgwiz batch conf base f oldk newk)
+        link_pages)
 
 let wiki_aux pp conf base env str =
   let s = Util.string_with_macros conf env str in
