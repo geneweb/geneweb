@@ -502,6 +502,19 @@ let print_foreach conf base print_ast _eval_expr =
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
     let current_s = Option.value ~default:"" (p_getenv_notrim conf.env "s") in
+    (* the words of the prefix ended by a space or a punctuation, left out of
+       the initials shown *)
+    let acquired =
+      let rec loop i =
+        if i = 0 then ""
+        else
+          match current_s.[i - 1] with
+          | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '\128' .. '\255' ->
+              loop (i - 1)
+          | _ -> String.sub current_s 0 i
+      in
+      loop (String.length current_s)
+    in
     (* in an index, the page of each group: its first and last groups *)
     let page_of = Hashtbl.create 16 in
     if index then
@@ -531,13 +544,20 @@ let print_foreach conf base print_ast _eval_expr =
     List.iteri
       (fun i (ini_k, n, list_v) ->
         let display_ini =
-          let len =
-            if String.is_valid_utf_8 ini_k then Utf8.length ini_k else 0
+          let s =
+            let a = String.length acquired in
+            if
+              a > 0
+              && String.length ini_k > a
+              && String.starts_with ~prefix:acquired ini_k
+            then String.sub ini_k a (String.length ini_k - a)
+            else ini_k
           in
+          let len = if String.is_valid_utf_8 s then Utf8.length s else 0 in
           if len > 5 then
-            let b = Utf8.get ini_k (len - 4) in
-            "…" ^ String.sub ini_k b (String.length ini_k - b)
-          else ini_k
+            let b = Utf8.get s (len - 4) in
+            "…" ^ String.sub s b (String.length s - b)
+          else s
         in
         let script_info =
           if String.length ini_k > 0 then
