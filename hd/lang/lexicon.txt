@@ -22575,7 +22575,10 @@ sv: statistik
 tr: i̇statistik
 
     server statistics
+af: bedienerstatistieke
 bg: статистика на сървъра
+br: stadegoù ar servijer
+ca: estadístiques del servidor
 co: statistiche di u servitore
 cs: statistiky serveru
 da: serverstatistik
@@ -22587,6 +22590,7 @@ et: serveri statistika
 fi: palvelimen tilastot
 fr: statistiques du serveur
 he: סטטיסטיקות שרת
+is: tölfræði netþjóns
 it: statistiche del server
 lt: serverio statistika
 lv: servera statistika
@@ -22595,15 +22599,20 @@ no: serverstatistikk
 oc: estatisticas del servidor
 pl: statystyki serwera
 pt: estatísticas do servidor
+pt-br: estatísticas do servidor
 ro: statisticile serverului
 ru: статистика сервера
 sk: štatistiky servera
 sl: statistika strežnika
 sv: serverstatistik
 tr: sunucu istatistikleri
+zh: 服务器统计
 
     day/week/month
+af: dag/week/maand
 bg: ден/седмица/месец
+br: deiz/sizhun/miz
+ca: dia/setmana/mes
 co: ghjornu/settimana/mese
 cs: den/týden/měsíc
 da: dag/uge/måned
@@ -22615,6 +22624,7 @@ et: päev/nädal/kuu
 fi: päivä/viikko/kuukausi
 fr: jour/semaine/mois
 he: יום/שבוע/חודש
+is: dagur/vika/mánuður
 it: giorno/settimana/mese
 lt: diena/savaitė/mėnuo
 lv: diena/nedēļa/mēnesis
@@ -22623,15 +22633,20 @@ no: dag/uke/måned
 oc: jorn/setmana/mes
 pl: dzień/tydzień/miesiąc
 pt: dia/semana/mês
+pt-br: dia/semana/mês
 ro: zi/săptămână/lună
 ru: день/неделя/месяц
 sk: deň/týždeň/mesiac
 sl: dan/teden/mesec
 sv: dag/vecka/månad
 tr: gün/hafta/ay
+zh: 日/周/月
 
     traffic
+af: verkeer
 bg: трафик
+br: tremenerezh
+ca: trànsit
 co: trafficu
 cs: provoz
 da: trafik
@@ -22643,6 +22658,7 @@ et: liiklus
 fi: liikenne
 fr: trafic
 he: תעבורה
+is: umferð
 it: traffico
 lt: srautas
 lv: datplūsma
@@ -22651,15 +22667,20 @@ no: trafikk
 oc: trafic
 pl: ruch
 pt: tráfego
+pt-br: tráfego
 ro: trafic
 ru: трафик
 sk: prevádzka
 sl: promet
 sv: trafik
 tr: trafik
+zh: 流量
 
     response time
+af: reaksietyd
 bg: време за отговор
+br: amzer respont
+ca: temps de resposta
 co: tempu di risposta
 cs: doba odezvy
 da: svartid
@@ -22671,6 +22692,7 @@ et: vastamisaeg
 fi: vasteaika
 fr: temps de réponse
 he: זמן תגובה
+is: svartími
 it: tempo di risposta
 lt: atsako laikas
 lv: atbildes laiks
@@ -22679,15 +22701,20 @@ no: responstid
 oc: temps de responsa
 pl: czas odpowiedzi
 pt: tempo de resposta
+pt-br: tempo de resposta
 ro: timp de răspuns
 ru: время ответа
 sk: čas odozvy
 sl: odzivni čas
 sv: svarstid
 tr: yanıt süresi
+zh: 响应时间
 
     request/requests
+af: versoek/versoeke
 bg: заявка/заявки
+br: goulenn/goulennoù
+ca: petició/peticions
 co: richiesta/richieste
 cs: požadavek/požadavky
 da: forespørgsel/forespørgsler
@@ -22699,6 +22726,7 @@ et: päring/päringud
 fi: pyyntö/pyynnöt
 fr: requête/requêtes
 he: בקשה/בקשות
+is: beiðni/beiðnir
 it: richiesta/richieste
 lt: užklausa/užklausos
 lv: pieprasījums/pieprasījumi
@@ -22707,15 +22735,20 @@ no: forespørsel/forespørsler
 oc: requèsta/requèstas
 pl: żądanie/żądania
 pt: pedido/pedidos
+pt-br: requisição/requisições
 ro: cerere/cereri
 ru: запрос/запросы
 sk: požiadavka/požiadavky
 sl: zahteva/zahteve
 sv: förfrågan/förfrågningar
 tr: istek/istekler
+zh: 请求/请求
 
     requests per minute
+af: versoeke per minuut
 bg: заявки в минута
+br: goulennoù dre vunutenn
+ca: peticions per minut
 co: richieste per minutu
 cs: požadavků za minutu
 da: forespørgsler pr. minut
@@ -22727,6 +22760,7 @@ et: päringuid minutis
 fi: pyyntöä minuutissa
 fr: requêtes par minute
 he: בקשות לדקה
+is: beiðnir á mínútu
 it: richieste al minuto
 lt: užklausos per minutę
 lv: pieprasījumi minūtē
@@ -22735,15 +22769,20 @@ no: forespørsler per minutt
 oc: requèstas per minuta
 pl: żądania na minutę
 pt: pedidos por minuto
+pt-br: requisições por minuto
 ro: cereri pe minut
 ru: запросов в минуту
 sk: požiadaviek za minútu
 sl: zahtev na minuto
 sv: förfrågningar per minut
 tr: dakika başına istek
+zh: 每分钟请求数
 
     received/sent
+af: ontvang/gestuur
 bg: получени/изпратени
+br: resevet/kaset
+ca: rebuts/enviats
 co: ricevuti/mandati
 cs: přijato/odesláno
 da: modtaget/sendt
@@ -22755,6 +22794,7 @@ et: vastu võetud/saadetud
 fi: vastaanotettu/lähetetty
 fr: reçus/envoyés
 he: התקבלו/נשלחו
+is: móttekið/sent
 it: ricevuti/inviati
 lt: gauta/išsiųsta
 lv: saņemts/nosūtīts
@@ -22763,15 +22803,20 @@ no: mottatt/sendt
 oc: recebuts/mandats
 pl: odebrane/wysłane
 pt: recebidos/enviados
+pt-br: recebidos/enviados
 ro: primite/trimise
 ru: получено/отправлено
 sk: prijaté/odoslané
 sl: prejeto/poslano
 sv: mottaget/skickat
 tr: alınan/gönderilen
+zh: 接收/发送
 
     mean (average)
+af: gemiddelde
 bg: средно
+br: keitad
+ca: mitjana
 co: media
 cs: průměr
 da: gennemsnit
@@ -22783,6 +22828,7 @@ et: keskmine
 fi: keskiarvo
 fr: moyenne
 he: ממוצע
+is: meðaltal
 it: media
 lt: vidurkis
 lv: vidējais
@@ -22791,15 +22837,20 @@ no: gjennomsnitt
 oc: mejana
 pl: średnia
 pt: média
+pt-br: média
 ro: medie
 ru: среднее
 sk: priemer
 sl: povprečje
 sv: medelvärde
 tr: ortalama
+zh: 平均值
 
     no data
+af: geen data
 bg: няма данни
+br: roadenn ebet
+ca: sense dades
 co: nisuna dati
 cs: žádná data
 da: ingen data
@@ -22811,6 +22862,7 @@ et: andmed puuduvad
 fi: ei tietoja
 fr: aucune donnée
 he: אין נתונים
+is: engin gögn
 it: nessun dato
 lt: duomenų nėra
 lv: nav datu
@@ -22819,12 +22871,14 @@ no: ingen data
 oc: cap de donada
 pl: brak danych
 pt: sem dados
+pt-br: sem dados
 ro: nicio dată
 ru: нет данных
 sk: žiadne údaje
 sl: ni podatkov
 sv: inga data
 tr: veri yok
+zh: 无数据
 
     record (all-time maximum)
 af: rekord
@@ -22861,7 +22915,10 @@ tr: rekor
 zh: 纪录
 
     kilobytes per second
+af: kB/s
 bg: КБ/с
+br: Ko/s
+ca: kB/s
 co: Ko/s
 cs: kB/s
 da: kB/s
@@ -22873,6 +22930,7 @@ et: kB/s
 fi: kB/s
 fr: Ko/s
 he: kB/s
+is: kB/s
 it: kB/s
 lt: kB/s
 lv: kB/s
@@ -22881,15 +22939,20 @@ no: kB/s
 oc: Ko/s
 pl: kB/s
 pt: kB/s
+pt-br: kB/s
 ro: kB/s
 ru: КБ/с
 sk: kB/s
 sl: kB/s
 sv: kB/s
 tr: kB/s
+zh: KB/s
 
     B/kB/MB/GB/TB
+af: B/kB/MB/GB/TB
 bg: Б/КБ/МБ/ГБ/ТБ
+br: o/Ko/Mo/Go/To
+ca: B/kB/MB/GB/TB
 co: o/Ko/Mo/Go/To
 cs: B/kB/MB/GB/TB
 da: B/kB/MB/GB/TB
@@ -22901,6 +22964,7 @@ et: B/kB/MB/GB/TB
 fi: B/kB/MB/GB/TB
 fr: o/Ko/Mo/Go/To
 he: B/kB/MB/GB/TB
+is: B/kB/MB/GB/TB
 it: B/kB/MB/GB/TB
 lt: B/kB/MB/GB/TB
 lv: B/kB/MB/GB/TB
@@ -22909,15 +22973,20 @@ no: B/kB/MB/GB/TB
 oc: o/Ko/Mo/Go/To
 pl: B/kB/MB/GB/TB
 pt: B/kB/MB/GB/TB
+pt-br: B/kB/MB/GB/TB
 ro: B/kB/MB/GB/TB
 ru: Б/КБ/МБ/ГБ/ТБ
 sk: B/kB/MB/GB/TB
 sl: B/kB/MB/GB/TB
 sv: B/kB/MB/GB/TB
 tr: B/kB/MB/GB/TB
+zh: B/KB/MB/GB/TB
 
     s (seconds)
+af: s
 bg: с
+br: s
+ca: s
 co: s
 cs: s
 da: s
@@ -22929,6 +22998,7 @@ et: s
 fi: s
 fr: s
 he: שנ׳
+is: s
 it: s
 lt: s
 lv: s
@@ -22937,12 +23007,14 @@ no: s
 oc: s
 pl: s
 pt: s
+pt-br: s
 ro: s
 ru: с
 sk: s
 sl: s
 sv: s
 tr: s
+zh: 秒
 
     statistics and anniversaries
 bg: статистика и годишнини
