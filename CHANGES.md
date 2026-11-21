@@ -248,6 +248,10 @@
   saving a form pair the events before and after a change by their
   content rather than by their position: an inserted, removed or moved
   event no longer shows as a change of every event after it.
+- A URL of a note holding `p=fn&n=sn` (and `oc=`), whatever its mode
+  (`m=IM_C` for an image of the carrousel, `m=A`…), now counts as a link
+  to that person, like `[[fn/sn]]`: the note is a linked page of the
+  person. Run `update_nldb` once on existing bases to index them.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

@@ -378,26 +378,35 @@ let adjust_cache_linked_pages conf ~removed ~added =
         write_cache_linked_pages conf ht
 
 let links_of_text s =
-  NotesLinks.fold_links
-    (fun ~pos link (list_nt, list_ind) ->
-      match link with
-      | NotesLinks.WLpage (_, _, lfname, _, _) ->
-          let list_nt =
-            if List.mem lfname list_nt then list_nt else lfname :: list_nt
-          in
-          (list_nt, list_ind)
-      | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
-          let link =
-            {
-              Def.NLDB.lnTxt = txt;
-              Def.NLDB.lnPos = pos;
-              Def.NLDB.lnFamMarker = fam_marker;
-            }
-          in
-          (list_nt, (key, link) :: list_ind)
-      | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
-          (list_nt, list_ind))
-    ([], []) s
+  let list_nt, list_ind =
+    NotesLinks.fold_links
+      (fun ~pos link (list_nt, list_ind) ->
+        match link with
+        | NotesLinks.WLpage (_, _, lfname, _, _) ->
+            let list_nt =
+              if List.mem lfname list_nt then list_nt else lfname :: list_nt
+            in
+            (list_nt, list_ind)
+        | NotesLinks.WLperson (_, key, _, txt, fam_marker) ->
+            let link =
+              {
+                Def.NLDB.lnTxt = txt;
+                Def.NLDB.lnPos = pos;
+                Def.NLDB.lnFamMarker = fam_marker;
+              }
+            in
+            (list_nt, (key, link) :: list_ind)
+        | NotesLinks.WLwizard _ | NotesLinks.WLimage _ | NotesLinks.WLnone _ ->
+            (list_nt, list_ind))
+      ([], []) s
+  in
+  (* a URL with p=fn&n=sn designates the person as a [[fn/sn]] link does;
+     it has no anchor in the page *)
+  NotesLinks.fold_person_urls
+    (fun ~start:_ ~stop:_ key (list_nt, list_ind) ->
+      let link = { Def.NLDB.lnTxt = None; lnPos = 0; lnFamMarker = None } in
+      (list_nt, (key, link) :: list_ind))
+    (list_nt, list_ind) s
 
 (* During a rename, the nldb is read once, updated in memory by every page
    rewritten, and written once at the end, with the cache of linked pages. *)
@@ -483,7 +492,7 @@ let notes_bearing_text_of_family base (f : _ Def.gen_family) =
   in
   String.concat " " (List.map (Driver.sou base) sl)
 
-let has_links s = Mutil.contains s "[["
+let has_links s = Mutil.contains s "[[" || Mutil.contains s "p="
 
 let update_notes_links_person_gen batch ?old_text conf base
     (p : _ Def.gen_person) =
