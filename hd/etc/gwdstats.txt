@@ -78,6 +78,7 @@ var GS = {
     wiz:"[*wizard/wizards/friend/friends/exterior]1", fri:"[*wizard/wizards/friend/friends/exterior]3",
     sent:"[*received/sent]1", recv:"[*received/sent]0", kbs:"[kilobytes per second]",
     bu:%["[B/kB/MB/GB/TB]0","[B/kB/MB/GB/TB]1","[B/kB/MB/GB/TB]2","[B/kB/MB/GB/TB]3","[B/kB/MB/GB/TB]4"%],
+    rec:"[record (all-time maximum)]",
     mean:"[*mean (average)]", rpm:"[*requests per minute]", s:"[s (seconds)]",
     req:"[*request/requests]1",
     per:%["[*day/week/month]0","[*day/week/month]1","[*day/week/month]2"%],
@@ -167,7 +168,13 @@ fetch(href(period, day) + "&json=1").then(function(r) {
   kpi(L.max, num(T.max, 3) + " " + L.s, C.r);
   kpi(L.sent, bytes(T.bytes_out), C.b);
   kpi(L.recv, bytes(T.bytes_in), C.g);
-  kpi(L.max + " — " + L.conn, num(T.conn_max, 0), C.n);
+  /* maximum of the period, with the all-time record (link to its day) */
+  var R = D.record;
+  kpi(L.max + " — " + L.conn, num(T.conn_max, 0)
+    + (R ? ' <a class="small fw-normal text-body-secondary text-decoration-none ms-1"'
+           + ' href="' + href("day", R.day) + '" title="' + R.day + " " + R.time + '">'
+           + "(" + L.rec + " " + num(R.conn, 0) + ")</a>"
+         : ""), C.n);
 
   var agg = period !== "day";
   var connSets = %[

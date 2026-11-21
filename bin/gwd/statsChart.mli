@@ -12,6 +12,8 @@
     a point (with their maximum); request rates and traffic are computed over
     the intervals between snapshots, whose length varies since a snapshot is
     taken by the first request after the period; response times are weighted by
-    the number of requests. Missing points are [null]. *)
+    the number of requests. Missing points are [null]. The JSON also gives the
+    all-time record of connections ([record]: value, day and time of the first
+    snapshot reaching it), over the whole file. *)
 
 val print : Geneweb.Config.config -> unit
