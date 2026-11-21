@@ -31,6 +31,23 @@ val advances_pos : wiki_link -> bool
 (** Whether a link takes a slot in the [#p_N] anchor numbering shared by
     [Wiki.syntax_links] and nldb's [lnPos]. *)
 
+val split_query : string -> (string * string) list
+(** [split_query q] is the fields of the query string [q], each with the
+    separator that precedes it (["&"], ["&amp;"] or the legacy [";"]; [""] for
+    the first one). *)
+
+val query_field : (string * string) list -> string -> string option
+(** [query_field fields k] is the decoded value of the field [k=...]. *)
+
+val fold_person_urls :
+  (start:int -> stop:int -> Def.NLDB.key -> 'a -> 'a) -> 'a -> string -> 'a
+(** [fold_person_urls f acc s] calls [f ~start ~stop key acc] for every relative
+    URL of [s] whose query holds [p=fn&n=sn] (and optionally [oc=occ]), whatever
+    the mode [m=]: such a URL designates the person [key] (lower-cased). A URL
+    with a host or a [b=] field points to another base and is ignored. [start]
+    and [stop] delimit its query string, after the ['?'] or the [%s] prefix if
+    any. The separators are ['&'], ["&amp;"] and the legacy [';']. *)
+
 val fold_links :
   (pos:int -> wiki_link -> 'acc -> 'acc) -> 'acc -> string -> 'acc
 (** [fold_links f acc s] folds [f] over the links of [s] in order, with the same

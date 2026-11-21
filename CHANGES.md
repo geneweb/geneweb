@@ -284,6 +284,10 @@
 - Touching `cnt/gwd.reload` in the bases directory makes every worker
   reload the lexicon, `lang/` overrides included, on its next request,
   without restarting gwd nor reloading the bases cached in memory.
+- A URL of a note holding `p=fn&n=sn` (and `oc=`), whatever its mode
+  (`m=IM_C` for an image of the carrousel, `m=A`…), now counts as a link
+  to that person, like `[[fn/sn]]`: the note is a linked page of the
+  person. Run `update_nldb` once on existing bases to index them.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
