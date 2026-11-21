@@ -17,7 +17,13 @@
     (seconds), bytes received and sent since the previous snapshot. Bytes are
     those exchanged by gwd itself (behind a reverse proxy, between the proxy and
     gwd); static files served outside a base request (css, js, fonts) are not
-    counted. *)
+    counted.
+
+    When the file {!Geoip.file} exists, each snapshot also appends to
+    [<base>_countries.txt] the countries of the connected users: a tab-separated
+    line with the date, the timestamp and the country codes with their number of
+    users, ["CC:n"] separated by spaces (see {!Robot.addresses}). Only the
+    counts are kept, not the addresses. *)
 
 val record :
   Geneweb.Config.config ->
@@ -35,3 +41,7 @@ val record :
 
 val stats_file : Geneweb.Config.config -> string
 (** [stats_file conf] is the path of the snapshot file of the base of [conf]. *)
+
+val countries_file : Geneweb.Config.config -> string
+(** [countries_file conf] is the path of the country file of the base of [conf].
+*)

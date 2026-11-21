@@ -22616,6 +22616,14 @@ sv: serverstatistik
 tr: sunucu istatistikleri
 zh: 服务器统计
 
+    connections by country
+de: Verbindungen nach Land
+en: connections by country
+es: conexiones por país
+fr: connexions par pays
+it: connessioni per paese
+nl: verbindingen per land
+
     day/week/month
 af: dag/week/maand
 bg: ден/седмица/месец

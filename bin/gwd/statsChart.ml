@@ -57,6 +57,64 @@ let read_snaps fname =
       in
       loop []
 
+(* One line of [<base>_countries.txt]: timestamp and users by country. The
+   header line fails on its timestamp and is skipped. *)
+let parse_countries l =
+  match String.split_on_char '\t' l with
+  | _date :: ts :: rest -> (
+      match float_of_string_opt ts with
+      | None -> None
+      | Some ts ->
+          let field = match rest with f :: _ -> f | [] -> "" in
+          let counts =
+            String.split_on_char ' ' field
+            |> List.filter_map (fun x ->
+                match String.index_opt x ':' with
+                | Some i -> (
+                    match
+                      int_of_string_opt
+                        (String.sub x (i + 1) (String.length x - i - 1))
+                    with
+                    | Some n -> Some (String.sub x 0 i, n)
+                    | None -> None)
+                | None -> None)
+          in
+          Some (ts, counts))
+  | _ -> None
+
+(* Users by country over the snapshots taken in [start, stop): for each
+   country, the sum of its users over the snapshots and its maximum, most
+   present first; with the number of snapshots. *)
+let read_countries fname ~start ~stop =
+  match Secure.open_in fname with
+  | exception Sys_error _ -> (0, [])
+  | ic ->
+      Fun.protect ~finally:(fun () -> close_in_noerr ic) @@ fun () ->
+      let tbl = Hashtbl.create 64 in
+      let rec loop n =
+        match input_line ic with
+        | l -> (
+            match parse_countries (String.trim l) with
+            | Some (ts, counts) when ts >= start && ts < stop ->
+                List.iter
+                  (fun (cc, k) ->
+                    let sum, mx =
+                      Option.value ~default:(0, 0) (Hashtbl.find_opt tbl cc)
+                    in
+                    Hashtbl.replace tbl cc (sum + k, Stdlib.max mx k))
+                  counts;
+                loop (n + 1)
+            | Some _ | None -> loop n)
+        | exception End_of_file -> n
+      in
+      let n = loop 0 in
+      let l =
+        Hashtbl.fold (fun cc (sum, mx) l -> (cc, sum, mx) :: l) tbl []
+        |> List.sort (fun (c1, s1, _) (c2, s2, _) ->
+            match Int.compare s2 s1 with 0 -> String.compare c1 c2 | c -> c)
+      in
+      (n, l)
+
 type period = Day | Week | Month
 
 let period_of_string = function
@@ -253,7 +311,7 @@ let record snaps =
       match r with Some r when r.conn >= s.conn -> Some r | _ -> Some s)
     None snaps
 
-let json period ~day ~prev ~next ~first ~record pts =
+let json period ~day ~prev ~next ~first ~record ~countries pts =
   let col f =
     `List
       (List.map
@@ -300,6 +358,18 @@ let json period ~day ~prev ~next ~first ~record pts =
                 ("day", `String (string_of_ymd (ymd (Unix.localtime s.ts))));
                 ("time", `String (label Day s.ts));
               ] );
+      ( "countries",
+        let n, l = countries in
+        `List
+          (List.map
+             (fun (cc, sum, mx) ->
+               `Assoc
+                 [
+                   ("cc", `String cc);
+                   ("mean", round3 (float sum /. float n));
+                   ("max", `Int mx);
+                 ])
+             l) );
       ("labels", `List (List.map (fun (t, _) -> `String (label period t)) pts));
       ("conn", col (per_snap (fun a -> float a.conn_sum)));
       ( "conn_max",
@@ -359,7 +429,9 @@ let print_json conf =
       ~prev ~next
       ~first:
         (Option.map (fun f -> string_of_ymd (ymd (Unix.localtime f))) first)
-      ~record:(record snaps) pts
+      ~record:(record snaps)
+      ~countries:(read_countries (StatsLog.countries_file conf) ~start ~stop)
+      pts
   in
   Output.header conf "Content-type: application/json; charset=utf-8";
   Output.header conf "Cache-control: no-store";

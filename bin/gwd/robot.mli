@@ -44,3 +44,9 @@ val snapshot : Geneweb.Config.config -> int -> Geneweb.Config.connections
 (** [snapshot conf sec] returns the users connected to the base of [conf] within
     the last [sec] seconds, like {!check}, but without recording a request nor
     saving the robot file. The caller should hold {!lock_file}. *)
+
+val addresses : Geneweb.Config.config -> int -> string list
+(** [addresses conf sec] is the address of each user counted in the connections
+    to the base of [conf] within the last [sec] seconds (see {!snapshot}): one
+    per client, a wizard once per user name. Like {!snapshot}, it records
+    nothing and the caller should hold {!lock_file}. *)

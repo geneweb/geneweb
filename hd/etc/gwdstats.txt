@@ -62,6 +62,12 @@
       <h2 class="h6">[*response time]</h2>
       <div style="height:300px"><canvas id="gs-time"></canvas></div>
     </div></div></div>
+    <div class="col-12 col-xl-6 mb-3 d-none" id="gs-countries-card"><div class="card"><div class="card-body">
+      <h2 class="h6">[*connections by country]</h2>
+      <div id="gs-countries-box"><canvas id="gs-countries"></canvas></div>
+      <p class="small text-body-secondary mt-2 mb-0">IP geolocation by
+        <a href="https://db-ip.com">DB-IP</a></p>
+    </div></div></div>
   </div>
 </div>
 
@@ -78,7 +84,7 @@ var GS = {
     wiz:"[*wizard/wizards/friend/friends/exterior]1", fri:"[*wizard/wizards/friend/friends/exterior]3",
     sent:"[*received/sent]1", recv:"[*received/sent]0", kbs:"[kilobytes per second]",
     bu:%["[B/kB/MB/GB/TB]0","[B/kB/MB/GB/TB]1","[B/kB/MB/GB/TB]2","[B/kB/MB/GB/TB]3","[B/kB/MB/GB/TB]4"%],
-    rec:"[record (all-time maximum)]",
+    rec:"[record (all-time maximum)]", unk:"[*unknown]",
     mean:"[*mean (average)]", rpm:"[*requests per minute]", s:"[s (seconds)]",
     req:"[*request/requests]1",
     per:%["[*day/week/month]0","[*day/week/month]1","[*day/week/month]2"%],
@@ -240,6 +246,34 @@ fetch(href(period, day) + "&json=1").then(function(r) {
           title:{display:true, text:L.rpm}}
     }}
   });
+
+  /* mean of the connected users by country over the period, top 20 */
+  var CO = (D.countries || %[%]).slice(0, 20);
+  if (CO.length) {
+    var names = null;
+    try { names = new Intl.DisplayNames(%[document.documentElement.lang || "en"%], {type:"region"}); }
+    catch (e) { names = null; }
+    var cname = function(cc) {
+      if (cc === "ZZ") return L.unk;
+      try { return (names && names.of(cc)) || cc; } catch (e) { return cc; }
+    };
+    document.getElementById("gs-countries-card").classList.remove("d-none");
+    document.getElementById("gs-countries-box").style.height = (40 + 22 * CO.length) + "px";
+    new Chart(document.getElementById("gs-countries"), {
+      type:"bar",
+      data:{labels:CO.map(function(c) { return cname(c.cc); }),
+        datasets:%[{label:L.mean, data:CO.map(function(c) { return c.mean; }),
+          backgroundColor:C.bA, borderColor:C.b, borderWidth:1}%]},
+      options:{indexAxis:"y", maintainAspectRatio:false,
+        interaction:{mode:"nearest", intersect:true},
+        plugins:{legend:{display:false}, tooltip:{callbacks:{
+          label:function(it) {
+            var c = CO%[it.dataIndex%];
+            return L.mean + " " + num(c.mean, 1) + " — " + L.max + " " + num(c.max, 0);
+          }}}},
+        scales:{x:{beginAtZero:true}, y:{ticks:{autoSkip:false}}}}
+    });
+  }
 }).catch(function(e) {
   var el = document.getElementById("gs-error");
   el.textContent = e.message;

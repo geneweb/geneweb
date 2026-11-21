@@ -240,3 +240,20 @@ let snapshot conf sec =
   let xcl, _ = robot_excl () in
   purge_who (Unix.time ()) xcl sec;
   connections conf sec xcl
+
+let addresses conf sec =
+  let xcl, _ = robot_excl () in
+  purge_who (Unix.time ()) xcl sec;
+  let ips, _ =
+    W.fold
+      (fun k w ((ips, wl) as acc) ->
+        if w.nbase = conf.bname && w.nbase <> "" then
+          match w.utype with
+          | Wizard n ->
+              if List.mem n wl then acc else (ip_of_key k :: ips, n :: wl)
+          | Friend _ | Normal ->
+              if w.nb_connect > 2 then (ip_of_key k :: ips, wl) else acc
+        else acc)
+      xcl.who ([], [])
+  in
+  ips
