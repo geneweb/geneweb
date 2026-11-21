@@ -277,22 +277,6 @@ tr: soyadda/adda kullanılan geçersiz karakter (%s)
 en: %s has unions with several persons named %s
 fr: %s a des unions avec plusieurs personnes nommées %s
 
-    %s modified
-co: %s mudificatu
-de: %s geändert
-en: %s modified
-es: %s modificada
-fi: %s muokattu
-fr: %s modifié
-it: %s modificata
-nl: %s veranderd
-no: %s er endret
-oc: %s modificat/da
-pt: %s modificado
-ru: %s изменён
-sv: %s ändrad
-tr: %s değiştirildi
-
     %s, it is %s of
 af: %s, dit is %s van
 bg: %s, е %s на
@@ -521,38 +505,6 @@ sk: %t narodený/narodená viac ako dva roky po smrti svojho otca: %t
 sl: %t je rojen(a) več kot 2 leti po smrti svojega očeta
 sv: %t är född mer än 2 år efter att sin egen far dog %t
 tr: %t, babasının %t ölümünden 2 yıl sonra doğmuş 
-
-    %t was witness after his/her death
-co: %t era testimone dopu a so morta
-de: %t war Zeitzeuge nach seinem Tod
-en: %t was a witness after their death
-es: %t era testigo tras su muerte
-fi: %t oli todistaja hänen kuolemansa jälkeen
-fr: %t était témoin après sa mort
-it: %t era testimone dopo la sua morte
-nl: %t was getuige na zijn overlijden
-no: %t var vitne etter deres død
-oc: %t foguèt testimòni après la mòrt
-pt: %t foi testemunha após a sua morte
-ru: %t был(а) свидетелем после своей смерти
-sv: %t var vittne vid hennes/hans död
-tr: %t, ölümlerinden sonra tanıktı
-
-    %t was witness before his/her birth
-co: %t era testimone nanzu a so nascita
-de: %t war Zeitzeuge vor seiner Geburt
-en: %t was a witness before their birth
-es: %t era testigo antes de su nacimiento
-fi: %t oli todistaja ennen hänen syntymäänsä
-fr: %t était témoin avant sa naissance
-it: %t era testimone prima della sua nascita
-nl: %t was getuige voor zijn geboorte
-no: %t var vitne før deres fødsel
-oc: %t foguèt testimòni abans la naissença
-pt: %t foi testemunha antes do seu nascimento
-ru: %t был(а) свидетелем до своего рождения
-sv: %t var vittne innan dennes födsel
-tr: %t, doğumlarından önce bir tanıktı
 
     %t witnessed %s after his/her death
 de: %t war Zeuge %s nach seinem Tod
@@ -1608,26 +1560,6 @@ sl: sin/hčerka/otrok
 sv: en son/en dotter/ett barn
 tr: bir oğul/bir kız/bir çocuk
 
-    a stepchild/stepchildren
-co: un(a) figliastru(a)/figliastri
-de: ein Stiefkind/Stiefkinder
-en: a stepchild/stepchildren
-es: un hijastro/hijastros
-fr: un bel-enfant/beaux-enfants
-pt: um enteado/enteados
-sv: ett svärbarn/svärbarn
-tr: bir üvey çocuk/üvey çocuklar
-
-    a stepson/stepsons/a stepdaughter/stepdaughters
-co: un figliastru/figliastri/una figliastra/figliastre
-de: ein Stiefsohn/Stiefsöhne/eine Stieftochter/Stieftöchter
-en: one stepson/stepsons/one stepdaughter/stepdaughters
-es: un hijastro/hijastros/una hijastra/hijastras
-fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
-pt: um enteado/enteados/uma enteada/enteadas
-sv: en svärson/svärsöner/svärdotter/svärdöttrar
-tr: bir üvey oğul/üvey oğulları/bir üvey kız/üvey kızları
-
     about (date)
 af: ongeveer
 bg: около
@@ -1852,23 +1784,6 @@ no: til anskaffelsen
 pl: nabycia
 ru: приобретения
 
-    activate/suppress
-co: attivà/squassà
-de: aktivieren/deaktivieren
-en: activate/suppress
-es: activar/suprimir
-fr: activer/supprimer
-pt: activar/suprimir
-sv: aktivera/undertrycka
-tr: etkinleştir/kaldır
-
-    suppress this path
-co: squassà stu chjassu
-de: diesen Pfad verbergen
-en: suppress this path
-es: suprimir este camino
-fr: supprimer ce chemin
-
     group/groups
 co: gruppu/gruppi
 de: Gruppe/Gruppen
@@ -2058,13 +1973,6 @@ en: add a portrait
 es: agregar un retrato
 fr: ajouter un portrait
 
-    add source
-co: aghjunghje una fonte
-de: Quelle hinzufügen
-en: add a source
-es: agregar una fuente
-fr: ajouter une source
-
     add the previous name as a first name alias
 co: aghjunghje u nome precedente cum’è cugnome di nome
 de: den vorherigen Namen als Vornamen-Alias hinzufügen
@@ -2117,10 +2025,6 @@ sk: pridať %tk dátam/vymazať dáta/zobraziť graf/upraviť dáta
 sl: dodaj %tv podatke/počisti podatke/pokaži graf/uredi podatke
 sv: lägg till %tpå datan/rensa datan/visa grafen/redigera datan
 tr: veriye %tekle/veriyi temizle/grafiği göster/veriyi düzenle
-
-    choose a folder
-en: choose a folder
-fr: choisir un dossier
 
     choose a file or a folder
 en: choose a file or a folder
@@ -2651,13 +2555,6 @@ sk: všetky tituly
 sl: vsi nazivi
 sv: alla titlar
 tr: tüm başlıklar
-
-    allowed characters
-co: caratteri permessi
-de: erlaubte Zeichen
-en: allowed characters
-es: caracteres permitidos
-fr: caractères autorisés
 
     alphabetic order
 af: alfabetiese volgorde
@@ -3457,22 +3354,6 @@ sk: sú
 sl: so
 sv: är
 tr: vardır
-
-    area code
-co: codice pustale
-de: Ortskennziffer
-en: code
-es: código postal
-fi: postinumero
-fr: code postal
-it: CAP
-nl: postcode stad
-no: postnummer
-oc: còde de comuna
-pt: código postal
-ru: почтовый индекс
-sv: postnummer
-tr: kod
 
     ascendants tree
 co: arburu d’ascendenza
@@ -4762,13 +4643,6 @@ pt: irmãos/irmãs/irmãos e irmãs
 sv: bröder/systrar/syskon
 tr: erkek kardeşler/kız kardeşler/kardeşler
 
-    browse
-co: navigà
-de: durchsuchen
-en: browse
-es: navegar
-fr: parcourir
-
     build information
 af: bou-inligting
 ar: معلومات البناء
@@ -5122,39 +4996,6 @@ sl: možen sine/možna hčerka/možni otroci
 sv: möjlig son/möjlig dotter/möjliga barn
 tr: oğul olabilir/kız olabilir/çocuk olabilir
 
-    cannot access base
-af: databasis ontoeganklik
-bg: няма достъп до базата
-br: n’eus tu ebet da vont e-barzh an bon roadoù
-ca: impossible accedir a la base
-co: impussibule d’accede à a basa
-cs: databáze je nepřístupná
-da: kan ikke nå databasen
-de: Datenbank nicht erreichbar
-en: cannot access base
-eo: ne eblas eniri la bazon
-es: acceso a la base imposible
-et: ei saa pöörduda andmebaasi poole
-fi: tietokantaan ei pääse
-fr: impossible d’accéder à la base
-he: אין כניסה למאגר המידע
-is: get ekki tengst gagnagrunni
-it: accesso alla base impossibile
-lt: bazė nepasiekiama
-lv: nav iespējams piekļūt datu bāzei
-nl: geen toegang tot bestand
-no: kan ikke nå databasen
-oc: se pòt pas accedir a la basa
-pl: dostęp do bazy jest niemożliwy
-pt: não se pode aceder à base
-pt-br: não pode acessar a base
-ro: nu pot accesa baza de date
-ru: нет доступа к базе
-sk: databáza je neprístupná
-sl: baza podatkov ni dostopna
-sv: kan inte nå databasen
-tr: tabana erişilemiyor
-
     cannot change sex of a married person
 af: kan die geslag van ’n getroude persoon nie verander nie
 bg: не може да се промени полът на човек в брак
@@ -5206,24 +5047,6 @@ de: Beim Titel muss auf Groß- und Kleinschreibung geachtet werden
 en: dont ignore case and accents
 es: tener en cuenta mayúsculas y acentos
 fr: tenir compte des majuscules et accents
-
-    celebrities
-bg: знаменити хора
-ca: celebritats
-co: persone celebre
-de: Bekannte Persönlichkeiten
-en: famous people
-es: personas famosas
-fi: kuuluisat henkilöt
-fr: personnes célèbres
-it: personaggi celebri
-nl: bekende personen
-no: berømte personer
-oc: celebritats
-pt: pessoas célebres
-ru: знаменитости
-sv: celebriteter
-tr: ünlü insanlar
 
     change children's names
 af: verander kinders se name
@@ -5465,13 +5288,6 @@ de: mehrere Leerzeichen
 en: multiple spaces
 es: espacios múltiples
 fr: espaces multiples
-
-    chk_data error multiple characters
-co: caratteri multiplice
-de: mehrere Zeichen
-en: multiple characters
-es: caracteres múltiples
-fr: caractères multiples
 
     chk_data error non-breaking spaces
 co: spazii nonspezzevule
@@ -5724,18 +5540,6 @@ nl: burgerlijk celebrant/burgerlijk celebrant/burgerlijk celebrant
 no: sivilregistrator/sivilregistrator/sivilregistrator
 pt: escrivão civil/escrivão civil/escrivão civil
 sv: civila register/civila register/civila register
-
-    civil registrar/civil registrars
-de: Standesbeamter/Standesbeamte
-en: civil registrar/civil registrars
-es: oficial del registro civil/registradores civiles
-fi: siviilirekisterin pitäjä/siviilirekisterin pitäjä
-fr: officier d’état-civil/officiers d’état-civil
-it: ufficiale dell’anagrafe/ufficiali dell’anagrafe
-nl: burgerlijk celebrant/ambtenaar
-no: sivilregistrator/sivile registerførere
-pt: escrivão civil/escrivão civil
-sv: civila register/civila register
 
     clear filters
 co: squassà tutti i filtri
@@ -6404,38 +6208,6 @@ sl: krvno sorodstvo
 sv: blodsband
 tr: akrabalık
 
-    consanguinity coefficient/percentage
-af: bloedverwantskapkoëffisiënt/bloedverwantskappersentasie
-bg: коефициент на кръвно родство/процент на кръвно родство
-br: coeffisient kenwadelezh/percentad kenwadelezh
-ca: coeficient de consanguinitat/percentatge de consanguinitat
-co: coeficiente de consanguinità/percentuale de consanguinità
-cs: koeficient pokrevenství/procento pokrevenství
-da: koefficient for blodsslægtskab/procent for blodsslægtskab
-de: konsanguinitätskoeffizient/konsanguinitätsprozentsatz
-en: consanguinity coefficient/consanguinity percentage
-eo: konsangvinica koeficiento/konsangvinica procento
-es: coeficiente de consanguinidad/porcentaje de consanguinidad
-et: veresuguluse koefitsient/veresuguluse protsent
-fi: verisukulaisuuden koeficientti/verisukulaisuuden prosenttiosuus
-fr: coefficient de consanguinité/pourcentage de consanguinité
-he: מקדם קרבת-דם/אחוז קרבת-דם
-is: skyldleika stuðull/prósenta skyldleika
-it: coefficiente di consanguineità/percentuale di consanguineità
-lt: giminystės koeficientas/giminystės procentas
-lv: asinsradniecības koeficients/asinsradniecības procents
-nl: bloedverwantschapscoëfficiënt/bloedverwantschapspercentage
-no: blodsbåndskoeffisient/blodsbåndsprosent
-oc: coeficient de consanguinitat/percentatge de consanguinitat
-pl: współczynnik pokrewieństwa krwi/procent pokrewieństwa krwi
-pt: coeficiente de consanguinidade/percentual de consanguinidade
-ro: coeficient de consanguinitate/procent de consanguinitate
-ru: коэффициент кровного родства/процент кровного родства
-sk: koeficient krvného príbuzenského vzťahu/percento krvného príbuzenského vzťahu
-sl: koeficient krvnega sorodstva/odstotek krvnega sorodstva
-sv: koefficient för blodsbandsläktskap/procent av blodsbandsläktskap
-tr: akrabalık katsayısı/akrabalık yüzdesi
-
     continue
 co: cuntinuà
 de: weiter
@@ -6504,34 +6276,6 @@ sk: pokračovať v spájaní
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
 tr: birleştirmeye devam et
-
-    continued
-bg: следва
-co: seguita
-cs: pokračuje
-da: fortsat
-de: fortgesetzt
-en: continued
-eo: continuigo
-es: continúa
-et: jätkub
-fi: jatkuu
-fr: suite
-he: המשך
-it: continua
-lt: toliau
-lv: nepārtraukts
-nl: vervolgd
-no: fortsatt
-oc: seguida
-pl: ciąg dalszy
-pt: continuação
-ro: continuare
-ru: продолжено
-sk: pokračovať
-sl: nadaljevano
-sv: forts
-tr: devam eden
 
     copied/copied
 co: cupiatu/cupiata
@@ -7055,38 +6799,6 @@ ru: кузены
 sk: bratranci/sesternice
 sl: bratranci/sestrične
 sv: kusiner
-tr: kuzenler
-
-    cousins (general term)
-af: neefs en niggies
-bg: братовчеди
-br: kendirvi
-ca: cosins
-co: cugini
-cs: pokrevní příbuzní
-da: fætre og kusiner
-de: Cousins
-en: cousins
-eo: gekuzoj
-es: primos
-et: kaimud
-fi: serkut
-fr: cousins
-he: בני דודים
-is: frændfólk
-it: cugini
-lt: pusbroliai/pusseserės
-lv: brālēni/māsīcas
-nl: neven en nichten
-no: søskenbarn og flermenninger
-oc: cosins
-pl: kuzyni
-pt: primos
-ro: veri
-ru: кузены
-sk: pokrvní príbuzní
-sl: bratranci/sestrične
-sv: kusiner och flermänningar
 tr: kuzenler
 
     cousins.0.1
@@ -8711,16 +8423,6 @@ sl: dni star/dni stara
 sv: dagar
 tr: eski günler
 
-    dd/mm/yyyy
-co: gg/mm/aaaa
-de: TT/MM/JJJJ
-en: dd/mm/yyyy
-es: dd/mm/aaaa
-fr: jj/mm/aaaa
-pt: DD/MM/AAAA
-sv: DD/MM/ÅÅÅÅ
-tr: GG/AA/YYYY
-
     death
 af: oorlede
 bg: смърт
@@ -9408,22 +9110,6 @@ ru: показать номер Aboville
 sv: visa Aboville nummer
 tr: d’Aboville numarasını görüntüle
 
-    display border tree
-co: affissà i bordi
-de: Rahmen in den Bäumen zeigen
-en: display frame
-es: editar los marcos a los árboles
-fi: näytä rajat
-fr: afficher les bordures
-it: visualizzare i bordi degli alberi
-nl: rand van de stambomen tonen
-no: vis kantlinje
-oc: afichar las bordadura dels arbres
-pt: exibir as molduras
-ru: включая рамку
-sv: visa kantlinje
-tr: ekran çerçevesi
-
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
 bg: да се покаже на части/широчина на частите/застъпване/обща широчина
@@ -9478,22 +9164,6 @@ de: Bilderkaroussel anzeigen
 en: display the carrousel of images
 es: mostrar el carrusel de imágenes
 fr: afficher le carrousel d’images
-
-    display empty picture
-co: affissà sempre e fiure
-de: Bilder immer anzeigen
-en: display empty picture
-es: editar siempre las imágenes
-fi: näytä kuva
-fr: toujours afficher les images
-it: visualizzare sempre le immagini
-nl: altijd beelden tonen
-no: vis bilde
-oc: sempre afichar los images
-pt: exibir sempre as imagens
-ru: оставить место под изображение
-sv: visa tom bild
-tr: resmi göster
 
     display generation
 co: affissà e generazioni
@@ -9578,22 +9248,6 @@ pt: exibir os implexos
 ru: редуцировать предков
 sv: visa anförlusten
 tr: soyağacı daralmasını göster
-
-    display spouse
-co: affissà cumpagnu(a)
-de: Ehepartner anzeigen
-en: display spouse
-es: editar cónyuge
-fi: näytä puolisot
-fr: afficher conjoint
-it: visualizzare il coniuge
-nl: partner tonen
-no: vis ektefeller
-oc: afichar lo conjunt
-pt: exibir cônjuge
-ru: влючая супругов
-sv: visa makar
-tr: eşini göster
 
     distinction
 co: distenzione
@@ -10280,16 +9934,6 @@ es: eventos en los que %s fue testigo
 fr: évènements auxquels %s était témoin
 tr: %s’in tanık olduğu etkinlikler
 
-    events tree
-co: arburu di l’evenimenti
-de: Baum der Ereignisse
-en: tree of events
-es: árbol de eventos
-fr: arbre des évènements
-pt: árvore de eventos
-sv: träd av händelser
-tr: etkinlikler ağacı
-
     exact
 af: presies
 bg: точно
@@ -10519,22 +10163,6 @@ sl: družina izbrisana
 sv: familj borttagen
 tr: aile silindi
 
-    family history
-co: accant’à l’arburu
-de: rund um den Stammbaum
-en: family history
-es: acerca del árbol
-fi: sukupuun lisäksi
-fr: autour de l’arbre
-it: attorno all’albero
-nl: rond de stamboom
-no: tillegg til slektstreet
-oc: subre l’arbre
-pt: autor da árvore
-ru: семейная история
-sv: utöver släktträdet
-tr: aile öyküsü
-
     family mode
 co: modu di famiglia
 de: Familienmodus
@@ -10584,22 +10212,6 @@ tr: aile değiştirildi
     sign with
 en: sign with
 fr: signer avec
-
-    sign with source help
-en: sign and provide source information (edit by hand the test "Source?" with the actuel source)
-fr: signer en précisant la source (remplacer manuellement le texte "Source?" apr la source concernée)
-
-    sign with source
-en: sign and provide source
-fr: signer en précisant la source
-
-    clear source memory
-en: clear source memory
-fr: supprimer la source mémorisée
-
-    clear source memory help
-en: clear source memory
-fr: supprimer la source mémorisée
 
     remember source
 en: remember source
@@ -10832,19 +10444,6 @@ sl: oče/mati
 sv: far/mor
 tr: baba/anne
 
-    field required
-co: campu richiestu
-de: Angabe obligatorisch
-en: input required
-es: introducción obligatoria
-fr: saisie obligatoire
-it: inserimento obbligatorio
-oc: sasida obligatòria
-pt: campo obrigatório
-ru: обязательное значение
-sv: obligatoriskt fält
-tr: gerekli
-
     file
 af: lêer
 bg: файл
@@ -10990,39 +10589,6 @@ sl: manjka osebno ime
 sv: förnamn saknas
 tr: ilk ad eksik
 
-    first name not found
-af: voornaam nie gevind nie
-bg: собственото име не е намерено
-br: n’eo ket bet kavet ar raganv
-ca: nom no localitzat
-co: nome micca trovu
-cs: křestní jméno nebylo nalezeno
-da: fornavn ikke fundet
-de: Vorname nicht gefunden
-en: first name not found
-eo: propra nomo ne trovita
-es: nombre no encontrado
-et: eesnime ei leitud
-fi: etunimeä ei löydy
-fr: prénom pas trouvé
-he: שם פרטי לא נמצא
-is: fornafn finnst ekki
-it: nome non trovato
-lt: vardo nerasta
-lv: vārds nav atrasts
-nl: voornaam niet gevonden
-no: finner ikke fornavn
-oc: prenom pas trobat
-pl: imię nie zostało znalezione
-pt: nome não encontrado
-pt-br: prenome não encontrado
-ro: nu am gasit prenumele
-ru: имя не найденно
-sk: meno nenájdené
-sl: osebno ime ni najdeno
-sv: hittar inte förnamn
-tr: ilk ad bulunamadı
-
     first name/first names
 af: voornaam/voorname
 ar: الإسم
@@ -11115,39 +10681,6 @@ pt: tamanho da fonte
 sv: textstorlek
 tr: yazı boyutu
 
-    for the first names by alphabetic order
-af: om die voorname in alfabetiese volgorde te kry
-bg: за собствените имена по азбучен ред
-br: evit ar raganvioù dre urzh al lizherenneg
-ca: per veure els noms en ordre alfabètic
-co: per i nomi da l’ordine alfabeticu
-cs: pro křestní jména v abecedním pořádku
-da: for fornavnene i alfabetisk orden
-de: für die Vornamen in alphabetischer Ordnung
-en: to display the results list by alphabetical order of first names
-eo: por la propraj nomoj laù la alfabeta ordo
-es: por los nombres en orden alfabético
-et: et järjestada eesnimed tähestiku järgi
-fi: etunimien mukaan aakkosjärjestyksessä
-fr: pour les prénoms par ordre alphabétique
-he: לשמות הפרטיים בסדר אלף-בת
-is: fornöfn í stafrófsröð
-it: per il primo nome in ordine alfabetico
-lt: vardus rikiuti pagal abėcelę
-lv: pa vārdiem alfabētiskā kārtībā
-nl: voor de voornamen in alfabetische volgorde
-no: alfabetisk på fornavn
-oc: pels prenoms per òrdre alfabetic
-pl: aby zobaczyć imiona w porządku alfabetycznym
-pt: para obter os nomes próprios por ordem alfabética
-pt-br: para obter os prenomes por ordem alfabética
-ro: prenume in ordine alfabetica
-ru: чтобы упорядочить имена по алфавиту
-sk: podľa mena v abecednom poradí
-sl: za lastna imena po abecednem redu
-sv: för förnamnen i bokstavsordning
-tr: sonuçlar listesini adların alfabetik sırasına göre görüntülemek için
-
     for the list in alphabetical order
 ca: per a la llista per ordre alfabètic
 de: für die Liste in alphabetischer Reihenfolge
@@ -11186,13 +10719,6 @@ sk: pre zoznam podľa dátumu poslednej zmeny
 sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
-
-    for url only
-co: per e fiure definite da un indirizzu web
-de: für Bilder, die durch eine URL definiert sind
-en: for URL defined images
-es: para imágenes definidas por URL
-fr: pour les images définies par une URL
 
     for/since
 co: durante/dapoi
@@ -11649,40 +11175,6 @@ en: go to the database/&#10;Be carefull to the index number in the query!
 es: ir a la base de datos/&#10;¡Atención al número de índice en la consulta!
 fr: aller vers la base de données/&#10;Attention au numéro d’index dans la requête !
 
-    go to section %s
-af: gaan na die %s seksie
-bg: отиди към раздела %s
-br: mont d’ar rubrik %s
-ca: anar a la secció %s
-co: andà à a sezzione %s
-cs: jít na sekci %s
-da: gå til afsnittet %s
-de: gehe zu Abschnitt %s
-en: go to section %s
-eo: iru al la sekcio %s
-es: ir a la sección %s
-et: mine jaotisse %s
-fi: siirry osioon %s
-fr: aller à la section %s
-he: ללכת לקטע %s
-is: fara í hluta %s
-it: vai alla sezione %s
-lt: eikite į skyrių %s
-lv: doties uz sadaļu %s
-nl: ga naar sectie %s
-no: gå til seksjonen %s
-oc: anar a la seccion %s
-pl: przejdź do sekcji %s
-pt: ir para a seção %s
-pt-br: ir para a seção %s
-ro: mergi la secțiunea %s
-ru: перейти к разделу %s
-sk: ísť do sekcie %s
-sl: pojdi na oddelek %s
-sv: gå till avsnittet %s
-tr: bölüme git %s
-zh: 转到%s部分
-
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
 bg: кръстник/кръстница/кръстници
@@ -11987,23 +11479,6 @@ sl: pol-/pol-/pol-
 sv: halv-/halv-/halv-
 tr: yarım-/yarım-/yarım-
 
-    half-siblings
-co: fratellastri è surellastre
-de: Halbgeschwister
-en: half-siblings
-es: hermanastros/as
-fi: puolisisarukset
-fr: demi-fratrie
-it: fratellastri e sorellastre
-lt: pusbroliai ir seserys
-nl: half broers en zusters
-no: halvsøsken
-oc: frairastres e sorrastras
-pt: meios irmãos e irmãs
-ru: сводные братья или сёстры
-sv: halvsyskon
-tr: üvey kardeşler
-
     happy birthday to them!
 co: felice nataliziu !
 de: Herzlichen Glückwunsch zum Geburtstag!
@@ -12193,37 +11668,6 @@ sl: tukaj
 sv: här
 tr: burada
 
-    hide portraits
-co: piattà i ritratti
-de: Portraits verbergen
-en: hide portraits
-es: no mostrar los retratos
-fr: ne pas afficher les portraits
-pt: não mostrar os retratos
-sv: dölj personbilder
-tr: portreleri gizle
-
-    hiddden person
-co: persona piattata
-de: versteckte Person
-en: hidden person
-es: persona oculta
-fr: individu masqué
-
-    hiddden first_name
-co: nome piattatu
-de: versteckter Vorname
-en: hidden first name
-es: nombre oculto
-fr: prénom masqué
-
-    hiddden surname
-co: casata piattata
-de: versteckter Nachname
-en: hidden surname
-es: apellido oculto
-fr: patronyme masqué
-
     hierarchical navigation
 af: kies ’n inskrywing in die hierargiese navigasie
 bg: изберете запис в йерархичната навигация
@@ -12336,17 +11780,6 @@ sk: on/ona
 sl: on/ona
 sv: honom/henne
 tr: onu/onu
-
-    his/her
-co: u so/a so
-de: sein/ihr
-en: his/her
-es: su/su
-fr: son/sa
-no: hans/hennes
-pt: seu/sua
-sv: hans/hennes
-tr: onun/onun
 
     his parents/her parents/their parents
 af: sy ouers/haar ouers/hul ouers
@@ -12586,38 +12019,6 @@ sl: ime/e-pošta/vsebina
 sv: identitet/email/ämne
 tr: kimlik/e-posta/konu
 
-    if titles
-af: as titels
-bg: ограничен
-br: ma vez titloù
-ca: si títols
-co: s’è tituli di nubiltà
-cs: jsou-li tituly
-da: hvis titler
-de: eingeschränkt
-en: if titles
-eo: se nobeltitoloj
-es: si títulos
-et: kui on tiitlid
-fi: jos arvonimiä
-fr: si titres
-he: אם בעל(ת) תואר
-is: ef titlar
-it: se titoli
-lt: jeigu su titulu
-lv: ja ir tituli
-nl: indien titels
-no: hvis titler
-oc: si i a de títols
-pl: jeśli z tytułem
-pt: se títulos
-ro: are titlu
-ru: если титул
-sk: ak sú tituly
-sl: če so nazivi
-sv: om titlar
-tr: eğer başlıklar
-
     iftitles/public/semipublic/private
 co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/halb-öffentlich/privat
@@ -12629,16 +12030,6 @@ oc: si i a de títols/half-public/public/privat
 pt: se títulos/público/half-public/privado
 sv: om titlar/publik/half-public/privat
 tr: başlıklar/herkese Açık/half-public/özel ise
-
-    ignore implex
-co: ignurà l’implessi
-de: Implex ignorieren
-en: ignore implex
-es: ignorar los implexos
-fr: ignorer les implexes
-pt: ignorar os implexos
-sv: ignorera implex
-tr: implexi yoksay
 
     illness
 co: malatia
@@ -12705,20 +12096,6 @@ sk: obrázok zmazaný
 sl: slika izbrisana
 sv: bilden borttagen
 tr: resim silindi
-
-    image note
-co: aghjunghje una nota per a fiura.
-de: Bildnotiz hinzufügen
-en: add a note for the image.
-es: agregar una nota para la imagen.
-fr: ajouter une note pour l’image.
-
-    image map
-co: una fiura reattiva
-de: eine klickbare Grafik
-en: an image map
-es: una imagen interactiva
-fr: une image réactive
 
     image received
 af: prent ontvang
@@ -12915,37 +12292,6 @@ sl: v letu
 sv: 
 tr: içinde
 zh: 于
-
-    include missing spouses
-af: ontbrekende ouers ingesluit
-bg: включително липсващите съпрузи и съпруги
-br: enklozañ ar priedoù a vank
-ca: incloure els cònjuges que falten
-co: include i cumpagni assente
-cs: včetně chybějících manželů/manželek
-da: medtag ukendte ægtefæller
-de: Fehlende Ehegatten einbeziehen
-en: include unknown spouses
-eo: inkludi mankantajn edz(in)ojn
-es: incluir los cónyuges faltantes
-et: kaasa puuduvad abikaasad
-fi: sisällytä puuttuvat puolisot
-fr: inclure les conjoints manquants
-he: כלל בני זוג החסרים
-is: meðtaldir makar sem vantar
-it: includere i coniugi mancanti
-lv: ieskaitot iztrūkstošos dzīvesbiedrus
-nl: inclusief ontbrekende echtgenoten
-no: inkluder savnede ektefeller
-oc: inclure los conjunts que mancan
-pl: pokaż brakujących małżonków
-pt: incluir os cônjuges que faltam
-ro: include soti necunoscuti
-ru: включая потерянных супругов
-sk: vrátane chýbajúcich manželov/manželiek
-sl: vključi manjkajoče može/žene
-sv: inkludera makar som saknas
-tr: bilinmeyen eşleri dahil et
 
     include spouses
 af: eggenote ingesluit
@@ -13251,38 +12597,6 @@ nl: aangever/aangever/aangever
 no: informant/informant/informant
 pt: informante/informante/informante
 sv: informatör/informatör/informatör
-
-    informant/informants
-de: Deklarant/Deklaranten
-en: informant/informants
-es: declarante/declarantes
-fi: ilmoittaja/ilmoittajat
-fr: déclarant/déclarants
-it: dichiarante/dichiaranti
-nl: aangever/aangevers
-no: informant/informanter
-pt: informante/informantes
-sv: informatör/informatör
-
-    inline chronology
-co: cronolugia simplice/cronolugia detagliata
-de: einfache Chronologie/detaillierte Chronologie
-en: simple chronology/detailed chronology
-es: cronología simple/cronología detallada
-fr: chronologie simple/chronologie détaillée
-pt: cronologia simples/cronologia detalhada
-sv: förenklad kronologi/detaljerad kronologi
-tr: basit kronoloji/ayrıntılı kronoloji
-
-    input database
-co: Stampittate quì u nome sanu di a basa di dati à impiegà
-de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll
-en: Please, enter the name of the database you want to use
-es: Escriba exactamente el nombre de la genealogía que quiere usar
-fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser
-pt: Introduza o nome da base de dados que quer utilizar
-sv: Skriv namnet på databasen du vill använda
-tr: Lütfen kullanmak istediğiniz veritabanının adını girin
 
     insert
 af: invoeg
@@ -13809,16 +13123,6 @@ pt: última revisão
 sv: senaste version
 tr: son revizyon
 
-    last sosa level not navigable
-co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
-de: letzte Sosa-Ebene nicht navigierbar. Vorfahren-Liste benutzen.
-en: last Sosa level not navigable. Use ancestors list.
-es: el último nivel de Sosa no es navegable. Use la lista de antepasados.
-fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
-pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
-sv: senaste sosa-nivån kan inte användas. Använd förteckningen över släktingar
-tr: son Sosa seviyesi gezilebilir değil. Atalar listesini kullanın.
-
     launch arguments of Gwd server
 af: beginargumente van Gwd-bediener
 ar: معطيات بدء تشغيل خادم Gwd
@@ -13991,40 +13295,6 @@ pt: link a utilizar
 ru: использовать ссылку
 sv: länk att använda
 tr: kullanılacak bağlantı
-
-    linked images
-af: gekoppelde beelde
-bg: свързани изображения
-br: skeudennoù liammet
-ca: imatges enllaçades
-co: fiure ligate
-cs: propojené obrázky
-da: tilknyttede billeder
-de: verknüpfte Bilder
-en: linked images
-eo: ligitaj bildoj
-es: imágenes vinculadas
-et: seotud pildid
-fi: linkitetyt kuvat
-fr: images liées
-he: תמונות מקושרות
-is: tengdar myndir
-it: immagini collegate
-lt: susieti vaizdai
-lv: saistītie attēli
-nl: gekoppelde afbeeldingen
-no: tilknyttede bilder
-oc: imatges ligadas
-pl: połączone obrazy
-pt: imagens vinculadas
-pt-br: imagens vinculadas
-ro: imagini asociate
-ru: связанные изображения
-sk: prepojené obrázky
-sl: povezane slike
-sv: länkade bilder
-tr: bağlantılı resimler
-zh: 关联图像
 
     reorder events
 af: verander die volgorde van die gebeurtenisse
@@ -14375,34 +13645,6 @@ no: til passasjerlisten
 pl: listy pasażerów
 ru: списка пассажиров
 
-    lists and charts
-co: grafichi è liste
-de: Stammbäume, Listen und Zustände
-en: charts and lists
-es: árboles, listas y estados
-fi: listat
-fr: arbres, listes et états
-it: alberi, liste e distinte
-nl: lijsten
-no: tavler og lister
-oc: listas, arbres e estats
-pt: listas e gráficos
-ru: списки и диаграммы
-sv: släkttavlor och listor
-tr: grafikler ve Listeler
-
-    lists of books
-co: liste di dizziunarii
-de: Liste der Wörterbücher
-en: lists of books
-es: lista de diccionarios
-fr: liste des dictionnaires
-oc: lista dels diccionaris
-pt: lista de dicionários
-ru: список словарей
-sv: lista öve förteckningar
-tr: kitap listeleri
-
     living after %s
 co: vivu(a) dopu %s
 de: lebte nach %s
@@ -14451,22 +13693,6 @@ ru: жил(а) между %s и %s
 sv: lever mellan %s och %s
 tr: %s ile %s arasında yaşadı
 
-    living from/to
-co: vivu(a) da/à
-de: lebte von/bis
-en: lived from/to
-es: vivo de/a
-fi: elänyt lähtien/asti
-fr: vivant de/à
-it: vivente dal/al
-nl: leefde van/tot
-no: levde fra/til
-oc: viu(va) de/entrò
-pt: vivo/a de/até
-ru: жил(а) с %s по %s
-sv: lever från/till
-tr: yaşamış/için
-
     loading/error
 de: Ladevorgang läuft…/Ladefehler
 en: loading in progress…/loading error
@@ -14508,22 +13734,6 @@ sk: dlhý zoznam
 sl: dolg seznam
 sv: utökad rapport
 tr: tam ekran
-
-    looking for
-co: elementi à ricercà
-de: zu suchende Elemente
-en: check
-es: elementos a buscar
-fi: katso
-fr: éléments à rechercher
-it: elementi da ricercare
-nl: op te zoeken elementen
-no: sjekk
-oc: elements de recercar
-pt: elementos a pesquisar
-ru: параметры поиска
-sv: leta efter
-tr: kontrol
 
     loop in database: %s is his/her own ancestor
 af: fout in die databasis: %s sy/haar eie voorvader
@@ -14912,22 +14122,6 @@ no: til vielsesattesten
 pl: zezwolenia na ślub
 ru: разрешения на брак
 
-    marriage of %t after his/her death
-co: matrimoniu di %t dopu a so morte
-de: Heirat von %t nach seinem/ihrem Tod
-en: marriage of %t after his/her death
-es: casamiento de %t después de su muerte
-fr: mariage de %t après son décès
-lt: santuoka po %t mirties
-
-    marriage of %t before his/her birth
-co: matrimoniu di %t nanzu a so nascita
-de: Heirat von %t vor seiner/ihrer Geburt
-en: marriage of %t before his/her birth
-es: casamiento de %t antes de su nacimiento
-fr: mariage de %t avant sa naissance
-lt: %t susituokė prieš gimdamas 
-
     marriage of the parents
 af: huwelik van die ouers
 bg: брак на родителите
@@ -15236,18 +14430,6 @@ sk: medián
 sv: median
 tr: medyan
 
-    mentioned/mentioned
-de: zitierte/zitierten
-en: cited/cited
-es: citado/citado
-fi: lainaus/lainaus
-fr: mentionné/mentionnés
-it: citato/citati
-nl: genoemd/genoemd
-no: sitert/sitert
-pt: citado/citados
-sv: citerad/citerad
-
     mentioned/mentioned/mentioned
 de: zitierte/zitierte/zitierte
 en: cited/cited/cited
@@ -15524,38 +14706,6 @@ it: del servizio militare
 no: til verneplikten
 pl: służby wojskowej
 ru: военной службы
-
-    miscellaneous
-co: diversu
-de: Verschiedenes
-en: misc.
-es: varios
-fi: eri
-fr: divers
-it: varie
-nl: diversen
-no: øvrig
-oc: divèrs
-pt: diversos
-ru: прочее
-sv: övrigt
-tr: çeşitli
-
-    miscellaneous information
-co: campi diversi
-de: verschiedene Felder
-en: other field
-es: campo diversos
-fi: muut kentät
-fr: champs divers
-it: voci diverse
-nl: verscheidene velden
-no: øvrige felt
-oc: informacions divèrsas
-pt: campos diversos
-ru: прочие сведения
-sv: övriga fält
-tr: diğer alan
 
     miscellaneous notes
 bg: разни бележки
@@ -16048,38 +15198,6 @@ sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 sv: månålder/nymåne/första kvarter/fullmåne/sista kvarter
 tr: yeni aydan sonraki gün sayısı/yeni ay/ilk çeyrek/dolunay/son çeyrek
 
-    more than %d answers
-af: meer as %d antwoorde
-bg: повече от %d отговори
-br: ouzhpenn %d respont
-ca: més de %d respostes
-co: più di %d risposte
-cs: více než %d odpovědí
-da: mere end %d svar
-de: mehr als %d Antworten
-en: more than %d answers
-eo: pli ol %d respondoj
-es: más de %d respuestas
-et: enam kui %d vastust
-fi: yli %d vastausta
-fr: plus de %d réponses
-he: יותר מ-%d תשובות
-is: fleiri en %d svör
-it: più di %d risposte
-lt: daugiau nei %d atsakymai(ų)
-lv: vairāk nekā %d atbildes
-nl: meer dan %d antwoorden
-no: mer enn %d svar
-oc: mai de %d responsas
-pl: więcej niż %d odpowiedzi
-pt: mais de %d respostas
-ro: mai mult de %s raspunsuri
-ru: более, чем %d ответы
-sk: viac ako %d odpovedí
-sl: več kot %d zadetkov
-sv: fler än %d svar
-tr: %d cevaptan daha fazla
-
     move
 co: dispiazzà
 de: verschieben
@@ -16495,22 +15613,6 @@ ru: количество людей
 sv: antal individer
 tr: bireylerin sayısı
 
-    NB: you should try another relationship computing mode
-co: andate puru à pruvà torna impieghendu un altru modu di calculu
-de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
-en: you can try another computing option
-es: puede relanzar un cálculo eligiendo otro modo de cálculo
-fi: valitse toinen laskutapa ja laske uudelleen
-fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
-it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
-nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
-no: velg en annen utregningsmåte og beregn påny
-oc: podètz ensajar amb un autre metòde de calcul de relacion
-pt: pode recomeçar utilizando um novo método de cálculo 
-ru: попытайтесь найти родственную связь другим образом
-sv: välj ett annat uträkningssätt och räkna ut igen
-tr: başka bir hesaplama seçeneği deneyebilirsiniz
-
     new modification
 co: cliccà quì per fà una nova currezzione
 de: hier klicken um eine neue Korrektion durchzuführen
@@ -16818,13 +15920,6 @@ pt: nenhuma modificação
 ru: изменений нет
 sv: ingen uppdatering
 tr: değişiklik yok
-
-    no more
-co: micca di più
-de: nicht mehr
-en: no more
-es: no hay más
-fr: pas d’autres
 
     no user key
 co: stu liame pò cundunce à un omonimu o ancu fiascà perchè a chjave di l’utilizatore ùn hè micca definita in u schedariu «.auth»
@@ -17197,23 +16292,6 @@ fr: les mots de 2 ou 3 lettres (%s) figurent dans presque toutes les notes : les
 de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
 en: miscellaneous notes/wizard notes/individual notes/family notes/individual event notes/family event notes
 fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’évènements individuels/notes d’évènements familiaux
-
-    notes summary
-bg: резюме на бележките
-co: riassuntu di e note diverse
-de: Zusammenfassung sonstiger Notizen
-en: notes summary
-es: sumario de notas diversas
-fi: merkinnät
-fr: sommaire des notes diverses
-it: sommario delle diverse note
-nl: overzicht van diverse notities
-no: merknader
-oc: ensenhador de las nòtas divèrsas
-pt: sumário de notas diversas
-ru: изменения вкратце
-sv: summering av noteringar
-tr: notlar
 
     notes sources show help
 co: in sfondulu per affissà e
@@ -17844,22 +16922,6 @@ ru: количество детей
 sv: antal barn
 tr: çocuk sayısı
 
-    number of events
-co: numeru d’evenimenti
-de: Anzahl der Ereignisse
-en: number of events
-es: número de eventos
-fi: tapahtumien lukumäärä
-fr: nombre d’évènements
-it: numero d’eventi
-nl: aantal evenementen
-no: antall hendelser
-oc: nombre d’eveniments
-pt: número de eventos
-ru: количество событий
-sv: antal händelser
-tr: etkinliklerin sayısı
-
     number of deceased persons
 bg: брой на починалите лица
 co: numeru di persone morte
@@ -17927,22 +16989,6 @@ fr: nombre de lignes
 de: Anzahl der Beziehungen
 en: number of unions
 fr: nombre de relations
-
-    n° d’Aboville
-co: n° d’Aboville
-de: Nr. Aboville
-en: d’Aboville number
-es: n° de Aboville
-fi: numero
-fr: n° d’Aboville
-it: n° d’Aboville
-nl: Abovillenummer
-no: nummer
-oc: n° d’Aboville
-pt: n° de Aboville
-ru: номер в системе d’Aboville
-sv: nummer
-tr: d’Aboville numarası
 
     n° Sosa
 co: n° Sosa
@@ -18061,16 +17107,6 @@ de: von
 en: of
 es: de
 fr: de
-pt: de
-sv: av
-tr: /
-
-    of (du)
-co: di
-de: von
-en: of
-es: de
-fr: du
 pt: de
 sv: av
 tr: /
@@ -18437,13 +17473,6 @@ en: open individual page
 es: abrir la página del individuo
 fr: ouvrir la page individuelle
 
-    open this individual page
-co: apre sta pagina individuale
-de: diese individuelle Seite öffnen
-en: open this individual page
-es: abrir la página de este individuo
-fr: ouvrir la page individuelle
-
     optional
 af: opsioneel
 bg: по желание
@@ -18733,33 +17762,12 @@ no: sogneregistrator/sogneregistrator/sogneregistrator
 pt: escrivão paroquial/escrivão paroquial/escrivão paroquial
 sv: församlingsregister/församlingsregister/församlingsregister
 
-    parrish registrar/parrish registrars
-de: religiöser Amtsträger/religiöse Amtsträgern
-en: parish registrar/parish registrars 
-es: oficiante religioso/oficiantes religiosos
-fi: seurakunnan rekisterinpitäjä/seurakunnan rekisteriin
-fr: officiant religieux/officiants religieux
-it: officiante religioso/officiante religioso
-nl: geestelijk celebrant/geestelijken celebranten
-no: sogneregistrator/menighetsregistratorer
-pt: escrivão paroquial/escrivão paroquial
-sv: församlingsregister/församlingsregister
-
     partial
 co: limitatu à l’antenati è i so fratelli è surelle
 de: begrenzt auf Vorfahren und Geschwister
 en: limited to ancestors and siblings
 es: limitado a los ascendientes y sus hermanos
 fr: limité aux ascendants et leurs frères et soeurs
-
-    participant/participant
-co: participante/participante
-de: Teilnehmer/Teilnehmerin
-en: participant/participant
-es: participante/participante
-fr: participant/participante
-sv: deltagare/deltagare
-tr: katılımcı/katılımcı
 
     passing by
 co: passendu da
@@ -19054,22 +18062,6 @@ it: nomi disordinati
 nl: ongeordende voornamen
 pt: nomes desordenados
 sv: oordnade förnamn
-
-    photos & documents
-co: ducumenti è fiure
-de: Fotos & Dokumente
-en: archive & pictures
-es: fotos & documentos
-fi: arkisto & kuvat
-fr: photos & documents
-it: foto & documenti
-nl: archief en foto’s
-no: arkiv & bilder
-oc: fotos e documents
-pt: arquivo & imagens
-ru: фотографии и документы
-sv: arkiv & bilder
-tr: arşiv ve resimler
 
     place filter
 co: numeru d’elementi cunservati in a lista di i lochi
@@ -19524,18 +18516,6 @@ sl: natančnost
 sv: precision
 tr: hassaslık
 
-    present/present
-de: Anwesende/Anwesende
-en: present/present
-es: presente/presente
-fi: läsnäolijat/läsnäolijat
-fr: présent/présents
-it: astante/presenti
-nl: aanwezig/aanwezig
-no: tilstedeværende/tilstedeværende
-pt: presente/presentes
-sv: närvarande/närvarande
-
     present/present/present
 de: Anwesende/Anwesende/Anwesende
 en: present/present/present  
@@ -19547,21 +18527,6 @@ nl: aanwezig/aanwezig/aanwezig
 no: tilstedeværende/tilstedeværende/tilstedeværende
 pt: presente/presente/presente
 sv: närvarande/närvarande/närvarande
-
-    presentation
-co: prisentazione
-de: Präsentation
-en: presentation
-es: presentación
-fr: présentation
-he: הצגה
-it: presentazione
-no: prensentasjon
-pl: prezentacja
-pt: apresentação
-ru: представление
-sv: presentation
-tr: sunum
 
     preview family tree
 co: fighjulata di l’arburu
@@ -19596,13 +18561,6 @@ de: zuvor/später
 en: previously/subsequently
 es: anteriormente/posteriormente
 fr: auparavant/par la suite
-
-    previous coat of arms
-co: una salvaguardia preesistente di l’armuratura serà squassata.
-de: eine mögliche vorherige Version des gespeicherten Wappens wird gelöscht.
-en: a possible previous version of the saved coat of arms will be deleted.
-es: si existe una versión anterior del blasón guardado, se eliminará.
-fr: une sauvegarde pré-existante du blason sera supprimée.
 
     previous image
 co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
@@ -20228,40 +19186,6 @@ sv: %d %s mellan %s och %s
 tr: %s ve %s arasında %d %s
 zh: %s 和 %s 之间的 %d 个 %ss
 
-    relationship link between %s and %s passing by %s
-af: verwantskapskakel tussen %s en %s deur %s
-ar: رابط قرابة بين %s و %s عبر %s
-bg: връзка на родство между %s и %s чрез %s
-br: liamm cʼheneliezh etre %s ha %s dre %s
-ca: enllaç de parentiu entre %s i %s per %s
-co: ligame di parentela trà %s è %s passendu da %s
-cs: příbuzenský vztah mezi %s a %s přes %s
-da: slægtskabsforbindelse mellem %s og %s gennem %s
-de: Verwandtschaftsverbindung zwischen %s und %s über %s
-en: relationship link between %s and %s passing by %s
-eo: genealogia ligo inter %s kaj %s tra %s
-es: enlace de parentesco entre %s y %s por %s
-et: sugulusseos %s ja %s kaudu %s
-fi: sukulaisuuslinkki %s ja %s kautta %s
-fr: lien de parenté entre %s et %s en passant par %s
-he: קשר קרבה בין %s ו %s דרך %s
-is: ættartengsl á milli %s og %s í gegnum %s
-it: legame di parentela tra %s e %s tramite %s
-lt: giminystės ryšys tarp %s ir %s per %s
-lv: radniecības saite starp %s un %s caur %s
-nl: verwantschapsverband tussen %s en %s via %s
-no: slektskapskobling mellom %s og %s gjennom %s
-oc: ligam de parentèla entre %s e %s per %s
-pl: więź pokrewieństwa między %s i %s przez %s
-pt: ligação de parentesco entre %s e %s por %s
-ro: legătură de rudenie între %s și %s prin %s
-ru: родственная связь между %s и %s через %s
-sk: príbuzenský vzťah medzi %s a %s cez %s
-sl: sorodstvena povezava med %s in %s preko %s
-sv: släktskapsförbindelse mellan %s och %s genom %s
-tr: %s ve %s arasındaki %s üzerinden akrabalık bağı
-zh: %s 和 %s 通过 %s 的亲属关系
-
     relationship by ancestors
 co: ascendenti diretti
 de: Direkte Vorfahren
@@ -20637,26 +19561,12 @@ en: restore
 es: restaurar
 fr: restaurer
 
-    restore coat of arms saved
-co: risturà l’armuratura
-de: gespeichertes Wappen wiederherstellen
-en: restore coat of arms
-es: restaurar el blasón
-fr: restaurer le blason
-
     restore image saved
 co: risturà una fiura arregistrata
 de: das gespeicherte Bild wiederherstellen
 en: restore saved image
 es: restaurar la imagen guardada
 fr: restaurer une image sauvegardée
-
-    restore portrait
-co: risturà u ritrattu
-de: das Porträt wiederherstellen
-en: restore portrait
-es: restaurar el retrato
-fr: restaurer le portrait
 
     restore portrait saved
 co: risturà u ritrattu arregistratu
@@ -20860,40 +19770,6 @@ sv: uppdatera URL-data för att verifiera ändrade individer/spara denna data i 
 tr: değiştirilen bireyleri doğrulamak için URL verilerini güncelle/bu verileri tarayıcı belleğinde kaydet/bu verilerle ağacı göster
 zh: 更新URL数据以验证修改的个人/将此数据保存在浏览器内存中/使用此数据显示树状图
 
-    RLM unknowns persons
-af: onbekende persoon/persone: korrigeer die individue wat in geel uitgelig is om te kan stoor of vertoon!
-ar: شخص/أشخاص غير معروفين: صحح الأفراد المميزين باللون الأصفر لتتمكن من الحفظ أو العرض!
-bg: неизвестно лице/лица: коригирайте индивидите, маркирани в жълто, за да можете да запазите или покажете графиката!
-br: den/tud dianav: reizhit an dud war wel e melen evit gallout enrollañ pe ziskouez ar grafik!
-ca: persona/persones desconegudes: corregiu els individus ressaltats en groc per poder desar o mostrar el gràfic!
-co: persona/persone incunnute: curriggite l’individui marcati in giallu per pudè salvà o affissà u graficu!
-cs: neznámá osoba/osoby: opravte jedince zvýrazněné žlutě, abyste mohli uložit nebo zobrazit graf!
-da: ukendt person/personer: ret de personer fremhævet i gult for at kunne gemme eller vise grafen!
-de: unbekannte Person(en): korrigieren Sie die gelb markierten Personen um speichern oder anzeigen zu können!
-en: unknown person(s): correct the individuals highlighted in yellow to be able to save or display the graph!
-eo: nekonata persono/personoj: korektu la individuojn reliefigitajn flavo por povi konservi aŭ montri la grafikon!
-es: persona(s) desconocida(s): corrija los individuos resaltados en amarillo para poder guardar o mostrar el gráfico!
-et: tundmatu isik/isikud: parandage kollasega esile tõstetud isikud, et saaksite salvestada või kuvada graafikut!
-fi: tuntematon henkilö/henkilöt: korjaa keltaisella korostetut henkilöt voidaksesi tallentaa tai näyttää kaavion!
-fr: personne(s) non trouvée(s) : corriger les individus en jaune pour pouvoir sauvegarder ou afficher le graphe !
-he: אדם/אנשים לא ידועים: תקן את האנשים המודגשים בצהוב כדי להיות מסוגל לשמור או להציג את הגרף!
-is: óþekktur einstaklingur/einstaklingar: leiðréttu einstaklingana sem eru auðkenndir í gulu til að geta vistað eða sýnt línuritið!
-it: persona/persone sconosciute: correggi gli individui evidenziati in giallo per poter salvare o mostrare il grafico!
-lt: nežinomas asmuo/asmenys: ištaisykite geltonai pažymėtus asmenis, kad galėtumėte išsaugoti arba rodyti grafiką!
-lv: nezināma persona/personas: labojiet dzeltenā krāsā iezīmētos indivīdus, lai varētu saglabāt vai parādīt grafiku!
-nl: onbekende persoon/personen: corrigeer de in geel gemarkeerde personen om te kunnen opslaan of weergeven!
-no: ukjent person/personer: korriger individene uthevet i gult for å kunne lagre eller vise grafen!
-oc: persona/personas desconegudas: corregissètz los individus marcats en jaune per poder enregistrar o afichar lo grafic!
-pl: nieznana osoba/osoby: popraw osoby podświetlone na żółto aby móc zapisać lub wyświetlić wykres!
-pt: pessoa(s) desconhecida(s): corrija os indivíduos destacados em amarelo para poder salvar ou exibir o gráfico!
-ro: persoană/persoane necunoscute: corectați indivizii evidențiați în galben pentru a putea salva sau afișa graficul!
-ru: неизвестное лицо/лица: исправьте выделенных желтым цветом лиц, чтобы иметь возможность сохранить или отобразить график!
-sk: neznáma osoba/osoby: opravte jedincov zvýraznených žlto, aby ste mohli uložiť alebo zobraziť graf!
-sl: neznana oseba/osebe: popravite posameznike, označene rumeno, da boste lahko shranili ali prikazali graf!
-sv: okänd person/personer: korrigera de individer som är markerade i gult för att kunna spara eller visa grafen!
-tr: bilinmeyen kişi/kişiler: kaydetmek veya göstermek için sarıyla vurgulanan bireyleri düzeltin!
-zh: 未知人员：更正黄色突出显示的个人以便能够保存或显示图表！
-
     same ancestor as n° Sosa
 co: uguale à u n° Sosa
 de: identisch mit Sosa Nr.
@@ -20944,20 +19820,6 @@ sv: spara
 tr: kaydet
 zh: 保存
 
-    save image
-co: una fiura cù un nome simile serà dispiazzata in
-de: wenn ein Bild mit demselben Namen existiert, wird es gespeichert nach
-en: an image with a similar name will moved to
-es: si ya existe una imagen con el mismo nombre, se guardará en
-fr: si une image du même nom existe déjà, elle sera sauvegardée dans
-
-    save portrait
-co: u ritrattu esistente serà arregistratu in
-de: das existierende Porträt wird gespeichert nach
-en: the existing portrait will be saved to
-es: el retrato existente se guardará en
-fr: le portrait existant sera sauvegardé dans
-
     saved
 co: arregistratu/arregistrata
 de: gespeichert
@@ -20971,12 +19833,6 @@ de: gespeichertes Bild/gespeicherte Bilder
 en: saved image/saved images
 es: imagen guardada/imágenes guardadas
 fr: sauvegarde/sauvegardes
-
-    save help
-co: schedarii micca referenzati à u furmatu [[[schedariu]]] o referenzati da persone non videvule ; seranu quantunque arregistrati da gwu
-en: files not referenced as [[[filename]]] or referenced by persons not visible; Will nonetheless be saved by gwu
-es: archivos no referenciados como [[[archivo]]] o referenciados por personas no visibles; gwu los guardará de todos modos
-fr: fichiers non référencés au format [[[fichier]]] ou référencés par des personnes non visibles; Seront néanmoins sauvegardés par gwu
 
     files not in db
 co: schedarii micca referenzati
@@ -21080,13 +19936,6 @@ no: besegling med ektefelle (LDS)
 pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
-
-    mentions legales
-co: infurmazione legale
-de: rechtlich
-en: legal
-es: aviso legal
-fr: mentions légales
 
     scellentSpouseLDS (at)
 de: bei der HLT-Ehepartner-Versiegelung
@@ -21384,54 +20233,6 @@ sl: glej zgoraj
 sv: se ovan
 tr: yukarıya bakın
 
-    see also
-co: fighjà dinù
-de: siehe auch
-en: see also
-es: ver también
-fi: näytä myös
-fr: à voir aussi
-it: vedi anche
-nl: ook te bekijken
-no: vis også
-oc: tanben veire
-pt: ver também
-ru: смотри также
-sv: se också
-tr: ayrıca bakınız
-
-    see ascendants notes/sources
-co: fighjà e note è e fonte
-de: siehe Notizen/Quellen
-en: view notes/sources
-es: ver las notas/fuentes
-fi: katso merkinnät/lähteet
-fr: voir les notes et sources
-it: vedere le note/fonti
-nl: notities & bronnen bekijken
-no: se på merknader/kilder
-oc: veire las nòtas e las fonts
-pt: ver notas & fontes
-ru: смотри заметки/документы
-sv: se noteringar och källor
-tr: notları/kaynakları görüntüle
-
-    see ascendants pictures
-co: fighjà e fotò
-de: siehe Porträts
-en: view pictures
-es: ver los retratos
-fi: näytä kuvat
-fr: voir les photos
-it: vedere i ritratti
-nl: foto’s bekijken
-no: se på bilder
-oc: veire las fòtos
-pt: ver fotos
-ru: смотри изображения предков
-sv: se bilder
-tr: resimleri görüntüle
-
     see coat of arms
 co: vede l’armuratura
 de: siehe das Wappen
@@ -21454,22 +20255,6 @@ pt: ver notas & fontes
 ru: смотри заметки/документы потомков
 sv: se noteringar och källor
 tr: notları/kaynakları görüntüle
-
-    see descendants pictures
-co: fighjà e fotò
-de: siehe Porträts
-en: view pictures
-es: ver los retratos
-fi: näytä kuvat
-fr: voir les photos
-it: vedere i ritratti
-nl: foto’s bekijken
-no: se på bilder
-oc: veire las fòtos
-pt: ver fotos
-ru: смотри изображения потомков
-sv: se efterföljandes bilder
-tr: resimleri görüntüle
 
     see further
 af: kyk verder
@@ -21503,35 +20288,12 @@ sl: nadalje glej
 sv: se vidare
 tr: daha fazlasını gör
 
-    see person
-co: statu civile
-de: Familienstand
-en: individual
-es: registro Civil
-fi: henkilö
-fr: état civil
-it: anagrafe
-nl: burgerlijke stand
-no: individuell
-oc: estat civil
-pt: ver pessoa
-ru: смотри человека
-sv: individ
-tr: bireysel
-
     see portrait
 co: vede u ritrattu
 de: siehe Porträt
 en: see portrait
 es: ver el retrato
 fr: voir le portrait
-
-    see portrait saved
-co: vede u ritrattu arregistratu
-de: siehe gespeichertes Porträt
-en: see saved portrait
-es: ver el retrato guardado
-fr: voir le portrait sauvegardé
 
     select
 co: sceglie
@@ -21583,51 +20345,12 @@ sv: välj en post i det alfabetiska indexet
 tr: alfabetik dizinde bir giriş seçin
 zh: 在字母索引中选择一个条目
 
-    select a month to see all the anniversaries
-co: selezziunà un mese per fighjà tutti l’anniversarii.
-de: zum Zeigen der Geburtstage den Monat auswählen.
-en: select a month to see all the anniversaries.
-es: elegir un mes para ver todos los cumpleaños.
-fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät.
-fr: sélectionnez un mois pour voir tous les anniversaires.
-it: scegliere un mese per vedere tutti i compleanni.
-nl: een maand kiezen om alle verjaardagen te zien.
-no: velg en måned for å vise alle fødselsdager.
-oc: causissètz-vos un mes per veire los aniversaris.
-pt: selecione um mês para ver todos os aniversários.
-ru: выберите месяц
-sv: välj en månad för att visa alla födelsedagar.
-tr: tüm yıldönümlerini görmek için bir ay seçin.
-
     select/delete an event
 co: selezziunà un evenimentu/squassà l’evenimentu
 de: ein Ereignis auswählen/ein Ereignis löschen
 en: select an event/delete the event
 es: elegir un evento/eliminar el evento
 fr: choisir un évènement/supprimer l’évènement
-
-    select a spouse
-co: selezziunà un(a) cumpagnu(a)
-de: Partner auswählen
-en: select spouse
-es: elija un cónyuge
-fi: valitse puoliso
-fr: choisissez un conjoint
-it: scegli un coniuge
-nl: kies een partner
-no: velg ektefelle
-oc: causissètz-vos un conjunt
-pt: selecione um cônjuge
-ru: выберите супруга/супругу
-sv: välj maka/make
-tr: eş seçin
-
-    select input
-co: sceglie un schedariu
-de: wählen
-en: choose file
-es: elegir archivo
-fr: sélect. fichier
 
     select lang
 af: taalvoorkeur
@@ -21689,22 +20412,6 @@ pt: selecione a pessoa sobre a qual pretende realizar um cálculo de parentesco.
 ru: выберите человека для поиска родственной связи
 sv: klicka på personen som du vill räkna ut släktskapsgraden med.
 tr: aile bağlantısını hesaplamak için aşağıda bir kişiyi tıklayın.
-
-    select the two revisions you want to compare
-co: selezziunà e duie revisioni ch’ellu ci vole à paragunà.
-de: wählen Sie zwei zu vergleichende Revisionen.
-en: select revisions to view history.
-es: seleccione las dos revisiones que quiere comparar.
-fi: valitse kaksi vertailtavaa versiota.
-fr: sélectionnez les deux révisions que vous voulez comparer.
-it: seleziona le due versioni da paragonare.
-nl: selecteer de twee revisies die u wenst te vergelijken.
-no: velg revisjoner for å se på historikk.
-oc: causissètz-vos las doás revisions de comparar.
-pt: selecione as duas revisões que pretende comparar.
-ru: выберите две версии для сравнения
-sv: välj de två uppdateringar Du vill jämföra.
-tr: geçmişi görüntülemek için düzeltmeleri seçin.
 
     send
 af: stuur
@@ -22034,15 +20741,6 @@ de: zeige alle
 en: show all
 es: mostrar todos
 fr: afficher tous les
-
-    show implex
-co: identificà l’implessi
-de: Implex anzeigen
-en: show implex
-es: identificar los implexos
-fr: identifier les implexes
-pt: identificar os implexos
-tr: implex göster
 
     siblings
 af: broers en susters
@@ -23070,23 +21768,6 @@ sv: s
 tr: s
 zh: 秒
 
-    statistics and anniversaries
-bg: статистика и годишнини
-co: statistiche è anniversarii
-de: Statistik und Geburtstage
-en: statistics and anniversaries
-es: estadísticas y aniversarios
-fi: tilastot ja vuosipäivät
-fr: statistiques et anniversaires
-it: statistiche e compleanni
-nl: statistieken en verjaardagen
-no: statistikk og familehendelser
-oc: estatisticas e aniversaris
-pt: estatísticas e aniversários
-ru: статистика и годовщины
-sv: statistik och årsdagar
-tr: istatistikler ve yıldönümleri
-
     stay on the current tool
 af: terwyl jy op hierdie instrument bly
 ar: أثناء البقاء على هذه الأداة
@@ -23128,13 +21809,6 @@ de: das Wappen dieser Person nicht mehr verwenden/diese Person hat aufgehört, d
 en: stop using the coat of arms of/this individual stopped using his ancestor coat of arms
 es: dejar de usar el blasón de/este individuo dejó de usar el blasón de su antepasado
 fr: arrêter d’utiliser le blason de/cet individu a arrêté d’utiliser le blason de son ancêtre
-
-    store image
-co: a fiura selezziunata serà piazzata in
-de: das ausgewählte Bild wird kopiert nach
-en: the selected image will be copied to
-es: la imagen seleccionada se guardará en
-fr: l’image sélectionnée sera enregistrée dans
 
     subplace help
 co: fate casu, a sintassa di i sottulochi hè « sottulocu – locu » cù una lineetta chì pò esse n (–) o M (—).
@@ -23330,39 +22004,6 @@ pt: ramos patronímicos
 ru: ветвь фамилии
 sv: efternamnsgrenar
 tr: isme göre satırlar
-
-    surnames list
-af: vanne lys
-bg: списък на фамилните имена
-br: roll an anvioù-tud
-ca: llistat de cognoms
-co: lista di casate
-cs: seznam příjmení
-da: efternavnsoversigt
-de: Nachnamen-Liste
-en: surnames list
-eo: listo de la familiaj nomoj
-es: lista de apellidos
-et: perekonnanimede nimekiri
-fi: sukunimiluettelo
-fr: liste éclair
-he: רשימת שמות משפחה
-is: eftirnafna listi
-it: lista dei cognomi
-lt: pavardžių sąrašas
-lv: uzvārdu saraksts
-nl: lijst van familienamen
-no: liste over etternavn
-oc: lista dels noms de familha
-pl: lista nazwisk
-pt: lista de apelidos
-pt-br: lista de sobrenomes
-ro: lista de nume de familie
-ru: список фамилий
-sk: zoznam priezvísk
-sl: seznam priimkov
-sv: efternamnslista
-tr: soyadı listesi
 
     table
 co: tavula
@@ -23864,13 +22505,6 @@ sl: otroci
 sv: barnen
 tr: çocuklar
 
-    the database name %s contains a forbidden character.
-co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
-de: der Datenbankname „%s“ enthält ein verbotenes Zeichen.
-en: the database name “%s” contains a forbidden character.
-es: el nombre de base «%s» contiene un carácter prohibido.
-fr: le nom de la base « %s » contient un caractère interdit.
-
     the day after tomorrow
 af: oormôre
 bg: вдругиден
@@ -24269,23 +22903,6 @@ sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 tr: son %d doğum
 
-    the latest %d celebrated marriages
-bg: последните %d чествувани сватби
-co: e %d ultime unione celebrate
-de: die %d letzten gefeierten Hochzeiten
-en: last %d marriages
-es: los %d últimos matrimonios célebres
-fi: viimeiset %d avioliittoa (vihkipäivämäärä)
-fr: les %d dernières unions célébrées
-it: i %d ultime unioni celebrate
-nl: de %d laatste uitgevoerde huwelijken
-no: siste %d ekteskap (Ekteskapsdato)
-oc: las %d darrièras unions celebradas
-pt: as últimas %d uniões celebradas
-ru: последние %d свадеб
-sv: det senaste %d firade bröllopet
-tr: son %d evlilik (Evlilik tarihi)
-
     the latest %d marriages and engagements
 af: die laaste %d huwelike en verlowings
 bg: последните %d брака и годежа
@@ -24318,23 +22935,6 @@ sl: zadnjih %d porok in zarok
 sv: de senaste %d äktenskapen och förlovningarna
 tr: son %d evlilik ve nişan
 
-    the latest %d registered marriages
-bg: последните %d регистрирани сватби
-co: e %d ultime unione arregistrate
-de: die %d letzten eingetragenen Hochzeiten
-en: last %d marriages
-es: los %d últimos matrimonios registrados
-fi: viimeiset %d rekisteröityä avioliittoa (syöttämispäivämäärä)
-fr: les %d dernières unions enregistrées
-it: le %d ultime unioni inserite
-nl: de %d laatste uitgevoerde huwelijken
-no: siste %d ekteskap (Registreringsdato)
-oc: las %d darrièras unions enregistradas
-pt: as últimas %d uniões registadas
-ru: последние %d зарегистрированных браков
-sv: det senast %d registreade äktenskapet
-tr: son %d evlilik (Giriş tarihi)
-
     the latest %t deaths
 af: die laaste %t afsterwes
 bg: последните %t умирания
@@ -24366,22 +22966,6 @@ sk: posledných %t úmrtí
 sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 tr: son %t ölüm
-
-    the modification impacted %d persons
-co: a mudificazione hè riesciuta : %d scheda(e) curretta(e)
-de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
-en: %d entries have been successfully updated
-es: la modificación ha sido hecha: %d ficha/s corregida/s
-fi: %d tietuetta on onnistuneesti päivitetty
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
-it: la modifica è stata effettuata : %d scheda/e corretta/e
-nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
-no: %d registreringer er blitt oppdatert
-oc: la modification se faguèt: %s fichas modificadas
-pt: a alteração decorreu com sucesso: %d ficha(s) corrigida(s)
-ru: изменения затронули %d людей
-sv: modifiering av %d personer
-tr: %d giriş başarıyla güncellendi
 
     the parents
 af: die ouers
@@ -24640,38 +23224,6 @@ en: to
 es: hacia
 fr: vers
 
-    to add a child to a family, use "%s"
-af: om ’n kind by te voeg by ’n familie, gebruik “%s”
-bg: за да добавите дете към семейство, използвайте „%s“
-br: evit ouzhpennañ ur bugel d’un tiegezh e ranker implij « %s »
-ca: per afegir un fill a una família, utilitzeu «%s»
-co: per aghjunghje un(a) zitellu(a) à una famiglia, impiegà « %s »
-cs: pro přidání dítěte do rodiny použij „%s“
-da: brug »%s« for at føje et barn til en familie
-de: um ein Kind zu einer Familie hinzuzufügen, benutze „%s“
-en: to add a child to a family, use “%s”
-eo: por aldoni infanon al familio, uzu “%s”
-es: para agregar un hijo a una familia, utiliza «%s»
-et: lapse lisamiseks perre kasuta „%st“
-fi: lisätäksesi perheeseen lapsen käytä ”%s”
-fr: pour ajouter un enfant à une famille, utiliser « %s »
-he: להוסיף ילד למשפחה, השתמש ב-"%s"
-is: til að bæta barni við fjölskyldu, notaðu „%s“
-it: per aggiungere un figlio ad una famiglia, scegliere «%s»
-lt: norėdami pridėti vaiką spauskite „%s“
-lv: lai pievienotu bērnu ģimenei, lietojiet „%s“
-nl: gebruik “%s” om een kind aan een gezin toe te voegen
-no: for å knytte et barn til en familie, bruk «%s»
-oc: per apondre un enfant a una familha, utilizatz «%s»
-pl: aby dodać dziecko do pary rodziców użyj „%s”
-pt: para acrescentar um filho a uma família utilizar «%s»
-ro: pentru a adauga un copil utilizeaza „%s”
-ru: чтобы добавить ребенка к семье, используй «%s»
-sk: pre pridanie dieťaťa do rodiny použi „%s“
-sl: da bi dodal otroka k družini, uporabite „%s“
-sv: för att lägga till ett barn i en familj, använd ”%s”
-tr: bir aileye çocuk eklemek için “%s” kullanın
-
     to carrousel
 co: à u carusellu
 de: zum Karussell
@@ -24697,58 +23249,10 @@ ru: к изменению
 sv: för att ändra
 tr: düzenle
 
-    to come
-co: hà da vene
-de: in Erwartung
-en: to come
-es: pronto
-fi: tulevat tapahtumat
-fr: à venir
-it: da venire
-nl: te komen
-no: kommende hendelser
-oc: a venir
-pt: brevemente
-ru: ещё будет
-sv: kommande händelser
-tr: gelmek
-
     to restore this value
 fr: pour restaurer cette valeur
 de: um diesen Wert wiederherzustellen
 en: to restore this value
-
-    to see the first branch
-af: om die eerste staak te sien
-bg: за да видите първия клон
-br: evit gwelout ar skourr kentañ
-ca: per veure la primera branca
-co: per fighjà a prima ghjemba
-cs: abyste viděli první
-da: for at se den første
-de: , um den ersten zu sehen
-en: to see the first one
-eo: por vidi la unuan branĉon
-es: para ver la primera rama
-et: esimese haru vaatamiseks
-fi: nähdäksesi ensimmäisen haaran
-fr: pour voir la première
-he: לראות את הענף הראשון
-is: til að sjá fyrstu grein
-it: per vedere il primo
-lt: kad pamatytumėte pirmą šaką
-lv: skatīt pirmo zaru
-nl: om de eerste tak te zien
-no: for å se den første
-oc: per veire la primièra branca
-pl: aby zobaczyć pierwszą linię (gałąź)
-pt: para ver o primeiro ramo
-ro: pentru a vedea primul
-ru: чтобы увидеть первую ветку
-sk: aby ste videli prvú vetvu
-sl: za prikaz prve veje
-sv: för att se den första
-tr: i̇lkini görmek için
 
     to see the first relationship link
 af: om die eerste te sien
@@ -25226,22 +23730,6 @@ pt: árvore de testemunhas
 sv: vittnesträd
 tr: tanıklar ağacı
 
-    trees & lists
-co: arburi è liste
-de: Bäume & Listen
-en: charts & lists
-es: árboles & listas
-fi: kaaviot & listat
-fr: arbres & listes
-it: alberi & elenchi
-nl: grafieken en lijsten
-no: tavler & lister
-oc: arbres e listas
-pt: tabelas & listas
-ru: деревья и списки
-sv: diagram & listor
-tr: grafikler ve listeler
-
     try again
 bg: опитайте отново
 co: pruvà torna
@@ -25539,13 +24027,6 @@ nl: onbekende personen zonder gegevens/verwijderen vervangt ze door ? ? in hun g
 pt: pessoas desconhecidas sem dados/a supressão substitui-as por ? ? nas suas famílias, ou elimina-as se estiverem isoladas
 sv: okända personer utan uppgifter/borttagningen ersätter dem med ? ? i deras familjer, eller tar bort dem om de är isolerade
 
-    unknown spouse
-co: cumpagni scunnisciuti
-de: fehlende(r) Ehegatte(n)
-en: unknown spouses
-es: cónyuges desconocidos
-fr: conjoints manquants
-
     unspecified
 af: nie gemeld nie
 bg: неуточнено
@@ -25651,35 +24132,12 @@ sv: uppdatera
 tr: güncelleme
 zh: 更新
 
-    update family
-co: amministrà l’unioni
-de: Lebensgemeinschaften verwalten
-en: edit family
-es: administrar las uniones
-fi: muokata perhe
-fr: gérer les unions
-it: gestire le unioni
-nl: huwelijken beheren
-no: redigere familie
-oc: gerir las unions
-pt: atualizar família
-ru: изменить семью
-sv: redigera familj
-tr: aileyi Düzenle
-
     update image note
 co: mudificà a fiura
 de: Bildnotiz aktualisieren
 en: update image
 es: actualizar la imagen
 fr: mettre à jour l’image
-
-    update image source
-co: mudificà a fonte di a fiura
-de: Bildquelle aktualisieren
-en: update image source
-es: actualizar la fuente de la imagen
-fr: mettre à jour la source de l’image
 
     uploaded
 co: incaricatu/incaricata
@@ -25888,13 +24346,6 @@ ru: версия
 sv: version
 tr: sürüm
 
-    very short display
-co: affissera corta corta
-de: sehr kurze Anzeige
-en: very short display
-es: visualización muy corta
-fr: affichage très court
-
     view as friend/back to wizard
 de: als Freund ansehen/zurück zum Meister
 en: view as friend/back to wizard
@@ -25997,13 +24448,6 @@ de: Datenbank wird analysiert/dies kann einen Moment dauern
 en: analyzing the database/this may take a moment
 es: analizando la base de datos/esto puede tardar un momento
 fr: analyse de la base de données/ceci peut prendre quelques instants
-
-    warning refresh
-co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
-de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
-en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
-es: no actualice la página sin antes hacer clic en el ícono principal, ya que repetiría el intercambio de imágenes.
-fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
     warnings
 af: waarskuwings
@@ -26293,15 +24737,6 @@ pt: testemunha/testemunhas
 sv: vittne/vittnen
 tr: tanık/tanıklar
 
-    witnesses at his events
-co: testimoni à i so evenimenti
-de: Zeugen zu seinen Ereignissen
-en: witnesses at his events
-es: testigos en sus eventos
-fr: témoins à ses évènements
-sv: vittnen vid hans händelser
-tr: etkinliklerinde tanıklar
-
     witnesses to events of
 co: testimoni à l’evenimenti di
 de: Zeugen zu Ereignissen von
@@ -26310,15 +24745,6 @@ es: testigos en los eventos de
 fr: témoins aux évènements de
 sv: vittnen vid händelser för
 tr: etkinliklerinin tanıkları
-
-    witnesses to my events and godparents
-co: testimoni à i mo evenimenti è cumpare/cummare
-de: Zeugen zu meinen Ereignissen und Taufzeugen
-en: witnesses to my events and godparents
-es: testigos en mis eventos y padrinos
-fr: témoins à mes évènements et parrains/marraines
-sv: vittnen vid mina händelser och gudföräldrar
-tr: etkinliklerime ve vaftiz babalarıma tanıklar
 
     wizard/wizards/friend/friends/exterior
 af: medewerkers/medewerkers/vriend/vriend/exterior
