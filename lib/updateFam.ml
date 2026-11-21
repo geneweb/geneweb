@@ -267,6 +267,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "cnt" ] -> eval_int_env "cnt" env
   | [ "comment" ] -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
   | [ "digest" ] -> eval_string_env "digest" env
+  | [ "nonce" ] -> eval_string_env "nonce" env
   | [ "divorce" ] -> eval_divorce fam
   | [ "divorce"; s ] -> eval_divorce' fam s
   | "father" :: sl -> eval_key conf base (Adef.father cpl) sl
@@ -535,6 +536,7 @@ let print_update_fam ?(grandparents = []) ?(snapshot = "") ?(review = "") conf
       let env =
         Templ.Env.empty
         |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "nonce" (Vstring (FormNonce.fresh ()))
         |> Templ.Env.add "snapshot" (Vstring snapshot)
         |> Templ.Env.add "review" (Vstring review)
         |> Templ.Env.add "is_upd_fam" (Vbool true)

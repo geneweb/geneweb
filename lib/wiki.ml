@@ -918,6 +918,7 @@ let print_mod_view_form_start conf can_edit mode fname has_v v stored
     Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then (
     Util.hidden_input conf "digest" (Mutil.digest stored |> Mutil.encode);
+    Util.hidden_input conf "nonce" (Mutil.encode (FormNonce.fresh ()));
     if not is_new_note then
       Output.printf conf {|<input type="hidden" name="snapshot" value="%s">|}
         (UpdateConflict.note_snapshot conf fname stored))

@@ -29,7 +29,8 @@
   update_order_test
   update_conflict_test
   collation_test
-  book_test)
+  book_test
+  form_nonce_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix yojson))
 
 (test

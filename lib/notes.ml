@@ -489,6 +489,7 @@ let commit_notes conf base fnotes s =
   (try Driver.commit_notes base fname s
    with Sys_error m ->
      Hutil.incorrect_request conf ~comment:("explication todo: " ^ m));
+  Util.record_nonce conf;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf base pg s
 
@@ -501,6 +502,7 @@ let commit_wiznotes conf base fnotes s =
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   Driver.commit_wiznotes base fname s;
+  Util.record_nonce conf;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db conf base pg s
 

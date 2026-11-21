@@ -238,6 +238,7 @@
   <p class="my-0">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">
+    <input type="hidden" name="nonce" value="%nonce;">
     %if;(snapshot!="")<input type="hidden" name="snapshot" value="%snapshot;">%nl;%end;
     %if;(evar_ip!="")<input type="hidden" name="ip" value="%evar_ip;">%nl;%end;
     %if;(evar_i!="")<input type="hidden" name="i" value="%evar_i;">%nl;%end;
