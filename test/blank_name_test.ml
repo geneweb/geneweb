@@ -278,6 +278,43 @@ let test_key_change () =
   chk "unique key" (None, Some true) (rename 3 "DURAND");
   chk "shared key" (Some "old", Some false) (rename 7 "DURAND")
 
+let test_records_by_key () =
+  with_base "history_records_test" @@ fun base ->
+  with_history_dir "records_test_history" @@ fun _ conf ->
+  let o =
+    Util.string_gen_person base
+      (Driver.gen_person_of_person (Driver.poi base (iper jean)))
+  in
+  HistoryDiff.record_diff conf base
+    (U_Modify_person (o, { o with occupation = "farmer" }));
+  let file = HistoryDiff.history_file o.first_name o.surname o.occ in
+  let history = HistoryDiff.load_person_history conf base file in
+  let ipers a = List.map Driver.Iper.to_string (Array.to_list a) in
+  let summary (gr : HistoryDiff.gen_record) =
+    ( Driver.Iper.to_string gr.gen_p.key_index,
+      List.map ipers gr.gen_c,
+      List.map Driver.Iper.to_string gr.gen_s,
+      List.map (fun f -> Driver.Ifam.to_string f.fam_index) gr.gen_f )
+  in
+  let expected = ("3", [ [ "2"; "5" ] ], [ "4" ], [ "0" ]) in
+  check int "two records" 2 (List.length history);
+  List.iter
+    (fun gr ->
+      check
+        (pair
+           (pair string (list (list string)))
+           (pair (list string) (list string)))
+        "persons read back"
+        (let a, b, c, d = expected in
+         ((a, b), (c, d)))
+        (let a, b, c, d = summary gr in
+         ((a, b), (c, d))))
+    history;
+  check (list string) "occupations" [ "farmer"; "" ]
+    (List.map
+       (fun (gr : HistoryDiff.gen_record) -> gr.gen_p.occupation)
+       history)
+
 let test_acces () =
   with_base "index_links_test" @@ fun base ->
   let link access_by_key i =
@@ -311,6 +348,7 @@ let v =
       [
         test_case "archive of deleted persons" `Quick test_archive_deleted;
         test_case "key change" `Quick test_key_change;
+        test_case "records by key" `Quick test_records_by_key;
       ] );
     ("index-links", [ test_case "Util.acces" `Quick test_acces ]);
   ]
