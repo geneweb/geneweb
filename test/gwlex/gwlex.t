@@ -99,18 +99,21 @@ variants than the English one with their text.
 
 Orphans: entries used nowhere, and keys missing from the lexicon. A key
 holding a parameter of its macro matches the entries it can produce, and a
-literal argument of %apply marks its entry as used. Brackets in scripts,
+literal argument of %apply marks its entry as used, as does a literal
+prefix or suffix of a concatenation in OCaml. Brackets in scripts,
 styles and pattern attributes are code unless they hold a phrase.
 
   $ mkdir -p repo/lib repo/hd/lang repo/hd/etc
   $ cd repo
-  $ printf '    alias\n->: target\n\n    by apply\nen: x\n\n    cousin.1.2\nen: cousin\n\n' > hd/lang/lexicon.txt
-  $ printf '    cousins.3.0\nen: cousins\n\n    from ml\nen: a\n\n    from template\nen: b\n\n' >> hd/lang/lexicon.txt
-  $ printf '    in comment\nen: c\n\n    target\nen: t\n\n    unused\nen: u\n' >> hd/lang/lexicon.txt
+  $ printf '    alias\n->: target\n\n    birth (at)\nen: birth\n\n    by apply\nen: x\n\n' > hd/lang/lexicon.txt
+  $ printf '    cousin.1.2\nen: cousin\n\n    cousins.3.0\nen: cousins\n\n    from ml\nen: a\n\n' >> hd/lang/lexicon.txt
+  $ printf '    from template\nen: b\n\n    in comment\nen: c\n\n    NOTIF by prefix\nen: n\n\n' >> hd/lang/lexicon.txt
+  $ printf '    target\nen: t\n\n    unused\nen: u\n' >> hd/lang/lexicon.txt
   $ printf 'let f conf = Util.transl conf "from ml"\n' > lib/a.ml
   $ printf 'let g conf = transl_nth conf "not in lexicon" 0\n' >> lib/a.ml
   $ printf '(* transl conf "in comment" *)\n' >> lib/a.ml
   $ printf 'let h a b = Printf.sprintf "cousin.%%d.%%d" a b\n' >> lib/a.ml
+  $ printf 'let n conf key = transl conf ("NOTIF " ^ key)\nlet e key = key ^ " (at)"\n' >> lib/a.ml
   $ printf '[*from template] [missing in lexicon]0 [alias]\n' > hd/etc/a.txt
   $ printf '%%define;f(xx)[cousins.xx.0]%%end;\n%%apply;f("by apply")\n' >> hd/etc/a.txt
   $ printf '<script>let a = b[i]; let t = "[missing in script]";</script>\n' >> hd/etc/a.txt
@@ -118,8 +121,8 @@ styles and pattern attributes are code unless they hold a phrase.
   $ gwlex check
   $ gwlex orphans
   Unused entries:
-  hd/lang/lexicon.txt:19: in comment
-  hd/lang/lexicon.txt:25: unused
+  hd/lang/lexicon.txt:22: in comment
+  hd/lang/lexicon.txt:31: unused
   
   Keys missing from the lexicon:
   hd/etc/a.txt: missing in lexicon

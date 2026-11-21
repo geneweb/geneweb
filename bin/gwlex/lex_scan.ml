@@ -114,12 +114,31 @@ let is_ident_char = function
   | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '\'' | '.' -> true
   | _ -> false
 
+let is_affix s =
+  let is_letter c = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') in
+  String.length s >= 4
+  && String.fold_left (fun n c -> if is_letter c then n + 1 else n) 0 s >= 2
+
 let scan_ml src =
   let len = String.length src in
-  let strings = ref [] and keys = ref [] in
-  let literal lnum pending v =
+  let strings = ref [] and keys = ref [] and affixes = ref [] in
+  let caret = ref false in
+  let rec next_caret j =
+    j < len
+    &&
+    match src.[j] with
+    | ' ' | '\t' | '\n' | '\r' -> next_caret (j + 1)
+    | c -> c = '^'
+  in
+  let literal lnum pending v j =
     strings := v :: !strings;
-    if pending then keys := (lnum, v) :: !keys
+    if pending then keys := (lnum, v) :: !keys;
+    (if is_affix v then
+       match (!caret, next_caret j) with
+       | true, false -> affixes := ("\002" ^ v) :: !affixes
+       | false, true -> affixes := (v ^ "\002") :: !affixes
+       | true, true | false, false -> ());
+    caret := false
   in
   let newlines s =
     String.fold_left (fun n c -> if c = '\n' then n + 1 else n) 0 s
@@ -128,11 +147,16 @@ let scan_ml src =
     if i < len then
       match src.[i] with
       | '\n' -> code (i + 1) (lnum + 1) pending
-      | ' ' | '\t' | '\r' | '~' | '?' | ':' | '0' .. '9' ->
+      | ' ' | '\t' | '\r' -> code (i + 1) lnum pending
+      | '~' | '?' | ':' | '0' .. '9' ->
+          caret := false;
           code (i + 1) lnum pending
+      | '^' ->
+          caret := true;
+          code (i + 1) lnum false
       | '"' ->
           let v, j, nl = read_string src (i + 1) in
-          literal lnum pending v;
+          literal lnum pending v j;
           code j (lnum + nl) false
       | '(' when i + 1 < len && src.[i + 1] = '*' ->
           let j, nl = comment (i + 2) 1 0 in
@@ -140,6 +164,7 @@ let scan_ml src =
       | '{' -> quoted i lnum pending
       | '\'' -> char_lit i lnum pending
       | 'a' .. 'z' | 'A' .. 'Z' | '_' ->
+          caret := false;
           let j = ident_end (i + 1) in
           let id = String.sub src i (j - i) in
           let name =
@@ -152,7 +177,9 @@ let scan_ml src =
             && (pending || List.mem name key_functions)
           in
           code j lnum pending
-      | _ -> code (i + 1) lnum false
+      | _ ->
+          caret := false;
+          code (i + 1) lnum false
   and ident_end j =
     if j < len && is_ident_char src.[j] then ident_end (j + 1) else j
   and comment i depth nl =
@@ -181,11 +208,15 @@ let scan_ml src =
       match find_sub src close (j + 1) with
       | Some k ->
           let v = String.sub src (j + 1) (k - j - 1) in
-          literal lnum pending v;
-          code (k + String.length close) (lnum + newlines v) false
+          let k = k + String.length close in
+          literal lnum pending v k;
+          code k (lnum + newlines v) false
       | None -> ()
-    else code (i + 1) lnum false
+    else (
+      caret := false;
+      code (i + 1) lnum false)
   and char_lit i lnum pending =
+    caret := false;
     if i + 3 < len && src.[i + 1] = '\\' then
       match String.index_from_opt src (i + 3) '\'' with
       | Some j -> code (j + 1) lnum false
@@ -194,7 +225,7 @@ let scan_ml src =
     else code (i + 1) lnum pending
   in
   code 0 1 false;
-  (List.rev !strings, List.rev !keys)
+  (List.rev !strings, List.rev !keys, !affixes)
 
 let split_at_coloncolon s =
   let rec loop i =
@@ -381,9 +412,10 @@ let orphans lexicon =
   [ "lib"; "bin"; "plugins" ]
   |> List.concat_map (files ~skip:[ "bin" // "setup"; "bin" // "gwlex" ] ".ml")
   |> List.iter (fun f ->
-      let strings, keys =
+      let strings, keys, affixes =
         scan_ml (In_channel.with_open_bin f In_channel.input_all)
       in
+      patterns := List.rev_append affixes !patterns;
       List.iter
         (fun s ->
           Hashtbl.replace used s ();
