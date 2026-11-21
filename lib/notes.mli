@@ -78,6 +78,15 @@ val rename_in_text :
     unless [text] is only the name; first name and surname are substituted in a
     single pass. [text] is returned unchanged if it is not valid UTF-8. *)
 
+val rename_person_urls :
+  Def.NLDB.key -> string * string * int -> string -> string
+(** [rename_person_urls oldk newk s] rewrites in [s] the URLs whose query holds
+    [p=fn&n=sn&oc=occ] designating [oldk] (lower-cased), whatever the mode [m=],
+    so that they designate [newk]. The separators [&], [&amp;] and the legacy
+    [;] are handled; a missing [oc] means 0, and is added if [newk] has a
+    non-zero one. A name that does not change keeps its case. Other URLs, and
+    those with a host or a [b=] field, are left untouched. *)
+
 val update_ind_key :
   Config.config ->
   Geneweb_db.Driver.base ->

@@ -13,8 +13,41 @@ let remains (ofn, osn) (nfn, nsn) text expected =
       check bool text expected
         (Notes.old_name_remains (lk (ofn, osn, 0)) (nfn, nsn, 0) text))
 
+let url old_ new_ text expected =
+  test_case text `Quick (fun () ->
+      check string text expected (Notes.rename_person_urls (lk old_) new_ text))
+
 let v =
   [
+    ( "notes-rename-urls",
+      [
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|<img src="m=IM_C&p=jean&n=dupont&s=a.jpg">|}
+          {|<img src="m=IM_C&p=Pierre&n=Durand&s=a.jpg">|};
+        url ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|<img src="?m=IM_C&amp;p=jean&amp;n=dupont&amp;oc=0&amp;s=a.jpg">|}
+          {|<img src="?m=IM_C&amp;p=jean&amp;n=dupont&amp;oc=2&amp;s=a.jpg">|};
+        url ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|m=IM_C&p=jean&n=dupont&s=a.jpg|}
+          {|m=IM_C&p=jean&n=dupont&s=a.jpg&oc=2|};
+        url ("Jean", "Dupont", 0) ("Jean", "Dupont", 2)
+          {|<img src="m=IM_C;p=jean;n=dupont;s=a.jpg">|}
+          {|<img src="m=IM_C;p=jean;n=dupont;s=a.jpg;oc=2">|};
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|<a href="?m=A&p=jean&n=dupont">Jean</a>|}
+          {|<a href="?m=A&p=Pierre&n=Durand">Jean</a>|};
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|<a href="%sp=jean&n=dupont#p_1">Jean</a>|}
+          {|<a href="%sp=Pierre&n=Durand#p_1">Jean</a>|};
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|https://gw.geneanet.org/x?lang=fr&n=dupont&oc=0&p=jean|}
+          {|https://gw.geneanet.org/x?lang=fr&n=dupont&oc=0&p=jean|};
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|?b=autre&p=jean&n=dupont|} {|?b=autre&p=jean&n=dupont|};
+        url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
+          {|m=IM_C&p=jean&n=dupont&oc=1&s=a.jpg|}
+          {|m=IM_C&p=jean&n=dupont&oc=1&s=a.jpg|};
+      ] );
     ( "notes-rename-text",
       [
         case ("Jean", "Dupont") ("Pierre", "Dupont") "Jean Dupont"

@@ -287,7 +287,10 @@
 - A URL of a note holding `p=fn&n=sn` (and `oc=`), whatever its mode
   (`m=IM_C` for an image of the carrousel, `m=A`…), now counts as a link
   to that person, like `[[fn/sn]]`: the note is a linked page of the
-  person. Run `update_nldb` once on existing bases to index them.
+  person, and renaming the person rewrites the URL. URLs to another site
+  or another base are left alone. The image paths of a gallery in the
+  carrousel folder of the person follow its renaming too. Run
+  `update_nldb` once on existing bases to index them.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

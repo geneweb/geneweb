@@ -761,10 +761,21 @@ let update_map json oldk newk =
         else person_json)
       lmap
   in
+  let odir, ndir =
+    let dir (fn, sn, oc) = Image.key_dir_basename fn sn oc ^ "/" in
+    (dir oldk, dir newk)
+  in
+  let update_img s =
+    if String.starts_with ~prefix:odir s then
+      ndir
+      ^ String.sub s (String.length odir) (String.length s - String.length odir)
+    else s
+  in
   let update_fields l =
     List.map
       (function
         | "map", `List lmap -> ("map", `List (update_map_list lmap))
+        | "img", `String s -> ("img", `String (update_img s))
         | "images", `List imgs ->
             ( "images",
               `List
@@ -776,6 +787,8 @@ let update_map json oldk newk =
                               (function
                                 | "map", `List lmap ->
                                     ("map", `List (update_map_list lmap))
+                                | "img", `String s ->
+                                    ("img", `String (update_img s))
                                 | e -> e)
                               il)
                      | e -> e)
@@ -802,12 +815,66 @@ let update_gallery s oldk newk =
       let updated_json = update_map json oldk newk in
       title_part ^ Yojson.Basic.pretty_to_string updated_json ^ "\n"
 
+(* [rewrite_url_query newk query] sets the p, n and oc fields of the query
+   string of a URL to the person [newk], keeping the separators, and the case
+   of a name that does not change. *)
+let rewrite_url_query (nfn, nsn, noc) query =
+  let items = NotesLinks.split_query query in
+  let has_oc = NotesLinks.query_field items "oc" <> None in
+  let name k v sep f =
+    match NotesLinks.query_field [ (sep, f) ] k with
+    | Some o when Name.lower o = Name.lower v -> (sep, f)
+    | Some _ | None -> (sep, k ^ "=" ^ (Mutil.encode v :> string))
+  in
+  let items =
+    List.map
+      (fun (sep, f) ->
+        match String.index_opt f '=' with
+        | Some e -> (
+            match String.sub f 0 e with
+            | "p" -> name "p" nfn sep f
+            | "n" -> name "n" nsn sep f
+            | "oc" -> (sep, "oc=" ^ string_of_int noc)
+            | _ -> (sep, f))
+        | None -> (sep, f))
+      items
+  in
+  let items =
+    if has_oc || noc = 0 then items
+    else
+      let sep =
+        match List.find_opt (fun (sep, _) -> sep <> "") items with
+        | Some (sep, _) -> sep
+        | None -> "&"
+      in
+      List.rev ((sep, "oc=" ^ string_of_int noc) :: List.rev items)
+  in
+  String.concat "" (List.map (fun (sep, f) -> sep ^ f) items)
+
+let rename_person_urls oldk newk s =
+  let okey = lower_key oldk in
+  let buf = Buffer.create (String.length s + 16) in
+  let last =
+    NotesLinks.fold_person_urls
+      (fun ~start ~stop key pos ->
+        if key <> okey then pos
+        else (
+          Buffer.add_substring buf s pos (start - pos);
+          Buffer.add_string buf
+            (rewrite_url_query newk (String.sub s start (stop - start)));
+          stop))
+      0 s
+  in
+  Buffer.add_substring buf s last (String.length s - last);
+  Buffer.contents buf
+
 let rewrite_key s oldk newk _file =
   let s =
     if Mutil.contains s "TYPE=gallery" || Mutil.contains s "TYPE=album" then
       update_gallery s oldk newk
     else s
   in
+  let s = rename_person_urls oldk newk s in
   let slen = String.length s in
   let out = Buffer.create (slen + 64) in
   (* the text as displayed: links to the person by their new display text,
