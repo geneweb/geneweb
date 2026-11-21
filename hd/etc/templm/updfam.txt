@@ -160,6 +160,7 @@
   <input type="hidden" name="rdsrc" value="%evar_rdsrc;"%/>
   %include;upd_datalist
   <input type="hidden" name="digest" value="%digest;"%/>
+  <input type="hidden" name="nonce" value="%nonce;"%/>
   %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
   %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
   %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")

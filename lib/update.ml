@@ -1016,6 +1016,35 @@ let error_locked conf =
   Output.print_sstring conf ".</p>";
   print_retry_forms conf
 
+let print_already_saved conf =
+  let title _ =
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "form already saved"))
+  in
+  Hutil.header conf title;
+  Output.print_sstring conf {|<div class="alert alert-info mt-3"><p>|};
+  Output.print_sstring conf
+    (Utf8.capitalize_fst
+       (transl conf "this form has already been saved: not applied again"));
+  Output.print_sstring conf ".</p></div>";
+  (* the person of the form: [ip] for the family forms, [i] for the others *)
+  let ip =
+    match p_getenv conf.env "ip" with
+    | Some _ as ip -> ip
+    | None -> (
+        match p_getenv conf.env "m" with
+        | Some ("MOD_IND_OK" | "CHG_EVT_IND_ORD_OK") -> p_getenv conf.env "i"
+        | Some _ | None -> None)
+  in
+  Option.iter
+    (fun ip ->
+      Output.printf conf {|<p><a href="%si=%s">%s</a></p>|}
+        (Util.commd conf :> string)
+        (Mutil.encode ip :> string)
+        (Utf8.capitalize_fst (transl conf "back")))
+    ip;
+  Hutil.trailer conf
+
 let bulk_retry_delay = 15
 
 let error_bulk conf (st : BulkStatus.t) =

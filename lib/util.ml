@@ -2879,9 +2879,19 @@ let test_cnt_d conf =
   else ();
   cnt_d
 
+let record_nonce conf =
+  match p_getenv conf.env "nonce" with
+  | Some nonce when nonce <> "" ->
+      FormNonce.record
+        (!GWPARAM.bpath conf.bname)
+        ~nonce
+        ~fingerprint:(FormNonce.fingerprint conf.env)
+  | Some _ | None -> ()
+
 let commit_patches conf base =
   let _ = test_cnt_d in
   Driver.commit_patches base;
+  record_nonce conf;
   conf.henv <-
     List.map
       (fun (k, v) -> if k = "escache" then (k, escache_value base) else (k, v))

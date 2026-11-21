@@ -52,6 +52,10 @@ val escache_value : Geneweb_db.Driver.base -> Adef.encoded_string
 val commit_patches : config -> Geneweb_db.Driver.base -> unit
 (** Commits the patches and logs the modification *)
 
+val record_nonce : config -> unit
+(** [record_nonce conf] records the nonce of the form posted, if any, as
+    applied: the same form posted again is not applied twice ({!FormNonce}). *)
+
 val update_wf_trace : config -> string -> unit
 
 val get_referer : config -> Adef.escaped_string

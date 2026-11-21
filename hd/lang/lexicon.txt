@@ -11201,6 +11201,17 @@ en: for/since
 es: durante/desde
 fr: pendant/depuis
 
+    form already saved
+de: Formular bereits gespeichert
+en: form already saved
+es: formulario ya guardado
+fr: formulaire déjà enregistré
+it: modulo già salvato
+nl: formulier al opgeslagen
+pl: formularz już zapisany
+pt: formulário já guardado
+sv: formuläret är redan sparat
+
     forum
 af: forum
 bg: форум на базата от данни
@@ -24440,6 +24451,17 @@ sk: celý zoznam
 sl: celoten seznam
 sv: hela listan
 tr: tam liste
+
+    this form has already been saved: not applied again
+de: dieses Formular wurde bereits gespeichert: es wurde kein zweites Mal ausgeführt
+en: this form has already been saved: it has not been applied a second time
+es: este formulario ya se ha guardado: no se ha aplicado una segunda vez
+fr: ce formulaire a déjà été enregistré : il n’a pas été appliqué une seconde fois
+it: questo modulo è già stato salvato: non è stato applicato una seconda volta
+nl: dit formulier is al opgeslagen: het is geen tweede keer uitgevoerd
+pl: ten formularz został już zapisany: nie został zastosowany drugi raz
+pt: este formulário já foi guardado: não foi aplicado uma segunda vez
+sv: det här formuläret har redan sparats: det har inte utförts en andra gång
 
     this forum is moderated
 bg: този форум се модерира

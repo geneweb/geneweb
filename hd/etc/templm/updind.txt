@@ -94,6 +94,7 @@
   %hidden;
   %include;upd_datalist
   <input type="hidden" name="digest" value="%digest;"%/>
+  <input type="hidden" name="nonce" value="%nonce;"%/>
   <input type="hidden" name="i" value="%index;"%/>
   %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
     %if;(evar_i2 != "")

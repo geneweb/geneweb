@@ -90,6 +90,7 @@ and eval_simple_var conf base env p = function
       safe_val (Util.escape_html p.death_src :> Adef.safe_string)
   | [ "died_young" ] -> bool_val (p.death = DeadYoung)
   | [ "digest" ] -> eval_string_env "digest" env
+  | [ "nonce" ] -> eval_string_env "nonce" env
   | [ "dont_know_if_dead" ] -> bool_val (p.death = DontKnowIfDead)
   | [ "dr_disappeared" ] -> eval_is_death_reason Disappeared p.death
   | [ "dr_executed" ] -> eval_is_death_reason Executed p.death
@@ -636,6 +637,7 @@ let print_update_ind ?(snapshot = "") ?(review = "") conf base p digest =
       let env =
         Templ.Env.empty
         |> Templ.Env.add "digest" (Vstring digest)
+        |> Templ.Env.add "nonce" (Vstring (FormNonce.fresh ()))
         |> Templ.Env.add "snapshot" (Vstring snapshot)
         |> Templ.Env.add "review" (Vstring review)
         |> Templ.Env.add "next_pevent" (Vcnt (ref (List.length p.pevents + 1)))

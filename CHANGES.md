@@ -231,6 +231,14 @@
   and notes of events are merged line by line likewise. A form opened on a
   section of a note is displayed again on the whole note. The note
   forms of the base are watched like the person and family forms.
+- A person, family or note form posted again after it was saved (a
+  double click, the browser after an error of the proxy, a page offering
+  to post it again) is no longer applied twice, creating a family or a
+  person twice: each form carries a nonce, recorded in `base.nonces`
+  next to `base.gwb` when its request writes into the base, and the same
+  form posted again with the same entry is answered "already saved". The
+  same form saved again with another entry is handled by its digest, as
+  before.
 - A person form is no longer refused with "the base has changed" when,
   meanwhile, the form of another person added or removed it as a
   witness, a godparent or a relation.
