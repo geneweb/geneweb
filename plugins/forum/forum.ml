@@ -213,7 +213,7 @@ let get_var ic lab s =
     (String.sub s start (String.length s - start), MF.input_line ic)
   else ("", s)
 
-let size_of_char s i = Utf8.nbc s.[i]
+let size_of_char s i = Unidecode.nbc s.[i]
 
 let string_length s i =
   let rec loop i =

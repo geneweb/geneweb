@@ -162,7 +162,7 @@ let substr_start_aux n s =
     if count = 0 || i >= len then Buffer.contents buffer
     else
       try
-        let nbc = Utf8.nbc s.[i] in
+        let nbc = Unidecode.nbc s.[i] in
         if i + nbc <= len then (
           let car = String.sub s i nbc in
           Buffer.add_string buffer car;

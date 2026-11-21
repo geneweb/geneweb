@@ -31,7 +31,6 @@ depends: [
   "ppx_blob"
   "ppx_deriving"
   "stdlib-shims"
-  "unidecode" {>= "0.5.0"}
   "uri"
   "uucp"
   "uunf"

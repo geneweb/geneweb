@@ -1,16 +1,4 @@
-(* TODO: replace with Unidecode.nbc
-   when version constraint [= 0.2.0] will be removed *)
-let nbc c =
-  if Char.code c < 0x80 then 1
-  else if Char.code c < 0xC0 then invalid_arg "nbc"
-  else if Char.code c < 0xE0 then 2
-  else if Char.code c < 0xF0 then 3
-  else if Char.code c < 0xF8 then 4
-  else if Char.code c < 0xFC then 5
-  else if Char.code c < 0xFE then 6
-  else invalid_arg "nbc"
-
-let next s i = i + nbc s.[i]
+let next s i = i + Unidecode.nbc s.[i]
 
 let get s i =
   let rec loop i k = if k = 0 then i else loop (next s i) (pred k) in

@@ -24,7 +24,6 @@
   qcheck,
   qcheck-alcotest,
   stdlib-shims,
-  unidecode,
   uutf,
   uunf,
   uucp,
@@ -77,7 +76,6 @@ buildDunePackage {
     ppx_blob
     ppx_deriving
     stdlib-shims
-    unidecode
     uutf
     uunf
     uucp
