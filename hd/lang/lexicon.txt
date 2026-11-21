@@ -18968,6 +18968,14 @@ de: Datenqualität
 en: data quality
 fr: qualité des données
 
+    growth of the database
+de: Wachstum der Datenbank
+en: growth of the database
+es: crecimiento de la base
+fr: évolution de la taille de la base
+it: crescita del database
+nl: groei van de database
+
     description
 af: beskrywing
 bg: описание
