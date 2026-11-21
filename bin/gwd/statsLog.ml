@@ -71,14 +71,34 @@ let iso8601 tm =
     (t.Unix.tm_mon + 1) t.Unix.tm_mday t.Unix.tm_hour t.Unix.tm_min
     t.Unix.tm_sec
 
+let countries_file conf = cnt_file conf "_countries.txt"
+let countries_header = "date\ttimestamp\tcountries\n"
+
+(* Appends the countries of the users connected at [tm]: "CC:n" separated by
+   spaces, empty when nobody is connected. *)
+let write_countries conf tm l =
+  let fname = countries_file conf in
+  let is_new = not (Sys.file_exists fname) in
+  Secure.with_open_out_gen
+    [ Open_wronly; Open_creat; Open_append; Open_text ]
+    0o644 fname
+  @@ fun oc ->
+  if is_new then output_string oc countries_header;
+  List.map (fun (cc, n) -> Printf.sprintf "%s:%d" cc n) l
+  |> String.concat " "
+  |> Printf.fprintf oc "%s\t%.0f\t%s\n" (iso8601 tm) tm
+
 (* Appends the snapshot taken at [tm], with the durations [r] accumulated
    since the previous one. Called without the accumulator lock held, since
    it opens the base. *)
 let snapshot conf ~window tm r =
-  let cn =
-    let on_exn _exn _bt = None in
+  let geoip = Geoip.file () in
+  let with_countries = Sys.file_exists geoip in
+  let cn, addrs =
+    let on_exn _exn _bt = (None, []) in
     Lock.control ~on_exn ~wait:true ~lock_file:(Robot.lock_file ()) @@ fun () ->
-    Some (Robot.snapshot conf window)
+    ( Some (Robot.snapshot conf window),
+      if with_countries then Robot.addresses conf window else [] )
   in
   let nb_persons, nb_families =
     Driver.with_database (bfile conf) @@ fun base ->
@@ -89,6 +109,8 @@ let snapshot conf ~window tm r =
     | Some cn -> (cn.cn_total, cn.cn_wizards, cn.cn_friends)
     | None -> (0, 0, 0)
   in
+  if with_countries then
+    Option.iter (write_countries conf tm) (Geoip.countries geoip addrs);
   let fname = stats_file conf in
   let is_new = not (Sys.file_exists fname) in
   Secure.with_open_out_gen

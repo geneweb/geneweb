@@ -14,6 +14,9 @@
     taken by the first request after the period; response times are weighted by
     the number of requests. Missing points are [null]. The JSON also gives the
     all-time record of connections ([record]: value, day and time of the first
-    snapshot reaching it), over the whole file. *)
+    snapshot reaching it), over the whole file, and the users by country of the
+    period ([countries], from [<base>_countries.txt], see {!StatsLog}): for each
+    country code, the mean number of connected users over the snapshots of the
+    period and its maximum, most present first. *)
 
 val print : Geneweb.Config.config -> unit

@@ -248,6 +248,15 @@
   saving a form pair the events before and after a change by their
   content rather than by their position: an inserted, removed or moved
   event no longer shows as a change of every event after it.
+- The statistics page (`m=STATS`) can show the growth of the base: the
+  milestones are given by `stats_growth=date:count …` in the `.gwf`
+  file (date `YYYY`, `YYYY-MM` or `YYYY-MM-DD`), today's total is added.
+- The periodic statistics (`stats_period`) record the countries of the
+  connected users when an IP-to-country file is installed as
+  `etc/ip_country.csv` in the bases directory (DB-IP "IP to Country
+  Lite", uncompressed): only the counts by country are kept, in
+  `<base>_countries.txt`. `m=GWD_STATS` charts their mean over the
+  period.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

@@ -25,7 +25,16 @@
   ipaddr
   cmdliner
   yojson)
- (modules request sites cmd cmd_legacy robot gwd_oidc statsLog statsChart))
+ (modules
+  request
+  sites
+  cmd
+  cmd_legacy
+  robot
+  gwd_oidc
+  geoip
+  statsLog
+  statsChart))
 
 (executable
  (package geneweb)
