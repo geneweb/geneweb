@@ -36,5 +36,6 @@ let () =
          Update_order_test.v;
          Userkey_test.v;
          Util_test.v;
+         Form_nonce_test.v;
          Wiki_test.v;
        ])

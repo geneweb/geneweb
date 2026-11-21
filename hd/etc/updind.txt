@@ -402,6 +402,7 @@
   <div class="row">
     %hidden;
     <input type="hidden" name="digest" value="%digest;">
+    <input type="hidden" name="nonce" value="%nonce;">
     %if;(snapshot!="")
       <input type="hidden" name="snapshot" value="%snapshot;">
     %end;

@@ -233,6 +233,21 @@ let try_plugin conn conf base_name meth =
   Registration.try_handlers ~meth (fun ~name handler ->
       List.mem name conf.allowed_plugins && handler conn conf base_name)
 
+(* A form posted again after it was applied is not applied twice
+   (FormNonce). To be put inside [w_lock]: checked under the lock, a double
+   click waits for the first request before being answered. *)
+let w_nonce fn conn conf (base_name : string option) =
+  match p_getenv conf.env "nonce" with
+  | Some nonce
+    when nonce <> ""
+         && FormNonce.saved (GWPARAM.bpath conf.bname) ~nonce
+              ~fingerprint:(FormNonce.fingerprint conf.env) ->
+      Log.info (fun k ->
+          k "%s: form %s posted again by %s, not applied" conf.bname nonce
+            conf.user);
+      Update.print_already_saved conf
+  | Some _ | None -> fn conn conf base_name
+
 (* The lock is first tried without waiting: when it is held by a bulk task
    (see [w_bulk]), the wizard is told so ([onbulk]) instead of waiting for
    the end of the task; otherwise the lock is waited for, as before. *)
@@ -492,7 +507,7 @@ let treat_request =
              let w_base hdl = w_base (fun _conn -> hdl) conn in
              let w_person hdl = w_person (fun _conn -> hdl) conn in
              let w_index hdl = w_index (fun _conn -> hdl) conn in
-             let w_lock hdl = w_lock (fun _conn -> hdl) conn in
+             let w_lock hdl = w_lock (w_nonce (fun _conn -> hdl)) conn in
              let w_bulk hdl = w_bulk ~command:m (fun _conn -> hdl) conn in
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
              match m with
