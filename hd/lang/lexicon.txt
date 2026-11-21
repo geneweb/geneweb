@@ -22826,6 +22826,40 @@ sl: ni podatkov
 sv: inga data
 tr: veri yok
 
+    record (all-time maximum)
+af: rekord
+bg: рекорд
+br: record
+ca: rècord
+co: record
+cs: rekord
+da: rekord
+de: Rekord
+en: record
+eo: rekordo
+es: récord
+et: rekord
+fi: ennätys
+fr: record
+he: שיא
+is: met
+it: record
+lt: rekordas
+lv: rekords
+nl: record
+no: rekord
+oc: record
+pl: rekord
+pt: recorde
+pt-br: recorde
+ro: record
+ru: рекорд
+sk: rekord
+sl: rekord
+sv: rekord
+tr: rekor
+zh: 纪录
+
     kilobytes per second
 bg: КБ/с
 co: Ko/s

@@ -246,7 +246,14 @@ let points period ~start ~stop snaps =
 
 let round3 x = `Float (Float.round (x *. 1000.) /. 1000.)
 
-let json period ~day ~prev ~next ~first pts =
+(* all-time maximum of the connections, with the first snapshot reaching it *)
+let record snaps =
+  List.fold_left
+    (fun r s ->
+      match r with Some r when r.conn >= s.conn -> Some r | _ -> Some s)
+    None snaps
+
+let json period ~day ~prev ~next ~first ~record pts =
   let col f =
     `List
       (List.map
@@ -283,6 +290,16 @@ let json period ~day ~prev ~next ~first pts =
       ("prev", opt_string prev);
       ("next", opt_string next);
       ("first", opt_string first);
+      ( "record",
+        match record with
+        | None -> `Null
+        | Some s ->
+            `Assoc
+              [
+                ("conn", `Int s.conn);
+                ("day", `String (string_of_ymd (ymd (Unix.localtime s.ts))));
+                ("time", `String (label Day s.ts));
+              ] );
       ("labels", `List (List.map (fun (t, _) -> `String (label period t)) pts));
       ("conn", col (per_snap (fun a -> float a.conn_sum)));
       ( "conn_max",
@@ -342,7 +359,7 @@ let print_json conf =
       ~prev ~next
       ~first:
         (Option.map (fun f -> string_of_ymd (ymd (Unix.localtime f))) first)
-      pts
+      ~record:(record snaps) pts
   in
   Output.header conf "Content-type: application/json; charset=utf-8";
   Output.header conf "Cache-control: no-store";
