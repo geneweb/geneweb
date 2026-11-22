@@ -10,7 +10,12 @@
   <link rel="apple-touch-icon" href="%image_prefix;favicon_gwd.png">
   %permalink;
   %include;css
-  <style>html { scrollbar-gutter: stable; }</style>
+  <style>
+html { scrollbar-gutter: stable; }
+/* the description wraps within the width of the image */
+.gallery-image-box { display: inline-block; vertical-align: top; min-width: 12rem; max-width: 100%%; }
+.gallery-description { display: block; width: 0; min-width: 100%%; overflow-wrap: anywhere; }
+  </style>
   %include;hed
 </head>
 <body%body_prop;>
@@ -37,9 +42,9 @@
   </div>
   <div id="gallery-view" class="ms-3">
     <map id="imap-notes" name="imap-notes"></map>
-    <div>
+    <div class="gallery-image-box">
       <img id="image" usemap="#imap-notes" alt="" hidden>
-      <span id="description" class="mx-1"></span>
+      <div id="description" class="gallery-description mt-1"></div>
     </div>
     <div class="d-none ms-3" id="div_legend">%nn;
       [*on this image][:]
