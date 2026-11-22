@@ -357,7 +357,7 @@ let alias_lang lang =
     with Sys_error _ -> lang
 
 let log_redirect from request req =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = GWPARAM.adm_file "gwd.lck" in
   let on_exn exn bt =
     Log.info (fun k -> k "%a\n" Lock.pp_exception (exn, bt))
   in
@@ -520,7 +520,7 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
   ((not check_from) || addr1 = addr2) && base1_pw1 = base2_pw2
 
 let get_actlog check_from utm from_addr base_password =
-  let fname = !GWPARAM.adm_file "actlog" in
+  let fname = GWPARAM.adm_file "actlog" in
   (if not (Sys.file_exists fname) then
      let oc = Secure.open_out fname in
      close_out oc);
@@ -578,7 +578,7 @@ let get_actlog check_from utm from_addr base_password =
     ([], ATnormal, false)
 
 let set_actlog list =
-  let fname = !GWPARAM.adm_file "actlog" in
+  let fname = GWPARAM.adm_file "actlog" in
   try
     let oc = Secure.open_out fname in
     List.iter
@@ -591,7 +591,7 @@ let set_actlog list =
   with Sys_error e -> Log.warn (fun k -> k "Error opening actlog: %s" e)
 
 let get_token check_from utm from_addr base_password =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = GWPARAM.adm_file "gwd.lck" in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
   let on_exn _exn _bt = ATnormal in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
@@ -613,7 +613,7 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr bname acc user username =
-  let lock_file = !GWPARAM.adm_file "gwd.lck" in
+  let lock_file = GWPARAM.adm_file "gwd.lck" in
   (* FIXME: we silently ignore errors if we cannot lock the database. *)
   let on_exn _exn _bt = "" in
   Lock.control ~on_exn ~wait:true ~lock_file @@ fun () ->
@@ -1244,8 +1244,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
     (* Set the per-base cnt directory before [get_token] reads the actlog:
        the gwd worker is reused between requests, and !GWPARAM.cnt_dir may
        still point to the base of the previous request. *)
-    GWPARAM.set_reorg bname None;
-    GWPARAM.cnt_dir := !GWPARAM.cnt_d bname;
+    GWPARAM.cnt_dir := Layout.cnt (Layout.of_bname ~mode:Layout.Detect bname);
     let passwd, env, access_type =
       let has_passwd = List.mem_assoc "w" env in
       let x, env = extract_assoc "w" env in
@@ -1286,10 +1285,10 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
     | "" -> ("", env)
     | _ -> ("", ("opt", Mutil.encode x) :: env)
   in
-  (* base environment location (reorg, cnt_dir) set above, before get_token *)
+  let layout = Layout.of_bname ~mode:Layout.Detect bname in
   let base_env =
     if bname = "" then []
-    else Util.read_base_env bname (Option.get !gw_prefix) !debug
+    else Util.read_base_env layout (Option.get !gw_prefix) !debug
   in
   let base_lang =
     match List.assoc_opt "default_lang" base_env with
@@ -1480,6 +1479,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
       allowed_plugins;
       secret_salt = Some secret_salt;
       predictable_mode;
+      layout;
     }
   in
   if access_type = ATset && not (ar.ar_wizard || ar.ar_friend) then
@@ -1691,7 +1691,7 @@ let conf_and_connection =
               if is_robot from then Robot.robot_error conf 0 0
               else begin
                 let tm = Unix.time () in
-                let lock_file = !GWPARAM.adm_file "gwd.lck" in
+                let lock_file = GWPARAM.adm_file "gwd.lck" in
                 let on_exn _exn _bt = () in
                 Lock.control ~on_exn ~wait:true ~lock_file (fun () ->
                     log_passwd_failed ar tm from request conf.bname);
@@ -1896,10 +1896,12 @@ let datalist_enabled fname =
             String.sub stem (String.length prefix)
               (String.length stem - String.length prefix)
           in
-          GWPARAM.set_reorg bname None;
-          List.assoc_opt ("datalist_" ^ t)
-            (Util.read_base_env bname (Option.get !gw_prefix) !debug)
-          = Some "1"
+          Mutil.good_name bname
+          && List.assoc_opt ("datalist_" ^ t)
+               (Util.read_base_env
+                  (Layout.of_bname ~mode:Layout.Detect bname)
+                  (Option.get !gw_prefix) !debug)
+             = Some "1"
       | _ -> false)
   | _ -> false
 
@@ -2360,7 +2362,7 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
-  GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
+  GWPARAM.cnt_dir := Layout.cnt (Layout.of_bname ~mode:Layout.Legacy "");
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Option.get !gw_prefix // "etc" // "particles.txt";
   Server.stop_server :=

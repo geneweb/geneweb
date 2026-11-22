@@ -6,7 +6,8 @@ val gwd_cmd : string ref
 val cnt_dir : string ref
 
 val reorg : bool ref
-(** set to true when base is in reorg format *)
+(** Set by the option [-reorg] of gwc and ged2gwb: the bases they create are in
+    the reorg layout. *)
 
 val force : bool ref
 (** force creation of database if already existing *)
@@ -27,9 +28,6 @@ val bname_of_arg : prog:string -> string -> string
     [prog]. If [s] does not name a database, it prints an error and exits with
     code 2. *)
 
-val config_reorg : string -> string
-val config_legacy : string -> string
-
 val cache_d : string -> string
 (** [cache_d bname] Directory of the binary caches of base [bname], written by
     cache_files and read by chk_data: bases/bname.gwb/caches, whatever the base
@@ -37,24 +35,11 @@ val cache_d : string -> string
     bases/etc/bname/cache, which holds the .gz datalists that browsers download,
     it is never served. *)
 
-type my_fun_2 = string -> string
-type my_fun_3 = string -> string -> string
-
-val config : my_fun_2 ref
-val cnt_d : my_fun_2 ref
-val adm_file : my_fun_2 ref
-val src_d : my_fun_2 ref
-val etc_d : my_fun_2 ref
-val config_d : my_fun_2 ref
-val lang_d : my_fun_3 ref
-val portraits_d : my_fun_2 ref
-val images_d : my_fun_2 ref
-val albums_d : my_fun_2 ref
-
-(* S: Move it to gwd_lib?  *)
+val adm_file : string -> string
+(** [adm_file file] is the file [file] of the directory [!cnt_dir]. *)
 
 val init : unit -> unit
-(** Function called to initialize path functions based on the reorg flag. *)
+(** Adds the current directory to the assets ({!Secure.add_assets}). *)
 
 val base_config_dir : string -> string
 (** [base_config_dir bname] is [<bases>/<bname>.gwb/config], whatever the mode
@@ -63,43 +48,13 @@ val base_config_dir : string -> string
     [config/<bname>.gwf] does. Requires [Secure.set_bases_dir]. *)
 
 val is_reorg_base : string -> bool
-(** returns true iff mybase.gwb/config/mybase.gwf exists *)
-
-val set_reorg : string -> bool option -> unit
-(** if bool option = Some bool -> set reorg to bool if bool option = None -> set
-    reorg according to is_reorg_base; call init *)
+(** {!Layout.is_reorg_base}. *)
 
 val check_base_exists : string -> unit
 (** Check if database exists and exit if so (unless -f flag is set) *)
 
 val create_base_and_config : string -> string
 (** Create base directory and configuration. *)
-
-module Default : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-end
-
-module Legacy : sig
-  val config : string -> string
-  val cnt_d : string -> string
-  val adm_file : string -> string
-  val portraits_d : string -> string
-  val src_d : string -> string
-  val etc_d : string -> string
-  val config_d : string -> string
-  val lang_d : string -> string -> string
-  val images_d : string -> string
-  val albums_d : string -> string
-end
 
 val output_error :
   ?headers:string list ->

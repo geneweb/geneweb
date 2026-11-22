@@ -1,5 +1,5 @@
 (** Periodic statistics of a base, appended by gwd to [<base>_stats.txt] in the
-    counter directory of the base ({!Geneweb.GWPARAM.cnt_d}).
+    counter directory of the base ({!Layout.cnt}).
 
     Enabled by [stats_period=n] in the [.gwf] file of the base, [n] being the
     period in minutes; absent or [0] disables it.

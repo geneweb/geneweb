@@ -106,7 +106,7 @@ let move_file_to_save dir file =
     0
 
 let create_blason_stop conf base p =
-  let blason_dir = !GWPARAM.portraits_d conf.bname in
+  let blason_dir = Layout.portraits conf.layout in
   let blason_stop =
     String.concat Filename.dir_sep
       [ blason_dir; Image.default_image_filename "blasons" base p ^ ".stop" ]
@@ -124,14 +124,14 @@ let remove_blason_stop conf base p =
   let blason_stop =
     String.concat Filename.dir_sep
       [
-        !GWPARAM.portraits_d conf.bname;
+        Layout.portraits conf.layout;
         Image.default_image_filename "blasons" base p ^ ".stop";
       ]
   in
   if Sys.file_exists blason_stop then Mutil.rm blason_stop
 
 let move_blason_file conf base src dst =
-  let blason_dir = !GWPARAM.portraits_d conf.bname in
+  let blason_dir = Layout.portraits conf.layout in
   let blason_src =
     String.concat Filename.dir_sep
       [ blason_dir; Image.get_blason_name conf base src ]
@@ -259,8 +259,8 @@ let get_extension conf keydir mode saved fname =
   in
   let dir =
     match mode with
-    | "portraits" | "blasons" -> !GWPARAM.portraits_d conf.bname
-    | _ -> Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    | "portraits" | "blasons" -> Layout.portraits conf.layout
+    | _ -> Filename.concat (Layout.images conf.layout) keydir
   in
   let f =
     if saved then String.concat Filename.dir_sep [ dir; "saved"; fname ]
@@ -408,9 +408,8 @@ let effective_send_c_ok conf base p file file_name =
   in
   let keydir = Image.default_image_filename mode base p in
   let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    if mode = "portraits" || mode = "blasons" then Layout.portraits conf.layout
+    else Filename.concat (Layout.images conf.layout) keydir
   in
   Filesystem.create_dir ~parent:true dir;
   let fname =
@@ -544,7 +543,7 @@ let effective_delete_ok conf base p =
   in
   let fname = Image.default_image_filename "portraits" base p in
   let ext = get_extension conf fname mode false fname in
-  let dir = !GWPARAM.portraits_d conf.bname in
+  let dir = Layout.portraits conf.layout in
   if move_file_to_save dir (fname ^ ext) = 0 then
     incorrect conf ("effective delete ok (" ^ (fname ^ ext) ^ ")");
   let changed =
@@ -589,9 +588,8 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     else f_name
   in
   let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    if mode = "portraits" || mode = "blasons" then Layout.portraits conf.layout
+    else Filename.concat (Layout.images conf.layout) keydir
   in
   Filesystem.create_dir ~parent:true dir;
   (* TODO verify we dont destroy a saved image
@@ -628,7 +626,7 @@ let effective_copy_portrait_to_blason conf base p =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
   let keydir = Image.default_image_filename "portraits" base p in
-  let dir = !GWPARAM.portraits_d conf.bname in
+  let dir = Layout.portraits conf.layout in
   let field_url =
     match Image.src_of_string conf (Driver.sou base (Driver.get_image p)) with
     | `Url u -> Some u
@@ -753,9 +751,8 @@ let effective_reset_c_ok conf base p =
     | _ -> ext
   in
   let dir =
-    if mode = "portraits" || mode = "blasons" then
-      !GWPARAM.portraits_d conf.bname
-    else Filename.concat (!GWPARAM.images_d conf.bname) keydir
+    if mode = "portraits" || mode = "blasons" then Layout.portraits conf.layout
+    else Filename.concat (Layout.images conf.layout) keydir
   in
   let file_in_new =
     if ext <> "." then Filename.concat dir (file_name_no_ext ^ ext)

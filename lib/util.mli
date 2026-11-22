@@ -15,8 +15,9 @@ val is_welcome : bool ref
 val print_default_gwf_file : string -> unit
 (** print default config file bname.gwf or bname.gwb/etc/mybase.gwf *)
 
-val read_base_env : string -> string -> bool -> (string * string) list
-(** read base environment bname.gwf or bname.gwb/etc/bname.gwf *)
+val read_base_env : Layout.t -> string -> bool -> (string * string) list
+(** [read_base_env layout gw_prefix debug] reads the configuration file of the
+    base ({!Layout.gwf}). *)
 
 val query_time : config -> float
 (** [query_time conf] is the time elapsed since gwd started to handle the

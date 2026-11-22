@@ -142,6 +142,7 @@ type config = {
   predictable_mode : bool;
       (** Determine if we are in predictable mode. In this mode, output must not
           depend on random state. *)
+  layout : Layout.t;  (** Files and directories of the base [bname]. *)
 }
 (** Geneweb configuration data type *)
 
