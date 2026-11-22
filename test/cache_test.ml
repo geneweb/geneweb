@@ -7,17 +7,17 @@ let show = Option.map (List.map (fun (i, s) -> (Driver.Istr.to_string i, s)))
 let entries = option (list (pair string string))
 
 let in_temp_bases f () =
-  let prev = Secure.base_dir () in
+  let prev = Secure.bases_dir () in
   let dir =
     Filename.concat
       (Filename.get_temp_dir_name ())
       ("gw_cache_test_" ^ string_of_int (Random.bits ()))
   in
-  Secure.set_base_dir dir;
+  Secure.set_bases_dir dir;
   Fun.protect
     ~finally:(fun () ->
       Mutil.rm_rf dir;
-      Secure.set_base_dir prev)
+      Secure.set_bases_dir prev)
     f
 
 let round_trip () =

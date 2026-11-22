@@ -1,7 +1,7 @@
 let magic_robot = "GWRB0008"
 
 let file () =
-  String.concat Filename.dir_sep [ Secure.base_dir (); "cnt"; "robot" ]
+  String.concat Filename.dir_sep [ Secure.bases_dir (); "cnt"; "robot" ]
 
 let lock_file () =
   let dir = Filename.dirname (file ()) in

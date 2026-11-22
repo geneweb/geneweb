@@ -380,7 +380,7 @@ let usage () =
 let rec extract_bd acc args =
   match args with
   | "-bd" :: dir :: rest ->
-      Secure.set_base_dir dir;
+      Secure.set_bases_dir dir;
       extract_bd acc rest
   | arg :: rest -> extract_bd (arg :: acc) rest
   | [] -> List.rev acc
@@ -401,11 +401,11 @@ let parse_args args =
   | _ -> usage ()
 
 let () =
-  let default_base_dir =
+  let default_bases_dir =
     if Sys.file_exists "bases" && Sys.is_directory "bases" then "bases"
     else "../bases"
   in
-  Secure.set_base_dir default_base_dir;
+  Secure.set_bases_dir default_bases_dir;
   match Array.to_list Sys.argv with
   | _ :: args -> parse_args args
   | [] -> usage ()

@@ -218,7 +218,7 @@ let index = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let speclist =
   [
@@ -259,7 +259,7 @@ let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =
   Arg.parse speclist anonfun usage;
-  Secure.set_base_dir !bases_dir;
+  Secure.set_bases_dir !bases_dir;
   match !bname with
   | None ->
       Arg.usage speclist usage;

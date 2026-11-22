@@ -9,12 +9,12 @@ let with_fake_base f =
   let dir = Filename.temp_file "notes_corpus_test" "" in
   Sys.remove dir;
   Sys.mkdir dir 0o755;
-  let old = Secure.base_dir () in
-  Secure.set_base_dir dir;
+  let old = Secure.bases_dir () in
+  Secure.set_bases_dir dir;
   let gwb = Filename.concat dir "fake.gwb" in
   Sys.mkdir gwb 0o755;
   Fun.protect
-    ~finally:(fun () -> Secure.set_base_dir old)
+    ~finally:(fun () -> Secure.set_bases_dir old)
     (fun () -> f (Filename.concat gwb))
 
 let write_file path s =

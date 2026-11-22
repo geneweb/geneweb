@@ -37,7 +37,7 @@ let resolve_out_file opts =
 
 let default_opts =
   {
-    bases_dir = Dirs.path Secure.default_base_dir;
+    bases_dir = Dirs.path Secure.default_bases_dir;
     asc = None;
     ascdesc = None;
     censor = 0;
@@ -70,7 +70,7 @@ let speclist c =
       Fmt.str
         "<DIR> Specify where the bases directory with databases is installed \
          (default if empty is %S)."
-        (Dirs.name Secure.default_base_dir) );
+        (Dirs.name Secure.default_bases_dir) );
     ( "-ad",
       Arg.Int (fun s -> c := { !c with ascdesc = Some s }),
       "<N> maximum generation of the root's ascendants descendants \
