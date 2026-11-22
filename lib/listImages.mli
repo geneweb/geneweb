@@ -1,14 +1,14 @@
 val print : Config.config -> Geneweb_db.Driver.base -> unit
 (** [print conf base] handles [m=LIST_IMAGES]. Required URL parameter [src]
     selects the source root:
-    - [src=key]: lists images under {!GWPARAM.images_d}/[<key>] where [<key>] is
+    - [src=key]: lists images under {!Layout.images}/[<key>] where [<key>] is
       built from URL parameters [p], [n] and [oc] (default [oc=0]). Multi-key
       mode supported via numeric suffixes: [p1]/[n1]/[oc1], [p2]/[n2]/[oc2],
       etc. — collection stops at the first missing pair. With an extra
       [dir=<subdir>] parameter, lists images of that subdirectory only.
-    - [src=albums]: lists albums under {!GWPARAM.albums_d}. Without [dir],
-      returns the list of album subdirectory names. With [dir=<album>], lists
-      images of that album.
+    - [src=albums]: lists albums under {!Layout.albums}. Without [dir], returns
+      the list of album subdirectory names. With [dir=<album>], lists images of
+      that album.
 
     Output is a JSON array, one entry per requested key (for [src=key] batch
     mode) or a single entry (other modes):

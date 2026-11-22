@@ -465,7 +465,11 @@ let cut_at_equal s =
   | None -> (s, "")
 
 let loc_read_base_env bname =
-  let fname = !GWPARAM.config bname in
+  let fname =
+    if Mutil.good_name bname then
+      Layout.gwf (Layout.of_bname ~mode:Layout.Detect bname)
+    else ""
+  in
   match open_in fname with
   | exception Sys_error _ -> []
   | ic ->
@@ -595,7 +599,6 @@ let rec copy_from_stream conf print strm =
                             really_input_string ic (in_channel_length ic)))
               in
               let in_base = strip_spaces (s_getenv conf.env "anon") in
-              GWPARAM.set_reorg in_base None;
               let benv = loc_read_base_env in_base in
               let conf = { conf with env = benv @ conf.env } in
               (* depending on when %f is called, conf may be sketchy *)
@@ -1257,7 +1260,7 @@ let rename conn conf =
   flush stderr;
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
-    let dir = !GWPARAM.cnt_d k in
+    let dir = Layout.cnt (Layout.of_bname ~mode:Layout.Detect v) in
     Printf.eprintf "Rename cnt files in %s\n" dir;
     flush stderr;
     let files = Sys.readdir dir in
@@ -1286,23 +1289,24 @@ let rename conn conf =
     List.iter
       (fun (k, v) ->
         if k <> v then begin
-          GWPARAM.set_reorg k None;
           Printf.eprintf "Start renaming (%s -> %s)\n" k v;
           flush stderr;
           try
-            if GWPARAM.is_reorg_base k then
+            if Mutil.good_name k && GWPARAM.is_reorg_base k then
               Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"))
             else begin
               if Sys.file_exists (base_path (k ^ ".gwb")) then
                 Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
               if Sys.file_exists (base_path (k ^ ".gwf")) then
                 Sys.rename (base_path (k ^ ".gwf")) (base_path (v ^ ".gwf"));
-              if Sys.file_exists (!GWPARAM.etc_d k) then
-                Sys.rename (!GWPARAM.etc_d k) (!GWPARAM.etc_d v);
-              if Sys.file_exists (!GWPARAM.src_d k) then
-                Sys.rename (!GWPARAM.src_d k) (!GWPARAM.src_d v);
-              if Sys.file_exists (!GWPARAM.portraits_d k) then
-                Sys.rename (!GWPARAM.portraits_d k) (!GWPARAM.portraits_d v)
+              if Sys.file_exists (base_path ("etc" // k)) then
+                Sys.rename (base_path ("etc" // k)) (base_path ("etc" // v));
+              if Sys.file_exists (base_path ("src" // k)) then
+                Sys.rename (base_path ("src" // k)) (base_path ("src" // v));
+              if Sys.file_exists (base_path ("images" // k)) then
+                Sys.rename
+                  (base_path ("images" // k))
+                  (base_path ("images" // v))
             end;
             rename_cnt_files k v
           with Sys_error msg ->

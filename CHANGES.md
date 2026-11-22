@@ -279,6 +279,8 @@
   instead of the shared temporary directory (#3033).
 - New page to run `anoma` on an existing base; the page after a base
   creation links to its anomalies report.
+- Renaming a base of the reorg layout no longer fails on its counter
+  files, now renamed in `<new name>.gwb/config/cnt`.
 
 ## Gwc, gwu and GEDCOM
 - In a `.gw` file, a witness line (`wit`) may be followed by `wnote`

@@ -699,7 +699,7 @@ let templ_eval_var (conf : Config.config) = function
   | [ "cgi" ] -> VVbool conf.cgi
   | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
-  | [ "reorg" ] -> VVbool !GWPARAM.reorg
+  | [ "reorg" ] -> VVbool (Layout.is_reorg conf.Config.layout)
   | [ "has_anomalies" ] ->
       VVbool (Anomaly.exists (GWPARAM.base_config_dir conf.bname))
   | [ "is_welcome" ] -> VVbool !Util.is_welcome
@@ -1413,7 +1413,7 @@ and print_simple_variable conf = function
       Util.time_debug conf (Util.query_time conf) !GWPARAM.nb_errors
         !GWPARAM.errors_undef !GWPARAM.errors_other !GWPARAM.set_vars
   | "src_albums_list" -> (
-      let dir = !GWPARAM.albums_d conf.bname in
+      let dir = Layout.albums conf.Config.layout in
       let has_image path =
         try
           let entries = Sys.readdir path in
@@ -1450,7 +1450,7 @@ and print_simple_variable conf = function
           Log.warn (fun k ->
               k "src_albums_list: %s (%s)" (Unix.error_message err) dir))
   | "src_images_list" -> (
-      let dir = !GWPARAM.images_d conf.bname in
+      let dir = Layout.images conf.Config.layout in
       try
         let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
         List.iter

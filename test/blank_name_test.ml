@@ -220,13 +220,14 @@ let test_sort_and_delete () =
     && not (Util.is_empty_name (p 17)))
 
 let test_portrait () =
-  let dir = "unknown_test_portraits" in
-  let portraits_d = !GWPARAM.portraits_d in
-  Filesystem.create_dir ~parent:true dir;
-  Out_channel.with_open_bin (Filename.concat dir "nn.0.nn.jpg") ignore;
-  GWPARAM.portraits_d := Fun.const dir;
+  let dir = Filename.concat (Sys.getcwd ()) "unknown_test_portraits" in
+  let portraits = Filename.concat dir "images" in
+  let bases_dir = Secure.bases_dir () in
+  Filesystem.create_dir ~parent:true portraits;
+  Out_channel.with_open_bin (Filename.concat portraits "nn.0.nn.jpg") ignore;
+  Secure.set_bases_dir dir;
   Fun.protect ~finally:(fun () ->
-      GWPARAM.portraits_d := portraits_d;
+      Secure.set_bases_dir bases_dir;
       Mutil.rm_rf dir)
   @@ fun () ->
   with_base "unknown_portrait_test" @@ fun base ->
