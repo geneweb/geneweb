@@ -342,8 +342,8 @@ let read_cache_linked_pages conf =
       Log.warn (fun k -> k "%s not found: run update_nldb" fname);
       None
 
-let save_cache_linked_pages bdir (ht : cache_linked_pages_t) =
-  let fname = Filename.concat bdir cache_linked_pages_name in
+let save_cache_linked_pages bpath (ht : cache_linked_pages_t) =
+  let fname = Filename.concat bpath cache_linked_pages_name in
   let tmp = fname ^ ".tmp" in
   let oc = open_out_bin tmp in
   Fun.protect

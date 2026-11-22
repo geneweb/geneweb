@@ -42,9 +42,9 @@ let () =
     Arg.usage speclist usage;
     exit 2);
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  let bdir = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb") in
-  if not (Sys.file_exists bdir) then (
-    Printf.eprintf "anoma: no base %s\n" bdir;
+  let bpath = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb") in
+  if not (Sys.file_exists bpath) then (
+    Printf.eprintf "anoma: no base %s\n" bpath;
     exit 2);
   (if not !fold_only then
      let verbose = Unix.isatty Unix.stderr in
@@ -53,7 +53,7 @@ let () =
          (Filename.concat (Secure.bases_dir ()) bname)
          (fun base ->
            let anomalies = Anomaly.collect ~verbose base in
-           Anomaly.write ~verbose ~signatures:(not !no_check) ~base ~bdir
+           Anomaly.write ~verbose ~signatures:(not !no_check) ~base ~bpath
              ~producer:"anoma" anomalies;
            anomalies)
      in

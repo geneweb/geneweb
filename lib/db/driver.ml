@@ -95,7 +95,7 @@ let dict_has base d = base.func.dict_index.dict_has d
 
 let dict_version base =
   Option.map
-    (fun v -> (base.data.bdir, v))
+    (fun v -> (base.data.bpath, v))
     (base.func.dict_index.dict_version ())
 
 let dict_records base d istr =
@@ -108,7 +108,7 @@ type base = dsk_base
 
 let ( // ) = Filename.concat
 let sou base i = base.data.strings.get i
-let bname base = Filename.(remove_extension @@ basename base.data.bdir)
+let bname base = Filename.(remove_extension @@ basename base.data.bpath)
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
@@ -158,11 +158,11 @@ let clear_base base =
 (* Map of loaded read-only databases in memory. *)
 let loaded_databases : (string, dsk_base) Hashtbl.t = Hashtbl.create 17
 
-let load_database bname =
-  match Hashtbl.find loaded_databases bname with
+let load_database bpath =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:true bname (fun base ->
-          Hashtbl.add loaded_databases bname base;
+      Database.with_database ~read_only:true bpath (fun base ->
+          Hashtbl.add loaded_databases bpath base;
           load_persons_array base;
           load_ascends_array base;
           load_unions_array base;
@@ -170,12 +170,12 @@ let load_database bname =
           load_descends_array base;
           load_families_array base;
           load_strings_array base)
-  | _base -> Fmt.failwith "'%s' is already loaded in memory" bname
+  | _base -> Fmt.failwith "'%s' is already loaded in memory" bpath
 
-let with_database bname k =
-  match Hashtbl.find loaded_databases bname with
+let with_database bpath k =
+  match Hashtbl.find loaded_databases bpath with
   | exception Not_found ->
-      Database.with_database ~read_only:false bname (fun base ->
+      Database.with_database ~read_only:false bpath (fun base ->
           Fun.protect ~finally:(fun () -> clear_base base) @@ fun () -> k base)
   | _base ->
       (* FIXME: We cannot reuse [_base] because it contains closures that
@@ -183,13 +183,13 @@ let with_database bname k =
          on disk before each request to process the latest version of the
          base. Otherwise, workers could keep different old versions in
          memory. *)
-      Database.with_database ~read_only:true bname k
+      Database.with_database ~read_only:true bpath k
 
 let date_of_last_change base =
   let s =
-    let bdir = base.data.bdir in
-    try Unix.stat (Filename.concat bdir "patches")
-    with Unix.Unix_error (_, _, _) -> Unix.stat (Filename.concat bdir "base")
+    let bpath = base.data.bpath in
+    try Unix.stat (Filename.concat bpath "patches")
+    with Unix.Unix_error (_, _, _) -> Unix.stat (Filename.concat bpath "base")
   in
   s.Unix.st_mtime
 
@@ -305,12 +305,12 @@ let sync ?(scratch = false) base =
     raise Def.(HttpExn (Forbidden, __LOC__))
   else Outbase.output base
 
-let make bname particles arrays k =
-  Database.make bname particles arrays (sync ~scratch:true);
-  with_database bname k
+let make bpath particles arrays k =
+  Database.make bpath particles arrays (sync ~scratch:true);
+  with_database bpath k
 
-let reindex bname =
-  Database.with_database ~with_patches:false bname (fun base ->
+let reindex bpath =
+  Database.with_database ~with_patches:false bpath (fun base ->
       match base.version with
       | GnWb0026 | GnWb0025 ->
           load_persons_array base;
@@ -320,7 +320,7 @@ let reindex bname =
           true
       | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 -> false)
 
-let bfname base fname = Filename.concat base.data.bdir fname
+let bfname base fname = Filename.concat base.data.bpath fname
 
 module NLDB = struct
   let magic = "GWNL0011"
@@ -399,7 +399,7 @@ let base_wiznotes_dir _base = "wiznotes"
 
 let base_notes_read_file base fname mode =
   try
-    Secure.with_open_in_text (base.data.bdir // fname) @@ fun ic ->
+    Secure.with_open_in_text (base.data.bpath // fname) @@ fun ic ->
     let str =
       match mode with
       | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
@@ -631,7 +631,7 @@ let dict_select base d select =
 let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
 
 let read_or_create_visible base =
-  let fname = Filename.concat base.data.bdir "restrict" in
+  let fname = Filename.concat base.data.bpath "restrict" in
   let visible =
     if Sys.file_exists fname then
       Secure.with_open_in_bin fname @@ fun ic ->
@@ -648,7 +648,7 @@ let read_or_create_visible base =
 let base_visible_write base =
   match (base.data.perm, !visible_ref) with
   | RDRW, Some visible ->
-      let fname = Filename.concat base.data.bdir "restrict" in
+      let fname = Filename.concat base.data.bpath "restrict" in
       Secure.with_open_out_bin fname @@ fun oc ->
       output_string oc Mutil.executable_magic;
       output_value oc visible

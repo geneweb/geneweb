@@ -242,8 +242,8 @@ val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
     load. *)
 
 val save_cache_linked_pages : string -> (Def.NLDB.key, int) Hashtbl.t -> unit
-(** [save_cache_linked_pages bdir ht] atomically replaces the linked-pages cache
-    of base directory [bdir] with [ht]. Raises [Sys_error] on failure. *)
+(** [save_cache_linked_pages bpath ht] atomically replaces the linked-pages
+    cache of base directory [bpath] with [ht]. Raises [Sys_error] on failure. *)
 
 val norm_type : string -> string
 (** [norm_type t] is the note TYPE [t], the deprecated [album] being read as

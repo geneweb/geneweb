@@ -513,10 +513,10 @@ let memo_of fname ic =
       Hashtbl.replace memos fname m;
       m
 
-let with_reader bdir ~particles src k =
-  let fname = Filename.concat bdir "base.inx" in
+let with_reader bpath ~particles src k =
+  let fname = Filename.concat bpath "base.inx" in
   let inx = lazy (Secure.open_in_bin fname) in
-  let dat = lazy (Secure.open_in_bin (Filename.concat bdir "base.dat")) in
+  let dat = lazy (Secure.open_in_bin (Filename.concat bpath "base.dat")) in
   let close c = if Lazy.is_val c then close_in_noerr (Lazy.force c) in
   Fun.protect ~finally:(fun () ->
       close inx;

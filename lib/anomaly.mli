@@ -186,14 +186,14 @@ val make :
   ?verbose:bool ->
   ?signatures:bool ->
   base:Geneweb_db.Driver.base ->
-  bdir:string ->
+  bpath:string ->
   producer:string ->
   t list ->
   report
-(** [make ~base ~bdir ~producer anomalies] dates the report and gathers, for
+(** [make ~base ~bpath ~producer anomalies] dates the report and gathers, for
     each subject, the signers in its sources and its first and last line in
-    [<bdir>/history] (read once, whole). [~verbose:true] shows a progress bar on
-    stderr while reading the history (no-op when stderr is not a terminal).
+    [<bpath>/history] (read once, whole). [~verbose:true] shows a progress bar
+    on stderr while reading the history (no-op when stderr is not a terminal).
     [~signatures:false] skips scanning the sources for [[w:ident]] signatures
     (no per-subject key resolution): much faster, but the report then carries no
     signers, so responsibility falls back to the history. *)
@@ -202,11 +202,11 @@ val write :
   ?verbose:bool ->
   ?signatures:bool ->
   base:Geneweb_db.Driver.base ->
-  bdir:string ->
+  bpath:string ->
   producer:string ->
   t list ->
   unit
-(** [write ~base ~bdir ~producer anomalies] saves [make] in [<bdir>/config]
+(** [write ~base ~bpath ~producer anomalies] saves [make] in [<bpath>/config]
     ({!GWPARAM.base_config_dir}), silently: gwc and ged2gwb output is unchanged.
     A failure is reported on stderr and otherwise ignored: the report must never
     make a build fail. *)

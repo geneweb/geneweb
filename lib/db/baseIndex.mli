@@ -54,8 +54,8 @@ val with_reader :
   source ->
   (Dbdisk.dict_index -> (unit -> unit) -> 'a) ->
   'a
-(** [with_reader bdir ~particles source k] calls [k] with the queries over the
-    index of the base directory [bdir] and a function to call after a commit of
+(** [with_reader bpath ~particles source k] calls [k] with the queries over the
+    index of the base directory [bpath] and a function to call after a commit of
     the patches. The files of the index are opened at the first query and closed
     when [k] returns.
 

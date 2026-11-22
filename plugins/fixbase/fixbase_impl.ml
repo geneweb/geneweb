@@ -390,9 +390,9 @@ let fixbase_ok conf base =
     in
     let tstab () =
       if UI.enabled conf "tstab" then (
-        let bname = !GWPARAM.bpath conf.bname in
-        Mutil.rm (Filename.concat bname "tstab_visitor");
-        Mutil.rm (Filename.concat bname "tstab");
+        let bpath = !GWPARAM.bpath conf.bname in
+        Mutil.rm (Filename.concat bpath "tstab_visitor");
+        Mutil.rm (Filename.concat bpath "tstab");
         Output.print_sstring conf {|<p>|};
         Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab");
         Output.print_sstring conf {|</p>|})
