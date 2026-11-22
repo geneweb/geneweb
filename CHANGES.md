@@ -266,6 +266,9 @@
   bases directory, next to `STOP_SERVER` and `gwd_secret_salt.txt`. For
   a base of the reorg layout they were in `<base>.gwb/config/cnt`: its
   wizards and friends logged in by token log in again once.
+- Touching `cnt/gwd.reload` in the bases directory makes every worker
+  reload the lexicon, `lang/` overrides included, on its next request,
+  without restarting gwd nor reloading the bases cached in memory.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
