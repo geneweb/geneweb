@@ -64,6 +64,12 @@ html { scrollbar-gutter: stable; }
 <script>
 'use strict';
 
+function imageUrl(p) {
+  return /^https?:\/\//.test(p) ? p
+    : p.startsWith('albums/') ? '%prefix;m=IMA&s=' + p.substring(7)
+    : '%prefix;m=DOC&s=' + p;
+}
+
 const MAPHILIGHT_CONFIG = {
   fillColor: 'ff0000',
   fillOpacity: 0.15,
@@ -151,9 +157,7 @@ function displayImage(img) {
     $$('#h1').innerHTML = json.title;
     $$('#description').innerHTML = img.desc || json.desc || '';
     const imageEl = $$('#image');
-    imageEl.src = img.img.startsWith('albums/')
-        ? '%prefix;m=IMA&s=' + img.img.substring(7)
-        : '%prefix;m=DOC&s=' + img.img;
+    imageEl.src = imageUrl(img.img);
     imageEl.hidden = false;
 
     let cnt = 1, cnt_rlm = 1;
@@ -427,12 +431,10 @@ function loadIndex() {
     const tooltip = desc
       ? ` data-bs-toggle="tooltip" data-bs-html="true" title="${desc.replace(/"/g, '&quot;')}"`
       : '';
-    const url = img.img.startsWith('albums/')
-      ? '%prefix;m=IMA&s=' + img.img.substring(7)
-      : '%prefix;m=DOC&s=' + img.img;
+    const url = imageUrl(img.img);
     const html =
       `<div class="imap-gallery" data-img="${i + 1}"${tooltip}` +
-      ` style="cursor:pointer">` + `<img src="${url}" alt="">` +
+      ` style="cursor:pointer">` + `<img src="${url.replace(/"/g, '&quot;')}" alt="">` +
       `<div class="gallery-legend">${label}</div></div>`;
     wall.insertAdjacentHTML('beforeend', html);
   });

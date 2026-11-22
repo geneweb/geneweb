@@ -1204,9 +1204,7 @@ function initializePageContent(data, tableApi) {
             img.onerror = null;
         };
         // Correct IMA/DOC routing, set LAST
-        img.src = imgFile.startsWith('albums/')
-            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgFile.substring(7))
-            : GW.prefix + 'm=DOC&s=' + encodeURI(imgFile);
+        img.src = imageUrl(imgFile);
     }
     updateAlbumNav();
 
@@ -1618,9 +1616,7 @@ function loadAlbumImage(index) {
         const frameEl = document.getElementById('frame');
 
         if (imgData.img) {
-            const src = imgData.img.startsWith('albums/')
-                ? GW.prefix + 'm=IMA&s=' + encodeURI(imgData.img.substring(7))
-                : GW.prefix + 'm=DOC&s=' + encodeURI(imgData.img);
+            const src = imageUrl(imgData.img);
             // Clear previous image immediately to prevent bleed-through on 404
             imgEl.src = '';
             imgEl.hidden = false;
@@ -1893,7 +1889,7 @@ let pendingImageAdds = [];
 function handleTomItemRemove(value) {
     const opt = fnameTS.options[value];
     if (!opt) return;
-    const path = imagePathFor(opt);
+    const path = srcMode === 'url' ? urlImagePath(value, true) : imagePathFor(opt);
     const idx = pendingImageAdds.indexOf(path);
     if (idx >= 0) pendingImageAdds.splice(idx, 1);
 }
@@ -1911,7 +1907,11 @@ function handleTomItemAdd(value) {
         fnameTS.removeItem(value, true);
         return;
     }
-    const path = imagePathFor(opt);
+    const path = srcMode === 'url' ? urlImagePath(value) : imagePathFor(opt);
+    if (path === null) {
+        fnameTS.removeItem(value, true);
+        return;
+    }
     if (!pendingImageAdds.includes(path)) {
         pendingImageAdds.push(path);
     }
@@ -2061,23 +2061,14 @@ function initFnameSelect() {
             .then(r => r.json())
             .then(arr => arr
                 .filter(p => p.has_keydir)
-                .map(p => ({
-                    value: 'key:' + p.key,
-                    text: p.label,
-                    optgroup: 'keys',
-                    kind: 'folder',
-                    keyData: { key: p.key, label: p.label,
-                               fn: p.fn, sn: p.sn, oc: String(p.oc || 0) }
-                })))
+                .map(keyOptOf))
             .catch(() => [])
         : Promise.resolve([]);
 
     keyOptsPromise.then(keyOpts => {
-        const allOpts = [...keyOpts, ...folderOpts, ...imageOpts]
-            .map((o, i) => ({ ...o, sortOrder: i }));
+        srcOpts = { keys: keyOpts, folders: folderOpts, images: imageOpts };
 
         fnameTS = new TomSelect(fnameEl, {
-            options: allOpts,
             optgroups: [
                 { value: 'keys',    label: GW.i18n?.keyDirs || 'Individual images' },
                 { value: 'folders', label: GW.i18n?.folders   || 'Folders'    },
@@ -2119,22 +2110,7 @@ function initFnameSelect() {
         
         fnameTS.on('dropdown_close', onDropdownClose);
         
-        const cur = albumImages[albumCurrent];
-        if (cur && cur.img) {
-            if (!fnameTS.options[cur.img]) {
-                fnameTS.addOption({
-                    value: cur.img,
-                    text: cur.img.split('/').pop(),
-                    optgroup: 'images',
-                    kind: 'image'
-                });
-            }
-            restoringSelection = true;
-            fnameTS.setValue(cur.img, true);
-            restoringSelection = false;
-        }
-        
-        initAddKeyUi();
+        initSourceMode();
     });
 }
 
@@ -2310,7 +2286,8 @@ const HandlerManager = {
 
         const imgEl = document.getElementById('image');
         if (!imgEl) return;
-        imgEl.src = GW.prefix + 'm=DOC&s=' + fname;
+        imgEl.src = isRemoteImg(fname)
+            ? fname : GW.prefix + 'm=DOC&s=' + fname;
 
         imgEl.addEventListener('load', function onLoad() {
             const frame = document.getElementById('frame');
@@ -2342,10 +2319,7 @@ function populateReorderModal() {
     const tbody = document.querySelector('#reorder_table tbody');
     tbody.innerHTML = '';
     albumImages.forEach((img, i) => {
-        const imgPath = img.img || '';
-        const thumbSrc = imgPath.startsWith('albums/')
-            ? GW.prefix + 'm=IMA&s=' + encodeURI(imgPath.substring(7))
-            : GW.prefix + 'm=DOC&s=' + encodeURI(imgPath);
+        const thumbSrc = imageUrl(img.img || '');
         tbody.insertAdjacentHTML('beforeend', `
             <tr data-idx="${i}">
               <td class="text-nowrap reorder-btns align-middle">
@@ -2355,7 +2329,7 @@ function populateReorderModal() {
                   <i class="fa-solid fa-arrow-down" draggable="false"></i></button>
               </td>
               <td class="reorder-num ps-2 border-start align-middle" title="${GW.i18n.moveDrag}">${i + 1}</td>
-              <td title="${GW.i18n.moveDrag}"><img src="${thumbSrc}" style="max-height:60px"></td>
+              <td title="${GW.i18n.moveDrag}"><img src="${thumbSrc.replace(/"/g, '&quot;')}" style="max-height:60px"></td>
               <td title="${GW.i18n.moveDrag}">${esc(img.img)}</td>
               <td title="${GW.i18n.moveDrag}">${esc(img.desc || '')}</td>
             </tr>`);
@@ -2445,19 +2419,9 @@ function validateRow(tr, data, opts) {
         });
 }
 
-function addKeyToPicker(person) {
-    if (!fnameTS || !person || !person.key) return;
-    if (!person.has_keydir) {
-      updateStatus('No key directory: ' + (person.label || person.key));
-      return;
-    }
-    const value = 'key:' + person.key;
-    if (fnameTS.options[value]) return;
-    const maxSort = Math.max(0, ...Object.values(fnameTS.options)
-        .filter(o => o.optgroup === 'keys')
-        .map(o => o.sortOrder || 0));
-    fnameTS.addOption({
-        value,
+function keyOptOf(person) {
+    return {
+        value: 'key:' + person.key,
         text: person.label || person.key,
         optgroup: 'keys',
         kind: 'folder',
@@ -2467,37 +2431,169 @@ function addKeyToPicker(person) {
             fn: person.fn,
             sn: person.sn,
             oc: String(person.oc || 0)
-        },
-        sortOrder: maxSort + 0.5
+        }
+    };
+}
+
+function addKeyToPicker(person) {
+    if (!person || !person.key) return;
+    if (!person.has_keydir) {
+        updateStatus('No key directory: ' + (person.label || person.key));
+        return;
+    }
+    const opt = keyOptOf(person);
+    if (!srcOpts.keys.some(o => o.value === opt.value)) {
+        srcOpts.keys.push(opt);
+    }
+    if (srcMode !== 'other' || !fnameTS || fnameTS.options[opt.value]) return;
+    const maxSort = Math.max(0, ...Object.values(fnameTS.options)
+        .filter(o => o.optgroup === 'keys')
+        .map(o => o.sortOrder || 0));
+    fnameTS.addOption({ ...opt, sortOrder: maxSort + 0.5 });
+}
+
+// Sources of the images: "visited" (carrousel of the visited person),
+// "other" (carrousel of another person), "images" (images folder and
+// albums), "url" (free file names under a URL prefix).
+let srcMode = 'images';
+let srcOpts = { keys: [], folders: [], images: [] };
+let visitedKeyOpt = null;
+const URL_PREFIX_STORE = 'gw_gallery_url_prefix';
+
+function isRemoteImg(s) {
+    return /^https?:\/\//.test(s || '');
+}
+
+function imageUrl(path) {
+    if (isRemoteImg(path)) return path;
+    return path.startsWith('albums/')
+        ? GW.prefix + 'm=IMA&s=' + encodeURI(path.substring(7))
+        : GW.prefix + 'm=DOC&s=' + encodeURI(path);
+}
+
+// Image path for a name typed in the "url" mode, null if no valid prefix.
+function urlImagePath(name, quiet) {
+    name = (name || '').trim();
+    if (isRemoteImg(name)) return name;
+    const el = document.getElementById('src_folder');
+    const prefix = (el?.value || '').trim().replace(/\/+$/, '');
+    if (!isRemoteImg(prefix)) {
+        if (!quiet && el) { el.classList.add('row-invalid'); el.focus(); }
+        return null;
+    }
+    el?.classList.remove('row-invalid');
+    return prefix + '/' + name.replace(/^\/+/, '');
+}
+
+function optsForMode(mode) {
+    let l = [];
+    if (mode === 'images') l = [...srcOpts.folders, ...srcOpts.images];
+    else if (mode === 'visited') l = visitedKeyOpt ? [visitedKeyOpt] : [];
+    else if (mode === 'other') {
+        l = srcOpts.keys.filter(o => !visitedKeyOpt
+                                   || o.value !== visitedKeyOpt.value);
+    }
+    return l.map((o, i) => ({ ...o, sortOrder: i }));
+}
+
+// The folder field holds the folder of the images: the key fn.oc.sn of the
+// visited or of another person, or the URL prefix; it is not used for the
+// images folder.
+function setFolderField(mode) {
+    const el = document.getElementById('src_folder');
+    const validate = document.getElementById('add_key_validate');
+    if (!el) return;
+    el.classList.remove('row-invalid');
+    el.disabled = mode === 'visited';
+    el.parentElement.classList.toggle('d-none', mode === 'images');
+    validate?.classList.toggle('d-none', mode !== 'other');
+    if (validate) validate.disabled = true;
+    if (mode === 'images') {
+        el.value = '';
+        el.placeholder = '';
+    } else if (mode === 'visited') {
+        el.value = visitedKeyOpt ? visitedKeyOpt.keyData.key : '';
+        el.placeholder = '';
+    } else if (mode === 'other') {
+        el.value = '';
+        el.placeholder = el.dataset.keyPlaceholder;
+    } else {
+        el.placeholder = 'https://…';
+        try { el.value = localStorage.getItem(URL_PREFIX_STORE) || ''; }
+        catch (e) { el.value = ''; }
+    }
+}
+
+function applySourceMode(mode) {
+    srcMode = mode;
+    setFolderField(mode);
+    if (!fnameTS) return;
+    restoringSelection = true;
+    try {
+        fnameTS.clear(true);
+        fnameTS.clearOptions();
+        fnameTS.addOptions(optsForMode(mode));
+        fnameTS.refreshOptions(false);
+        const cur = albumImages[albumCurrent];
+        if (cur && cur.img) {
+            fnameTS.addOption({ value: cur.img,
+                                text: cur.img.split('/').pop(),
+                                optgroup: 'images', kind: 'image' });
+            fnameTS.setValue(cur.img, true);
+        }
+    } finally {
+        restoringSelection = false;
+    }
+    if (mode === 'visited' && visitedKeyOpt) {
+        const opt = fnameTS.options[visitedKeyOpt.value];
+        if (opt && !opt.expanded) expandFolder(opt);
+    } else if (mode === 'url') {
+        document.getElementById('src_folder')?.focus();
+    }
+}
+
+// The visited person owns the key directory of src, the image given by the
+// carrousel link m=MOD_GALLERY&new&src=<key>/<image>.
+function loadVisitedKey() {
+    const src = new URLSearchParams(window.location.search).get('src') || '';
+    const i = src.indexOf('/');
+    if (i <= 0 || src.startsWith('albums/')) return Promise.resolve(null);
+    return fetch(GW.prefix + 'm=PNOC_LOOKUP&keys='
+                 + encodeURIComponent(src.substring(0, i)))
+        .then(r => r.json())
+        .then(arr => arr.find(p => p.has_keydir) || null)
+        .catch(() => null);
+}
+
+function initSourceMode() {
+    const sel = document.getElementById('src_mode');
+    const folder = document.getElementById('src_folder');
+    if (!sel || !folder) return;
+    folder.addEventListener('change', () => {
+        if (srcMode !== 'url') return;
+        try { localStorage.setItem(URL_PREFIX_STORE, folder.value.trim()); }
+        catch (e) { /* storage unavailable */ }
     });
+    sel.addEventListener('change', () => applySourceMode(sel.value));
+    initAddKeyUi();
+    loadVisitedKey().then(p => {
+        if (!p) return;
+        visitedKeyOpt = keyOptOf(p);
+        sel.querySelector('option[value="visited"]').disabled = false;
+        sel.value = 'visited';
+        applySourceMode('visited');
+    });
+    applySourceMode(srcMode);
 }
 
 function initAddKeyUi() {
-    const toggle = document.getElementById('add_key_btn');
-    const inline = document.getElementById('add_key_inline');
-    const input = document.getElementById('add_key_input');
+    const input = document.getElementById('src_folder');
     const validateBtn = document.getElementById('add_key_validate');
-    if (!toggle || !inline || !input || !validateBtn) return;
-
-    toggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        const showing = !inline.classList.contains('d-none');
-        if (showing) {
-            inline.classList.add('d-none');
-            validateBtn.classList.add('d-none');
-            input.value = '';
-            input.classList.remove('row-invalid');
-            validateBtn.disabled = true;
-        } else {
-            inline.classList.remove('d-none');
-            validateBtn.classList.remove('d-none');
-            input.focus();
-        }
-    });
-
-    PersonPicker.bindInput(input);
+    if (!input || !validateBtn) return;
 
     input.addEventListener('input', () => {
+        input.classList.remove('row-invalid');
+        if (srcMode !== 'other') return;
         const k = PersonPicker.parseGeneWebKey(input.value);
         validateBtn.disabled = !(k && k.fn && k.sn);
     });
@@ -2511,12 +2607,10 @@ function initAddKeyUi() {
                 return;
             }
             addKeyToPicker(p);
-            input.value = '';
             input.classList.remove('row-invalid');
             validateBtn.disabled = true;
-            inline.classList.add('d-none');
-            validateBtn.classList.add('d-none');
-            fnameTS?.open();
+            const opt = fnameTS?.options['key:' + p.key];
+            if (opt && !opt.expanded) expandFolder(opt);
         });
     });
 }

@@ -154,6 +154,10 @@ let notes_links_db conf base eliminate_unlinked =
 
 let image_url_from_path conf path =
   if path = "" then ""
+  else if
+    String.starts_with ~prefix:"http://" path
+    || String.starts_with ~prefix:"https://" path
+  then path
   else
     let prefix = (Util.commd conf :> string) in
     let album = "albums/" in
