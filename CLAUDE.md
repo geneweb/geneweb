@@ -194,6 +194,10 @@ Prefer template + CSS over JS that computes or toggles classes.
   `;`. Every mode taking a person must accept both the index (`i=`)
   and the key (`p=`, `n=`, `oc=`); do not convert keys to indexes,
   which do not survive a rebuild of the base.
+- **Person links**: every link to a person on a results page (search,
+  lists, reports such as anomalies) carries the full key `fn.oc sn` in
+  its `title` attribute, occ 0 included (`Jean.0 DUPONT`), so homonyms
+  can be told apart by hovering.
 - **Styles**: a class in `css.css` rather than `style="…"`; vertical
   spacing with `mt-*`, not `mb-*`; a literal U+00A0, not `&nbsp;`.
 - **Roglo**: `%if;roglo;` (base_env `roglo=yes`) only for what is

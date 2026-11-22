@@ -85,12 +85,25 @@ let resolver base =
         Hashtbl.add cache k r;
         r
 
+(* A link to a person carries its full key [fn.oc sn] as title, occ 0
+   included, so homonyms can be told apart by hovering. *)
+let person_link conf base dp p =
+  let text = (Util.gen_person_text conf base dp :> string) in
+  if
+    (not (GWPARAM.p_auth_sp conf base dp))
+    || Util.p_getenv conf.env "cgl" = Some "on"
+  then text
+  else
+    Printf.sprintf {|<a href="%s%s" title="%s">%s</a>|}
+      (Util.commd conf :> string)
+      (Util.acces conf base dp :> string)
+      (esc (person_key p))
+      text
+
 let who conf base resolve p =
   match resolve p with
   | Some dp ->
-      "<strong>"
-      ^ (Util.referenced_person_text conf base dp :> string)
-      ^ "</strong>"
+      "<strong>" ^ person_link conf base dp p ^ "</strong>"
       ^ (DateDisplay.short_dates_text conf base dp :> string)
   | None -> "<strong>" ^ esc (person_key p) ^ "</strong>"
 
