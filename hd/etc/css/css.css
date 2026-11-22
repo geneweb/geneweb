@@ -967,6 +967,7 @@ a[id^="p_"]:target {
 
 .book-n
 {
+  align-self: last baseline;
   font-size: .875em;
   font-variant-numeric: tabular-nums;
   color: var(--bs-secondary-color);
