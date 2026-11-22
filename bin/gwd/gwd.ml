@@ -1236,10 +1236,11 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
       | [ bname; access ] -> (bname, access)
       | _ ->
           Log.err (fun k -> k "bad bname: (%s)" base_access);
-          assert false
+          ("", "")
     in
     let bases = Util.get_bases_list () in
     let bname = match bases with [ x ] -> x | _ -> bname in
+    let bname = if Mutil.good_name bname then bname else "" in
     (* Set the per-base cnt directory before [get_token] reads the actlog:
        the gwd worker is reused between requests, and !GWPARAM.cnt_dir may
        still point to the base of the previous request. *)
@@ -1431,7 +1432,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
          else
            try List.assoc "no_note_for_visitor" base_env = "yes"
            with Not_found -> false);
-      bname = Filename.remove_extension bname;
+      bname;
       nb_of_persons = 0;
       nb_of_families = 0;
       env;

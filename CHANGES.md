@@ -383,6 +383,10 @@
   bases directory (`-bd`), and `gwc` no longer creates a base whose
   name, given by `-o` or taken from its input file, has other
   characters.
+- `gwd` serves only a base whose name is made of these characters, like
+  the names that `gwc`, `ged2gwb` and `gwsetup` accept: a base with
+  another name (accented letters, `_`, `.`) must be renamed to be
+  served, and `--cache-database` refuses it.
 
 ## Build system
 The camlp5 dependency has been removed. The GEDCOM date grammar and the stream
