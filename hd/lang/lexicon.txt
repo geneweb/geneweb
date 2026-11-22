@@ -3125,7 +3125,7 @@ fr: ordre des enfants modifié
 
     ANOMALY ChangedOrderOfFamilyEvents
 en: changed order of family events
-fr: ordre des événements familiaux modifié
+fr: ordre des évènements familiaux modifié
 
     ANOMALY ChangedOrderOfMarriages
 en: changed order of marriages
@@ -3133,7 +3133,7 @@ fr: ordre des mariages modifié
 
     ANOMALY ChangedOrderOfPersonEvents
 en: changed order of personal events
-fr: ordre des événements individuels modifié
+fr: ordre des évènements individuels modifié
 
     ANOMALY ChildrenNotInOrder
 en: children not in birth order
@@ -3157,15 +3157,15 @@ fr: enfants nés très éloignés
 
     ANOMALY FEventOrder
 en: family events out of order
-fr: événements familiaux dans le désordre
+fr: évènements familiaux dans le désordre
 
     ANOMALY FWitnessEventAfterDeath
 en: witness of a family event after their death
-fr: témoin d’un événement familial après son décès
+fr: témoin d’un évènement familial après son décès
 
     ANOMALY FWitnessEventBeforeBirth
 en: witness of a family event before their birth
-fr: témoin d’un événement familial avant sa naissance
+fr: témoin d’un évènement familial avant sa naissance
 
     ANOMALY IncoherentAncestorDate
 en: ancestor younger than a descendant
@@ -3205,7 +3205,7 @@ fr: parent très jeune
 
     ANOMALY PEventOrder
 en: personal events out of order
-fr: événements individuels dans le désordre
+fr: évènements individuels dans le désordre
 
     ANOMALY PossibleDuplicateFam
 en: possible duplicate families
@@ -3217,11 +3217,11 @@ fr: familles possiblement en double (homonymes)
 
     ANOMALY PWitnessEventAfterDeath
 en: witness of a personal event after their death
-fr: témoin d’un événement individuel après son décès
+fr: témoin d’un évènement individuel après son décès
 
     ANOMALY PWitnessEventBeforeBirth
 en: witness of a personal event before their birth
-fr: témoin d’un événement individuel avant sa naissance
+fr: témoin d’un évènement individuel avant sa naissance
 
     ANOMALY TitleDatesError
 en: incorrect title dates
@@ -5372,7 +5372,7 @@ co: cambiu di l’ordine di l’evenimenti famigliale
 de: ändern der Reihenfolge familiärer Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
-fr: changement de l’ordre des événements familiaux
+fr: changement de l’ordre des évènements familiaux
 it: modifica dell’ordine degli eventi di famiglia
 oc: cambiament de l’òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
@@ -5401,7 +5401,7 @@ co: cambiu di l’ordine di l’evenimenti di l’individuu
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
-fr: changement de l’ordre des événements individu
+fr: changement de l’ordre des évènements individu
 it: modifica dell’ordine degli eventi individuo
 oc: cambiament de l’òrdre dels eveniments d’un individú
 pt: modificar ordem dos eventos da pessoa
@@ -5903,7 +5903,7 @@ tr: implex daraltma
     colorize places
 de: Orte einfärben (Ereignisse durchlaufen)
 en: colorize places (cycle through events)
-fr: colorisation des lieux (cycle entre les événements)
+fr: colorisation des lieux (cycle entre les évènements)
 
     color
 af: kleur
@@ -5942,7 +5942,7 @@ co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (g
 de: Eine farbige Ecke zeigt das Vorhandensein von Notizen (blau), Quellen (gelb) oder beidem (grün) für ein Ereignis an. Die Daten können dann in einem Popup angezeigt werden, indem man auf den Hintergrund der Zellen klickt.
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
 es: una esquina coloreada indica la existencia de notas (azul), fuentes (amarillo) o ambas (verde) para un evento. Los datos pueden verse en una ventana emergente haciendo clic en el fondo de la celda.
-fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
+fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un évènement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
 
     first
 af: eerste
@@ -8445,7 +8445,7 @@ co: evenimentu persunalizatu
 de: benutzerdefiniertes Ereignis
 en: custom event
 es: evento personalizado
-fr: événement personnalisé
+fr: évènement personnalisé
 pt: evento personalizado
 sv: anpassad händelse
 tr: özel etkinlik
@@ -10246,7 +10246,7 @@ zh: 地点
 de: Ereignis vor %s nicht dargestellt/Ereignisse vor %s nicht dargestellt
 en: event before %s not shown/events before %s not shown
 es: evento anterior a %s no representado/eventos anteriores a %s no representados
-fr: événement antérieur à %s non représenté/événements antérieurs à %s non représentés
+fr: évènement antérieur à %s non représenté/évènements antérieurs à %s non représentés
 it: evento anteriore al %s non rappresentato/eventi anteriori al %s non rappresentati
 nl: gebeurtenis vóór %s niet weergegeven/gebeurtenissen vóór %s niet weergegeven
 pt: evento anterior a %s não representado/eventos anteriores a %s não representados
@@ -10258,7 +10258,7 @@ de: Ereignis/Ereignisse
 en: event/events/event(s)
 es: evento/eventos
 fi: tapahtuma/tapahtuma
-fr: événement/événements/événement(s)
+fr: évènement/évènements/évènement(s)
 it: evento/evento
 nl: evenement/evenementen
 no: hendelse/hendelse
@@ -10270,7 +10270,7 @@ tr: etkinlik/etkinlikler
     event/events for this place
 de: Ereignis für diesen Ort/Ereignisse für diesen Ort
 en: event for this place/events for this place
-fr: événement pour ce lieu/événements pour ce lieu
+fr: évènement pour ce lieu/évènements pour ce lieu
 
     events to which %s was witness
 co: evenimenti induve %s era testimoniu
@@ -10285,7 +10285,7 @@ co: arburu di l’evenimenti
 de: Baum der Ereignisse
 en: tree of events
 es: árbol de eventos
-fr: arbre des événements
+fr: arbre des évènements
 pt: árvore de eventos
 sv: träd av händelser
 tr: etkinlikler ağacı
@@ -12752,13 +12752,6 @@ sl: slika sprejeta
 sv: bilden mottagen
 tr: resim yüklendi
 
-    image source
-co: aghjunghje una fonte per a fiura.
-de: Bildquelle hinzufügen
-en: add a source for the image.
-es: agregar una fuente para la imagen.
-fr: ajouter une source pour l’image.
-
     image/images
 af: prent/prente
 bg: изображение/изображения
@@ -13185,6 +13178,51 @@ de: persönliche Bilder (Schlüsselverzeichnisse)
 en: individual images (key directories)
 fr: images individuelles (répertoires clés)
 
+    image source
+de: Bildquelle
+en: image source
+fr: source des images
+
+    images folder
+de: Bilderordner
+en: images folder
+fr: dossier des images
+
+    carrousel of the visited person
+de: Karussell der besuchten Person
+en: carousel of the visited person
+fr: carrousel de la personne visitée
+
+    carrousel of another person
+de: Karussell einer anderen Person
+en: carousel of another person
+fr: carrousel d’une autre personne
+
+    url prefix
+de: URL-Präfix
+en: URL prefix
+fr: préfixe d’URL
+
+    gallery file name help
+de: Name der Notizdatei ohne .txt, zum Beispiel familie_dupont_1900
+en: name of the note file without .txt, for example dupont_family_1900
+fr: nom du fichier de la note sans .txt, par exemple famille_dupont_1900
+
+    gallery title help
+de: Titel der Galerie, angezeigt in der Liste der verknüpften Seiten
+en: title of the gallery, shown in the list of linked pages
+fr: titre de la galerie, affiché dans la liste des pages liées
+
+    gallery chronicle help
+de: Text unter dem Titel, angezeigt auf der Indexseite der Galerie
+en: text under the title, shown on the index page of the gallery
+fr: texte sous le titre, affiché sur la page d’index de la galerie
+
+    gallery image description help
+de: Text unter dem Bild
+en: text shown under the image
+fr: texte affiché sous l’image
+
     individual notes
 co: note nant’à l’individuu
 de: Hinweise zur Person
@@ -13593,7 +13631,7 @@ tr: çocuğundan sonra doğmuş
     isolated persons/totally isolated/linked by relation/witness to an event
 de: isolierte Personen/völlig isoliert/durch Beziehung verknüpft/Zeuge bei einem Ereignis
 en: isolated persons/totally isolated/linked by relation/witness to an event
-fr: personnes isolées/totalement isolées/liées par relation/témoin à un événement
+fr: personnes isolées/totalement isolées/liées par relation/témoin à un évènement
 
     it is the same person!
 af: is dieselfde persoon!
@@ -14002,7 +14040,7 @@ eo: ŝanĝi la ordon de la eventoj
 es: reordenar los eventos
 et: muuda sündmuste järjekorda
 fi: muuta tapahtumien järjestystä
-fr: réordonner les événements
+fr: réordonner les évènements
 he: שינוי סדר האירועים
 is: breyta röð atburða
 it: riordinare gli eventi
@@ -15613,7 +15651,7 @@ de: Fehlende Ereignisse
 en: missing events
 es: faltan eventos
 fi: puuttuvat asiatiedot
-fr: événements manquants
+fr: évènements manquants
 it: eventi mancanti
 nl: ontbrekende evenementen
 no: manglende hendelser
@@ -15637,7 +15675,7 @@ tr: eksik görüntü
     missing family event
 de: fehlendes Familienereignis
 en: missing family event
-fr: événement familial manquant
+fr: évènement familial manquant
 
     missing parents
 co: genitori assente
@@ -16431,7 +16469,7 @@ de: Ereignisse
 en: number of events
 es: núm. eventos
 fi: tapahtumat
-fr: nombre d’événements
+fr: nombre d’évènements
 it: n° eventi
 nl: aantal evenementen
 no: hendelser
@@ -17158,7 +17196,7 @@ fr: les mots de 2 ou 3 lettres (%s) figurent dans presque toutes les notes : les
     notes search scopes
 de: Diverse Notizen/Notizen der Meister/Personennotizen/Familiennotizen/Notizen zu Personenereignissen/Notizen zu Familienereignissen
 en: miscellaneous notes/wizard notes/individual notes/family notes/individual event notes/family event notes
-fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’événements individuels/notes d’événements familiaux
+fr: notes diverses/notes des magiciens/notes d’individus/notes de familles/notes d’évènements individuels/notes d’évènements familiaux
 
     notes summary
 bg: резюме на бележките
@@ -17189,7 +17227,7 @@ co: nant’à a data à manca per mudificà st’evenimentu
 de: auf das Datum links zum Ändern dieses Ereignisses
 en: on the date on the left to modify this event
 es: en la fecha a la izquierda para modificar este evento
-fr: sur la date à gauche pour modifier cet événement
+fr: sur la date à gauche pour modifier cet évènement
 
     note without title
 co: nota senza titulu
@@ -17812,7 +17850,7 @@ de: Anzahl der Ereignisse
 en: number of events
 es: número de eventos
 fi: tapahtumien lukumäärä
-fr: nombre d’événements
+fr: nombre d’évènements
 it: numero d’eventi
 nl: aantal evenementen
 no: antall hendelser
@@ -19043,7 +19081,7 @@ fr: nombre d’éléments à conserver dans la liste des places
     places and events
 de: Orte & Ereignisse
 en: places & events
-fr: lieux & événements
+fr: lieux & évènements
 
     place term/place terms
 de: Ortsbestandteil/Ortsbestandteile
@@ -21566,7 +21604,7 @@ co: selezziunà un evenimentu/squassà l’evenimentu
 de: ein Ereignis auswählen/ein Ereignis löschen
 en: select an event/delete the event
 es: elegir un evento/eliminar el evento
-fr: choisir un événement/supprimer l’événement
+fr: choisir un évènement/supprimer l’évènement
 
     select a spouse
 co: selezziunà un(a) cumpagnu(a)
@@ -21705,7 +21743,7 @@ co: mandà a fiura selezziunata cù nota è fonte
 de: sende das gewählte Bild mit Notizen und Quellen
 en: send selected image with note and source
 es: enviar la imagen seleccionada con nota y fuente
-fr: envoyer l’image selectionée avec note et source
+fr: envoyer l’image selectionnée avec note et source
 
     separate event
 co: staccanza
@@ -22232,7 +22270,7 @@ de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Erei
 en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
 fi: lajittelu:/päivämäärä/aakkosjärjestys/henkilöiden lukumäärä/tapahtumien lukumäärä
-fr: trier par/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
+fr: trier par/date de début/ordre alphabétique/nombre d’individus/nombre d’évènements
 it: smistare per : data d’inizio/ordine alfabetico/numero d’individui/numero d’eventi
 nl: sorteren per:/begindatum/alfabetisch/aantal personen/aantal evenementen
 no: sorter etter:/dato/alfabetisk rekkefølge/antall individer/antall hendelser
@@ -23744,7 +23782,7 @@ eo: la bazo ŝangis; faru “malantaŭe”, “reŝargi”, kaj replenigu la for
 es: la base ha cambiado: hacer «back», «reload» y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; valitse ”takaisin”, ”lataa uudelleen” ja täytä lomake uudelleen
-fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez la et ressaisissez le formulaire
 he: מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu „Back“, „Reload“, og settu aftur í formið
 it: la base è cambiata; fate «back», «reload» e rifate la scheda
