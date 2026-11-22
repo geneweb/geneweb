@@ -11,13 +11,12 @@ module Log = (val Logs.src_log src : Logs.LOG)
 
 (* login state is bound to the browser via a signed cookie, not a server store *)
 
-let session_cookie_name base_file = "__Host-gw_oidc_" ^ base_file
-let login_cookie_name base_file = "__Host-gw_oidc_login_" ^ base_file
+let session_cookie_name bname = "__Host-gw_oidc_" ^ bname
+let login_cookie_name bname = "__Host-gw_oidc_login_" ^ bname
 
-let login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp =
+let login_cookie_sig secret ~bname ~state ~nonce ~verifier ~exp =
   let msg =
-    String.concat "\000"
-      [ base_file; state; nonce; verifier; string_of_int exp ]
+    String.concat "\000" [ bname; state; nonce; verifier; string_of_int exp ]
   in
   Digestif.SHA256.(
     to_hex (hmac_string ~key:secret ("gw-oidc-login-v1\000" ^ msg)))
@@ -31,17 +30,17 @@ let sig_ok expected_hex provided_hex =
       | Some expected -> Digestif.SHA256.equal provided expected
       | None -> false)
 
-let make_login_cookie secret ~base_file ~state ~nonce ~verifier ~exp =
-  let s = login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp in
+let make_login_cookie secret ~bname ~state ~nonce ~verifier ~exp =
+  let s = login_cookie_sig secret ~bname ~state ~nonce ~verifier ~exp in
   String.concat "." [ state; nonce; verifier; string_of_int exp; s ]
 
-let parse_login_cookie secret ~base_file value =
+let parse_login_cookie secret ~bname value =
   match String.split_on_char '.' value with
   | [ state; nonce; verifier; exp_s; s ] -> (
       match int_of_string_opt exp_s with
       | Some exp
         when sig_ok
-               (login_cookie_sig secret ~base_file ~state ~nonce ~verifier ~exp)
+               (login_cookie_sig secret ~bname ~state ~nonce ~verifier ~exp)
                s
              && float_of_int exp >= Unix.time () ->
           Some (state, nonce, verifier)
@@ -56,12 +55,12 @@ let session_cookie_sig secret payload =
   Digestif.SHA256.(
     to_hex (hmac_string ~key:secret ("gw-oidc-sess-v1\000" ^ payload)))
 
-let make_session_cookie secret ~base_file ~acc ~user ~username ~exp ~deadline =
+let make_session_cookie secret ~bname ~acc ~user ~username ~exp ~deadline =
   let payload =
     Geneweb_oidc.Oidc.base64url_encode
       (String.concat "\000"
          [
-           base_file;
+           bname;
            String.make 1 acc;
            user;
            username;
@@ -71,14 +70,14 @@ let make_session_cookie secret ~base_file ~acc ~user ~username ~exp ~deadline =
   in
   payload ^ "." ^ session_cookie_sig secret payload
 
-let parse_session_cookie secret ~base_file value =
+let parse_session_cookie secret ~bname value =
   match String.split_on_char '.' value with
   | [ payload; s ] when sig_ok (session_cookie_sig secret payload) s -> (
       match Geneweb_oidc.Oidc.base64url_decode payload with
       | Ok raw -> (
           match String.split_on_char '\000' raw with
           | [ b; acc; user; username; exp_s; deadline_s ]
-            when b = base_file && String.length acc = 1 -> (
+            when b = bname && String.length acc = 1 -> (
               match (int_of_string_opt exp_s, int_of_string_opt deadline_s) with
               | Some exp, Some deadline
                 when float_of_int exp >= Unix.time ()
@@ -110,12 +109,12 @@ let extract_oidc_cookie request cookie_name =
     in
     find pairs
 
-let cookie_access ~secret request base_name =
+let cookie_access ~secret request bname =
   if secret = "" then None
   else
-    match extract_oidc_cookie request (session_cookie_name base_name) with
+    match extract_oidc_cookie request (session_cookie_name bname) with
     | None -> None
-    | Some v -> parse_session_cookie secret ~base_file:base_name v
+    | Some v -> parse_session_cookie secret ~bname v
 
 type oidc_config = {
   provider_url : string;
@@ -241,13 +240,11 @@ let set_cookie conn ~name ~value ~max_age =
        "Set-Cookie: %s=%s; Path=/; HttpOnly; Secure; SameSite=Lax%s" name value
        max_age)
 
-let set_login_cookie conn base_file value =
-  set_cookie conn ~name:(login_cookie_name base_file) ~value ~max_age:(Some 600)
+let set_login_cookie conn bname value =
+  set_cookie conn ~name:(login_cookie_name bname) ~value ~max_age:(Some 600)
 
-let clear_login_cookie conn base_file =
-  set_cookie conn
-    ~name:(login_cookie_name base_file)
-    ~value:"" ~max_age:(Some 0)
+let clear_login_cookie conn bname =
+  set_cookie conn ~name:(login_cookie_name bname) ~value:"" ~max_age:(Some 0)
 
 let session_timeout base_env =
   match List.assoc_opt "oidc_session_timeout" base_env with
@@ -265,18 +262,17 @@ let session_max_age base_env =
       | _ -> 0)
   | None -> 0
 
-let renew_session conn conf ~base_file ~acc ~user ~username ~deadline =
+let renew_session conn conf ~bname ~acc ~user ~username ~deadline =
   match conf_secret conf with
   | "" -> ()
   | secret ->
       let timeout = session_timeout conf.base_env in
       let exp = int_of_float (Unix.time ()) + timeout in
       let cookie =
-        make_session_cookie secret ~base_file ~acc ~user ~username ~exp
-          ~deadline
+        make_session_cookie secret ~bname ~acc ~user ~username ~exp ~deadline
       in
       set_cookie conn
-        ~name:(session_cookie_name base_file)
+        ~name:(session_cookie_name bname)
         ~value:cookie ~max_age:(Some timeout)
 
 let send_redirect conf url =
@@ -286,7 +282,7 @@ let send_redirect conf url =
   Output.print_sstring conf "";
   Output.flush conf
 
-let handle_oidc_login conn conf base_env base_file =
+let handle_oidc_login conn conf base_env bname =
   match (conf_secret conf, read_oidc_config base_env) with
   | "", _ -> oidc_error_page conf "OIDC unavailable: no secret salt configured"
   | _, None ->
@@ -311,7 +307,7 @@ let handle_oidc_login conn conf base_env base_file =
           | state, nonce, verifier ->
               let exp = int_of_float (Unix.time ()) + 600 in
               let cookie =
-                make_login_cookie (conf_secret conf) ~base_file ~state ~nonce
+                make_login_cookie (conf_secret conf) ~bname ~state ~nonce
                   ~verifier ~exp
               in
               let url =
@@ -320,12 +316,12 @@ let handle_oidc_login conn conf base_env base_file =
                   ~nonce
                   ~code_challenge:(Geneweb_oidc.Oidc.code_challenge verifier)
               in
-              Log.info (fun k -> k "login initiated: base=%s" base_file);
+              Log.info (fun k -> k "login initiated: base=%s" bname);
               Output.status conf Code.Moved_Temporarily;
-              set_login_cookie conn base_file cookie;
+              set_login_cookie conn bname cookie;
               send_redirect conf url))
 
-let handle_oidc_callback conn conf base_env from_addr base_file =
+let handle_oidc_callback conn conf base_env from_addr bname =
   let ( let* ) = Result.bind in
   let err_str e = Format.asprintf "%a" Geneweb_oidc.Oidc.pp_error e in
   let result =
@@ -357,10 +353,10 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
     in
     (* matching the URL state against the login cookie is what stops login CSRF *)
     let* nonce, verifier =
-      match extract_oidc_cookie conf.request (login_cookie_name base_file) with
+      match extract_oidc_cookie conf.request (login_cookie_name bname) with
       | None -> Error "No login in progress"
       | Some v -> (
-          match parse_login_cookie (conf_secret conf) ~base_file v with
+          match parse_login_cookie (conf_secret conf) ~bname v with
           | None -> Error "Invalid or expired login state"
           | Some (cookie_state, nonce, verifier) ->
               if String.equal url_state cookie_state then Ok (nonce, verifier)
@@ -427,21 +423,20 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
     Ok (acc, claim_value, username)
   in
   let base_url =
-    if Connection.is_cgi conn then conf.command ^ "?b=" ^ base_file
-    else base_file
+    if Connection.is_cgi conn then conf.command ^ "?b=" ^ bname else bname
   in
   match result with
   | Error msg -> oidc_error_page conf msg
   | Ok ('v', user, _) ->
       Log.info (fun k ->
-          k "login as visitor (no role): base=%s user=%s from=%s" base_file user
+          k "login as visitor (no role): base=%s user=%s from=%s" bname user
             from_addr);
       Output.status conf Code.Moved_Temporarily;
-      clear_login_cookie conn base_file;
+      clear_login_cookie conn bname;
       send_redirect conf base_url
   | Ok (acc, claim_value, username) ->
       Log.info (fun k ->
-          k "login: base=%s user=%s access=%c from=%s" base_file claim_value acc
+          k "login: base=%s user=%s access=%c from=%s" bname claim_value acc
             from_addr);
       let now = int_of_float (Unix.time ()) in
       let timeout = session_timeout base_env in
@@ -449,34 +444,32 @@ let handle_oidc_callback conn conf base_env from_addr base_file =
       let exp = now + timeout in
       let deadline = if max_age > 0 then now + max_age else 0 in
       let cookie =
-        make_session_cookie (conf_secret conf) ~base_file ~acc ~user:claim_value
+        make_session_cookie (conf_secret conf) ~bname ~acc ~user:claim_value
           ~username ~exp ~deadline
       in
       Output.status conf Code.Moved_Temporarily;
-      clear_login_cookie conn base_file;
+      clear_login_cookie conn bname;
       set_cookie conn
-        ~name:(session_cookie_name base_file)
+        ~name:(session_cookie_name bname)
         ~value:cookie ~max_age:(Some timeout);
       send_redirect conf base_url
 
 let request_is_post request = Header.extract_param "POST " ' ' request <> ""
 
-let handle_oidc_logout conn conf base_env _from_addr base_file =
+let handle_oidc_logout conn conf base_env _from_addr bname =
   let base_url =
-    if Connection.is_cgi conn then conf.command ^ "?b=" ^ base_file
-    else base_file
+    if Connection.is_cgi conn then conf.command ^ "?b=" ^ bname else bname
   in
   (* SameSite=Lax keeps the session cookie off cross-site POSTs (CSRF) *)
   let has_session =
-    Option.is_some
-      (cookie_access ~secret:(conf_secret conf) conf.request base_file)
+    Option.is_some (cookie_access ~secret:(conf_secret conf) conf.request bname)
   in
   if not (has_session && request_is_post conf.request) then begin
     Output.status conf Code.Moved_Temporarily;
     send_redirect conf base_url
   end
   else begin
-    Log.info (fun k -> k "logout: base=%s" base_file);
+    Log.info (fun k -> k "logout: base=%s" bname);
     let logout_target =
       match read_oidc_config base_env with
       | None -> base_url
@@ -493,7 +486,7 @@ let handle_oidc_logout conn conf base_env _from_addr base_file =
     in
     Output.status conf Code.Moved_Temporarily;
     set_cookie conn
-      ~name:(session_cookie_name base_file)
+      ~name:(session_cookie_name bname)
       ~value:"" ~max_age:(Some 0);
     send_redirect conf logout_target
   end
@@ -501,20 +494,20 @@ let handle_oidc_logout conn conf base_env _from_addr base_file =
 let handle_mode conn conf mode =
   let base_env = conf.base_env
   and from_addr = conf.from
-  and base_file = conf.bname in
+  and bname = conf.bname in
   match mode with
   (* refused on native Windows; Cygwin has /dev/urandom *)
   | Some ("OIDC_LOGIN" | "OIDC_CALLBACK" | "OIDC_LOGOUT") when Sys.win32 ->
       oidc_error_page conf "OIDC is not available on Windows";
       true
   | Some "OIDC_LOGIN" ->
-      handle_oidc_login conn conf base_env base_file;
+      handle_oidc_login conn conf base_env bname;
       true
   | Some "OIDC_CALLBACK" ->
-      handle_oidc_callback conn conf base_env from_addr base_file;
+      handle_oidc_callback conn conf base_env from_addr bname;
       true
   | Some "OIDC_LOGOUT" ->
-      handle_oidc_logout conn conf base_env from_addr base_file;
+      handle_oidc_logout conn conf base_env from_addr bname;
       true
   | None ->
       (* only treat code+state as a callback for a login this browser started *)
@@ -522,13 +515,13 @@ let handle_mode conn conf mode =
       let has_code = Util.p_getenv conf.env "code" <> None in
       let has_error = Util.p_getenv conf.env "error" <> None in
       let in_login =
-        extract_oidc_cookie conf.request (login_cookie_name base_file) <> None
+        extract_oidc_cookie conf.request (login_cookie_name bname) <> None
       in
       if
         has_state && (has_code || has_error) && in_login
         && Option.is_some (read_oidc_config base_env)
       then begin
-        handle_oidc_callback conn conf base_env from_addr base_file;
+        handle_oidc_callback conn conf base_env from_addr bname;
         true
       end
       else false

@@ -2913,10 +2913,10 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-let read_gen_auth_file fname base_file =
+let read_gen_auth_file fname bname =
   let fname =
-    if GWPARAM.is_reorg_base base_file then
-      Filename.concat (!GWPARAM.config_d base_file) fname
+    if GWPARAM.is_reorg_base bname then
+      Filename.concat (!GWPARAM.config_d bname) fname
     else Filename.concat (Secure.bases_dir ()) fname
   in
   try
