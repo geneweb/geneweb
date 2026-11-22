@@ -15,6 +15,7 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
+let bpath bname = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb")
 
 let config_reorg bname =
   let bname = Filename.remove_extension bname in
@@ -35,16 +36,13 @@ let src_d = ref (fun _ -> "")
 let etc_d = ref (fun _ -> "")
 let config_d = ref (fun _ -> "")
 let lang_d = ref (fun _ _ -> "")
-let bpath = ref (fun _ -> "")
 let portraits_d = ref (fun _ -> "")
 let images_d = ref (fun _ -> "")
 let albums_d = ref (fun _ -> "")
 let clean_bname bname = Filename.remove_extension bname
 let path_concat parts = String.concat Filename.dir_sep parts
 let bases_dir () = Secure.bases_dir ()
-
-let cache_d bname =
-  path_concat [ bases_dir (); clean_bname bname ^ ".gwb"; "caches" ]
+let cache_d bname = Filename.concat (bpath bname) "caches"
 
 (* Module for reorg mode paths *)
 module Default = struct
@@ -87,10 +85,6 @@ module Default = struct
   let albums_d bname =
     let bname = clean_bname bname in
     path_concat [ bases_dir (); bname ^ ".gwb"; "documents"; "albums" ]
-
-  let bpath bname =
-    let bname = clean_bname bname in
-    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Module for legacy mode paths *)
@@ -131,18 +125,13 @@ module Legacy = struct
   let albums_d bname =
     let bname = clean_bname bname in
     path_concat [ bases_dir (); "src"; bname; "albums" ]
-
-  let bpath bname =
-    let bname = clean_bname bname in
-    Filename.concat (bases_dir ()) (bname ^ ".gwb")
 end
 
 (* Per-base working files (anomalies report, its whitelist): the same
    <bases>/<base>.gwb/config/ in reorg AND classic mode. Creating this
    directory does not turn a classic base into a reorg one: only
    config/<base>.gwf does (see [is_reorg_base]). *)
-let base_config_dir bname =
-  path_concat [ bases_dir (); clean_bname bname ^ ".gwb"; "config" ]
+let base_config_dir bname = Filename.concat (bpath bname) "config"
 
 (* Check if a base is in reorg format *)
 let is_reorg_base bname =
@@ -160,7 +149,6 @@ let init () =
     etc_d := Default.etc_d;
     config_d := Default.config_d;
     lang_d := Default.lang_d;
-    bpath := Default.bpath;
     portraits_d := Default.portraits_d;
     images_d := Default.images_d;
     albums_d := Default.albums_d)
@@ -172,7 +160,6 @@ let init () =
     etc_d := Legacy.etc_d;
     config_d := Legacy.config_d;
     lang_d := Legacy.lang_d;
-    bpath := Legacy.bpath;
     portraits_d := Legacy.portraits_d;
     images_d := Legacy.images_d;
     albums_d := Legacy.albums_d)
@@ -218,20 +205,18 @@ let create_default_gwf config_path =
   close_out oc
 
 let check_base_exists bname =
-  let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.bases_dir ()) (clean_bname ^ ".gwb") in
-  if (not !force) && Sys.file_exists bdir then (
+  if (not !force) && Sys.file_exists (bpath bname) then (
     Printf.eprintf "Database \"%s\" already exists. Use -f to overwrite.\n"
       bname;
     exit 2)
 
 let rec create_base_and_config bname =
   let clean_bname = Filename.remove_extension bname in
-  let bdir = Filename.concat (Secure.bases_dir ()) (clean_bname ^ ".gwb") in
+  let bpath = bpath clean_bname in
   let user_wants_reorg = !reorg in
-  if Sys.file_exists bdir then
+  if Sys.file_exists bpath then
     migrate_gwf_bidirectional clean_bname user_wants_reorg;
-  Filesystem.create_dir bdir;
+  Filesystem.create_dir bpath;
   if
     (not (Sys.file_exists (config_reorg clean_bname)))
     && not (Sys.file_exists (config_legacy clean_bname))
@@ -239,7 +224,7 @@ let rec create_base_and_config bname =
   Printf.eprintf "\n";
   reorg := user_wants_reorg;
   init ();
-  bdir
+  bpath
 
 and migrate_gwf_bidirectional bname user_wants_reorg =
   let bname = Filename.remove_extension bname in

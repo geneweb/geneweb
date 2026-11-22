@@ -453,7 +453,7 @@ let unauth_server conn conf ar =
   Notif.error
     ~title:(transl conf "NOTIF_TT access refused")
     (transl conf "NOTIF access refused");
-  let bpath = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb") in
+  let bpath = GWPARAM.bpath conf.bname in
   try
     Request.w_base ~none:ignore
       (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
@@ -1462,7 +1462,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
         (try
            let x = List.assoc "auth_file" base_env in
            if x = "" then Option.value ~default:"" !auth_file
-           else Filename.concat (!GWPARAM.bpath base_file) x
+           else Filename.concat (GWPARAM.bpath base_file) x
          with Not_found -> Option.value ~default:"" !auth_file);
       border = (match Util.p_getint env "border" with Some i -> i | None -> 0);
       n_connect = None;
@@ -2348,7 +2348,7 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
   List.iter
     (fun dbn ->
       Log.info (fun k -> k "Caching database %s in memory… %!" dbn);
-      let bpath = !GWPARAM.bpath dbn in
+      let bpath = GWPARAM.bpath dbn in
       try Driver.load_database bpath
       with Sys_error _ | Driver.Incompatible_format _ ->
         (* HOTFIX: we cannot print the Sys_error payload in tests. A missing

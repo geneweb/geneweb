@@ -29,7 +29,7 @@ let period conf =
       | _ -> None)
   | None -> None
 
-let bpath conf = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
+let bpath conf = GWPARAM.bpath conf.bname
 
 let cnt_file conf suffix =
   Filename.concat (Util.test_cnt_d conf) (conf.bname ^ suffix)

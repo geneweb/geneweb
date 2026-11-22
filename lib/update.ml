@@ -507,7 +507,7 @@ let print_err_unknown conf (f, s, o) =
   print_return conf
 
 let delete_topological_sort_v conf _base =
-  let bpath = Util.bpath conf.bname in
+  let bpath = GWPARAM.bpath conf.bname in
   let tstab_file = Filename.concat bpath "tstab_visitor" in
   Mutil.rm tstab_file;
   let tstab_file = Filename.concat bpath "restrict" in
@@ -515,7 +515,7 @@ let delete_topological_sort_v conf _base =
 
 let delete_topological_sort conf base =
   let _ = delete_topological_sort_v conf base in
-  let bpath = Util.bpath conf.bname in
+  let bpath = GWPARAM.bpath conf.bname in
   let tstab_file = Filename.concat bpath "tstab" in
   Mutil.rm tstab_file
 

@@ -237,7 +237,7 @@ let try_plugin conn conf base_name meth =
    (see [w_bulk]), the wizard is told so ([onbulk]) instead of waiting for
    the end of the task; otherwise the lock is waited for, as before. *)
 let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
-  let bpath = !GWPARAM.bpath conf.bname in
+  let bpath = GWPARAM.bpath conf.bname in
   let lock_file = Mutil.lock_file bpath in
   let run () = fn conn conf base_name in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
@@ -260,7 +260,7 @@ let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
 (* To be put inside [w_lock]: marks the base as held by a bulk task for the
    requests arriving meanwhile. *)
 let w_bulk ~command fn conn conf (base_name : string option) =
-  BulkStatus.with_marker (!GWPARAM.bpath conf.bname) ~command ~user:conf.user
+  BulkStatus.with_marker (GWPARAM.bpath conf.bname) ~command ~user:conf.user
   @@ fun () -> fn conn conf base_name
 
 (* Module-level ref used as an init-once guard: the nldb format check
@@ -432,9 +432,7 @@ let treat_request =
     let bpath =
       if conf.bname = "" then None
       else
-        let bpath =
-          Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
-        in
+        let bpath = GWPARAM.bpath conf.bname in
         if Sys.file_exists bpath then Some bpath else None
     in
     let process () =

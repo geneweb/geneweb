@@ -429,7 +429,7 @@ let read_or_build_level_json ~last_change ~ttl ~on_miss cache_file key level
 
 let cousins_cache_dir conf =
   Filename.concat
-    (Filename.concat (!GWPARAM.bpath conf.Config.bname) "caches")
+    (Filename.concat (GWPARAM.bpath conf.Config.bname) "caches")
     "cousins_json"
 
 let cousins_cache_key base p =

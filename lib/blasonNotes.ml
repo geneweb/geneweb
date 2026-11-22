@@ -191,7 +191,9 @@ let usable_target target =
 
 let redirect_portrait_refs conf base p target =
   let root =
-    Filename.concat (Util.bpath conf.Config.bname) (Driver.base_notes_dir base)
+    Filename.concat
+      (GWPARAM.bpath conf.Config.bname)
+      (Driver.base_notes_dir base)
   in
   let dir = notes_dir conf in
   let files = if usable_target target then fnotes_below root dir else [] in
