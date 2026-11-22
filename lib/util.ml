@@ -1342,8 +1342,6 @@ let string_of_witness_kind_raw witness_kind =
   in
   Adef.safe s
 
-let bpath bname = !GWPARAM.bpath bname
-
 (* Cached [dir_listing_cache_ttl] seconds. [None] = directory absent/unreadable. *)
 let dir_listing_cache :
     (string, float * (string, unit) Hashtbl.t option) Hashtbl.t =
@@ -2424,7 +2422,7 @@ let create_topological_sort conf base =
       Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Driver.iper_marker (Driver.ipers base) 0
   | _ ->
-      let bpath = bpath (conf.bname ^ ".gwb") in
+      let bpath = GWPARAM.bpath conf.bname in
       let tstab_file =
         if conf.use_restrict && (not conf.wizard) && not conf.friend then
           Filename.concat bpath "tstab_visitor"
@@ -3187,11 +3185,7 @@ type cache_visited_t = (string, (Driver.iper * string) list) Hashtbl.t
     - config : configuration de la base [Retour] : unit [Rem] : Exporté en clair
       hors de ce module. *)
 let cache_visited conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (bpath bname) "cache_visited"
+  Filename.concat (GWPARAM.bpath conf.bname) "cache_visited"
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)

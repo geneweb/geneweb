@@ -164,7 +164,7 @@ module MF : MF = struct
 end
 
 let forum_file conf =
-  let fn = Filename.concat (Util.bpath conf.bname) "forum" in
+  let fn = Filename.concat (GWPARAM.bpath conf.bname) "forum" in
   MF.filename_of_string fn
 
 (* Black list *)

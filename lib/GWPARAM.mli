@@ -11,6 +11,10 @@ val reorg : bool ref
 val force : bool ref
 (** force creation of database if already existing *)
 
+val bpath : string -> string
+(** [bpath bname] is the directory of the database [bname],
+    [<bases_dir>/<bname>.gwb], in both layouts. *)
+
 val config_reorg : string -> string
 val config_legacy : string -> string
 
@@ -31,7 +35,6 @@ val src_d : my_fun_2 ref
 val etc_d : my_fun_2 ref
 val config_d : my_fun_2 ref
 val lang_d : my_fun_3 ref
-val bpath : my_fun_2 ref
 val portraits_d : my_fun_2 ref
 val images_d : my_fun_2 ref
 val albums_d : my_fun_2 ref
@@ -71,9 +74,6 @@ module Default : sig
   val lang_d : string -> string -> string
   val images_d : string -> string
   val albums_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.bases_dir ())] *)
 end
 
 module Legacy : sig
@@ -87,9 +87,6 @@ module Legacy : sig
   val lang_d : string -> string -> string
   val images_d : string -> string
   val albums_d : string -> string
-
-  val bpath : string -> string
-  (** [Filename.concat (Secure.bases_dir ()) (string ^ ".gwb") ] *)
 end
 
 val output_error :

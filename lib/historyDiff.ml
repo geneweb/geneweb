@@ -72,11 +72,7 @@ let history_d conf =
     | _ -> "history_d"
   in
   if Filename.is_relative path then
-    let bname =
-      if Filename.check_suffix conf.bname ".gwb" then conf.bname
-      else conf.bname ^ ".gwb"
-    in
-    Filename.concat (Util.bpath bname) path
+    Filename.concat (GWPARAM.bpath conf.bname) path
   else path
 
 (* Folder name for the character of [fname] starting at byte [i], and the

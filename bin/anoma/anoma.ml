@@ -42,7 +42,7 @@ let () =
     Arg.usage speclist usage;
     exit 2);
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  let bpath = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb") in
+  let bpath = GWPARAM.bpath bname in
   if not (Sys.file_exists bpath) then (
     Printf.eprintf "anoma: no base %s\n" bpath;
     exit 2);

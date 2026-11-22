@@ -7,7 +7,7 @@ module Gutil = Geneweb_db.Gutil
 module Connection = Geneweb_http.Connection
 
 let wiz_dir conf base =
-  Filename.concat (Util.bpath conf.bname) (Driver.base_wiznotes_dir base)
+  Filename.concat (GWPARAM.bpath conf.bname) (Driver.base_wiznotes_dir base)
 
 let wzfile wiznotes_dir wiz = Filename.concat wiznotes_dir (wiz ^ ".txt")
 

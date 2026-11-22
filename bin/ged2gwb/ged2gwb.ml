@@ -3724,8 +3724,7 @@ let main () =
     exit 2);
   let bname = !out_file in
   Geneweb.GWPARAM.check_base_exists bname;
-  let _bdir = Geneweb.GWPARAM.create_base_and_config bname in
-  out_file := Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb");
+  out_file := Geneweb.GWPARAM.create_base_and_config bname;
   Geneweb.GWPARAM.init ();
   let arrays = make_arrays !in_file in
   Gc.compact ();

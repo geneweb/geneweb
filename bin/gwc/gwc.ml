@@ -325,7 +325,7 @@ let cleanup gwo_files =
     gwo_files
 
 let reindex_database bname =
-  let bpath = !GWPARAM.bpath bname in
+  let bpath = GWPARAM.bpath bname in
   if not (Sys.file_exists bpath) then (
     Fmt.epr "Database %S not found.@." bname;
     exit 2);

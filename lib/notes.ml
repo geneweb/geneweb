@@ -34,7 +34,7 @@ let existing_pages base db =
 
 let file_path conf base fname =
   String.concat Filename.dir_sep
-    [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
+    [ GWPARAM.bpath conf.bname; Driver.base_notes_dir base; fname ^ ".txt" ]
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -329,7 +329,7 @@ type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
 let cache_linked_pages_name = "cache_linked_pages"
 
 let get_linked_pages_fname conf =
-  Filename.concat (!GWPARAM.bpath conf.bname) cache_linked_pages_name
+  Filename.concat (GWPARAM.bpath conf.bname) cache_linked_pages_name
 
 let read_cache_linked_pages conf =
   let fname = get_linked_pages_fname conf in
@@ -354,7 +354,7 @@ let save_cache_linked_pages bpath (ht : cache_linked_pages_t) =
   Sys.rename tmp fname
 
 let write_cache_linked_pages conf ht =
-  try save_cache_linked_pages (!GWPARAM.bpath conf.bname) ht
+  try save_cache_linked_pages (GWPARAM.bpath conf.bname) ht
   with Sys_error e ->
     Log.warn (fun k -> k "%s not updated: %s" cache_linked_pages_name e)
 
@@ -483,7 +483,7 @@ let commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   let fpath =
     String.concat Filename.dir_sep
-      [ Util.bpath conf.bname; Driver.base_notes_dir base; fname ]
+      [ GWPARAM.bpath conf.bname; Driver.base_notes_dir base; fname ]
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);
   (try Driver.commit_notes base fname s
@@ -496,8 +496,7 @@ let commit_wiznotes conf base fnotes s =
   let pg = Def.NLDB.PgWizard fnotes in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat
-      (Util.bpath (conf.bname ^ ".gwb"))
+    List.fold_left Filename.concat (GWPARAM.bpath conf.bname)
       [ Driver.base_wiznotes_dir base; fname ]
   in
   Filesystem.create_dir ~parent:true (Filename.dirname fpath);

@@ -24,17 +24,16 @@ type t = { fingerprint : string; built : float; synchro_len : int }
 let magic = "GWNOTES"
 let current_version = 3
 let ( // ) = Filename.concat
-let gwb_dir bname = Secure.bases_dir () // (bname ^ ".gwb")
 
 (* The "base" file of a .gwb is only rewritten by a full rebuild (gwc,
    gwfixbase...), which also renumbers persons and families; commits from
    gwd go to "patches" and are followed with [changes]. *)
 let fingerprint bname =
-  match Unix.stat (gwb_dir bname // "base") with
+  match Unix.stat (GWPARAM.bpath bname // "base") with
   | st -> Printf.sprintf "%.0f-%d" st.Unix.st_mtime st.Unix.st_size
   | exception Unix.Unix_error _ -> ""
 
-let synchro bname = (Database.input_synchro (gwb_dir bname)).synch_list
+let synchro bname = (Database.input_synchro (GWPARAM.bpath bname)).synch_list
 
 let entry kind id evt note acc =
   let text = NotesSearch.plain_text note in

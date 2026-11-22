@@ -74,7 +74,7 @@ let notes_aliases conf =
   let fname =
     match List.assoc_opt "notes_alias_file" conf.base_env with
     | Some f -> f
-    | None -> Filename.concat (Util.bpath conf.bname) "notes.alias"
+    | None -> Filename.concat (GWPARAM.bpath conf.bname) "notes.alias"
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->
@@ -1141,7 +1141,7 @@ let mod_ok conf edit_mode fname read_string commit ~conflict =
   | Some _ when fname <> "" ->
       let new_fn_path =
         String.concat Filename.dir_sep
-          [ !GWPARAM.bpath conf.bname; "notes_d"; fname ^ ".txt" ]
+          [ GWPARAM.bpath conf.bname; "notes_d"; fname ^ ".txt" ]
       in
       if Sys.file_exists new_fn_path then Update.error_same_file conf
   | _ -> ());
