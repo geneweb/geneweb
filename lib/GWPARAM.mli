@@ -3,7 +3,6 @@ val errors_undef : string list ref
 val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
-val cnt_dir : string ref
 
 val reorg : bool ref
 (** Set by the option [-reorg] of gwc and ged2gwb: the bases they create are in
@@ -35,8 +34,12 @@ val cache_d : string -> string
     bases/etc/bname/cache, which holds the .gz datalists that browsers download,
     it is never served. *)
 
+val adm_dir : unit -> string
+(** [adm_dir ()] is the directory of the files of the server, shared by all the
+    bases: [<bases_dir>/cnt] (lock, tokens, keys, [STOP_SERVER]). *)
+
 val adm_file : string -> string
-(** [adm_file file] is the file [file] of the directory [!cnt_dir]. *)
+(** [adm_file file] is the file [file] of {!adm_dir}. *)
 
 val init : unit -> unit
 (** Adds the current directory to the assets ({!Secure.add_assets}). *)

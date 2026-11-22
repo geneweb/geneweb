@@ -381,7 +381,7 @@ let print_redirected conf from request new_addr =
 
 let nonce_private_key =
   Lazy.from_fun (fun () ->
-      let fname = Filename.concat !GWPARAM.cnt_dir "gwd_private.txt" in
+      let fname = GWPARAM.adm_file "gwd_private.txt" in
       let k =
         try
           let ic = open_in fname in
@@ -1241,10 +1241,6 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
     let bases = Util.get_bases_list () in
     let bname = match bases with [ x ] -> x | _ -> bname in
     let bname = if Mutil.good_name bname then bname else "" in
-    (* Set the per-base cnt directory before [get_token] reads the actlog:
-       the gwd worker is reused between requests, and !GWPARAM.cnt_dir may
-       still point to the base of the previous request. *)
-    GWPARAM.cnt_dir := Layout.cnt (Layout.of_bname ~mode:Layout.Detect bname);
     let passwd, env, access_type =
       let has_passwd = List.mem_assoc "w" env in
       let x, env = extract_assoc "w" env in
@@ -2164,7 +2160,7 @@ let retrieve_secret_salt () =
 let load_secret_salt ~predictable_mode () =
   if predictable_mode then generate_secret_salt ~random:false ()
   else
-    let fname = Filename.concat !GWPARAM.cnt_dir "gwd_secret_salt.txt" in
+    let fname = GWPARAM.adm_file "gwd_secret_salt.txt" in
     let saved =
       try Secure.with_open_in_text fname In_channel.input_line
       with Sys_error _ -> None
@@ -2193,9 +2189,9 @@ let daemonize ~daemon k =
   else k ()
 
 let create_cnt_dir () =
-  try Filesystem.create_dir ~parent:true ~required_perm:0o755 !GWPARAM.cnt_dir
-  with Sys_error e ->
-    Log.err (fun k -> k "failure creating %s:@ %s" !GWPARAM.cnt_dir e)
+  let dir = GWPARAM.adm_dir () in
+  try Filesystem.create_dir ~parent:true ~required_perm:0o755 dir
+  with Sys_error e -> Log.err (fun k -> k "failure creating %s:@ %s" dir e)
 
 let slashify = String.map (fun c -> match c with '\\' -> '/' | _ -> c)
 
@@ -2289,7 +2285,8 @@ let manage_cgi_timeout conn tmout =
 let geneweb_cgi ~loaded_plugins ~secret_salt addr script_name contents =
   let conn = Connection.of_out_channel ~cgi:true stdout in
   if Sys.unix then manage_cgi_timeout conn !conn_timeout;
-  (try Unix.mkdir !GWPARAM.cnt_dir 0o755 with Unix.Unix_error (_, _, _) -> ());
+  (try Unix.mkdir (GWPARAM.adm_dir ()) 0o755
+   with Unix.Unix_error (_, _, _) -> ());
   let add k x request =
     try
       let v = Sys.getenv x in
@@ -2362,11 +2359,9 @@ let main ~plugins ~trusted_proxies ?interface ~port ~daemon ~predictable_mode
        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
      in
      images_prefix := Some ("file://" ^ slashify abs_dir));
-  GWPARAM.cnt_dir := Layout.cnt (Layout.of_bname ~mode:Layout.Legacy "");
   if !Mutil.particles_file = "" then
     Mutil.particles_file := Option.get !gw_prefix // "etc" // "particles.txt";
-  Server.stop_server :=
-    List.fold_left Filename.concat !GWPARAM.cnt_dir [ "STOP_SERVER" ];
+  Server.stop_server := GWPARAM.adm_file "STOP_SERVER";
   Util.is_welcome := false;
   if !check then (
     Log.debug (fun k -> k "End of check mode.");

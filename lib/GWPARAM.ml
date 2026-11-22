@@ -14,7 +14,6 @@ let set_vars = ref []
 let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
-let cnt_dir = ref ""
 let bpath = Layout.bpath
 
 let bname_of_string s =
@@ -34,7 +33,8 @@ let bname_of_arg ~prog s =
       exit 2
 
 let cache_d bname = Filename.concat (bpath bname) "caches"
-let adm_file file = Filename.concat !cnt_dir file
+let adm_dir () = Filename.concat (Secure.bases_dir ()) "cnt"
+let adm_file file = Filename.concat (adm_dir ()) file
 
 (* Per-base working files (anomalies report, its whitelist): the same
    <bases>/<base>.gwb/config/ in reorg AND classic mode. Creating this
