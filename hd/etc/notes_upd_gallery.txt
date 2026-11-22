@@ -130,20 +130,22 @@ li.in { background-color: #FFE8CC; }
           <div class="col-sm-10">
             <input type="text" class="form-control" id="fnotes_name"
               required pattern="[^\/\\?\s]+"
-              placeholder="ex: famille_dupont_1900">
+              placeholder="[*gallery file name help]">
           </div>
         </div>
       %end;
       <div class="row mt-2">
         <label for="page_title" class="col-sm-2 col-form-label">[*title/titles]0</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="page_title">
+          <input type="text" class="form-control" id="page_title"
+              placeholder="[*gallery title help]">
         </div>
       </div>
       <div class="row">
         <label for="album_chronicle" class="col-sm-2 col-form-label">[*chronicle]</label>
         <div class="col-sm-10">
-          <textarea class="form-control" id="album_chronicle" rows="2"></textarea>
+          <textarea class="form-control" id="album_chronicle" rows="2"
+            placeholder="[*gallery chronicle help]"></textarea>
         </div>
       </div>
       <div id="album-nav" class="d-none justify-content-center align-items-center gap-3 my-1">
@@ -188,7 +190,8 @@ li.in { background-color: #FFE8CC; }
       <div class="row">
         <label for="page_desc" class="col-sm-2 col-form-label">[*description]</label>
         <div class="col-sm-10">
-          <textarea class="form-control" id="page_desc" rows="1"></textarea>
+          <textarea class="form-control" id="page_desc" rows="1"
+            placeholder="[*gallery image description help]"></textarea>
         </div>
       </div>
     </div>
