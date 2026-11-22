@@ -257,6 +257,10 @@
   Lite", uncompressed): only the counts by country are kept, in
   `<base>_countries.txt`. `m=GWD_STATS` charts their mean over the
   period.
+- The files named by `forum_exclude_file` and `moderator_file` are read
+  from the configuration directory of the base, like the password
+  files: the bases directory, or `<base>.gwb/config` for a reorg base.
+  They were looked for in a `<file>.gwb` directory.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
