@@ -395,10 +395,10 @@ let validate_options () =
 let speclist =
   [
     ( "-bd",
-      Arg.String Secure.set_base_dir,
+      Arg.String Secure.set_bases_dir,
       Fmt.str
         "<DIR> Specify where the 'bases' directory is installed (default %S)"
-        (Dirs.name Secure.default_base_dir) );
+        (Dirs.name Secure.default_bases_dir) );
     ("", Arg.Unit (fun () -> ()), "");
     ("-fn", Arg.Set fnames, " first names");
     ("-fna", Arg.Set fname_aliases, " first name aliases (only with -binary)");
@@ -445,14 +445,14 @@ let usage = "Usage: cache_files [options] base\nwhere [options] are:"
 
 let () =
   Arg.parse speclist anonfun usage;
-  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_bases_dir ".";
   validate_options ();
   let bname = Filename.remove_extension (Filename.basename !bname) in
 
-  Driver.with_database (Secure.base_dir () // bname) @@ fun base ->
+  Driver.with_database (Secure.bases_dir () // bname) @@ fun base ->
   let gen_dl = should_gen_datalist () in
   let gen_cd = should_gen_checkdata () in
-  text_dir := Secure.base_dir () // "etc" // bname // "cache";
+  text_dir := Secure.bases_dir () // "etc" // bname // "cache";
   if gen_dl then Filesystem.create_dir ~parent:true !text_dir;
 
   width := String.length (Geneweb.GWPARAM.cache_d bname // bname) + 30;

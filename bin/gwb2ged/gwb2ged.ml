@@ -27,7 +27,7 @@ let ( // ) = Filename.concat
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun usage;
-  Secure.set_base_dir !opts.bases_dir;
+  Secure.set_bases_dir !opts.bases_dir;
   if !opts.Gwexport.charset = Gwexport.Ansel then
     Printf.eprintf "%s\n%!" ansel_warning;
   match !bname with

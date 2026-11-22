@@ -537,7 +537,7 @@ let mem = ref false
 let d_mode = ref false
 let ad_mode = ref false
 let html = ref false
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let speclist =
   [
@@ -582,7 +582,7 @@ let load_base f k =
 
 let main () =
   Arg.parse speclist anon_fun usage_msg;
-  Secure.set_base_dir !bases_dir;
+  Secure.set_bases_dir !bases_dir;
   (match List.rev !anon_args with
   | [ ba; bb ] ->
       in_file1 := ba;

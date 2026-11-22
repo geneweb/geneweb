@@ -24,7 +24,7 @@ type t = { fingerprint : string; built : float; synchro_len : int }
 let magic = "GWNOTES"
 let current_version = 3
 let ( // ) = Filename.concat
-let gwb_dir bname = Secure.base_dir () // (bname ^ ".gwb")
+let gwb_dir bname = Secure.bases_dir () // (bname ^ ".gwb")
 
 (* The "base" file of a .gwb is only rewritten by a full rebuild (gwc,
    gwfixbase...), which also renumbers persons and families; commits from

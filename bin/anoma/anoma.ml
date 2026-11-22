@@ -23,9 +23,9 @@ let () =
     Arg.align
       [
         ( "-bd",
-          Arg.String Secure.set_base_dir,
+          Arg.String Secure.set_bases_dir,
           Printf.sprintf "<DIR> bases directory (default %S)"
-            (Dirs.path Secure.default_base_dir) );
+            (Dirs.path Secure.default_bases_dir) );
         ("-fold", Arg.Set fold_only, " only merge the pending verifications");
         ( "-no-check",
           Arg.Set no_check,
@@ -42,7 +42,7 @@ let () =
     Arg.usage speclist usage;
     exit 2);
   let bname = Filename.remove_extension (Filename.basename !bname) in
-  let bdir = Filename.concat (Secure.base_dir ()) (bname ^ ".gwb") in
+  let bdir = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb") in
   if not (Sys.file_exists bdir) then (
     Printf.eprintf "anoma: no base %s\n" bdir;
     exit 2);
@@ -50,7 +50,7 @@ let () =
      let verbose = Unix.isatty Unix.stderr in
      let anomalies =
        Driver.with_database
-         (Filename.concat (Secure.base_dir ()) bname)
+         (Filename.concat (Secure.bases_dir ()) bname)
          (fun base ->
            let anomalies = Anomaly.collect ~verbose base in
            Anomaly.write ~verbose ~signatures:(not !no_check) ~base ~bdir

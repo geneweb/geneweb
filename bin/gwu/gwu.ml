@@ -60,7 +60,7 @@ let ( // ) = Filename.concat
 
 let () =
   let opts, bname = parse_cmd () in
-  Secure.set_base_dir !opts.bases_dir;
+  Secure.set_bases_dir !opts.bases_dir;
   let name =
     if !Gwexport.out_file = "" then !opts.bases_dir // (bname ^ ".gw")
     else Gwexport.resolve_out_file !opts
@@ -113,7 +113,7 @@ let () =
   if not !GwuLib.raw_output then oc "encoding: utf-8\n";
   if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
   let in_dir =
-    let full = Filename.concat (Secure.base_dir ()) bname in
+    let full = Filename.concat (Secure.bases_dir ()) bname in
     if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
   in
   GwuLib.prepare_free_occ base;

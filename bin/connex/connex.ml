@@ -16,7 +16,7 @@ let cnt_for_delete = ref 0
 let exact = ref false
 let bname = ref None
 let is_html () = !output <> None
-let bases_dir = ref (Dirs.path Secure.default_base_dir)
+let bases_dir = ref (Dirs.path Secure.default_bases_dir)
 
 let format_date () =
   let t = Unix.localtime (Unix.gettimeofday ()) in
@@ -311,7 +311,7 @@ let speclist =
 
 let () =
   Arg.parse speclist (fun s -> bname := Some s) usage;
-  Secure.set_base_dir !bases_dir;
+  Secure.set_bases_dir !bases_dir;
   (match !output with
   | Some file ->
       let file =

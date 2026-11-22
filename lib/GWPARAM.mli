@@ -4,7 +4,6 @@ val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
 val cnt_dir : string ref
-val bases : string ref
 
 val reorg : bool ref
 (** set to true when base is in reorg format *)
@@ -46,7 +45,7 @@ val base_config_dir : string -> string
 (** [base_config_dir bname] is [<bases>/<bname>.gwb/config], whatever the mode
     (reorg or classic), for per-base working files such as the anomalies report
     and its whitelist. The directory alone does not make the base reorg: only
-    [config/<bname>.gwf] does. Requires [Secure.set_base_dir]. *)
+    [config/<bname>.gwf] does. Requires [Secure.set_bases_dir]. *)
 
 val is_reorg_base : string -> bool
 (** returns true iff mybase.gwb/config/mybase.gwf exists *)
@@ -74,7 +73,7 @@ module Default : sig
   val albums_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ())] *)
+  (** [Filename.concat (Secure.bases_dir ())] *)
 end
 
 module Legacy : sig
@@ -90,7 +89,7 @@ module Legacy : sig
   val albums_d : string -> string
 
   val bpath : string -> string
-  (** [Filename.concat (Secure.base_dir ()) (string ^ ".gwb") ] *)
+  (** [Filename.concat (Secure.bases_dir ()) (string ^ ".gwb") ] *)
 end
 
 val output_error :

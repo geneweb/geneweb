@@ -271,7 +271,7 @@ let load_lexicon =
         if Sys.file_exists f then f
         else
           let bf =
-            Filename.concat (Secure.base_dir ()) (Filename.concat "lang" fname)
+            Filename.concat (Secure.bases_dir ()) (Filename.concat "lang" fname)
           in
           if Sys.file_exists bf then bf else fname
       in
@@ -453,7 +453,7 @@ let unauth_server conn conf ar =
   Notif.error
     ~title:(transl conf "NOTIF_TT access refused")
     (transl conf "NOTIF access refused");
-  let bfile = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb") in
+  let bfile = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb") in
   try
     Request.w_base ~none:ignore
       (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
@@ -672,7 +672,7 @@ let allowed_denied_titles key base_env () =
     let fname = List.assoc key base_env in
     if fname = "" then []
     else
-      let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
+      let ic = Secure.open_in (Filename.concat (Secure.bases_dir ()) fname) in
       let rec loop set =
         let line, eof =
           try (input_line ic, false) with End_of_file -> ("", true)
@@ -2434,7 +2434,7 @@ let parse_cmd () =
   match Cmd.parse () with
   | `Ok o ->
       selected_port := o.port;
-      Secure.set_base_dir o.base_dir;
+      Secure.set_bases_dir o.bases_dir;
       gw_prefix := Some o.gw_prefix;
       images_prefix := Some o.images_prefix;
       images_dir := o.images_dir;

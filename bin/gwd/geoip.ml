@@ -1,5 +1,5 @@
 let file () =
-  Filename.concat (Filename.concat (Secure.base_dir ()) "etc") "ip_country.csv"
+  Filename.concat (Filename.concat (Secure.bases_dir ()) "etc") "ip_country.csv"
 
 let unknown = "ZZ"
 
