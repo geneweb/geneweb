@@ -211,3 +211,11 @@
   $ gwc -bd . -reindex nobase
   Database "nobase" not found.
   [2]
+
+  $ gwc -bd . -reindex galichet.gwb
+  Index generation: 0 min 0 sec
+
+  $ gwc -bd . -o "foo bar"
+  gwc: "foo bar" is not a valid database name.
+  Allowed characters: a..z, A..Z, 0..9, -
+  [2]

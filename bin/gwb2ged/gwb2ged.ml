@@ -13,7 +13,7 @@ let bname = ref None
 
 let anonfun s =
   match !bname with
-  | None -> bname := Some s
+  | None -> bname := Some (Geneweb.GWPARAM.bname_of_arg ~prog:"gwb2ged" s)
   | Some _ -> raise (Arg.Bad "Cannot treat several databases")
 
 let usage = "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] base"

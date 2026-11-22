@@ -15,6 +15,16 @@ val bpath : string -> string
 (** [bpath bname] is the directory of the database [bname],
     [<bases_dir>/<bname>.gwb], in both layouts. *)
 
+val bname_of_string : string -> string option
+(** [bname_of_string s] is the name of the database given as [s] on a command
+    line, without its [.gwb] suffix, if this name is not empty and valid
+    ({!Mutil.good_name}). *)
+
+val bname_of_arg : prog:string -> string -> string
+(** [bname_of_arg ~prog s] is [bname_of_string s] for an argument of the command
+    [prog]. If [s] does not name a database, it prints an error and exits with
+    code 2. *)
+
 val config_reorg : string -> string
 val config_legacy : string -> string
 

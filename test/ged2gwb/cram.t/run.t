@@ -212,3 +212,8 @@ Check the support for UTF-16 BE encoding with BOM mark
   Convert to UTF-8 first:
   iconv -f UTF-16BE -t UTF-8 UHLBOMCL.GED > UHLBOMCL_UTF8.GED
   [2]
+
+  $ ged2gwb -bd . SIMPLE.GED -o "foo bar"
+  ged2gwb: "foo bar" is not a valid database name.
+  Allowed characters: a..z, A..Z, 0..9, -
+  [2]

@@ -585,8 +585,8 @@ let main () =
   Secure.set_bases_dir !bases_dir;
   (match List.rev !anon_args with
   | [ ba; bb ] ->
-      in_file1 := ba;
-      in_file2 := bb
+      in_file1 := Geneweb.GWPARAM.bname_of_arg ~prog:"gwdiff" ba;
+      in_file2 := Geneweb.GWPARAM.bname_of_arg ~prog:"gwdiff" bb
   | _ ->
       Printf.eprintf "Error: Expected exactly 2 base names\n";
       Arg.usage speclist usage_msg;

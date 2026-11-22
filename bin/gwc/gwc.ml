@@ -293,7 +293,7 @@ let parse_cmd () =
   let inputs = List.rev !rev_inputs in
   if !reindex && inputs <> [] then
     raise_bad "-reindex rebuilds an existing base and takes no input file.";
-  let bname = parse_output inputs !output in
+  let bname = GWPARAM.bname_of_arg ~prog:"gwc" (parse_output inputs !output) in
   (* derive only now, once all options (incl. -bd) are known *)
   (if !bases_dir = None then
      match inputs with

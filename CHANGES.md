@@ -376,6 +376,13 @@
   effect (#2594).
 - The `referer` and `has_referer` template variables are removed. The
   `%w` and `%W` macros of base source files print nothing.
+- The tools take the name of a base, with or without its `.gwb` suffix,
+  made of the letters a-z and A-Z, the digits 0-9 and `-`, and refuse
+  any other: they no longer take a path (`gwu`, `cache_files` and
+  `anoma` ignored its directory), `gwdiff` compares two bases of the
+  bases directory (`-bd`), and `gwc` no longer creates a base whose
+  name, given by `-o` or taken from its input file, has other
+  characters.
 
 ## Build system
 The camlp5 dependency has been removed. The GEDCOM date grammar and the stream
