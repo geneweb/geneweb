@@ -41,8 +41,8 @@ let () =
       exit 2
   | Some bname ->
       if !verbosity = 0 then Mutil.verbose := false;
-      let bpath = Filename.concat !bases_dir bname in
       Secure.set_bases_dir !bases_dir;
+      let bpath = Geneweb.GWPARAM.bpath bname in
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Logs.err (fun k -> k "%a" Lock.pp_exception (exn, bt));

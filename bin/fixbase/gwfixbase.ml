@@ -265,7 +265,7 @@ let main () =
       Arg.usage speclist usage;
       exit 2
   | Some bname ->
-      let bpath = Filename.concat !bases_dir bname in
+      let bpath = GWPARAM.bpath bname in
       let lock_file = Mutil.lock_file bpath in
       let on_exn exn bt =
         Format.eprintf "%a@." Lock.pp_exception (exn, bt);

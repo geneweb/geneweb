@@ -323,7 +323,7 @@ let () =
       let oc = open_out file in
       Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout
   | None -> ());
-  let bpath = Filename.concat !bases_dir (Option.value ~default:"" !bname) in
+  let bpath = Geneweb.GWPARAM.bpath (Option.value ~default:"" !bname) in
   let run () =
     Driver.with_database bpath (fun base -> compute_connex base bpath)
   in
