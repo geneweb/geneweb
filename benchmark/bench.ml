@@ -110,6 +110,9 @@ let bench () =
   in
   match Sys.getenv_opt "BENCH_BASE" with
   | Some bpath when bpath <> "" ->
+      let bpath =
+        if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
+      in
       let conf = Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
         Secure.set_bases_dir (Filename.dirname bpath);

@@ -400,7 +400,7 @@ let macro conf = function
       in
       match
         Geneweb_db.Driver.base_format_status_of_dir
-          (base_path (strip_spaces (s_getenv conf.env "anon")))
+          (base_path (strip_spaces (s_getenv conf.env "anon") ^ ".gwb"))
       with
       | Current -> ""
       | Older _ ->

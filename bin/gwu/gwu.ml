@@ -73,7 +73,8 @@ let () =
       Gwexport.oc = (name, output_string oc, fun () -> close_out oc);
     };
   let opts = !opts in
-  Driver.with_database (opts.bases_dir // bname) @@ fun base ->
+  let bpath = Geneweb.GWPARAM.bpath bname in
+  Driver.with_database bpath @@ fun base ->
   let select = Gwexport.select base opts [] in
   let src_oc_ht = Hashtbl.create 1009 in
   Driver.load_ascends_array base;
@@ -113,10 +114,6 @@ let () =
   let _ofile, oc, close = opts.Gwexport.oc in
   if not !GwuLib.raw_output then oc "encoding: utf-8\n";
   if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
-  let bpath =
-    let full = Filename.concat (Secure.bases_dir ()) bname in
-    if Filename.check_suffix full ".gwb" then full else full ^ ".gwb"
-  in
   GwuLib.prepare_free_occ base;
   GwuLib.gwu opts !isolated base bpath !out_dir src_oc_ht select;
   Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;

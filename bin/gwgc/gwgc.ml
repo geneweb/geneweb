@@ -17,7 +17,7 @@ let () =
     | "" ->
         Arg.usage speclist usage;
         exit 1
-    | s -> s
+    | s -> if Filename.check_suffix s ".gwb" then s else s ^ ".gwb"
   in
   let dry_run = !dry_run in
   Secure.set_bases_dir (Filename.dirname bpath);

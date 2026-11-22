@@ -449,7 +449,7 @@ let () =
   validate_options ();
   let bname = !bname in
 
-  Driver.with_database (Secure.bases_dir () // bname) @@ fun base ->
+  Driver.with_database (Geneweb.GWPARAM.bpath bname) @@ fun base ->
   let gen_dl = should_gen_datalist () in
   let gen_cd = should_gen_checkdata () in
   text_dir := Secure.bases_dir () // "etc" // bname // "cache";

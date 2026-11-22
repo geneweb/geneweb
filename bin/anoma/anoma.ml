@@ -49,9 +49,7 @@ let () =
   (if not !fold_only then
      let verbose = Unix.isatty Unix.stderr in
      let anomalies =
-       Driver.with_database
-         (Filename.concat (Secure.bases_dir ()) bname)
-         (fun base ->
+       Driver.with_database bpath (fun base ->
            let anomalies = Anomaly.collect ~verbose base in
            Anomaly.write ~verbose ~signatures:(not !no_check) ~base ~bpath
              ~producer:"anoma" anomalies;

@@ -22,8 +22,6 @@ let ansel_warning =
   "Warning: ANSEL charset was administratively withdrawn in 2013. UTF-8 is \
    recommended for new GEDCOM files."
 
-let ( // ) = Filename.concat
-
 let () =
   let opts = ref Gwexport.default_opts in
   Arg.parse (speclist opts) anonfun usage;
@@ -43,6 +41,6 @@ let () =
           (oc, path, fun () -> close_out oc)
       in
       opts := { !opts with Gwexport.oc = (name, output_string oc, close) };
-      Driver.with_database (!opts.bases_dir // bname) @@ fun base ->
+      Driver.with_database (Geneweb.GWPARAM.bpath bname) @@ fun base ->
       let select = Gwexport.select base !opts [] in
       Gwb2gedLib.gwb2ged base !with_indexes !opts select

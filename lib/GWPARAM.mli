@@ -13,7 +13,9 @@ val force : bool ref
 
 val bpath : string -> string
 (** [bpath bname] is the directory of the database [bname],
-    [<bases_dir>/<bname>.gwb], in both layouts. *)
+    [<bases_dir>/<bname>.gwb], in both layouts.
+    @raise Invalid_argument if [bname] is not a valid name ({!Mutil.good_name}).
+*)
 
 val bname_of_string : string -> string option
 (** [bname_of_string s] is the name of the database given as [s] on a command

@@ -571,7 +571,7 @@ let usage_msg =
   "Usage: " ^ Sys.argv.(0) ^ " [options] base1 base2\nOptions are: "
 
 let load_base f k =
-  Driver.with_database f (fun base ->
+  Driver.with_database (Geneweb.GWPARAM.bpath f) (fun base ->
       Driver.load_ascends_array base;
       Driver.load_strings_array base;
       if not !mem then (
@@ -606,8 +606,6 @@ let main () =
   let resolve f =
     if Filename.is_relative f then Filename.concat !bases_dir f else f
   in
-  in_file1 := resolve !in_file1;
-  in_file2 := resolve !in_file2;
   (if !out_file <> "" then
      let oc = open_out (resolve !out_file) in
      Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stdout);

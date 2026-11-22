@@ -39,9 +39,6 @@ let parse_cmd () =
   (!bname, get_bases_dir ())
 
 let compute base bpath =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let db = ref [] in
@@ -208,8 +205,6 @@ let compute base bpath =
 
   Notes.save_cache_linked_pages bpath cache_linked_pages
 
-let ( // ) = Filename.concat
-
 let main () =
   let bname, bases_dir = parse_cmd () in
   Secure.set_bases_dir bases_dir;
@@ -218,7 +213,7 @@ let main () =
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
-  let bpath = bases_dir // bname in
+  let bpath = GWPARAM.bpath bname in
   Driver.with_database bpath @@ fun base ->
   Sys.catch_break true;
   Driver.load_strings_array base;

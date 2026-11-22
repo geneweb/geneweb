@@ -15,7 +15,10 @@ let gwd_cmd = ref ""
 let reorg = ref false
 let force = ref false
 let cnt_dir = ref ""
-let bpath bname = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb")
+
+let bpath bname =
+  if not (Mutil.good_name bname) then invalid_arg "GWPARAM.bpath";
+  Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb")
 
 let bname_of_string s =
   let bname =

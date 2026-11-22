@@ -46,8 +46,8 @@ val magic_of_version : Dbdisk.base_version -> string
 
 val base_format_of_dir : string -> string
 (** [base_format_of_dir bpath] is the header of the {i base} file of the
-    database at [bpath] (with or without its [.gwb] suffix), without opening the
-    database; [""] if it cannot be read. *)
+    database at [bpath], without opening the database; [""] if it cannot be
+    read. *)
 
 type base_format_status =
   | Current  (** Written by this version. *)
@@ -58,9 +58,9 @@ type base_format_status =
           or [""] if the {i base} file cannot be read at all. *)
 
 val base_format_status_of_dir : string -> base_format_status
-(** [base_format_status_of_dir bpath] tells whether the database at [bpath]
-    (with or without its [.gwb] suffix) can be read by this version, from the
-    headers of its {i base} and {i patches} files only. *)
+(** [base_format_status_of_dir bpath] tells whether the database at [bpath] can
+    be read by this version, from the headers of its {i base} and {i patches}
+    files only. *)
 
 (* Ajout pour l'API *)
 

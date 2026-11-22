@@ -675,9 +675,6 @@ let magic_of_version version =
   | GnWb0020 -> Dutil.magic_GnWb0020
 
 let base_format_of_dir bpath =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   read_header (Filename.concat bpath "base") read_base_magic
 
 module type X = sig
@@ -989,9 +986,6 @@ let input_patches ~witness_notes bpath =
 type base_format_status = Current | Older of string | Unreadable of string
 
 let base_format_status_of_dir bpath =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   let found = base_format_of_dir bpath in
   match base_version_of_magic found with
   | None -> Unreadable found
@@ -1062,9 +1056,6 @@ let try_with_open openfun s f =
 let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
 
 let with_database ?(read_only = false) ?(with_patches = true) bpath k =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   let tm_fname = bpath // "commit_timestamp" in
   let version =
     let fname = bpath // "base" in
@@ -1592,9 +1583,6 @@ let record_access_of tab =
   }
 
 let make bpath particles ((persons, families, strings, bnotes) as _arrays) k =
-  let bpath =
-    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
-  in
   Filesystem.create_dir ~parent:true (bpath // "notes_d");
   (* wiznotes sera créé seulement si nécessaire par db1link.ml *)
   Filesystem.create_file (bpath // "notes");
