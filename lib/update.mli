@@ -198,9 +198,8 @@ val print_already_saved : config -> unit
 
 val error_bulk : config -> BulkStatus.t -> 'exn
 (** [error_bulk conf st] prints the page telling that the bulk task [st] holds
-    the lock of the base: the request has not been applied, and is resubmitted
-    automatically after a few seconds (or with the "try again" button). Raises
-    [ModErr UERR_locked_base]. *)
+    the lock of the base: the request has not been applied, and can be posted
+    again with the "try again" button. Raises [ModErr UERR_locked_base]. *)
 
 val error_digest : config -> 'exn
 (** [error_digest conf] reports that the base changed since the form was
