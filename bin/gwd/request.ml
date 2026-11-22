@@ -248,29 +248,45 @@ let w_nonce fn conn conf (base_name : string option) =
       Update.print_already_saved conf
   | Some _ | None -> fn conn conf base_name
 
-(* The lock is first tried without waiting: when it is held by a bulk task
-   (see [w_bulk]), the wizard is told so ([onbulk]) instead of waiting for
-   the end of the task; otherwise the lock is waited for, as before. *)
+(* How long a write request tries the lock of its base. It must stay well
+   below the time limit of a request (-conn_tmout, 120 s by default), past
+   which the worker exits with "Time out" and the entry is lost, and below
+   the timeout of a proxy in front of gwd. *)
+let lock_deadline = 10.
+
+(* The lock is tried without waiting, again and again until [lock_deadline]:
+   a request never blocks on the lock, and is never killed by the time limit
+   while waiting for it. When the lock is held by a bulk task (see [w_bulk]),
+   checked at each try, the wizard is told so at once ([onbulk]); past the
+   deadline, the base being still busy, the wizard is offered to post the
+   request again ([onerror]). *)
 let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
   let bpath = GWPARAM.bpath conf.bname in
   let lock_file = Mutil.lock_file bpath in
-  let run () = fn conn conf base_name in
-  (* FIXME: we lost the backtrace because onerror does not handle it. *)
-  let wait () =
-    Lock.control
-      ~on_exn:(fun _exn _bt -> onerror conn conf base_name)
-      ~wait:true ~lock_file run
+  let deadline = Unix.gettimeofday () +. lock_deadline in
+  let bulk () =
+    match onbulk with
+    | None -> None
+    | Some onbulk ->
+        Option.map (onbulk conn conf base_name) (BulkStatus.read bpath)
   in
-  match onbulk with
-  | None -> wait ()
-  | Some onbulk ->
-      Lock.control ~wait:false ~lock_file run ~on_exn:(fun exn _bt ->
-          match exn with
-          | Unix.Unix_error ((Unix.EAGAIN | Unix.EACCES), _, _) -> (
-              match BulkStatus.read bpath with
-              | Some st -> onbulk conn conf base_name st
-              | None -> wait ())
-          | _ -> wait ())
+  (* FIXME: we lost the backtrace because onerror does not handle it. *)
+  let rec loop () =
+    Lock.control ~wait:false ~lock_file
+      (fun () -> fn conn conf base_name)
+      ~on_exn:(fun exn _bt ->
+        match exn with
+        | Unix.Unix_error ((Unix.EAGAIN | Unix.EACCES), _, _) -> (
+            match bulk () with
+            | Some x -> x
+            | None ->
+                if Unix.gettimeofday () < deadline then (
+                  Unix.sleepf 0.1;
+                  loop ())
+                else onerror conn conf base_name)
+        | _ -> onerror conn conf base_name)
+  in
+  loop ()
 
 (* To be put inside [w_lock]: marks the base as held by a bulk task for the
    requests arriving meanwhile. *)

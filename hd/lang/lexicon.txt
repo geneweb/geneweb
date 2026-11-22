@@ -13252,17 +13252,6 @@ sl: je ena in ista oseba!
 sv: det är samma person!
 tr: aynı kişi!
 
-    it will be resubmitted automatically in %s seconds
-de: sie wird in %s Sekunden automatisch erneut gesendet
-en: it will be resubmitted automatically in %s seconds
-es: se volverá a enviar automáticamente dentro de %s segundos
-fr: elle sera renvoyée automatiquement dans %s secondes
-it: sarà inviata di nuovo automaticamente tra %s secondi
-nl: het wordt over %s seconden automatisch opnieuw verzonden
-pl: zostanie automatycznie wysłane ponownie za %s sekund
-pt: será reenviado automaticamente dentro de %s segundos
-sv: den skickas automatiskt igen om %s sekunder
-
     itree
 co: arburu in I
 de: I-Baum

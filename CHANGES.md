@@ -231,6 +231,13 @@
   and notes of events are merged line by line likewise. A form opened on a
   section of a note is displayed again on the whole note. The note
   forms of the base are watched like the person and family forms.
+- A request saved while the base is locked no longer waits for the lock
+  without limit, until the time limit of the request killed its worker
+  ("Time out", the entry lost) or the proxy gave up: it tries the lock
+  for ten seconds, then shows the page offering to post it again. A bulk
+  task taking the lock meanwhile is reported at once, the marker being
+  read at each try, and the page of a bulk task offers to post the
+  request again instead of resubmitting it after fifteen seconds.
 - A person, family or note form posted again after it was saved (a
   double click, the browser after an error of the proxy, a page offering
   to post it again) is no longer applied twice, creating a family or a

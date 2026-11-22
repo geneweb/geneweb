@@ -965,17 +965,10 @@ let def_error conf base x =
 
 (* The "try again" form, resubmitting the current request, and the "cancel"
    form of a page telling that the base is locked. *)
-let print_retry_forms ?form_id conf =
+let print_retry_forms conf =
   Output.print_sstring conf {|<table><tr><td><form method="post" action="|};
   Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"|};
-  Option.iter
-    (fun id ->
-      Output.print_sstring conf {| id="|};
-      Output.print_sstring conf id;
-      Output.print_sstring conf {|"|})
-    form_id;
-  Output.print_sstring conf ">";
+  Output.print_sstring conf {|">|};
   let aux env =
     List.iter
       (fun (x, v) ->
@@ -1045,8 +1038,6 @@ let print_already_saved conf =
     ip;
   Hutil.trailer conf
 
-let bulk_retry_delay = 15
-
 let error_bulk conf (st : BulkStatus.t) =
   let err = UERR_locked_base in
   prerr conf err @@ fun () ->
@@ -1065,15 +1056,8 @@ let error_bulk conf (st : BulkStatus.t) =
   Output.print_sstring conf {|)</small>.<br>|};
   Output.print_sstring conf
     (transl conf "your request has not been applied yet" |> Utf8.capitalize_fst);
-  Output.print_sstring conf ". ";
-  Output.print_sstring conf
-    (Printf.sprintf
-       (ftransl conf "it will be resubmitted automatically in %s seconds")
-       (Printf.sprintf {|<span id="bulk-retry-delay">%d</span>|}
-          bulk_retry_delay)
-    |> Utf8.capitalize_fst);
-  Output.print_sstring conf "</p></div>";
-  print_retry_forms ~form_id:"bulk-retry" conf
+  Output.print_sstring conf ".</p></div>";
+  print_retry_forms conf
 
 let error_digest conf =
   let err = UERR_digest in
