@@ -401,12 +401,12 @@ let safe_rename src dst =
     Filesystem.copy_file src dst;
     Mutil.rm src
 
-let test_size bname =
+let test_size bpath =
   (* Final size check for large bases (e.g. Roglo). Positions in the base
      file are unsigned 32-bit integers (see lib/db/position.mli): writing
      past 4 GiB raises Position.Overflow and no base is created. Warn at
      90% of that limit. *)
-  let base_file = Filename.concat bname "base" in
+  let base_file = Filename.concat bpath "base" in
   let sz = (Unix.LargeFile.stat base_file).Unix.LargeFile.st_size in
   let limit =
     0x1_0000_0000L
@@ -421,26 +421,26 @@ let test_size bname =
       base_file sz
       (100. *. Int64.to_float sz /. Int64.to_float limit)
 
-let remove_name_indexes bname =
+let remove_name_indexes bpath =
   List.iter
-    (fun f -> Mutil.rm (Filename.concat bname f))
+    (fun f -> Mutil.rm (Filename.concat bpath f))
     [ "snames.inx"; "snames.dat"; "fnames.inx"; "fnames.dat" ]
 
 let output base =
   (* create database directory *)
-  let bname = base.data.bdir in
-  if not (Sys.file_exists bname) then Unix.mkdir bname 0o755;
+  let bpath = base.data.bpath in
+  if not (Sys.file_exists bpath) then Unix.mkdir bpath 0o755;
   (* temporary files *)
-  let tmp_particles = Filename.concat bname "1particles.txt" in
-  let tmp_base = Filename.concat bname "1base" in
-  let tmp_base_acc = Filename.concat bname "1base.acc" in
-  let tmp_names_inx = Filename.concat bname "1names.inx" in
-  let tmp_names_acc = Filename.concat bname "1names.acc" in
-  let tmp_strings_inx = Filename.concat bname "1strings.inx" in
-  let tmp_index_inx = Filename.concat bname "1base.inx" in
-  let tmp_index_dat = Filename.concat bname "1base.dat" in
-  let tmp_notes = Filename.concat bname "1notes" in
-  let tmp_notes_d = Filename.concat bname "1notes_d" in
+  let tmp_particles = Filename.concat bpath "1particles.txt" in
+  let tmp_base = Filename.concat bpath "1base" in
+  let tmp_base_acc = Filename.concat bpath "1base.acc" in
+  let tmp_names_inx = Filename.concat bpath "1names.inx" in
+  let tmp_names_acc = Filename.concat bpath "1names.acc" in
+  let tmp_strings_inx = Filename.concat bpath "1strings.inx" in
+  let tmp_index_inx = Filename.concat bpath "1base.inx" in
+  let tmp_index_dat = Filename.concat bpath "1base.dat" in
+  let tmp_notes = Filename.concat bpath "1notes" in
+  let tmp_notes_d = Filename.concat bpath "1notes_d" in
   load_ascends_array base;
   load_unions_array base;
   load_couples_array base;
@@ -559,7 +559,7 @@ let output base =
        in
        loop 0 0
      in
-     let oc = Secure.open_out_bin @@ Filename.concat bname "nb_persons" in
+     let oc = Secure.open_out_bin @@ Filename.concat bpath "nb_persons" in
      output_value oc nbp;
      close_out oc
    with e ->
@@ -574,19 +574,19 @@ let output base =
      Mutil.rm tmp_index_dat;
      Mutil.rm_rf tmp_notes_d;
      raise e);
-  safe_rename tmp_base (Filename.concat bname "base");
-  safe_rename tmp_base_acc (Filename.concat bname "base.acc");
-  safe_rename tmp_names_inx (Filename.concat bname "names.inx");
-  safe_rename tmp_names_acc (Filename.concat bname "names.acc");
-  safe_rename tmp_strings_inx (Filename.concat bname "strings.inx");
-  safe_rename tmp_index_dat (Filename.concat bname "base.dat");
-  safe_rename tmp_index_inx (Filename.concat bname "base.inx");
-  safe_rename tmp_particles (Filename.concat bname "particles.txt");
-  Mutil.rm (Filename.concat bname "notes");
+  safe_rename tmp_base (Filename.concat bpath "base");
+  safe_rename tmp_base_acc (Filename.concat bpath "base.acc");
+  safe_rename tmp_names_inx (Filename.concat bpath "names.inx");
+  safe_rename tmp_names_acc (Filename.concat bpath "names.acc");
+  safe_rename tmp_strings_inx (Filename.concat bpath "strings.inx");
+  safe_rename tmp_index_dat (Filename.concat bpath "base.dat");
+  safe_rename tmp_index_inx (Filename.concat bpath "base.inx");
+  safe_rename tmp_particles (Filename.concat bpath "particles.txt");
+  Mutil.rm (Filename.concat bpath "notes");
   if Sys.file_exists tmp_notes then
-    Sys.rename tmp_notes (Filename.concat bname "notes");
+    Sys.rename tmp_notes (Filename.concat bpath "notes");
   if Sys.file_exists tmp_notes_d then (
-    let notes_d = Filename.concat bname "notes_d" in
+    let notes_d = Filename.concat bpath "notes_d" in
     if Sys.file_exists notes_d then Mutil.rm_rf notes_d;
     try Sys.rename tmp_notes_d notes_d
     with e ->
@@ -595,18 +595,18 @@ let output base =
            tmp_notes_d notes_d (Printexc.to_string e));
       Unix.sleepf 0.5;
       Sys.rename tmp_notes_d notes_d);
-  Mutil.rm (Filename.concat bname "patches");
-  Mutil.rm (Filename.concat bname "patches~");
-  Mutil.rm (Filename.concat bname "synchro_patches");
-  Mutil.rm (Filename.concat bname "notes_link");
-  Mutil.rm (Filename.concat bname "restrict");
-  Mutil.rm (Filename.concat bname "tstab_visitor");
-  remove_name_indexes bname;
+  Mutil.rm (Filename.concat bpath "patches");
+  Mutil.rm (Filename.concat bpath "patches~");
+  Mutil.rm (Filename.concat bpath "synchro_patches");
+  Mutil.rm (Filename.concat bpath "notes_link");
+  Mutil.rm (Filename.concat bpath "restrict");
+  Mutil.rm (Filename.concat bpath "tstab_visitor");
+  remove_name_indexes bpath;
   (* FIXME: should not be present in this part of the code? *)
-  Mutil.rm (Filename.concat bname "tstab");
-  Mutil.rm (Filename.concat bname "tstab_visitor");
+  Mutil.rm (Filename.concat bpath "tstab");
+  Mutil.rm (Filename.concat bpath "tstab_visitor");
   (* final test against 4Go size limit *)
-  test_size bname
+  test_size bpath
 
 let output_index base =
   let upgrade =
@@ -616,25 +616,25 @@ let output_index base =
     | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
         invalid_arg "Outbase.output_index: format earlier than GnWb0025"
   in
-  let bname = base.data.bdir in
-  let tmp_inx = Filename.concat bname "1base.inx" in
-  let tmp_dat = Filename.concat bname "1base.dat" in
+  let bpath = base.data.bpath in
+  let tmp_inx = Filename.concat bpath "1base.inx" in
+  let tmp_dat = Filename.concat bpath "1base.dat" in
   (try
      BaseIndex.output ~budget:!index_budget base.data ~inx:tmp_inx ~dat:tmp_dat
    with e ->
      Mutil.rm tmp_inx;
      Mutil.rm tmp_dat;
      raise e);
-  safe_rename tmp_dat (Filename.concat bname "base.dat");
-  safe_rename tmp_inx (Filename.concat bname "base.inx");
+  safe_rename tmp_dat (Filename.concat bpath "base.dat");
+  safe_rename tmp_inx (Filename.concat bpath "base.inx");
   if upgrade then (
     let oc =
       Secure.open_out_gen
         [ Open_wronly; Open_binary ]
         0
-        (Filename.concat bname "base")
+        (Filename.concat bpath "base")
     in
     Fun.protect
       ~finally:(fun () -> close_out oc)
       (fun () -> output_string oc Dutil.magic_GnWb0026);
-    remove_name_indexes bname)
+    remove_name_indexes bpath)

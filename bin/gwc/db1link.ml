@@ -1544,7 +1544,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic k =
+let make_base bpath gen per_index_ic per_ic k =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1596,7 +1596,7 @@ let make_base bname gen per_index_ic per_ic k =
     gen.g_base.c_strings <- [||];
     a
   in
-  Driver.make bname
+  Driver.make bpath
     (input_particles !particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
@@ -1611,8 +1611,8 @@ let write_file_contents fname text =
   close_out oc
 
 (** Create and fill a file for every wizard note *)
-let output_wizard_notes bdir wiznotes =
-  let wizdir = Filename.concat bdir "wiznotes" in
+let output_wizard_notes bpath wiznotes =
+  let wizdir = Filename.concat bpath "wiznotes" in
   if wiznotes <> [] then (
     (* FIXME ad hoc solution. wiznotes should be handled same as notes_d *)
     (* not necessarily true! notes_d is part of base, wiznotes is not *)
@@ -1624,8 +1624,8 @@ let output_wizard_notes bdir wiznotes =
       wiznotes)
 
 (** Create file that contains command used to call this program *)
-let output_command_line bdir =
-  let oc = open_out (Filename.concat bdir "command.txt") in
+let output_command_line bpath =
+  let oc = open_out (Filename.concat bpath "command.txt") in
   Printf.fprintf oc "%s" Sys.argv.(0);
   for i = 1 to Array.length Sys.argv - 1 do
     Printf.fprintf oc " %s" Sys.argv.(i)
@@ -1634,8 +1634,8 @@ let output_command_line bdir =
   close_out oc
 
 (** Link .gwo files and create a database. *)
-let link ?(no_warn = false) next_family_fun bdir =
-  let tmp_dir = Filename.concat bdir "gw_tmp" in
+let link ?(no_warn = false) next_family_fun bpath =
+  let tmp_dir = Filename.concat bpath "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
@@ -1693,7 +1693,7 @@ let link ?(no_warn = false) next_family_fun bdir =
   Hashtbl.clear gen.g_strings;
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
-  make_base bdir gen per_index_ic per_ic @@ fun base ->
+  make_base bpath gen per_index_ic per_ic @@ fun base ->
   Hashtbl.clear gen.g_patch_p;
   Gc.full_major ();
   close_in per_index_ic;
@@ -1713,13 +1713,13 @@ let link ?(no_warn = false) next_family_fun bdir =
   if not gen.g_errored then (
     Option.iter
       (fun anomalies ->
-        Anomaly.write ~base ~bdir ~producer:"gwc" (anomalies ()))
+        Anomaly.write ~base ~bpath ~producer:"gwc" (anomalies ()))
       anomalies;
     if !do_consang then (
       ignore @@ ConsangAll.compute base true;
       Driver.sync base);
-    output_wizard_notes bdir gen.g_wiznotes;
-    output_command_line bdir;
+    output_wizard_notes bpath gen.g_wiznotes;
+    output_command_line bpath;
     Mutil.rm_rf tmp_dir;
     true)
   else (

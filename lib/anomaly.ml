@@ -587,8 +587,8 @@ let latest a b =
   | Some _, None -> a
   | None, _ -> b
 
-let make ?(verbose = false) ?(signatures = true) ~base ~bdir ~producer anomalies
-    =
+let make ?(verbose = false) ?(signatures = true) ~base ~bpath ~producer
+    anomalies =
   let wanted = Hashtbl.create 4096 in
   List.iter
     (fun a ->
@@ -603,7 +603,7 @@ let make ?(verbose = false) ?(signatures = true) ~base ~bdir ~producer anomalies
     anomalies;
   let hist =
     history_changes ~verbose
-      ~history_file:(Filename.concat bdir "history")
+      ~history_file:(Filename.concat bpath "history")
       wanted
   in
   let history p =
@@ -1275,11 +1275,11 @@ let still_present base a =
         (persons a);
       !found
 
-let write ?(verbose = false) ?(signatures = true) ~base ~bdir ~producer
+let write ?(verbose = false) ?(signatures = true) ~base ~bpath ~producer
     anomalies =
-  let dir = Filename.concat bdir "config" in
+  let dir = Filename.concat bpath "config" in
   match
-    save dir (make ~verbose ~signatures ~base ~bdir ~producer anomalies)
+    save dir (make ~verbose ~signatures ~base ~bpath ~producer anomalies)
   with
   | () -> ()
   | exception (Sys_error msg | Failure msg) ->

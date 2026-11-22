@@ -126,20 +126,20 @@ let move_with_backup src dst =
    running `gwfixbase -index /path/to/base.gwb`
 *)
 let old_persons_of_first_name_or_surname base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
+  let proj, person_patches, names_inx, names_dat, bpath = params in
   let module IstrTree = Avl.Make (struct
     type t = int
 
     let compare = Dutil.compare_snames_i base_data
   end) in
-  let fname_dat = bname // names_dat in
+  let fname_dat = bpath // names_dat in
   let bt =
     let btr = ref None in
     fun () ->
       match !btr with
       | Some bt -> bt
       | None ->
-          let fname_inx = bname // names_inx in
+          let fname_inx = bpath // names_inx in
           Secure.with_open_in_bin fname_inx @@ fun ic_inx ->
           (*
           let ab1 = Gc.allocated_bytes () in
@@ -247,12 +247,12 @@ let binary_search_next arr cmp =
   aux None 0 (Array.length arr - 1)
 
 let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
-  let proj, person_patches, names_inx, names_dat, bname = params in
-  let fname_dat = bname // names_dat in
+  let proj, person_patches, names_inx, names_dat, bpath = params in
+  let fname_dat = bpath // names_dat in
   (* content of "snames.inx" *)
   let bt =
     lazy
-      (let fname_inx = bname // names_inx in
+      (let fname_inx = bpath // names_inx in
        Secure.with_open_in_bin fname_inx @@ fun ic_inx ->
        let bt : (int * int) array = input_value ic_inx in
        bt)
@@ -397,13 +397,13 @@ let persons_of_surname version dict_index base_data params =
 
 (* Search index for a given name in file names.inx *)
 
-let persons_of_name bname patches =
+let persons_of_name bpath patches =
   let t = ref None in
   fun s ->
     let i = Dutil.name_index s in
     let ai =
-      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
-      let fname_inx_acc = bname // "names.acc" in
+      Secure.with_open_in_bin (bpath // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bpath // "names.acc" in
       if Sys.file_exists fname_inx_acc then (
         Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
         seek_in ic_inx_acc (Iovalue.sizeof_long * i);
@@ -429,13 +429,13 @@ let persons_of_name bname patches =
           (Array.to_list ai) patches
     | exception Not_found -> Array.to_list ai
 
-let old_strings_of_fsname bname strings (_, person_patches) =
+let old_strings_of_fsname bpath strings (_, person_patches) =
   let t = ref None in
   fun s ->
     let i = Dutil.name_index s in
     let r =
-      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
-      let fname_inx_acc = bname // "names.acc" in
+      Secure.with_open_in_bin (bpath // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bpath // "names.acc" in
       if Sys.file_exists fname_inx_acc then (
         Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
         seek_in ic_inx_acc (Iovalue.sizeof_long * (Dutil.table_size + i));
@@ -475,14 +475,14 @@ let old_strings_of_fsname bname strings (_, person_patches) =
 (**)
 
 (** offset: 1 pour sname 2 pour fname *)
-let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
+let new_strings_of_fsname_aux offset_acc offset_inx split get bpath strings
     (_, person_patches) =
   let t = ref None in
   fun s ->
     let i = Dutil.name_index s in
     let r =
-      Secure.with_open_in_bin (bname // "names.inx") @@ fun ic_inx ->
-      let fname_inx_acc = bname // "names.acc" in
+      Secure.with_open_in_bin (bpath // "names.inx") @@ fun ic_inx ->
+      let fname_inx_acc = bpath // "names.acc" in
       if Sys.file_exists fname_inx_acc then (
         Secure.with_open_in_bin fname_inx_acc @@ fun ic_inx_acc ->
         seek_in ic_inx_acc
@@ -648,21 +648,21 @@ let records_have_current_layout ic ic_acc =
   (persons_len = 0 || first_record 0 person_fields)
   && (families_len = 0 || first_record (3 * persons_len) family_fields)
 
-let has_current_layout bname =
+let has_current_layout bpath =
   try
-    Secure.with_open_in_bin (Filename.concat bname "base.acc") @@ fun ic_acc ->
-    Secure.with_open_in_bin (Filename.concat bname "base") @@ fun ic ->
+    Secure.with_open_in_bin (Filename.concat bpath "base.acc") @@ fun ic_acc ->
+    Secure.with_open_in_bin (Filename.concat bpath "base") @@ fun ic ->
     ignore (read_base_magic ic : string);
     records_have_current_layout ic ic_acc
   with
   | Sys_error _ -> true
   | End_of_file | Failure _ -> false
 
-let readable_version bname version =
+let readable_version bpath version =
   match version with
   | GnWb0026 | GnWb0025 -> true
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
-      has_current_layout bname
+      has_current_layout bpath
 
 let magic_of_version version =
   match version with
@@ -674,11 +674,11 @@ let magic_of_version version =
   | GnWb0021 -> Dutil.magic_GnWb0021
   | GnWb0020 -> Dutil.magic_GnWb0020
 
-let base_format_of_dir bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+let base_format_of_dir bpath =
+  let bpath =
+    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
   in
-  read_header (Filename.concat bname "base") read_base_magic
+  read_header (Filename.concat bpath "base") read_base_magic
 
 module type X = sig
   val equal : string -> string -> bool
@@ -944,8 +944,8 @@ let patches_ht_of_old (o : Old.patches_ht) =
     h_name = o.h_name;
   }
 
-let input_patches ~witness_notes bname =
-  let fname = Filename.concat bname "patches" in
+let input_patches ~witness_notes bpath =
+  let fname = Filename.concat bpath "patches" in
   if Sys.file_exists fname then
     try
       Secure.with_open_in_bin fname @@ fun ic ->
@@ -988,17 +988,17 @@ let input_patches ~witness_notes bname =
 
 type base_format_status = Current | Older of string | Unreadable of string
 
-let base_format_status_of_dir bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+let base_format_status_of_dir bpath =
+  let bpath =
+    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
   in
-  let found = base_format_of_dir bname in
+  let found = base_format_of_dir bpath in
   match base_version_of_magic found with
   | None -> Unreadable found
-  | Some version when not (readable_version bname version) -> Unreadable found
+  | Some version when not (readable_version bpath version) -> Unreadable found
   | Some version -> (
       let patches_magic =
-        read_header (Filename.concat bname "patches") read_patch_magic
+        read_header (Filename.concat bpath "patches") read_patch_magic
       in
       if
         patches_magic <> magic_patch
@@ -1010,9 +1010,9 @@ let base_format_status_of_dir bname =
         | GnWb0025 | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 | GnWb0020 ->
             Older found)
 
-let input_synchro bname =
+let input_synchro bpath =
   try
-    Secure.with_open_in_bin (Filename.concat bname "synchro_patches")
+    Secure.with_open_in_bin (Filename.concat bpath "synchro_patches")
     @@ fun ic ->
     let r : synchro_patch = input_value ic in
     r
@@ -1061,18 +1061,18 @@ let try_with_open openfun s f =
 
 let try_with_open_bin s f = try_with_open Secure.open_in_bin s f
 
-let with_database ?(read_only = false) ?(with_patches = true) bname k =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+let with_database ?(read_only = false) ?(with_patches = true) bpath k =
+  let bpath =
+    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
   in
-  let tm_fname = bname // "commit_timestamp" in
+  let tm_fname = bpath // "commit_timestamp" in
   let version =
-    let fname = bname // "base" in
+    let fname = bpath // "base" in
     (* A missing or unreadable base file is reported like an unknown
        format, rather than as an uncaught Sys_error. *)
     let found = read_header fname read_base_magic in
     match base_version_of_magic found with
-    | Some version when readable_version bname version -> version
+    | Some version when readable_version bpath version -> version
     | Some _ ->
         raise
           (Dutil.Incompatible_format
@@ -1082,10 +1082,10 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
   in
   let witness_notes = has_witness_notes version in
   let patches_stamp =
-    if with_patches then BaseIndex.stamp (bname // "patches") else None
+    if with_patches then BaseIndex.stamp (bpath // "patches") else None
   in
   let patches =
-    if with_patches then input_patches ~witness_notes bname
+    if with_patches then input_patches ~witness_notes bpath
     else Ok (empty_patch_ht ())
   in
   let pending : patches_ht = empty_patch_ht () in
@@ -1105,7 +1105,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
             Printf.sprintf
               "%s exists: a previous commit was interrupted, the base is \
                read-only. Check %s (and %s if present), then remove %s"
-              tm_fname (bname // "patches") (bname // "1patches") tm_fname )
+              tm_fname (bpath // "patches") (bpath // "1patches") tm_fname )
         else (patches, RDRW, "")
     | Error msg ->
         ( empty_patch_ht (),
@@ -1126,10 +1126,10 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
           Printf.sprintf
             "base %s is in an earlier format, read-only until rebuilt (gwu \
              then gwc)"
-            bname )
+            bpath )
     | RDRW, GnWb0026 when not with_patches ->
         ( RDONLY,
-          Printf.sprintf "base %s is read without its patches, read-only" bname
+          Printf.sprintf "base %s is read without its patches, read-only" bpath
         )
     | RDRW, GnWb0026
     | ( RDONLY,
@@ -1138,12 +1138,12 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
         (perm, rdonly_reason)
   in
   let forbidden loc = HttpExn (Forbidden, loc ^ ": " ^ rdonly_reason) in
-  let fname = bname // "particles.txt" in
+  let fname = bpath // "particles.txt" in
   let particles =
     if Sys.file_exists fname then Mutil.input_particles fname
     else Mutil.input_particles !Mutil.particles_file
   in
-  Secure.with_open_in_bin (bname // "base") @@ fun ic ->
+  Secure.with_open_in_bin (bpath // "base") @@ fun ic ->
   ignore (read_base_magic ic : string);
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
@@ -1156,7 +1156,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
   let descends_array_pos = Position.input ic in
   let strings_array_pos = Position.input ic in
   let norigin_file = input_value ic in
-  try_with_open_bin (bname // "base.acc") @@ fun ic_acc ->
+  try_with_open_bin (bpath // "base.acc") @@ fun ic_acc ->
   let shift = 0 in
   let iper_exists =
     make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len
@@ -1173,7 +1173,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
         im_descends,
         im_strings ) : ro_data_records =
     let bid =
-      let s = Unix.stat bname in
+      let s = Unix.stat bpath in
       (s.st_dev, s.st_ino)
     in
     match List.find_opt (fun (n, _) -> bid = n) !cached_records with
@@ -1271,13 +1271,13 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     make_record_access im_strings patches.h_string pending.h_string strings_len
   in
   let commit_synchro () =
-    let tmp_fname = bname // "1synchro_patches" in
-    let fname = bname // "synchro_patches" in
+    let tmp_fname = bpath // "1synchro_patches" in
+    let fname = bpath // "synchro_patches" in
     let oc9 =
       try Secure.open_out_bin tmp_fname
       with Sys_error _ -> raise (Failure "the database is not writable")
     in
-    let synchro = input_synchro bname in
+    let synchro = input_synchro bpath in
     let synchro =
       let timestamp = string_of_float (Unix.time ()) in
       let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
@@ -1288,7 +1288,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     close_out oc9;
     move_with_backup tmp_fname fname
   in
-  let nbp_fname = bname // "nb_persons" in
+  let nbp_fname = bpath // "nb_persons" in
   let is_empty_name p =
     (0 = p.surname || 1 = p.surname) && (0 = p.first_name || 1 = p.first_name)
   in
@@ -1340,8 +1340,8 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       aux patches.h_descend pending.h_descend;
       aux patches.h_string pending.h_string;
       (* update "patches" file *)
-      let tmp_fname = bname // "1patches" in
-      let fname = bname // "patches" in
+      let tmp_fname = bpath // "1patches" in
+      let fname = bpath // "patches" in
       Secure.with_open_out_bin tm_fname (fun oc ->
           output_string oc (tm : Adef.safe_string :> string));
       Secure.with_open_out_bin tmp_fname (fun oc ->
@@ -1400,7 +1400,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     let string_of_id = strings.get
   end) in
   let inv_idx =
-    I.load version ~inx:(bname // "strings.inx")
+    I.load version ~inx:(bpath // "strings.inx")
       [ snd patches.h_string; snd pending.h_string ]
   in
   let insert_string s =
@@ -1447,7 +1447,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       else Filename.concat "notes_d" (fnotes ^ ".txt")
     in
     try
-      Secure.with_open_in_text (bname // fname) @@ fun ic ->
+      Secure.with_open_in_text (bpath // fname) @@ fun ic ->
       match rn_mode with
       | RnDeg -> if in_channel_length ic = 0 then "" else " "
       | Rn1Ln -> ( try input_line ic with End_of_file -> "")
@@ -1466,10 +1466,10 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       let fname =
         if fnotes = "" then "notes"
         else (
-          (try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with _ -> ());
+          (try Unix.mkdir (Filename.concat bpath "notes_d") 0o755 with _ -> ());
           Filename.concat "notes_d" (fnotes ^ ".txt"))
       in
-      let fname = Filename.concat bname fname in
+      let fname = Filename.concat bpath fname in
       (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
       (try Sys.rename fname (fname ^ "~") with _ -> ());
       if s <> "" then
@@ -1479,11 +1479,11 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     if perm = RDONLY then fun _ _ -> raise (forbidden __LOC__)
     else fun fnotes s ->
       if fnotes <> "" && s <> "" then (
-        let wiznotes_dir = Filename.concat bname "wiznotes" in
+        let wiznotes_dir = Filename.concat bpath "wiznotes" in
         let fname =
           (try
              if Sys.file_exists wiznotes_dir then ()
-             else Unix.mkdir (Filename.concat bname "wiznotes") 0o755
+             else Unix.mkdir (Filename.concat bpath "wiznotes") 0o755
            with _ -> ());
           Filename.concat wiznotes_dir (fnotes ^ ".txt")
         in
@@ -1501,7 +1501,7 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
         | File _ | Dir _ | Exn _ ->
             (* TODO: we may print a warning for errors. *)
             files)
-      (Filename.concat bname "nodes_d")
+      (Filename.concat bpath "nodes_d")
       []
   in
   let bnotes = { nread = read_notes; norigin_file; efiles = ext_files } in
@@ -1517,12 +1517,12 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
       particles_txt = particles;
       particles = lazy (Mutil.compile_particles particles);
       bnotes;
-      bdir = bname;
+      bpath;
       perm;
     }
   in
-  let persons_of_name = persons_of_name bname patches.h_name in
-  BaseIndex.with_reader bname ~particles:base_data.particles
+  let persons_of_name = persons_of_name bpath patches.h_name in
+  BaseIndex.with_reader bpath ~particles:base_data.particles
     {
       BaseIndex.file_person = im_persons.im_get;
       persons_len;
@@ -1544,22 +1544,22 @@ let with_database ?(read_only = false) ?(with_patches = true) bname k =
     {
       person_of_key = person_of_key persons strings persons_of_name;
       persons_of_name;
-      strings_of_sname = strings_of_sname version bname strings patches.h_person;
-      strings_of_fname = strings_of_fname version bname strings patches.h_person;
+      strings_of_sname = strings_of_sname version bpath strings patches.h_person;
+      strings_of_fname = strings_of_fname version bpath strings patches.h_person;
       persons_of_surname =
         persons_of_surname version dict_index base_data
           ( (fun p -> p.surname),
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
-            bname );
+            bpath );
       persons_of_first_name =
         persons_of_first_name version dict_index base_data
           ( (fun p -> p.first_name),
             snd patches.h_person,
             "fnames.inx",
             "fnames.dat",
-            bname );
+            bpath );
       dict_index;
       patch_person;
       patch_ascend;
@@ -1591,13 +1591,13 @@ let record_access_of tab =
     clear_array = (fun () -> ());
   }
 
-let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+let make bpath particles ((persons, families, strings, bnotes) as _arrays) k =
+  let bpath =
+    if Filename.check_suffix bpath ".gwb" then bpath else bpath ^ ".gwb"
   in
-  Filesystem.create_dir ~parent:true (bdir // "notes_d");
+  Filesystem.create_dir ~parent:true (bpath // "notes_d");
   (* wiznotes sera créé seulement si nécessaire par db1link.ml *)
-  Filesystem.create_file (bdir // "notes");
+  Filesystem.create_file (bpath // "notes");
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
   let data : Dbdisk.base_data =
@@ -1612,7 +1612,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) k =
       particles_txt = particles;
       particles = lazy (Mutil.compile_particles particles);
       bnotes;
-      bdir;
+      bpath;
       perm = RDRW;
     }
   in

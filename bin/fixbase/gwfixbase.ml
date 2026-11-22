@@ -6,8 +6,8 @@ module Collection = Geneweb_db.Collection
 
 let nb_ind_init = ref 0
 
-let dump_persons bname ofile =
-  Driver.with_database bname @@ fun base ->
+let dump_persons bpath ofile =
+  Driver.with_database bpath @@ fun base ->
   let nb_ind = Driver.nb_of_persons base in
   let nb_fam = Driver.nb_of_families base in
   let undef = ref 0 in
@@ -35,7 +35,7 @@ let dump_persons bname ofile =
     result;
   let real_count = List.length result in
   let check = real_count + !undef in
-  Printf.eprintf "Base %s\n" bname;
+  Printf.eprintf "Base %s\n" bpath;
   Printf.eprintf "Final state: %d persons (initial value %d), %d families\n"
     nb_ind !nb_ind_init nb_fam;
   Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"

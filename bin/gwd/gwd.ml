@@ -453,12 +453,12 @@ let unauth_server conn conf ar =
   Notif.error
     ~title:(transl conf "NOTIF_TT access refused")
     (transl conf "NOTIF access refused");
-  let bfile = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb") in
+  let bpath = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb") in
   try
     Request.w_base ~none:ignore
       (fun _ conf base -> SrcfileDisplay.print_welcome conf base)
       conn conf
-      (if Sys.file_exists bfile then Some bfile else None)
+      (if Sys.file_exists bpath then Some bpath else None)
   with Driver.Incompatible_format (file, found, expected) ->
     Request.print_incompatible_base conf (file, found, expected)
 

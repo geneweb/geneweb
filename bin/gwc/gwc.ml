@@ -82,9 +82,9 @@ let iterator_gwo_files bar inputs file_info =
     in
     next
 
-let generate_database ~no_warn ~bdir bar gwo_files =
+let generate_database ~no_warn ~bpath bar gwo_files =
   let iterator = iterator_gwo_files bar gwo_files in
-  match Db1link.link ~no_warn iterator bdir with
+  match Db1link.link ~no_warn iterator bpath with
   | exception Db1link.Critical_import_error msg ->
       Fmt.epr "CRITICAL ERROR: %s@." msg;
       exit 2
@@ -325,18 +325,18 @@ let cleanup gwo_files =
     gwo_files
 
 let reindex_database bname =
-  let bdir = !GWPARAM.bpath bname in
-  if not (Sys.file_exists bdir) then (
+  let bpath = !GWPARAM.bpath bname in
+  if not (Sys.file_exists bpath) then (
     Fmt.epr "Database %S not found.@." bname;
     exit 2);
   let on_exn exn bt =
     Fmt.epr "%a@." Lock.pp_exception (exn, bt);
     exit 2
   in
-  Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bdir)
+  Lock.control ~on_exn ~wait:false ~lock_file:(Mutil.lock_file bpath)
   @@ fun () ->
   let reindexed, duration =
-    with_timer @@ fun () -> Geneweb_db.Driver.reindex bdir
+    with_timer @@ fun () -> Geneweb_db.Driver.reindex bpath
   in
   if not reindexed then (
     Fmt.epr
@@ -370,8 +370,8 @@ let () =
       if !kill_gwo then cleanup gwo_files;
       Fmt.epr "Database %S already exists. Use -f to overwrite.@." bname;
       exit 2);
-    let bdir = GWPARAM.create_base_and_config bname in
-    let lock_file = Mutil.lock_file bdir in
+    let bpath = GWPARAM.create_base_and_config bname in
+    let lock_file = Mutil.lock_file bpath in
     let on_exn exn bt =
       Fmt.epr "%a@." Lock.pp_exception (exn, bt);
       exit 2
@@ -385,7 +385,7 @@ let () =
     let (), duration =
       with_timer @@ fun () ->
       ProgrBar.with_bar ~disabled:(not !prog) Format.std_formatter @@ fun bar ->
-      generate_database ~no_warn:!no_warn ~bdir bar gwo_files
+      generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
     if !kill_gwo then cleanup gwo_files)

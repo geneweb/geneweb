@@ -13,9 +13,9 @@ type t = {
 }
 
 val read : string -> t option
-(** [read bfile] is the marker of the base [bfile], if a bulk task is running. A
+(** [read bpath] is the marker of the base [bpath], if a bulk task is running. A
     marker whose process is gone, or older than 12 hours, is ignored. *)
 
 val with_marker : string -> command:string -> user:string -> (unit -> 'a) -> 'a
-(** [with_marker bfile ~command ~user k] runs [k] with the marker of [bfile]
+(** [with_marker bpath ~command ~user k] runs [k] with the marker of [bpath]
     set. To be called while holding the lock of the base. *)

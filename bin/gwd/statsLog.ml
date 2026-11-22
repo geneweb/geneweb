@@ -29,7 +29,7 @@ let period conf =
       | _ -> None)
   | None -> None
 
-let bfile conf = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
+let bpath conf = Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
 
 let cnt_file conf suffix =
   Filename.concat (Util.test_cnt_d conf) (conf.bname ^ suffix)
@@ -101,7 +101,7 @@ let snapshot conf ~window tm r =
       if with_countries then Robot.addresses conf window else [] )
   in
   let nb_persons, nb_families =
-    Driver.with_database (bfile conf) @@ fun base ->
+    Driver.with_database (bpath conf) @@ fun base ->
     (Driver.nb_of_real_persons base, Driver.nb_of_families base)
   in
   let total, wizards, friends =
@@ -126,7 +126,7 @@ let snapshot conf ~window tm r =
 let record conf ~window ~bytes_in ~bytes_out duration =
   match period conf with
   | None -> ()
-  | Some _ when conf.bname = "" || not (Sys.file_exists (bfile conf)) -> ()
+  | Some _ when conf.bname = "" || not (Sys.file_exists (bpath conf)) -> ()
   | Some period -> (
       let tm = Unix.time () in
       let fname = cnt_file conf "_qtime.txt" in

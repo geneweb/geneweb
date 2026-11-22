@@ -995,8 +995,8 @@ let get_persons_with_notes m list =
   in
   Array.fold_right List.cons m.m_chil list
 
-let notes_aliases bdir =
-  let fname = Filename.concat bdir "notes.alias" in
+let notes_aliases bpath =
+  let fname = Filename.concat bpath "notes.alias" in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
   | Some ic ->
       let rec loop list =
@@ -1666,7 +1666,7 @@ let rs_printf opts s =
   in
   loop true 0
 
-let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
+let gwu opts isolated base bpath out_dir src_oc_ht (per_sel, fam_sel) =
   if out_dir <> "" && not (Sys.file_exists out_dir) then
     Filesystem.create_dir ~parent:true out_dir;
   let to_separate = separate base in
@@ -1705,7 +1705,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       fam_done;
       notes_pl_p = [];
       ext_files = [];
-      notes_alias = notes_aliases in_dir;
+      notes_alias = notes_aliases bpath;
       pevents_pl_p = [];
     }
   in
@@ -1825,14 +1825,14 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       ignore (add_linked_files gen (fun _ -> "database notes") s [] : _ list));
     (try
        let files =
-         Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
+         Sys.readdir (Filename.concat bpath (Driver.base_wiznotes_dir base))
        in
        Array.sort compare files;
        for i = 0 to Array.length files - 1 do
          let file = files.(i) in
          if Filename.check_suffix file ".txt" then
            let wfile =
-             List.fold_left Filename.concat in_dir
+             List.fold_left Filename.concat bpath
                [ Driver.base_wiznotes_dir base; file ]
            in
            let s = read_file_contents wfile in
@@ -1881,7 +1881,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
 
     (* gen.ext_files does not list all files in notes_d. Format is note_link *)
     let ext_files_1 = List.map (fun (f, _) -> f) gen.ext_files in
-    let notes_d = Filename.concat in_dir (Driver.base_notes_dir base) in
+    let notes_d = Filename.concat bpath (Driver.base_notes_dir base) in
     let notes_d_length = String.length notes_d in
     let ext_files_2 =
       Filesystem.walk_folder ~recursive:true
@@ -1939,7 +1939,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
     in
     try
       let files =
-        Sys.readdir (Filename.concat in_dir (Driver.base_wiznotes_dir base))
+        Sys.readdir (Filename.concat bpath (Driver.base_wiznotes_dir base))
       in
       Array.sort compare files;
       for i = 0 to Array.length files - 1 do
@@ -1947,7 +1947,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         if Filename.check_suffix file ".txt" then (
           let wizid = Filename.chop_suffix file ".txt" in
           let wfile =
-            List.fold_left Filename.concat in_dir
+            List.fold_left Filename.concat bpath
               [ Driver.base_wiznotes_dir base; file ]
           in
           let s = String.trim (read_file_contents wfile) in

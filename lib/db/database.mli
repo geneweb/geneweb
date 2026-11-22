@@ -6,8 +6,8 @@ val with_database :
   string ->
   (Dbdisk.dsk_base -> 'a) ->
   'a
-(** [with_database ?read_only ?with_patches dbname k] initializes a [dsk_base]
-    structure from the database located in the specified directory [dbname].
+(** [with_database ?read_only ?with_patches bpath k] initializes a [dsk_base]
+    structure from the database located in the specified directory [bpath].
 
     Both data and functionality part are initialized. The continuation [k] is
     called with the [dsk_base] structure.
@@ -33,7 +33,7 @@ val make :
   * Def.base_notes ->
   (Dbdisk.dsk_base -> 'a) ->
   'a
-(** [make bname particles ((persons, ascendants, unions) (families, couples,
+(** [make bpath particles ((persons, ascendants, unions) (families, couples,
      descendants) strings base_notes) k] initializes a [dsk_base] structure with
     giving data. The continuation [k] is called with the [dsk_base] structure.
 
@@ -45,9 +45,9 @@ val magic_of_version : Dbdisk.base_version -> string
 (** Header written in the {i base} file of this version. *)
 
 val base_format_of_dir : string -> string
-(** [base_format_of_dir bname] is the header of the {i base} file of database
-    [bname] (with or without its [.gwb] suffix), without opening the database;
-    [""] if it cannot be read. *)
+(** [base_format_of_dir bpath] is the header of the {i base} file of the
+    database at [bpath] (with or without its [.gwb] suffix), without opening the
+    database; [""] if it cannot be read. *)
 
 type base_format_status =
   | Current  (** Written by this version. *)
@@ -58,9 +58,9 @@ type base_format_status =
           or [""] if the {i base} file cannot be read at all. *)
 
 val base_format_status_of_dir : string -> base_format_status
-(** [base_format_status_of_dir bname] tells whether the database [bname] (with
-    or without its [.gwb] suffix) can be read by this version, from the headers
-    of its {i base} and {i patches} files only. *)
+(** [base_format_status_of_dir bpath] tells whether the database at [bpath]
+    (with or without its [.gwb] suffix) can be read by this version, from the
+    headers of its {i base} and {i patches} files only. *)
 
 (* Ajout pour l'API *)
 
@@ -72,4 +72,5 @@ type synchro_patch = {
     ids, third - changed/added by considered commit families ids. *)
 
 val input_synchro : string -> synchro_patch
-(** Get [synchro_patch] from the giving database directory. *)
+(** [input_synchro bpath] gets the [synchro_patch] from the database directory
+    [bpath]. *)

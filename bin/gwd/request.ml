@@ -237,8 +237,8 @@ let try_plugin conn conf base_name meth =
    (see [w_bulk]), the wizard is told so ([onbulk]) instead of waiting for
    the end of the task; otherwise the lock is waited for, as before. *)
 let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
-  let bfile = !GWPARAM.bpath conf.bname in
-  let lock_file = Mutil.lock_file bfile in
+  let bpath = !GWPARAM.bpath conf.bname in
+  let lock_file = Mutil.lock_file bpath in
   let run () = fn conn conf base_name in
   (* FIXME: we lost the backtrace because onerror does not handle it. *)
   let wait () =
@@ -252,7 +252,7 @@ let w_lock ~onerror ?onbulk fn conn conf (base_name : string option) =
       Lock.control ~wait:false ~lock_file run ~on_exn:(fun exn _bt ->
           match exn with
           | Unix.Unix_error ((Unix.EAGAIN | Unix.EACCES), _, _) -> (
-              match BulkStatus.read bfile with
+              match BulkStatus.read bpath with
               | Some st -> onbulk conn conf base_name st
               | None -> wait ())
           | _ -> wait ())
@@ -332,14 +332,14 @@ let redirect_to_random_person conn conf base =
             [ "i"; "p"; "n"; "oc"; "file"; "rnd" ]
             [ Driver.Iper.to_string (Driver.get_iper p) ]))
 
-let w_base ~none fn conn conf (bfile : string option) =
-  match bfile with
+let w_base ~none fn conn conf (bpath : string option) =
+  match bpath with
   | None -> none conf
-  | Some bfile ->
-      let bname = Filename.basename bfile |> Filename.chop_extension in
+  | Some bpath ->
+      let bname = Filename.basename bpath |> Filename.chop_extension in
       (* make sure the various folders (portraits, images, ...) are located properly *)
       GWPARAM.set_reorg bname None;
-      Driver.with_database bfile (fun base ->
+      Driver.with_database bpath (fun base ->
           let conf = make_henv conn conf base in
           let conf = make_senv conn conf base in
           let conf =
@@ -378,7 +378,7 @@ let w_wizard fn conn conf base =
     (* FIXME: send authentification headers *)
     GWPARAM.output_error conf Code.Unauthorized
 
-(* The closures w_lock, w_base, w_person, print_page and handle_no_bfile
+(* The closures w_lock, w_base, w_person, print_page and handle_no_bpath
    are constructed once at module load time (treat_request being a value
    binding, not a function definition) and shared across every request.
    The actual per-request entry point is the [fun conf -> ...] at the
@@ -422,20 +422,20 @@ let treat_request =
          | _ -> person_selected conn conf base p)
       conn conf l
   in
-  let handle_no_bfile conn conf l =
+  let handle_no_bpath conn conf l =
     if conf.bname = "" then
       try Templ.output_simple conf Templ.Env.empty "index"
       with _ -> SrcfileDisplay.propose_base conf
     else print_page conn conf l
   in
   fun conn conf ->
-    let bfile =
+    let bpath =
       if conf.bname = "" then None
       else
-        let bfile =
+        let bpath =
           Filename.concat (Secure.bases_dir ()) (conf.bname ^ ".gwb")
         in
-        if Sys.file_exists bfile then Some bfile else None
+        if Sys.file_exists bpath then Some bpath else None
     in
     let process () =
       if
@@ -443,7 +443,7 @@ let treat_request =
         || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
       then (
         let old_format () =
-          match bfile with
+          match bpath with
           | Some f -> (
               match Driver.base_format_status_of_dir f with
               | Older _ -> true
@@ -458,22 +458,22 @@ let treat_request =
             (fun conn conf base ->
               request_issue conn conf base ~level:`Error
                 ~key:"wizards cant write")
-            conn conf bfile
+            conn conf bpath
         else if this_request_edits conf && old_format () then
           w_base
             (fun conn conf base ->
               request_issue conn conf base ~level:`Error
                 ~key:"old base format read only")
-            conn conf bfile
+            conn conf bpath
         else if p_getenv conf.env "rnd" = Some "1" then
-          w_base redirect_to_random_person conn conf bfile
+          w_base redirect_to_random_person conn conf bpath
         else
           let () =
             Registration.call_hooks (fun ~name hook ->
-                if List.mem name conf.allowed_plugins then hook conn conf bfile)
+                if List.mem name conf.allowed_plugins then hook conn conf bpath)
           in
           let m = Option.value ~default:"" (p_getenv conf.env "m") in
-          if not @@ try_plugin conn conf bfile m then
+          if not @@ try_plugin conn conf bpath m then
             ((if
                 List.assoc_opt "counter" conf.base_env <> Some "no"
                 && m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
@@ -502,16 +502,16 @@ let treat_request =
              let w_wizard hdl = w_wizard (fun _conn -> hdl) conn in
              match m with
              | "" -> (
-                 match bfile with
-                 | Some bfile -> (
+                 match bpath with
+                 | Some bpath -> (
                      (* We attempt to load the database in order to detect issues. *)
                      try
-                       Driver.with_database bfile ignore;
+                       Driver.with_database bpath ignore;
                        print_page conn
                      with
                      | Driver.Incompatible_format _ as exn -> raise exn
-                     | _ -> handle_no_bfile conn)
-                 | None -> handle_no_bfile conn)
+                     | _ -> handle_no_bpath conn)
+                 | None -> handle_no_bpath conn)
              | "A" -> w_base @@ w_person @@ AscendDisplay.print
              | "ADD_FAM" -> w_wizard @@ w_base @@ UpdateFam.print_add
              | "ADD_FAM_OK" ->
@@ -974,7 +974,7 @@ let treat_request =
                       (Util.escape_html m :> string));
                  let conf = Notif.inject_pending conf in
                  SrcfileDisplay.print_welcome conf base)
-              conf bfile)
+              conf bpath)
       else
         let title _ =
           Printf.sprintf "%s %s %s"

@@ -5,15 +5,15 @@
 
 type t = { command : string; user : string; started : float; pid : int }
 
-let file bfile = Filename.remove_extension bfile ^ ".bulk"
+let file bpath = Filename.remove_extension bpath ^ ".bulk"
 
 (* A marker older than this is ignored whatever its process: protection
    against a marker left by a killed process when its pid cannot be checked
    (Windows) or has been reused. *)
 let max_age = 12. *. 3600.
 
-let write bfile t =
-  let fname = file bfile in
+let write bpath t =
+  let fname = file bpath in
   let tmp = fname ^ ".tmp" in
   try
     Secure.with_open_out_bin tmp (fun oc ->
@@ -21,7 +21,7 @@ let write bfile t =
     Sys.rename tmp fname
   with Sys_error _ -> ()
 
-let remove bfile = try Sys.remove (file bfile) with Sys_error _ -> ()
+let remove bpath = try Sys.remove (file bpath) with Sys_error _ -> ()
 
 let alive pid =
   match Unix.kill pid 0 with
@@ -30,8 +30,8 @@ let alive pid =
   | exception Unix.Unix_error (_, _, _) -> true
   | exception Invalid_argument _ -> true
 
-let read bfile =
-  match Secure.with_open_in_bin (file bfile) In_channel.input_all with
+let read bpath =
+  match Secure.with_open_in_bin (file bpath) In_channel.input_all with
   | exception Sys_error _ -> None
   | s -> (
       match String.split_on_char '\n' s with
@@ -43,6 +43,6 @@ let read bfile =
           | Some _, Some _ | None, _ | _, None -> None)
       | _ -> None)
 
-let with_marker bfile ~command ~user k =
-  write bfile { command; user; started = Unix.time (); pid = Unix.getpid () };
-  Fun.protect ~finally:(fun () -> remove bfile) k
+let with_marker bpath ~command ~user k =
+  write bpath { command; user; started = Unix.time (); pid = Unix.getpid () };
+  Fun.protect ~finally:(fun () -> remove bpath) k
