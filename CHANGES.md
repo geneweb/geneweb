@@ -261,6 +261,11 @@
   from the configuration directory of the base, like the password
   files: the bases directory, or `<base>.gwb/config` for a reorg base.
   They were looked for in a `<file>.gwb` directory.
+- The files of the server shared by all the bases, `actlog` (login
+  tokens), `gwd.lck` and `gwd_private.txt`, are always in `cnt` of the
+  bases directory, next to `STOP_SERVER` and `gwd_secret_salt.txt`. For
+  a base of the reorg layout they were in `<base>.gwb/config/cnt`: its
+  wizards and friends logged in by token log in again once.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
