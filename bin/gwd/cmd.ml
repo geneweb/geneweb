@@ -139,6 +139,14 @@ let ipaddr_parser s =
 let ipaddr_conv =
   C.Arg.Conv.make ~docv:"ADDR" ~parser:ipaddr_parser ~pp:Ipaddr.pp ()
 
+let bname_parser s =
+  match GWPARAM.bname_of_string s with
+  | Some bname -> Ok bname
+  | None -> Error (Fmt.str "\"%s\" is not a valid database name" s)
+
+let bname_conv =
+  C.Arg.Conv.make ~docv:"BASE" ~parser:bname_parser ~pp:Fmt.string ()
+
 (* Directories commands *)
 let dirs_section = "DIRECTORIES"
 let default_bases_dir = Secure.default_bases_dir
@@ -245,7 +253,7 @@ let cache_databases =
   let doc = "Load these databases in memory before starting the server." in
   C.Arg.(
     value
-    & opt_all (list string) []
+    & opt_all (list bname_conv) []
     & info [ "cache-database" ] ~docs:data_section ~doc)
 
 let cache_databases =
