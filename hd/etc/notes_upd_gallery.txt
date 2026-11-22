@@ -21,6 +21,8 @@
   %end;
   <style>
 html { scrollbar-gutter: stable; }
+.src-folder { flex: 1 1 0; min-width: 14rem; }
+.src-name { flex: 2 1 0; min-width: 14rem; }
 
 /* --- Layout helpers --- */
 .visually-hidden {
@@ -148,40 +150,51 @@ li.in { background-color: #FFE8CC; }
             placeholder="[*gallery chronicle help]"></textarea>
         </div>
       </div>
-      <div id="album-nav" class="d-none justify-content-center align-items-center gap-3 my-1">
-        <a href="#" id="album-first" title="[*first]"><i class="fa-solid fa-backward"></i></a>
-        <a href="#" id="album-prev" title="[*previous]"><i class="fa-solid fa-caret-left"></i></a>
-        <span><span id="album-current">1</span> / <span id="album-count">1</span></span>
-        <a href="#" id="album-next" title="[*next]"><i class="fa-solid fa-caret-right"></i></a>
-        <a href="#" id="album-last" title="[*last]"><i class="fa-solid fa-forward"></i></a>
-        <a href="#" id="album-reorder" title="[*reorder images]"
-          data-bs-toggle="modal" data-bs-target="#reorder_modal">%nn;
-          <i class="fa fa-up-down"></i>
-        </a>
-        <div id="album-actions-mount-nav" class="d-inline-flex gap-2"></div>
+      <div class="row mt-1">
+        <label for="src_mode" class="col-sm-2 col-form-label">[*image source]</label>
+        <div class="col-sm-10 d-flex align-items-center gap-2 pe-1">
+          <select id="src_mode" class="form-select form-select-sm w-auto" autocomplete="off">
+            <option value="images" selected>[*images folder]</option>
+            <option value="visited" disabled>[*carrousel of the visited person]</option>
+            <option value="other">[*carrousel of another person]</option>
+            <option value="url">[*url prefix]</option>
+          </select>
+          <div id="album-nav" class="d-none align-items-center gap-3 ms-auto">
+            <a href="#" id="album-first" title="[*first]"><i class="fa-solid fa-backward"></i></a>
+            <a href="#" id="album-prev" title="[*previous]"><i class="fa-solid fa-caret-left"></i></a>
+            <span><span id="album-current">1</span> / <span id="album-count">1</span></span>
+            <a href="#" id="album-next" title="[*next]"><i class="fa-solid fa-caret-right"></i></a>
+            <a href="#" id="album-last" title="[*last]"><i class="fa-solid fa-forward"></i></a>
+            <a href="#" id="album-reorder" title="[*reorder images]"
+              data-bs-toggle="modal" data-bs-target="#reorder_modal">%nn;
+              <i class="fa fa-up-down"></i>
+            </a>
+            <div id="album-actions-mount-nav" class="d-inline-flex gap-2"></div>
+          </div>
+        </div>
       </div>
       <div class="row mt-1">
-        <label for="fname" class="col-sm-2 col-form-label">[*file]/[folder/folders]0</label>
+        <label for="fname" class="col-sm-2 col-form-label">[*folder/folders]0/[file]</label>
         <div class="col-sm-10 d-flex align-items-center pe-1">
-          <div class="flex-grow-1">
-            <input id="fname" type="text" class="form-control no-clear-button"
-                   placeholder="[*choose a file or a folder]">
-            <datalist id="src_images">%src_images_list;</datalist>
-            <datalist id="src_albums">%src_albums_list;</datalist>
-          </div>
-          <div id="add_key_inline" class="d-none ms-1" style="min-width: 220px;">
-            <input id="add_key_input" type="text" class="form-control p-input"
-                   placeholder="[first name/first names]1.[occurence]0.[surname/surnames]0">
+          <div class="src-folder">
+            <input id="src_folder" type="text" class="form-control"
+                   disabled autocomplete="off"
+                   data-key-placeholder="[first name/first names]0.[occurence]0 [surname/surnames]0">
           </div>
           <button type="button" id="add_key_validate"
                   class="btn btn-sm btn-outline-info mx-1 d-none"
                   disabled title="[*add::key]1">
             <i class="fa-solid fa-check"></i>
           </button>
+          <div class="src-name ms-1">
+            <input id="fname" type="text" class="form-control no-clear-button"
+                   placeholder="[*choose a file or a folder]">
+            <datalist id="src_images">%src_images_list;</datalist>
+            <datalist id="src_albums">%src_albums_list;</datalist>
+          </div>
           <div id="album-actions-mount-solo" class="pe-2">
             <div id="album-actions" class="d-inline-flex align-items-center gap-2 ms-2">
               <a href="#" id="album-add" class="me-1" title="[*add::image/images]0"><i class="fa-solid fa-file-circle-plus"></i></a>
-              <a href="#" id="add_key_btn" class="me-1" title="[*add::key]1"><i class="fa-solid fa-folder-plus"></i></a>
               <a href="#" id="album-remove" class="d-none text-danger" title="[*delete::image/images]0"><i class="fa-solid fa-trash-can"></i></a>
             </div>
           </div>
