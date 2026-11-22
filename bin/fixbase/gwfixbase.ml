@@ -254,7 +254,7 @@ let speclist =
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
 
-let anonfun i = bname := Some i
+let anonfun i = bname := Some (GWPARAM.bname_of_arg ~prog:"gwfixbase" i)
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 
 let main () =

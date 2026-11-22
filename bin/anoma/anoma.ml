@@ -35,13 +35,13 @@ let () =
   in
   Arg.parse speclist
     (fun s ->
-      if !bname = "" then bname := s
+      if !bname = "" then bname := GWPARAM.bname_of_arg ~prog:"anoma" s
       else raise (Arg.Bad ("unexpected argument " ^ s)))
     usage;
   if !bname = "" then (
     Arg.usage speclist usage;
     exit 2);
-  let bname = Filename.remove_extension (Filename.basename !bname) in
+  let bname = !bname in
   let bpath = GWPARAM.bpath bname in
   if not (Sys.file_exists bpath) then (
     Printf.eprintf "anoma: no base %s\n" bpath;

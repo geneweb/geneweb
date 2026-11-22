@@ -15,7 +15,7 @@ let get_bases_dir () =
   | None -> Dirs.path Secure.default_bases_dir
 
 let parse_cmd () =
-  let fname = ref "" in
+  let bname = ref "" in
   let errmsg = Format.sprintf "usage: %s [options] <file_name>" Sys.argv.(0) in
 
   let speclist =
@@ -32,11 +32,11 @@ let parse_cmd () =
     |> Arg.align
   in
   let anonfun s =
-    if !fname = "" then fname := s
+    if !bname = "" then bname := GWPARAM.bname_of_arg ~prog:"update_nldb" s
     else raise (Arg.Bad "Cannot treat several databases")
   in
   Arg.parse speclist anonfun errmsg;
-  (!fname, get_bases_dir ())
+  (!bname, get_bases_dir ())
 
 let compute base bpath =
   let bpath =
@@ -211,14 +211,14 @@ let compute base bpath =
 let ( // ) = Filename.concat
 
 let main () =
-  let fname, bases_dir = parse_cmd () in
+  let bname, bases_dir = parse_cmd () in
   Secure.set_bases_dir bases_dir;
-  let bpath = bases_dir // fname in
-  if fname = "" then (
+  if bname = "" then (
     Printf.eprintf "Missing database name\n";
     Printf.eprintf "Use option -help for usage\n";
     flush stderr;
     exit 2);
+  let bpath = bases_dir // bname in
   Driver.with_database bpath @@ fun base ->
   Sys.catch_break true;
   Driver.load_strings_array base;

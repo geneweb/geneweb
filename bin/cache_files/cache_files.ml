@@ -440,14 +440,14 @@ let speclist =
   |> List.filter (fun (opt, _, _) -> opt <> "") (* retire les séparateurs *)
   |> Arg.align
 
-let anonfun i = bname := i
+let anonfun i = bname := Geneweb.GWPARAM.bname_of_arg ~prog:"cache_files" i
 let usage = "Usage: cache_files [options] base\nwhere [options] are:"
 
 let () =
   Arg.parse speclist anonfun usage;
   if not (Array.mem "-bd" Sys.argv) then Secure.set_bases_dir ".";
   validate_options ();
-  let bname = Filename.remove_extension (Filename.basename !bname) in
+  let bname = !bname in
 
   Driver.with_database (Secure.bases_dir () // bname) @@ fun base ->
   let gen_dl = should_gen_datalist () in

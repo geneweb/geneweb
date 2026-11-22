@@ -45,7 +45,8 @@ let parse_cmd () =
     |> Arg.align
   in
   let anonfun s =
-    if !bname = None then bname := Some (Filename.basename s)
+    if !bname = None then
+      bname := Some (Geneweb.GWPARAM.bname_of_arg ~prog:"gwu" s)
     else raise (Arg.Bad "Cannot treat several databases")
   in
   let opts = ref Gwexport.default_opts in

@@ -28,7 +28,7 @@ let speclist =
 
 let anonfun s =
   match !bname with
-  | None -> bname := Some s
+  | None -> bname := Some (Geneweb.GWPARAM.bname_of_arg ~prog:"consang" s)
   | _ -> raise (Arg.Bad "Cannot treat several databases")
 
 let () =

@@ -3714,15 +3714,11 @@ let main () =
   in
   if input_file <> "" && not (Array.mem "-o" Sys.argv) then
     out_file := input_file;
-  out_file := Filename.basename !out_file |> Filename.remove_extension;
-  if not (Mutil.good_name !out_file) then (
-    (* Util.transl conf not available !*)
-    Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
-      !out_file;
-    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
-    flush stderr;
-    exit 2);
-  let bname = !out_file in
+  let bname =
+    Filename.basename !out_file
+    |> Filename.remove_extension
+    |> Geneweb.GWPARAM.bname_of_arg ~prog:"ged2gwb"
+  in
   Geneweb.GWPARAM.check_base_exists bname;
   out_file := Geneweb.GWPARAM.create_base_and_config bname;
   Geneweb.GWPARAM.init ();

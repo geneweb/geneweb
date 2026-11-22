@@ -310,7 +310,9 @@ let speclist =
   |> Arg.align
 
 let () =
-  Arg.parse speclist (fun s -> bname := Some s) usage;
+  Arg.parse speclist
+    (fun s -> bname := Some (Geneweb.GWPARAM.bname_of_arg ~prog:"connex" s))
+    usage;
   Secure.set_bases_dir !bases_dir;
   (match !output with
   | Some file ->

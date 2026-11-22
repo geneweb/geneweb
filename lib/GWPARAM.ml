@@ -17,6 +17,22 @@ let force = ref false
 let cnt_dir = ref ""
 let bpath bname = Filename.concat (Secure.bases_dir ()) (bname ^ ".gwb")
 
+let bname_of_string s =
+  let bname =
+    Option.value ~default:s (Filename.chop_suffix_opt ~suffix:".gwb" s)
+  in
+  if bname <> "" && Mutil.good_name bname then Some bname else None
+
+let bname_of_arg ~prog s =
+  match bname_of_string s with
+  | Some bname -> bname
+  | None ->
+      Printf.eprintf
+        "%s: \"%s\" is not a valid database name.\n\
+         Allowed characters: a..z, A..Z, 0..9, -\n"
+        prog s;
+      exit 2
+
 let config_reorg bname =
   let bname = Filename.remove_extension bname in
   String.concat Filename.dir_sep
