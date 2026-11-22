@@ -258,7 +258,15 @@ let lexicon_fname = ref (Filename.concat tmp "lexicon.bin.")
    does not activate this plugin in .gwf file. *)
 let load_lexicon =
   let lexicon_cache = Hashtbl.create 0 in
+  let generation = ref 0. in
   fun lang ->
+    let g =
+      try (Unix.stat (GWPARAM.adm_file "gwd.reload")).Unix.st_mtime
+      with Unix.Unix_error _ -> 0.
+    in
+    if not (Float.equal g !generation) then (
+      generation := g;
+      Hashtbl.reset lexicon_cache);
     let process_lexicon ht fname =
       let fname =
         (* Search gw/lang/<fname>, then the installation-wide
@@ -284,8 +292,12 @@ let load_lexicon =
     | Some lex -> lex
     | None ->
         let lex =
-          Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
-            (fun () ->
+          (* Workers are forked processes: the mtime of cnt/gwd.reload is a
+             generation each of them compares, also mixed into the magic so
+             that the first worker to see it rebuilds the marshalled file. *)
+          Mutil.read_or_create_value ~wait:true
+            ~magic:(Printf.sprintf "%s-%.6f" Mutil.random_magic !generation)
+            fname (fun () ->
               let ht = Hashtbl.create 0 in
               process_lexicon ht "lexicon.txt";
               List.iter (process_lexicon ht) !lexicon_list;
