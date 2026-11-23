@@ -17,8 +17,26 @@ let url old_ new_ text expected =
   test_case text `Quick (fun () ->
       check string text expected (Notes.rename_person_urls (lk old_) new_ text))
 
+let file_name text expected =
+  test_case text `Quick (fun () ->
+      check bool text expected (NotesLinks.check_file_name text <> None))
+
 let v =
   [
+    ( "notes-file-names",
+      [
+        file_name "famille-dupont_2.1" true;
+        file_name "dir:page" true;
+        file_name "Été" true;
+        file_name "Séjour_à_Évian" true;
+        file_name "dir:Été" true;
+        file_name "" false;
+        file_name "a b" false;
+        file_name "a/b" false;
+        file_name "a?b" false;
+        file_name "dir::page" false;
+        file_name "\xC9t\xE9" false;
+      ] );
     ( "notes-rename-urls",
       [
         url ("Jean", "Dupont", 0) ("Pierre", "Durand", 0)
