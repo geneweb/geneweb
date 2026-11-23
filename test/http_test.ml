@@ -267,6 +267,30 @@ let test_env () =
     ~msg:"Http.Env.merge body retained" (Some "body_v3")
     (Http.Env.get merged "k3")
 
+let test_env_tail_recursive () =
+  let count = 50_000 in
+  let q =
+    String.concat "&"
+      (List.init count (fun i -> "k" ^ string_of_int i ^ "=v" ^ string_of_int i))
+  in
+  let env = Http.create_env (Adef.encoded q) in
+  let () =
+    Geneweb_test_utils.Check.int ~pos:__POS__
+      ~msg:
+        "Http.create_env tail-recursive parses large input without stack \
+         overflow"
+      count (List.length env)
+  in
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.create_env preserves first parameter" "k0"
+      (fst (List.hd env))
+  in
+  Geneweb_test_utils.Check.string ~pos:__POS__
+    ~msg:"Http.create_env preserves last parameter"
+    ("k" ^ string_of_int (count - 1))
+    (fst (List.hd (List.rev env)))
+
 let test_parse_content_type () =
   let ct_multipart =
     "multipart/form-data; boundary=----WebKitFormBoundaryXYZ"
@@ -594,8 +618,11 @@ let v =
         Alcotest.test_case "typed headers extraction" `Quick test_headers;
       ] );
     ( "http-env",
-      [ Alcotest.test_case "env constructors and operations" `Quick test_env ]
-    );
+      [
+        Alcotest.test_case "env constructors and operations" `Quick test_env;
+        Alcotest.test_case "env tail-recursive large input" `Quick
+          test_env_tail_recursive;
+      ] );
     ( "http-request-line",
       [
         Alcotest.test_case "parse GET" `Quick test_parse_request_line_get;

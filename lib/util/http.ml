@@ -136,13 +136,13 @@ let rec skip_spaces s i =
 
 let create_env s =
   let s = (s : Adef.encoded_string :> string) in
-  let rec get_assoc beg i =
+  let rec get_assoc acc beg i =
     if i = String.length s then
-      if i = beg then [] else [ String.sub s beg (i - beg) ]
+      if i = beg then acc else String.sub s beg (i - beg) :: acc
     else if s.[i] = ';' || s.[i] = '&' then
       let next_i = skip_spaces s (succ i) in
-      String.sub s beg (i - beg) :: get_assoc next_i next_i
-    else get_assoc beg (succ i)
+      get_assoc (String.sub s beg (i - beg) :: acc) next_i next_i
+    else get_assoc acc beg (succ i)
   in
   let separate s =
     match String.index_opt s '=' with
@@ -151,7 +151,7 @@ let create_env s =
           Adef.encoded (String.sub s (succ i) (String.length s - succ i)) )
     | None -> (s, Adef.encoded "")
   in
-  List.map separate (get_assoc 0 0)
+  List.rev (get_assoc [] 0 0) |> List.map separate
 
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
@@ -268,7 +268,7 @@ let parse_part_headers str i =
   in
   (env, body_i)
 
-let parse_part_content str boundary body_i env loop =
+let parse_part_content acc str boundary body_i env loop =
   match (p_getenv env "name", p_getenv env "filename") with
   | Some var, Some filename ->
       let var = strip_quotes var in
@@ -276,29 +276,35 @@ let parse_part_content str boundary body_i env loop =
       let body_i = skip_nl str body_i in
       let i1 = find_boundary str boundary body_i in
       let v = String.sub str body_i (i1 - body_i) in
-      (var ^ "_name", Mutil.encode filename) :: (var, Adef.encoded v) :: loop i1
+      let acc =
+        (var, Adef.encoded v) :: (var ^ "_name", Mutil.encode filename) :: acc
+      in
+      loop acc i1
   | Some var, None ->
       let var = strip_quotes var in
       let val_line, next_i = next_line str body_i in
       if val_line = boundary || val_line = boundary ^ "--" then
-        (var, Adef.encoded "") :: loop body_i
-      else (var, Adef.encoded val_line) :: loop next_i
-  | None, Some _ | None, None -> loop body_i
+        let acc = (var, Adef.encoded "") :: acc in
+        loop acc body_i
+      else
+        let acc = (var, Adef.encoded val_line) :: acc in
+        loop acc next_i
+  | None, Some _ | None, None -> loop acc body_i
 
 let extract_multipart boundary str =
   let str = (str : Adef.encoded_string :> string) in
   let boundary = "--" ^ Boundary.to_string boundary in
-  let rec loop i =
-    if i = String.length str then []
+  let rec loop acc i =
+    if i = String.length str then acc
     else
       let s, i = next_line str i in
       if s = boundary then
         let env, body_i = parse_part_headers str i in
-        parse_part_content str boundary body_i env loop
-      else if s = boundary ^ "--" then []
-      else loop i
+        parse_part_content acc str boundary body_i env loop
+      else if s = boundary ^ "--" then acc
+      else loop acc i
   in
-  let env = loop 0 in
+  let env = List.rev (loop [] 0) in
   let str, _ =
     List.fold_left
       (fun (str, sep) (v, x) ->
