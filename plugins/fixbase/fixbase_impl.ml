@@ -186,7 +186,6 @@ let fixbase_ok conf base =
     opt "missing_spouses" Fixbase.fix_missing_spouses;
     opt "invalid_utf8" Fixbase.fix_utf8_sequence;
     opt "p_key" Fixbase.fix_key;
-    opt "p_key" Fixbase.fix_key;
     opt "children_order" Fixbase.fix_children_order;
     Driver.clear_persons_array base;
     Driver.clear_strings_array base;
