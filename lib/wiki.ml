@@ -1147,6 +1147,9 @@ let mod_ok conf edit_mode fname read_string commit ~conflict =
       if Sys.file_exists new_fn_path then Update.error_same_file conf
   | _ -> ());
   match edit_mode fname with
+  | Some _ when new_fname <> None && fname = "" ->
+      Hutil.incorrect_request conf;
+      None
   | Some mode ->
       let old_string =
         let e, s = read_string fname in
