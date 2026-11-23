@@ -321,6 +321,10 @@
   creation links to its anomalies report.
 - Renaming a base of the reorg layout no longer fails on its counter
   files, now renamed in `<new name>.gwb/config/cnt`.
+- `gwfixbase -children-order`, also offered on the gwfixbase page and by
+  the fixbase plugin, puts the dated children of every family in birth
+  order (birth date, else baptism date); undated children keep their
+  slots. Not part of the default set of fixes (#3196).
 
 ## Gwc, gwu and GEDCOM
 - In a `.gw` file, a witness line (`wit`) may be followed by `wnote`

@@ -20,6 +20,7 @@ type patch =
       * Driver.iper option
       * (Driver.istr * Driver.istr) option
   | Fix_UpdatedOcc of Driver.iper * int * int
+  | Fix_ChildrenOrder of Driver.ifam * Driver.iper array * Driver.iper array
 
 let mk_pevent name date place note src =
   {
@@ -229,6 +230,85 @@ let check_families_children ?report progress base =
          *   flush stdout
          * end *)
       done)
+    (Driver.families base)
+
+(* Inclusive SDN interval of the birth date of [p], or of its baptism date
+   when there is no birth date; [None] when neither is a Gregorian-comparable
+   date (no date, or text date). Partial non-Gregorian dates are normalized
+   first, as in [CheckItem]. *)
+let child_date_interval p =
+  let interval cd =
+    match Option.map Date.date_to_gregorian_bounds (Date.od_of_cdate cd) with
+    | Some (Adef.Dgreg (d, _)) -> Some (Date.gregorian_interval d)
+    | Some (Adef.Dtext _) | None -> None
+  in
+  match interval (Driver.get_birth p) with
+  | Some _ as i -> i
+  | None -> interval (Driver.get_baptism p)
+
+(* Reorders the dated children of [children], leaving every undated child in
+   its slot: the dated children are put back into the slots they occupied,
+   in an order where no child is strictly born before an elder one. Among
+   children whose dates are not strictly comparable (overlapping intervals:
+   « about 1800 » and « 1800 », same year...), the original order is kept as
+   much as possible: each slot takes the first remaining child, in the
+   original order, that no other remaining child strictly precedes.
+   Returns [None] when nothing has to move. *)
+let sort_dated_children base children =
+  let slots, dated =
+    Array.to_list children
+    |> List.mapi (fun i ip -> (i, ip))
+    |> List.filter_map (fun (i, ip) ->
+        Option.map
+          (fun itv -> (i, (ip, itv)))
+          (child_date_interval (Driver.poi base ip)))
+    |> List.split
+  in
+  let dated = Array.of_list dated in
+  let n = Array.length dated in
+  if n < 2 then None
+  else
+    let before (_, (_, hi1)) (_, (lo2, _)) = hi1 < lo2 in
+    let used = Array.make n false in
+    let has_predecessor i =
+      let rec loop j =
+        if j >= n then false
+        else if j <> i && (not used.(j)) && before dated.(j) dated.(i) then true
+        else loop (j + 1)
+      in
+      loop 0
+    in
+    let rec pick i =
+      (* a strict order on intervals is acyclic: there is always a minimal
+         remaining child, so [pick] never runs past [n] *)
+      if used.(i) || has_predecessor i then pick (i + 1) else i
+    in
+    let sorted =
+      Array.init n (fun _ ->
+          let i = pick 0 in
+          used.(i) <- true;
+          fst dated.(i))
+    in
+    if Array.for_all2 (fun ip (ip', _) -> ip = ip') sorted dated then None
+    else
+      let result = Array.copy children in
+      List.iteri (fun k slot -> result.(slot) <- sorted.(k)) slots;
+      Some result
+
+let fix_children_order ?report progress base =
+  let nb_fam = Driver.nb_of_families base in
+  Collection.iteri
+    (fun i fam ->
+      progress i nb_fam;
+      let ifam = Driver.get_ifam fam in
+      let before = Driver.get_children fam in
+      match sort_dated_children base before with
+      | None -> ()
+      | Some children -> (
+          Driver.patch_descend base ifam { children };
+          match report with
+          | Some fn -> fn (Fix_ChildrenOrder (ifam, before, children))
+          | None -> ()))
     (Driver.families base)
 
 let check_persons_parents ?report progress base =

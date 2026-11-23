@@ -101,6 +101,19 @@ let aux txt
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
           nocc
+    | Fix_ChildrenOrder (ifam, before, after) ->
+        (* new order given as former ranks, e.g. "1 2 3 -> 3 1 2" *)
+        let rank ip =
+          let rec loop i =
+            if i >= Array.length before then "?"
+            else if before.(i) = ip then string_of_int (i + 1)
+            else loop (i + 1)
+          in
+          loop 0
+        in
+        let ranks a = Array.to_list a |> List.map rank |> String.concat " " in
+        Printf.sprintf "Reordered children of %s: %s -> %s" (string_of_f ifam)
+          (ranks before) (ranks after)
   in
   let i' = ref 0 in
   if v1 then (
@@ -155,10 +168,11 @@ let fix_utf8_sequence =
   aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
 
 let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
+let fix_children_order = aux "Fix children order" Fixbase.fix_children_order
 
 let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key =
+    ~invalid_utf8 ~key ~children_order =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -179,6 +193,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
+  if !children_order then fix_children_order ~v1 ~v2 base nb_fam fix;
   if fast then (
     Driver.clear_strings_array base;
     Driver.clear_persons_array base);
@@ -214,6 +229,7 @@ let fevents_witnesses = ref false
 let marriage_divorce = ref false
 let invalid_utf8 = ref false
 let key = ref false
+let children_order = ref false
 let index = ref false
 let history = ref false
 let dry_run = ref false
@@ -245,6 +261,10 @@ let speclist =
       Arg.Set marriage_divorce,
       " fix marriage and divorce events" );
     ("-person-key", Arg.Set key, " fix duplicate person keys");
+    ( "-children-order",
+      Arg.Set children_order,
+      " put dated children in birth order (undated ones are not moved; not \
+       included in the default set)" );
     ("-dump", Arg.Set dump, " dump list of persons");
     ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
     ( "-index",
@@ -288,7 +308,7 @@ let main () =
       let fixes =
         !f_parents || !f_children || !p_parents || !p_families
         || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
-        || !p_NBDS || !invalid_utf8 || !key || !index
+        || !p_NBDS || !invalid_utf8 || !key || !index || !children_order
       in
       if fixes || !history then ()
       else (
@@ -305,7 +325,7 @@ let main () =
       if fixes || not !history then
         check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
           ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
-          ~marriage_divorce ~invalid_utf8 ~key;
+          ~marriage_divorce ~invalid_utf8 ~key ~children_order;
       (if !history then
          let layout = Layout.of_bname ~mode:Layout.Detect bname in
          let conf =
