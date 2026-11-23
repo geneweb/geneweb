@@ -698,12 +698,13 @@ let print_mod_gallery_ok conn conf base =
   let read_string = read_notes base in
   let commit = Notes.commit_notes conf base in
   let fname_saved = Wiki.do_mod_ok conf edit_mode fname read_string commit in
-  let url =
-    Printf.sprintf "%sm=GALLERY&f=%s"
-      (commd conf :> string)
-      (Mutil.encode fname_saved :> string)
-  in
-  Connection.http_redirect_temporarily conn url
+  if fname_saved <> "" then
+    let url =
+      Printf.sprintf "%sm=GALLERY&f=%s"
+        (commd conf :> string)
+        (Mutil.encode fname_saved :> string)
+    in
+    Connection.http_redirect_temporarily conn url
 
 let print_gallery_json conf base =
   let _, s = read_notes_from_conf conf base in
