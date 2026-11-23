@@ -80,3 +80,10 @@ val record_of_entry :
     records are [entries], its persons read in [base]. The file follows the
     renames of its person: the person of a record stored by key is the one of
     the most recent record. *)
+
+val convert : dry_run:bool -> Config.config -> Geneweb_db.Driver.base -> int
+(** [convert ~dry_run conf base] Rewrites every file of {i history_d} holding
+    records of the earlier formats, with these records in the current one, their
+    persons read through their indexes in [base]. A record keeps designating the
+    persons it designates in [base], and survives the next rebuilds of the base.
+    Returns the number of such files, left unchanged if [dry_run]. *)
