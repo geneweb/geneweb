@@ -136,8 +136,9 @@
     }
 
     /**
-     * Parses a GeneWeb key string. Two formats:
+     * Parses a GeneWeb key string. Three formats:
      *  - "fn.occ sn"  (canonical)
+     *  - "fn.occ.sn"  (name of the key directory of the carrousel)
      *  - "fn sn"      (last-space split, oc=0)
      * The bare fallback does not consult base particles, so
      * "de la Croix" parses as fn="de la" sn="Croix". Users with
@@ -150,6 +151,10 @@
         const m = t.match(/^(.+)\.(\d+)\s+(.+)$/);
         if (m) return {
             fn: m[1].trim(), oc: parseInt(m[2], 10), sn: m[3].trim()
+        };
+        const d = t.match(/^(.+)\.(\d+)\.(\S.*)$/);
+        if (d) return {
+            fn: d[1].trim(), oc: parseInt(d[2], 10), sn: d[3].trim()
         };
         const sp = t.lastIndexOf(' ');
         if (sp < 0) return null;
