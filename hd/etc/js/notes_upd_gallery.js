@@ -1897,6 +1897,7 @@ function handleTomItemRemove(value) {
     const path = srcMode === 'url' ? urlImagePath(value, true) : imagePathFor(opt);
     const idx = pendingImageAdds.indexOf(path);
     if (idx >= 0) pendingImageAdds.splice(idx, 1);
+    setTimeout(showSelectedFolder, 0);
 }
 
 function handleTomItemAdd(value) {
@@ -1920,6 +1921,7 @@ function handleTomItemAdd(value) {
     if (!pendingImageAdds.includes(path)) {
         pendingImageAdds.push(path);
     }
+    showSelectedFolder();
 }
 
 function onDropdownClose() {
@@ -2099,7 +2101,12 @@ function initFnameSelect() {
                             ? 'albums/' + data.value
                             : data.value)
                         : data.value;
-                    return '<div>' + escape(path) + '</div>';
+                    // The folder is shown in the folder field: the tag only
+                    // holds the file name
+                    const label = srcMode === 'url' ? path
+                        : path.split('/').pop();
+                    return '<div title="' + escape(path) + '">'
+                        + escape(label) + '</div>';
                 },
                 option_create: (data, escape) =>
                     '<div class="create">'
@@ -2502,20 +2509,30 @@ function optsForMode(mode) {
 }
 
 // The folder field holds the folder of the images: the key fn.oc.sn of the
-// visited or of another person, or the URL prefix; it is not used for the
-// images folder.
+// visited or of another person, or the URL prefix. For the images folder it
+// only shows the folder of the selected image.
+function showSelectedFolder() {
+    const el = document.getElementById('src_folder');
+    if (!el || srcMode !== 'images' || !fnameTS) return;
+    const last = fnameTS.items[fnameTS.items.length - 1];
+    const opt = last ? fnameTS.options[last] : null;
+    const path = opt ? imagePathFor(opt) : '';
+    const i = path.lastIndexOf('/');
+    el.value = i > 0 ? path.substring(0, i) : '';
+}
+
 function setFolderField(mode) {
     const el = document.getElementById('src_folder');
     const validate = document.getElementById('add_key_validate');
     if (!el) return;
     el.classList.remove('row-invalid');
-    el.disabled = mode === 'visited';
-    el.parentElement.classList.toggle('d-none', mode === 'images');
+    el.disabled = mode === 'visited' || mode === 'images';
     validate?.classList.toggle('d-none', mode !== 'other');
     if (validate) validate.disabled = true;
     if (mode === 'images') {
         el.value = '';
         el.placeholder = '';
+        showSelectedFolder();
     } else if (mode === 'visited') {
         el.value = visitedKeyOpt ? visitedKeyOpt.keyData.key : '';
         el.placeholder = '';
@@ -2549,6 +2566,7 @@ function applySourceMode(mode) {
     } finally {
         restoringSelection = false;
     }
+    showSelectedFolder();
     if (mode === 'visited' && visitedKeyOpt) {
         const opt = fnameTS.options[visitedKeyOpt.value];
         if (opt && !opt.expanded) expandFolder(opt);
