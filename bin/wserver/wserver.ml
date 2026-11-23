@@ -152,8 +152,13 @@ let get_request_and_content strm =
     | None -> ""
     | Some len when len <= 0 || len > max_allowed_content_length -> ""
     | Some len -> (
-        try String.init len (fun _ -> Stream.next strm)
-        with Stream.Failure -> "")
+        let buf = Buffer.create (min len 8192) in
+        try
+          for _ = 1 to len do
+            Buffer.add_char buf (Stream.next strm)
+          done;
+          Buffer.contents buf
+        with Stream.Failure -> Buffer.contents buf)
   in
   (request, Adef.encoded content)
 
