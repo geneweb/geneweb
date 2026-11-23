@@ -2230,7 +2230,7 @@ function setupFormHandler() {
         }
         const newFEl = document.getElementById('new_f');
         if (newFEl && fnameInput) {
-            newFEl.value = fnameInput.value.trim();
+            newFEl.value = fnameInput.value.trim().normalize('NFC');
         }
     });
 }

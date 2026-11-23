@@ -24,6 +24,10 @@
 > text instead.
 
 ## Gwd
+- The names of notes and galleries may contain accented letters and
+  other UTF-8 characters (`[[[Séjour_à_Évian]]]`, `m=NOTES&f=Été`).
+  A new gallery named with accents used to fail with "the base has
+  changed".
 - Event witnesses carry a note, as on Geneanet. It is entered next to
   each witness in the person and family forms and rendered like the
   other notes: wiki syntax, allowed tags, and links indexed in the notes

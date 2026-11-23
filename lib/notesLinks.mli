@@ -20,7 +20,13 @@ type wiki_link =
 
 val char_dir_sep : char
 val dir_sep : string
+
 val check_file_name : string -> (string list * string) option
+(** [check_file_name s] splits the name of a note into its directories and its
+    base name. ASCII letters, digits, ['_'], ['-'], ['.'] and valid UTF-8
+    sequences are accepted, [char_dir_sep] separates the directories; [None] for
+    any other name (including an empty component). *)
+
 val misc_notes_link : string -> int -> wiki_link
 
 val display_text : person_text -> string
