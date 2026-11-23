@@ -246,54 +246,125 @@ let child_date_interval p =
   | Some _ as i -> i
   | None -> interval (Driver.get_baptism p)
 
-(* Reorders the dated children of [children], leaving every undated child in
-   its slot: the dated children are put back into the slots they occupied,
-   in an order where no child is strictly born before an elder one. Among
-   children whose dates are not strictly comparable (overlapping intervals:
-   « about 1800 » and « 1800 », same year...), the original order is kept as
-   much as possible: each slot takes the first remaining child, in the
-   original order, that no other remaining child strictly precedes.
+(* Puts the dated children of [children] in birth order, moving few of them;
+   children without a comparable date are never moved and keep their place
+   relative to the children that do not move.
+
+   1. Target order of the dated children: each rank takes the first remaining
+      child, in the original order, that no other remaining child is strictly
+      born before. Children whose dates cannot be strictly compared
+      (overlapping intervals: « about 1800 » and « 1800 »...) thus keep their
+      original relative order when possible.
+   2. The dated children that stay are a longest subsequence already in target
+      order (the earliest one in the list when there are several). The target
+      order being fixed first, overlapping dates may cost an extra move.
+   3. Each other dated child, in target order, is removed and reinserted
+      between its neighbours in the target order: just before its successor
+      when it comes from below it, just after its predecessor otherwise, so
+      that it moves as little as possible.
+   Ex.: [A(1800) ? B(1790)] becomes [B A ?].
    Returns [None] when nothing has to move. *)
 let sort_dated_children base children =
-  let slots, dated =
+  let dated =
     Array.to_list children
-    |> List.mapi (fun i ip -> (i, ip))
-    |> List.filter_map (fun (i, ip) ->
+    |> List.filter_map (fun ip ->
         Option.map
-          (fun itv -> (i, (ip, itv)))
+          (fun itv -> (ip, itv))
           (child_date_interval (Driver.poi base ip)))
-    |> List.split
+    |> Array.of_list
   in
-  let dated = Array.of_list dated in
   let n = Array.length dated in
   if n < 2 then None
   else
-    let before (_, (_, hi1)) (_, (lo2, _)) = hi1 < lo2 in
+    let before i j =
+      let _, (_, hi) = dated.(i) and _, (lo, _) = dated.(j) in
+      hi < lo
+    in
+    (* 1. target order: order.(k) is the index in [dated] of rank [k] *)
     let used = Array.make n false in
     let has_predecessor i =
       let rec loop j =
         if j >= n then false
-        else if j <> i && (not used.(j)) && before dated.(j) dated.(i) then true
+        else if j <> i && (not used.(j)) && before j i then true
         else loop (j + 1)
       in
       loop 0
     in
     let rec pick i =
-      (* a strict order on intervals is acyclic: there is always a minimal
-         remaining child, so [pick] never runs past [n] *)
+      (* strict order on intervals is acyclic: a minimal remaining child
+         always exists, so [pick] never runs past [n] *)
       if used.(i) || has_predecessor i then pick (i + 1) else i
     in
-    let sorted =
+    let order =
       Array.init n (fun _ ->
           let i = pick 0 in
           used.(i) <- true;
-          fst dated.(i))
+          i)
     in
-    if Array.for_all2 (fun ip (ip', _) -> ip = ip') sorted dated then None
+    if Array.for_all2 ( = ) order (Array.init n Fun.id) then None
     else
-      let result = Array.copy children in
-      List.iteri (fun k slot -> result.(slot) <- sorted.(k)) slots;
-      Some result
+      let rank = Array.make n 0 in
+      Array.iteri (fun k i -> rank.(i) <- k) order;
+      (* 2. earliest longest increasing subsequence of [rank] *)
+      let best = Array.make n 1 in
+      for i = n - 1 downto 0 do
+        for j = i + 1 to n - 1 do
+          if rank.(j) > rank.(i) && best.(j) + 1 > best.(i) then
+            best.(i) <- best.(j) + 1
+        done
+      done;
+      let placed = Array.make n false in
+      let need = ref (Array.fold_left max 0 best) and last = ref (-1) in
+      for i = 0 to n - 1 do
+        if !need > 0 && best.(i) = !need && rank.(i) > !last then (
+          placed.(i) <- true;
+          decr need;
+          last := rank.(i))
+      done;
+      (* 3. reinsert the other dated children *)
+      let cur =
+        let k = ref (-1) in
+        Array.to_list children
+        |> List.filter_map (fun ip ->
+            if !k + 1 < n && fst dated.(!k + 1) = ip then (
+              incr k;
+              if placed.(!k) then Some (Either.Right !k) else None)
+            else Some (Either.Left ip))
+        |> ref
+      in
+      let insert ~at ~after x =
+        let rec loop = function
+          | [] -> [ x ]
+          | (Either.Right j as e) :: l when j = at ->
+              if after then e :: x :: l else x :: e :: l
+          | e :: l -> e :: loop l
+        in
+        cur := loop !cur
+      in
+      Array.iteri
+        (fun k i ->
+          if not placed.(i) then (
+            let rec find k' step =
+              if k' < 0 || k' >= n then None
+              else if placed.(order.(k')) then Some order.(k')
+              else find (k' + step) step
+            in
+            (* coming from below its successor: just before it; otherwise
+               just after its predecessor *)
+            (match (find (k - 1) (-1), find (k + 1) 1) with
+            | None, Some succ -> insert ~at:succ ~after:false (Either.Right i)
+            | Some pred, None -> insert ~at:pred ~after:true (Either.Right i)
+            | Some pred, Some succ ->
+                if i > succ then insert ~at:succ ~after:false (Either.Right i)
+                else insert ~at:pred ~after:true (Either.Right i)
+            | None, None -> assert false (* at least one child is placed *));
+            placed.(i) <- true))
+        order;
+      Some
+        (List.map
+           (Either.fold ~left:Fun.id ~right:(fun i -> fst dated.(i)))
+           !cur
+        |> Array.of_list)
 
 let fix_children_order ?report progress base =
   let nb_fam = Driver.nb_of_families base in
