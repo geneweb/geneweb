@@ -34,6 +34,11 @@ type patch =
       * Geneweb_db.Driver.iper option
       * (Geneweb_db.Driver.istr * Geneweb_db.Driver.istr) option
   | Fix_UpdatedOcc of Geneweb_db.Driver.iper * int * int
+  | Fix_ChildrenOrder of
+      Geneweb_db.Driver.ifam
+      * Geneweb_db.Driver.iper array
+      * Geneweb_db.Driver.iper array
+      (** family, children before and after reordering *)
 
 val check_NBDS :
   ?report:(patch -> unit) ->
@@ -59,6 +64,19 @@ val check_families_children :
 (** For every family's children in the base remove the children listed more than
     once, and add current family to the children's ascendants if absent. Doesn't
     modify consanguinity rate. *)
+
+val fix_children_order :
+  ?report:(patch -> unit) ->
+  (int -> int -> unit) ->
+  Geneweb_db.Driver.base ->
+  unit
+(** For every family, put the children in birth order (baptism date when there
+    is no birth date). Only children with such a date are moved, and only
+    between the slots held by dated children: a child without a comparable date
+    keeps its position. Children whose dates cannot be strictly compared
+    (overlapping imprecise dates) keep their relative order when possible. Fixes
+    the [ChildrenNotInOrder] anomaly, except for a child known only by its death
+    date. *)
 
 val check_persons_parents :
   ?report:(patch -> unit) ->

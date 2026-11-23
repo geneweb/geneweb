@@ -1550,6 +1550,12 @@ de: Familien' Kinder.
 en: families' children.
 fr: enfants des familles.
 
+    children order.
+aa: gwfix.htm
+de: Reihenfolge der Kinder (nur datierte Kinder werden verschoben).
+en: children order (only dated children are moved).
+fr: ordre des enfants (seuls les enfants datés sont déplacés).
+
     families' parents.
 aa: gwfix.htm
 co: genitori di e famiglie.

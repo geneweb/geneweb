@@ -16,6 +16,7 @@ let arg_marriage_divorce = "marriage_divorce"
 let arg_missing_spouses = "missing_spouses"
 let arg_invalid_utf8 = "invalid_utf8"
 let arg_p_key = "p_key"
+let arg_children_order = "children_order"
 let arg_tstab = "tstab"
 let arg_password = "password"
 
@@ -109,6 +110,7 @@ let fixbase conf _base =
       input arg_missing_spouses "plugin_fixbase_missing_spouses";
       input arg_invalid_utf8 "plugin_fixbase_invalid_utf8";
       input arg_p_key "plugin_fixbase_p_key";
+      input arg_children_order "plugin_fixbase_children_order";
       input arg_tstab "plugin_fixbase_tstab";
     ]
   in
@@ -141,7 +143,9 @@ let fixbase_ok conf base =
       | Fix_MissingSpouse (ifam, iper) ->
           ifams := ifam :: !ifams;
           ipers := iper :: !ipers
-      | Fix_MarriageDivorce ifam | Fix_AddedChild ifam ->
+      | Fix_MarriageDivorce ifam
+      | Fix_AddedChild ifam
+      | Fix_ChildrenOrder (ifam, _, _) ->
           ifams := ifam :: !ifams
       | Fix_WrongUTF8Encoding (ifam, iper, istr) ->
           istrs := (ifam, iper, istr) :: !istrs
@@ -157,6 +161,7 @@ let fixbase_ok conf base =
           "fevents_witnesses";
           "missing_spouses";
           "invalid_utf8";
+          "children_order";
         ]
     then Driver.load_families_array base;
     if enabled [ "invalid_utf8"; "p_key" ] then Driver.load_strings_array base;
@@ -182,6 +187,7 @@ let fixbase_ok conf base =
     opt "invalid_utf8" Fixbase.fix_utf8_sequence;
     opt "p_key" Fixbase.fix_key;
     opt "p_key" Fixbase.fix_key;
+    opt "children_order" Fixbase.fix_children_order;
     Driver.clear_persons_array base;
     Driver.clear_strings_array base;
     Driver.clear_families_array base;
@@ -380,6 +386,7 @@ let fixbase_ok conf base =
       opt "missing_spouses";
       opt "invalid_utf8";
       opt "p_key";
+      opt "children_order";
       opt "tstab";
       Output.print_sstring conf {|<p>|};
       Output.print_sstring conf {|<input type="submit" value="|};

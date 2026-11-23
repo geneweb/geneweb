@@ -8,6 +8,10 @@ co: Currezzione di i dati alterati
 en: Fix corrupted data
 fr: Correction des données corrompues
 
+    plugin_fixbase_children_order
+en: Put the dated children of each family in birth order.
+fr: Range les enfants datés de chaque famille par ordre de naissance.
+
     plugin_fixbase_description
 co: St’attrezzu vi pò permette di currege certi dati in una basa. Una validazione di i cambiamenti pruposti vi serà dumandata prima d’appiecalli nant’à a basa.
 en: This tool (may) allow you to fix corrupted data in a base. You will be asked to review proposed changes before actually applying them to the base.
