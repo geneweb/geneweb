@@ -32,7 +32,8 @@ type meth =
   | PATCH
   | OTHER of string
 
-let meth_of_string = function
+let meth_of_string s =
+  match String.uppercase_ascii s with
   | "GET" -> GET
   | "POST" -> POST
   | "HEAD" -> HEAD
@@ -42,18 +43,7 @@ let meth_of_string = function
   | "TRACE" -> TRACE
   | "CONNECT" -> CONNECT
   | "PATCH" -> PATCH
-  | s -> (
-      match String.uppercase_ascii s with
-      | "GET" -> GET
-      | "POST" -> POST
-      | "HEAD" -> HEAD
-      | "PUT" -> PUT
-      | "DELETE" -> DELETE
-      | "OPTIONS" -> OPTIONS
-      | "TRACE" -> TRACE
-      | "CONNECT" -> CONNECT
-      | "PATCH" -> PATCH
-      | other -> OTHER other)
+  | other -> OTHER other
 
 let string_of_meth = function
   | GET -> "GET"
@@ -184,15 +174,12 @@ end
 let start_with_case_insensitive ~prefix s =
   let len_p = String.length prefix in
   let len_s = String.length s in
-  if len_s < len_p then false
-  else
-    let rec loop i =
-      if i = len_p then true
-      else if Char.lowercase_ascii s.[i] = Char.lowercase_ascii prefix.[i] then
-        loop (i + 1)
-      else false
-    in
-    loop 0
+  let rec loop i =
+    i = len_p
+    || Char.lowercase_ascii s.[i] = Char.lowercase_ascii prefix.[i]
+       && loop (i + 1)
+  in
+  len_s >= len_p && loop 0
 
 let is_multipart_form =
   start_with_case_insensitive ~prefix:"multipart/form-data"
@@ -231,7 +218,7 @@ let parse_content_type header =
 let extract_boundary_opt content_type =
   match parse_content_type (content_type : Adef.encoded_string :> string) with
   | MultipartForm { boundary } -> Some boundary
-  | _ -> None
+  | UrlEncoded | Other _ -> None
 
 let extract_boundary content_type =
   match extract_boundary_opt content_type with
@@ -256,9 +243,7 @@ let find_boundary str boundary start_pos =
   let b_len = String.length boundary in
   let s_len = String.length str in
   let rec check idx k =
-    if k = b_len then true
-    else if str.[idx + k] = boundary.[k] then check idx (k + 1)
-    else false
+    k = b_len || (str.[idx + k] = boundary.[k] && check idx (k + 1))
   in
   let rec find j =
     match String.index_from_opt str j boundary.[0] with
@@ -298,7 +283,7 @@ let parse_part_content str boundary body_i env loop =
       if val_line = boundary || val_line = boundary ^ "--" then
         (var, Adef.encoded "") :: loop body_i
       else (var, Adef.encoded val_line) :: loop next_i
-  | None, _ -> loop body_i
+  | None, Some _ | None, None -> loop body_i
 
 let extract_multipart boundary str =
   let str = (str : Adef.encoded_string :> string) in

@@ -161,10 +161,10 @@ let test_parse_request_line_no_version () =
 
 let test_parse_request_line_invalid () =
   let check_none msg req =
-    match Http.parse_request_line req with
-    | None -> ()
-    | Some _ ->
-        Geneweb_test_utils.Check.fail ~pos:__POS__ (msg ^ " expected None")
+    Option.iter
+      (fun _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__ (msg ^ " expected None"))
+      (Http.parse_request_line req)
   in
   check_none "Http.parse_request_line empty" [];
   check_none "Http.parse_request_line malformed" [ "INVALID" ];
@@ -220,20 +220,30 @@ let test_headers () =
 
 let test_env () =
   let empty = Http.Env.empty in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.get empty" None (Http.Env.get empty "key");
-  Geneweb_test_utils.Check.int ~pos:__POS__ ~msg:"Http.Env.to_list empty" 0
-    (List.length (Http.Env.to_list empty));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.get empty" None (Http.Env.get empty "key")
+  in
+  let () =
+    Geneweb_test_utils.Check.int ~pos:__POS__ ~msg:"Http.Env.to_list empty" 0
+      (List.length (Http.Env.to_list empty))
+  in
   let env =
     Http.Env.of_list
       [ ("k1", Adef.encoded "val1"); ("k2", Adef.encoded "val2") ]
   in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.get k1" (Some "val1") (Http.Env.get env "k1");
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.get k2" (Some "val2") (Http.Env.get env "k2");
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.get missing" None (Http.Env.get env "k3");
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.get k1" (Some "val1") (Http.Env.get env "k1")
+  in
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.get k2" (Some "val2") (Http.Env.get env "k2")
+  in
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.get missing" None (Http.Env.get env "k3")
+  in
   let url_env =
     Http.Env.of_list
       [ ("k1", Adef.encoded "url_v1"); ("k2", Adef.encoded "url_v2") ]
@@ -243,12 +253,16 @@ let test_env () =
       [ ("k2", Adef.encoded "body_v2"); ("k3", Adef.encoded "body_v3") ]
   in
   let merged = Http.Env.merge ~url_env ~body_env in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.merge url priority" (Some "url_v1")
-    (Http.Env.get merged "k1");
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.Env.merge url overrides body" (Some "url_v2")
-    (Http.Env.get merged "k2");
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.merge url priority" (Some "url_v1")
+      (Http.Env.get merged "k1")
+  in
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.merge url overrides body" (Some "url_v2")
+      (Http.Env.get merged "k2")
+  in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.Env.merge body retained" (Some "body_v3")
     (Http.Env.get merged "k3")
@@ -257,75 +271,92 @@ let test_parse_content_type () =
   let ct_multipart =
     "multipart/form-data; boundary=----WebKitFormBoundaryXYZ"
   in
-  (match Http.parse_content_type ct_multipart with
-  | Http.MultipartForm { boundary } ->
-      Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_content_type boundary" "----WebKitFormBoundaryXYZ"
-        (Http.Boundary.to_string boundary)
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse multipart");
+  let () =
+    match Http.parse_content_type ct_multipart with
+    | Http.MultipartForm { boundary } ->
+        Geneweb_test_utils.Check.string ~pos:__POS__
+          ~msg:"Http.parse_content_type boundary" "----WebKitFormBoundaryXYZ"
+          (Http.Boundary.to_string boundary)
+    | Http.UrlEncoded | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse multipart"
+  in
   let ct_multipart_quoted =
     "multipart/form-data; boundary=\"----WebKitFormBoundaryQuoted\""
   in
-  (match Http.parse_content_type ct_multipart_quoted with
-  | Http.MultipartForm { boundary } ->
-      Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_content_type quoted boundary"
-        "----WebKitFormBoundaryQuoted"
-        (Http.Boundary.to_string boundary)
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse quoted boundary");
+  let () =
+    match Http.parse_content_type ct_multipart_quoted with
+    | Http.MultipartForm { boundary } ->
+        Geneweb_test_utils.Check.string ~pos:__POS__
+          ~msg:"Http.parse_content_type quoted boundary"
+          "----WebKitFormBoundaryQuoted"
+          (Http.Boundary.to_string boundary)
+    | Http.UrlEncoded | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse quoted boundary"
+  in
   let ct_multipart_upper = "MULTIPART/FORM-DATA; boundary=BOUNDARY_UPPER" in
-  (match Http.parse_content_type ct_multipart_upper with
-  | Http.MultipartForm { boundary } ->
-      Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_content_type uppercase boundary" "BOUNDARY_UPPER"
-        (Http.Boundary.to_string boundary)
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse uppercase multipart");
+  let () =
+    match Http.parse_content_type ct_multipart_upper with
+    | Http.MultipartForm { boundary } ->
+        Geneweb_test_utils.Check.string ~pos:__POS__
+          ~msg:"Http.parse_content_type uppercase boundary" "BOUNDARY_UPPER"
+          (Http.Boundary.to_string boundary)
+    | Http.UrlEncoded | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse uppercase multipart"
+  in
   let ct_multipart_attr_upper = "multipart/form-data; BOUNDARY=foo" in
-  (match Http.parse_content_type ct_multipart_attr_upper with
-  | Http.MultipartForm { boundary } ->
-      Geneweb_test_utils.Check.string ~pos:__POS__
-        ~msg:"Http.parse_content_type uppercase boundary attribute" "foo"
-        (Http.Boundary.to_string boundary)
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse uppercase boundary attribute");
+  let () =
+    match Http.parse_content_type ct_multipart_attr_upper with
+    | Http.MultipartForm { boundary } ->
+        Geneweb_test_utils.Check.string ~pos:__POS__
+          ~msg:"Http.parse_content_type uppercase boundary attribute" "foo"
+          (Http.Boundary.to_string boundary)
+    | Http.UrlEncoded | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse uppercase boundary attribute"
+  in
   let ct_multipart_no_boundary = "multipart/form-data" in
-  (match Http.parse_content_type ct_multipart_no_boundary with
-  | Http.Other "multipart/form-data" -> ()
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type should fallback to Other when boundary is \
-         missing");
+  let () =
+    match Http.parse_content_type ct_multipart_no_boundary with
+    | Http.Other "multipart/form-data" -> ()
+    | Http.UrlEncoded | Http.MultipartForm _ | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type should fallback to Other when boundary is \
+           missing"
+  in
   let ct_urlencoded = "application/x-www-form-urlencoded; charset=UTF-8" in
-  (match Http.parse_content_type ct_urlencoded with
-  | Http.UrlEncoded -> ()
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse urlencoded");
+  let () =
+    match Http.parse_content_type ct_urlencoded with
+    | Http.UrlEncoded -> ()
+    | Http.MultipartForm _ | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse urlencoded"
+  in
   let ct_urlencoded_with_spaces =
     "  application/x-www-form-urlencoded; charset=UTF-8  "
   in
-  (match Http.parse_content_type ct_urlencoded_with_spaces with
-  | Http.UrlEncoded -> ()
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse urlencoded with leading spaces");
+  let () =
+    match Http.parse_content_type ct_urlencoded_with_spaces with
+    | Http.UrlEncoded -> ()
+    | Http.MultipartForm _ | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse urlencoded with leading \
+           spaces"
+  in
   let ct_urlencoded_upper = "APPLICATION/X-WWW-FORM-URLENCODED" in
-  (match Http.parse_content_type ct_urlencoded_upper with
-  | Http.UrlEncoded -> ()
-  | _ ->
-      Geneweb_test_utils.Check.fail ~pos:__POS__
-        "Http.parse_content_type failed to parse uppercase urlencoded");
+  let () =
+    match Http.parse_content_type ct_urlencoded_upper with
+    | Http.UrlEncoded -> ()
+    | Http.MultipartForm _ | Http.Other _ ->
+        Geneweb_test_utils.Check.fail ~pos:__POS__
+          "Http.parse_content_type failed to parse uppercase urlencoded"
+  in
   let ct_json = "application/json" in
   match Http.parse_content_type ct_json with
   | Http.Other "application/json" -> ()
-  | _ ->
+  | Http.UrlEncoded | Http.MultipartForm _ | Http.Other _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse other"
 
@@ -340,12 +371,18 @@ let test_parse_query_and_merge () =
   in
   let merged = Http.merge_env url_params body_params in
   let get_val k env = (List.assoc k env : Adef.encoded_string :> string) in
-  Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.merge_env URL param takes precedence" "NG" (get_val "m" merged);
-  Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.merge_env URL param retained" "base" (get_val "b" merged);
-  Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.merge_env body param retained" "bar" (get_val "foo" merged);
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.merge_env URL param takes precedence" "NG" (get_val "m" merged)
+  in
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.merge_env URL param retained" "base" (get_val "b" merged)
+  in
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.merge_env body param retained" "bar" (get_val "foo" merged)
+  in
   let m_count = List.length (List.filter (fun (k, _) -> k = "m") merged) in
   Geneweb_test_utils.Check.int ~pos:__POS__
     ~msg:"Http.merge_env deduplicates shadowed keys" 1 m_count
@@ -405,7 +442,7 @@ let test_extract_multipart_quoted_boundary () =
       Geneweb_test_utils.Check.string ~pos:__POS__
         ~msg:"Http.extract_multipart with quoted boundary" "val"
         (get_val "field")
-  | _ ->
+  | Http.UrlEncoded | Http.Other _ ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.parse_content_type failed to parse quoted boundary"
 
@@ -419,9 +456,11 @@ let test_extract_boundary_quotes () =
 let test_extract_boundary_case_insensitive () =
   let ct_upper = Adef.encoded "multipart/form-data; BOUNDARY=xyz" in
   let boundary_upper = Http.extract_boundary ct_upper in
-  Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.extract_boundary uppercase attribute" "xyz"
-    (Http.Boundary.to_string boundary_upper);
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.extract_boundary uppercase attribute" "xyz"
+      (Http.Boundary.to_string boundary_upper)
+  in
   let ct_mixed = Adef.encoded "multipart/form-data; Boundary=abc" in
   let boundary_mixed = Http.extract_boundary ct_mixed in
   Geneweb_test_utils.Check.string ~pos:__POS__
@@ -430,34 +469,46 @@ let test_extract_boundary_case_insensitive () =
 
 let test_extract_boundary_opt () =
   let ct_multipart = Adef.encoded "multipart/form-data; boundary=xyz123" in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt multipart" (Some "xyz123")
-    (Option.map Http.Boundary.to_string
-       (Http.extract_boundary_opt ct_multipart));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt multipart" (Some "xyz123")
+      (Option.map Http.Boundary.to_string
+         (Http.extract_boundary_opt ct_multipart))
+  in
   let ct_quoted =
     Adef.encoded "multipart/form-data; boundary=\"quoted_boundary\""
   in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt quoted boundary" (Some "quoted_boundary")
-    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_quoted));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt quoted boundary" (Some "quoted_boundary")
+      (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_quoted))
+  in
   let ct_case = Adef.encoded "multipart/form-data; BOUNDARY=xyz" in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt case-insensitive" (Some "xyz")
-    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_case));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt case-insensitive" (Some "xyz")
+      (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_case))
+  in
   let ct_urlencoded = Adef.encoded "application/x-www-form-urlencoded" in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt urlencoded" None
-    (Option.map Http.Boundary.to_string
-       (Http.extract_boundary_opt ct_urlencoded));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt urlencoded" None
+      (Option.map Http.Boundary.to_string
+         (Http.extract_boundary_opt ct_urlencoded))
+  in
   let ct_other = Adef.encoded "text/plain" in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt text/plain" None
-    (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_other));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt text/plain" None
+      (Option.map Http.Boundary.to_string (Http.extract_boundary_opt ct_other))
+  in
   let ct_no_boundary = Adef.encoded "multipart/form-data" in
-  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
-    ~msg:"Http.extract_boundary_opt multipart without boundary" None
-    (Option.map Http.Boundary.to_string
-       (Http.extract_boundary_opt ct_no_boundary));
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.extract_boundary_opt multipart without boundary" None
+      (Option.map Http.Boundary.to_string
+         (Http.extract_boundary_opt ct_no_boundary))
+  in
   let ct_empty = Adef.encoded "" in
   Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
     ~msg:"Http.extract_boundary_opt empty" None
@@ -465,12 +516,14 @@ let test_extract_boundary_opt () =
 
 let test_extract_boundary_backward_compat () =
   let ct_multipart = Adef.encoded "multipart/form-data; boundary=xyz123" in
-  Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.extract_boundary backward compat success" "xyz123"
-    (Http.Boundary.to_string (Http.extract_boundary ct_multipart));
+  let () =
+    Geneweb_test_utils.Check.string ~pos:__POS__
+      ~msg:"Http.extract_boundary backward compat success" "xyz123"
+      (Http.Boundary.to_string (Http.extract_boundary ct_multipart))
+  in
   let ct_non_multipart = Adef.encoded "application/x-www-form-urlencoded" in
   match Http.extract_boundary ct_non_multipart with
-  | _ ->
+  | _boundary ->
       Geneweb_test_utils.Check.fail ~pos:__POS__
         "Http.extract_boundary expected Not_found on non-multipart"
   | exception Not_found -> ()

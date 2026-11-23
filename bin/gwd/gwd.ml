@@ -1629,7 +1629,9 @@ let parse_body_by_content_type parsed_content_type
 let combine_query_and_contents parsed_content_type url_query
     (contents : Adef.encoded_string) : Adef.encoded_string =
   let is_other_body =
-    match parsed_content_type with Some (Http.Other _) -> true | _ -> false
+    match parsed_content_type with
+    | Some (Http.Other _) -> true
+    | Some (Http.UrlEncoded | Http.MultipartForm _) | None -> false
   in
   let url_query = Http.string_of_query url_query in
   if is_other_body || url_query = "" then contents
@@ -1651,12 +1653,12 @@ let build_env request (contents : Adef.encoded_string) :
   let url_params =
     match req_line with
     | Some { query = Some q; _ } -> Http.Env.to_list (Http.parse_query_params q)
-    | _ -> []
+    | Some { query = None; _ } | None -> []
   in
   let url_query =
     match req_line with
     | Some { query = Some q; _ } -> q
-    | _ -> Http.query_of_string ""
+    | Some { query = None; _ } | None -> Http.query_of_string ""
   in
   let headers = Http.Headers.of_lines request in
   let content_type = Http.Headers.get headers "content-type" in

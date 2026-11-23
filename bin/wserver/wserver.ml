@@ -198,7 +198,8 @@ let treat_connection tmout callback addr fd =
           let q =
             match req_line.meth with
             | Http.POST | Http.PUT | Http.PATCH -> raw_content
-            | _ -> (
+            | Http.GET | Http.HEAD | Http.DELETE | Http.OPTIONS | Http.TRACE
+            | Http.CONNECT | Http.OTHER _ -> (
                 match req_line.query with
                 | Some q_str -> Adef.encoded (Http.string_of_query q_str)
                 | None -> Adef.encoded "")
