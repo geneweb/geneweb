@@ -110,10 +110,12 @@
   surname, occurrence) rather than by index, in a new record format
   `GnHd0003`: after a rebuild of the base (`gwu | gwc`), `m=HIST_DIFF`
   still shows the right person, children, spouses and witnesses. Records
-  of the earlier formats are kept and still read with their indexes,
-  which designate other persons on a base rebuilt since they were
-  written, as before. An older gwd cannot read `GnHd0003` records: do
-  not share a `history_d` with it.
+  of the earlier formats are still read with their indexes, which
+  designate other persons on a base rebuilt since they were written.
+  `gwfixbase -history` rewrites them once in the new format, with the
+  persons their indexes designate in the current base, so that they
+  survive the next rebuilds: run it before the next one. An older gwd
+  cannot read `GnHd0003` records: do not share a `history_d` with it.
 - The random person link (`rnd=1`) is resolved server-side, among the
   persons visible to the user, and honors `access_by_key`. On the A, C, D,
   F, LINKED and R tools it keeps the current tool.

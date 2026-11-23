@@ -215,6 +215,7 @@ let marriage_divorce = ref false
 let invalid_utf8 = ref false
 let key = ref false
 let index = ref false
+let history = ref false
 let dry_run = ref false
 let dump = ref false
 let ofile = ref ""
@@ -250,6 +251,9 @@ let speclist =
       Arg.Set index,
       " rebuild index. It is automatically enabled by any other option." );
     ("-invalid-utf8", Arg.Set invalid_utf8, " fix invalid UTF-8 sequences");
+    ( "-history",
+      Arg.Set history,
+      " convert the history of changes (history_d) to the current format" );
   ]
   |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   |> Arg.align
@@ -281,11 +285,12 @@ let main () =
         nb_ind nb_real_ind nb_fam;
 
       Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
-      if
+      let fixes =
         !f_parents || !f_children || !p_parents || !p_families
         || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
         || !p_NBDS || !invalid_utf8 || !key || !index
-      then ()
+      in
+      if fixes || !history then ()
       else (
         f_parents := true;
         f_children := true;
@@ -297,9 +302,21 @@ let main () =
         p_NBDS := true;
         invalid_utf8 := true;
         key := true);
-      check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
-        ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
-        ~marriage_divorce ~invalid_utf8 ~key;
+      if fixes || not !history then
+        check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
+          ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+          ~marriage_divorce ~invalid_utf8 ~key;
+      (if !history then
+         let layout = Layout.of_bname ~mode:Layout.Detect bname in
+         let conf =
+           {
+             Config.empty with
+             Config.bname;
+             base_env = Util.read_base_env layout "" false;
+           }
+         in
+         let n = HistoryDiff.convert ~dry_run:!dry_run conf base in
+         Printf.eprintf "%d history files converted\n" n);
       if !dump then dump_persons bpath !ofile
 
 let _ = main ()

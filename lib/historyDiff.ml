@@ -75,13 +75,15 @@ let entry_wizard e = e.e_wizard
 let unique_key fn sn = Name.lower fn <> "" && Name.lower sn <> ""
 
 let person_ref base ip =
-  let p = Driver.poi base ip in
-  {
-    r_fn = Driver.sou base (Driver.get_first_name p);
-    r_sn = Driver.sou base (Driver.get_surname p);
-    r_oc = Driver.get_occ p;
-    r_ip = ip;
-  }
+  if Driver.iper_exists base ip then
+    let p = Driver.poi base ip in
+    {
+      r_fn = Driver.sou base (Driver.get_first_name p);
+      r_sn = Driver.sou base (Driver.get_surname p);
+      r_oc = Driver.get_occ p;
+      r_ip = ip;
+    }
+  else { r_fn = ""; r_sn = ""; r_oc = 0; r_ip = Driver.Iper.dummy }
 
 let stored_of_record base gr =
   let r = person_ref base in
@@ -566,25 +568,29 @@ let record_diff conf base changed =
       | _ -> ())
   | _ -> ()
 
-let load_entries conf fname =
+let read_entries path =
   let rec loop ic acc =
     match input_raw ic with
     | raw -> loop ic (entry_of_raw raw :: acc)
     | exception End_of_file -> acc
   in
-  try Secure.with_open_in_bin (history_path conf fname) (fun ic -> loop ic [])
+  try Secure.with_open_in_bin path (fun ic -> loop ic [])
   with Sys_error _ -> []
 
-let write_entries conf fname entries =
-  let fname = history_path conf fname in
-  if entries = [] then Mutil.rm fname
+let load_entries conf fname = read_entries (history_path conf fname)
+
+let rewrite_entries path entries =
+  if entries = [] then Mutil.rm path
   else
     try
       Secure.with_open_out_gen
         [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
-        0o644 fname (fun oc ->
+        0o644 path (fun oc ->
           List.iter (fun e -> output_raw oc e.e_raw) entries)
     with Sys_error _ -> ()
+
+let write_entries conf fname entries =
+  rewrite_entries (history_path conf fname) entries
 
 let record_of_entry base entries e =
   let ki =
@@ -597,3 +603,30 @@ let record_of_entry base entries e =
     | _ -> Driver.Iper.dummy
   in
   record_of_raw base ki e.e_raw
+
+let convert ~dry_run conf base =
+  let legacy e =
+    match e.e_raw with V0003 _ -> false | V0002 _ | V0024 _ -> true
+  in
+  let upgrade e =
+    if legacy e then
+      let gr = record_of_raw base Driver.Iper.dummy e.e_raw in
+      { e with e_raw = V0003 (Marshal.to_bytes (stored_of_record base gr) []) }
+    else e
+  in
+  let dir = history_d conf in
+  if not (Sys.file_exists dir) then 0
+  else
+    Filesystem.walk_folder ~recursive:true
+      (fun entry n ->
+        match entry with
+        | Filesystem.File path -> (
+            match read_entries path with
+            | exception Failure _ -> n
+            | entries when List.exists legacy entries ->
+                if not dry_run then
+                  rewrite_entries path (List.rev_map upgrade entries);
+                n + 1
+            | _ -> n)
+        | Filesystem.Dir _ | Filesystem.Exn _ -> n)
+      dir 0
