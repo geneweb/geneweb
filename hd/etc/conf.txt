@@ -62,7 +62,7 @@
 <section id="bvar-list" class="mt-3 mx-3">
   <h2>[*configuration parameters]</h2>
   <div>
-    <b>Gwf</b>[:] %if;reorg;%base.name;.gwb%/etc%/%base.name;.gwf (<b>Reorg</b>)
+    <b>Gwf</b>[:] %if;reorg;%base.name;.gwb%/config%/%base.name;.gwf (<b>Reorg</b>)
     %else;%base.name;.gwf (<b>Classic</b>)%end;<br>
     <br>
     %bvar.list;
