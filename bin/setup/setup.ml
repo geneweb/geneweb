@@ -1256,8 +1256,11 @@ let rename conn conf =
       [] conf.env
     |> List.rev
   in
-  List.iter (fun (k, v) -> Printf.eprintf "k=%s, v=%s\n" k v) rename_list;
-  flush stderr;
+  let rename_path src dst =
+    try Sys.rename src dst
+    with Sys_error msg ->
+      raise (Sys_error (Printf.sprintf "%s -> %s: %s" src dst msg))
+  in
   let rename_cnt_files k v =
     (* we assume that etc/bname/cache has been renamed *)
     let dir = Layout.cnt (Layout.of_bname ~mode:Layout.Detect v) in
@@ -1278,7 +1281,7 @@ let rename conn conf =
           else None
         in
         Option.iter
-          (fun new_name -> Sys.rename (dir // filename) (dir // new_name))
+          (fun new_name -> rename_path (dir // filename) (dir // new_name))
           new_name)
       files
   in
@@ -1292,20 +1295,20 @@ let rename conn conf =
           flush stderr;
           try
             if Mutil.good_name k && GWPARAM.is_reorg_base k then (
-              Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
+              rename_path (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
               let config = base_path (v ^ ".gwb") // "config" in
-              Sys.rename (config // (k ^ ".gwf")) (config // (v ^ ".gwf")))
+              rename_path (config // (k ^ ".gwf")) (config // (v ^ ".gwf")))
             else begin
               if Sys.file_exists (base_path (k ^ ".gwb")) then
-                Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
+                rename_path (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
               if Sys.file_exists (base_path (k ^ ".gwf")) then
-                Sys.rename (base_path (k ^ ".gwf")) (base_path (v ^ ".gwf"));
+                rename_path (base_path (k ^ ".gwf")) (base_path (v ^ ".gwf"));
               if Sys.file_exists (base_path ("etc" // k)) then
-                Sys.rename (base_path ("etc" // k)) (base_path ("etc" // v));
+                rename_path (base_path ("etc" // k)) (base_path ("etc" // v));
               if Sys.file_exists (base_path ("src" // k)) then
-                Sys.rename (base_path ("src" // k)) (base_path ("src" // v));
+                rename_path (base_path ("src" // k)) (base_path ("src" // v));
               if Sys.file_exists (base_path ("images" // k)) then
-                Sys.rename
+                rename_path
                   (base_path ("images" // k))
                   (base_path ("images" // v))
             end;
