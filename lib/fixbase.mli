@@ -71,11 +71,12 @@ val fix_children_order :
   Geneweb_db.Driver.base ->
   unit
 (** For every family, put the children in birth order (baptism date when there
-    is no birth date). Only children with such a date are moved, and only
-    between the slots held by dated children: a child without a comparable date
-    keeps its position. Children whose dates cannot be strictly compared
-    (overlapping imprecise dates) keep their relative order when possible. Fixes
-    the [ChildrenNotInOrder] anomaly, except for a child known only by its death
+    is no birth date), moving few children. Only children with such a date are
+    moved; a child without a comparable date keeps its place relative to the
+    children that do not move (e.g. [A(1800) ? B(1790)] becomes [B A ?]).
+    Children whose dates cannot be strictly compared (overlapping imprecise
+    dates) keep their relative order when possible. Fixes the
+    [ChildrenNotInOrder] anomaly, except for a child known only by its death
     date. *)
 
 val check_persons_parents :
