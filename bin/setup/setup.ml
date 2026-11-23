@@ -1619,8 +1619,9 @@ let wrap_setup conn a b (c : Adef.encoded_string) =
   if not Sys.unix then (
     (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
     (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
-    (try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
-    try set_bases_dir @@ Sys.getenv "GWBD" with Not_found -> ());
+    (try bin_dir := Sys.getenv "GWBIN" with Not_found -> ());
+    (try set_bases_dir @@ Sys.getenv "GWBD" with Not_found -> ());
+    Secure.set_bases_dir @@ get_bases_dir ());
   try setup conn a b c with Exit -> ()
 
 let copy_text lang =
@@ -1762,6 +1763,7 @@ let intro () =
   if not Sys.unix then (
     Unix.putenv "GWLANG" setup_lang;
     Unix.putenv "GWGD" !setup_dir;
+    Unix.putenv "GWBIN" !bin_dir;
     Unix.putenv "GWBD" @@ get_bases_dir ());
   try
     print_char '\n';
