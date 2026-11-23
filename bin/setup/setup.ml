@@ -1263,24 +1263,23 @@ let rename conn conf =
     let dir = Layout.cnt (Layout.of_bname ~mode:Layout.Detect v) in
     Printf.eprintf "Rename cnt files in %s\n" dir;
     flush stderr;
-    let files = Sys.readdir dir in
+    let files = if Sys.file_exists dir then Sys.readdir dir else [||] in
     Array.iter
       (fun filename ->
         let k1 = k ^ "_" in
-        let v1 = v ^ "_" in
-        if Util.starts_with filename k1 then (
-          let suffix =
-            String.sub filename (String.length k1)
-              (String.length filename - String.length k1)
-          in
-          let old_path = dir // filename in
-          let new_path = dir // (v1 ^ suffix) in
-          Unix.rename old_path new_path;
-          if Filename.remove_extension filename = k then
-            let ext = Filename.extension filename in
-            let old_path = dir // filename in
-            let new_path = dir // (v ^ ext) in
-            Unix.rename old_path new_path))
+        let new_name =
+          if Util.starts_with filename k1 then
+            Some
+              (v ^ "_"
+              ^ String.sub filename (String.length k1)
+                  (String.length filename - String.length k1))
+          else if Filename.remove_extension filename = k then
+            Some (v ^ Filename.extension filename)
+          else None
+        in
+        Option.iter
+          (fun new_name -> Sys.rename (dir // filename) (dir // new_name))
+          new_name)
       files
   in
   try
@@ -1292,8 +1291,10 @@ let rename conn conf =
           Printf.eprintf "Start renaming (%s -> %s)\n" k v;
           flush stderr;
           try
-            if Mutil.good_name k && GWPARAM.is_reorg_base k then
-              Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"))
+            if Mutil.good_name k && GWPARAM.is_reorg_base k then (
+              Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
+              let config = base_path (v ^ ".gwb") // "config" in
+              Sys.rename (config // (k ^ ".gwf")) (config // (v ^ ".gwf")))
             else begin
               if Sys.file_exists (base_path (k ^ ".gwb")) then
                 Sys.rename (base_path (k ^ ".gwb")) (base_path (v ^ ".gwb"));
