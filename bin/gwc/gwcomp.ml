@@ -1051,39 +1051,36 @@ let get_relation ~bname str = function
 (** Read notes of a person inside [note] block across multiple lines and concat
     them. *)
 let read_notes ic =
-  let notes =
-    try
-      let rec loop = function
-        | "end notes" -> ""
-        | l -> l ^ "\n" ^ loop (input_a_line ic)
-      in
-      loop (input_a_line ic)
-    with End_of_file -> failwith "end of file"
+  let b = Buffer.create 1024 in
+  let rec loop () =
+    match input_a_line ic with
+    | "end notes" -> ()
+    | l ->
+        Buffer.add_string b l;
+        Buffer.add_char b '\n';
+        loop ()
   in
-  Mutil.strip_all_trailing_spaces notes
+  (try loop () with End_of_file -> failwith "end of file");
+  Mutil.strip_all_trailing_spaces (Buffer.contents b)
 
 (* from version 5.00 *)
 
 (** Read database notes across multiple lines and concat them. Stop reading when
     encounter [end_text] *)
 let read_notes_db ic end_txt =
-  let notes =
-    try
-      let rec loop s =
-        if s = end_txt then ""
-        else
-          let len = String.length s in
-          let s =
-            if len > 2 && s.[0] = ' ' && s.[1] = ' ' then
-              String.sub s 2 (len - 2)
-            else s
-          in
-          s ^ "\n" ^ loop (input_a_line ic)
-      in
-      loop (input_a_line ic)
-    with End_of_file -> failwith "end of file"
+  let b = Buffer.create 4096 in
+  let rec loop () =
+    let s = input_a_line ic in
+    if s <> end_txt then (
+      let len = String.length s in
+      if len > 2 && s.[0] = ' ' && s.[1] = ' ' then
+        Buffer.add_substring b s 2 (len - 2)
+      else Buffer.add_string b s;
+      Buffer.add_char b '\n';
+      loop ())
   in
-  Mutil.strip_all_trailing_spaces notes
+  (try loop () with End_of_file -> failwith "end of file");
+  Mutil.strip_all_trailing_spaces (Buffer.contents b)
 
 (** Parsing status of .gw block *)
 type 'a read_family =
