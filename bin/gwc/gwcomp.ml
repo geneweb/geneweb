@@ -535,12 +535,7 @@ let name_unaccent_lower s =
   in
   copy 0 0
 
-(* read .auth file and build a consent_list of keys *)
-let auth_access ~bname fn sn oc l =
-  let access, l = get_access l in
-  let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
-  let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
-  let frs = if access = SemiPublic then "SemiPublic" else "Other" in
+let read_consent_keys bname =
   let gwf_file = Layout.gwf (Layout.of_bname ~mode:Layout.Detect bname) in
   let auth_file_name =
     try
@@ -557,48 +552,59 @@ let auth_access ~bname fn sn oc l =
           loop ())
     with Sys_error _ -> None
   in
+  let ht = Hashtbl.create 10 in
+  match auth_file_name with
+  | Some file_name -> (
+      let friend_passwd_file =
+        Filename.concat (Secure.bases_dir ()) file_name
+      in
+      try
+        Secure.with_open_in_text friend_passwd_file (fun ic ->
+            let rec loop ht =
+              match input_line ic |> name_unaccent_lower with
+              | exception End_of_file -> ht
+              | line -> (
+                  (* ident:passwd:name[|key]:comment *)
+                  let parts = String.split_on_char ':' line in
+                  let username = try List.nth parts 2 with Failure _ -> "" in
+                  match Geneweb.Util.extract_value '|' username with
+                  | exception Not_found -> loop ht
+                  | key ->
+                      Hashtbl.add ht key key;
+                      loop ht)
+            in
+            loop ht)
+      with Sys_error _ ->
+        if Sys.file_exists friend_passwd_file then
+          Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
+        ht)
+  | None -> ht
 
-  let consent_htbl =
-    let ht = Hashtbl.create 10 in
-    match auth_file_name with
-    | Some file_name -> (
-        let friend_passwd_file =
-          Filename.concat (Secure.bases_dir ()) file_name
-        in
-        try
-          Secure.with_open_in_text friend_passwd_file (fun ic ->
-              let rec loop ht =
-                match input_line ic |> name_unaccent_lower with
-                | exception End_of_file -> ht
-                | line -> (
-                    (* ident:passwd:name[|key]:comment *)
-                    let parts = String.split_on_char ':' line in
-                    let username =
-                      try List.nth parts 2 with Failure _ -> ""
-                    in
-                    match Geneweb.Util.extract_value '|' username with
-                    | exception Not_found -> loop ht
-                    | key ->
-                        Hashtbl.add ht key key;
-                        loop ht)
-              in
-              loop ht)
-        with Sys_error _ ->
-          if Sys.file_exists friend_passwd_file then
-            Printf.eprintf "Warning: error reading %s\n" friend_passwd_file;
-          ht)
-    | None -> ht
-  in
+let consent_cache = ref None
 
-  let is_consent =
-    Hashtbl.mem consent_htbl (Format.sprintf "%s.%d+%s" fns oc sns)
-  in
+let consent_keys bname =
+  match !consent_cache with
+  | Some (b, ht) when b = bname -> ht
+  | _ ->
+      let ht = read_consent_keys bname in
+      consent_cache := Some (bname, ht);
+      ht
+
+let auth_access ~bname fn sn oc l =
+  let access, l = get_access l in
   if access = Public then (Public, l)
-  else if is_consent then (
-    incr semi_pub_cnt;
-    if !verbose then Printf.eprintf "Set to %s %s.%d %s\n" frs fns oc sns;
-    (SemiPublic, l))
-  else (access, l)
+  else
+    let fns = name_unaccent_lower fn |> Mutil.tr ' ' '_' in
+    let sns = name_unaccent_lower sn |> Mutil.tr ' ' '_' in
+    let key = Format.sprintf "%s.%d+%s" fns oc sns in
+    if Hashtbl.mem (consent_keys bname) key then (
+      incr semi_pub_cnt;
+      if !verbose then
+        Printf.eprintf "Set to %s %s.%d %s\n"
+          (if access = SemiPublic then "SemiPublic" else "Other")
+          fns oc sns;
+      (SemiPublic, l))
+    else (access, l)
 
 (** test presence of a file fn.occ.sn.pdf in rgpd_dirs *)
 let rgpd_access fn sn occ l =
