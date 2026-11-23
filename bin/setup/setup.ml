@@ -1324,6 +1324,7 @@ let rename conn conf =
             prerr_string msg;
             flush stderr;
             Out_channel.with_open_text comm_log (fun oc -> output_string oc msg);
+            print_file "err_standard.htm" conn conf;
             raise Exit
         end)
       rename_list;
@@ -1331,9 +1332,7 @@ let rename conn conf =
   with
   | Exit ->
       Printf.eprintf "Failed renaming\n";
-      flush stderr;
-      (*raise Exit  Re-raise to signal failure to caller *)
-      print_file "err_standard.htm" conn conf
+      flush stderr
   | Sys_error msg ->
       Printf.eprintf "System error during renaming: %s\n" msg;
       flush stderr;
