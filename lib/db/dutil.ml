@@ -32,12 +32,19 @@ let printable_magic found =
   if found <> "" && String.for_all printable found then found else "?"
 
 let incompatible_format_message file found expected =
-  Printf.sprintf
-    "%s: unsupported format %S, this executable reads %s. The file was \
-     probably written by another GeneWeb version: use the gwd/gwu/gwc built \
-     with it, or recompile the base from a .gw export made with that version."
-    file (printable_magic found)
-    (String.concat ", " expected)
+  if found = "" then
+    Printf.sprintf
+      "%s: missing, empty or unreadable file. Check the name of the base and \
+       its folder (-bd)."
+      file
+  else
+    Printf.sprintf
+      "%s: unsupported format %S, this executable reads %s. The file was \
+       probably written by another GeneWeb version: use the gwd/gwu/gwc built \
+       with it, or recompile the base from a .gw export made with that \
+       version."
+      file (printable_magic found)
+      (String.concat ", " expected)
 
 let () =
   Printexc.register_printer (fun exn ->
