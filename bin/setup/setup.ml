@@ -1314,8 +1314,16 @@ let rename conn conf =
             end;
             rename_cnt_files k v
           with Sys_error msg ->
-            Printf.eprintf "Error renaming %s to %s: %s\n" k v msg;
+            let msg =
+              Printf.sprintf "Error renaming %s to %s: %s\n%s" k v msg
+                (if Sys.win32 then
+                   "A window of the Windows Explorer opened on this base may \
+                    lock it: close it and retry.\n"
+                 else "")
+            in
+            prerr_string msg;
             flush stderr;
+            Out_channel.with_open_text comm_log (fun oc -> output_string oc msg);
             raise Exit
         end)
       rename_list;
