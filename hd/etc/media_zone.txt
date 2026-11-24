@@ -1,0 +1,75 @@
+<!-- $Id: media_zone.txt v7.1 24/11/2026 $ -->
+%( Drop zone, wall and preview of the files to send, driven by media.js.
+   Included in the #media element of the page, which holds the place of
+   the files. %)
+<div class="dropzone upload-zone" id="upload-zone"
+  data-action="%action;"%if;(cgi) data-base="%e.b;"%end;
+  data-max-image="%if;(b.max_images_size!="")%b.max_images_size;%else;20000000%end;"
+  data-max-document="%if;(b.max_documents_size!="")%b.max_documents_size;%else;100000000%end;"
+  data-units="[file size units]"
+  data-too-big="[*file too big (max %s):::{max}]"
+  data-type-refused="[*file type not accepted here]"
+  data-slot-taken="[*upload slot taken]"
+  data-error="[*error]">
+  <div class="dz-message">
+    <button type="button" class="dz-button">[*upload zone]</button>
+  </div>
+</div>
+<div id="upload-wall"></div>
+<div class="mt-2">
+  <button type="button" class="btn btn-primary d-none" id="upload-send"
+    disabled>[*upload send/finish]0</button>
+  <button type="button" class="btn btn-primary d-none"
+    id="upload-finish">[*upload send/finish]1</button>
+</div>
+<template id="upload-preview">
+  <div class="dz-preview dz-file-preview upload-item d-flex border rounded p-2 mt-2">
+    <div class="upload-thumb me-2">
+      <img data-dz-thumbnail alt="">
+      <i class="far fa-file-lines fa-3x text-secondary" aria-hidden="true"></i>
+    </div>
+    <div class="flex-grow-1 upload-body">
+      <fieldset class="upload-controls">
+        <div class="row g-2">
+          <div class="col-auto upload-dest-col">
+            <select class="form-select upload-dest" aria-label="[*upload destination]"
+              title="[*upload destination]">
+              <option value="portrait">[*upload dest/portrait/blason/person]0</option>
+              <option value="blason">[*upload dest/portrait/blason/person]1</option>
+              <option value="person">[*upload dest/portrait/blason/person]2</option>
+            </select>
+          </div>
+          <div class="col upload-name-col">
+            <div class="input-group has-validation">
+              <input type="text" class="form-control upload-name" autocomplete="off"
+                aria-label="[*name]" title="[*name]">
+              <span class="input-group-text upload-ext"></span>
+              <div class="invalid-feedback">[*invalid file name]</div>
+            </div>
+          </div>
+        </div>
+        <div class="upload-conflict alert alert-warning p-2 mt-2 mb-0 d-none">
+          <div>[*upload conflict]</div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <button type="button"
+              class="btn btn-sm btn-warning upload-replace">[*replace/skip/rename]0</button>
+            <button type="button"
+              class="btn btn-sm btn-outline-secondary upload-skip">[*replace/skip/rename]1</button>
+            <button type="button"
+              class="btn btn-sm btn-outline-secondary upload-rename">[*replace/skip/rename]2</button>
+          </div>
+        </div>
+        <div class="upload-replaces text-warning-emphasis mt-1 d-none">[*will replace]</div>
+      </fieldset>
+      <div class="small text-body-secondary text-break mt-1">
+        <span data-dz-name></span>, <span class="upload-size"></span>
+      </div>
+      <div class="progress mt-1">
+        <div class="progress-bar" data-dz-uploadprogress></div>
+      </div>
+      <div class="upload-error text-danger mt-1" data-dz-errormessage></div>
+    </div>
+    <button type="button" class="btn-close ms-2" data-dz-remove
+      aria-label="[*delete]" title="[*delete]"></button>
+  </div>
+</template>

@@ -120,51 +120,28 @@
   <div class="row">
     %( *** Col 1 *** upload form %)
     <div class="col-6">
-      <div class="d-flex align-items-center">
-        <h1 class="display-5 mb-0">%nn;
-          %if;(has_portrait)[*modify portrait]%else;[*add portrait]%end;</h1>
-        %if;(has_portrait or has_portrait_url)
-          <abbr class="ms-2 text-primary small" data-bs-toggle="tooltip" data-bs-html="true"
-            data-bs-placement="top"
-            title="%if;has_portrait_url;[*must use MOD_IND]%else;%if;has_portrait;[*previous portrait]%end;%end;">
-            (<i class="fa fa-info fa-xs" aria-hidden="true"></i>)</abbr>
-        %end;
-      </div>
-      <form class="row g-2 align-items-center" method="post" action="%action;"
-            enctype="multipart/form-data">
-        %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
-        <input type="hidden" name="m" value="SND_IMAGE_OK">
-        <input type="hidden" name="i" value="%index;">
-        <input type="hidden" name="notes" value="">
-        <input type="hidden" name="mode" value="portraits">
-        <div class="col">
-          <input type="file" name="file" class="form-control custom-portrait"
-            id="portrait_file" accept="image/*"%if;(not has_portrait) autofocus%end;>
+      %if;(b.can_send_image!="no")
+        <div id="media" data-mode="person" data-access="%access;"
+          data-list="%prefix;m=MEDIA_LIST&%access;"
+          data-done="%prefix;m=MEDIA&%access;"
+          data-accepted=".jpg,.jpeg,.png,.gif,.pdf,.docx,.odt">
+          %if;(has_portrait or has_portrait_url or (has_blason and has_old_blason))
+            <div class="small mt-1">
+              %if;(has_portrait or has_portrait_url)
+                [*portrait]0
+                <abbr class="text-primary" data-bs-toggle="tooltip" data-bs-html="true"
+                  data-bs-placement="top"
+                  title="%if;has_portrait_url;[*must use MOD_IND]%else;[*previous portrait]%end;">
+                  (<i class="fa fa-info fa-xs" aria-hidden="true"></i>)</abbr>
+              %end;
+              %if;(has_blason and has_old_blason)
+                <span class="ms-2">[*previous::blason/blasons]0</span>
+              %end;
+            </div>
+          %end;
+          %include;media_zone
         </div>
-        <button class="btn btn-primary col-auto snd-btn-portrait"
-          type="submit" disabled>[*send::]</button>
-      </form>
-
-      <h1 class="display-5 mt-2">%nn;
-        %if;(has_blason)[*modify coat of arms]%else;[*add coat of arms]%end;</h1>
-      <form class="row g-2 align-items-center" method="post" action="%action;"
-            enctype="multipart/form-data">
-        %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
-        <input type="hidden" name="m" value="SND_IMAGE_OK">
-        <input type="hidden" name="i" value="%index;">
-        <input type="hidden" name="notes" value="">
-        <input type="hidden" name="mode" value="blasons">
-        <div class="col">
-          <input type="file" name="file" class="form-control custom-blason"
-            id="blason_file" accept="image/*"%if;(not has_blason) autofocus%end;>
-        </div>
-        <button class="btn btn-primary col-auto snd-btn-blason"
-          type="submit" disabled>[*send::]</button>
-      </form>
-      %if;(has_blason and has_old_blason)
-        <div class="small mt-2">[*previous::blason/blasons]0</div>
       %end;
-
       <div class="d-flex align-items-center mt-2">
         <h1 class="display-5 mb-0">[*add image]</h1>
         <abbr class="ms-2 text-primary small" data-bs-toggle="tooltip" data-bs-html="true"
@@ -172,25 +149,13 @@
           (<i class="fa fa-info fa-xs" aria-hidden="true"></i>)
         </abbr>
       </div>
-      <form method="post" action="%action;" enctype="multipart/form-data">
+      <form method="post" action="%action;">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
         <input type="hidden" name="m" value="SND_IMAGE_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="mode" id="mode_2" value="carrousel">
         <input type="hidden" name="file_name_2" id="file_name_2" value="">
-        <div class="row g-2 align-items-center">
-          <div class="col">
-            <input type="file" name="file" class="form-control custom-others"
-              id="others_file" accept="image/*"%if;has_portrait; autofocus%end;>
-          </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-primary btn-quick-upload" disabled>[*send::]</button>
-          </div>
-        </div>
         <div class="row g-2 align-items-center mt-1">
-          <div class="col-auto">
-            <span>[or]</span>
-          </div>
           <div class="col">
             <input type="text" class="form-control" id="image_url" name="image_url"
               placeholder="%apply;a_of_b%with;[URL]%and;[image/images]0%end;">
@@ -200,6 +165,7 @@
               placeholder="[*name]" disabled>
           </div>
         </div>
+        <div class="small text-success mt-1 d-none" id="upload-url-hint">[*dropped url hint]</div>
         <div class="mt-3 mb-2">
           <textarea class="form-control" id="image_note" disabled
             name="note" rows="2" placeholder="[*note/notes]0 ([optional])"></textarea>
@@ -489,32 +455,6 @@ function updateTextareaSize() {
 
 let editAbort = null;
 
-// ── File input BS5 (remplace custom-file BS4) ──────────────────────────────
-// Pour portrait et blason : active simplement le bouton submit sur changement de fichier.
-// Pour "others" (carrousel) : active le btn-quick-upload + les champs note/source.
-function setupFileInput(fileInputSel, submitSel, isCarrousel) {
-  const input = $q(fileInputSel);
-  const btn   = $q(submitSel);
-  if (!input || !btn) return;
-
-  input.addEventListener('change', () => {
-    const hasFile = input.value !== '';
-    btn.disabled = !hasFile;
-    if (isCarrousel && hasFile) {
-      setDisabled([$('image_note'), $('image_source')], false);
-      setDisabled([$q('.submit-button')], false);
-      // URL et nom désactivés quand un fichier est sélectionné
-      const urlEl  = $('image_url');
-      const nameEl = $('image_name');
-      if (urlEl)  { urlEl.disabled = true;  urlEl.value = ''; }
-      if (nameEl) { nameEl.disabled = true; nameEl.value = ''; }
-      showCancelBtn();
-      const note = $('image_note');
-      if (note) note.focus();
-    }
-  });
-}
-
 function showCancelBtn() {
   const btn = $('btn-cancel-edit');
   if (btn) { btn.classList.remove('d-none'); btn.classList.add('d-flex', 'align-items-center'); }
@@ -531,14 +471,11 @@ const editImageNote = (cnt, name) => {
   const noteData  = anchor ? anchor.dataset.note   : '';
   const srcData   = anchor ? anchor.dataset.source : '';
 
-  // Verrouiller upload pendant l'édition
-  const othersFile = $('others_file');
-  const urlEl      = $('image_url');
-  const nameEl     = $('image_name');
-  if (othersFile) othersFile.disabled = true;
-  if (urlEl)      urlEl.disabled = true;
-  if (nameEl)     nameEl.disabled = true;
-  $q('.btn-quick-upload').disabled = true;
+  // Verrouiller l'URL pendant l'édition
+  const urlEl  = $('image_url');
+  const nameEl = $('image_name');
+  if (urlEl)  urlEl.disabled = true;
+  if (nameEl) nameEl.disabled = true;
 
   showCancelBtn();
 
@@ -580,16 +517,12 @@ const editImageNote = (cnt, name) => {
 $('image_url')?.addEventListener('input', function() {
   const url    = this.value.trim();
   const nameEl = $('image_name');
-  const submitBtn  = $q('.submit-button');
-  const quickBtn   = $q('.btn-quick-upload');
-  const othersFile = $('others_file');
+  const submitBtn = $q('.submit-button');
 
   if (url) {
-    if (quickBtn)   quickBtn.disabled   = false;
-    if (submitBtn)  submitBtn.disabled  = false;
+    if (submitBtn) submitBtn.disabled = false;
     setDisabled([$('image_note'), $('image_source')], false);
-    if (othersFile) { othersFile.disabled = true; }
-    if (nameEl)     { nameEl.disabled = false; }
+    if (nameEl)    { nameEl.disabled = false; }
     // Pré-remplir le placeholder du nom depuis l'URL
     if (nameEl && !nameEl.value) {
       const filename = url.split('/').pop().split('?')[0];
@@ -597,12 +530,9 @@ $('image_url')?.addEventListener('input', function() {
     }
     showCancelBtn();
   } else {
-    if (othersFile && !othersFile.disabled) {
-      if (quickBtn)  quickBtn.disabled  = true;
-      if (submitBtn) submitBtn.disabled = true;
-      setDisabled([$('image_note'), $('image_source')], true);
-      hideCancelBtn();
-    }
+    if (submitBtn) submitBtn.disabled = true;
+    setDisabled([$('image_note'), $('image_source')], true);
+    hideCancelBtn();
     if (nameEl) { nameEl.disabled = true; nameEl.value = ''; }
   }
 });
@@ -610,11 +540,9 @@ $('image_url')?.addEventListener('input', function() {
 // ── Champs métadonnées (nom/note/source) ──────────────────────────────────
 ['image_name', 'image_note', 'image_source'].forEach(id => {
   $(id)?.addEventListener('input', function() {
-    const othersFile = $('others_file');
-    const urlEl      = $('image_url');
-    const submitBtn  = $q('.submit-button');
+    const urlEl     = $('image_url');
+    const submitBtn = $q('.submit-button');
     if (submitBtn && (
-      (othersFile && othersFile.value) ||
       (urlEl && urlEl.value.trim()) ||
       this.value.trim()
     )) submitBtn.disabled = false;
@@ -638,24 +566,12 @@ $('btn-cancel-edit')?.addEventListener('click', () => {
   const submitBtn = $q('.submit-button');
   if (submitBtn) submitBtn.disabled = true;
 
-  const othersFile = $('others_file');
-  if (othersFile) { othersFile.value = ''; othersFile.disabled = false; }
-
   const urlEl  = $('image_url');
   const nameEl = $('image_name');
   if (urlEl)  { urlEl.value  = ''; urlEl.disabled  = false; }
   if (nameEl) { nameEl.value = ''; nameEl.disabled = true; }
 
-  const quickBtn = $q('.btn-quick-upload');
-  if (quickBtn) quickBtn.disabled = true;
-
   hideCancelBtn();
-});
-
-// ── Btn-quick-upload ──────────────────────────────────────────────────────
-$q('.btn-quick-upload')?.addEventListener('click', () => {
-  const othersFile = $('others_file');
-  if (othersFile && othersFile.value) othersFile.closest('form').submit();
 });
 
 // ── Submit guard ──────────────────────────────────────────────────────────
@@ -669,10 +585,6 @@ $qa('form').forEach(form => {
 
 // ── Tooltips BS5 ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  setupFileInput('.custom-portrait', '.snd-btn-portrait', false);
-  setupFileInput('.custom-blason',   '.snd-btn-blason',   false);
-  setupFileInput('.custom-others',   '.btn-quick-upload', true);
-
   $qa('[data-bs-toggle="tooltip"]').forEach(el => {
     new bootstrap.Tooltip(el, { html: true });
   });
