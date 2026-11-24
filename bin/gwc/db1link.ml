@@ -1721,6 +1721,7 @@ let link ?(no_warn = false) next_family_fun bpath =
     output_wizard_notes bpath gen.g_wiznotes;
     output_command_line bpath;
     Mutil.rm_rf tmp_dir;
+    Notes.rebuild_links_db ~verbose:!Gwcomp.verbose base bpath;
     true)
   else (
     Mutil.rm_rf tmp_dir;

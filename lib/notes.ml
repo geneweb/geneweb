@@ -524,6 +524,104 @@ let update_notes_links_family_gen batch ?old_text conf base
 let update_notes_links_family ?old_text conf base f =
   update_notes_links_family_gen None ?old_text conf base f
 
+let rebuild_links_db ?(verbose = false) base bpath =
+  let say fmt =
+    if verbose then Printf.eprintf fmt else Printf.ifprintf stderr fmt
+  in
+  let db = ref [] in
+  let linked = Hashtbl.create 1024 in
+  let add_page pg ((list_nt, list_ind) as links) =
+    if list_nt <> [] || list_ind <> [] then (
+      (* each page is visited once: consing spares the List.remove_assoc of
+         NotesLinks.add_in_db, quadratic over a whole base *)
+      db := (pg, links) :: !db;
+      List.iter
+        (fun key ->
+          let n = Option.value ~default:0 (Hashtbl.find_opt linked key) in
+          Hashtbl.replace linked key (n + 1))
+        (List.sort_uniq compare (List.map fst list_ind)))
+  in
+  let is_note_file f =
+    f <> "" && f.[0] <> '.' && f.[String.length f - 1] <> '~'
+  in
+  Driver.load_strings_array base;
+  say "--- database notes\n%!";
+  add_page Def.NLDB.PgNotes (links_of_text (Driver.base_notes_read base ""));
+  say "--- wizard notes\n%!";
+  let wdir = Filename.concat bpath (Driver.base_wiznotes_dir base) in
+  (match Sys.readdir wdir with
+  | exception Sys_error _ -> ()
+  | files ->
+      Array.iter
+        (fun file ->
+          if is_note_file file && Filename.check_suffix file ".txt" then
+            let wizid = Filename.chop_suffix file ".txt" in
+            match links_of_text (Driver.base_wiznotes_read base wizid) with
+            | [], [] -> ()
+            | links ->
+                say "%s... %!" wizid;
+                add_page (Def.NLDB.PgWizard wizid) links)
+        files;
+      say "\n%!");
+  say "--- misc notes\n%!";
+  let ndir = Filename.concat bpath (Driver.base_notes_dir base) in
+  let join name f =
+    if name = "" then f
+    else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep f
+  in
+  let rec scan_dir dir name =
+    match Sys.readdir (Filename.concat ndir dir) with
+    | exception Sys_error _ ->
+        Printf.eprintf "Warning: error while reading misc notes %s\n%!" name
+    | files ->
+        Array.iter
+          (fun file ->
+            if not (is_note_file file) then ()
+            else if Filename.check_suffix file ".txt" then (
+              let f = Filename.chop_suffix file ".txt" in
+              let fnotes = join name f in
+              if NotesLinks.file_name fnotes <> Some fnotes then
+                Printf.eprintf "Warning: misc note %s skipped: invalid name\n%!"
+                  fnotes
+              else
+                match
+                  links_of_text
+                    (Driver.base_notes_read base (Filename.concat dir f))
+                with
+                | [], [] -> ()
+                | links ->
+                    say "%s...\n%!" fnotes;
+                    add_page (Def.NLDB.PgMisc fnotes) links)
+            else
+              let sub = Filename.concat dir file in
+              if Sys.is_directory (Filename.concat ndir sub) then
+                scan_dir sub (join name file))
+          files
+  in
+  scan_dir "" "";
+  let scan title nb page text coll =
+    say "--- %s\n%!" title;
+    if verbose then ProgrBar.start ();
+    Geneweb_db.Collection.iteri
+      (fun i x ->
+        if verbose then ProgrBar.run i nb;
+        add_page (page x) (links_of_text (text x)))
+      coll;
+    if verbose then ProgrBar.finish ()
+  in
+  scan "individual notes"
+    (Driver.nb_of_persons base)
+    (fun p -> Def.NLDB.PgInd (Driver.get_iper p))
+    (fun p -> notes_bearing_text_of_person base (Driver.gen_person_of_person p))
+    (Driver.persons base);
+  scan "families notes"
+    (Driver.nb_of_families base)
+    (fun f -> Def.NLDB.PgFam (Driver.get_ifam f))
+    (fun f -> notes_bearing_text_of_family base (Driver.gen_family_of_family f))
+    (Driver.families base);
+  Driver.write_nldb base !db;
+  save_cache_linked_pages bpath linked
+
 let commit_notes_gen batch conf base fnotes s =
   let pg = if fnotes = "" then Def.NLDB.PgNotes else Def.NLDB.PgMisc fnotes in
   let fname = path_of_fnotes fnotes in

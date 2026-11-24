@@ -370,6 +370,7 @@
   order (birth date, else baptism date), moving few of them; undated
   children keep their place relative to the others. Not part of the
   default set of fixes (#3196).
+- The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM
 - In a `.gw` file, a witness line (`wit`) may be followed by `wnote`
@@ -390,6 +391,13 @@
   base again, and upgrades a base of format `GnWb0025`.
 - `cache_files` takes the strings of the datalists from this index
   instead of reading every person and family.
+- `gwc` and `ged2gwb` build the notes links database (`notes_links`) and
+  the linked pages cache (`cache_linked_pages`) once the base is written:
+  `update_nldb` no longer has to be run after them. `update_nldb` rebuilds
+  them on an existing base with the same code, which now also scans the
+  witness notes and indexes the same fields as gwd when a person or a
+  family is saved; a misc note whose file name is not a valid note name
+  is skipped with a warning. Its `-debug` option is removed.
 
 ## Templates
 - Accessibility pass on the welcome, home, menubar, copyr and person

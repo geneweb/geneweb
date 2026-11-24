@@ -161,9 +161,6 @@ for xx in "${DBNAME}.gwu.o.gw" "outdir.$DBNAME/$DBNAME.gw" ; do
     fi
 done
 
-$SUDOPRFX $BIN_DIR/update_nldb -bd $BASES_DIR $DBNAME  >$BASES_DIR/$DBNAME.update_nldb.log 2>&1 || \
-  { echo "update_nldb failure, details in $BASES_DIR/$DBNAME.update_nldb.log"; exit 1; }
-
 gwb2geddbn="${DBNAME}gwb2ged"
 gwb2gedout="$BASES_DIR/$gwb2geddbn"
 $SUDOPRFX $BIN_DIR/gwb2ged $DBNAME -bd $BASES_DIR -v -o $gwb2geddbn.ged 2>$gwb2gedout.stderr || \
