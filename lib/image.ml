@@ -462,7 +462,7 @@ let rename_portrait_and_blason conf base p (nfn, nsn, noc) =
             with Sys_error e ->
               Log.err (fun k ->
                   k "Error renaming %s to %s: %s" old_file new_file e))
-        [| ".jpg"; ".jpeg"; ".png"; ".gif"; ".stop" |]
+        ext_list_2
     in
     rename_files_with_extensions p_dir old_key;
     rename_files_with_extensions p_dir (old_key ^ ".blason");
