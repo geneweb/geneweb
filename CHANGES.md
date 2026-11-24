@@ -444,6 +444,12 @@
   browser; an image is only loaded on the hover of its icon, a click on
   a name copies it, a new gallery starts with an image or a whole
   folder, and a file is deleted to the saved files.
+- The documents (PDF, DOCX, ODT) of the directory of a person are listed
+  with its images: on the carrousel page, where they can be viewed,
+  annotated, deleted and restored like an image, and on the person page
+  (image slider and documents module), with a file icon and a link. The
+  new `carrousel_doc` variable of the `img_in_carrousel` loops tells a
+  document from an image.
 
 ## Deprecated features
 - The former names of the person display macros of perso_utils.txt

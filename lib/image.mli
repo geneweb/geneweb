@@ -4,6 +4,10 @@ val portrait_folder : config -> string
 val carrousel_folder : config -> string
 val ext_list_1 : string array
 val ext_list_2 : string array
+
+val ext_list_doc : string array
+(** Extensions of the documents listed with the images of a person. *)
+
 val find_file_without_ext : string -> string
 val is_url : string -> bool
 
@@ -197,6 +201,11 @@ val get_carrousel_imgs :
   Geneweb_db.Driver.base ->
   Geneweb_db.Driver.person ->
   (string * string * string * string) list
+(** [get_carrousel_imgs conf base p] lists the images and the documents
+    ([ext_list_doc]) of the directory of [p] as [(name, url, source, note)]:
+    [name] is the path of the file and [url] is empty, or [name] is the name of
+    a [.url] file and [url] its content. The list is empty if the files of [p]
+    are not accessible. *)
 
 val get_carrousel_old_imgs :
   config ->

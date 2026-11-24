@@ -346,28 +346,38 @@
               onclick='editImageNote(%img_cnt;, "%carrousel_img_raw;"); return false;'
               data-source="%carrousel_img_src;" data-note="%carrousel_img_note;"
               data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
-              title="<strong><i class='fas fa-images fa-xs me-1'></i>[*see] [image/images]0</strong><br>
-                <span class='small'>%carrousel_img_raw;</span><br>
-                <img class='rounded my-1' width='185px'
-                  src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>
+              title="<strong><i class='fas fa-images fa-xs me-1'></i>[*see] %if;carrousel_doc;[document/documents]0%else;[image/images]0%end;</strong><br>
+                <span class='small'>%carrousel_img_raw;</span>
+                %if;(not carrousel_doc)<br>
+                  <img class='rounded my-1' width='185px'
+                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>
+                %end;
                 %if;(carrousel_img_note!="")<br><strong>[*note/notes]0[:]</strong> %carrousel_img_note;%end;
                 %if;(carrousel_img_src!="")<br><strong>[*source/sources]0[:]</strong> %carrousel_img_src;%end;">
-              <i class="far fa-file-image fa-fw text-primary"></i></a>
-            <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
-              title="[*copy image to blason]">
-              <i class="fa fa-user-shield fa-xs text-success me-1"></i></a>
-            <a href="%prefix;m=MOD_GALLERY&new&src=%keydir;/%carrousel_img;"
-              title="[*create gallery]2">
-               <i class="fa-regular fa-images fa-xs text-info"></i></a>
-            <samp class="text-truncate ms-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
+              <i class="far %if;carrousel_doc;fa-file-lines%else;fa-file-image%end; fa-fw text-primary"></i></a>
+            %if;carrousel_doc;
+              <a class="text-truncate ms-1" href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;"
+                target="_blank" rel="noopener"
+                title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;"><samp>%carrousel_img_raw;</samp></a>
+            %else;
+              <a href="%prefix;m=IMAGE_TO_BLASON&i=%index;&mode=blasons&file_name=%carrousel_img;"
+                title="[*copy image to blason]">
+                <i class="fa fa-user-shield fa-xs text-success me-1"></i></a>
+              <a href="%prefix;m=MOD_GALLERY&new&src=%keydir;/%carrousel_img;"
+                title="[*create gallery]2">
+                 <i class="fa-regular fa-images fa-xs text-info"></i></a>
+              <samp class="text-truncate ms-1" title="%images_store;%X;%carrousel;%X;%carrousel_img_raw;">%carrousel_img_raw;</samp>
+            %end;
             <div class="ms-auto">
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=carrousel&file_name=%carrousel_img;"
                 data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
                 title="<i class='far fa-trash-can text-warning me-1'></i><strong>[*delete image]</strong><br>
-                  <span class='small'>%carrousel_img_raw;</span><br>
-                  <img class='rounded my-1' width='185px'
-                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>">
+                  <span class='small'>%carrousel_img_raw;</span>
+                  %if;(not carrousel_doc)<br>
+                    <img class='rounded my-1' width='185px'
+                      src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C&i=%index;&s=%carrousel_img;%end;>
+                  %end;">
                 <i class="far fa-trash-can text-warning"></i></a>
             </div>
           </div>
@@ -388,10 +398,12 @@
               target="_blank" rel="noopener"
               data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
               title="<strong><i class='fas fa-images fa-xs me-1'></i>[*see] [saved images]0</strong><br>
-                <span class='small'>%carrousel_img_raw;</span><br>
-                <img class='rounded my-1' width='185px'
-                  src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>">
-              <i class="far fa-file-image fa-fw text-primary"></i></a>
+                <span class='small'>%carrousel_img_raw;</span>
+                %if;(not carrousel_doc)<br>
+                  <img class='rounded my-1' width='185px'
+                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>
+                %end;">
+              <i class="far %if;carrousel_doc;fa-file-lines%else;fa-file-image%end; fa-fw text-primary"></i></a>
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=carrousel&delete=on&file_name=%carrousel_img;"
               %if;(url_in_env!="")%else;data-bs-toggle="tooltip" data-bs-placement="top"%end;
               title="[*restore image saved]">
@@ -401,9 +413,11 @@
               href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&mode=carrousel&delete=on&file_name=%carrousel_img;"
               data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"
               title="<i class='far fa-trash-can text-warning me-1'></i><strong>[*delete saved image]</strong><br>
-                <span class='small'>%carrousel_img_raw;</span><br>
-                <img class='rounded my-1' width='185px'
-                  src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>">
+                <span class='small'>%carrousel_img_raw;</span>
+                %if;(not carrousel_doc)<br>
+                  <img class='rounded my-1' width='185px'
+                    src=%if;(url_in_env!="")%url_in_env;%else;%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;%end;>
+                %end;">
               <i class="far fa-trash-can text-danger"></i></a>
           </div>
         %end;
