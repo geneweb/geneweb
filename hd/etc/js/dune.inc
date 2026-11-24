@@ -145,6 +145,15 @@
 
 (rule
   (package geneweb)
+  (targets media.js.gz media.js.br)
+  (deps (:input media.js))
+  (action
+    (concurrent
+      (run gzip -9 -k -f %{input})
+      (run brotli -q 11 %{input}))))
+
+(rule
+  (package geneweb)
   (targets notes_upd_gallery.js.gz notes_upd_gallery.js.br)
   (deps (:input notes_upd_gallery.js))
   (action

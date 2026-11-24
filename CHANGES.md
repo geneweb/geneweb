@@ -425,6 +425,15 @@
   bullet of a grandchild in the grandparents module no longer always
   shows children. The horizontal ancestor tree no longer prints
   `%apply;ext_link?` in its links.
+- Carrousel page (`m=MEDIA` of a person): one zone receives the files
+  dropped from the desktop, pasted from the clipboard (Ctrl+V:
+  screenshot, copied image or files) or chosen with the file picker,
+  several at once. They wait on a wall where each one gets its
+  destination (portrait, coat of arms or image of the person) and its
+  name, a name already taken being replaced, skipped or renamed, then
+  are sent together. It replaces the three file inputs of the page and
+  uses Dropzone 6.3.5. An image dragged from another tab fills the URL
+  field.
 
 ## Deprecated features
 - The former names of the person display macros of perso_utils.txt

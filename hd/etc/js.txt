@@ -94,6 +94,9 @@
   %if;(e.m="RM")
     <script src="%etc_prefix;js/relationmatrix.js?hash=%apply;hash%with;%etc_prefix;js/relationmatrix.js%end;"></script>
   %end;
+  %if;(e.m="MEDIA")
+    <script src="%etc_prefix;js/media.js?hash=%apply;hash%with;%etc_prefix;js/media.js%end;"></script>
+  %end;
   %( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
   %if;(upd_form=1 or e.m="MOD_GALLERY" or e.m="UNKNOWN" or e.m="MOD_DATA")
    <script src="%etc_prefix;js/clearinput.js?hash=%apply;hash%with;%etc_prefix;js/clearinput.js%end;" data-clear-title="[*clear input]"></script>
