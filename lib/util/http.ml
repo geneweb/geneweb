@@ -136,14 +136,6 @@ let rec skip_spaces s i =
 
 let create_env s =
   let s = (s : Adef.encoded_string :> string) in
-  let rec get_assoc acc beg i =
-    if i = String.length s then
-      if i = beg then acc else String.sub s beg (i - beg) :: acc
-    else if s.[i] = ';' || s.[i] = '&' then
-      let next_i = skip_spaces s (succ i) in
-      get_assoc (String.sub s beg (i - beg) :: acc) next_i next_i
-    else get_assoc acc beg (succ i)
-  in
   let separate s =
     match String.index_opt s '=' with
     | Some i ->
@@ -151,7 +143,15 @@ let create_env s =
           Adef.encoded (String.sub s (succ i) (String.length s - succ i)) )
     | None -> (s, Adef.encoded "")
   in
-  List.rev (get_assoc [] 0 0) |> List.map separate
+  let rec get_assoc acc beg i =
+    if i = String.length s then
+      if i = beg then acc else separate (String.sub s beg (i - beg)) :: acc
+    else if s.[i] = ';' || s.[i] = '&' then
+      let next_i = skip_spaces s (succ i) in
+      get_assoc (separate (String.sub s beg (i - beg)) :: acc) next_i next_i
+    else get_assoc acc beg (succ i)
+  in
+  List.rev (get_assoc [] 0 0)
 
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
