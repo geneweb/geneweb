@@ -27,7 +27,7 @@ let this_request_updates_database conf =
       | "CHG_FAM_ORD_OK" | "CHG_TIT_ORD_OK" | "DEL_FAM" | "DEL_IMAGE"
       | "DEL_IND" | "IMAGE_TO_BLASON" | "KILL_ANC" | "MOD_FAM" | "MOD_IND"
       | "MOD_NOTES" | "MOD_WIZNOTES" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N"
-      | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
+      | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA_OK"
       | "PORTRAIT_MOVE_TO_BLASON" | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
       | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" | "MEDIA_SEND_OK"
@@ -45,7 +45,7 @@ let this_request_edits conf =
   | Some "AS_OK" | None -> false
   | Some
       ( "ADD_PAR" | "CHG_EVT_IND_ORD" | "CHG_EVT_FAM_ORD" | "MOD_GALLERY"
-      | "HIST_CLEAN" | "MRG" | "MRG_DUP" | "MRG_FAM" | "UNKNOWN" | "SND_IMAGE_C"
+      | "HIST_CLEAN" | "MRG" | "MRG_DUP" | "MRG_FAM" | "UNKNOWN" | "MEDIA"
       | "BLASON_MOVE_TO_ANC" | "PORTRAIT_TO_BLASON" | "IMAGE_TO_BLASON" ) ->
       true
   | Some m -> String.ends_with ~suffix:"_OK" m
@@ -701,6 +701,7 @@ let treat_request =
              | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
+             | "MEDIA" -> w_base @@ w_person @@ Perso.interp_templ "carrousel"
              | "MEDIA_DEL_OK" -> w_wizard @@ w_base @@ Media.print_delete
              | "MEDIA_LIST" -> w_wizard @@ w_base @@ Media.print_list
              | "MEDIA_MKDIR_OK" -> w_wizard @@ w_base @@ Media.print_mkdir
@@ -959,12 +960,14 @@ let treat_request =
              | "S" | "SN" ->
                  w_base @@ fun conf base ->
                  SearchName.print conn conf base Some.specify
-             | "SND_IMAGE" ->
-                 w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print
              | "SND_IMAGE_OK" ->
                  w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
              | "SND_IMAGE_C" ->
-                 w_base @@ w_person @@ Perso.interp_templ "carrousel"
+                 w_base @@ w_person
+                 @@ fun conf base p ->
+                 Connection.http_redirect_temporarily conn
+                   (Adef.(commd conf ^^^ "m=MEDIA&" ^<^ Util.acces conf base p)
+                     :> string)
              | "SRC" -> (
                  w_base @@ fun conf base ->
                  match p_getenv conf.env "v" with

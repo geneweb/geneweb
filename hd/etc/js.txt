@@ -33,7 +33,7 @@
                          sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA=="
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
-    %if;(e.m="SND_IMAGE_C")
+    %if;(e.m="MEDIA")
       <script src="https://cdn.jsdelivr.net/npm/dropzone@6.3.5/dist/dropzone-min.js"
               integrity="sha256-3+sEImMiCQfpEG8A/MGWKSRtDQCsMqTt0/nEcVbfQ9g=
                          sha384-wHTterC8uaPhGVKg8kmSlqcmI8CCFkOI+Mn51O3udobTBX0vQLs6a18vJqh0AnW3
@@ -51,7 +51,7 @@
     %if;(e.m="STATS" or e.m="GWD_STATS")
       <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
     %end;
-    %if;(e.m="SND_IMAGE_C")
+    %if;(e.m="MEDIA")
       <script src="%etc_prefix;js/dropzone-min.js?version=6.3.5"></script>
     %end;
   %end;
@@ -172,7 +172,7 @@ document.getElementById('hist-back')?.addEventListener('click', () => history.ba
     %end;
   %end;
 %end;
-%if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or "SND_IMAGE_C" in e.m
+%if;((wizard and e.m="" and not is_welcome) or upd_form=1 or "CHK_DATA" in e.m or e.m="MEDIA"
     or upd_notes=1 or e.m="MOD_GALLERY" or (e.m="MOD_DATA" and (e.data="src" or e.data="occu" or e.data="place")))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/6.0.1/autosize.min.js"

@@ -5689,11 +5689,6 @@ en: choose an ancestor
 es: elegir un antepasado
 fr: choisir un ancêtre
 
-    choose an image
-de: ein Bild auswählen
-en: choose an image
-fr: choisir une image
-
     chronicle
 de: Chronik
 en: chronicle

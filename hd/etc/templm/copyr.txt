@@ -1,28 +1,4 @@
-%if;(evar.m!="SND_IMAGE")
-  %include;menu_search
-%else;
-  %if;not cancel_links;
-    %if;(evar.n != "" or evar.i != "" or evar.ip !="" or evar.m !="")
-      <table style="position:absolute;top:50px;float:%if;(evar.m="D" and evar.t="T" and (evar.slices="" or evar.slices !="on"))
-        left;left:10px;%else;right;right:10px;%end;">
-        <tr><td>
-          <a href="%prefix;"><img src="%images_prefix;up.png" %wid_hei;up.pnd; alt="^^" title="[*home]"></a>
-          <a href="%url_set.cgl.on;" target="_blank"><img style="border-width: thin"%sp;
-            src="%images_prefix;right.png"%wid_hei;right.png; alt="" title="[*cancel GeneWeb links]"></a>
-        </td></tr>
-      </table>
-    %end;
-    %if;(evar.digest = "" and evar.m!="SND_IMAGE")
-      %nl;
-      <div id="trl" style="clear:both;">
-        <ul>
-          <li><a href="%url_set.templ;">default</a></li>
-          <li><a href="%url_set.templ.templm;">templm</a></li>
-        </ul>
-      </div>
-    %end;
-  %end;
-%end;
+%include;menu_search
 %( contrary to copyr.txt, see templm/search_menu for language choice %)
 <div id="footer" style="clear:both;">
   <table style="border:0;">

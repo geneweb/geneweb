@@ -34,7 +34,7 @@
                        sha512-vCtMyusd4IjT8MY+EQZPbHnV2reghhrISEkeFdH5cH6nWXNbIJxTy48LQrn5gGoBdp41DxxK2jtPPn7uhUiE8g=="
             crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
-    %if;(e.m="SND_IMAGE_C")
+    %if;(e.m="MEDIA")
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@6.3.5/dist/dropzone.css"
             integrity="sha256-ZB3j5wMxEjT6y6qA9V4AjRC9HZNNJj77y6d8uvoxkTA=
                        sha384-asD8pW//1IYJd67ZZn/Eyo31U/YtixrhsNyn90jnZTEIgTpYfE2mkwGYVWHwg2vD
@@ -49,7 +49,7 @@
     %if;((e.m="A" and e.t="") or e.m="MOD_GALLERY")
       <link rel="stylesheet" href="%etc_prefix;css/tom-select.bootstrap5.min.css?version=2.7.0">
     %end;
-    %if;(e.m="SND_IMAGE_C")
+    %if;(e.m="MEDIA")
       <link rel="stylesheet" href="%etc_prefix;css/dropzone.css?version=6.3.5">
     %end;
   %end;

@@ -330,6 +330,8 @@
 - `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
   downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
   (`folder=a/b`).
+- The actions of the carrousel (send, delete, restore an image) accept
+  the person by its key (`p`, `n`, `oc`) as well as by its index.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
@@ -440,6 +442,7 @@
   `<base>.gwb/caches/*.bin`) are no longer read by gwd and can be
   deleted: `cache_files` writes only the datalists by default, and
   `-binary` is deprecated.
+- `m=SND_IMAGE_C` is renamed `m=MEDIA` and redirects to it.
 
 ## Breaking changes
 - Deprecate the multi-parents feature (#2726)
@@ -463,6 +466,9 @@
   the names that `gwc`, `ged2gwb` and `gwsetup` accept: a base with
   another name (accented letters, `_`, `.`) must be renamed to be
   served, and `--cache-database` refuses it.
+- `m=SND_IMAGE`, the page that sent a portrait alone, is removed, with
+  its links in the templm templates: the portrait, the coat of arms and
+  the images of a person are managed in `m=MEDIA`.
 
 ## Build system
 The camlp5 dependency has been removed. The GEDCOM date grammar and the stream

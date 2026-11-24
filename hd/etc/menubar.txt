@@ -160,7 +160,7 @@
           %end;
           %( IND dropdown menu %)
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
+            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="MEDIA" or e.m="MRG" or e.m="DEL_IND")active%end;"
                data-bs-toggle="dropdown" data-bs-auto-close="outside" href="#" role="button" aria-expanded="false" title="[*tools] [person/persons]0">%nn;
               <i class="fa fa-user-gear %visib_color;" aria-hidden="true"></i>%nn;
               <span class="visually-hidden">[*tools] [person/persons]0, [visibility] (%apply;nth%with;[iftitles/public/semipublic/private]%and;%visib;%end;)</span></a>
@@ -204,7 +204,7 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw me-2" aria-hidden="true"></i>[*cancel GeneWeb links]</a>%nn;
               %end;
-              %( WIZARD | CHG_EVT / SND_IMAGE / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
+              %( WIZARD | CHG_EVT / MEDIA / MRG / DEL_IND / MRG_DUP / HIST_DIFF buttons %)
               %if;(iswiz=1)
                 <div class="dropdown-divider"></div>
                 %if;(update_order=1 and has_free_event_order)
@@ -218,7 +218,7 @@
                     <i class="fa fa-award fa-fw me-2" aria-hidden="true"></i>[*reorder titles]</button>
                 %end;
                 %if;(first_name!="?" and surname!="?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE_C&%access;">
+                  <a class="dropdown-item" href="%prefix;m=MEDIA&%access;">
                     <i class="far fa-file-image fa-fw me-2" aria-hidden="true"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
@@ -459,7 +459,7 @@
               </div>
             </div>
           </li>
-          %( SND_IMAGE_C carrousel button: portrait, blason and images %)
+          %( MEDIA carrousel button: portrait, blason and images %)
           %if;(has_portrait or has_blason or carrousel_img_nbr>0)
             <li class="nav-item">
               <a class="nav-link text-secondary" href="#" role="button" data-bs-toggle="modal" data-bs-target="#carousel_modal"
@@ -471,7 +471,7 @@
           %end;
           %if;(wizard and not has_portrait and not has_blason and carrousel_img_nbr=0)
             <li class="nav-item">
-              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&%access;" %laI;>%nn;
+              <a class="nav-link text-secondary" href="%prefix;m=MEDIA&%access;" %laI;>%nn;
                 <i class="fa fa-image fa-fw" aria-hidden="true"></i>%nn;
                 <span class="visually-hidden">[*add]/[delete::image/images]1</span></a>
             </li>
