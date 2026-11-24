@@ -475,7 +475,7 @@ let old_strings_of_fsname bpath strings (_, person_patches) =
 (**)
 
 (** offset: 1 pour sname 2 pour fname *)
-let new_strings_of_fsname_aux offset_acc offset_inx split get bpath strings
+let new_strings_of_fsname_aux offset_acc offset_inx keys get bpath strings
     (_, person_patches) =
   let t = ref None in
   fun s ->
@@ -507,22 +507,22 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bpath strings
     Hashtbl.fold
       (fun _ p acc ->
         let istr = get p in
-        let str = strings.get istr in
         if
           (not (List.mem istr acc))
-          &&
-          match split str with
-          | [ s ] -> i = Dutil.name_index s
-          | list -> List.exists (fun s -> i = Dutil.name_index s) (str :: list)
+          && List.exists
+               (fun s -> i = Dutil.name_index s)
+               (keys (strings.get istr))
         then istr :: acc
         else acc)
       person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.surname)
+  new_strings_of_fsname_aux 1 0
+    (fun s -> s :: Name.split_sname s)
+    (fun p -> p.surname)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
+  new_strings_of_fsname_aux 2 1 Dutil.first_name_keys (fun p -> p.first_name)
 
 let strings_of_sname = function
   | GnWb0026 | GnWb0025 | GnWb0024 | GnWb0023 -> new_strings_of_sname
