@@ -422,7 +422,7 @@ let print_what_links conf base fnotes =
 let read_notes_from_conf conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | Some f -> Option.value ~default:"" (NotesLinks.file_name f)
     | None -> ""
   in
   read_notes base fnotes
@@ -430,7 +430,7 @@ let read_notes_from_conf conf base =
 let print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+    | Some f -> Option.value ~default:"" (NotesLinks.file_name f)
     | None -> ""
   in
   let nenv, s = read_notes base fnotes in
@@ -459,7 +459,7 @@ let print_mod conf base =
     if is_new_note then ""
     else
       match p_getenv conf.env "f" with
-      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | Some f -> Option.value ~default:"" (NotesLinks.file_name f)
       | None -> ""
   in
   let nenv, s = if is_new_note then ([], "") else read_notes base fnotes in
@@ -483,8 +483,7 @@ let print_mod conf base =
 let print_mod_ok conf base =
   let fname = function
     | Some f ->
-        let f = Mutil.tr ' ' '_' f in
-        if NotesLinks.check_file_name f <> None then f else ""
+        Option.value ~default:"" (NotesLinks.file_name (Mutil.tr ' ' '_' f))
     | None -> ""
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
@@ -656,7 +655,7 @@ let check_note_access ~is_new conf base =
     if is_new then ""
     else
       match p_getenv conf.env "f" with
-      | Some f -> if NotesLinks.check_file_name f <> None then f else ""
+      | Some f -> Option.value ~default:"" (NotesLinks.file_name f)
       | None -> ""
   in
   let nenv, _s = if is_new then ([], "") else read_notes base fnotes in
@@ -690,8 +689,7 @@ let print_gallery conf base =
 let print_mod_gallery_ok conn conf base =
   let fname = function
     | Some f ->
-        let f = Mutil.tr ' ' '_' f in
-        if NotesLinks.check_file_name f <> None then f else ""
+        Option.value ~default:"" (NotesLinks.file_name (Mutil.tr ' ' '_' f))
     | None -> ""
   in
   let edit_mode _ = if conf.wizard then Some "GALLERY" else None in

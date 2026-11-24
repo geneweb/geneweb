@@ -27,7 +27,10 @@
 - The names of notes and galleries may contain accented letters and
   other UTF-8 characters (`[[[Séjour_à_Évian]]]`, `m=NOTES&f=Été`).
   A new gallery named with accents used to fail with "the base has
-  changed".
+  changed". Names are put in NFC, so that a name typed or pasted in
+  decomposed form names the same note, and beyond ASCII only letters,
+  marks and digits are accepted (no Unicode spaces, invisible, control
+  or bidi characters).
 - The name of a note refuses a `.` or `..` component: `m=NOTES&f=..:x`
   read, and `m=MOD_NOTES_OK` saved, a `.txt` file outside the notes
   directory.

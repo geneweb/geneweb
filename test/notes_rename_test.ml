@@ -21,6 +21,12 @@ let file_name text expected =
   test_case text `Quick (fun () ->
       check bool text expected (NotesLinks.check_file_name text <> None))
 
+let nfc text expected =
+  test_case
+    ("nfc " ^ String.escaped text)
+    `Quick
+    (fun () -> check (option string) text expected (NotesLinks.file_name text))
+
 let v =
   [
     ( "notes-file-names",
@@ -39,6 +45,16 @@ let v =
         file_name "dir:." false;
         file_name "a..b" true;
         file_name "\xC9t\xE9" false;
+        file_name "a\xC2\xA0b" false;
+        file_name "a\xE2\x80\xAFb" false;
+        file_name "a\xE2\x80\x8Bb" false;
+        file_name "a\xE2\x80\xAEb" false;
+        file_name "a\xC2\x85b" false;
+        file_name "\xD0\x96\xE6\x97\xA5\xE6\x9C\xAC" true;
+        nfc "E\xCC\x81t\xC3\xA9" (Some "\xC3\x89t\xC3\xA9");
+        nfc "dir:E\xCC\x81t\xC3\xA9" (Some "dir:\xC3\x89t\xC3\xA9");
+        nfc "famille_dupont" (Some "famille_dupont");
+        nfc "a\xC2\xA0b" None;
       ] );
     ( "notes-rename-urls",
       [
