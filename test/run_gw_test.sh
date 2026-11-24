@@ -448,6 +448,9 @@ crl "m=STAT"
 crl "m=TT"
 crl "m=TT&p=*" $nodiff
 crl "m=UNKNOWN&ph="
+crl "m=MEDIA_LIST&dest=images" $nodiff
+crl "m=MEDIA_LIST&dest=albums" $nodiff
+crl "m=MEDIA_LIST&dest=person&i=$ID" $nodiff
 if check_gwf 'authorized_wizards_notes=yes'; then
 crl "m=CONN_WIZ"
 crl "m=MOD_WIZNOTES&f=$WIZ"

@@ -312,6 +312,24 @@
   (`MediaDir`) for the gallery editor (`m=LIST_IMAGES`,
   `m=FOLDER_IMAGES`, album and image lists): the `saved/` directories
   of replaced files are no longer offered as albums or subfolders.
+- New requests for wizards, answering in JSON: `m=MEDIA_SEND_OK` stores
+  a file as the portrait, the coat of arms or an image of a person, in
+  the images directory of the base or in an album (subdirectories of any
+  depth); `m=MEDIA_LIST` lists the files, with their size, and the
+  subdirectories of such a place; `m=MEDIA_MKDIR_OK` creates an album;
+  `m=MEDIA_DEL_OK` deletes an image or a document of the base, or an
+  empty album. Besides JPEG, PNG and GIF images, PDF, DOCX, ODT and TXT
+  documents are accepted where they make sense. A file is limited to
+  `max_images_size` (20 000 000 bytes by default) for an image and to
+  the new variable `max_documents_size` (100 000 000 bytes by default)
+  for a document. A name already taken is refused unless a replacement
+  is asked. A replaced or deleted file moves to `saved/`: in the
+  directory of a person and in the images directory, and at the root of
+  the albums under the path of its album (`albums/saved/a/b/` for
+  `albums/a/b/`).
+- `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
+  downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
+  (`folder=a/b`).
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the

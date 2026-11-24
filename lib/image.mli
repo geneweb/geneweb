@@ -28,6 +28,20 @@ val key_dir_basename : string -> string -> int -> string
     involving an individual key. e.g.
     [key_dir_basename "Jean Marc" "DUPONT" 0 = "jean_marc.0.dupont"]. *)
 
+val safe_name : string -> string option
+(** [safe_name s] is the NFC form of [s] when it can name a file or a directory
+    on every system, [None] otherwise. Are refused: an empty name, more than 200
+    bytes, a leading [.], a trailing [.] or space, a slash, a backslash, a
+    double quote, any of [: * ? < > |], a control character, and the names
+    reserved by Windows ([CON], [PRN], [AUX], [NUL], [COM1] to [COM9], [LPT1] to
+    [LPT9]), with or without extension. *)
+
+val safe_subpath : string -> string list option
+(** [safe_subpath s] is the list of the segments of the relative path [s], split
+    on [/], each one checked and normalised by [safe_name]. [None] if a segment
+    is refused, such as an empty one (leading, trailing or double [/]), [.],
+    [..] or {!MediaDir.saved}. *)
+
 (* TODO this should be removed *)
 val default_image_filename :
   string -> Geneweb_db.Driver.base -> Geneweb_db.Driver.person -> string

@@ -17,6 +17,7 @@
   geneweb
   geneweb.oidc
   geneweb.robot
+  geneweb.media
   geneweb_http
   geneweb_register
   digestif
