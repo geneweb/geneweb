@@ -279,70 +279,6 @@ let get_extension conf keydir mode saved fname =
 (*                                                                          *)
 (* ************************************************************************ *)
 
-(* we need print_link_delete_image in the send function *)
-let print_link_delete_image conf base p =
-  if Option.is_some @@ Image.get_portrait conf base p then (
-    Output.print_sstring conf {|<div><a class="btn btn-danger mt-3" href="|};
-    Output.print_string conf (commd conf);
-    Output.print_sstring conf "m=DEL_IMAGE&";
-    Output.print_string conf (acces conf base p);
-    Output.print_sstring conf {|">|};
-    transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf {| |};
-    transl_nth conf "image/images" 0 |> Output.print_sstring conf;
-    Output.print_sstring conf "</a></div>")
-
-let print_send_image conf base mode p =
-  let title h =
-    if Option.is_some @@ Image.get_portrait conf base p then
-      transl_nth conf "image/images" 0
-      |> transl_decline conf "modify"
-      |> Utf8.capitalize_fst |> Output.print_sstring conf
-    else
-      transl_nth conf "image/images" 0
-      |> transl_decline conf "add" |> Utf8.capitalize_fst
-      |> Output.print_sstring conf;
-    if not h then (
-      Output.print_sstring conf (transl conf ":");
-      Output.print_sstring conf " ";
-      Output.print_string conf (Util.escape_html (Driver.p_first_name base p));
-      Output.print_sstring conf (Format.sprintf ".%d " (Driver.get_occ p));
-      Output.print_string conf (Util.escape_html (Driver.p_surname base p)))
-  in
-  Hutil.header conf title;
-  Output.printf conf
-    {|<form method="post" action="%s" enctype="multipart/form-data">|}
-    conf.command;
-  Output.print_sstring conf
-    {|<div class="d-flex align-items-center gap-2 mt-2 flex-wrap">|};
-  Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
-  Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-  Util.hidden_input conf "mode" (Adef.encoded mode);
-  Output.print_sstring conf {|<label for="file" class="visually-hidden">|};
-  Output.print_sstring conf
-    (Utf8.capitalize_fst (transl conf "choose an image"));
-  Output.print_sstring conf (Util.transl conf ":");
-  Output.print_sstring conf {|</label>|};
-  Output.print_sstring conf
-    {|<input type="file" class="form-control w-50" id="file" name="file" accept="image/*">|};
-  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|</button></div>|};
-  (match
-     Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
-   with
-  | Some len ->
-      Output.printf conf
-        {|<p class="text-body-secondary small mt-1">(maximum authorized size = %d bytes)</p>|}
-        len
-  | None -> ());
-  Output.print_sstring conf {|</form>|};
-  print_link_delete_image conf base p;
-  Hutil.trailer conf
-
 let send_portrait conf base p mode ext content =
   let dir = Layout.portraits conf.layout in
   let name = Image.default_image_filename mode base p in
@@ -547,10 +483,8 @@ let effective_delete_ok conf base p =
 
 let print_del_ok conf base =
   try
-    match p_getenv conf.env "i" with
-    | Some ip ->
-        let p = Driver.poi base (Driver.Iper.of_string ip) in
-        effective_delete_ok conf base p
+    match Util.find_person_in_env conf base "" with
+    | Some p -> effective_delete_ok conf base p
     | None -> incorrect conf "print del ok"
   with Done -> ()
 
@@ -785,9 +719,8 @@ let print_main_c conf base =
         (* Process action and redirect with success message *)
         match Util.p_getenv conf.env "m" with
         | Some m -> (
-            match Util.p_getenv conf.env "i" with
-            | Some ip -> (
-                let p = Driver.poi base (Driver.Iper.of_string ip) in
+            match Util.find_person_in_env conf base "" with
+            | Some p -> (
                 let updated_notes = ref [] in
                 let processed_filename =
                   match m with
@@ -878,8 +811,7 @@ let print_main_c conf base =
                       else processed_filename
                     in
                     let base_url =
-                      Printf.sprintf
-                        "%sm=SND_IMAGE_C&%s&em=%s&file_name=%s&mode=%s"
+                      Printf.sprintf "%sm=MEDIA&%s&em=%s&file_name=%s&mode=%s"
                         (commd conf :> string)
                         (acces conf base p :> string)
                         (Mutil.encode m :> string)
@@ -916,31 +848,15 @@ let print_main_c conf base =
                     Output.header conf "Location: %s" redirect_url;
                     Output.header conf "Connection: close";
                     Output.flush conf)
-            | None ->
-                Hutil.incorrect_request conf ~comment:"missing person index")
+            | None -> Hutil.incorrect_request conf ~comment:"missing person")
         | None -> Hutil.incorrect_request conf ~comment:"missing action")
     (* Display main page with success message from URL params *)
-    | Some _ ->
-        let p =
-          match Util.p_getint conf.env "i" with
-          | Some ip ->
-              Driver.poi base (Driver.Iper.of_string (string_of_int ip))
-          | None ->
-              Hutil.incorrect_request conf
-                ~comment:"missing person index in display";
-              raise Done
-        in
-        Perso.interp_templ "carrousel" conf base p
+    | Some _ -> (
+        match Util.find_person_in_env conf base "" with
+        | Some p -> Perso.interp_templ "carrousel" conf base p
+        | None ->
+            Hutil.incorrect_request conf ~comment:"missing person in display")
   with Done -> ()
-
-let print conf base =
-  match Util.find_person_in_env conf base "" with
-  | None -> Hutil.incorrect_request conf
-  | Some p ->
-      let fn = Driver.p_first_name base p in
-      let sn = Driver.p_surname base p in
-      if fn = "?" || sn = "?" then Hutil.incorrect_request conf
-      else print_send_image conf base "portraits" p
 
 (* carrousel *)
 let print_c ?(saved = false) ?(portrait = true) conf base =
