@@ -9,36 +9,35 @@
     source files end with .gw
     object files end with .gwo
   and [options] are:
-    -bd <DIR>                     Specify where the 'bases' directory is installed (default "$XDG_DATA_HOME/geneweb/bases")
-    -bnotes                       [drop|erase|first|merge] Behavior for base notes of the next file. [drop]: dropped. [erase]: erase the current content. [first]: dropped if current content is not empty. [merge]: concatenated to the current content. Default: merge
-    -c                            Only compiling
-    -cg                           Compute consanguinity
-    -ds <str>                     Set the source field for persons and families without source data
-    -f                            Remove database if already existing
-    -gwo                          Suppress .gwo files after base creation
-    -hd <DIR>                     Specify where "etc", "images" and "lang" directories are installed.
-    -index-budget <KiB>           Size of the landmarks of each dictionary of the index (default 1024)
-    -mem                          Save memory, but slower
-    -nc                           No consistency check
-    -ngrams <bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or '500')
-    -nofail                       No failure in case of error
-    -nolock                       Do not lock database
-    -nopicture                    Do not create associative pictures
-    -nowarn                       Do not show warnings during import
-    -o <file>                     Output database (default: <input file name>.gwb, a.gwb if not available). Alphanumerics and -
-    -particles <file>             Particles file (default = predefined particles)
-    -prog                         show progress bar
-    -q                            Quiet
-    -reindex <base>               Only rebuild the index of the dictionaries of an existing base
-    -reorg                        Mode reorg
-    -rgpd <dir>                   Rgpd directory
-    -roglo_special                Special treatment for Roglo (ignore multiple relations definitions)
-    -sep                          Separate all persons in next file
-    -sh <int>                     Shift all persons numbers in next files
-    -stats                        Print statistics
-    -v                            Verbose
-    -help                         Display this list of options
-    --help                        Display this list of options
+    -bd <DIR>           Specify where the 'bases' directory is installed (default "$XDG_DATA_HOME/geneweb/bases")
+    -bnotes             [drop|erase|first|merge] Behavior for base notes of the next file. [drop]: dropped. [erase]: erase the current content. [first]: dropped if current content is not empty. [merge]: concatenated to the current content. Default: merge
+    -c                  Only compiling
+    -cg                 Compute consanguinity
+    -ds <str>           Set the source field for persons and families without source data
+    -f                  Remove database if already existing
+    -gwo                Suppress .gwo files after base creation
+    -hd <DIR>           Specify where "etc", "images" and "lang" directories are installed.
+    -index-budget <KiB> Size of the landmarks of each dictionary of the index (default 1024)
+    -mem                Save memory, but slower
+    -nc                 No consistency check
+    -nofail             No failure in case of error
+    -nolock             Do not lock database
+    -nopicture          Do not create associative pictures
+    -nowarn             Do not show warnings during import
+    -o <file>           Output database (default: <input file name>.gwb, a.gwb if not available). Alphanumerics and -
+    -particles <file>   Particles file (default = predefined particles)
+    -prog               show progress bar
+    -q                  Quiet
+    -reindex <base>     Only rebuild the index of the dictionaries of an existing base
+    -reorg              Mode reorg
+    -rgpd <dir>         Rgpd directory
+    -roglo_special      Special treatment for Roglo (ignore multiple relations definitions)
+    -sep                Separate all persons in next file
+    -sh <int>           Shift all persons numbers in next files
+    -stats              Print statistics
+    -v                  Verbose
+    -help               Display this list of options
+    --help              Display this list of options
   [2]
 
   $ gwc -bd .
