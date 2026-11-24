@@ -3611,9 +3611,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         | Some "always" ->
             if nb_fam > 0 || List.length events > 0 then true else false
         | Some _ | None ->
-            (* Renvoie vrai que si il y a des informations supplémentaires *)
-            (* par rapport aux évènements principaux, i.e. témoins (mais   *)
-            (* on ne prend pas en compte les notes).                       *)
             let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
               match events with
               | [] -> false
@@ -3626,7 +3623,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                       match pname with
                       | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
                       | Epers_Cremation ->
-                          if Array.length wl > 0 then true
+                          if Array.length wl > 0 || (n <> "" && not conf.no_note)
+                          then true
                           else
                             let nb_birth, nb_bapt, nb_deat, nb_buri =
                               match pname with
