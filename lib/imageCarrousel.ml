@@ -865,8 +865,8 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
   | Some f, Some p ->
       let k = Image.default_image_filename "portraits" base p in
       let f = Filename.concat k f in
-      ImageDisplay.print_source conf (if saved then insert_saved f else f)
-  | Some f, _ -> ImageDisplay.print_source conf f
+      ImageDisplay.print_source conf base (if saved then insert_saved f else f)
+  | Some f, _ -> ImageDisplay.print_source conf base f
   | _, Some p -> (
       match
         if saved then Image.get_old_portrait_or_blason conf base "portraits" p
