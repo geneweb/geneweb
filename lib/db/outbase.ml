@@ -34,7 +34,7 @@ let make_name_index base =
   let t = Array.make Dutil.table_size [] in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    if p.first_name <> 1 && p.first_name <> 1 then
+    if p.first_name <> 1 then
       List.iter (fun i -> Array.set t i @@ (p.key_index :: Array.get t i))
       @@ Mutil.list_map_sort_uniq Dutil.name_index
       @@ Dutil.dsk_person_misc_names base p (fun p -> p.titles)
