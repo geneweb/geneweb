@@ -308,6 +308,10 @@
 - A file sent by a form is stored byte for byte: two bytes were added at
   its end. The text fields of such a form (name, note and source of an
   image) keep their `+` and `%` characters.
+- The images, albums and person directories are listed by one module
+  (`MediaDir`) for the gallery editor (`m=LIST_IMAGES`,
+  `m=FOLDER_IMAGES`, album and image lists): the `saved/` directories
+  of replaced files are no longer offered as albums or subfolders.
 
 ## Gwsetup
 - Bind `127.0.0.1` instead of resolving `localhost`, which selects the
