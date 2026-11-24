@@ -1540,6 +1540,10 @@ and eval_simple_bool_var conf base env =
       | Vfam (_, fam, _, m_auth) ->
           m_auth && Array.length (Driver.get_witnesses fam) > 0
       | _ -> raise Not_found)
+  | "carrousel_doc" -> (
+      match get_env "carrousel_doc" env with
+      | Vbool x -> x
+      | _ -> raise Not_found)
   | "is_first" -> (
       match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
   | "is_last" -> (
@@ -5583,6 +5587,9 @@ let print_foreach conf base print_ast eval_expr =
             Templ.Env.(
               env
               |> add "carrousel_img" (Vstring (Filename.basename name))
+              |> add "carrousel_doc"
+                   (Vbool
+                      (Array.mem (Filename.extension name) Image.ext_list_doc))
               |> add "carrousel_img_src" (Vstring src)
               |> add "carrousel_img_note" (Vstring note)
               |> add "first" (Vbool first)

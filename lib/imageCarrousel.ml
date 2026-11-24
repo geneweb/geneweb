@@ -246,11 +246,13 @@ let swap_files file old_file =
   let old_file = Filename.remove_extension old_file ^ ".src" in
   swap_files_aux dir src_file old_file
 
+let known_extensions = Array.append Image.ext_list_2 Image.ext_list_doc
+
 (* TODO merge with Image.file_without_extension *)
 let get_extension conf keydir mode saved fname =
   let t_ext = Filename.extension fname in
   let fname =
-    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension fname
+    if Array.mem t_ext known_extensions then Filename.remove_extension fname
     else fname
   in
   let dir =
@@ -262,13 +264,10 @@ let get_extension conf keydir mode saved fname =
     if saved then String.concat Filename.dir_sep [ dir; "saved"; fname ]
     else Filename.concat dir fname
   in
-  if Sys.file_exists (f ^ ".jpg") then ".jpg"
-  else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
-  else if Sys.file_exists (f ^ ".png") then ".png"
-  else if Sys.file_exists (f ^ ".gif") then ".gif"
-  else if Sys.file_exists (f ^ ".url") then ".url"
-  else if Sys.file_exists (f ^ ".stop") then ".stop"
-  else "."
+  Option.value ~default:"."
+    (Mutil.array_find_map
+       (fun ext -> if Sys.file_exists (f ^ ext) then Some ext else None)
+       known_extensions)
 
 (* ************************************************************************ *)
 (*  send, delete, reset and print functions                                 *)
@@ -522,8 +521,11 @@ let effective_delete_c_ok conf base ?(f_name = "") p =
     else Filename.concat dir fname
   in
   let orig_file =
-    if Filename.extension orig_file = ".url" && Sys.file_exists orig_file then
-      orig_file
+    let ext = Filename.extension orig_file in
+    if
+      (ext = ".url" || Array.mem ext Image.ext_list_doc)
+      && Sys.file_exists orig_file
+    then orig_file
     else Filename.remove_extension orig_file |> Image.find_file_without_ext
   in
   (* FIXME basename *)
@@ -665,7 +667,7 @@ let effective_reset_c_ok conf base p =
   let old_ext = get_extension conf keydir mode true file_name in
   let t_ext = Filename.extension file_name in
   let file_name_no_ext =
-    if Array.mem t_ext Image.ext_list_2 then Filename.remove_extension file_name
+    if Array.mem t_ext known_extensions then Filename.remove_extension file_name
     else file_name
   in
   let ext =

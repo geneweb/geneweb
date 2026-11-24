@@ -43,7 +43,13 @@
               %foreach;img_in_carrousel;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and not has_blason and is_first) active%end;"
                   data-caption="[image/images]0 %count;/%carrousel_img_nbr; — %carrousel_img;%if;(carrousel_img_src!="") — [*source/sources]0[:] %carrousel_img_src;%end;%if;(carrousel_img_note!="") — [*note/notes]0[:] %carrousel_img_note;%end;">
-                  %if;("http" in url_in_env)
+                  %if;carrousel_doc;
+                    <a class="carrousel-doc" href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;"
+                      target="_blank" rel="noopener">
+                      <i class="far fa-file-lines" aria-hidden="true"></i>
+                      <span>%carrousel_img_raw;</span>
+                    </a>
+                  %elseif;("http" in url_in_env)
                     <a href="%url_in_env;" target="_blank" rel="noopener">
                       <img class="img-fluid d-block mx-auto" src="%url_in_env;" alt="%count; slide">
                     </a>

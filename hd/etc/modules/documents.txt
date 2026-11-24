@@ -16,19 +16,18 @@
               class="d-flex"
               data-bs-toggle="tooltip" data-bs-placement="top"
               title="%carrousel_img_raw;">
-              %if;("http" in url_in_env)
-                <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
-              %else;
-                <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
-              %end;
-            </a>
-          %else;
-            %if;("http" in url_in_env)
-              <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
-            %else;
-              <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
-            %end;
           %end;
+          %if;carrousel_doc;
+            <span class="carrousel-doc border rounded w-100">
+              <i class="far fa-file-lines" aria-hidden="true"></i>
+              <span>%carrousel_img_raw;</span>
+            </span>
+          %elseif;("http" in url_in_env)
+            <img class="rounded d-block w-100" src="%url_in_env;" loading="lazy" alt="%carrousel_img_raw;">
+          %else;
+            <img class="rounded d-block w-100" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" loading="lazy" alt="%carrousel_img_raw;">
+          %end;
+          %if;(e.cgl!="on")</a>%end;
           %if;(carrousel_img_note!="" or carrousel_img_src!="")
             <div class="position-absolute end-0 d-flex gap-1" style="transform: translate(-0.25rem, -20%%);">
               %if;(carrousel_img_note!="")
