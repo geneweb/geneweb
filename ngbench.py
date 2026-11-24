@@ -44,7 +44,8 @@ import urllib.parse
 import urllib.request
 
 PERSON_RE = re.compile(
-    r'[?&;](?:amp;)?p=([^&;"#]*)&(?:amp;)?n=([^&;"#]*)(?:&(?:amp;)?oc=(\d+))?'
+    r'[?&;](?:amp;)?(?:i=(\d+)|'
+    r'p=([^&;"#]*)[&;](?:amp;)?n=([^&;"#]*)(?:[&;](?:amp;)?oc=(\d+))?)'
 )
 MODES = ["p_order=on"]
 FIELDS = ["round", "mode", "group", "query", "base", "seconds", "bytes", "persons"]
