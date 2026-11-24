@@ -2901,3 +2901,4 @@ body.upd-edit [data-updfield] a {
 .upload-item.dz-processing [data-dz-remove] { display: none; }
 .upload-item.dz-success { border-color: var(--bs-success) !important; }
 .upload-item.dz-error { border-color: var(--bs-danger) !important; }
+#media-new-name { width: 12rem; }

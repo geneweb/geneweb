@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: media.txt v7.1 24/11/2026 $ -->
+  <title>[*media page]</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;favicon_gwd.png">
+  %include;css
+</head>
+<body%body_prop;>
+%include;hed
+%include;home
+<div class="container">
+<h1 class="display-5 mt-2">[*media page]</h1>
+<div class="row g-4 mt-1">
+  <div class="col-lg-5">
+    %let;media_dir;%if;reorg;%base.name;.gwb%X;documents%else;src%X;%base.name;%end;%in;
+    <div id="media" data-mode="base" data-list="%prefix;m=MEDIA_LIST" data-prefix="%prefix;"
+      data-images-dir="%media_dir;%X;images" data-albums-dir="%media_dir;%X;albums" data-sep="%X;"
+      data-accepted=".jpg,.jpeg,.png,.gif,.pdf,.docx,.odt,.txt"
+      data-delete-confirm="[*media delete confirm]" data-deleted="[*file deleted]">
+      <div class="text-warning-emphasis mb-2 d-none" id="media-album-hint">[*folder required]</div>
+      %include;media_zone
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="d-flex align-items-center gap-2">
+      <input type="search" class="form-control flex-grow-1" id="media-filter" size="8"
+        placeholder="[*filter]" aria-label="[*filter]">
+      <div class="btn-group flex-shrink-0" role="group" aria-label="[*media page]">
+        <button type="button" class="btn btn-outline-primary active" data-media-dest="images"
+          aria-pressed="true">[*media images/albums]0</button>
+        <button type="button" class="btn btn-outline-primary" data-media-dest="albums"
+          aria-pressed="false">[*media images/albums]1</button>
+      </div>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+      <button type="button" class="btn btn-sm btn-outline-success d-none" id="media-new">
+        <i class="fa fa-folder-plus me-1" aria-hidden="true"></i>[*new folder]</button>
+      <form class="input-group input-group-sm has-validation flex-nowrap w-auto d-none"
+        id="media-new-form">
+        <input type="text" class="form-control" id="media-new-name" autocomplete="off"
+          aria-label="[*new folder]" placeholder="[*new folder]">
+        <button type="submit" class="btn btn-success">[*create]</button>
+        <div class="invalid-tooltip">[*invalid subdirectory]</div>
+      </form>
+      <i class="fa fa-folder-open text-warning" aria-hidden="true"></i>
+      <nav aria-label="[*folder/folders]0">
+        <ol class="breadcrumb font-monospace mb-0" id="media-crumbs"></ol>
+      </nav>
+      <a class="ms-auto d-none" id="media-album-gallery" title="[*create gallery]3">
+        <i class="fa-regular fa-images text-info" aria-hidden="true"></i>
+        <span class="visually-hidden">[*create gallery]3</span></a>
+    </div>
+    <div class="mt-2" id="media-status" role="status" aria-live="polite"></div>
+    <div class="mt-2" id="media-rows"
+      data-gallery="[*create gallery]2" data-delete="[*delete]" data-copied="[copied/copied]0"></div>
+    <div class="text-body-secondary mt-2 d-none" id="media-empty">[*no file here]</div>
+    <button type="button" class="btn btn-outline-secondary mt-2 d-none"
+      id="media-more">[*show more]</button>
+  </div>
+</div>
+%include;trl
+%include;copyr
+</div>
+%include;js
+%query_time;
+</body>
+</html>

@@ -21,6 +21,13 @@
     [413] file too big, [415] type not accepted for the place, [500] file not
     written. *)
 
+val print : Geneweb.Config.config -> Geneweb_db.Driver.base -> unit
+(** [print conf base] displays the media page ([m=MEDIA]): with a person ([i] or
+    [p]/[n]/[oc]), the carrousel page of that person (template [carrousel]);
+    without, for a wizard, the images and the albums of the base (template
+    [media]). The page of the base is forbidden by the bvar [can_send_image=no].
+*)
+
 val print_send : Geneweb.Config.config -> Geneweb_db.Driver.base -> unit
 (** [print_send conf base] stores the file sent in the field [file] of a
     [multipart/form-data] request ([m=MEDIA_SEND_OK]) and answers

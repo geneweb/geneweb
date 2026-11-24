@@ -8233,9 +8233,9 @@ sv: skapa
 tr: oluştur
 
     create gallery
-de: Galerie/eine neue Galerie erstellen/eine neue Galerie ausgehend von diesem Bild erstellen
-en: gallery/create a new gallery/create a new gallery starting with this image
-fr: galerie/créer une nouvelle galerie/créer une nouvelle galerie à partir de cette image
+de: Galerie/eine neue Galerie erstellen/eine neue Galerie ausgehend von diesem Bild erstellen/eine neue Galerie aus diesem Album erstellen
+en: gallery/create a new gallery/create a new gallery starting with this image/create a new gallery with this album
+fr: galerie/créer une nouvelle galerie/créer une nouvelle galerie à partir de cette image/créer une nouvelle galerie avec cet album
 
     cremated
 af: veras
@@ -10740,6 +10740,21 @@ sl: datoteka
 sv: fil
 tr: dosya
 
+    file deleted
+ca: el fitxer s’ha mogut als fitxers desats
+da: filen er flyttet til de gemte filer
+de: die Datei wurde zu den gesicherten Dateien verschoben
+en: the file was moved to the saved files
+es: el archivo se ha movido a los archivos guardados
+fr: le fichier a été déplacé dans les fichiers sauvegardés
+it: il file è stato spostato tra i file salvati
+nl: het bestand is verplaatst naar de opgeslagen bestanden
+no: filen er flyttet til de lagrede filene
+pl: plik został przeniesiony do zapisanych plików
+pt: o ficheiro foi movido para os ficheiros salvaguardados
+ru: файл перемещён в сохранённые файлы
+sv: filen har flyttats till de sparade filerna
+
     file size units
 ca: B/KB/MB/GB
 da: B/KB/MB/GB
@@ -11054,6 +11069,21 @@ de: Den Fehler automatisch korrigieren
 en: fix error automatically
 es: corregir el error automáticamente
 fr: fixer automatiquement l’erreur
+
+    folder required
+ca: obriu o creeu una carpeta per enviar-hi fitxers
+da: åbn eller opret en mappe for at sende filer til den
+de: öffnen oder erstellen Sie einen Ordner, um Dateien hineinzusenden
+en: open or create a folder to send files to it
+es: abra o cree una carpeta para enviarle archivos
+fr: ouvrez ou créez un dossier pour y envoyer des fichiers
+it: aprite o create una cartella per inviarvi dei file
+nl: open of maak een map om er bestanden naartoe te sturen
+no: åpne eller opprett en mappe for å sende filer til den
+pl: otwórz lub utwórz folder, aby wysłać do niego pliki
+pt: abra ou crie uma pasta para lhe enviar ficheiros
+ru: откройте или создайте папку, чтобы отправить в неё файлы
+sv: öppna eller skapa en mapp för att skicka filer till den
 
     folder/folders
 en: folder/folders
@@ -14692,6 +14722,51 @@ sv: medelvärde
 tr: ortalama
 zh: 平均值
 
+    media delete confirm
+ca: voleu suprimir aquest fitxer? Es conserva entre els fitxers desats.
+da: slet denne fil? Den gemmes blandt de gemte filer.
+de: diese Datei löschen? Sie bleibt bei den gesicherten Dateien erhalten.
+en: delete this file? It is kept with the saved files.
+es: ¿eliminar este archivo? Se conserva entre los archivos guardados.
+fr: supprimer ce fichier ? Il est conservé avec les fichiers sauvegardés.
+it: eliminare questo file? Viene conservato tra i file salvati.
+nl: dit bestand verwijderen? Het blijft bewaard bij de opgeslagen bestanden.
+no: slette denne filen? Den beholdes blant de lagrede filene.
+pl: usunąć ten plik? Zostanie zachowany wśród zapisanych plików.
+pt: eliminar este ficheiro? Fica guardado com os ficheiros salvaguardados.
+ru: удалить этот файл? Он сохранится среди сохранённых файлов.
+sv: ta bort den här filen? Den behålls bland de sparade filerna.
+
+    media images/albums
+ca: imatges/àlbums
+da: billeder/album
+de: Bilder/Alben
+en: images/albums
+es: imágenes/álbumes
+fr: images/albums
+it: immagini/album
+nl: afbeeldingen/albums
+no: bilder/album
+pl: obrazy/albumy
+pt: imagens/álbuns
+ru: изображения/альбомы
+sv: bilder/album
+
+    media page
+ca: imatges i àlbums de la base
+da: basens billeder og album
+de: Bilder und Alben der Datenbank
+en: images and albums of the base
+es: imágenes y álbumes de la base
+fr: images et albums de la base
+it: immagini e album della base
+nl: afbeeldingen en albums van de database
+no: basens bilder og album
+pl: obrazy i albumy bazy
+pt: imagens e álbuns da base
+ru: изображения и альбомы базы
+sv: basens bilder och album
+
     median
 ca: mediana
 cs: medián
@@ -15935,6 +16010,21 @@ ru: количество людей
 sv: antal individer
 tr: bireylerin sayısı
 
+    new folder
+ca: carpeta nova
+da: ny mappe
+de: neuer Ordner
+en: new folder
+es: carpeta nueva
+fr: nouveau dossier
+it: nuova cartella
+nl: nieuwe map
+no: ny mappe
+pl: nowy folder
+pt: nova pasta
+ru: новая папка
+sv: ny mapp
+
     new modification
 co: cliccà quì per fà una nova currezzione
 de: hier klicken um eine neue Korrektion durchzuführen
@@ -16161,6 +16251,21 @@ pt: sem descendentes
 ru: без потомков
 sv: utan ättlingar
 tr: nesiller olmadan
+
+    no file here
+ca: cap fitxer aquí
+da: ingen filer her
+de: keine Datei hier
+en: no file here
+es: ningún archivo aquí
+fr: aucun fichier ici
+it: nessun file qui
+nl: geen bestand hier
+no: ingen filer her
+pl: brak plików
+pt: nenhum ficheiro aqui
+ru: здесь нет файлов
+sv: inga filer här
 
     no information available
 de: keine Informationen verfügbar
@@ -21231,6 +21336,21 @@ fr: afficher tous les ancêtres
 de: Steuerung anzeigen
 en: show controls
 fr: afficher les contrôles
+
+    show more
+ca: mostra’n més
+da: vis flere
+de: mehr anzeigen
+en: show more
+es: mostrar más
+fr: afficher la suite
+it: mostra altri
+nl: meer tonen
+no: vis flere
+pl: pokaż więcej
+pt: mostrar mais
+ru: показать ещё
+sv: visa fler
 
     show panel
 de: Seitenleiste anzeigen
