@@ -383,3 +383,13 @@ let print_list conf base =
       print_json conf Code.OK
         (`Assoc [ ("files", `List (List.map file files)); ("dirs", `List dirs) ])
   | Error e -> print_error conf e
+
+let print conf base =
+  if List.exists (fun k -> List.mem_assoc k conf.env) [ "i"; "p"; "n" ] then
+    match Util.find_person_in_env conf base "" with
+    | Some p -> Perso.interp_templ "carrousel" conf base p
+    | None -> Hutil.incorrect_request conf
+  else if
+    conf.wizard && List.assoc_opt "can_send_image" conf.base_env <> Some "no"
+  then Templ.output_simple conf Templ.Env.empty "media"
+  else GWPARAM.output_error conf Code.Forbidden

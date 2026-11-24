@@ -60,6 +60,7 @@
           </div>
         </div>
         <div class="upload-replaces text-warning-emphasis mt-1 d-none">[*will replace]</div>
+        <div class="upload-refused text-danger mt-1 d-none">[*file type not accepted here]</div>
       </fieldset>
       <div class="small text-body-secondary text-break mt-1">
         <span data-dz-name></span>, <span class="upload-size"></span>

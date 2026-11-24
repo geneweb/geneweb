@@ -434,6 +434,16 @@
   are sent together. It replaces the three file inputs of the page and
   uses Dropzone 6.3.5. An image dragged from another tab fills the URL
   field.
+- Page of the images and albums of the base (`m=MEDIA` without person,
+  button on the welcome page for the wizards): the drop zone of the
+  carrousel sends the files to the images, or to the folder of the
+  albums shown. A path at the top of the list starts with the directory
+  of the images or of the albums in the layout of the base and opens the
+  folders; a new folder is created there, and an empty folder can be
+  deleted. The files are listed with their size and filtered in the
+  browser; an image is only loaded on the hover of its icon, a click on
+  a name copies it, a new gallery starts with an image or a whole
+  folder, and a file is deleted to the saved files.
 
 ## Deprecated features
 - The former names of the person display macros of perso_utils.txt

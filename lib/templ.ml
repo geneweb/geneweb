@@ -423,6 +423,7 @@ and eval_simple_variable conf = function
   | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
   | "nl" -> "\n"
+  | "X" -> Filename.dir_sep
   | "nn" -> ""
   | "plugins" -> String.concat ", " conf.allowed_plugins
   | "bname" -> conf.bname

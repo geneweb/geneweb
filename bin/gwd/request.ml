@@ -701,7 +701,7 @@ let treat_request =
              | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
-             | "MEDIA" -> w_base @@ w_person @@ Perso.interp_templ "carrousel"
+             | "MEDIA" -> w_base @@ Media.print
              | "MEDIA_DEL_OK" -> w_wizard @@ w_base @@ Media.print_delete
              | "MEDIA_LIST" -> w_wizard @@ w_base @@ Media.print_list
              | "MEDIA_MKDIR_OK" -> w_wizard @@ w_base @@ Media.print_mkdir

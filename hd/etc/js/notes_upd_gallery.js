@@ -1234,18 +1234,23 @@ function initTables() {
     const params = new URLSearchParams(window.location.search);
     const isNew = params.has('new');
     const seedSrc = params.get('src');
+    const seedFolder = params.get('folder');
+    // A new gallery starts with the image src or the images of the album folder.
+    const seed = seedFolder
+        ? fetch(GW.prefix + 'm=FOLDER_IMAGES&folder=' + encodeURIComponent(seedFolder))
+            .then(r => (r.ok ? r.json() : []))
+            .catch(() => [])
+        : Promise.resolve(seedSrc ? [seedSrc] : []);
     // MD5("") matches Mutil.digest "" used server-side for new-note digest check
     const source = isNew
-        ? Promise.resolve({
+        ? seed.then(imgs => ({
             digest: 'd41d8cd98f00b204e9800998ecf8427e',
             r: {
                 title: '',
                 chronicle: '',
-                images: seedSrc
-                    ? [{ img: seedSrc, desc: '', map: [], groups: [] }]
-                    : []
+                images: imgs.map(img => ({ img: img, desc: '', map: [], groups: [] }))
             }
-        })
+        }))
         : fetch(GW.url + '&ajax=on').then(r => r.json());
     source
         .then(json => {

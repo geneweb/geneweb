@@ -507,6 +507,11 @@ fr: Mon compte associatif
         <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success ms-2"
           title="[*unknown persons]"><i class="fas fa-user-xmark" aria-hidden="true"></i>
         </a>
+        %if;(b.can_send_image!="no")
+          <a href="%prefix;m=MEDIA" class="btn btn-outline-success ms-2"
+            title="[*media page]"><i class="fas fa-images" aria-hidden="true"></i>
+          </a>
+        %end;
       %end;
     </div>
   </div>
