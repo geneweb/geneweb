@@ -27,10 +27,10 @@
                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="STATS" or e.m="GWD_STATS")
-      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
-              integrity="sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo=
-                         sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ
-                         sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA=="
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.2/dist/chart.umd.min.js"
+              integrity="sha256-PyiPTyaILCa1iTH7WGqbTzA3C13jjWncAFsL0FsI4RM=
+                         sha384-wFIO1nJgUOP2XDesMi2Xqyej8+jLnzOfBrJbdvz7Pp+UI88xOiL08fKFupi2KqR0
+                         sha512-yimJPlA2LwcTVkyKcDs3Xa5/6NNIeyMJeqmKWu6ExzL1I2Xf/BsISw9cVQWiu4jQR2dnbYV6g2O3/jZ1qIUaKQ=="
               crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
     %if;(e.m="MEDIA")
@@ -49,7 +49,7 @@
       <script src="%etc_prefix;js/regex.min.js?version=6.1.0"></script>
     %end;
     %if;(e.m="STATS" or e.m="GWD_STATS")
-      <script src="%etc_prefix;js/chart.umd.min.js?version=4.5.1"></script>
+      <script src="%etc_prefix;js/chart.umd.min.js?version=4.6.2"></script>
     %end;
     %if;(e.m="MEDIA")
       <script src="%etc_prefix;js/dropzone-min.js?version=6.3.5"></script>
