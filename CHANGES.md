@@ -327,6 +327,9 @@
   directory of a person and in the images directory, and at the root of
   the albums under the path of its album (`albums/saved/a/b/` for
   `albums/a/b/`).
+- `m=IM`, `m=DOC` and `m=IM_C` refuse a file of the directory of a
+  person to a visitor who may not see that person, as they do for a
+  file under `private/`. Wizards and friends keep full access.
 - `m=IM` and `m=DOC` also serve `.docx`, `.odt` and `.txt` files, as
   downloads, and `m=FOLDER_IMAGES` accepts a subfolder of an album
   (`folder=a/b`).

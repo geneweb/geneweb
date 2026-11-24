@@ -621,7 +621,8 @@ let treat_request =
                  w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
              | "DOC" ->
                  w_base @@ fun conf base ->
-                 doc_aux conf base ImageDisplay.print_source
+                 doc_aux conf base (fun conf f ->
+                     ImageDisplay.print_source conf base f)
              | "DOCH" ->
                  w_base @@ fun conf base ->
                  doc_aux conf base (fun conf _base ->
