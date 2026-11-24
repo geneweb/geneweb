@@ -50,231 +50,21 @@ module IntSet = Set.Make (struct
   let compare = compare
 end)
 
-(* N-grams configuration *)
-type ngram_config = {
-  bigram_threshold : int;
-  trigram_threshold : int;
-  quadrigram_threshold : int;
-}
-
-let ngram_config = ref None
-
-let set_ngram_thresholds bi tri quad =
-  ngram_config :=
-    Some
-      {
-        bigram_threshold = bi;
-        trigram_threshold = tri;
-        quadrigram_threshold = quad;
-      }
-
-let make_strings_of_fsname_aux split get base =
+let make_strings_of_fname base =
   let t = Array.make Dutil.table_size IntSet.empty in
-  let add_name (key : string) (value : int) =
+  let add_name istr key =
     let key = Dutil.name_index key in
     let set = Array.get t key in
-    let set' = IntSet.add value set in
-    if set == set' then () else Array.set t key set'
+    let set' = IntSet.add istr set in
+    if set != set' then Array.set t key set'
   in
-
-  (* Phase 1: Count n-gram occurrences if configured *)
-  let bigram_counts, trigram_counts, quadrigram_counts =
-    match !ngram_config with
-    | None -> (None, None, None)
-    | Some _ ->
-        let bi_tbl = Hashtbl.create 100_000 in
-        let tri_tbl = Hashtbl.create 50_000 in
-        let quad_tbl = Hashtbl.create 10_000 in
-
-        for i = 0 to base.data.persons.len - 1 do
-          let p = Dutil.poi base i in
-          let istr = get p in
-          if istr <> 1 then (
-            let s = base.data.strings.get istr in
-            let s_norm = String.map (fun c -> if c = '-' then ' ' else c) s in
-            let words = Name.split_fname s_norm in
-            let nb = List.length words in
-
-            (* Count bigrams (sliding window) *)
-            if nb >= 2 then
-              for j = 0 to nb - 2 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let bigram = w1 ^ w2 in
-                let count =
-                  try Hashtbl.find bi_tbl bigram with Not_found -> 0
-                in
-                Hashtbl.replace bi_tbl bigram (count + 1)
-              done;
-
-            (* Count trigrams (sliding window) *)
-            if nb >= 3 then
-              for j = 0 to nb - 3 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let w3 = List.nth words (j + 2) in
-                let trigram = w1 ^ w2 ^ w3 in
-                let count =
-                  try Hashtbl.find tri_tbl trigram with Not_found -> 0
-                in
-                Hashtbl.replace tri_tbl trigram (count + 1)
-              done;
-
-            (* Count quadrigrams (sliding window) *)
-            if nb >= 4 then
-              for j = 0 to nb - 4 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let w3 = List.nth words (j + 2) in
-                let w4 = List.nth words (j + 3) in
-                let quadrigram = w1 ^ w2 ^ w3 ^ w4 in
-                let count =
-                  try Hashtbl.find quad_tbl quadrigram with Not_found -> 0
-                in
-                Hashtbl.replace quad_tbl quadrigram (count + 1)
-              done)
-        done;
-
-        (Some bi_tbl, Some tri_tbl, Some quad_tbl)
-  in
-
-  (* Log counts *)
-  (match !ngram_config with
-  | Some cfg -> (
-      (match bigram_counts with
-      | Some tbl ->
-          let total = Hashtbl.length tbl in
-          let kept =
-            Hashtbl.fold
-              (fun _ v acc ->
-                if v >= cfg.bigram_threshold then acc + 1 else acc)
-              tbl 0
-          in
-          trace
-            (Printf.sprintf "Bigrams: %d unique, %d kept (threshold=%d, %.1f%%)"
-               total kept cfg.bigram_threshold
-               (100. *. float kept /. float total))
-      | None -> ());
-
-      (match trigram_counts with
-      | Some tbl ->
-          let total = Hashtbl.length tbl in
-          let kept =
-            Hashtbl.fold
-              (fun _ v acc ->
-                if v >= cfg.trigram_threshold then acc + 1 else acc)
-              tbl 0
-          in
-          trace
-            (Printf.sprintf
-               "Trigrams: %d unique, %d kept (threshold=%d, %.1f%%)" total kept
-               cfg.trigram_threshold
-               (100. *. float kept /. float total))
-      | None -> ());
-
-      match quadrigram_counts with
-      | Some tbl ->
-          let total = Hashtbl.length tbl in
-          let kept =
-            Hashtbl.fold
-              (fun _ v acc ->
-                if v >= cfg.quadrigram_threshold then acc + 1 else acc)
-              tbl 0
-          in
-          trace
-            (Printf.sprintf
-               "Quadrigrams: %d unique, %d kept (threshold=%d, %.1f%%)" total
-               kept cfg.quadrigram_threshold
-               (100. *. float kept /. float total))
-      | None -> ())
-  | None -> ());
-
-  (* Phase 2: Index with filtering *)
   for i = 0 to base.data.persons.len - 1 do
-    let p = Dutil.poi base i in
-    let aux istr =
-      if istr <> 1 then (
-        let s = base.data.strings.get istr in
-        let s_normalized = String.map (fun c -> if c = '-' then ' ' else c) s in
-
-        (* Index complete normalized firstname *)
-        add_name s_normalized istr;
-
-        (* Index individual words (current behavior) *)
-        split
-          (fun i j -> add_name (String.sub s_normalized i j) istr)
-          s_normalized;
-
-        (* Index n-grams if configured *)
-        match !ngram_config with
-        | Some cfg ->
-            let words = Name.split_fname s_normalized in
-            let nb = List.length words in
-
-            (* Index bigrams above threshold *)
-            if nb >= 2 then
-              for j = 0 to nb - 2 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let bigram = w1 ^ w2 in
-                match bigram_counts with
-                | Some tbl ->
-                    let count =
-                      try Hashtbl.find tbl bigram with Not_found -> 0
-                    in
-                    if count >= cfg.bigram_threshold then add_name bigram istr
-                | None -> ()
-              done;
-
-            (* Index trigrams above threshold *)
-            if nb >= 3 then
-              for j = 0 to nb - 3 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let w3 = List.nth words (j + 2) in
-                let trigram = w1 ^ w2 ^ w3 in
-                match trigram_counts with
-                | Some tbl ->
-                    let count =
-                      try Hashtbl.find tbl trigram with Not_found -> 0
-                    in
-                    if count >= cfg.trigram_threshold then add_name trigram istr
-                | None -> ()
-              done;
-
-            (* Index quadrigrams above threshold *)
-            if nb >= 4 then
-              for j = 0 to nb - 4 do
-                let w1 = List.nth words j in
-                let w2 = List.nth words (j + 1) in
-                let w3 = List.nth words (j + 2) in
-                let w4 = List.nth words (j + 3) in
-                let quadrigram = w1 ^ w2 ^ w3 ^ w4 in
-                match quadrigram_counts with
-                | Some tbl ->
-                    let count =
-                      try Hashtbl.find tbl quadrigram with Not_found -> 0
-                    in
-                    if count >= cfg.quadrigram_threshold then
-                      add_name quadrigram istr
-                | None -> ()
-              done
-        | None -> ())
-    in
-    aux (get p)
+    let istr = (Dutil.poi base i).first_name in
+    if istr <> 1 then
+      List.iter (add_name istr)
+        (Dutil.first_name_keys (base.data.strings.get istr))
   done;
-
-  Array.map
-    (fun set ->
-      let a = Array.make (IntSet.cardinal set) 0 in
-      let i = ref 0 in
-      IntSet.iter
-        (fun e ->
-          Array.set a !i e;
-          incr i)
-        set;
-      a)
-    t
+  Array.map (fun set -> Array.of_list (IntSet.elements set)) t
 
 (* Index surnames under the whole name, its pieces (particles kept, see
    Mutil.surnames_pieces) and its components (particles left out, see
@@ -314,9 +104,6 @@ let make_strings_of_sname_with_pieces base =
         set;
       a)
     t
-
-let make_strings_of_fname =
-  make_strings_of_fsname_aux Name.split_fname_callback (fun p -> p.first_name)
 
 let make_strings_of_sname = make_strings_of_sname_with_pieces
 

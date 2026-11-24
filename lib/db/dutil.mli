@@ -99,3 +99,10 @@ end
 val name_index : string -> int
 (** [name_index s] Compute the index of crush_lowered version of s in an array
     of size [table_size]. *)
+
+val first_name_keys : string -> string list
+(** [first_name_keys s] Keys under which the first name [s] is indexed, hyphens
+    read as spaces: the whole first name, each of its words, and each sequence
+    of 2 to 4 consecutive words joined without space. A search then finds the
+    first name from any of its parts, and an order-insensitive search from any
+    permutation of up to 4 consecutive words. *)
