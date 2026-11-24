@@ -1412,63 +1412,22 @@ and print_simple_variable conf = function
          See issue https://github.com/geneweb/geneweb/issues/2231 *)
       Util.time_debug conf (Util.query_time conf) !GWPARAM.nb_errors
         !GWPARAM.errors_undef !GWPARAM.errors_other !GWPARAM.set_vars
-  | "src_albums_list" -> (
+  | "src_albums_list" ->
       let dir = Layout.albums conf.Config.layout in
-      let has_image path =
-        try
-          let entries = Sys.readdir path in
-          Array.exists
-            (fun f ->
-              let full = Filename.concat path f in
-              try
-                (Unix.stat full).st_kind = Unix.S_REG
-                && f <> ""
-                && f.[0] <> '.'
-                && f.[0] <> '~'
-                && ListImages.image_extension f
-              with Unix.Unix_error _ -> false)
-            entries
-        with Sys_error _ | Unix.Unix_error _ -> false
+      let has_image name =
+        List.exists
+          (fun (f : MediaDir.file) -> ListImages.image_extension f.name)
+          (MediaDir.read (Filename.concat dir name)).files
       in
-      let collect entry acc =
-        match entry with
-        | Filesystem.Dir path ->
-            let name = Filename.basename path in
-            if name <> "" && name.[0] <> '.' && has_image path then name :: acc
-            else acc
-        | Filesystem.File _ | Filesystem.Exn _ -> acc
-      in
-      try
-        Filesystem.walk_folder collect dir []
-        |> List.sort String.compare
-        |> List.iter (fun f ->
-            Output.printf conf "<option>%s\n" (Util.escape_html f :> string))
-      with
-      | Sys_error msg ->
-          Log.warn (fun k -> k "src_albums_list: %s (%s)" msg dir)
-      | Unix.Unix_error (err, _, _) ->
-          Log.warn (fun k ->
-              k "src_albums_list: %s (%s)" (Unix.error_message err) dir))
-  | "src_images_list" -> (
-      let dir = Layout.images conf.Config.layout in
-      try
-        let f_list = Sys.readdir dir |> Array.to_list |> List.sort compare in
-        List.iter
-          (fun f ->
-            let full_path = Filename.concat dir f in
-            if
-              (Unix.stat full_path).st_kind = Unix.S_REG
-              && f.[0] <> '.'
-              && f.[0] <> '~'
-            then
-              Output.printf conf "<option>%s\n" (Util.escape_html f :> string))
-          f_list
-      with
-      | Sys_error msg ->
-          Log.warn (fun k -> k "src_images_list: %s (%s)" msg dir)
-      | Unix.Unix_error (err, _, _) ->
-          Log.warn (fun k ->
-              k "src_images_list: %s (%s)" (Unix.error_message err) dir))
+      List.iter
+        (fun name ->
+          Output.printf conf "<option>%s\n" (Util.escape_html name :> string))
+        (List.filter has_image (MediaDir.read dir).dirs)
+  | "src_images_list" ->
+      List.iter
+        (fun (f : MediaDir.file) ->
+          Output.printf conf "<option>%s\n" (Util.escape_html f.name :> string))
+        (MediaDir.read (Layout.images conf.Config.layout)).files
   | _ -> raise Not_found
 
 and print_variable conf sl =

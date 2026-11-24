@@ -93,19 +93,15 @@ let safe_folder f =
 let print_folder_images_json conf folder =
   let files =
     match folder with
-    | Some f when safe_folder f -> (
+    | Some f when safe_folder f ->
         let dir = Filename.concat (Layout.albums conf.layout) f in
-        let collect entry acc =
-          match entry with
-          | Filesystem.File path ->
-              let ext = String.lowercase_ascii (Filename.extension path) in
-              if Array.mem ext Image.ext_list_1 then
-                String.concat "/" [ "albums"; f; Filename.basename path ] :: acc
-              else acc
-          | Filesystem.Dir _ | Filesystem.Exn _ -> acc
-        in
-        try Filesystem.walk_folder collect dir [] |> List.sort String.compare
-        with _ -> [])
+        List.filter_map
+          (fun (file : MediaDir.file) ->
+            let ext = String.lowercase_ascii (Filename.extension file.name) in
+            if Array.mem ext Image.ext_list_1 then
+              Some (String.concat "/" [ "albums"; f; file.name ])
+            else None)
+          (MediaDir.read dir).files
     | _ -> []
   in
   let json =

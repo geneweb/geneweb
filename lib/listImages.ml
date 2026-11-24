@@ -6,29 +6,13 @@ let image_extension f =
   let ext = String.lowercase_ascii (Filename.extension f) in
   Array.exists (fun e -> String.lowercase_ascii e = ext) Image.ext_list_1
 
-let is_visible f = String.length f > 0 && f.[0] <> '.' && f.[0] <> '~'
-
 let list_images dir =
-  try
-    Sys.readdir dir |> Array.to_list
-    |> List.filter (fun f ->
-        let full = Filename.concat dir f in
-        try
-          (Unix.stat full).st_kind = Unix.S_REG
-          && is_visible f && image_extension f
-        with Unix.Unix_error _ -> false)
-    |> List.sort compare
-  with Sys_error _ | Unix.Unix_error _ -> []
+  List.filter_map
+    (fun (f : MediaDir.file) ->
+      if image_extension f.name then Some f.name else None)
+    (MediaDir.read dir).files
 
-let list_subdirs dir =
-  try
-    Sys.readdir dir |> Array.to_list
-    |> List.filter (fun f ->
-        let full = Filename.concat dir f in
-        try (Unix.stat full).st_kind = Unix.S_DIR && is_visible f
-        with Unix.Unix_error _ -> false)
-    |> List.sort compare
-  with Sys_error _ | Unix.Unix_error _ -> []
+let list_subdirs dir = (MediaDir.read dir).dirs
 
 let safe_segment s =
   s <> "" && s <> ".."
