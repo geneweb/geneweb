@@ -28,6 +28,9 @@
   other UTF-8 characters (`[[[Séjour_à_Évian]]]`, `m=NOTES&f=Été`).
   A new gallery named with accents used to fail with "the base has
   changed".
+- The name of a note refuses a `.` or `..` component: `m=NOTES&f=..:x`
+  read, and `m=MOD_NOTES_OK` saved, a `.txt` file outside the notes
+  directory.
 - Event witnesses carry a note, as on Geneanet. It is entered next to
   each witness in the person and family forms and rendered like the
   other notes: wiki syntax, allowed tags, and links indexed in the notes

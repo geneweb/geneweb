@@ -35,6 +35,9 @@ let v =
         file_name "a/b" false;
         file_name "a?b" false;
         file_name "dir::page" false;
+        file_name "..:..:page" false;
+        file_name "dir:." false;
+        file_name "a..b" true;
         file_name "\xC9t\xE9" false;
       ] );
     ( "notes-rename-urls",
