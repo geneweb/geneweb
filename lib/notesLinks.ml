@@ -6,9 +6,14 @@ let dir_sep = ":"
 
 let check_file_name s =
   let valid_utf_8 = String.is_valid_utf_8 s in
+  let named ibeg i =
+    match String.sub s ibeg (i - ibeg) with
+    | "" | "." | ".." -> false
+    | _ -> true
+  in
   let rec loop path ibeg i =
     if i = String.length s then
-      if i > ibeg then
+      if named ibeg i then
         let path = (List.rev path, String.sub s ibeg (i - ibeg)) in
         Some path
       else None
@@ -19,7 +24,7 @@ let check_file_name s =
       | '\x80' .. '\xff' when valid_utf_8 -> loop path ibeg (i + 1)
       | c ->
           if c = char_dir_sep then
-            if i > ibeg then
+            if named ibeg i then
               loop (String.sub s ibeg (i - ibeg) :: path) (i + 1) (i + 1)
             else None
           else None
