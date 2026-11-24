@@ -545,7 +545,7 @@ let hidden_env conf =
 let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
 
-let p_getenv = Http.p_getenv
+let p_getenv env label = Http.Env.get (Http.Env.of_list env) label
 
 let p_getint env label =
   try
@@ -859,7 +859,7 @@ let surname_without_particle base s =
   in
   String.sub s part_len (String.length s - part_len)
 
-let create_env = Http.create_env
+let create_env s = Http.Env.to_list (Http.Env.of_encoded_string s)
 let index_of_sex = function Def.Male -> 0 | Def.Female -> 1 | Def.Neuter -> 2
 
 let string_of_pevent_name_without_base conf = function

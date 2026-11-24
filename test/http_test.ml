@@ -273,23 +273,24 @@ let test_env_tail_recursive () =
     String.concat "&"
       (List.init count (fun i -> "k" ^ string_of_int i ^ "=v" ^ string_of_int i))
   in
-  let env = Http.create_env (Adef.encoded q) in
+  let env = Http.Env.of_encoded_string (Adef.encoded q) in
+  let env_list = Http.Env.to_list env in
   let () =
     Geneweb_test_utils.Check.int ~pos:__POS__
       ~msg:
-        "Http.create_env tail-recursive parses large input without stack \
-         overflow"
-      count (List.length env)
+        "Http.Env.of_encoded_string tail-recursive parses large input without \
+         stack overflow"
+      count (List.length env_list)
   in
   let () =
     Geneweb_test_utils.Check.string ~pos:__POS__
-      ~msg:"Http.create_env preserves first parameter" "k0"
-      (fst (List.hd env))
+      ~msg:"Http.Env.of_encoded_string preserves first parameter" "k0"
+      (fst (List.hd env_list))
   in
   Geneweb_test_utils.Check.string ~pos:__POS__
-    ~msg:"Http.create_env preserves last parameter"
+    ~msg:"Http.Env.of_encoded_string preserves last parameter"
     ("k" ^ string_of_int (count - 1))
-    (fst (List.hd (List.rev env)))
+    (fst (List.hd (List.rev env_list)))
 
 let test_parse_content_type () =
   let ct_multipart =
@@ -385,31 +386,48 @@ let test_parse_content_type () =
         "Http.parse_content_type failed to parse other"
 
 let test_parse_query_and_merge () =
-  let url_params =
-    Http.Env.to_list
-      (Http.parse_query_params (Http.query_of_string "m=NG&b=base"))
+  let url_env = Http.parse_query_params (Http.query_of_string "m=NG&b=base") in
+  let body_env =
+    Http.parse_query_params (Http.query_of_string "foo=bar&m=OVERRIDDEN")
   in
-  let body_params =
-    Http.Env.to_list
-      (Http.parse_query_params (Http.query_of_string "foo=bar&m=OVERRIDDEN"))
-  in
-  let merged = Http.merge_env url_params body_params in
-  let get_val k env = (List.assoc k env : Adef.encoded_string :> string) in
+  let merged = Http.Env.merge ~url_env ~body_env in
   let () =
-    Geneweb_test_utils.Check.string ~pos:__POS__
-      ~msg:"Http.merge_env URL param takes precedence" "NG" (get_val "m" merged)
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.merge URL param takes precedence" (Some "NG")
+      (Http.Env.get merged "m")
   in
   let () =
-    Geneweb_test_utils.Check.string ~pos:__POS__
-      ~msg:"Http.merge_env URL param retained" "base" (get_val "b" merged)
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.merge URL param retained" (Some "base")
+      (Http.Env.get merged "b")
   in
   let () =
-    Geneweb_test_utils.Check.string ~pos:__POS__
-      ~msg:"Http.merge_env body param retained" "bar" (get_val "foo" merged)
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.Env.merge body param retained" (Some "bar")
+      (Http.Env.get merged "foo")
   in
-  let m_count = List.length (List.filter (fun (k, _) -> k = "m") merged) in
+  let merged_list = Http.Env.to_list merged in
+  let m_count = List.length (List.filter (fun (k, _) -> k = "m") merged_list) in
   Geneweb_test_utils.Check.int ~pos:__POS__
-    ~msg:"Http.merge_env deduplicates shadowed keys" 1 m_count
+    ~msg:"Http.Env.merge deduplicates shadowed keys" 1 m_count
+
+let[@warning "-3"] test_deprecated_compatibility () =
+  let env = Http.create_env (Adef.encoded "a=1&b=2") in
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.p_getenv retrieves value from list-based env" (Some "1")
+      (Http.p_getenv env "a")
+  in
+  let env2 = Http.create_env (Adef.encoded "a=override&c=3") in
+  let merged = Http.merge_env env env2 in
+  let () =
+    Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+      ~msg:"Http.merge_env retains precedence in list-based env" (Some "1")
+      (Http.p_getenv merged "a")
+  in
+  Geneweb_test_utils.Check.option Alcotest.string ~pos:__POS__
+    ~msg:"Http.merge_env retains non-shadowed key in list-based env" (Some "3")
+    (Http.p_getenv merged "c")
 
 let test_extract_multipart () =
   let boundary = Http.Boundary.of_string "AaB03x" in
@@ -649,6 +667,8 @@ let v =
       [
         Alcotest.test_case "parse query and merge env" `Quick
           test_parse_query_and_merge;
+        Alcotest.test_case "deprecated compatibility env functions" `Quick
+          test_deprecated_compatibility;
       ] );
     ( "http-multipart",
       [

@@ -169,10 +169,13 @@ val extract_multipart :
     by [boundary], returning the reconstructed query string and parsed environment. *)
 
 val create_env : Adef.encoded_string -> (string * Adef.encoded_string) list
+  [@@ocaml.deprecated
+    "Use Http.Env.of_encoded_string or Http.Env.of_query_string instead"]
 (** [create_env s] parses a query string or form body into an association list
     of key-value pairs separated by '&' or ';'. *)
 
 val p_getenv : (string * Adef.encoded_string) list -> string -> string option
+  [@@ocaml.deprecated "Use Http.Env.get instead"]
 (** [p_getenv env label] returns the decoded value associated with [label] in [env]. *)
 
 val parse_query_params : query_string -> Env.t
@@ -182,5 +185,6 @@ val merge_env :
   (string * Adef.encoded_string) list ->
   (string * Adef.encoded_string) list ->
   (string * Adef.encoded_string) list
+  [@@ocaml.deprecated "Use Http.Env.merge instead"]
 (** [merge_env url_params body_params] merges URL query parameters with body
     parameters, placing URL parameters first. *)

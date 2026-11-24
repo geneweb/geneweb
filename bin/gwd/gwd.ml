@@ -1617,14 +1617,13 @@ let misc_request conf fname =
   else false
 
 let parse_body_by_content_type parsed_content_type
-    (contents : Adef.encoded_string) :
-    Adef.encoded_string * (string * Adef.encoded_string) list =
+    (contents : Adef.encoded_string) : Adef.encoded_string * Http.Env.t =
   match parsed_content_type with
   | Some (Http.MultipartForm { boundary }) ->
-      let str, env = Http.extract_multipart boundary contents in
-      (str, Http.Env.to_list env)
-  | None | Some Http.UrlEncoded -> (contents, Http.create_env contents)
-  | Some (Http.Other _) -> (contents, [])
+      Http.extract_multipart boundary contents
+  | None | Some Http.UrlEncoded ->
+      (contents, Http.Env.of_encoded_string contents)
+  | Some (Http.Other _) -> (contents, Http.Env.empty)
 
 let combine_query_and_contents parsed_content_type url_query
     (contents : Adef.encoded_string) : Adef.encoded_string =
@@ -1650,10 +1649,10 @@ let combine_query_and_contents parsed_content_type url_query
 let build_env request (contents : Adef.encoded_string) :
     Adef.encoded_string * (string * Adef.encoded_string) list =
   let req_line = Http.parse_request_line request in
-  let url_params =
+  let url_env =
     match req_line with
-    | Some { query = Some q; _ } -> Http.Env.to_list (Http.parse_query_params q)
-    | Some { query = None; _ } | None -> []
+    | Some { query = Some q; _ } -> Http.parse_query_params q
+    | Some { query = None; _ } | None -> Http.Env.empty
   in
   let url_query =
     match req_line with
@@ -1667,15 +1666,15 @@ let build_env request (contents : Adef.encoded_string) :
     match req_line with
     | Some { meth = Http.POST | Http.PUT | Http.PATCH; _ } ->
         parse_body_by_content_type parsed_content_type contents
-    | Some _ when url_params = [] && (contents :> string) <> "" ->
-        (contents, Http.create_env contents)
-    | Some _ -> (contents, [])
+    | Some _ when Http.Env.to_list url_env = [] && (contents :> string) <> "" ->
+        (contents, Http.Env.of_encoded_string contents)
+    | Some _ -> (contents, Http.Env.empty)
     | None -> parse_body_by_content_type parsed_content_type contents
   in
   let contents =
     combine_query_and_contents parsed_content_type url_query contents
   in
-  let env = Http.merge_env url_params body_env in
+  let env = Http.Env.to_list (Http.Env.merge ~url_env ~body_env) in
   (contents, env)
 
 let connection (addr, request) script_name contents0 =
