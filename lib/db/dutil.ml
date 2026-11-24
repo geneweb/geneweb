@@ -114,3 +114,17 @@ module IntHT = Hashtbl.Make (struct
 end)
 
 let name_index s = Hashtbl.hash (Name.crush_lower s) mod table_size
+
+let first_name_keys s =
+  let s = String.map (fun c -> if c = '-' then ' ' else c) s in
+  let words = Array.of_list (Name.split_fname s) in
+  let nb = Array.length words in
+  let rec sequences len j acc =
+    if j + len > nb then acc
+    else
+      sequences len (j + 1)
+        (String.concat "" (Array.to_list (Array.sub words j len)) :: acc)
+  in
+  List.fold_left
+    (fun acc len -> sequences len 0 acc)
+    (s :: Array.to_list words) [ 2; 3; 4 ]
