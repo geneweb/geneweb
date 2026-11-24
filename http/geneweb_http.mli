@@ -8,7 +8,10 @@ module Code : sig
     | Unauthorized (* 401 *)
     | Forbidden (* 403 *)
     | Not_Found (* 404 *)
+    | Conflict (* 409 *)
     | Payload_Too_Large (* 413 *)
+    | Unsupported_Media_Type (* 415 *)
+    | Internal_Server_Error (* 500 *)
     | Service_Unavailable (* 503 *)
 
   val status_code : status -> int

@@ -161,8 +161,15 @@
 # Don’t authorise wizards to send images.
 #can_send_image=no
 
-# Set a maximum images size in bytes which can be accepted in “send image”
-#max_images_size=
+# Set a maximum size in bytes for an image sent by a wizard
+# (default: 20000000).
+#max_images_size=20000000
+
+# Set a maximum size in bytes for a document (PDF, DOCX, ODT, TXT) sent by a
+# wizard (default: 100000000). gwd refuses any request larger than its option
+# --max-request-size (134217728 bytes by default), to raise as well for a
+# higher value.
+#max_documents_size=100000000
 
 # Optional path for images defined by the "image" field (i.e. *not* added
 # by “send image”). Applies only for images not found in the image/base

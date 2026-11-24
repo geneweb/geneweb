@@ -31,12 +31,16 @@ let print_placeholder_gendered_portrait conf p size =
     - len : la taille en octet du fichier
     - fname : le nom du fichier [Retour] : aucun [Rem] : Ne pas utiliser en
       dehors de ce module. *)
-let content conf ct len fname =
+let content conf ~inline ct len fname =
   Output.status conf Code.OK;
   Output.header conf "Content-type: %s" ct;
   Output.header conf "Content-length: %d" len;
-  Output.header conf "Content-disposition: inline; filename=%s"
-    (Filename.basename fname);
+  if inline then
+    Output.header conf "Content-disposition: inline; filename=%s"
+      (Filename.basename fname)
+  else
+    Output.header conf {|Content-disposition: attachment; filename="%s"|}
+      (Filename.basename fname);
   (* TODO: Utiliser un cache public pour les images non personelles. *)
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
   Output.header conf "Connection: close";
@@ -44,14 +48,19 @@ let content conf ct len fname =
 
 let allowed_extensions =
   [
-    (".png", "image/png");
-    (".jpg", "image/jpeg");
-    (".jpeg", "image/jpeg");
-    (".pjpeg", "image/jpeg");
-    (".gif", "image/gif");
-    (".pdf", "application/pdf");
-    (".htm", "text/html");
-    (".html", "text/html");
+    (".png", "image/png", true);
+    (".jpg", "image/jpeg", true);
+    (".jpeg", "image/jpeg", true);
+    (".pjpeg", "image/jpeg", true);
+    (".gif", "image/gif", true);
+    (".pdf", "application/pdf", true);
+    (".htm", "text/html", true);
+    (".html", "text/html", true);
+    ( ".docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      false );
+    (".odt", "application/vnd.oasis.opendocument.text", false);
+    (".txt", "text/plain; charset=utf-8", false);
   ]
 
 let error fmt = Format.kasprintf (fun s -> Error s) fmt
@@ -59,19 +68,19 @@ let error fmt = Format.kasprintf (fun s -> Error s) fmt
 let print_image_file conf fname =
   let res =
     List.find_opt
-      (fun (suff, _ctype) ->
+      (fun (suff, _ctype, _inline) ->
         Filename.check_suffix fname suff
         || Filename.check_suffix fname (String.uppercase_ascii suff))
       allowed_extensions
   in
   match res with
   | None -> error "cannot find MIME type from extension of file %s" fname
-  | Some (_suff, ctype) -> (
+  | Some (_suff, ctype, inline) -> (
       try
         Secure.with_open_in_bin fname @@ fun ic ->
         let buf = Bytes.create 1024 in
         let len = in_channel_length ic in
-        content conf ctype len fname;
+        content conf ~inline ctype len fname;
         let rec loop len =
           if len = 0 then ()
           else
@@ -84,17 +93,14 @@ let print_image_file conf fname =
         Ok ()
       with Sys_error e -> error "cannot print image file %s: %s" fname e)
 
-let safe_folder f =
-  f <> ""
-  && (not (Mutil.contains f ".."))
-  && (not (String.contains f '/'))
-  && not (String.contains f '\\')
-
 let print_folder_images_json conf folder =
   let files =
-    match folder with
-    | Some f when safe_folder f ->
-        let dir = Filename.concat (Layout.albums conf.layout) f in
+    match Option.bind folder Image.safe_subpath with
+    | Some segments ->
+        let dir =
+          List.fold_left Filename.concat (Layout.albums conf.layout) segments
+        in
+        let f = String.concat "/" segments in
         List.filter_map
           (fun (file : MediaDir.file) ->
             let ext = String.lowercase_ascii (Filename.extension file.name) in
@@ -102,7 +108,7 @@ let print_folder_images_json conf folder =
               Some (String.concat "/" [ "albums"; f; file.name ])
             else None)
           (MediaDir.read dir).files
-    | _ -> []
+    | None -> []
   in
   let json =
     Yojson.Basic.to_string (`List (List.map (fun s -> `String s) files))

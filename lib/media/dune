@@ -1,0 +1,12 @@
+(library
+ (name geneweb_media)
+ (public_name geneweb.media)
+ (libraries
+  geneweb
+  geneweb.util
+  geneweb_db
+  geneweb_def
+  geneweb_http
+  logs
+  unix
+  yojson))

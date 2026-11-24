@@ -11,6 +11,7 @@ module Registration = Geneweb_register.Registration
 module Server = Geneweb_http.Server
 module Code = Geneweb_http.Code
 module Connection = Geneweb_http.Connection
+module Media = Geneweb_media.Media
 
 let src = Logs.Src.create ~doc:"Request" "REQ "
 
@@ -29,7 +30,8 @@ let this_request_updates_database conf =
       | "OK_ADD" | "OK_DEL" | "OK_FOLD" | "SND_IMAGE" | "UNKNOWN_OK" | "MRG_IND"
       | "MRG_MOD_FAM" | "MRG_MOD_IND" | "MOD_DATA_OK"
       | "PORTRAIT_MOVE_TO_BLASON" | "PORTRAIT_TO_BLASON" | "RESET_IMAGE_C_OK"
-      | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" ) ->
+      | "PLACE_TERMS_OK" | "SOURCE_TERMS_OK" | "OCCU_TERMS_OK" | "MEDIA_SEND_OK"
+        ) ->
       true
   | _ -> false
 
@@ -699,6 +701,11 @@ let treat_request =
              | "LIST_IMAGES" -> w_wizard @@ w_base @@ ListImages.print
              | "LL" -> w_base @@ BirthDeathDisplay.print_longest_lived
              | "LM" -> w_base @@ BirthDeathDisplay.print_marriage
+             | "MEDIA_DEL_OK" -> w_wizard @@ w_base @@ Media.print_delete
+             | "MEDIA_LIST" -> w_wizard @@ w_base @@ Media.print_list
+             | "MEDIA_MKDIR_OK" -> w_wizard @@ w_base @@ Media.print_mkdir
+             | "MEDIA_SEND_OK" ->
+                 w_wizard @@ w_lock @@ w_base @@ Media.print_send
              | "MISC_NOTES" -> w_base @@ NotesDisplay.print_misc_notes
              | "MISC_NOTES_SEARCH" ->
                  w_base @@ NotesDisplay.print_misc_notes_search
