@@ -22,10 +22,17 @@ val char_dir_sep : char
 val dir_sep : string
 
 val check_file_name : string -> (string list * string) option
-(** [check_file_name s] splits the name of a note into its directories and its
-    base name. ASCII letters, digits, ['_'], ['-'], ['.'] and valid UTF-8
-    sequences are accepted, [char_dir_sep] separates the directories; [None] for
-    any other name, and for an empty, ["."] or [".."] component. *)
+(** [check_file_name s] splits the name of a note, put in NFC, into its
+    directories and its base name. ASCII letters, digits, ['_'], ['-'], ['.']
+    and the Unicode letters, marks and digits are accepted, [char_dir_sep]
+    separates the directories; [None] for any other name (invalid UTF-8, spaces,
+    invisible, control or bidi characters…), and for an empty, ["."] or [".."]
+    component. *)
+
+val file_name : string -> string option
+(** [file_name s] is the name of a note [s] put in NFC, when {!check_file_name}
+    accepts it. A name typed or pasted in decomposed form names the same note as
+    its composed form. *)
 
 val misc_notes_link : string -> int -> wiki_link
 

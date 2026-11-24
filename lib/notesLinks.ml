@@ -4,32 +4,45 @@ module Driver = Geneweb_db.Driver
 let char_dir_sep = ':'
 let dir_sep = ":"
 
-let check_file_name s =
-  let valid_utf_8 = String.is_valid_utf_8 s in
-  let named ibeg i =
-    match String.sub s ibeg (i - ibeg) with
-    | "" | "." | ".." -> false
-    | _ -> true
-  in
-  let rec loop path ibeg i =
-    if i = String.length s then
-      if named ibeg i then
-        let path = (List.rev path, String.sub s ibeg (i - ibeg)) in
-        Some path
-      else None
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '.' ->
-          loop path ibeg (i + 1)
-      | '\x80' .. '\xff' when valid_utf_8 -> loop path ibeg (i + 1)
-      | c ->
-          if c = char_dir_sep then
-            if named ibeg i then
-              loop (String.sub s ibeg (i - ibeg) :: path) (i + 1) (i + 1)
+let name_uchar u =
+  match Uucp.Gc.general_category u with
+  | `Lu | `Ll | `Lt | `Lm | `Lo | `Mn | `Mc | `Me | `Nd | `Nl | `No -> true
+  | _ -> false
+
+let split_file_name s =
+  if not (String.is_valid_utf_8 s) then None
+  else
+    let s = Mutil.normalize_utf_8 s in
+    let named ibeg i =
+      match String.sub s ibeg (i - ibeg) with
+      | "" | "." | ".." -> false
+      | _ -> true
+    in
+    let rec loop path ibeg i =
+      if i = String.length s then
+        if named ibeg i then
+          Some (s, (List.rev path, String.sub s ibeg (i - ibeg)))
+        else None
+      else
+        match s.[i] with
+        | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '.' ->
+            loop path ibeg (i + 1)
+        | '\x80' .. '\xff' ->
+            let d = String.get_utf_8_uchar s i in
+            if name_uchar (Uchar.utf_decode_uchar d) then
+              loop path ibeg (i + Uchar.utf_decode_length d)
             else None
-          else None
-  in
-  loop [] 0 0
+        | c ->
+            if c = char_dir_sep then
+              if named ibeg i then
+                loop (String.sub s ibeg (i - ibeg) :: path) (i + 1) (i + 1)
+              else None
+            else None
+    in
+    loop [] 0 0
+
+let check_file_name s = Option.map snd (split_file_name s)
+let file_name s = Option.map fst (split_file_name s)
 
 type person_text = Short of string * string | Explicit of string
 
@@ -91,8 +104,8 @@ let misc_notes_link s i =
                 String.sub target (k + 1) (String.length target - k - 1) )
         in
         let text = match text with Some t -> t | None -> target in
-        match check_file_name fname with
-        | Some pg_path -> WLpage (j, pg_path, fname, anchor, text)
+        match split_file_name fname with
+        | Some (fname, pg_path) -> WLpage (j, pg_path, fname, anchor, text)
         | None -> wlnone j
       else wlnone j
     else

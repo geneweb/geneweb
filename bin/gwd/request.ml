@@ -644,8 +644,7 @@ let treat_request =
                          let fnotes =
                            match p_getenv conf.env "f" with
                            | Some f ->
-                               if NotesLinks.check_file_name f <> None then f
-                               else ""
+                               Option.value ~default:"" (NotesLinks.file_name f)
                            | None -> ""
                          in
                          NotesDisplay.print_what_links conf base fnotes
@@ -833,8 +832,7 @@ let treat_request =
                          let fnotes =
                            match p_getenv conf.env "f" with
                            | Some f ->
-                               if NotesLinks.check_file_name f <> None then f
-                               else ""
+                               Option.value ~default:"" (NotesLinks.file_name f)
                            | None -> ""
                          in
                          NotesDisplay.print_what_links conf base fnotes
