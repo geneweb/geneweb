@@ -58,6 +58,16 @@ val update_notes_links_family :
   unit
 (** Same as [update_notes_links_person] for a family. *)
 
+val rebuild_links_db : ?verbose:bool -> Geneweb_db.Driver.base -> string -> unit
+(** [rebuild_links_db base bpath] rebuilds from scratch the notes links database
+    and the linked pages cache of [base], whose directory is [bpath]. It scans
+    the base notes, the wizard notes, the misc notes whose file name is a valid
+    note name, and the fields of every person and family that
+    {!update_notes_links_person} and {!update_notes_links_family} index when
+    they are saved. The strings array of [base] is loaded. With [verbose]
+    (default [false]), sections, linked pages and progress bars are printed on
+    stderr. *)
+
 val file_path : Config.config -> Geneweb_db.Driver.base -> string -> string
 
 val read_notes :
@@ -249,10 +259,6 @@ val mark_pnocs_validity : Geneweb_db.Driver.base -> string -> string
     unchanged. Used by both the gallery viewer and the gallery editor to seed
     client-side validity state without requiring per-row API round-trips at page
     load. *)
-
-val save_cache_linked_pages : string -> (Def.NLDB.key, int) Hashtbl.t -> unit
-(** [save_cache_linked_pages bpath ht] atomically replaces the linked-pages
-    cache of base directory [bpath] with [ht]. Raises [Sys_error] on failure. *)
 
 val norm_type : string -> string
 (** [norm_type t] is the note TYPE [t], the deprecated [album] being read as

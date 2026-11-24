@@ -3747,6 +3747,7 @@ let main () =
     flush !log_oc;
     Anomaly.write ~base ~bpath:!out_file ~producer:"ged2gwb" (anomalies ())
   end;
+  Notes.rebuild_links_db base !out_file;
   if !log_oc != stdout then close_out !log_oc
 
 let _ =

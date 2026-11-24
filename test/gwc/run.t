@@ -219,3 +219,8 @@
   gwc: "foo bar" is not a valid database name.
   Allowed characters: a..z, A..Z, 0..9, -
   [2]
+
+  $ cp galichet.gwb/notes_links galichet.gwb/cache_linked_pages .
+  $ update_nldb -bd . galichet > /dev/null 2>&1
+  $ cmp notes_links galichet.gwb/notes_links
+  $ cmp cache_linked_pages galichet.gwb/cache_linked_pages
