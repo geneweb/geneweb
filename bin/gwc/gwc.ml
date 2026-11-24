@@ -120,7 +120,6 @@ let set_bases_dir s = bases_dir := Some s
 let just_comp = ref false
 let kill_gwo = ref false
 let no_warn = ref false
-let ngrams_arg = ref None
 let reindex = ref false
 let prog = ref false
 let default_separate = false
@@ -166,25 +165,6 @@ let set_reindex s =
   reindex := true;
   set_output s
 
-(* Parse -ngrams argument: <bi>[,<tri>[,<quad>]] *)
-let parse_ngrams s =
-  match String.split_on_char ',' s with
-  | [ bi_str ] ->
-      let bi = int_of_string bi_str in
-      let tri = max 10 (bi / 25) in
-      let quad = max 5 (bi / 50) in
-      (bi, tri, quad)
-  | [ bi_str; tri_str ] ->
-      let bi = int_of_string bi_str in
-      let tri = int_of_string tri_str in
-      let quad = max 5 (tri / 2) in
-      (bi, tri, quad)
-  | [ bi_str; tri_str; quad_str ] ->
-      (int_of_string bi_str, int_of_string tri_str, int_of_string quad_str)
-  | _ -> raise_bad "Invalid -ngrams format. Use: <bi>[,<tri>[,<quad>]]"
-
-let set_ngrams_arg s = ngrams_arg := Some (parse_ngrams s)
-
 let speclist =
   [
     ( "-bd",
@@ -214,10 +194,6 @@ let speclist =
     ("-mem", Arg.Set Geneweb_db.Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
-    ( "-ngrams",
-      Arg.String set_ngrams_arg,
-      "<bi>[,<tri>[,<quad>]] N-gram indexing thresholds (e.g., '500,20,10' or \
-       '500')" );
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
@@ -376,11 +352,6 @@ let () =
       Fmt.epr "%a@." Lock.pp_exception (exn, bt);
       exit 2
     in
-    Option.iter
-      (fun (bi, tri, quad) ->
-        Geneweb_db.Outbase.set_ngram_thresholds bi tri quad;
-        Format.eprintf "N-grams enabled: bi≥%d, tri≥%d, quad≥%d@." bi tri quad)
-      !ngrams_arg;
     Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
     let (), duration =
       with_timer @@ fun () ->
