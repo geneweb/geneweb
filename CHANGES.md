@@ -114,9 +114,9 @@
   On a base without index (of an earlier format, or whose `base.inx`
   is missing), `m=PS` warns that every person is read; wizards are
   told how to add the index.
-  For wizards, each place and group of places of `m=PS` links to the
-  book of places, at the entries starting with it (order from the last
-  term).
+  For wizards, each place and level of the long display of `m=PS`
+  links to the book of places, at the entries starting with it (order
+  from the last term).
   In the short display, a place found by a deeper term is shown down to
   that term ("Chateaumeillant, Cher", not "Cher"), and following a group
   keeps the place searched.

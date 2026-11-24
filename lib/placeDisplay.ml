@@ -98,9 +98,10 @@ let strip_pl keep pll =
     in
     loop [] 1 pll
 
-(* For wizards, a link from a place of m=PS to the book of places
-   (m=MOD_DATA), at the entries starting with it: [dict_link pl] for the
-   place or the group of places [pl] (its terms, country first). The book
+(* For wizards, a link from a place of the long display of m=PS to the
+   book of places (m=MOD_DATA), at the entries starting with it: [dict_link
+   pl] for the place or the level [pl] (its terms, country first). None in
+   the short display, where it would be too intrusive. The book
    is read from the last term ("France, Manche, Granville", [o=r]), so that
    a group of places is one interval of it; a base recording its places
    country first ([places_inverted]) is read in the alphabetic order. An
@@ -179,7 +180,7 @@ let short_depth conf keep =
       fun pl -> max keep (Place.match_depth conf pl k)
   | Some _ | None -> fun _ -> keep
 
-let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
+let print_html_places_surnames_short conf _base _link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
@@ -264,7 +265,6 @@ let print_html_places_surnames_short conf _base _link_to_ind ~dict_link
             (string_of_int (keep + 1))
             (Mutil.encode (drill_k conf str) :> string)
             str;
-          Output.print_sstring conf (dict_link ~leaf:false pl);
           if len < Place.max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place%s&k=%s&nb=%d"
               (commd conf :> string)
@@ -627,7 +627,7 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
      let dict_link = dict_link conf base in
      if long then
        print_html_places_surnames_long conf base link_to_ind ~dict_link arry
-     else print_html_places_surnames_short conf base link_to_ind ~dict_link arry);
+     else print_html_places_surnames_short conf base link_to_ind arry);
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
