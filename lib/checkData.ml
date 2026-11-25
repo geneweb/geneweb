@@ -88,12 +88,7 @@ let make_error_set = function
 
 let applies error_type dict =
   match (error_type, dict) with
-  | (BadCapitalization | HtmlEntities), Sources -> false
-  | ( SuspiciousCharacters,
-      (Fnames | Snames | Fnames_alias | Snames_alias | PubNames | Qualifiers) )
-    ->
-      true
-  | SuspiciousCharacters, _ -> false
+  | (BadCapitalization | HtmlEntities | SuspiciousCharacters), Sources -> false
   | _ -> true
 
 let place_suburb_sep_range s =
@@ -1229,29 +1224,67 @@ let find_html_entity_positions s =
 let fix_html_entities s =
   Re.replace (Lazy.force html_entity_re) ~f:html_entity_fix s
 
-let is_suspicious_name_char = function
-  | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' | '*' | '_' | '!' | ';' | ':'
-  | '@' | '#' | '$' | '%' | '&' | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '`'
-  | '"' ->
+let is_suspicious_char = function
+  | '[' | ']' | '{' | '}' | '/' | '\\' | '*' | '_' | '@' | '#' | '$' | '%' | '&'
+  | '=' | '+' | '<' | '>' | '|' | '~' | '^' | '`' ->
       true
   | _ -> false
 
+let is_suspicious_name_char = function
+  | '(' | ')' | '!' | ';' | ':' | '"' -> true
+  | c -> is_suspicious_char c
+
 let is_digit c = c >= '0' && c <= '9'
 
-let is_suspicious_name_code code =
+(* A character with a compatibility decomposition: ligature, superscript or
+   subscript letter, fullwidth form... *)
+let is_compatibility_char u =
+  let normalize form =
+    let n = Uunf.create form in
+    let rec add acc v =
+      match Uunf.add n v with
+      | `Uchar c -> add (c :: acc) `Await
+      | `Await | `End -> acc
+    in
+    add (add [] (`Uchar u)) `End
+  in
+  not (List.equal Uchar.equal (normalize `NFKC) (normalize `NFC))
+
+let is_suspicious_code code =
   match code with
-  | 0xA7 | 0xB5 | 0x2013 | 0x2014 | 0x2018 | 0x2026 -> true
-  | 0xB4 | 0x2212 -> false
+  | 0xA7 | 0xB5 | 0x2018 | 0x2032 | 0x2033 | 0x2034 | 0x2035 | 0x2036 | 0x2037
+  | 0x2057 ->
+      true
+  | 0xA0 | 0xB4 | 0x202F | 0x2026 | 0x2212 -> false
   | _ -> (
       Uchar.is_valid code
+      && (not (is_invisible_code code))
       &&
-      match Uucp.Gc.general_category (Uchar.of_int code) with
+      let u = Uchar.of_int code in
+      is_compatibility_char u
+      ||
+      match Uucp.Gc.general_category u with
       | `Sc | `Sk | `Sm | `So | `No -> true
       | _ -> false)
 
+let is_mark code =
+  Uchar.is_valid code
+  &&
+  match Uucp.Gc.general_category (Uchar.of_int code) with
+  | `Mn | `Mc | `Me -> true
+  | _ -> false
+
 let find_suspicious_characters_positions dict s =
   let len = String.length s in
-  let comma = match dict with Fnames | Fnames_alias -> false | _ -> true in
+  let names = is_name_dict dict in
+  let comma =
+    names && match dict with Fnames | Fnames_alias -> false | _ -> true
+  in
+  let suburb_bracket =
+    match if dict = Places then place_suburb_sep_range s else None with
+    | Some (j, _) -> fun i -> i = 0 || i = j
+    | None -> fun _ -> false
+  in
   let is_ordinal_end j =
     dict = PubNames && j < len && (is_ascii_lower s.[j] || s.[j] >= '\x80')
   in
@@ -1260,14 +1293,21 @@ let find_suspicious_characters_positions dict s =
   in
   let rec loop i acc =
     if i >= len then acc
-    else if is_digit s.[i] then
+    else if names && is_digit s.[i] then
       let j = digits_end (i + 1) in
       loop j (if is_ordinal_end j then acc else span_positions i j acc)
-    else if is_suspicious_name_char s.[i] || (comma && s.[i] = ',') then
-      loop (i + 1) (i :: acc)
+    else if
+      (if names then is_suspicious_name_char s.[i]
+       else is_suspicious_char s.[i] && not (suburb_bracket i))
+      || (comma && s.[i] = ',')
+    then loop (i + 1) (i :: acc)
     else if s.[i] >= '\x80' then
       let code, size = Util.get_unicode_point s i in
-      loop (i + size) (if is_suspicious_name_code code then i :: acc else acc)
+      let orphan_mark =
+        (i = 0 || s.[i - 1] = ' ' || s.[i - 1] = '-') && is_mark code
+      in
+      loop (i + size)
+        (if orphan_mark || is_suspicious_code code then i :: acc else acc)
     else loop (i + 1) acc
   in
   loop 0 []
