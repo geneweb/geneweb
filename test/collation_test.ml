@@ -38,6 +38,9 @@ let root () =
       [ "† Dupont"; "✠ ambassadeur"; "1789"; "Abel" ];
       [ "Saint Martin"; "Saint-Martin"; "Sainte"; "Saintes" ];
       [ "d’Arc"; "Dame" ];
+      [ "Abd"; "ʿAbd"; "Abda" ];
+      [ "Ahomee"; "ʻAhomeʻe"; "Ahomef" ];
+      [ "Ali"; "ʾAli"; "Alia" ];
       [ "ê"; "ẹ"; "é\u{323}"; "ẹ\u{301}"; "f" ];
       [ "dža"; "ǆa"; "Dža"; "ǅa"; "Ǆa" ];
       [ "fils"; "ﬁls"; "Fils" ];
@@ -90,7 +93,7 @@ let tailorings () =
 
 (* The characters followed by "a" of CollationTest_NON_IGNORABLE_SHORT.txt
    (UCA 17.0.0) that are in the table, in its order, without the spaces and
-   invisible characters, l· (a contraction of the DUCET, as ŀ) and the
+   invisible characters, ʻ ʾ ʿ (ignored by the table), l· (a contraction of the DUCET, as ŀ) and the
    characters whose third weight in the DUCET marks a variant (ª, ᵉ, ｅ, ς,
    ϐ…), digraphs and ligatures excepted (ǅ, ﬁ) *)
 let ducet =
@@ -116,7 +119,7 @@ C ć Ć ĉ Ĉ č Č ċ Ċ ç Ç ḉ Ḉ ᴄ ȼ Ȼ ꞓ Ꞓ ꞔ Ꞔ ƈ Ƈ ɕ ꜿ �
 ệ Ệ ḙ Ḙ ḛ Ḛ ᴇ ꬲ ꬳ ɇ Ɇ ᶒ ꬴ ⱸ ǝ Ǝ ⱻ ə Ə ᶕ ɛ Ɛ ᶓ ɘ ɚ ɜ Ɜ ᶔ ᴈ ɝ ɞ ʚ ɤ Ɤ f F ḟ Ḟ
 ℻ ﬀ ﬃ ﬄ ﬁ ﬂ ʩ ꜰ ꬵ ꞙ Ꞙ ᵮ ᶂ ƒ Ƒ ꟻ g G ǵ Ǵ ğ Ğ ĝ Ĝ ǧ Ǧ ġ Ġ ģ Ģ ḡ Ḡ ꟑ Ꟑ ɡ Ɡ ꬶ ɢ
 ǥ Ǥ ᶃ ɠ Ɠ ʛ ᵷ ꝿ Ꝿ ɣ Ɣ ƣ Ƣ h H ĥ Ĥ ȟ Ȟ ḧ Ḧ ḣ Ḣ ḩ Ḩ ħ Ħ ḥ Ḥ ḫ Ḫ ẖ ʜ ƕ Ƕ ꞕ ɦ Ɦ
-ⱨ Ⱨ ⱶ Ⱶ ꟶ Ꟶ ꜧ Ꜧ ɧ ʻ ʽ i I í Í ì Ì ĭ Ĭ î Î ǐ Ǐ ï Ï ḯ Ḯ ĩ Ĩ İ į Į ī Ī ỉ Ỉ ȉ Ȉ
+ⱨ Ⱨ ⱶ Ⱶ ꟶ Ꟶ ꜧ Ꜧ ɧ ʽ i I í Í ì Ì ĭ Ĭ î Î ǐ Ǐ ï Ï ḯ Ḯ ĩ Ĩ İ į Į ī Ī ỉ Ỉ ȉ Ȉ
 ȋ Ȋ ị Ị ḭ Ḭ ⅱ Ⅱ ⅲ Ⅲ ĳ Ĳ ⅳ Ⅳ ⅸ Ⅸ ı ɪ Ɪ ꟾ ꟷ ᴉ ɨ Ɨ ᵻ ᶖ ꞽ Ꞽ ɩ Ɩ ᵼ j J ĵ Ĵ ǰ ȷ ᴊ
 ɉ Ɉ ʝ Ʝ ɟ ʄ k K ḱ Ḱ ǩ Ǩ ķ Ķ ḳ Ḳ ḵ Ḵ ᴋ ᶄ ƙ Ƙ ⱪ Ⱪ ꝁ Ꝁ ꝃ Ꝃ ꝅ Ꝅ ʞ Ʞ l L ĺ Ĺ ľ Ľ
 ļ Ļ ł Ł ḷ Ḷ ḹ Ḹ ḽ Ḽ ḻ Ḻ ŀ Ŀ ǉ ǈ Ǉ ỻ Ỻ ʪ ʫ ʟ ꝇ Ꝇ ᴌ ꝉ Ꝉ ƚ Ƚ ⱡ Ⱡ ɫ Ɫ ꬸ ꬹ ɬ Ɬ ꬷ
@@ -136,7 +139,7 @@ C ć Ć ĉ Ĉ č Č ċ Ċ ç Ç ḉ Ḉ ᴄ ȼ Ȼ ꞓ Ꞓ ꞔ Ꞔ ƈ Ƈ ɕ ꜿ �
 ᴡ ⱳ Ⱳ ʍ x X ẍ Ẍ ẋ Ẋ ⅺ Ⅺ ⅻ Ⅻ ᶍ ꭖ ꭗ ꭘ ꭙ ꭓ Ꭓ ꭔ ꭕ y Y ý Ý ỳ Ỳ ŷ Ŷ ẙ ÿ Ÿ ỹ Ỹ ẏ Ẏ
 ȳ Ȳ ỷ Ỷ ỵ Ỵ ʏ ɏ Ɏ ƴ Ƴ ỿ Ỿ ꭚ ȝ Ȝ z Z ź Ź ẑ Ẑ ž Ž ż Ż ẓ Ẓ ẕ Ẕ ƍ ᴢ ƶ Ƶ ᵶ ᶎ Ᶎ ȥ
 Ȥ ʐ ʑ ɀ Ɀ ⱬ Ⱬ ꝣ Ꝣ ʒ Ʒ ǯ Ǯ ᴣ ƹ Ƹ ᶚ ƺ ʓ þ Þ ꟓ ꟒ ꝥ Ꝥ ꝧ Ꝧ ƿ Ƿ ꟕ ꟔ ꝩ Ꝩ ꭠ ꭡ ꭣ ꝫ Ꝫ
-ꝭ Ꝭ ꝯ Ꝯ ꝸ ƻ ꜫ Ꜫ ꜭ Ꜭ ꜯ Ꜯ ƨ Ƨ ƽ Ƽ ƅ Ƅ ʔ ɂ Ɂ ˀ ʼ ŉ ˮ ʾ ꜣ Ꜣ ꞌ Ꞌ ꞏ ʕ ꟏ ꟎ ʿ ˁ ᴤ ᴥ
+ꝭ Ꝭ ꝯ Ꝯ ꝸ ƻ ꜫ Ꜫ ꜭ Ꜭ ꜯ Ꜯ ƨ Ƨ ƽ Ƽ ƅ Ƅ ʔ ɂ Ɂ ˀ ʼ ŉ ˮ ꜣ Ꜣ ꞌ Ꞌ ꞏ ʕ ꟏ ꟎ ˁ ᴤ ᴥ
 ꜥ Ꜥ ʡ ʢ ʖ ǀ ǁ ǂ ǃ ʗ ʘ ʬ ʭ α Α ἀ Ἀ ἄ Ἄ ᾄ ᾌ ἂ Ἂ ᾂ ᾊ ἆ Ἆ ᾆ ᾎ ᾀ ᾈ ἁ Ἁ ἅ Ἅ ᾅ ᾍ ἃ
 Ἃ ᾃ ᾋ ἇ Ἇ ᾇ ᾏ ᾁ ᾉ ά Ά ᾴ ὰ Ὰ ᾲ ᾰ Ᾰ ᾶ ᾷ ᾱ Ᾱ ᾳ ᾼ β Β γ Γ ᴦ δ Δ ε Ε ἐ Ἐ ἔ Ἔ ἒ Ἒ
 ἑ Ἑ ἕ Ἕ ἓ Ἓ έ Έ ὲ Ὲ ϝ Ϝ ͷ Ͷ ϛ Ϛ ζ Ζ ͱ Ͱ η Η ἠ Ἠ ἤ Ἤ ᾔ ᾜ ἢ Ἢ ᾒ ᾚ ἦ Ἦ ᾖ ᾞ ᾐ ᾘ
