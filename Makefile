@@ -210,11 +210,11 @@ help:
 bundle: distrib ## Create macOS app bundle
 ifeq ($(OS_TYPE),Darwin)
 	@printf "\n\033[1;1m=== Creating macOS bundle ===\033[0m\n"
-	@if [ ! -f "create_bundle.sh" ]; then \
-		echo "❌ create_bundle.sh not found"; \
+	@if [ ! -f "etc/Mac/create_bundle.sh" ]; then \
+		echo "❌ etc/Mac/create_bundle.sh not found"; \
 		exit 1; \
 	fi
-	./create_bundle.sh
+	bash etc/Mac/create_bundle.sh
 	@printf "\n\033[1;1m✅ Bundle created: GeneWeb.app\033[0m\n"
 else
 	@echo "❌ Bundle creation is only supported on macOS"
@@ -223,11 +223,11 @@ endif
 dmg: bundle ## Create macOS DMG installer
 ifeq ($(OS_TYPE),Darwin)
 	@printf "\n\033[1;1m=== Creating DMG installer ===\033[0m\n"
-	@if [ ! -f "create_dmg.sh" ]; then \
-		echo "❌ create_dmg.sh not found"; \
+	@if [ ! -f "etc/Mac/create_dmg.sh" ]; then \
+		echo "❌ etc/Mac/create_dmg.sh not found"; \
 		exit 1; \
 	fi
-	./create_dmg.sh
+	bash etc/Mac/create_dmg.sh
 	@printf "\n\033[1;1m✅ DMG created\033[0m\n"
 else
 	@echo "❌ DMG creation is only supported on macOS"

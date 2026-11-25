@@ -2,7 +2,7 @@
 
 set -e
 
-APP_NAME="geneweb"
+APP_NAME="GeneWeb"
 VERSION=$(awk -F\" '/^let ver =/ {print $2}' lib/version.txt 2>/dev/null || echo "7.0")
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 
@@ -13,7 +13,7 @@ echo ""
 
 if [ ! -d "${APP_NAME}.app" ]; then
     echo "❌ ${APP_NAME}.app non trouvé"
-    echo "Lancez d'abord: ./create_bundle.sh"
+    echo "Lancez d'abord: etc/Mac/create_bundle.sh"
     exit 1
 fi
 
