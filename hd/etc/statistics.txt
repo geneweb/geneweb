@@ -474,5 +474,6 @@ fetch(GW.url).then(function(r) {
 });
 })();
 </script>
+%query_time;
 </body>
 </html>
