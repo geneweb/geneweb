@@ -18,8 +18,51 @@ echo ""
 
 rm -rf "${APP_NAME}.app"
 
-echo "📁 Création de la structure du bundle..."
-mkdir -p "${BUNDLE_DIR}"/{MacOS,Frameworks,Resources}
+echo "📁 Création de l’applet (AppleScript, reste ouvert dans le Dock)..."
+# L’applet reste active dans le Dock tant que GeneWeb tourne :
+#   - Dock → clic droit → Quitter (ou ⌘Q) arrête gwd et gwsetup
+#   - clic sur l’icône quand GeneWeb tourne : rouvre la page d’accueil
+#   - si gwd s’arrête, l’applet quitte d’elle-même
+APPLET_SRC=$(mktemp -t geneweb_applet).applescript
+cat > "$APPLET_SRC" << 'EOFAPPLET'
+on res(n)
+	return POSIX path of (path to resource n)
+end res
+
+on run
+	try
+		do shell script quoted form of res("geneweb_launch.sh")
+	on error
+		-- lancement impossible ou annulé : le lanceur a déjà affiché le message
+		quit
+	end try
+end run
+
+on reopen
+	try
+		do shell script "open " & quoted form of res("START.htm")
+	end try
+end reopen
+
+on idle
+	try
+		do shell script "pgrep -f " & quoted form of (res("gw") & "gwd")
+	on error
+		quit
+	end try
+	return 30
+end idle
+
+on quit
+	try
+		do shell script quoted form of res("geneweb_stop.command") & " --from-app"
+	end try
+	continue quit
+end quit
+EOFAPPLET
+osacompile -s -o "${APP_NAME}.app" "$APPLET_SRC"
+rm -f "$APPLET_SRC"
+mkdir -p "${BUNDLE_DIR}"/{Frameworks,Resources}
 
 echo "📦 Copie des ressources GeneWeb..."
 cp -R "${DISTRIB_DIR}/gw" "${BUNDLE_DIR}/Resources/"
@@ -244,28 +287,20 @@ fi
 echo ""
 echo "📝 Création des scripts de lancement..."
 
-cat > "${BUNDLE_DIR}/MacOS/${APP_NAME}" << 'EOFMAIN'
+cat > "${BUNDLE_DIR}/Resources/geneweb_launch.sh" << 'EOFMAIN'
 #!/bin/bash
 set -euo pipefail
 
 BUNDLE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 if [[ "$BUNDLE_DIR" == /Volumes/* ]]; then
-    clear
-    echo ""
-    echo "╔═══════════════════════════════════════════════════════╗"
-    echo "║                    ERREUR                             ║"
-    echo "╠═══════════════════════════════════════════════════════╣"
-    echo "║  GeneWeb ne peut pas être lancé depuis le DMG         ║"
-    echo "║                                                       ║"
-    echo "║  Installation requise :                               ║"
-    echo "║    1. Glissez GeneWeb.app vers Applications           ║"
-    echo "║    2. Éjectez le DMG                                  ║"
-    echo "║    3. Lancez depuis /Applications                     ║"
-    echo "╚═══════════════════════════════════════════════════════╝"
-    echo ""
-    echo "Cette fenêtre se fermera dans 10 secondes..."
-    sleep 10
+    osascript -e 'display alert "GeneWeb" message "GeneWeb ne peut pas être lancé depuis le DMG.
+
+1. Glissez GeneWeb.app vers Applications
+2. Éjectez le DMG
+3. Lancez GeneWeb depuis Applications
+
+GeneWeb cannot run from the DMG: drag it to Applications first." as critical' >/dev/null 2>&1 || true
     exit 1
 fi
 
@@ -350,7 +385,7 @@ detect_language() {
     if [ -n "${GENEWEB_LANG:-}" ]; then
         echo "$GENEWEB_LANG"
     else
-        case "${LANG:-}" in
+        case "${LANG:-$(defaults read -g AppleLocale 2>/dev/null || true)}" in
             de*) echo "de" ;; es*) echo "es" ;; fr*) echo "fr" ;;
             it*) echo "it" ;; lv*) echo "lv" ;; sv*) echo "sv" ;;
             *)   echo "en" ;;
@@ -380,8 +415,8 @@ msg() {
                 echo "    gwd: $GWD_LOG"
                 echo ""
                 echo "Pour arrêter GeneWeb :"
-                echo "  - Script: Arrêter GeneWeb.command"
-                echo "  - Terminal: pkill gwd; pkill gwsetup"
+                echo "  - Dock : clic droit sur GeneWeb → Quitter (ou ⌘Q)"
+                echo "  - Script : Utilitaires/Arrêter GeneWeb.command"
             else
                 echo ""; echo "✅ GeneWeb is running!"; echo ""
                 echo "🌐 Your browser will open."
@@ -394,8 +429,8 @@ msg() {
                 echo "    gwd: $GWD_LOG"
                 echo ""
                 echo "To stop GeneWeb:"
-                echo "  - Script: geneweb_stop.command"
-                echo "  - Terminal: pkill gwd; pkill gwsetup"
+                echo "  - Dock: right-click GeneWeb → Quit (or ⌘Q)"
+                echo "  - Script: Utilitaires/Arrêter GeneWeb.command"
             fi
             ;;
         stop)
@@ -414,11 +449,16 @@ cleanup() {
 # Affiche une alerte (le terminal n’est pas visible quand l’app est lancée depuis le Finder)
 alert() {
     echo "❌ $1"
-    osascript -e "display alert \"GeneWeb\" message \"$1\" as critical" >/dev/null 2>&1 || true
+    # Échapper \ et " pour AppleScript
+    local m="${1//\\/\\\\}"; m="${m//\"/\\\"}"
+    osascript -e "display alert \"GeneWeb\" message \"$m\" as critical" >/dev/null 2>&1 || true
 }
 
 # PID du processus qui écoute sur un port (vide si libre)
 port_owner() { lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | head -1 || true; }
+# Tous les PID qui écoutent sur un port (un serveur peut avoir des processus fils
+# qui héritent de la socket)
+port_pids() { lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | sort -u | tr '\n' ' ' || true; }
 
 # Définir les ports
 GWD_PORT="${GWD_PORT:-2317}"
@@ -433,14 +473,97 @@ for i in 1 2 3 4 5; do
     sleep 1
 done
 
-# Vérifier que les ports sont libres
-for p in "$GWSETUP_PORT" "$GWD_PORT"; do
-    pid=$(port_owner "$p")
-    if [ -n "$pid" ]; then
-        alert "Le port $p est déjà utilisé par : $(ps -o command= -p "$pid" | cut -c1-120) (PID $pid)"
+# Pose une question avec deux boutons ; renvoie le libellé du bouton choisi
+# (renvoie le 2e bouton si osascript échoue ou si l’utilisateur annule)
+ask() {
+    local m="${1//\\/\\\\}"; m="${m//\"/\\\"}"
+    local r
+    r=$(osascript -e "button returned of (display alert \"GeneWeb\" message \"$m\" as critical buttons {\"$3\", \"$2\"} default button \"$2\" cancel button \"$3\")" 2>/dev/null) || r="$3"
+    echo "$r"
+}
+
+# Décrit les ports occupés ; remplit BUSY (texte) et BUSY_PIDS
+check_ports() {
+    BUSY=""; BUSY_PIDS=""
+    local p pids pid var cmd
+    for p in "$GWSETUP_PORT" "$GWD_PORT"; do
+        pids=$(port_pids "$p")
+        [ -z "${pids// /}" ] && continue
+        [ "$p" = "$GWSETUP_PORT" ] && var=GWSETUP_PORT || var=GWD_PORT
+        # Ne montrer que le(s) processus principal(aux) : ceux dont le parent
+        # n’écoute pas lui-même sur le port (les workers de gwd sont des fils)
+        local mains="" nchild=0 ppid
+        for pid in $pids; do
+            ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+            case " $pids " in
+                *" $ppid "*) nchild=$((nchild + 1)) ;;
+                *) mains="$mains $pid" ;;
+            esac
+        done
+        for pid in $mains; do
+            cmd=$(ps -o user=,command= -p "$pid" 2>/dev/null | cut -c1-90 || true)
+            BUSY="${BUSY}
+• $p ($var) : PID $pid — ${cmd}"
+        done
+        if [ "$nchild" -gt 0 ]; then
+            if [[ "$DETECTED_LANG" = "fr" ]]; then
+                BUSY="${BUSY} (+ $nchild processus fils)"
+            else
+                BUSY="${BUSY} (+ $nchild child processes)"
+            fi
+        fi
+        # Les principaux d’abord, les fils ensuite
+        BUSY_PIDS="$BUSY_PIDS $mains $(for pid in $pids; do case " $mains " in *" $pid "*) ;; *) echo "$pid" ;; esac; done | tr '\n' ' ')"
+    done
+}
+
+check_ports
+if [ -n "$BUSY" ]; then
+    if [[ "$DETECTED_LANG" = "fr" ]]; then
+        Q="Port(s) déjà utilisé(s) par un autre programme :
+${BUSY}
+
+Voulez-vous arrêter ce(s) programme(s) et démarrer GeneWeb ?
+
+(Sinon, vous pouvez choisir d’autres ports dans $CONFIG_FILE, par exemple GWSETUP_PORT=2326 et GWD_PORT=2327.)"
+        B_KILL="Arrêter et démarrer"; B_QUIT="Annuler"
+    else
+        Q="Port(s) already in use by another program:
+${BUSY}
+
+Do you want to stop this program and start GeneWeb?
+
+(Otherwise, you can choose other ports in $CONFIG_FILE, e.g. GWSETUP_PORT=2326 and GWD_PORT=2327.)"
+        B_KILL="Stop and start"; B_QUIT="Cancel"
+    fi
+    echo "Ports occupés :${BUSY}"
+    if [ "$(ask "$Q" "$B_KILL" "$B_QUIT")" = "$B_KILL" ]; then
+        # TERM d’abord, puis KILL ; on relit les ports à chaque tour car
+        # d’autres processus (fils) peuvent apparaître comme propriétaires
+        for sig in TERM TERM TERM KILL KILL; do
+            echo "→ kill -$sig :$BUSY_PIDS"
+            kill -"$sig" $BUSY_PIDS 2>&1 || true
+            sleep 1
+            check_ports
+            [ -z "$BUSY" ] && break
+        done
+        if [ -n "$BUSY" ]; then
+            if [[ "$DETECTED_LANG" = "fr" ]]; then
+                alert "Impossible d’arrêter le(s) programme(s) :${BUSY}
+
+Il appartient peut-être à un autre utilisateur. Arrêtez-le manuellement ou changez de ports dans $CONFIG_FILE."
+            else
+                alert "Could not stop the program(s):${BUSY}
+
+It may belong to another user. Stop it manually or change the ports in $CONFIG_FILE."
+            fi
+            exit 1
+        fi
+    else
+        echo "→ Annulé par l’utilisateur"
         exit 1
     fi
-done
+fi
 
 trap cleanup INT TERM EXIT
 
@@ -504,13 +627,12 @@ sleep 1
 
 # Désactiver le trap cleanup car les processus sont détachés
 trap - INT TERM EXIT
-sleep 3
 
-# Fermer le script (les processus continuent)
+# Rendre la main à l’applet (les serveurs continuent ; l’applet reste dans le Dock)
 exit 0
 EOFMAIN
 
-chmod +x "${BUNDLE_DIR}/MacOS/${APP_NAME}"
+chmod +x "${BUNDLE_DIR}/Resources/geneweb_launch.sh"
 
 cat > "${BUNDLE_DIR}/Resources/gwd.command" << 'EOFGWD'
 #!/bin/bash
@@ -548,14 +670,26 @@ chmod +x "${BUNDLE_DIR}/Resources/gwsetup.command"
 
 cat > "${BUNDLE_DIR}/Resources/geneweb_stop.command" << 'EOFSTOP'
 #!/bin/bash
+# Arrête les serveurs lancés depuis un bundle GeneWeb.app (pas les gwd de
+# développement). Appelé par l’applet avec --from-app quand on quitte GeneWeb ;
+# lancé à la main, il fait aussi quitter l’applet du Dock.
+PAT='/Contents/Resources/gw/'
 echo "🛑 Arrêt de GeneWeb / Stopping GeneWeb..."
-pkill gwd
-pkill gwsetup
-sleep 1
-pkill -9 gwd 2>/dev/null
-pkill -9 gwsetup 2>/dev/null
-echo "✅ GeneWeb arrêté / GeneWeb stopped"
-sleep 2
+pkill -f "${PAT}gwd" 2>/dev/null
+pkill -f "${PAT}gwsetup" 2>/dev/null
+for i in 1 2 3 4 5; do
+    pgrep -f "${PAT}gw(d|setup)" >/dev/null 2>&1 || break
+    sleep 1
+done
+pkill -9 -f "${PAT}gwd" 2>/dev/null
+pkill -9 -f "${PAT}gwsetup" 2>/dev/null
+if [ "${1:-}" != "--from-app" ]; then
+    # en arrière-plan : l’applet exécute alors son propre « on quit »
+    osascript -e 'tell application id "org.geneweb.GeneWeb" to quit' >/dev/null 2>&1 &
+    echo "✅ GeneWeb arrêté / GeneWeb stopped"
+    sleep 2
+fi
+exit 0
 EOFSTOP
 
 chmod +x "${BUNDLE_DIR}/Resources/geneweb_stop.command"
@@ -659,7 +793,7 @@ GeneWeb pour macOS
 ==================
 
 LANCEMENT : Double-cliquez sur GeneWeb.app
-ARRÊT : Double-cliquez sur geneweb_stop.command dans Resources
+ARRÊT : Dock → clic droit sur GeneWeb → Quitter (ou ⌘Q)
 LOGS : /tmp/geneweb_launch.log
 SUPPORT : https://github.com/geneweb/geneweb
 EOFREADME
@@ -669,36 +803,18 @@ if [ -f "lib/version.txt" ]; then
     VERSION=$(awk -F\" '/^let ver =/ {print $2}' lib/version.txt)
 fi
 
-cat > "${BUNDLE_DIR}/Info.plist" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>GeneWeb</string>
-    <key>CFBundleIdentifier</key>
-    <string>org.geneweb.GeneWeb</string>
-    <key>CFBundleName</key>
-    <string>GeneWeb</string>
-    <key>CFBundleDisplayName</key>
-    <string>GeneWeb</string>
-    <key>CFBundleVersion</key>
-    <string>${VERSION}</string>
-    <key>CFBundleShortVersionString</key>
-    <string>${VERSION}</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleIconFile</key>
-    <string>GeneWeb.icns</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.13</string>
-    <key>NSHumanReadableCopyright</key>
-    <string>Copyright © INRIA</string>
-</dict>
-</plist>
-EOF
+PLIST="${BUNDLE_DIR}/Info.plist"
+pb() { /usr/libexec/PlistBuddy -c "Set :$1 $2" "$PLIST" 2>/dev/null \
+    || /usr/libexec/PlistBuddy -c "Add :$1 ${3:-string} $2" "$PLIST"; }
+pb CFBundleIdentifier         org.geneweb.GeneWeb
+pb CFBundleName               GeneWeb
+pb CFBundleDisplayName        GeneWeb
+pb CFBundleVersion            "${VERSION}"
+pb CFBundleShortVersionString "${VERSION}"
+pb CFBundleIconFile           GeneWeb
+pb NSHighResolutionCapable    true bool
+pb LSMinimumSystemVersion     10.13
+pb NSHumanReadableCopyright   "Copyright © INRIA"
 
 # Générer l’icône si elle existe
 echo ""
@@ -713,6 +829,11 @@ else
     
     if [ -f "geneweb.icns" ]; then
         mv "geneweb.icns" "${BUNDLE_DIR}/Resources/GeneWeb.icns"
+        # L’applet d’osacompile porte son icône dans un catalogue d’assets
+        # (Assets.car + CFBundleIconName), prioritaire sur CFBundleIconFile :
+        # on le retire pour que macOS utilise GeneWeb.icns
+        rm -f "${BUNDLE_DIR}/Resources/Assets.car" "${BUNDLE_DIR}/Resources/applet.icns"
+        /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "${BUNDLE_DIR}/Info.plist" 2>/dev/null || true
         echo "   ✅ Icône générée et ajoutée"
     else
         echo "   ❌ Échec génération icône"
@@ -767,6 +888,9 @@ done
 
 echo "   → Signature du bundle…"
 codesign --force --deep --sign - --timestamp=none "${APP_NAME}.app" 2>/dev/null || true
+
+# Forcer le Finder/Dock à relire l’icône
+touch "${APP_NAME}.app"
 
 echo ""
 echo "✅ Bundle créé avec succès : ${APP_NAME}.app"
