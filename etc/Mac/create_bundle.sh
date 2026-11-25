@@ -2,7 +2,7 @@
 
 set -e
 
-APP_NAME="geneweb"
+APP_NAME="GeneWeb"
 BUNDLE_DIR="${APP_NAME}.app/Contents"
 DISTRIB_DIR="distribution"
 
@@ -406,25 +406,47 @@ msg() {
 
 cleanup() {
     msg "stop"
-    pkill -f '/gwd' 2>/dev/null || true
-    pkill -f '/gwsetup' 2>/dev/null || true
-    exit 0
+    pkill -f "$GW_DIR/gwd" 2>/dev/null || true
+    pkill -f "$GW_DIR/gwsetup" 2>/dev/null || true
+    exit 1
 }
 
-trap cleanup INT TERM EXIT
+# Affiche une alerte (le terminal n’est pas visible quand l’app est lancée depuis le Finder)
+alert() {
+    echo "❌ $1"
+    osascript -e "display alert \"GeneWeb\" message \"$1\" as critical" >/dev/null 2>&1 || true
+}
 
-pkill -f '/gwd' 2>/dev/null || true
-pkill -f '/gwsetup' 2>/dev/null || true
-sleep 1
-
-cd "$BASES_DIR"
-
-msg "start"
+# PID du processus qui écoute sur un port (vide si libre)
+port_owner() { lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | head -1 || true; }
 
 # Définir les ports
 GWD_PORT="${GWD_PORT:-2317}"
 GWSETUP_PORT="${GWSETUP_PORT:-2316}"
 GWD_OPTS="${GWD_OPTS:-}"
+
+# Arrêter une éventuelle instance précédente de CE bundle (pas les autres gwd)
+pkill -f "$GW_DIR/gwd" 2>/dev/null || true
+pkill -f "$GW_DIR/gwsetup" 2>/dev/null || true
+for i in 1 2 3 4 5; do
+    [ -z "$(port_owner "$GWSETUP_PORT")" ] && [ -z "$(port_owner "$GWD_PORT")" ] && break
+    sleep 1
+done
+
+# Vérifier que les ports sont libres
+for p in "$GWSETUP_PORT" "$GWD_PORT"; do
+    pid=$(port_owner "$p")
+    if [ -n "$pid" ]; then
+        alert "Le port $p est déjà utilisé par : $(ps -o command= -p "$pid" | cut -c1-120) (PID $pid)"
+        exit 1
+    fi
+done
+
+trap cleanup INT TERM EXIT
+
+cd "$BASES_DIR"
+
+msg "start"
 
 # Définir les emplacements des logs (depuis config ou par défaut dans /tmp)
 GWSETUP_LOG="${GWSETUP_LOG:-/tmp/geneweb_gwsetup.log}"
@@ -450,26 +472,26 @@ echo "  gwsetup: $GWSETUP_LOG"
 echo "  gwd: $GWD_LOG"
 
 # Lancer gwsetup et le détacher complètement
-"$GW_DIR/gwsetup" -gd "$GW_DIR" -lang "$DETECTED_LANG" > "$GWSETUP_LOG" 2>&1 &
+"$GW_DIR/gwsetup" -gd "$GW_DIR" -lang "$DETECTED_LANG" -p "$GWSETUP_PORT" > "$GWSETUP_LOG" 2>&1 &
 GWSETUP_PID=$!
 disown $GWSETUP_PID
 sleep 3
 
-if ! pgrep -f '/gwsetup' >/dev/null 2>&1; then
-    [[ "$DETECTED_LANG" = "fr" ]] && echo "❌ Échec gwsetup" || echo "❌ Failed gwsetup"
+if [ -z "$(port_owner "$GWSETUP_PORT")" ]; then
+    [[ "$DETECTED_LANG" = "fr" ]] && alert "Échec du lancement de gwsetup (voir $GWSETUP_LOG)" || alert "gwsetup failed to start (see $GWSETUP_LOG)"
     echo "Voir les logs: $GWSETUP_LOG"
     cat "$GWSETUP_LOG"
     exit 1
 fi
 
 # Lancer gwd et le détacher complètement
-"$GW_DIR/gwd" -bd "$BASES_DIR" -hd "$GW_DIR" $GWD_OPTS > "$GWD_LOG" 2>&1 &
+"$GW_DIR/gwd" -bd "$BASES_DIR" -hd "$GW_DIR" -p "$GWD_PORT" $GWD_OPTS > "$GWD_LOG" 2>&1 &
 GWD_PID=$!
 disown $GWD_PID
 sleep 3
 
-if ! pgrep -f '/gwd' >/dev/null 2>&1; then
-    [[ "$DETECTED_LANG" = "fr" ]] && echo "❌ Échec gwd" || echo "❌ Failed gwd"
+if [ -z "$(port_owner "$GWD_PORT")" ]; then
+    [[ "$DETECTED_LANG" = "fr" ]] && alert "Échec du lancement de gwd (voir $GWD_LOG)" || alert "gwd failed to start (see $GWD_LOG)"
     echo "Voir les logs: $GWD_LOG"
     cat "$GWD_LOG"
     exit 1
@@ -478,7 +500,7 @@ fi
 msg "ready"
 
 sleep 1
-[[ -f "$START_PAGE" ]] && open "$START_PAGE" || open "http://127.0.0.1:2317/gw_setup"
+[[ -f "$START_PAGE" ]] && open "$START_PAGE" || open "http://127.0.0.1:$GWSETUP_PORT/"
 
 # Désactiver le trap cleanup car les processus sont détachés
 trap - INT TERM EXIT
@@ -682,15 +704,15 @@ EOF
 echo ""
 echo "🎨 Génération de l’icône macOS…"
 
-if [ ! -f "hd/imges/geneweb_icon.png" ]; then
+if [ ! -f "hd/images/geneweb_icon.png" ]; then
     echo "   ⚠️  geneweb_icon.png manquante (généré sans icône)"
 else
     # Générer le .icns à la volée
-    chmod +x create_icon_set.sh
-    ./create_icon_set.sh
+    chmod +x ./etc/Mac/create_icon_set.sh
+    ./etc/Mac/create_icon_set.sh
     
     if [ -f "geneweb.icns" ]; then
-        cp "geneweb.icns" "${BUNDLE_DIR}/Resources/"
+        mv "geneweb.icns" "${BUNDLE_DIR}/Resources/GeneWeb.icns"
         echo "   ✅ Icône générée et ajoutée"
     else
         echo "   ❌ Échec génération icône"
