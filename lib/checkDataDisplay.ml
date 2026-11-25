@@ -461,6 +461,7 @@ let display_results conf base dicts sel_err_types max_results =
         | _ ->
             let entries =
               CheckData.collect_all_errors ?max_results:remaining ~sel_err_types
+                ~roglo:(List.assoc_opt "roglo" conf.base_env = Some "yes")
                 base dict
             in
             if entries = [] then acc
