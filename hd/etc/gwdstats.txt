@@ -281,5 +281,6 @@ fetch(href(period, day) + "&json=1").then(function(r) {
 });
 })();
 </script>
+%query_time;
 </body>
 </html>
