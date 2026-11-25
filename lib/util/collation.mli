@@ -12,10 +12,10 @@ val compare : string -> string -> int
     before the letters, in the order of the table for the common blocks (from
     Basic Latin to Cyrillic, General Punctuation, Currency Symbols, Letterlike
     Symbols, Number Forms), the other spaces, punctuation and symbols just
-    before the digits, by code point, the invisible characters being ignored;
-    the letters and digits of other scripts come after the letters, by code
-    point. The sort key of each string is computed once and kept, up to 100,000
-    strings, until the language changes. *)
+    before the digits, by code point, the invisible characters and the modifier
+    letters ʻ ʾ ʿ being ignored; the letters and digits of other scripts come
+    after the letters, by code point. The sort key of each string is computed
+    once and kept, up to 100,000 strings, until the language changes. *)
 
 val set_lang : string -> unit
 (** [set_lang lang] makes [compare] follow the alphabet of the language [lang]

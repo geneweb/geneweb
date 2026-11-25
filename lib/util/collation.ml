@@ -7,7 +7,9 @@
    Symbols and Number Forms, without canonical decomposition or weighed apart
    from it (й): code point, primary and secondary weights, in hexadecimal,
    none for the ignored characters; the primary weights are multiplied by 16,
-   so that a tailoring can insert letters between two of them *)
+   so that a tailoring can insert letters between two of them. The modifier
+   letters ʻ ʾ ʿ (okina, hamza and ayn of the transliterations) are ignored, as
+   in the filing rules of libraries, so that ʻAhomeʻe is sorted as Ahomee *)
 let ducet =
   {|0:: 1:: 2:: 3:: 4:: 5:: 6:: 7:: 8:: 9:201:20 A:202:20 B:203:20 C:204:20
 D:205:20 E:: F:: 10:: 11:: 12:: 13:: 14:: 15:: 16:: 17:: 18:: 19:: 1A:: 1B::
@@ -62,8 +64,8 @@ E6:23EC.2453:20.11F.20 F0:2436:20.11F F7:6D9:20 F8:2598:20.2F FE:271E:20
 2A9:248E.2591:20.20 2AA:2528.2632:20.20 2AB:2528.26EE:20.20 2AC:2785:20
 2AD:2789:20 2AE:2699:20 2AF:269D:20 2B0:24C4:20 2B1:24D1:20 2B2:24FB:20
 2B3:25F0:20 2B4:2600:20 2B5:260A:20 2B6:2629:20 2B7:26C2:20 2B8:26D8:20
-2B9:4F2:20 2BA:4F4:20 2BB:24DD:20 2BC:274E:20 2BD:24DE:20 2BE:2750:20
-2BF:2759:20 2C0:274D:20 2C1:275A:20 2C2:4F5:20 2C3:4F6:20 2C4:4F7:20
+2B9:4F2:20 2BA:4F4:20 2BB:: 2BC:274E:20 2BD:24DE:20 2BE::
+2BF:: 2C0:274D:20 2C1:275A:20 2C2:4F5:20 2C3:4F6:20 2C4:4F7:20
 2C5:4F8:20 2C6:4F9:20 2C7:4FA:20 2C8:4FB:20 2C9:4FC:20 2CA:4FD:20 2CB:4FE:20
 2CC:4FF:20 2CD:500:20 2CE:501:20 2CF:502:20 2D0:2191:20 2D1:2192:20 2D2:503:20
 2D3:504:20 2D4:505:20 2D5:506:20 2D6:509:20 2D7:50A:20 2D8:4E6:20 2D9:4E7:20
