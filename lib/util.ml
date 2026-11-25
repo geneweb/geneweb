@@ -932,7 +932,7 @@ let accessible_by_key conf base p fn sn =
   conf.access_by_key
   && (not (fn = "?" || sn = "?"))
   && ((not (is_hide_names conf p))
-     || is_public conf base p || conf.friend || conf.wizard)
+     || conf.wizard || conf.friend || is_public conf base p)
 
 (* ********************************************************************** *)
 (*  [Fonc] acces_n : config -> base -> string -> person -> string         *)

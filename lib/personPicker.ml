@@ -8,7 +8,7 @@ let prefix_match prefix s =
 let pickable conf base p fn sn =
   (not (fn = "?" || sn = "?"))
   && ((not (Util.is_hide_names conf p))
-     || Util.is_public conf base p || conf.friend || conf.wizard)
+     || conf.wizard || conf.friend || Util.is_public conf base p)
 
 let search_prefix conf base ~limit ~fn_prefix ~sn_prefix =
   if sn_prefix = "" then []
