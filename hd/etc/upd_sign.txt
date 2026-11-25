@@ -1,6 +1,6 @@
-<!-- $Id: upd_sign.txt v7.1 22/11/2026 $ -->
+<!-- $Id: upd_sign.txt v7.1 25/11/2026 $ -->
 %let;sig;%[%[w:%user.ident;%]%]%in;
-%let;sdate;%today.day;/%apply;nth%with;/i/ii/iii/iv/v/vi/vii/viii/ix/x/xi/xii%and;%today.month;%end;/%today.year;%in;
+%let;sdate;%today.day;&nbsp;%apply;nth%with;/i/ii/iii/iv/v/vi/vii/viii/ix/x/xi/xii%and;%today.month;%end;&nbsp;%today.year;%in;
 <div class="d-flex flex-column flex-md-row align-items-md-center gap-1 mt-2" id="sign">
   <button type="button" class="btn btn-sm btn-outline-secondary bg-danger-subtle text-nowrap align-self-start align-self-md-center"
     data-sig="%sig;" data-date="%sdate;">[*sign with][:]</button>
