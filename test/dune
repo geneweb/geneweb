@@ -30,7 +30,8 @@
   update_conflict_test
   collation_test
   book_test
-  form_nonce_test)
+  form_nonce_test
+  p_auth_test)
  (libraries alcotest geneweb geneweb.oidc fmt unix yojson))
 
 (test

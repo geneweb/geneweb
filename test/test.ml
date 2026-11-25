@@ -26,6 +26,7 @@ let () =
          Notes_search_test.v;
          Occu_test.v;
          Oidc_test.v;
+         P_auth_test.v;
          Place_rename_test.v;
          Place_test.v;
          Sosa_test.v;
