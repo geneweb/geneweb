@@ -135,7 +135,7 @@ let url_aux ?(pwd = true) (conf : Config.config) =
         let v = Adef.as_string v in
         if ((k = "oc" || k = "ocz") && v = "0") || k = "" then None
         else Some (Format.sprintf "%s=%s" k v))
-      (conf.henv @ conf.senv @ conf.env)
+      (Util.link_env conf (conf.henv @ conf.senv @ conf.env))
   in
   let prefix =
     if pwd then (Util.prefix_base_password conf :> string)
@@ -463,7 +463,8 @@ and eval_simple_variable conf = function
       let l =
         List.fold_left
           (fun accu (k, _) -> List.remove_assoc k accu)
-          conf.env (conf.henv @ conf.senv)
+          (Util.link_env conf conf.env)
+          (conf.henv @ conf.senv)
       in
       let l =
         List.filter_map
@@ -969,7 +970,7 @@ and print_foreach_env_binding (conf : Config.config) print_ast set_vother env ep
           if k = "notif" || List.mem_assoc k acc then loop acc env_vars
           else loop ((k, v) :: acc) env_vars
     in
-    loop [] (conf.env @ conf.henv @ conf.senv)
+    loop [] (Util.link_env conf (conf.env @ conf.henv @ conf.senv))
   in
   List.iter
     (fun (k, v) ->

@@ -15,6 +15,15 @@ module Header = Geneweb_http.Header
 let is_welcome = ref false
 let p_getenv env label = Option.map Mutil.decode (List.assoc_opt label env)
 
+let is_upload uploads k =
+  List.exists
+    (fun var -> k = var || k = var ^ "_name" || k = var ^ "_type")
+    uploads
+
+let link_env conf env =
+  if conf.uploads = [] then env
+  else List.filter (fun (k, _) -> not (is_upload conf.uploads k)) env
+
 let p_getenv_notrim env label =
   Option.map (Mutil.gen_decode false) (List.assoc_opt label env)
 
@@ -3607,7 +3616,7 @@ let url_set_aux conf url evar_l str_l =
   in
 
   (* Merge and deduplicate conf environment lists (latest values take precedence) *)
-  let all_conf_env = conf.henv @ conf.senv @ conf.env in
+  let all_conf_env = link_env conf (conf.henv @ conf.senv @ conf.env) in
   let conf_map =
     List.fold_left
       (fun acc (k, v) -> (k, v) :: List.remove_assoc k acc)

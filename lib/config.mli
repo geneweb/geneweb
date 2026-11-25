@@ -106,6 +106,8 @@ type config = {
   nb_of_families : int;
   cgi_passwd : string;
   env : env;
+  uploads : string list;
+      (* file fields of a multipart request: [env] holds their content *)
   mutable senv : env;
   mutable henv : env;
   base_env : (string * string) list (* content of .gwf file *);
