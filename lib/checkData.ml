@@ -1274,9 +1274,17 @@ let is_mark code =
   | `Mn | `Mc | `Me -> true
   | _ -> false
 
-let find_suspicious_characters_positions dict s =
+let find_suspicious_characters_positions ~roglo dict s =
   let len = String.length s in
   let names = is_name_dict dict in
+  let dynasty =
+    roglo && dict = Snames && len >= 2
+    && s.[0] = '('
+    && s.[len - 1] = ')'
+    && not
+         (String.contains_from s 1 '('
+         || String.index_opt s ')' <> Some (len - 1))
+  in
   let comma =
     names && match dict with Fnames | Fnames_alias -> false | _ -> true
   in
@@ -1297,7 +1305,8 @@ let find_suspicious_characters_positions dict s =
       let j = digits_end (i + 1) in
       loop j (if is_ordinal_end j then acc else span_positions i j acc)
     else if
-      (if names then is_suspicious_name_char s.[i]
+      (if names then
+         is_suspicious_name_char s.[i] && not (dynasty && (i = 0 || i = len - 1))
        else is_suspicious_char s.[i] && not (suburb_bracket i))
       || (comma && s.[i] = ',')
     then loop (i + 1) (i :: acc)
@@ -1312,8 +1321,8 @@ let find_suspicious_characters_positions dict s =
   in
   loop 0 []
 
-let has_suspicious_characters dict s =
-  find_suspicious_characters_positions dict s <> []
+let has_suspicious_characters ~roglo dict s =
+  find_suspicious_characters_positions ~roglo dict s <> []
 
 let french_ordinal_re =
   lazy
@@ -1430,7 +1439,7 @@ let has_no_letter dict s =
   && not (has_letter s)
 
 (* Generic error handling *)
-let find_error_positions error_type data base s =
+let find_error_positions ~roglo error_type data base s =
   let dict_type = data_to_dict_type data in
   match error_type with
   | InvisibleCharacters -> find_invisible_positions s
@@ -1438,7 +1447,8 @@ let find_error_positions error_type data base s =
   | MultipleSpaces -> find_multiple_spaces_positions s
   | NonBreakingSpace -> find_non_breaking_space_positions s
   | MixedScripts -> find_mixed_scripts_positions s
-  | SuspiciousCharacters -> find_suspicious_characters_positions dict_type s
+  | SuspiciousCharacters ->
+      find_suspicious_characters_positions ~roglo dict_type s
   | RepeatedWords -> find_repeated_words_positions s
   | NoLetters -> span_positions 0 (String.length s) []
   | MiscTypographicErrors | Mojibake | HtmlEntities | FrenchOrdinals -> []
@@ -1451,7 +1461,9 @@ let find_error_highlight_info error_type data base s conf =
   | Mojibake -> WithMessages (find_mojibake_positions s)
   | HtmlEntities -> WithMessages (find_html_entity_positions s)
   | FrenchOrdinals -> WithMessages (find_french_ordinal_positions s)
-  | _ -> SimplePositions (find_error_positions error_type data base s)
+  | _ ->
+      let roglo = List.assoc_opt "roglo" conf.Config.base_env = Some "yes" in
+      SimplePositions (find_error_positions ~roglo error_type data base s)
 
 let fix_error error_type dict_type s =
   match error_type with
@@ -1633,7 +1645,7 @@ let make_error_html conf base data istr entry error_type =
   (hl, url_mod, url_chk, entry_escaped, s2_auto)
 
 (* Fonction commune pour analyser les erreurs dans une chaîne *)
-let analyze_string_errors dict_type base s check_errors_set =
+let analyze_string_errors ~roglo dict_type base s check_errors_set =
   let add_if test error acc =
     if ErrorSet.mem error check_errors_set && applies error dict_type && test ()
     then error :: acc
@@ -1653,7 +1665,7 @@ let analyze_string_errors dict_type base s check_errors_set =
   |> add_if (fun () -> has_mojibake s) Mojibake
   |> add_if (fun () -> has_html_entities s) HtmlEntities
   |> add_if
-       (fun () -> has_suspicious_characters dict_type s)
+       (fun () -> has_suspicious_characters ~roglo dict_type s)
        SuspiciousCharacters
   |> add_if (fun () -> has_french_ordinals s) FrenchOrdinals
   |> add_if (fun () -> has_repeated_words s) RepeatedWords
@@ -1692,7 +1704,8 @@ let find_dict_type_for_istr base istr =
       Sources;
     ]
 
-let collect_all_errors ?max_results ?(sel_err_types = []) base dict_type =
+let collect_all_errors ?max_results ?(sel_err_types = []) ~roglo base dict_type
+    =
   let check_errors_set = make_error_set sel_err_types in
   let full count =
     match max_results with Some max -> count >= max | None -> false
@@ -1704,7 +1717,9 @@ let collect_all_errors ?max_results ?(sel_err_types = []) base dict_type =
     | istr :: l when Driver.Istr.is_empty istr -> loop acc count l
     | istr :: l -> (
         let s = Driver.sou base istr in
-        match analyze_string_errors dict_type base s check_errors_set with
+        match
+          analyze_string_errors ~roglo dict_type base s check_errors_set
+        with
         | [] -> loop acc count l
         | errors -> loop ((istr, s, errors) :: acc) (count + 1) l)
   in

@@ -56,9 +56,13 @@ val make_error_html :
 val collect_all_errors :
   ?max_results:int ->
   ?sel_err_types:error_type list ->
+  roglo:bool ->
   Geneweb_db.Driver.base ->
   dict_type ->
   (Geneweb_db.Driver.istr * string * error_type list) list
-(** [collect_all_errors ?max_results ?sel_err_types base dict] The entries of
-    [dict] with errors of [sel_err_types], at most [max_results], in the order
-    of the index of the dictionaries, corrected by the committed patches. *)
+(** [collect_all_errors ?max_results ?sel_err_types ~roglo base dict] The
+    entries of [dict] with errors of [sel_err_types], at most [max_results], in
+    the order of the index of the dictionaries, corrected by the committed
+    patches. With [roglo], a surname wholly between parentheses, the convention
+    of Roglo for dynasties ("(Arnulfiens)"), is not reported for these
+    parentheses. *)
