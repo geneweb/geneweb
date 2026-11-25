@@ -190,13 +190,15 @@ let reconstitute conf base p1 p2 =
     | Some "2" -> x2
     | _ -> if null x1 then x2 else x1
   in
-  let merge_field name proj =
+  (* Notes are merged as paragraphs, sources as a list, like those of
+     the families (MergeFamOk). *)
+  let merge_field ?(sep = "<br>\n") name proj =
     let x1 = proj p1 in
     let x2 = proj p2 in
     match p_getenv conf.env name with
     | Some "1" -> x1
     | Some "2" -> x2
-    | _ -> merge_strings base x1 "<br>\n" x2 |> Driver.insert_string base
+    | _ -> merge_strings base x1 sep x2 |> Driver.insert_string base
   in
   let list conv proj =
     let l1 = List.map conv (proj p1) in
@@ -257,7 +259,7 @@ let reconstitute conf base p1 p2 =
         merge_field "birth_note" (fun p -> Driver.get_birth_note p)
         |> Driver.sou base;
       birth_src =
-        merge_field "birth_source" (fun p -> Driver.get_birth_src p)
+        merge_field ~sep:", " "birth_source" (fun p -> Driver.get_birth_src p)
         |> Driver.sou base;
       baptism = field "baptism" Driver.get_baptism (( = ) Date.cdate_None);
       baptism_place =
@@ -268,7 +270,7 @@ let reconstitute conf base p1 p2 =
         merge_field "baptism_note" (fun p -> Driver.get_baptism_note p)
         |> Driver.sou base;
       baptism_src =
-        merge_field "baptism_source" (fun p -> Driver.get_baptism_src p)
+        merge_field ~sep:", " "baptism_source" Driver.get_baptism_src
         |> Driver.sou base;
       death =
         field "death" Driver.get_death (fun x ->
@@ -281,7 +283,7 @@ let reconstitute conf base p1 p2 =
         merge_field "death_note" (fun p -> Driver.get_death_note p)
         |> Driver.sou base;
       death_src =
-        merge_field "death_src" (fun p -> Driver.get_death_src p)
+        merge_field ~sep:", " "death_src" (fun p -> Driver.get_death_src p)
         |> Driver.sou base;
       burial = field "burial" Driver.get_burial (( = ) UnknownBurial);
       burial_place =
@@ -292,7 +294,7 @@ let reconstitute conf base p1 p2 =
         merge_field "burial_note" (fun p -> Driver.get_burial_note p)
         |> Driver.sou base;
       burial_src =
-        merge_field "burial_source" (fun p -> Driver.get_burial_src p)
+        merge_field ~sep:", " "burial_source" (fun p -> Driver.get_burial_src p)
         |> Driver.sou base;
       pevents =
         list
@@ -301,7 +303,7 @@ let reconstitute conf base p1 p2 =
       notes =
         merge_field "notes" (fun p -> Driver.get_notes p) |> Driver.sou base;
       psources =
-        merge_field "sources" (fun p -> Driver.get_psources p)
+        merge_field ~sep:", " "sources" (fun p -> Driver.get_psources p)
         |> Driver.sou base;
       key_index = Driver.get_iper p1;
     }
