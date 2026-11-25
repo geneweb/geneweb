@@ -446,6 +446,15 @@ val create_env : Adef.encoded_string -> Config.env
 (** Create association list from the query part of a URL. (i.e. a list of
     key-value separated by `&` or `;`) *)
 
+val is_upload : string list -> string -> bool
+(** [is_upload uploads k]: [k] is one of the file fields [uploads] of a
+    multipart request, or its [_name] or [_type] companion. *)
+
+val link_env : Config.config -> Config.env -> Config.env
+(** [link_env conf env] is [env] without the file fields of the request
+    ([conf.uploads]): the content of a sent file has no place in the links of a
+    page. *)
+
 val string_of_place : config -> string -> Adef.escaped_string
 val raw_string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option

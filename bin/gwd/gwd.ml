@@ -1443,6 +1443,7 @@ let make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
       nb_of_persons = 0;
       nb_of_families = 0;
       env;
+      uploads = [];
       senv = [];
       cgi_passwd = ar.ar_passwd;
       henv =
@@ -1623,6 +1624,7 @@ let conf_and_connection =
     ~cgi
     ~loaded_plugins
     ~secret_salt
+    ~uploads
     from
     request
     script_name
@@ -1637,6 +1639,7 @@ let conf_and_connection =
       make_conf ~predictable_mode ~cgi ~loaded_plugins ~secret_salt ~query_start
         conn from request script_name env
     in
+    let conf = { conf with uploads } in
     let m = Util.p_getenv env "m" in
     let is_binary =
       match m with
@@ -2005,15 +2008,15 @@ let extract_multipart boundary str =
   let len = String.length str in
   let boundary = "--" ^ boundary in
   let delim = "\r\n" ^ boundary in
-  let rec loop acc i =
-    if i + 2 <= len && str.[i] = '-' && str.[i + 1] = '-' then acc
+  let rec loop ((acc, ups) as res) i =
+    if i + 2 <= len && str.[i] = '-' && str.[i + 1] = '-' then res
     else
       match find_sub str "\r\n\r\n" i with
-      | None -> acc
+      | None -> res
       | Some j -> (
           let start = j + 4 in
           match find_sub str delim start with
-          | None -> acc
+          | None -> res
           | Some k ->
               let headers =
                 String.split_on_char '\n' (String.sub str i (j - i))
@@ -2024,7 +2027,7 @@ let extract_multipart boundary str =
                 | None -> []
               in
               let content = String.sub str start (k - start) in
-              let acc =
+              let res =
                 match
                   ( List.assoc_opt "name" params,
                     List.assoc_opt "filename" params )
@@ -2034,32 +2037,39 @@ let extract_multipart boundary str =
                       Option.value ~default:""
                         (multipart_header "content-type" headers)
                     in
-                    (var ^ "_type", Mutil.encode ctype)
-                    :: (var, Adef.encoded content)
-                    :: (var ^ "_name", Mutil.encode filename)
-                    :: acc
+                    ( (var ^ "_type", Mutil.encode ctype)
+                      :: (var, Adef.encoded content)
+                      :: (var ^ "_name", Mutil.encode filename)
+                      :: acc,
+                      var :: ups )
                 | Some var, None ->
-                    (var, Mutil.encode (String.trim content)) :: acc
-                | None, (Some _ | None) -> acc
+                    ((var, Mutil.encode (String.trim content)) :: acc, ups)
+                | None, (Some _ | None) -> res
               in
-              loop acc (k + String.length delim))
+              loop res (k + String.length delim))
   in
-  let env =
+  let env, uploads =
     match find_sub str boundary 0 with
-    | Some i -> List.rev (loop [] (i + String.length boundary))
-    | None -> []
+    | Some i ->
+        let env, ups = loop ([], []) (i + String.length boundary) in
+        (List.rev env, List.sort_uniq compare ups)
+    | None -> ([], [])
   in
+  (* The content of a file field is kept in [env] for the request, but
+     never copied into the string of the request (logs) nor into the
+     links of the page (see [Util.is_upload]). *)
   let str, _ =
     List.fold_left
       (fun (str, sep) (v, x) ->
-        if v = "file" then (str, sep) else (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
+        if Util.is_upload uploads v then (str, sep)
+        else (str ^^^ sep ^<^ v ^<^ "=" ^<^ x, "&"))
       (Adef.encoded "", "")
       env
   in
-  (str, env)
+  (str, env, uploads)
 
 let build_env request (contents : Adef.encoded_string) :
-    Adef.encoded_string * (string * Adef.encoded_string) list =
+    Adef.encoded_string * (string * Adef.encoded_string) list * string list =
   let content_type = Header.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary =
@@ -2068,7 +2078,7 @@ let build_env request (contents : Adef.encoded_string) :
         :> string)
     in
     extract_multipart boundary contents
-  else (contents, Util.create_env contents)
+  else (contents, Util.create_env contents, [])
 
 (* Map IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) to plain IPv4, so that
    both forms designate the same host. *)
@@ -2143,13 +2153,13 @@ let connection ~predictable_mode ~cgi ~loaded_plugins ~secret_salt
         if not accept then only_log printer_conf from
         else
           try
-            let contents, env = build_env request contents0 in
+            let contents, env, uploads = build_env request contents0 in
             if
               (not (asset_image_request printer_conf script_name))
               && not (misc_request conn printer_conf request script_name)
             then
               conf_and_connection ~predictable_mode ~cgi ~loaded_plugins
-                ~secret_salt from request script_name contents env conn
+                ~secret_salt ~uploads from request script_name contents env conn
           with Exit -> ())
 
 let null_reopen flags fd =
