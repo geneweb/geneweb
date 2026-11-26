@@ -45,7 +45,7 @@ let decode_table (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         | 0x99 | 0x9A | 0x9B | 0x9C -> fnc n 'U'
         | 0x9D -> fnc n 'Y'
         | 0x9E -> fns n "TH"
-        | 0x9F -> fns n "sz"
+        | 0x9F -> fns n "ss"
         | 0xA0 | 0xA1 | 0xA2 | 0xA3 | 0xA4 | 0xA5 -> fnc n 'a'
         | 0xA6 -> fns n "ae"
         | 0xA7 -> fnc n 'c'
@@ -626,7 +626,7 @@ let decode_table (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
             | 0x9B -> fnc n 's'
             | 0x9C -> fnc n 's'
             | 0x9D -> fnc n 's'
-            | 0x9E -> fns n "SZ"
+            | 0x9E -> fns n "SS"
             | 0x9F -> fnc n 'd'
             | 0xA0 -> fnc n 'A'
             | 0xA1 -> fnc n 'a'

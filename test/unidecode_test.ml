@@ -9,8 +9,8 @@ let v =
         test_case "Ḣ" `Quick (lower "hugh" "Ḣugh");
         test_case "Ή" `Quick (lower "era" "Ήρα");
         test_case "ΰ" `Quick (lower "u" "ΰ");
-        test_case "ẞ" `Quick (lower "weisz" "WEIẞ");
-        test_case "ß" `Quick (lower "weisz" "Weiß");
+        test_case "ẞ" `Quick (lower "weiss" "WEIẞ");
+        test_case "ß" `Quick (lower "weiss" "Weiß");
         test_case "ю" `Quick (lower "kryouger" "Крюгер");
         test_case "Љ" `Quick (lower "ljoubitsa" "Љубица");
         test_case "Ș" `Quick (lower "stefan" "Ștefan");

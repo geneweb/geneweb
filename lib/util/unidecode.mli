@@ -4,10 +4,9 @@
     Its table feeds [Name.lower], hence the keys of the persons, the name
     indexes and the files named after the keys (portraits, carrousels, history):
     changing an output changes the keys of existing bases. Some outputs are
-    conventions kept on purpose: ß "sz", Greek zeta "dz", Cyrillic soft sign
-    "'", French transliteration of Cyrillic (Ч "TCH", У "OU", Ю "YOU"); the
-    apostrophes are not decoded, their code points being distinct in the keys.
-*)
+    conventions kept on purpose: Greek zeta "dz", Cyrillic soft sign "'", French
+    transliteration of Cyrillic (Ч "TCH", У "OU", Ю "YOU"); the apostrophes are
+    not decoded, their code points being distinct in the keys. *)
 
 val nbc : char -> int
 (** For a given byte, returns how many bytes compose the UTF8 character. *)
