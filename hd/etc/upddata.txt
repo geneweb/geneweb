@@ -189,10 +189,10 @@
                      %if;(e.data="src")</a>%end;
                      %if;(e.data="place" and suburb!="")
                        %if;(first)
-                         %escape.other;<br><span class="ms-4">%escape.suburb;</span>
+                         %escape.other;<span class="d-block ms-4">%escape.suburb;</span>
                        %else;
                          <span class="visually-hidden">%escape.printable.other (</span>%nn;
-                         <span class="ms-4">%escape.suburb;</span>%nn;
+                         <span class="d-block ms-4">%escape.suburb;</span>%nn;
                          <span class="visually-hidden">)</span>
                        %end;
                      %else;
