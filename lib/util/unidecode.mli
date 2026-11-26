@@ -31,6 +31,10 @@ val decode :
     If its representation is a string, e.g. "Ч" -> "TCH", [fns] will be called
     with that string.
 
+    A character missing from the table is decoded as its base letter (Ș, ǰ, ї,
+    ἀ) or its other case (ſ, ʉ, Ь) when the table has them; a combining mark
+    shared by the scripts is decoded as the empty string.
+
     In case of un supported char, [unsupported] will be called.
 
     In all of these 3 cases, the first argument is the offset of the next byte

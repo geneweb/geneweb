@@ -35,6 +35,7 @@ let () =
          Templ_test.v;
          Update_conflict_test.v;
          Update_order_test.v;
+         Unidecode_test.v;
          Userkey_test.v;
          Util_test.v;
          Form_nonce_test.v;

@@ -29,6 +29,7 @@
   update_order_test
   update_conflict_test
   collation_test
+  unidecode_test
   book_test
   form_nonce_test
   p_auth_test)

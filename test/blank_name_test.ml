@@ -142,6 +142,9 @@ let test_lower_blank_chars () =
     | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' -> false
     | _ -> true)
     || (c >= 0x300 && c <= 0x36F)
+    ||
+    let u = Uchar.of_int c in
+    Uunf.ccc u > 0 && Uucp.Script.script u = `Zinh
   in
   let mismatches = ref [] in
   for c = 0x10FFFF downto 0 do

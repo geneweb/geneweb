@@ -11,7 +11,7 @@ let nbc c =
   else if Char.code c < 0xFE then 6
   else invalid_arg "nbc"
 
-let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
+let decode_table (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
     (unsupported : int -> 'a) (s : string) (i : int) (len : int) : 'a =
   let c = String.unsafe_get s i in
   let nbc = try nbc c with Invalid_argument _ -> -1 in
@@ -786,6 +786,66 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         | _ -> unsupported n
         end
     | _ -> unsupported n
+
+let table_output u =
+  let b = Buffer.create 4 in
+  Buffer.add_utf_8_uchar b u;
+  let s = Buffer.contents b in
+  decode_table
+    (fun _ t -> Some t)
+    (fun _ c -> Some (String.make 1 c))
+    (fun _ -> None)
+    s 0 (String.length s)
+
+let case_output u =
+  let single m =
+    match m with `Uchars [ c ] -> Some c | `Self | `Uchars _ -> None
+  in
+  List.find_map table_output
+    (List.filter_map single
+       [ Uucp.Case.Map.to_lower u; Uucp.Case.Map.to_upper u ])
+
+let nfd u =
+  let n = Uunf.create `NFD in
+  let rec add acc v =
+    match Uunf.add n v with
+    | `Uchar c -> add (c :: acc) `Await
+    | `Await | `End -> acc
+  in
+  List.rev (add (add [] (`Uchar u)) `End)
+
+(* The decoding of a character missing from the table: nothing for a
+   combining mark shared by the scripts (as U+0300..U+036F in the table); the
+   decoding of its base letter for a letter decomposed into one letter and
+   combining marks (Ș, ǰ, ї, ἀ); the decoding of its other case (ſ, ʉ, Ь).
+   Syllables (Hangul) and letters whose marks change the sound (kana) are
+   left undecoded. *)
+let fallback u =
+  if Uunf.ccc u > 0 then
+    match Uucp.Script.script u with `Zinh -> Some "" | _ -> None
+  else
+    let base =
+      match List.filter (fun c -> Uunf.ccc c = 0) (nfd u) with
+      | [ c ] when not (Uchar.equal c u) -> (
+          match table_output c with Some _ as t -> t | None -> case_output c)
+      | [] | _ :: _ -> None
+    in
+    match base with Some _ as t -> t | None -> case_output u
+
+let decode fns fnc unsupported s i len =
+  decode_table fns fnc
+    (fun n ->
+      let d = String.get_utf_8_uchar s i in
+      if
+        Char.code (String.unsafe_get s i) < 0x80
+        || (not (Uchar.utf_decode_is_valid d))
+        || i + Uchar.utf_decode_length d <> n
+      then unsupported n
+      else
+        match fallback (Uchar.utf_decode_uchar d) with
+        | Some t -> fns n t
+        | None -> unsupported n)
+    s i len
 
 (* [string_forall fn s] is [true] iff [fn] holds for every byte of [s]
    (vacuously [true] for [""]). Used as an ASCII fast path in
