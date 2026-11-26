@@ -11,71 +11,6 @@ let nbc c =
   else if Char.code c < 0xFE then 6
   else invalid_arg "nbc"
 
-(* KNOWN ISSUES — DO NOT CHANGE WITHOUT AN INDEX REBUILD
-
-   This table feeds Name.lower, hence person keys and name indexes.
-   Changing any output below changes keys of existing bases and may
-   break stored references ([[fn/sn/oc]] links in notes, permalinks,
-   caches). The entries are kept as-is on purpose; fix them only
-   together with a change that already requires rebuilding the
-   indexes.
-
-   1. Wrong mappings
-
-   CA 84     U+0284 ʄ  (dotless j with stroke and hook) -> 'u'
-             Probably meant CA 89, U+0289 ʉ (u bar), the lowercase
-             of U+0244 Ʉ (C9 84 -> 'U').
-   C9 AE     U+026E ɮ  (lezh) -> 'i'
-             Probably meant C9 AA, U+026A ɪ (small capital I).
-   CE 89     U+0389 Ή  (capital eta with tonos) -> 'H'
-             Expected 'E', as CE 97 U+0397 Η -> 'E'.
-   CE AE     U+03AE ή  (small eta with tonos) -> 'n'
-             Expected 'e', as CE B7 U+03B7 η -> 'e'.
-   CE 90     U+0390 ΐ  (small iota with dialytika and tonos) -> 'I'
-             Expected lowercase 'i'.
-   CE B0     U+03B0 ΰ  (small upsilon with dialytika and tonos) -> 'a'
-             Expected 'u', as CF 85 U+03C5 υ -> 'u'.
-   E1 BA 9D  U+1E9D ẝ  (long s with high stroke) -> 'r'
-             Expected 's'.
-   E1 BA 9E  U+1E9E ẞ  (capital sharp s) -> 's'
-             Expected "SZ", consistent with C3 9F U+00DF ß -> "sz".
-   D0 AE     U+042E Ю -> "YOU"   but   D1 8E  U+044E ю -> "yu"
-             Upper and lower case transliterate differently.
-
-   2. Inconsistent choices
-
-   Greek upsilon:  CE A5 U+03A5 Υ -> 'U'; CF 85 υ, CF 8B ϋ, CF 8D ύ -> 'u'
-                   but CE 8E U+038E Ύ and CE AB U+03AB Ϋ -> 'Y'.
-   Soft sign:      D1 8C U+044C ь -> '\''
-                   but D0 AC U+042C Ь is unmapped.
-   Sharp s:        C3 9F U+00DF ß -> "sz" (usual transliteration "ss").
-   Zeta:           CE 96 U+0396 Ζ -> "DZ", CE B6 U+03B6 ζ -> "dz"
-                   (usual transliteration 'Z' / 'z').
-   CE A2           U+03A2 is unassigned; its mapping is harmless.
-
-   3. Unmapped sequences (passed through unchanged by the default
-      [unsupported] of [decode_string])
-
-   Romanian comma below:
-     C8 98 U+0218 Ș, C8 99 U+0219 ș, C8 9A U+021A Ț, C8 9B U+021B ț
-     (the cedilla forms U+015E/015F Ş ş, U+0162/0163 Ţ ţ are mapped).
-   Long s:          C5 BF U+017F ſ
-   Ukrainian:       D0 84 U+0404 Є, D1 94 U+0454 є,
-                    D0 87 U+0407 Ї, D1 97 U+0457 ї,
-                    D1 96 U+0456 і (capital D0 86 U+0406 І is mapped)
-   Hard sign:       D0 AA U+042A Ъ, D1 8A U+044A ъ
-   F with hook:     C6 91 U+0191 Ƒ, C6 92 U+0192 ƒ
-   Latin Ext-B:     C7 A6/A7 U+01E6/01E7 Ǧ ǧ, C7 A8/A9 U+01E8/01E9 Ǩ ǩ,
-                    C7 B0 U+01F0 ǰ, C7 B4/B5 U+01F4/01F5 Ǵ ǵ,
-                    C7 B8/B9 U+01F8/01F9 Ǹ ǹ,
-                    C8 92/93 U+0212/0213 Ȓ ȓ, C8 9E/9F U+021E/021F Ȟ ȟ
-   Latin-1 block:   C2 80..C2 BF (U+0080..U+00BF) is unsupported as a
-                    whole, including C2 A0 U+00A0 no-break space.
-
-   Not handled here on purpose: typographic apostrophes
-   E2 80 98 U+2018 ‘ and E2 80 99 U+2019 ’. Apostrophe variants are
-   normalised by norm_apo before Name.lower (see searchName.ml). *)
-
 let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
     (unsupported : int -> 'a) (s : string) (i : int) (len : int) : 'a =
   let c = String.unsafe_get s i in
@@ -180,6 +115,8 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         begin match Char.code @@ String.unsafe_get s (i + 1) with
         | 0x86 | 0x9F | 0xA0 -> fnc n 'O'
         | 0x90 -> fnc n 'E'
+        | 0x91 -> fnc n 'F'
+        | 0x92 -> fnc n 'f'
         | 0x96 | 0x97 -> fnc n 'I'
         | 0xA1 -> fnc n 'o'
         | 0xAF | 0xB1 -> fnc n 'U'
@@ -228,12 +165,13 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         | 0x8E -> fnc n 'Y'
         | 0x8F -> fnc n 'y'
         | 0x94 -> fnc n 'o'
-        | 0xA8 | 0xA9 | 0xAE -> fnc n 'i'
+        | 0xA8 | 0xA9 | 0xAA -> fnc n 'i'
+        | 0xAE -> fnc n 'l'
         | _ -> unsupported n
         end
     | 0xCA ->
         begin match Char.code @@ String.unsafe_get s (i + 1) with
-        | 0x84 -> fnc n 'u'
+        | 0x84 -> fnc n 'j'
         | _ -> unsupported n
         end
     (* diacritical marks *)
@@ -245,12 +183,12 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         begin match Char.code @@ String.unsafe_get s (i + 1) with
         | 0x86 -> fnc n 'A'
         | 0x88 -> fnc n 'E'
-        | 0x89 -> fnc n 'H'
+        | 0x89 -> fnc n 'E'
         | 0x8A -> fnc n 'I'
         | 0x8C -> fnc n 'O'
-        | 0x8E -> fnc n 'Y'
+        | 0x8E -> fnc n 'U'
         | 0x8F -> fnc n 'O'
-        | 0x90 -> fnc n 'I'
+        | 0x90 -> fnc n 'i'
         | 0x91 -> fnc n 'A'
         | 0x92 -> fnc n 'B'
         | 0x93 -> fnc n 'G'
@@ -276,12 +214,12 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         | 0xA8 -> fns n "PS"
         | 0xA9 -> fnc n 'O'
         | 0xAA -> fnc n 'I'
-        | 0xAB -> fnc n 'Y'
+        | 0xAB -> fnc n 'U'
         | 0xAC -> fnc n 'a'
         | 0xAD -> fnc n 'e'
-        | 0xAE -> fnc n 'n'
+        | 0xAE -> fnc n 'e'
         | 0xAF -> fnc n 'i'
-        | 0xB0 -> fnc n 'a'
+        | 0xB0 -> fnc n 'u'
         | 0xB1 -> fnc n 'a'
         | 0xB2 -> fnc n 'b'
         | 0xB3 -> fnc n 'g'
@@ -318,7 +256,14 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         (* Cyrillic *)
         begin match Char.code @@ String.unsafe_get s (i + 1) with
         | 0x81 -> fnc n 'E'
+        | 0x82 -> fnc n 'D'
+        | 0x85 -> fns n "DZ"
         | 0x86 -> fnc n 'I'
+        | 0x88 -> fnc n 'J'
+        | 0x89 -> fns n "LJ"
+        | 0x8A -> fns n "NJ"
+        | 0x8B -> fnc n 'C'
+        | 0x8F -> fns n "DZ"
         | 0x90 -> fnc n 'A'
         | 0x91 -> fnc n 'B'
         | 0x92 -> fnc n 'V'
@@ -380,13 +325,22 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
         | 0x8B -> fnc n 'y'
         | 0x8C -> fnc n '\''
         | 0x8D -> fnc n 'e'
-        | 0x8E -> fns n "yu"
+        | 0x8E -> fns n "you"
         | 0x8F -> fns n "ya"
         | 0x91 -> fnc n 'e'
+        | 0x92 -> fnc n 'd'
+        | 0x95 -> fns n "dz"
+        | 0x98 -> fnc n 'j'
+        | 0x99 -> fns n "lj"
+        | 0x9A -> fns n "nj"
+        | 0x9B -> fnc n 'c'
+        | 0x9F -> fns n "dz"
         | _ -> unsupported n
         end
     | 0xD2 ->
         begin match Char.code @@ String.unsafe_get s (i + 1) with
+        | 0x90 -> fnc n 'G'
+        | 0x91 -> fnc n 'g'
         | 0xAf -> fnc n 'u'
         | _ -> unsupported n
         end
@@ -538,10 +492,10 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
             | 0x9D -> fnc n 'e'
             | 0x9E -> fnc n 'F'
             | 0x9F -> fnc n 'f'
-            | 0xA0 -> fnc n 'F'
-            | 0xA1 -> fnc n 'f'
-            | 0xA2 -> fnc n 'G'
-            | 0xA3 -> fnc n 'g'
+            | 0xA0 -> fnc n 'G'
+            | 0xA1 -> fnc n 'g'
+            | 0xA2 -> fnc n 'H'
+            | 0xA3 -> fnc n 'h'
             | 0xA4 -> fnc n 'H'
             | 0xA5 -> fnc n 'h'
             | 0xA6 -> fnc n 'H'
@@ -671,8 +625,8 @@ let decode (fns : int -> string -> 'a) (fnc : int -> char -> 'a)
             | 0x9A -> fnc n 'a'
             | 0x9B -> fnc n 's'
             | 0x9C -> fnc n 's'
-            | 0x9D -> fnc n 'r'
-            | 0x9E -> fnc n 's'
+            | 0x9D -> fnc n 's'
+            | 0x9E -> fns n "SZ"
             | 0x9F -> fnc n 'd'
             | 0xA0 -> fnc n 'A'
             | 0xA1 -> fnc n 'a'
