@@ -27,6 +27,7 @@ let get_opt conf =
         "a_sort";
         "lower";
         "word";
+        "case";
         "any";
       ]
   in
@@ -97,6 +98,88 @@ let strip_pl keep pll =
     in
     loop [] 1 pll
 
+(* For wizards, a link from a place of the long display of m=PS to the
+   book of places (m=MOD_DATA), at the entries starting with it: [dict_link
+   pl] for the place or the level [pl] (its terms, country first). None in
+   the short display, where it would be too intrusive. The book
+   is read from the last term ("France, Manche, Granville", [o=r]), so that
+   a group of places is one interval of it; a base recording its places
+   country first ([places_inverted]) is read in the alphabetic order. An
+   index without the order from the last term only links whole places
+   ([~leaf:true]), the book listing them as written. No link without index:
+   the book needs it. *)
+let dict_link conf base =
+  if not (conf.wizard && Driver.dict_has base Geneweb_db.Dict.Place) then
+    fun ~leaf:_ _ -> ""
+  else
+    let inverted = Place.places_inverted conf in
+    let rev =
+      (not inverted) && Driver.dict_has base Geneweb_db.Dict.Place_last
+    in
+    let book =
+      Utf8.capitalize_fst
+        (Printf.sprintf
+           (ftransl conf "book of %s")
+           (transl_nth conf "place/places" 1))
+    in
+    fun ~leaf pl ->
+      let s =
+        if pl = [] then None
+        else if inverted || rev then Some (String.concat ", " pl)
+        else if leaf then Some (Place.places_to_string false pl)
+        else None
+      in
+      match s with
+      | None -> ""
+      | Some s ->
+          Printf.sprintf
+            "<a href=\"%sm=MOD_DATA&data=place%s&s=%s\" title=\"%s%s “%s”\"><i \
+             class=\"fa fa-wand-magic-sparkles fa-fw ms-1\" \
+             aria-hidden=\"true\"></i></a>"
+            (commd conf :> string)
+            (if rev then "&o=r" else "")
+            (Mutil.encode s :> string)
+            (Util.escape_html book :> string)
+            (transl conf ":")
+            (Util.escape_html s :> string)
+
+(* The [k] of a link from a group [label] of the short display to its
+   details: the group added to the place searched, so that the search is
+   kept ("Chateaumeillant" found in "Chateaumeillant, Cher" leads to
+   "Chateaumeillant, Cher", not to every place of the Cher). With several
+   comma-separated parts, each must match a term of the place
+   ({!Place.find_in}); a part already there is not repeated. *)
+let drill_k conf label =
+  match p_getenv conf.env "k" with
+  | Some k when String.trim k <> "" ->
+      let parts s =
+        List.filter_map
+          (fun p ->
+            let p = String.trim p in
+            if p = "" then None else Some p)
+          (String.split_on_char ',' s)
+      in
+      let l =
+        List.fold_left
+          (fun acc p ->
+            if List.exists (fun q -> Name.lower q = Name.lower p) acc then acc
+            else acc @ [ p ])
+          []
+          (parts k @ parts label)
+      in
+      String.concat ", " l
+  | Some _ | None -> label
+
+(* The number of terms of a place in a group of the short display: [keep],
+   or more, down to the term found by the place searched [k]
+   ("Châteaumeillant" searched in any term shows "Châteaumeillant, Cher",
+   not "Cher"). *)
+let short_depth conf keep =
+  match p_getenv conf.env "k" with
+  | Some k when String.trim k <> "" ->
+      fun pl -> max keep (Place.match_depth conf pl k)
+  | Some _ | None -> fun _ -> keep
+
 let print_html_places_surnames_short conf _base _link_to_ind
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
@@ -106,22 +189,24 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
+  let depth = short_depth conf keep in
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
   (* build new list of (places, ipl) *)
   (* accumulate snl according to keep *)
   let new_l =
     let rec loop prev_pl acc_snl acc_l = function
-      | ((pl, _sub), snl) :: l when prev_pl = strip_pl keep pl ->
-          loop (strip_pl keep pl) (get_ip_list snl :: acc_snl) acc_l l
+      | ((pl, _sub), snl) :: l when prev_pl = strip_pl (depth pl) pl ->
+          loop (strip_pl (depth pl) pl) (get_ip_list snl :: acc_snl) acc_l l
       | ((pl, _sub), snl) :: l when acc_snl <> [] ->
           let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
-          loop (strip_pl keep pl)
+          loop
+            (strip_pl (depth pl) pl)
             [ get_ip_list snl ]
             ((prev_pl, acc_snl) :: acc_l)
             l
       | ((pl, _sub), snl) :: l ->
-          loop (strip_pl keep pl) [ get_ip_list snl ] acc_l l
+          loop (strip_pl (depth pl) pl) [ get_ip_list snl ] acc_l l
       | [] ->
           let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
           (prev_pl, acc_snl) :: acc_l
@@ -152,9 +237,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let new_l =
     let rec loop prev acc_snl acc_l new_l =
       match (new_l, prev) with
-      | (pl, snl) :: l, prev when prev = strip_pl keep pl ->
+      | (pl, snl) :: l, prev when prev = strip_pl (depth pl) pl ->
           loop pl ((pl, snl) :: acc_snl) acc_l l
-      | (pl, snl) :: l, prev when prev <> strip_pl keep pl ->
+      | (pl, snl) :: l, prev when prev <> strip_pl (depth pl) pl ->
           loop pl
             [ (pl, snl) ]
             (if acc_snl <> [] then acc_snl :: acc_l else acc_l)
@@ -178,7 +263,8 @@ let print_html_places_surnames_short conf _base _link_to_ind
             opt
             (if long then "long" else "short")
             (string_of_int (keep + 1))
-            str2 str;
+            (Mutil.encode (drill_k conf str) :> string)
+            str;
           if len < Place.max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place%s&k=%s&nb=%d"
               (commd conf :> string)
@@ -216,7 +302,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
   loop true new_l;
   Output.print_sstring conf "<p>"
 
-let print_html_places_surnames_long conf base link_to_ind
+let print_html_places_surnames_long conf base link_to_ind ~dict_link
     (arry : ((string list * string) * (string * Driver.iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k =
@@ -289,27 +375,31 @@ let print_html_places_surnames_long conf base link_to_ind
     Output.print_sstring conf "</li>\n"
   in
 
+  (* number of leading terms shared by two places *)
+  let rec common l1 l2 =
+    match (l1, l2) with
+    | x1 :: l1, x2 :: l2 when x1 = x2 -> 1 + common l1 l2
+    | _ -> 0
+  in
   let rec loop prev = function
     | ((pl, sub), snl) :: l ->
-        let rec loop1 prev (pl, sub) =
-          match (prev, pl) with
-          | [], l2 ->
-              List.iter
-                (fun x ->
-                  Output.printf conf "<li>%s<ul>\n"
-                    (pps_call conf opt true keep k [ x ]))
-                l2
-          | x1 :: l1, x2 :: l2 ->
-              if x1 = x2 then loop1 l1 (l2, sub)
-              else (
-                List.iter
-                  (fun _ -> Output.print_sstring conf "</ul></li>\n")
-                  (x1 :: l1);
-                loop1 [] (x2 :: l2, sub))
-          | l1, [] ->
-              List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") l1
-        in
-        loop1 prev (pl, sub);
+        (* close the levels of [prev] not shared with [pl], open those of
+           [pl]: each level is linked to the book of places with the terms
+           above it *)
+        let c = common prev pl in
+        List.iteri
+          (fun i _ -> if i >= c then Output.print_sstring conf "</ul></li>\n")
+          prev;
+        let n = List.length pl in
+        List.iteri
+          (fun i x ->
+            if i >= c then
+              Output.printf conf "<li>%s%s<ul>\n"
+                (pps_call conf opt true keep k [ x ])
+                (dict_link
+                   ~leaf:(i = n - 1)
+                   (List.filteri (fun j _ -> j <= i) pl)))
+          pl;
         print_sn_list (pl, sub) snl;
         loop pl l
     | [] -> List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") prev
@@ -318,14 +408,62 @@ let print_html_places_surnames_long conf base link_to_ind
   loop [] l;
   Output.print_sstring conf "</ul>\n"
 
+(* ---- pages of m=PS ---- *)
+
+let page_size_key = "places_page_size"
+
+(* A row of m=PS: a place with its suburbs in the long display, the group of
+   its first terms (country first) in the short one: [depth pl] terms, see
+   {!short_depth}. *)
+let row_key ~long depth ((pl, _sub) : string list * string) =
+  if long then pl else strip_pl (depth pl) pl
+
+(* The rows in the order of the display ([a_sort]: reversed), or by their
+   number of uses ([f_sort], fewest first with [up]). *)
+let sort_rows conf (rows : (string list * int) list) =
+  let a_sort = p_getenv conf.env "a_sort" = Some "on" in
+  let f_sort = p_getenv conf.env "f_sort" = Some "on" in
+  let up = p_getenv conf.env "up" = Some "on" in
+  let alpha r1 r2 = sort_place_utf8 (r1, "") (r2, "") in
+  List.sort
+    (fun (r1, w1) (r2, w2) ->
+      if f_sort then
+        let c = if up then compare w1 w2 else compare w2 w1 in
+        if c <> 0 then c else alpha r1 r2
+      else if a_sort then alpha r2 r1
+      else alpha r1 r2)
+    rows
+
+(* The rows of the places of the index of the dictionaries kept by [filter],
+   each with its number of uses ({!Driver.dict_count}: every event and
+   record, without reading them), and the row of each place string. *)
+let index_rows base ~long depth fold filter =
+  let rows : (string list, int ref) Hashtbl.t = Hashtbl.create 2048 in
+  let row_of : (Driver.istr, string list) Hashtbl.t = Hashtbl.create 2048 in
+  List.iter
+    (fun (istr, count) ->
+      let s = Driver.sou base istr in
+      if s <> "" then
+        let key = fold s in
+        if filter key then (
+          let r = row_key ~long depth key in
+          Hashtbl.replace row_of istr r;
+          match Hashtbl.find_opt rows r with
+          | Some w -> w := !w + count
+          | None -> Hashtbl.add rows r (ref count)))
+    (Driver.dict_entries_count base Geneweb_db.Dict.Place "");
+  (Hashtbl.fold (fun r w acc -> (r, !w) :: acc) rows [], row_of)
+
 let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage lim filter =
+    ~add_burial ~add_marriage filter =
   let inverted = Place.places_inverted conf in
-  let arry =
-    Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage ([], "") []
-      (Place.fold_place_long inverted)
-      filter
+  let long = p_getenv conf.env "display" = Some "long" in
+  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
+  let fold = Place.fold_place_long inverted in
+  let depth = short_depth conf keep in
+  let get_all ?only () =
+    Place.get_all ?only conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage ([], "") [] fold filter
       (fun prev p ->
         (* add one ip to a list flagged by surname *)
         let value = (Driver.get_surname p, Driver.get_iper p) in
@@ -343,18 +481,58 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
         in
         loop [] v)
   in
-  let short =
-    p_getenv conf.env "display" = Some "long" && Array.length arry > lim
+  let page rows =
+    let rows = sort_rows conf rows in
+    let total = List.length rows in
+    let sl = ListBar.slice ~gwf_key:page_size_key conf total in
+    let page = Hashtbl.create 256 in
+    List.iter (fun (r, _) -> Hashtbl.replace page r ()) (ListBar.take sl rows);
+    (total, sl, page)
   in
-  let conf =
-    if short then
-      {
-        conf with
-        env =
-          ("display", Adef.encoded "short")
-          :: List.remove_assoc "display" conf.env;
-      }
-    else conf
+  (* The places come from the index of the dictionaries, in rows; only the
+     persons and families of the places of the page are read. On a base of
+     an earlier format, without index, every place is read, then a page of
+     them kept. The page opens empty, without reading anything: the places
+     are listed once the user has chosen them: a place ([k]) or all of
+     them ([go=on]). *)
+  let k = p_getenv conf.env "k" in
+  let go = p_getenv conf.env "go" = Some "on" in
+  let chosen = go || match k with Some k -> k <> "" | None -> false in
+  let total, sl, arry =
+    if not chosen then (0, (1, 0), [||])
+    else if
+      not (add_birth || add_baptism || add_death || add_burial || add_marriage)
+    then (0, (1, 0), [||])
+    else if Driver.dict_has base Geneweb_db.Dict.Place then
+      let rows, row_of = index_rows base ~long depth fold filter in
+      let total, sl, page = page rows in
+      let only istr =
+        match Hashtbl.find_opt row_of istr with
+        | Some r -> Hashtbl.mem page r
+        | None -> false
+      in
+      (total, sl, get_all ~only ())
+    else
+      let arry = get_all () in
+      let weights : (string list, int ref) Hashtbl.t = Hashtbl.create 2048 in
+      Array.iter
+        (fun (key, snl) ->
+          let n = List.fold_left (fun n (_, l) -> n + List.length l) 0 snl in
+          let r = row_key ~long depth key in
+          match Hashtbl.find_opt weights r with
+          | Some w -> w := !w + n
+          | None -> Hashtbl.add weights r (ref n))
+        arry;
+      let total, sl, page =
+        page (Hashtbl.fold (fun r w acc -> (r, !w) :: acc) weights [])
+      in
+      let arry =
+        Array.of_list
+          (List.filter
+             (fun (key, _) -> Hashtbl.mem page (row_key ~long depth key))
+             (Array.to_list arry))
+      in
+      (total, sl, arry)
   in
   let title _ =
     Output.printf conf "%s / %s"
@@ -362,8 +540,6 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
   let opt = get_opt conf in
-  let long = p_getenv conf.env "display" = Some "long" in
-  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   Hutil.header conf title;
   let ifun =
     Templ.
@@ -379,37 +555,79 @@ let print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
   Templ.output conf ifun Templ.Env.empty
     (Driver.empty_person base Driver.Iper.dummy)
     "buttons_places";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  (* without index, every person and family is read *)
+  if not (Driver.dict_has base Geneweb_db.Dict.Place) then (
+    Output.printf conf "<div class=\"alert alert-warning py-2 mt-2\">%s"
+      (Utf8.capitalize_fst (transl conf "places: no index"));
+    if conf.wizard then
+      Output.printf conf " %s"
+        (Printf.sprintf
+           (ftransl conf "places: no index, reindex %s")
+           (Util.escape_html conf.bname :> string));
+    Output.print_sstring conf "</div>\n");
   let link_to_ind =
     match List.assoc_opt "place_surname_link_to_ind" conf.base_env with
     | Some "yes" -> true
     | _ -> false
   in
-  let t =
-    if short then
-      Printf.sprintf "%s" (Utf8.capitalize (transl conf "v7 list too long"))
-    else ""
-  in
-  let href =
-    Printf.sprintf "href=\"%sm=PS%s&display=%s&keep=%s%s\" title=\"%s\""
+  let max_rlm = p_getenv conf.env "max_rlm_nbr" in
+  (* the page without [n] and [from], in [display] *)
+  let href display =
+    Printf.sprintf "%sm=PS%s&display=%s&keep=%d%s%s%s"
       (commd conf :> string)
-      opt
-      (if long then "short" else "long")
-      (string_of_int keep)
-      (match p_getenv conf.env "k" with
-      | Some ini -> "&k=" ^ (Mutil.encode ini :> string)
+      opt display keep
+      (match k with
+      | Some k when k <> "" -> "&k=" ^ (Mutil.encode k :> string)
+      | Some _ | None -> "")
+      (if go then "&go=on" else "")
+      (match max_rlm with
+      | Some m -> "&max_rlm_nbr=" ^ (Mutil.encode m :> string)
       | None -> "")
-      t
   in
-  Output.printf conf "<p>\n<a %s>%s</a>" href
-    (Utf8.capitalize
-       (transl conf (if long then "short display" else "long display")));
-  if short then Output.printf conf " (%s)\n" t;
-  Output.printf conf "<p>\n";
-  if arry <> [||] then
-    if long then print_html_places_surnames_long conf base link_to_ind arry
-    else print_html_places_surnames_short conf base link_to_ind arry;
-  Output.printf conf "</form>\n";
+  let hidden () =
+    let h n v = Util.hidden_input_s conf n v in
+    h "m" "PS";
+    h "display" (if long then "long" else "short");
+    h "keep" (string_of_int keep);
+    List.iter
+      (fun n -> if p_getenv conf.env n = Some "on" then h n "on")
+      [
+        "bi";
+        "ba";
+        "de";
+        "bu";
+        "ma";
+        "f_sort";
+        "up";
+        "a_sort";
+        "lower";
+        "word";
+        "case";
+        "any";
+      ];
+    (match k with Some k when k <> "" -> h "k" k | Some _ | None -> ());
+    if go then h "go" "on";
+    Option.iter (h "max_rlm_nbr") max_rlm
+  in
+  (* the place is chosen by the field [k] of the form above: no field
+     "starting with" in the bar; an empty page has no bar *)
+  if chosen then (
+    (* the other display keeps [n], from the first row *)
+    Output.printf conf "<p>\n<a href=\"%s&n=%s\">%s</a>\n"
+      (href (if long then "short" else "long"))
+      (ListBar.n_param ~gwf_key:page_size_key conf)
+      (Utf8.capitalize
+         (transl conf (if long then "short display" else "long display")));
+    ListBar.print_list_bar ~gwf_key:page_size_key ~begins:false ~offer_all:true
+      conf
+      ~href:(href (if long then "long" else "short"))
+      ~hidden
+      (Some (total, sl)));
+  (if arry <> [||] then
+     let dict_link = dict_link conf base in
+     if long then
+       print_html_places_surnames_long conf base link_to_ind ~dict_link arry
+     else print_html_places_surnames_short conf base link_to_ind arry);
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =
@@ -418,14 +636,10 @@ let print_all_places_surnames conf base =
   let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
-  let lim =
-    try int_of_string @@ List.assoc "short_place_threshold" conf.base_env
-    with _ -> 500
-  in
   let filter =
     match p_getenv conf.env "k" with
     | Some ini when ini <> "" -> fun (x, _) -> Place.find_in conf x ini
     | Some _ | None -> fun _ -> true
   in
   print_all_places_surnames_aux conf base ~add_birth ~add_baptism ~add_death
-    ~add_burial ~add_marriage lim filter
+    ~add_burial ~add_marriage filter
