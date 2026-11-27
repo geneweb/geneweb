@@ -11,10 +11,11 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
   let person_j = persons.(j) in
   let iper_i = Driver.get_iper person_i in
   let iper_j = Driver.get_iper person_j in
-  if i = j then
+  if i = j then (
     Output.printf conf {|<td class="rm-diag" data-id="§%s_§%s">—</td>|}
       (Driver.Iper.to_string iper_i)
-      (Driver.Iper.to_string iper_j)
+      (Driver.Iper.to_string iper_j);
+    Sosa.zero)
   else
     let cell_data_opt =
       if j > i then (
@@ -36,10 +37,13 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
             <span class="text-body-secondary">—</span>
           </td>|}
           (Driver.Iper.to_string iper_i)
-          (Driver.Iper.to_string iper_j)
+          (Driver.Iper.to_string iper_j);
+        Sosa.zero
     | Some cell_data -> (
         match find_shortest_path cell_data.paths with
-        | None -> Output.print_sstring conf {|<td class="rm-cell">—</td>|}
+        | None ->
+            Output.print_sstring conf {|<td class="rm-cell">—</td>|};
+            Sosa.zero
         | Some shortest ->
             let cell_content =
               let pct = format_percentage_for_cell conf cell_data.coeff in
@@ -62,7 +66,8 @@ let print_matrix_cell conf base tstab persons i j cell_storage n =
               (Driver.Iper.to_string iper_i)
               (Driver.Iper.to_string iper_j)
               (String.map (function '"' -> '\'' | c -> c) tooltip_text)
-              relationship_url cell_content)
+              relationship_url cell_content;
+            cell_data.total)
 
 (* Afficher les en-têtes de colonnes *)
 let print_matrix_headers conf persons =
@@ -77,7 +82,8 @@ let print_matrix_headers conf persons =
       (Driver.Iper.to_string iper_j)
       (j + 1)
   done;
-  Output.print_sstring conf {|</tr>|}
+  Output.printf conf {|<th class="text-center rm-thead" title="%s">Σ</th></tr>|}
+    (Util.transl_nth conf "relationship link/relationship links" 1)
 
 (* Afficher une ligne de la matrice *)
 let print_matrix_row conf base tstab persons i cell_storage n =
@@ -97,10 +103,15 @@ let print_matrix_row conf base tstab persons i cell_storage n =
     (Util.mod_ind_link conf base person
        (DateDisplay.short_dates_text conf base person)
       :> string);
+  let sum = ref Sosa.zero in
   for j = 0 to n - 1 do
-    print_matrix_cell conf base tstab persons i j cell_storage n
+    sum :=
+      Sosa.add !sum
+        (print_matrix_cell conf base tstab persons i j cell_storage n)
   done;
-  Output.print_sstring conf "</tr>"
+  Output.printf conf {|<td class="rm-sum" data-id="§%s_">%s</td></tr>|}
+    (Driver.Iper.to_string iper_i)
+    (links_count conf !sum)
 
 (* Point d'entrée principal pour l'affichage de la matrice *)
 let print_matrix_table conf base persons =
@@ -127,12 +138,12 @@ let print_matrix_table conf base persons =
   <td class="rm-empty" colspan="%d"></td>
 </tr>
 </tbody></table></div>|}
-    (n + 1)
+    (n + 2)
     (Util.transl_nth conf "relationship table" 3)
     (Util.transl_nth conf "relationship link/relationship links" 1)
     (Util.transl_nth conf "relationship coefficient/percentage" 1)
     (format_percentage_for_cell conf 0.09375)
-    (n - 1);
+    n;
   let json_data =
     RelationMatrix.matrix_to_json conf base persons cell_storage n
   in

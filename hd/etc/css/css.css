@@ -2729,6 +2729,12 @@ span.notesourcecolor {
   --bs-table-bg: #e9ecef;
   line-height: 1rem;
 }
+.rm-sum {
+  --bs-table-bg: #f8f9fa;
+  vertical-align: middle !important;
+  text-align: center;
+  font-weight: bold;
+}
 .rm-diag {
   --bs-table-bg: #bcd3eb;
   color: white;
