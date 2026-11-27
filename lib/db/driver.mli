@@ -453,7 +453,25 @@ val find_string : base -> string -> istr option
 
 val commit_patches : base -> unit
 (** Commit blocked modifications (patches) and update database files in order to
-    apply modifications on the disk. *)
+    apply modifications on the disk. The index of the consanguinities
+    ({!ConsangIndex}) is outdated for the persons whose parents change, for
+    those becoming or no longer named "? ?", and for their descendants. *)
+
+val consang_index : base -> iper -> ConsangIndex.entry
+(** [consang_index base ip] is the record of [ip] in the index of the
+    consanguinities of [base]. *)
+
+val update_consang_index :
+  base ->
+  ((iper -> ConsangIndex.entry) -> (iper -> ConsangIndex.entry -> unit) -> 'a) ->
+  'a
+(** See {!ConsangIndex.update}. *)
+
+val cache_consang_index :
+  base ->
+  ((iper -> ConsangIndex.entry) -> (iper -> ConsangIndex.entry -> unit) -> unit) ->
+  unit
+(** See {!ConsangIndex.cache}. *)
 
 val commit_notes : base -> string -> string -> unit
 (** [commit_notes fname s] Update content of the notes/extended page file
