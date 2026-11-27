@@ -5749,6 +5749,14 @@ let print_foreach conf base print_ast eval_expr =
               let ep = make_ep conf base ip in
               loop env ep efam sl
           | _ -> raise Not_found)
+      | "event_witness_relation" :: "person" :: sl -> (
+          (* inside %foreach;event_witness_relation; : the person whose
+             event was witnessed *)
+          match get_env "event_witness_relation" env with
+          | Vevent (p, _) ->
+              let ep = (p, authorized_age conf base p) in
+              loop env ep efam sl
+          | _ -> raise Not_found)
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl -> (
           match efam with
