@@ -81,17 +81,6 @@
     %apply;one_pvar(zz+1)
   %end;
 %end;
-%define;one_pvar_json(zz)
-  %if;(e.izz!="" or e.pzz!="")
-    %if;pvar.zz.exist;
-      %if;(zz!=1),%end;
-      {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz;"}%nn;
-    %end;
-  %end;
-  %if;(zz<=max_index)
-    %apply;one_pvar_json(zz+1)
-  %end;
-%end;
 %define;my_hidden(xx)
   %if;(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
@@ -142,7 +131,6 @@
           <i class="fas fa-user-plus me-2" aria-hidden="true"></i>%nn;
           [*person picker title]
         </button>
-        <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
         <button type="button" class="btn btn-primary me-3" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
           <span class="me-2">
@@ -157,6 +145,12 @@
         <button type="button" class="btn btn-warning" id="showMatrix"
           title="[*relationship table]1 (RM)" onclick="showOverlay()" disabled>
           <i class="fas fa-table-cells me-2"></i>[*relationship table]0
+        </button>
+        <button type="button" class="btn btn-danger ms-4" id="clearRLM">
+          <span class="me-2">
+            <i class="fas fa-trash-can toggle-icon"></i>
+            <i class="fas fa-check toggle-icon d-none"></i>
+          </span>[*add/clear/show/edit the graph]1
         </button>
       </td>
     </tfoot>
@@ -294,17 +288,26 @@
   const saveBtn = $('#saveRLM');
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
-      const src = $('#rlm-data');
-      if (!src) return;
-      const jsonText = src.innerHTML.trim();
-      try {
-        const jsonData = JSON.parse(jsonText);
-        localStorage.setItem('inds', JSON.stringify(jsonData));
-        toggleIcons('#saveRLM');
-        setTimeout(() => toggleIcons('#saveRLM'), 2000);
-      } catch (err) {
-        console.error('Invalid JSON data in #rlm-data', err);
-      }
+      const inds = visibleRows().flatMap(row => {
+        const { fn: p, sn: n, oc } = rowKey(row);
+        if (!p || !n) return [];
+        const t = row.querySelector("input[name='t']").value.trim();
+        return [{ p, n, ...(oc !== '0' && { oc }), ...(t && { t }) }];
+      });
+      localStorage.setItem('inds', JSON.stringify(inds));
+      history.replaceState(null, '', buildUrl('TP') + '&v=updRLM');
+      toggleIcons('#saveRLM');
+      setTimeout(() => toggleIcons('#saveRLM'), 2000);
+    });
+  }
+
+  // clear RLM (localStorage)
+  const clearBtn = $('#clearRLM');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      localStorage.removeItem('inds');
+      toggleIcons('#clearRLM');
+      setTimeout(() => toggleIcons('#clearRLM'), 2000);
     });
   }
 
@@ -335,7 +338,7 @@
         const oc = ocIn.value;
         if (oc !== '' && oc !== '0') params.set('oc' + dataIndex, oc);
       }
-      if (mode === 'RLM') {
+      if (mode !== 'RLM') {
         const tIn = row.querySelector("input[name='t']");
         if (tIn) {
           const text = tIn.value.trim();
