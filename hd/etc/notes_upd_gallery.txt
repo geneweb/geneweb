@@ -361,6 +361,7 @@ window.GW = {
   hasSnList: %if;(b.datalist_snames=1)true%else;false%end;,
   i18n: {
     person: "[*person/persons]0",
+    pickPerson: "[*person picker title]",
     folders: "[*folder/folders]1 “albums”",
     images: "[*image/images]1",
     keyDirs: "[*individual images]",

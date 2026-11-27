@@ -111,7 +111,7 @@ window.GW = { prefix: "%prefix;" };
 </script>
 <script src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"></script>
 %end;
-%if;(e.v="updRLM" or e.m="MRG")
+%if;(e.v="updRLM" or e.m="MRG" or e.m="MOD_GALLERY")
   %include;person_picker
 %end;
 %if;(e.m="MRG")

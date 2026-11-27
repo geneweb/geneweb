@@ -886,6 +886,19 @@ function initializeHandlers() {
             const tr = this.closest('tr');
             if (!tr || !table) return;
             validateRow(tr, table.row(tr).data(), { flash: true });
+        })
+        .on('click', '.pick-person', function () {
+            const tr = this.closest('tr');
+            PersonPicker.open(undefined, (p) => {
+                const rowData = table.row(tr).data();
+                rowData.fn = p.fn;
+                rowData.sn = p.sn;
+                rowData.oc = p.oc ? String(p.oc) : '';
+                tr.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + (p.oc || '0');
+                tr.classList.remove('row-invalid');
+                table.row(tr).data(rowData).draw(false);
+                addKeyToPicker(p);
+            });
         });
 
     if (GW.hasFnList || GW.hasSnList) {
@@ -1340,7 +1353,9 @@ function initTables() {
                             if (type === 'sort' || type === 'type') return get(data).toLowerCase();
                             const disabled = (get(row.t) !== '' && row.t !== 'p') ? ' disabled' : '';
                             const dl = GW.hasFnList ? ' list="datalist_fnames" data-book="fn"' : '';
-                            return '<input class="form-control update p-input" type="text" value="' + get(data) + '"' + disabled + dl + '>';
+                            return '<div class="d-flex align-items-center">' +
+                                '<button type="button" class="btn btn-link px-1 mx-1 pick-person p-input" title="' + GW.i18n.pickPerson + '"' + disabled + '><i class="fa fa-user-plus"></i></button>' +
+                                '<input class="form-control update p-input" type="text" value="' + get(data) + '"' + disabled + dl + '></div>';
                         }
                     },
                     {
