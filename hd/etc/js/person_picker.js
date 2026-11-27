@@ -223,45 +223,13 @@
         return { fn, sn, oc: 0 };
     }
 
-    function bindInput(el, options) {
-        if (!el || el.dataset.pnocBound) return;
-        el.dataset.pnocBound = '1';
-        options = options || {};
-        const parse = options.parse || parseGeneWebKey;
-
-        function run(flash) {
-            const k = parse(el.value);
-            if (!k || !k.fn || !k.sn) {
-                el.classList.remove('row-invalid');
-                delete el.dataset.pnocChecked;
-                return Promise.resolve();
-            }
-            const sig = k.fn + '|' + k.sn + '|' + (k.oc || 0);
-            if (el.dataset.pnocChecked === sig) return Promise.resolve();
-            return checkExact(k.fn, k.sn, k.oc || 0).then(p => {
-                const ok = !!p;
-                el.dataset.pnocChecked = sig;
-                el.classList.toggle('row-invalid', !ok);
-                if (ok && flash) flashValid(el);
-            });
-        }
-
-        el.addEventListener('focusout', () => run(true));
-        if (el.value) run(false);
-    }
-
     window.PersonPicker = {
-        open, lookup, checkExact, wikiKey, bindInput, parseGeneWebKey,
-        bindGroup
+        open, url, lookup, checkExact, wikiKey, parseGeneWebKey, bindGroup
     };
 
-    function autoBind() {
-        document.querySelectorAll('.pnoc-input').forEach(bindInput);
-        autoBindGroups();
-    }
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', autoBind);
+        document.addEventListener('DOMContentLoaded', autoBindGroups);
     } else {
-        autoBind();
+        autoBindGroups();
     }
 })();

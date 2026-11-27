@@ -175,7 +175,6 @@
 %end;
 </div>
 %include;overlay
-%include;person_picker
 %include;js
 %query_time;
 <script>

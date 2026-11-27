@@ -53,54 +53,38 @@ let print conf base p =
   Output.print_sstring conf (transl_decline conf "with" "");
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf "\n</h2>\n";
-  Output.print_sstring conf
-    (Format.sprintf {|<form method="get" action="%s" class="my-3">|}
-       (conf.command :> string));
-  Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
-  Util.hidden_input conf "i"
-    (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-  let ph =
-    Format.sprintf "%s.%s %s"
-      (transl_nth conf "first name/first names" 0)
-      (transl conf "number")
-      (transl_nth conf "surname/surnames" 0)
-  in
-  Output.print_sstring conf
-    {|<div class="form-check d-flex align-items-center gap-2 ms-3">|};
-  Output.print_sstring conf
-    {|<input class="form-check-input" type="radio" name="select" id="input" value="input" checked>|};
-  Output.print_sstring conf
-    {|<label class="form-check-label text-nowrap" for="input">|};
-  Output.print_sstring conf (transl conf "any individual in the base");
-  Output.print_sstring conf {|</label>|};
   Output.printf conf
-    {|<input type="text" class="form-control form-control-sm w-auto pnoc-input" name="n" id="inlineinput" placeholder="%s" title="%s" size="50" autofocus>|}
-    ph ph;
-  Output.print_sstring conf {|</div>|};
-  if list <> [] then
-    List.iter
-      (fun p ->
-        Output.print_sstring conf {|<div class="form-check ms-3">|};
-        Output.print_sstring conf
-          {|<input type="radio" class="form-check-input" name="select" id="|};
-        Output.print_string conf
-          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf {|" value="|};
-        Output.print_string conf
-          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf {|"><label class="form-check-label" for="|};
-        Output.print_string conf
-          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
-        Output.print_sstring conf {|">|};
+    {|<button type="button" class="btn btn-success my-3" id="mrg_pick" data-i="%s" data-q="%s">
+<i class="fas fa-user-plus me-2" aria-hidden="true"></i>%s</button>|}
+    (Driver.Iper.to_string (Driver.get_iper p))
+    (escape_html (Driver.p_surname base p) :> string)
+    (Utf8.capitalize_fst (transl conf "person picker title"));
+  if list <> [] then (
+    Output.print_sstring conf
+      (Format.sprintf {|<form method="get" action="%s" class="my-3">|}
+         (conf.command :> string));
+    Util.hidden_env conf;
+    Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
+    Util.hidden_input conf "i"
+      (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode);
+    List.iteri
+      (fun k p ->
+        let ip =
+          (Driver.get_iper p |> Driver.Iper.to_string |> Mutil.encode :> string)
+        in
+        Output.printf conf
+          {|<div class="form-check ms-3"><input type="radio" class="form-check-input" name="select" id="%s" value="%s"%s><label class="form-check-label" for="%s">|}
+          ip ip
+          (if k = 0 then " checked" else "")
+          ip;
         print_person_info conf base p;
         Output.print_sstring conf {|</label></div>|})
       list;
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary btn-lg mt-3">|};
-  Output.print_sstring conf
-    (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_sstring conf "</button></form>\n";
+    Output.print_sstring conf
+      {|<button type="submit" class="btn btn-primary btn-lg mt-3">|};
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+    Output.print_sstring conf "</button></form>\n");
   Hutil.trailer conf
 
 let print_possible_continue_merging conf base =

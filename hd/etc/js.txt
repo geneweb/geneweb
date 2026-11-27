@@ -111,6 +111,19 @@ window.GW = { prefix: "%prefix;" };
 </script>
 <script src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"></script>
 %end;
+%if;(e.v="updRLM" or e.m="MRG")
+  %include;person_picker
+%end;
+%if;(e.m="MRG")
+<script>
+document.getElementById('mrg_pick')?.addEventListener('click', (e) => {
+  const b = e.currentTarget;
+  PersonPicker.open(b.dataset.q + '/', (p) => {
+    location.href = PersonPicker.url('m=MRG_IND&i=' + b.dataset.i + '&i2=' + p.i);
+  });
+});
+</script>
+%end;
 %if;(e.m="C" and e.t="")
 <script src="%etc_prefix;js/cousins.js?hash=%apply;hash%with;%etc_prefix;js/cousins.js%end;"></script>
 %end;

@@ -451,13 +451,9 @@ let print conf base =
     match p_getenv conf.env "i2" with
     | Some i2 -> Some (Driver.poi base (Driver.Iper.of_string i2))
     | None -> (
-        match (p_getenv conf.env "select", p_getenv conf.env "n") with
-        | (Some "input" | None), Some n -> (
-            let ipl = Gutil.person_ht_find_all base n in
-            match ipl with [ ip2 ] -> Some (Driver.poi base ip2) | _ -> None)
-        | Some x, (Some "" | None) ->
-            Some (Driver.poi base (Driver.Iper.of_string x))
-        | _ -> None)
+        match p_getenv conf.env "select" with
+        | Some x -> Some (Driver.poi base (Driver.Iper.of_string x))
+        | None -> None)
   in
   match (p1, p2) with
   | Some p1, Some p2 -> (
