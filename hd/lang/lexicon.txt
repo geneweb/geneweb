@@ -8380,11 +8380,11 @@ en: data quality
 fr: qualité des données
 
     data typographic checker
-co: verificadore tipograficu di i dati
-de: Typografischer Daten-Checker
-en: data typographic checker
-es: verificador tipográfico de los datos
-fr: vérificateur typographique des données
+co: verificadore di i dati
+de: Daten-Checker
+en: data checker
+es: verificador de los datos
+fr: vérificateur des données
 
     database
 af: stamboom
@@ -18503,6 +18503,78 @@ sk: osoba zmenená
 sl: oseba spremenjena
 sv: person ändrad
 tr: kişi değiştirildi
+
+    person picker help
+de: Eine Person durch Klicken auf den Hintergrund hinter ihrem Namen auswählen
+en: Select an individual by clicking the background behind their name
+es: Elegir una persona haciendo clic en el fondo detrás de su nombre
+fr: Choisir un individu en cliquant sur le fond derrière son nom
+it: Scegliere una persona cliccando sullo sfondo dietro il suo nome
+nl: Kies een persoon door op de achtergrond achter de naam te klikken
+pt: Escolher uma pessoa clicando no fundo atrás do seu nome
+
+    person picker modify
+de: in einem neuen Tab bearbeiten
+en: modify in a new tab
+es: modificar en una pestaña nueva
+fr: modifier dans un nouvel onglet
+it: modificare in una nuova scheda
+nl: in een nieuw tabblad wijzigen
+pt: modificar num novo separador
+
+    person picker pick
+de: diese Person auswählen
+en: select this individual
+es: elegir esta persona
+fr: choisir cet individu
+it: scegliere questa persona
+nl: deze persoon kiezen
+pt: escolher esta pessoa
+
+    person picker placeholder
+de: Nachname/Vornamen Jahr oder Wiki-Schlüssel
+en: surname/first names year or wiki key
+es: apellido/nombres año o clave wiki
+fr: patronyme/prénoms année ou clé wiki
+it: cognome/nomi anno o chiave wiki
+nl: familienaam/voornamen jaar of wikisleutel
+pt: apelido/nomes ano ou chave wiki
+
+    person picker see
+de: die Seite in einem neuen Tab öffnen
+en: open the page in a new tab
+es: abrir la ficha en una pestaña nueva
+fr: ouvrir la fiche dans un nouvel onglet
+it: aprire la pagina in una nuova scheda
+nl: de pagina in een nieuw tabblad openen
+pt: abrir a ficha num novo separador
+
+    person picker text
+de: Text des Wiki-Links (optional)
+en: wiki link text (optional)
+es: texto del enlace wiki (opcional)
+fr: texte du lien wiki (facultatif)
+it: testo del link wiki (facoltativo)
+nl: tekst van de wikilink (optioneel)
+pt: texto da ligação wiki (opcional)
+
+    person picker title
+de: eine Person auswählen
+en: select an individual
+es: elegir una persona
+fr: choisir un individu
+it: scegliere una persona
+nl: een persoon kiezen
+pt: escolher uma pessoa
+
+    person picker truncated
+de: nur die ersten Ergebnisse werden angezeigt: verfeinern Sie die Suche
+en: only the first results are shown: refine the search
+es: solo se muestran los primeros resultados: precise la búsqueda
+fr: seuls les premiers résultats sont affichés : précisez la recherche
+it: sono mostrati solo i primi risultati: affinare la ricerca
+nl: alleen de eerste resultaten worden getoond: verfijn de zoekopdracht
+pt: só são mostrados os primeiros resultados: refine a pesquisa
 
     person source
 co: fonte di l’individuu

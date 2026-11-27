@@ -2,52 +2,31 @@
 
 'use strict';
 
-const RLM = document.getElementById('RLM');
+const RLM = document.getElementById('saveButton');
 if (RLM) {
   const { i, p, n, oc, self, eb: eBase, accessbykey: ak } = RLM.dataset;
-  const descInput = document.getElementById('description');
-  const saveBtn = document.getElementById('saveButton');
-  const clearBtn = document.getElementById('clearGraphButton');
-  const graphBtns = document.getElementById('graphButtons');
-  const genBtn = document.getElementById('generateGraphButton');
   const editBtn = document.getElementById('editGraphButton');
+  const count = document.getElementById('graphCount');
   const cgibase = eBase ? '&b=' + eBase : '';
 
-  // Prevent dropdown close on interactive elements
-  [saveBtn, clearBtn].forEach(el => {
-    if (el) el.addEventListener('click', e => e.stopPropagation());
-  });
-
-  saveBtn.addEventListener('click', () => {
-    const t = descInput.value;
+  // the dropdown stays open to show the count
+  RLM.addEventListener('click', e => {
+    e.stopPropagation();
     const storedInds = JSON.parse(localStorage.getItem('inds')) || [];
-    const last = storedInds.at(-1);
-    if (last?.i === i) {
-      if (t) last.t = t;
-    } else {
-      storedInds.push({ i, p, n, oc, t, self });
+    if (storedInds.at(-1)?.i !== i) {
+      storedInds.push({ i, p, n, oc, self });
+      localStorage.setItem('inds', JSON.stringify(storedInds));
     }
-    localStorage.setItem('inds', JSON.stringify(storedInds));
-    descInput.value = '';
-    updateUI();
-  });
-
-  clearBtn.addEventListener('click', () => {
-    localStorage.removeItem('inds');
     updateUI();
   });
 
   function updateUI() {
     const storedInds = JSON.parse(localStorage.getItem('inds')) || [];
     const { url, tooltip } = buildUrlAndTooltip(storedInds);
-    const urlRLM = `?m=RLM${cgibase}${url}`;
-    const urlEditRLM = `?m=TP&v=updRLM${cgibase}${url}`;
-    genBtn.href = urlRLM;
-    genBtn.title = tooltip;
-    editBtn.href = urlEditRLM;
-    const hasData = storedInds.length >= 1;
-    clearBtn.classList.toggle('d-none', !hasData);
-    graphBtns.classList.toggle('d-none', !hasData);
+    editBtn.href = `?m=TP&v=updRLM${cgibase}${url}`;
+    editBtn.title = tooltip;
+    count.textContent = storedInds.length;
+    count.classList.toggle('d-none', !storedInds.length);
   }
 
   function indLabel(ind) {
@@ -69,9 +48,9 @@ if (RLM) {
   }
 
   function buildUrlParams(ind, num) {
-    const useKey = ak === '1' && ind.self !== '? ? ';
+    const useKey = (ak === '1' || !ind.i) && ind.self !== '? ? ';
     const ident = useKey
-      ? `p${num}=${ind.p}&n${num}=${ind.n}${ind.oc ? `&oc${num}=${ind.oc}` : ''}`
+      ? `p${num}=${encodeURIComponent(ind.p)}&n${num}=${encodeURIComponent(ind.n)}${ind.oc ? `&oc${num}=${ind.oc}` : ''}`
       : `i${num}=${ind.i}`;
     const text = ind.t ? `&t${num}=${encodeURIComponent(ind.t)}` : '';
     return `&${ident}${text}`;

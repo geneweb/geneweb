@@ -11,11 +11,15 @@
         };
     }
 
-    function endpoint(qs) {
-        const base = (window.GW && GW.prefix || '').replace(/\?$/, '?');
+    function url(qs) {
+        const base = window.GW && GW.prefix || '';
         const sep = base.endsWith('?') || base.endsWith('&') ? '' :
                     base.indexOf('?') >= 0 ? '&' : '?';
-        return fetch(base + sep + 'm=PNOC_LOOKUP&' + qs)
+        return base + sep + qs;
+    }
+
+    function endpoint(qs) {
+        return fetch(url('m=PNOC_LOOKUP&' + qs))
             .then(r => r.ok && (r.headers.get('content-type') || '').indexOf('json') >= 0
                 ? r.json() : [])
             .catch(() => []);
@@ -23,7 +27,8 @@
 
     function lookup(q, limit) {
         return endpoint('q=' + encodeURIComponent(q) +
-            '&n=' + (limit || 20));
+            '&n=' + (limit || 20))
+            .then(r => Array.isArray(r) ? { persons: [], truncated: false } : r);
     }
 
     function checkExact(fn, sn, oc) {
@@ -33,42 +38,110 @@
             .then(arr => arr.length > 0 ? arr[0] : null);
     }
 
+    // [[fn/sn]], [[fn/sn/oc]] or [[fn/sn/oc/text]], as in the menubar
+    function wikiKey(p, text) {
+        return '[[' + p.fn + '/' + p.sn +
+            (text ? '/' + p.oc + '/' + text : p.oc ? '/' + p.oc : '') + ']]';
+    }
+
+    // Search dialog of person_picker.txt
+    let dialog = null;
+    let onPicked = null;
+    let picked = null;
+    let seq = 0;
+
+    function ind(p) {
+        const node = document.getElementById('pp-ind')
+            .content.firstElementChild.cloneNode(true);
+        const pick = node.querySelector('.pp-pick');
+        pick.ariaLabel = pick.title + ', ' + p.name;
+        // a relative without key fields cannot be picked, nor any person
+        // when browsing (no callback)
+        if (p.fn === undefined || !onPicked) pick.remove();
+        else pick.addEventListener('click', () => {
+            picked = p;
+            bootstrap.Modal.getOrCreateInstance(dialog).hide();
+        });
+        const name = node.querySelector('.pp-name');
+        name.textContent = p.name;
+        name.href = url(p.acc);
+        const dates = node.querySelector('.pp-dates');
+        if (!p.dates) dates.remove();
+        else {
+            dates.textContent = p.dates;
+            if (dates.tagName === 'A') dates.href = url('m=MOD_IND&i=' + p.i);
+        }
+        return node;
+    }
+
+    function render(res, short) {
+        const row = document.getElementById('pp-row').content.firstElementChild;
+        dialog.querySelector('tbody').replaceChildren(...res.persons.map(p => {
+            const tr = row.cloneNode(true);
+            tr.querySelector('.pp-self').append(ind(p));
+            if (p.father) tr.querySelector('.pp-father').append(ind(p.father));
+            if (p.mother) tr.querySelector('.pp-mother').append(ind(p.mother));
+            tr.querySelector('.pp-spouses').append(...p.spouses.map(ind));
+            return tr;
+        }));
+        dialog.querySelector('.pp-results').classList.toggle('d-none', short);
+        dialog.querySelector('.pp-none').classList.toggle('d-none',
+            short || res.persons.length > 0);
+        dialog.querySelector('.pp-truncated').classList.toggle('d-none',
+            !res.truncated);
+        dialog.querySelector('.pp-help').classList.toggle('d-none',
+            res.persons.length === 0 || !onPicked);
+    }
+
+    function search() {
+        const q = dialog.querySelector('.pp-query').value.trim();
+        const n = ++seq;
+        // a link key is searched once complete
+        if (q.length < 2 || q.startsWith('[[') && !q.endsWith(']]')) {
+            render({ persons: [], truncated: false }, true);
+            return;
+        }
+        lookup(q, 200).then(res => { if (n === seq) render(res, false); });
+    }
+
+    // text: initial link text, shown in a second input when given
+    function open(query, onPick, text) {
+        if (!dialog) {
+            dialog = document.getElementById('pp-modal');
+            if (!dialog) return;
+            const input = dialog.querySelector('.pp-query');
+            input.addEventListener('input', debounce(search, 250));
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    search();
+                }
+            });
+            dialog.addEventListener('shown.bs.modal', () => input.select());
+            // after the focus trap of the dialog is released
+            dialog.addEventListener('hidden.bs.modal', () => {
+                if (picked && onPicked)
+                    onPicked(picked, dialog.querySelector('.pp-text').value.trim());
+                picked = null;
+            });
+        }
+        onPicked = onPick;
+        picked = null;
+        if (query !== undefined) dialog.querySelector('.pp-query').value = query;
+        const textInput = dialog.querySelector('.pp-text');
+        textInput.parentElement.classList.toggle('d-none', text === undefined);
+        textInput.value = text || '';
+        search();
+        bootstrap.Modal.getOrCreateInstance(dialog).show();
+    }
+
     function flashValid(el) {
         el.classList.add('row-valid-flash');
         setTimeout(() => el.classList.remove('row-valid-flash'), 900);
     }
 
-    function create(el, opts) {
-        if (!el || typeof TomSelect === 'undefined') return null;
-        opts = opts || {};
-        return new TomSelect(el, {
-            valueField: 'key',
-            labelField: 'label',
-            searchField: ['label'],
-            create: opts.create !== false,
-            maxItems: opts.maxItems || 1,
-            preload: false,
-            load: debounce((q, cb) => {
-                if (!q || q.length < 2) { cb([]); return; }
-                lookup(q, opts.limit)
-                    .then(arr => arr.map(p => Object.assign({}, p, {
-                        key: p.fn + '/' + p.sn + '/' + (p.oc || 0)
-                    })))
-                    .then(cb).catch(() => cb([]));
-            }, 200),
-            render: {
-                option: (data, escape) =>
-                    '<div>' + escape(data.label) + '</div>',
-                no_results: () =>
-                    '<div class="no-results">' +
-                    ((window.GW && GW.i18n && GW.i18n.noResult)
-                        || 'No results found') + '</div>'
-            }
-        });
-    }
-
     function bindGroup(opts) {
-        const { fn, sn, oc, gate, link } = opts;
+        const { fn, sn, oc, gate, link, pick } = opts;
         if (!fn || !sn || !oc) return;
         if (gate && gate.dataset.pnocBound) return;
         if (gate) gate.dataset.pnocBound = '1';
@@ -118,6 +191,25 @@
         inputs.forEach(el =>
             el.addEventListener('focusout', () => run(true)));
         if (gate) gate.addEventListener('change', e => run(e.isTrusted));
+        // the surname and first names typed as query, else the last one
+        if (pick) pick.addEventListener('click', () => {
+            const s = sn.value.trim();
+            open(s ? s + '/' + fn.value.trim() : undefined, p => {
+                fn.value = p.fn;
+                sn.value = p.sn;
+                oc.value = p.oc;
+                inputs.forEach(el => el.dispatchEvent(new Event('change')));
+                if (gate) {
+                    gate.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + p.oc;
+                    if (gate.value !== 'link') {
+                        gate.value = 'link';
+                        gate.dispatchEvent(new Event('change'));
+                    }
+                }
+                if (link) link.href = url('m=MOD_IND&i=' + p.i);
+                paint('flash');
+            });
+        });
         run(false);
     }
 
@@ -130,7 +222,8 @@
                 oc: document.getElementById(pre + '_occ'),
                 gate,
                 link: document.querySelector(
-                    '#' + pre + '_p_selct_mod a')
+                    '#' + pre + '_p_selct_mod a'),
+                pick: document.getElementById(pre + '_p_selct_pick')
             });
         });
     }
@@ -164,44 +257,13 @@
         return { fn, sn, oc: 0 };
     }
 
-    function bindInput(el, options) {
-        if (!el || el.dataset.pnocBound) return;
-        el.dataset.pnocBound = '1';
-        options = options || {};
-        const parse = options.parse || parseGeneWebKey;
-
-        function run(flash) {
-            const k = parse(el.value);
-            if (!k || !k.fn || !k.sn) {
-                el.classList.remove('row-invalid');
-                delete el.dataset.pnocChecked;
-                return Promise.resolve();
-            }
-            const sig = k.fn + '|' + k.sn + '|' + (k.oc || 0);
-            if (el.dataset.pnocChecked === sig) return Promise.resolve();
-            return checkExact(k.fn, k.sn, k.oc || 0).then(p => {
-                const ok = !!p;
-                el.dataset.pnocChecked = sig;
-                el.classList.toggle('row-invalid', !ok);
-                if (ok && flash) flashValid(el);
-            });
-        }
-
-        el.addEventListener('focusout', () => run(true));
-        if (el.value) run(false);
-    }
-
     window.PersonPicker = {
-        create, lookup, checkExact, bindInput, parseGeneWebKey, bindGroup
+        open, url, lookup, checkExact, wikiKey, parseGeneWebKey, bindGroup
     };
 
-    function autoBind() {
-        document.querySelectorAll('.pnoc-input').forEach(bindInput);
-        autoBindGroups();
-    }
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', autoBind);
+        document.addEventListener('DOMContentLoaded', autoBindGroups);
     } else {
-        autoBind();
+        autoBindGroups();
     }
 })();

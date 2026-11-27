@@ -14,8 +14,7 @@
 <body%body_prop;>
 <main class="container" id="welcome">
 %include;hed
-%define;book_of(xx)[book of %s:::xx]%end;
-%define;book_of_cap(xx)[*book of %s:::xx]%end;
+%define;book_of(xx)[*book of %s:::xx]%end;
 %define;connect_with(xx)[*connect with %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
@@ -45,11 +44,17 @@
   %else;[*base notes]
   %end;
 %end;
-%define;book_button(xxx,yyy,zzz)
-  <a class="btn btn-outline-success" data-bs-toggle="tooltip"
-    href="%prefix;m=MOD_DATA&data=xxx" title="%if;wizard;[*modify] %apply;book_of%with;[yyy]1%end;%sp;
-      ([wizard/wizards/friend/friends/exterior]0)%else;%apply;book_of_cap%with;[yyy]1%end;%end;"><i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1
-  </a>
+%( Button of the dictionary xxx when dd="1" (access to m=MOD_DATA), else its
+   label only, first of a group of buttons of lists. %)
+%define;book_button(xxx,yyy,zzz,dd)
+  %if;("dd"="1")
+    <a class="btn btn-outline-primary" data-bs-toggle="tooltip"
+      href="%prefix;m=MOD_DATA&data=xxx" title="%apply;book_of%with;[yyy]1%end;">%nn;
+      <i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1</a>
+  %else;
+    <span class="btn btn-outline-primary pe-none">%nn;
+      <i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1</span>
+  %end;
 %end;
 %if;(e.i!="" or e.p!="" or e.n!="" or e.pn!="")
   <div class="d-flex justify-content-center">
@@ -209,20 +214,33 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     <i class="fa fa-triangle-exclamation fa-fw" aria-hidden="true"></i>
   </div>
 %elseif;(nb_persons.v!=0)
-  <div id="welcome-search" class="d-flex flex-wrap justify-content-center mt-3 mt-lg-1">
-    <div class="col col-md-10 col-xl-9">
-      <form id="main-search" class="mt-2 mt-xl-4" method="get" action="%prefix;">
-        %hidden_no_senv;
-        <input type="hidden" name="m" value="S" class="has_validation">
-        <div class="d-flex justify-content-center">
-          <div class="d-flex flex-column justify-content-center w-100">
-            <div class="d-flex flex-column flex-md-row">
-              <div class="w-100 w-md-auto flex-md-grow-1">
-                <div class="d-flex flex-grow-1">
-                  <div class="d-flex align-items-center ms-1 me-2">
-                     <button type="button" class="btn btn-link p-0 border-0" aria-label="[*search format]"
-                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bs-trigger="hover focus"
-                       title="<div class='text-start fw-bold'><div class='h5'>[*search format][:]</div>
+  <div id="welcome-search" class="col-12 col-md-10 col-xl-8 mx-auto m-3 px-2">
+    <form id="main-search" method="get" action="%prefix;">
+      %hidden_no_senv;
+      <input type="hidden" name="m" value="S" class="has_validation">
+      <label for="fullname" class="visually-hidden">[*search/case sensitive]0 [person/persons]0</label>
+      <input type="search" id="fullname" class="form-control form-control-lg" autofocus
+        name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
+        %if;(e.pn!="") value="%e.pn;"%end;>
+      <div class="row g-2 mt-1">
+        <div class="col-sm-6">
+          <label for="firstname" class="visually-hidden">[*first name/first names]2</label>
+          <input type="search" id="firstname" class="form-control form-control-lg"
+            name="p" placeholder="[*first name/first names]2"
+            %if;(e.p!="") value="%e.p;"%end;%if;(b.datalist_fnames=1 or b.rpc_datalist=1) list="datalist_fnames"%end; data-book="fn">
+        </div>
+        <div class="col-sm-6">
+          <label for="surname" class="visually-hidden">[*surname/surnames]0</label>
+          <input type="search" id="surname" class="form-control form-control-lg"
+            title="[*word/words]1" data-bs-toggle="tooltip"
+            name="n" placeholder="[*surname/surnames]0"
+            %if;(e.n!="") value="%e.n;"%end;%if;(b.datalist_snames=1 or b.rpc_datalist=1) list="datalist_snames"%end; data-book="sn">
+        </div>
+      </div>
+      <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-2 mt-2">
+        <button type="button" class="btn btn-link p-0 border-0 ms-4" aria-label="[*search format]"
+          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" data-bs-trigger="hover focus"
+          title="<div class='text-start fw-bold'><div class='h5'>[*search format][:]</div>
                               1. [*person/persons]0[:]<br>
                                  a. [first name/first names]2 [surname/surnames]0 ¹<br>
                                      <i class='fw-lighter'>John Doe</i><br><br>
@@ -235,139 +253,75 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                               5. [*key]0[:] [first name/first names]2.[occ]1 [surname/surnames]0 ²<br>
                                      <i class='fw-lighter'>James William.2 Smith-Johnson<br>       james william.2 smith johnson</i><br>
                               <br><div class='fw-lighter small'>¹ [word/words]0<br>² [word/words]1<br>³ [optional/mandatory]0</div></div>">
-                      <i class="far fa-circle-question text-primary" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                  <label for="fullname" class="visually-hidden">[*search/case sensitive]0 [person/persons]0</label>
-                  <input type="search" id="fullname" class="form-control form-control-lg py-0 border border-top-0" autofocus
-                    name="pn" placeholder="[*search/case sensitive]0 [person/persons]0, [surname/surnames]0, [public name], [alias], [key]0%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
-                    %if;(e.pn!="") value="%e.pn;"%end;>
-                </div>
-                <div class="d-flex mt-3">
-                  <div class="btn-group-vertical me-2">
-                    <a href="%prefix;m=P&tri=A" data-bs-toggle="tooltip"
-                      title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
-                      <i class="fa fa-arrow-down-a-z fa-fw" aria-hidden="true"></i></a>
-                    <a href="%prefix;m=P&tri=F" data-bs-toggle="tooltip"
-                      title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
-                      <i class="fa fa-arrow-down-wide-short fa-fw" aria-hidden="true"></i></a>
-                  </div>
-                  <div class="d-flex flex-grow-1">
-                    <div class="flex-grow-1 align-self-center">
-                      <label for="firstname" class="visually-hidden form-label">[*first name/first names]2</label>
-                      <input type="search" id="firstname" class="form-control form-control-lg border-top-0"
-                        name="p" placeholder="[*first name/first names]2"
-                        %if;(e.p!="") value="%e.p;"%end;%if;(b.datalist_fnames=1 or b.rpc_datalist=1) list="datalist_fnames"%end; data-book="fn">
-                    </div>
-                  </div>
-                </div>
-                <div class="d-flex mt-2">
-                  <div class="btn-group-vertical me-2">
-                    <a href="%prefix;m=N&tri=A" data-bs-toggle="tooltip"
-                      title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
-                      <i class="fa fa-arrow-down-a-z fa-fw" aria-hidden="true"></i></a>
-                    <a href="%prefix;m=N&tri=F" data-bs-toggle="tooltip"
-                      title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
-                      <i class="fa fa-arrow-down-wide-short fa-fw" aria-hidden="true"></i></a>
-                  </div>
-                  <div class="d-flex flex-grow-1">
-                    <div class="flex-grow-1 align-self-center">
-                      <label for="surname" class="visually-hidden form-label">[*surname/surnames]0</label>
-                      <input type="search" id="surname" class="form-control form-control-lg border border-top-0"
-                        title="[*word/words]1" data-bs-toggle="tooltip"
-                        name="n" placeholder="[*surname/surnames]0"
-                        %if;(e.n!="") value="%e.n;"%end;%if;(b.datalist_snames=1 or b.rpc_datalist=1) list="datalist_snames"%end; data-book="sn">
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex flex-column align-items-center justify-content-between mt-3 mt-md-0 mx-0 mx-md-1 px-0 px-md-3 col-md-auto">
-                <div class="d-flex flex-row flex-md-column justify-content-start mb-3 mb-md-0">
-                  <div class="align-self-md-start fw-bold me-3 me-md-0 mb-0 mb-md-1">[*first name/first names]1[:]</div>
-                  <div class="d-flex flex-row flex-md-column">
-                    <div class="form-check me-3 me-md-0 mb-md-1" data-bs-toggle="tooltip" data-bs-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*order hlp]">
-                      <input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
-                      <label class="form-check-label d-flex align-items-center" for="p_order">[*order]</label>
-                    </div>
-                    <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="%if;(b.propose_titles="no")top%else;left%end;" title="[*not exact]1, [phonetic variants] [not exact hlp]">
-                      <input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="off">
-                      <label class="form-check-label d-flex align-items-center" for="p_exact">[*not exact]0</label>
-                    </div>
-                  </div>
-                </div>
-                <button id="global-search-inline" type="submit" class="%if;(b.propose_titles!="no")d-none %end;btn btn-outline-primary fw-bolder w-100 w-md-auto py-2 mb-1">
-                  <i class="fa fa-magnifying-glass fa-lg fa-fw" aria-hidden="true"></i>
-                  [*search/case sensitive]0
-                </button>
-              </div>
-            </div>
-            %( BS5: commented-out checkboxes kept in sync for future restoration
-            <div class="d-flex align-items-center mx-2">
-              <div class="d-flex flex-column justify-content-around h-100">
-                <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*all-hlp]">
-                  <input class="form-check-input" type="checkbox" name="n_all" id="n_all" value="on" checked>
-                  <label class="form-check-label d-flex align-items-center" for="n_all">[*all]</label>
-                </div>
-                <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*order-hlp]">
-                  <input class="form-check-input" type="checkbox" name="n_order" id="n_order" value="on">
-                  <label class="form-check-label small d-flex align-items-center" for="n_order">[*order]</label>
-                </div>
-                <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*exact-hlp]">
-                  <input class="form-check-input" type="checkbox" name="n_exact" id="n_exact" value="on" checked>
-                  <label class="form-check-label small d-flex align-items-center" for="n_exact">[*exact]</label>
-                </div>
-              </div>
-            </div>%)
-          </div>
+          <i class="far fa-circle-question" aria-hidden="true"></i>
+        </button>
+        <span>[*first name/first names]1</span>
+        <div class="form-check form-check-inline m-0" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*order hlp]">
+          <input class="form-check-input" type="checkbox" name="p_order" id="p_order" value="on">
+          <label class="form-check-label" for="p_order">[order]</label>
         </div>
-      </form>
-      %if;(b.propose_titles!="no")
-        <div class="d-flex flex-wrap flex-md-nowrap justify-content-center align-items-md-center mt-1 mt-md-3">
-          <form id="title-search" class="d-flex flex-column flex-md-row align-items-start align-items-md-center col-12 col-md-9 ms-md-4" method="get" action="%action;">
-            %hidden_no_senv;
-            <input type="hidden" name="m" value="TT">
-            <div class="d-flex align-items-center w-100 mb-2 mb-md-0">
-              <a class="me-2" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                href="%prefix;m=TT" title="[*all the titles]"><i class="fa fa-list-ul fa-fw" aria-hidden="true"></i></a>
-              <label for="titles" class="visually-hidden form-label">[*title/titles]0</label>
-              <input type="search" class="form-control border-top-0 border-end-0 border-start-0 w-100"
-                name="t" id="titles" placeholder="[*title/titles]0"
-                %if;(b.datalist_titles=1 or b.rpc_datalist=1) list="datalist_titles"%end; data-book="title">
-            </div>
-            <div class="d-flex align-items-center w-100 mb-2 mb-md-0 ms-0 ms-md-2">
-              <a class="me-2" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                href="%prefix;m=TT&p=*" title="[*all the estates]"><i class="fa fa-list-ul fa-fw" aria-hidden="true"></i></a>
-              <label for="estates" class="visually-hidden form-label">[*estate]0</label>
-              <input type="search" class="form-control border-top-0 border-end-0 border-start-0 w-100"
-                name="p" id="estates" placeholder="[*estate]0"
-                %if;(b.datalist_estates=1 or b.rpc_datalist=1) list="datalist_estates"%end; data-book="domain">
-            </div>
-            <button class="d-none" type="submit"></button>
-          </form>
-          <button id="global-search" class="btn btn-outline-primary fw-bolder col-12 col-md-auto mt-1 mt-md-0 ms-md-auto me-md-2 py-2"
-            type="button" data-bs-toggle="tooltip" data-bs-placement="right" title="[*search/case sensitive]0">
-            <i class="fa fa-magnifying-glass fa-lg fa-fw" aria-hidden="true"></i>
-            [*search/case sensitive]0
+        <div class="form-check form-check-inline m-0" data-bs-toggle="tooltip" data-bs-placement="bottom"
+          title="[*not exact]1, [phonetic variants] [not exact hlp]">
+          <input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="off">
+          <label class="form-check-label" for="p_exact">[not exact]0</label>
+        </div>
+        <div class="d-flex flex-wrap gap-4 ms-auto me-4">
+          <button type="button" class="btn btn-outline-primary" onclick="PersonPicker.open(undefined, null)">
+            <i class="fa fa-user-plus me-2" aria-hidden="true"></i>[*person picker title]
+          </button>
+          <button type="submit" id="global-search" class="btn btn-primary"%if;(b.propose_titles!="no")
+            data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*search/case sensitive]0"%end;>
+            <i class="fa fa-magnifying-glass me-2" aria-hidden="true"></i>[*search/case sensitive]0
           </button>
         </div>
-      %end;
-    </div>
+      </div>
+      %( BS5: commented-out checkboxes kept in sync for future restoration
+      <div class="d-flex align-items-center mx-2">
+        <div class="d-flex flex-column justify-content-around h-100">
+          <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*all-hlp]">
+            <input class="form-check-input" type="checkbox" name="n_all" id="n_all" value="on" checked>
+            <label class="form-check-label d-flex align-items-center" for="n_all">[*all]</label>
+          </div>
+          <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*order-hlp]">
+            <input class="form-check-input" type="checkbox" name="n_order" id="n_order" value="on">
+            <label class="form-check-label small d-flex align-items-center" for="n_order">[*order]</label>
+          </div>
+          <div class="form-check" data-bs-toggle="tooltip" data-bs-placement="bottom" title="[*exact-hlp]">
+            <input class="form-check-input" type="checkbox" name="n_exact" id="n_exact" value="on" checked>
+            <label class="form-check-label small d-flex align-items-center" for="n_exact">[*exact]</label>
+          </div>
+        </div>
+      </div>%)
+    </form>
+    %if;(b.propose_titles!="no")
+      <form id="title-search" class="row g-2 mt-3 justify-content-center" method="get" action="%action;">
+        %hidden_no_senv;
+        <input type="hidden" name="m" value="TT">
+        <div class="col-sm-5">
+          <label for="titles" class="visually-hidden">[*title/titles]0</label>
+          <input type="search" class="form-control" name="t" id="titles" placeholder="[*title/titles]0"
+            %if;(b.datalist_titles=1 or b.rpc_datalist=1) list="datalist_titles"%end; data-book="title">
+        </div>
+        <div class="col-sm-5">
+          <label for="estates" class="visually-hidden">[*estate]0</label>
+          <input type="search" class="form-control" name="p" id="estates" placeholder="[*estate]0"
+            %if;(b.datalist_estates=1 or b.rpc_datalist=1) list="datalist_estates"%end; data-book="domain">
+        </div>
+        <button class="d-none" type="submit"></button>
+      </form>
+    %end;
   </div>
 %end;
-<div class="d-flex flex-column justify-content-start justify-content-md-center mt-4 col-12 col-md-11 col-lg-10 mx-auto">
-  <h2 class="h4 text-md-center"><i class="fas fa-screwdriver-wrench fa-sm fa-fw text-secondary" aria-hidden="true"></i>
+%( Sections of buttons, wider than the search block, their title centered
+   between two rules; the wizard buttons on their own lines. %)
+<section class="col-10 col-md-9 col-xl-8 mx-auto px-2 mt-4" aria-labelledby="welcome-tools">
+  <h2 class="h5 section-title mb-2" id="welcome-tools">%nn;
     %if;roglo;[
 en: Around the tree
 fr: Autour de l’arbre
-]
-    %else;[*tools]%end;
-  </h2>
-  <div class="d-flex flex-wrap justify-content-md-center">
-    %if;(wizard and not base.has_notes)
-      <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES">
-        <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add base notes]
-      </a>
-    %end;
+]%nn;
+    %else;[*tools]%end;</h2>
+  <div class="d-flex flex-wrap justify-content-center">
     %if;base.has_notes;
       <a class="btn btn-outline-primary" href="%prefix;m=NOTES">%nn;
         <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>%apply;notes_title(lang)
@@ -386,7 +340,15 @@ fr: Autour de l’arbre
        <a class="btn btn-outline-primary" href="%prefix;m=WIZNOTES">%nn;
          <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*base wizard notes]</a>
     %end;
+    %if;(b.hide_advanced_request="no")
+      <a class="btn btn-outline-primary" href="%prefix;m=AS">%nn;
+        <i class="fa fa-magnifying-glass-plus fa-fw me-1" aria-hidden="true"></i>[*advanced request]0</a>
+    %end;
     %if;(nb_persons.v!=0)
+      %if;(has_history and b.history="yes")
+        <a class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">%nn;
+          <i class="fas fa-clock-rotate-left fa-fw me-1" aria-hidden="true"></i>[*history]</a>
+      %end;
       <a class="btn btn-outline-primary" href="%prefix;m=ISOLATED">%nn;
         <i class="fa fa-user fa-fw me-1" aria-hidden="true"></i>%nn;
         [*isolated persons/totally isolated/linked by relation/witness to an event]0</a>
@@ -394,10 +356,6 @@ fr: Autour de l’arbre
         <i class="far fa-chart-bar fa-fw me-1" aria-hidden="true"></i>[*statistics]</a>
       <a class="btn btn-outline-primary" href="%prefix;m=ANM">%nn;
         <i class="fa fa-cake-candles fa-fw me-1" aria-hidden="true"></i>[*anniversaries]</a>
-      %if;(has_history and b.history="yes")
-        <a class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">%nn;
-          <i class="fas fa-clock-rotate-left fa-fw me-1" aria-hidden="true"></i>[*history]</a>
-      %end;
     %end;
     %if;((plugin.forum or roglo) and b.disable_forum!="yes")
       <a class="btn btn-outline-primary"
@@ -408,38 +366,39 @@ fr: Autour de l’arbre
       <a class="btn btn-outline-primary" href="%prefix;m=PS&bi=on&ba=on&ma=on&de=on&bu=on">%nn;
         <i class="fas fa-globe fa-fw me-1" aria-hidden="true"></i>[*place/places]1/[surname/surnames]0</a>
     %end;
-    %if;(b.hide_advanced_request="no")
-      <a class="btn btn-outline-primary" href="%prefix;m=AS">%nn;
-        <i class="fa fa-magnifying-glass-plus fa-fw me-1" aria-hidden="true"></i>[*advanced request]0</a>
-    %end;
     <a class="btn btn-outline-primary" href="%prefix;m=CAL">%nn;
       <i class="far fa-calendar-days fa-fw me-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
+    %if;(wizard or (roglo and user.ident!="" and user.ident in b.superwizard))
+      <div class="w-100"></div>
+    %end;
     %if;((roglo and user.ident!="" and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))
       or (not roglo and wizard))
       <a class="btn btn-outline-success" href="%prefix;m=H&v=conf">%nn;
         <i class="fas fa-gear fa-fw me-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
     %if;wizard;
+      %if;(not base.has_notes)
+        <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES">%nn;
+          <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add base notes]</a>
+      %end;
       <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&new">%nn;
         <i class="fa fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add::note/notes]0</a>
       %if;(b.propose_add_family!="no")
       <a class="btn btn-outline-success" href="%prefix;m=ADD_FAM">%nn;
         <i class="fas fa-user-plus fa-fw me-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
-      %if;has_anomalies;
-        <a class="btn btn-outline-success" href="%prefix;m=ANOMA">%nn;
-          <i class="fas fa-triangle-exclamation fa-fw me-1" aria-hidden="true"></i>[*anomalies]</a>
+      %if;(b.can_send_image!="no")
+        <a href="%prefix;m=MEDIA" class="btn btn-outline-success">%nn;
+          <i class="fas fa-images fa-fw me-1" aria-hidden="true"></i>[*add::image/images]1</a>
       %end;
     %end;
   </div>
-</div>
+</section>
 %if;roglo;
-  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-10 mx-auto">
-    <h2 class="h4 text-md-center">
-      <img src="%images_prefix;logo-roglo.png" alt="" width="30">
-      Association Roglo
-    </h2>
-    <div class="d-flex flex-wrap justify-content-md-center">
+  <section class="col-12 col-md-11 col-xl-10 mx-auto px-2 mt-4" aria-labelledby="welcome-roglo">
+    <h2 class="h5 section-title mb-2" id="welcome-roglo">%nn;
+      <span><img src="%images_prefix;logo-roglo.png" alt="" width="24" class="me-2">Association Roglo</span></h2>
+    <div class="d-flex flex-wrap justify-content-center">
       %if;((wizard or friend) and b.alt_serv_base!="" and not cgi)
         <a class="btn btn-outline-primary"%sp;
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
@@ -478,43 +437,74 @@ fr: Mon compte associatif
         <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=GeneWeb:Trucs">Trucs et astuces</a>
       %end;
     </div>
-  </div>
+  </section>
 %end;
 
-%if;(nb_persons.v!=0 and (friend or ((not roglo) and wizard) or (roglo and user.ident!=""
-    and (user.ident in b.superwizard or b.superwizard="all"))))
-  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
-    <h2 class="h4 text-md-center">
-      <i class="fas fa-book fa-sm fa-fw text-success me-1" aria-hidden="true"></i>[*book/books]1%nn;
-    </h2>
-    <div class="d-flex flex-wrap justify-content-md-center">
-      %apply;book_button("fn","first name/first names","child")
-      %apply;book_button("sn","surname/surnames","user")
-      %apply;book_button("fna","first name alias","child")
-      %apply;book_button("sna","surname alias","user")
-      %apply;book_button("pubn","public name/public names","signature")
-      %apply;book_button("qual","qualifier/qualifiers","comment")
-      %apply;book_button("alias","alias/aliases","mask")
-      %apply;book_button("occu","occupation/occupations","briefcase")
-      %apply;book_button("place","place/places","location-dot")
-      %apply;book_button("src","source/sources","box-archive")
-      %apply;book_button("title","title/titles","crown")
-      %apply;book_button("domain","domain/domains","chess-rook")
+%( Dictionaries (friends and wizards) and lists of first names, surnames,
+   titles and estates (everyone), these grouped with their dictionary. %)
+%if;(nb_persons.v!=0 and (b.visitor_access!="no" or wizard or friend))
+  %let;dico;%if;(friend or ((not roglo) and wizard) or (roglo and user.ident!=""
+    and (user.ident in b.superwizard or b.superwizard="all")))1%end;%in;
+  <section class="col-12 col-md-11 col-xl-10 mx-auto px-2 mt-4" aria-labelledby="welcome-books">
+    <h2 class="h5 section-title mb-2" id="welcome-books">[*book/books]1</h2>
+    <div class="d-flex flex-wrap justify-content-center gap-1 mx-2">
+      <div class="btn-group" role="group" aria-label="[*first name/first names]1">
+        %apply;book_button("fn","first name/first names","child",dico)
+        <a class="btn btn-outline-primary" href="%prefix;m=P&tri=A" data-bs-toggle="tooltip"
+          title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
+          <i class="fa fa-arrow-down-a-z fa-fw" aria-hidden="true"></i></a>
+        <a class="btn btn-outline-primary" href="%prefix;m=P&tri=F" data-bs-toggle="tooltip"
+          title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
+          <i class="fa fa-arrow-down-wide-short fa-fw" aria-hidden="true"></i></a>
+      </div>
+      <div class="btn-group" role="group" aria-label="[*surname/surnames]1">
+        %apply;book_button("sn","surname/surnames","user",dico)
+        <a class="btn btn-outline-primary" href="%prefix;m=N&tri=A" data-bs-toggle="tooltip"
+          title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2">%nn;
+          <i class="fa fa-arrow-down-a-z fa-fw" aria-hidden="true"></i></a>
+        <a class="btn btn-outline-primary" href="%prefix;m=N&tri=F" data-bs-toggle="tooltip"
+          title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">%nn;
+          <i class="fa fa-arrow-down-wide-short fa-fw" aria-hidden="true"></i></a>
+      </div>
+      %if;(dico=1)
+        %apply;book_button("fna","first name alias","child",dico)
+        %apply;book_button("sna","surname alias","user",dico)
+        %apply;book_button("pubn","public name/public names","signature",dico)
+        %apply;book_button("qual","qualifier/qualifiers","comment",dico)
+        %apply;book_button("alias","alias/aliases","mask",dico)
+        %apply;book_button("occu","occupation/occupations","briefcase",dico)
+        %apply;book_button("place","place/places","location-dot",dico)
+        %apply;book_button("src","source/sources","box-archive",dico)
+      %end;
+      %if;(b.propose_titles!="no" or dico=1)
+        <div class="btn-group" role="group" aria-label="[*title/titles]1">
+          %apply;book_button("title","title/titles","crown",dico)
+          %if;(b.propose_titles!="no")
+            <a class="btn btn-outline-primary" href="%prefix;m=TT" data-bs-toggle="tooltip"
+              title="[*all the titles]"><i class="fa fa-list-ul fa-fw" aria-hidden="true"></i></a>
+          %end;
+        </div>
+        <div class="btn-group" role="group" aria-label="[*domain/domains]1">
+          %apply;book_button("domain","domain/domains","chess-rook",dico)
+          %if;(b.propose_titles!="no")
+            <a class="btn btn-outline-primary" href="%prefix;m=TT&p=*" data-bs-toggle="tooltip"
+              title="[*all the estates]"><i class="fa fa-list-ul fa-fw" aria-hidden="true"></i></a>
+          %end;
+        </div>
+      %end;
       %if;wizard;
-        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ms-2"
-          title="[*data typographic checker]"><i class="fas fa-spell-check" aria-hidden="true"></i>
-        </a>
-        <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success ms-2"
-          title="[*unknown persons]"><i class="fas fa-user-xmark" aria-hidden="true"></i>
-        </a>
-        %if;(b.can_send_image!="no")
-          <a href="%prefix;m=MEDIA" class="btn btn-outline-success ms-2"
-            title="[*media page]"><i class="fas fa-images" aria-hidden="true"></i>
-          </a>
+        <div class="w-100"></div>
+        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success">%nn;
+          <i class="fas fa-spell-check fa-fw me-1" aria-hidden="true"></i>[*data typographic checker]</a>
+        <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success">%nn;
+          <i class="fas fa-user-xmark fa-fw me-1" aria-hidden="true"></i>[*unknown persons]</a>
+        %if;has_anomalies;
+          <a class="btn btn-outline-success" href="%prefix;m=ANOMA">%nn;
+            <i class="fas fa-triangle-exclamation fa-fw me-1" aria-hidden="true"></i>[*anomalies]</a>
         %end;
       %end;
     </div>
-  </div>
+  </section>
 %end;
 <div class="d-flex mt-3">
   <div class="col-11 col-md-auto mx-auto">

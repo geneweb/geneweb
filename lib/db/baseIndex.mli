@@ -13,8 +13,8 @@
 
     {i base.dat} holds for each entry the number of records using its string,
     then these records: [2 * iper] for a person, [2 * ifam + 1] for a family.
-    Only the sections of first names and surnames have an entry for the empty
-    string; deleted families are left out. *)
+    Only the sections of first names and surnames, in both orders, have an entry
+    for the empty string; deleted families are left out. *)
 
 val default_budget : int
 (** Default size in bytes of the landmarks of a dictionary: 1 MiB. *)

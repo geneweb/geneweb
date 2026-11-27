@@ -41,7 +41,7 @@
         <i class="fas fa-arrow-down" aria-hidden="true"></i>
       </button>
     </td>
-    <td class="align-middle fw-bold border-start px-3 line-number"></td>
+    <td class="align-middle fw-bold border-start px-3 line-number" title="[*move up/down]4" style="cursor: grab"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz" aria-label="[*first name/first names]1"></td>
     <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz" aria-label="[*surname/surnames]0"></td>
     <td%mid;><input name="oc" type="number" min="0" class="form-control reset_bd_text" value="zocz" aria-label="[*occ]0"></td>
@@ -79,17 +79,6 @@
   %end;
   %if;(zz<=max_index)
     %apply;one_pvar(zz+1)
-  %end;
-%end;
-%define;one_pvar_json(zz)
-  %if;(e.izz!="" or e.pzz!="")
-    %if;pvar.zz.exist;
-      %if;(zz!=1),%end;
-      {"i":"%pvar.zz.index;","p":"%pvar.zz.first_name;","n":"%pvar.zz.surname;"%if;(pvar.zz.occ!=0),"oc":"%pvar.zz.occ;"%end;%if;(e.tzz!=""),"t":"%e.tzz;"%end;,"self":"%pvar.zz;"}%nn;
-    %end;
-  %end;
-  %if;(zz<=max_index)
-    %apply;one_pvar_json(zz+1)
   %end;
 %end;
 %define;my_hidden(xx)
@@ -138,7 +127,10 @@
           <i class="fas fa-plus me-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
-        <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
+        <button type="button" class="btn btn-success me-3" id="pp_open">
+          <i class="fas fa-user-plus me-2" aria-hidden="true"></i>%nn;
+          [*person picker title]
+        </button>
         <button type="button" class="btn btn-primary me-3" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
           <span class="me-2">
@@ -154,10 +146,22 @@
           title="[*relationship table]1 (RM)" onclick="showOverlay()" disabled>
           <i class="fas fa-table-cells me-2"></i>[*relationship table]0
         </button>
+        <button type="button" class="btn btn-danger ms-4" id="clearRLM">
+          <span class="me-2">
+            <i class="fas fa-trash-can toggle-icon"></i>
+            <i class="fas fa-check toggle-icon d-none"></i>
+          </span>[*add/clear/show/edit the graph]1
+        </button>
       </td>
     </tfoot>
   </table>
   </div>
+  <template id="bd_tpl">
+    <div class="d-flex flex-column justify-content-center lh-1">
+      <div class="bd_birth" aria-label="[*birth date]">° <span></span></div>
+      <div class="bd_death" aria-label="[*death date]">† <span></span></div>
+    </div>
+  </template>
   </form>
 %if;(not cancel_links)
   %include;trl
@@ -166,6 +170,7 @@
 </div>
 %include;overlay
 %include;js
+<script src="%etc_prefix;js/html5sortable.min.js?version=0.14.0"></script>
 %query_time;
 <script>
 (function () {
@@ -209,7 +214,20 @@
       if (downBtn) downBtn.style.visibility = 'hidden';
     }
     updateLineNumbers();
+    makeSortable();
   }
+
+  // drag and drop of the rows by their number, the rows added included
+  function makeSortable() {
+    if (typeof sortable !== 'function') return;
+    sortable(tbody, {
+      items: 'tr:not(.template_line)',
+      handle: '.line-number',
+      placeholderClass: 'bg-warning-subtle',
+      forcePlaceholderSize: true
+    });
+  }
+  tbody.addEventListener('sortupdate', updateArrowVisibility);
 
   function toggleIcons(buttonSelector) {
     const btn = typeof buttonSelector === 'string' ? $(buttonSelector) : buttonSelector;
@@ -284,17 +302,26 @@
   const saveBtn = $('#saveRLM');
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
-      const src = $('#rlm-data');
-      if (!src) return;
-      const jsonText = src.innerHTML.trim();
-      try {
-        const jsonData = JSON.parse(jsonText);
-        localStorage.setItem('inds', JSON.stringify(jsonData));
-        toggleIcons('#saveRLM');
-        setTimeout(() => toggleIcons('#saveRLM'), 2000);
-      } catch (err) {
-        console.error('Invalid JSON data in #rlm-data', err);
-      }
+      const inds = visibleRows().flatMap(row => {
+        const { fn: p, sn: n, oc } = rowKey(row);
+        if (!p || !n) return [];
+        const t = row.querySelector("input[name='t']").value.trim();
+        return [{ p, n, ...(oc !== '0' && { oc }), ...(t && { t }) }];
+      });
+      localStorage.setItem('inds', JSON.stringify(inds));
+      history.replaceState(null, '', buildUrl('TP') + '&v=updRLM');
+      toggleIcons('#saveRLM');
+      setTimeout(() => toggleIcons('#saveRLM'), 2000);
+    });
+  }
+
+  // clear RLM (localStorage)
+  const clearBtn = $('#clearRLM');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      localStorage.removeItem('inds');
+      toggleIcons('#clearRLM');
+      setTimeout(() => toggleIcons('#clearRLM'), 2000);
     });
   }
 
@@ -325,7 +352,7 @@
         const oc = ocIn.value;
         if (oc !== '' && oc !== '0') params.set('oc' + dataIndex, oc);
       }
-      if (mode === 'RLM') {
+      if (mode !== 'RLM') {
         const tIn = row.querySelector("input[name='t']");
         if (tIn) {
           const text = tIn.value.trim();
@@ -419,6 +446,47 @@ function validateRow(row, opts) {
     });
     row.classList.add('row-active');
   });
+
+  // ---------- person picker ----------
+  function fillDate(bd, sel, date) {
+    const el = bd.querySelector(sel);
+    if (date) el.querySelector('span').innerHTML = date;
+    else el.remove();
+  }
+
+  const isEmpty = (row) => { const k = rowKey(row); return !k.fn && !k.sn; };
+
+  function addPerson(p) {
+    const oc = String(p.oc || 0);
+    const rows = visibleRows();
+    const empty = rows.find(isEmpty);
+    const filled = rows.slice(0, empty ? rows.indexOf(empty) : rows.length)
+      .filter(r => !isEmpty(r));
+    const prev = filled.pop();
+    if (prev) {
+      const k = rowKey(prev);
+      if (k.fn === p.fn && k.sn === p.sn && k.oc === oc) return;
+    }
+    const row = empty || cloneTemplate();
+    row.querySelector("input[name='p']").value = p.fn;
+    row.querySelector("input[name='n']").value = p.sn;
+    row.querySelector("input[name='oc']").value = p.oc ? p.oc : '';
+    const bd = $('#bd_tpl').content.firstElementChild.cloneNode(true);
+    fillDate(bd, '.bd_birth', p.birth);
+    fillDate(bd, '.bd_death', p.death);
+    row.querySelector('.bd_text').replaceChildren(bd);
+    row.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + oc;
+    row.classList.remove('row-invalid');
+    if (!empty) tbody.appendChild(row);
+    row.classList.add('row-valid-flash');
+    setTimeout(() => row.classList.remove('row-valid-flash'), 900);
+    updateArrowVisibility();
+    checkFormValidity();
+  }
+
+  const ppOpen = $('#pp_open');
+  if (ppOpen) ppOpen.addEventListener('click', () =>
+    PersonPicker.open(undefined, addPerson));
 
   // init
 function init() {

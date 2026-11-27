@@ -14,6 +14,7 @@ type t =
   | Title
   | Domain
   | Place_last
+  | Surname_search
 
 let all =
   [
@@ -30,6 +31,7 @@ let all =
     Title;
     Domain;
     Place_last;
+    Surname_search;
   ]
 
 let to_string d =
@@ -47,12 +49,13 @@ let to_string d =
   | Title -> "title"
   | Domain -> "domain"
   | Place_last -> "place_last"
+  | Surname_search -> "sn_search"
 
 let of_string s =
   List.find_opt
     (fun d ->
       match d with
-      | Place_last -> false
+      | Place_last | Surname_search -> false
       | First_name | Surname | First_name_alias | Surname_alias | Public_name
       | Qualifier | Alias | Occupation | Place | Source | Title | Domain ->
           to_string d = s)
@@ -61,7 +64,7 @@ let of_string s =
 let person_strings d p =
   match d with
   | First_name -> [ p.first_name ]
-  | Surname -> [ p.surname ]
+  | Surname | Surname_search -> [ p.surname ]
   | First_name_alias -> p.first_names_aliases
   | Surname_alias -> p.surnames_aliases
   | Public_name -> [ p.public_name ]
@@ -93,12 +96,13 @@ let family_strings d f =
         [ f.marriage_src; f.fsources ]
         f.fevents
   | First_name | Surname | First_name_alias | Surname_alias | Public_name
-  | Qualifier | Alias | Occupation | Title | Domain ->
+  | Qualifier | Alias | Occupation | Title | Domain | Surname_search ->
       []
 
 let records_dict d =
   match d with
   | Place_last -> Place
+  | Surname_search -> Surname
   | First_name | Surname | First_name_alias | Surname_alias | Public_name
   | Qualifier | Alias | Occupation | Place | Source | Title | Domain ->
       d
@@ -107,7 +111,7 @@ let has_family_fields d =
   match d with
   | Place | Place_last | Source -> true
   | First_name | Surname | First_name_alias | Surname_alias | Public_name
-  | Qualifier | Alias | Occupation | Title | Domain ->
+  | Qualifier | Alias | Occupation | Title | Domain | Surname_search ->
       false
 
 let suburb s =
@@ -171,18 +175,25 @@ let last_terms s =
 let last_terms_sep = ", "
 let last_key s = String.concat last_terms_sep (last_terms s)
 
+let split_particle particles s =
+  let p = Mutil.get_particle particles s in
+  let n = String.length p in
+  (p, String.sub s n (String.length s - n))
+
+let search_key particles s = Name.lower (snd (split_particle particles s))
+
 let key particles d s =
   match d with
   | Surname | Domain ->
-      let p = Mutil.get_particle particles s in
-      let n = String.length p in
-      String.concat "\000" [ String.sub s n (String.length s - n); p ]
+      let p, n = split_particle particles s in
+      String.concat "\000" [ n; p ]
   | Place -> (
       match suburb s with
       | Some (_, j) ->
           String.concat "\000" [ String.sub s j (String.length s - j); s ]
       | None -> s ^ "\000")
   | Place_last -> String.concat "\000" [ last_key s; s ]
+  | Surname_search -> String.concat "\000" [ search_key particles s; s ]
   | First_name | First_name_alias | Surname_alias | Public_name | Qualifier
   | Alias | Occupation | Source | Title ->
       s

@@ -99,7 +99,12 @@
               <input class="form-check-input" type="checkbox" name="p_exact" id="hs_p_exact" value="off">
               <label class="form-check-label" for="hs_p_exact">[not exact]0</label>
             </div>
-            <button type="submit" class="btn btn-primary ms-auto">%nn;
+            <button type="button" class="btn btn-outline-primary ms-auto" id="hs_pick"
+              data-src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"
+              %if;(rng=1)data-url="%url_set.i_p_n_oc_file_rnd;" title="[*stay on the current tool]"%end;>%nn;
+              <i class="fa fa-user-plus me-2" aria-hidden="true"></i>[*person picker title]%nn;
+            </button>
+            <button type="submit" class="btn btn-primary">%nn;
               <i class="fa fa-magnifying-glass me-2" aria-hidden="true"></i>[*search/case sensitive]0%nn;
             </button>
           </div>
@@ -107,4 +112,24 @@
       </div>
     </div>
   </div>
+  <script>
+  %( The person picker, loaded on its first use. The person picked is shown
+     in the current tool, as the random person; elsewhere the dialog only
+     links to the persons. %)
+  document.getElementById('hs_pick').addEventListener('click', e => {
+    const { url, src } = e.currentTarget.dataset;
+    const open = () => PersonPicker.open(undefined,
+      url ? p => { location.href = url + '&i=' + p.i; } : null);
+    const search = document.getElementById('searchmodal');
+    search.addEventListener('hidden.bs.modal', () => {
+      if (window.PersonPicker) return open();
+      window.GW = Object.assign({ prefix: "%prefix;" }, window.GW);
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = open;
+      document.head.appendChild(script);
+    }, { once: true });
+    bootstrap.Modal.getInstance(search).hide();
+  });
+  </script>
 %end;

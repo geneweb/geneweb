@@ -8,7 +8,20 @@ val lookup_print : config -> Driver.base -> unit
     - [exact=1] with [fn], [sn], [oc] (default 0) — strict key existence check,
       returns 0 or 1 element. When [fn] or [sn] is "?", [oc] is the person
       index, as in [Update.insert_person].
-    - otherwise [q=…&n=…] — prefix search on a [fn sn] query (single token
-      treated as surname prefix), capped at [n] (default 20, max 50) results.
+    - [keys=fn1.oc1.sn1;fn2.oc2.sn2…] — the persons of the existing keys.
+    - otherwise [q=…&n=…] — search of the persons, answered as
+      [{"persons":[…],"truncated":b}]. [q] is ["surname/first names year"],
+      first names and year optional, or a link key ["[[fn/sn/oc/text]]"] giving
+      the person of the key. The surname is a prefix of the surname without
+      particle, case nor accents ({!Geneweb_db.Dict.Surname_search}; the surname
+      as typed with an index written before it), each word of the first names a
+      prefix of a word of the first name, the year a prefix of the year of birth
+      or death. At most [n] persons (default 20, max 200), [truncated] when
+      others match. Each person has also ["i"], ["acc"] (its URL parameters),
+      ["name"], ["dates"] (years), ["birth"] and ["death"] (short dates, HTML),
+      ["father"] and ["mother"] ([null] if unknown) and ["spouses"], these
+      relatives with the same fields but their own relatives, only ["i"],
+      ["acc"], ["name"] and ["dates"] when they cannot be picked. Hidden persons
+      are left out and relatives masked as anywhere else.
 
     Response [Content-type: application/json; charset=utf-8]. *)

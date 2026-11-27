@@ -43,6 +43,7 @@
         <input type="hidden" name="ei" value="%index;">
       %end;
       <span>[*relationship shortcut][:]</span>
+      <input type="radio" class="d-none" id="sel_pick" name="select" value="" aria-hidden="true" tabindex="-1">
       <div class="mt-1 ms-2">
         %if;(user.index!="" and (not browsing_with_sosa_ref or user.index!=sosa_ref.index))
           <div class="form-check">
@@ -122,6 +123,8 @@
         </div>
       </div>
       <div class="text-center my-4">
+        <button type="button" class="btn btn-outline-primary btn-lg me-2" id="rel_pick">
+          <i class="fa fa-user-plus me-2" aria-hidden="true"></i>[*person picker title]</button>
         <button type="submit" class="btn btn-outline-primary btn-lg">[*validate/delete]0</button>
       </div>
     </div>
@@ -195,6 +198,17 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
+
+// the person picked is computed as a shortcut, with the mode and options set
+document.getElementById('rel_pick').addEventListener('click', () => {
+  PersonPicker.open(undefined, p => {
+    const sel = document.getElementById('sel_pick');
+    sel.value = p.i;
+    sel.checked = true;
+    main();
+    document.forms.relationship.requestSubmit();
+  });
+});
 </script>
 %include;js
 %query_time;

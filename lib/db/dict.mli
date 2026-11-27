@@ -19,6 +19,9 @@ type t =
       (** the places again, sorted from their last term (see {!last_key}); not
           listed among the books, the order "from the last term" of the book of
           places *)
+  | Surname_search
+      (** the surnames again, sorted from {!search_key}; not a book, the search
+          of persons by surname *)
 
 val all : t list
 (** Every dictionary, first names first. *)
@@ -26,12 +29,12 @@ val all : t list
 val to_string : t -> string
 (** Name of the dictionary in URLs ([data] parameter): ["fn"], ["sn"], ["fna"],
     ["sna"], ["pubn"], ["qual"], ["alias"], ["occu"], ["place"], ["src"],
-    ["title"], ["domain"], ["place_last"]. *)
+    ["title"], ["domain"], ["place_last"], ["sn_search"]. *)
 
 val of_string : string -> t option
 (** Inverse of {!to_string} for the dictionaries that are books of [m=MOD_DATA]:
-    [Place_last], only another order of the book of places, has no [data] value.
-*)
+    [Place_last] and [Surname_search], only other orders of the books of places
+    and surnames, have no [data] value. *)
 
 val person_strings :
   t -> ('iper, 'person, 'string) Def.gen_person -> 'string list
@@ -45,8 +48,9 @@ val family_strings :
 
 val records_dict : t -> t
 (** The dictionary holding the same strings in the same records: [Place] for
-    [Place_last], which only sorts them otherwise; the dictionary itself for the
-    others. The index writes the records of such dictionaries once. *)
+    [Place_last] and [Surname] for [Surname_search], which only sort them
+    otherwise; the dictionary itself for the others. The index writes the
+    records of such dictionaries once. *)
 
 val has_family_fields : t -> bool
 (** Whether families hold strings of the dictionary: places and sources. *)
@@ -79,6 +83,11 @@ val last_key : string -> string
 (** [last_key s] is [String.concat last_terms_sep (last_terms s)]: the place as
     displayed in the order from its last term. *)
 
+val search_key : Re.re -> string -> string
+(** [search_key particles s] is the surname [s] without its particle, lowered
+    and unaccented by {!Name.lower}: ["de La Tour"] and ["LA TOUR"] give
+    ["la tour"]. The key searched for a surname as typed. *)
+
 val key : Re.re -> t -> string -> string
 (** [key particles dict s] is the sort key of [s] in [dict], compared byte by
     byte, so that the entries whose displayed text starts with a prefix form an
@@ -90,6 +99,8 @@ val key : Re.re -> t -> string -> string
     - places: the place without its suburb, a null byte, then the whole string
       if it has a suburb. A place comes before its suburbs.
     - places from their last term: {!last_key}, a null byte, then the whole
+      string.
+    - surnames for the search: {!search_key}, a null byte, then the whole
       string.
     - other dictionaries: the string itself, in the order of [String.compare].
 

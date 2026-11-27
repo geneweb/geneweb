@@ -9,10 +9,10 @@ let names () =
   List.iter
     (fun d ->
       let s = Dict.to_string d in
-      (* [Place_last] is an order of the book of places, not a book *)
+      (* [Place_last] and [Surname_search] are orders of books, not books *)
       (check (option string))
         s
-        (if d = Dict.Place_last then None else Some s)
+        (if d = Dict.Place_last || d = Dict.Surname_search then None else Some s)
         (Option.map Dict.to_string (Dict.of_string s)))
     Dict.all;
   (check bool) "unknown" true (Dict.of_string "x" = None)
@@ -110,6 +110,20 @@ let last_keys () =
          String.compare (key Dict.Place_last a) (key Dict.Place_last b))
        l)
 
+let search_keys () =
+  List.iter
+    (fun (s, k) ->
+      (check string) s k (Dict.search_key particles s);
+      (check bool) ("key of " ^ s) true
+        (String.starts_with ~prefix:(k ^ "\000") (key Dict.Surname_search s)))
+    [
+      ("de La Tour", "la tour");
+      ("LA TOUR", "la tour");
+      ("d'Éon", "eon");
+      ("Bourbon-Parme", "bourbon parme");
+      ("van der Berg", "berg");
+    ]
+
 let suburb () =
   let bounds = check (option (pair int int)) in
   bounds "hyphen" (Some (3, 7)) (Dict.suburb "[ab] - c");
@@ -163,6 +177,7 @@ let v =
         test_case "Dict surname order" `Quick surname_order;
         test_case "Dict place keys" `Quick place_keys;
         test_case "Dict place keys from the last term" `Quick last_keys;
+        test_case "Dict surname search keys" `Quick search_keys;
         test_case "Dict suburb" `Quick suburb;
         test_case "Dict fields" `Quick fields;
       ] );

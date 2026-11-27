@@ -536,7 +536,8 @@ let book conf base =
               [ Driver.Istr.empty; Driver.Istr.quest ]
         | Dict.(
             ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-            | Occupation | Place | Source | Title | Domain | Place_last )) ->
+            | Occupation | Place | Source | Title | Domain | Place_last
+            | Surname_search )) ->
             []
       in
       let index () =
