@@ -18549,6 +18549,15 @@ it: aprire la pagina in una nuova scheda
 nl: de pagina in een nieuw tabblad openen
 pt: abrir a ficha num novo separador
 
+    person picker text
+de: Text des Wiki-Links (optional)
+en: wiki link text (optional)
+es: texto del enlace wiki (opcional)
+fr: texte du lien wiki (facultatif)
+it: testo del link wiki (facoltativo)
+nl: tekst van de wikilink (optioneel)
+pt: texto da ligação wiki (opcional)
+
     person picker title
 de: eine Person auswählen
 en: select an individual

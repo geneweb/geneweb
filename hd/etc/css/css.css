@@ -2836,6 +2836,14 @@ input.row-valid-flash {
 .pp-results {
     width: fit-content;
 }
+/* with the input of the link text (notes toolbar), a wider search bar; its
+   wrapper is the one of the floating placeholder, hidden with it */
+.pp-head:has(.pp-text-wrap:not(.d-none)) {
+    min-width: min(72rem, 100%);
+}
+.pp-text-wrap {
+    flex: 0 0 18rem;
+}
 #pp-modal td a {
     position: relative;
     z-index: 2;

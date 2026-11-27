@@ -7,6 +7,10 @@
           <label for="pp-query" class="col-form-label fw-bold text-nowrap me-1" id="pp-title">[*person picker title]</label>
           <input type="search" class="form-control pp-query no-clear-button" id="pp-query"
             placeholder="[*person picker placeholder] %[%[[first name/first names]0/[surname/surnames]0/occ…%]%]">
+          <div class="input-wrapper pp-text-wrap d-none">
+            <input type="text" class="form-control pp-text no-clear-button" id="pp-text"
+              placeholder="[*person picker text]" aria-label="[*person picker text]">
+          </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="[*close]"></button>
         </div>
       </div>

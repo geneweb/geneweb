@@ -38,8 +38,10 @@
             .then(arr => arr.length > 0 ? arr[0] : null);
     }
 
-    function wikiKey(p) {
-        return '[[' + p.fn + '/' + p.sn + (p.oc ? '/' + p.oc : '') + ']]';
+    // [[fn/sn]], [[fn/sn/oc]] or [[fn/sn/oc/text]], as in the menubar
+    function wikiKey(p, text) {
+        return '[[' + p.fn + '/' + p.sn +
+            (text ? '/' + p.oc + '/' + text : p.oc ? '/' + p.oc : '') + ']]';
     }
 
     // Search dialog of person_picker.txt
@@ -101,7 +103,8 @@
         lookup(q, 200).then(res => { if (n === seq) render(res, false); });
     }
 
-    function open(query, onPick) {
+    // text: initial link text, shown in a second input when given
+    function open(query, onPick, text) {
         if (!dialog) {
             dialog = document.getElementById('pp-modal');
             if (!dialog) return;
@@ -116,13 +119,17 @@
             dialog.addEventListener('shown.bs.modal', () => input.select());
             // after the focus trap of the dialog is released
             dialog.addEventListener('hidden.bs.modal', () => {
-                if (picked && onPicked) onPicked(picked);
+                if (picked && onPicked)
+                    onPicked(picked, dialog.querySelector('.pp-text').value.trim());
                 picked = null;
             });
         }
         onPicked = onPick;
         picked = null;
         if (query !== undefined) dialog.querySelector('.pp-query').value = query;
+        const textInput = dialog.querySelector('.pp-text');
+        textInput.parentElement.classList.toggle('d-none', text === undefined);
+        textInput.value = text || '';
         search();
         bootstrap.Modal.getOrCreateInstance(dialog).show();
     }
