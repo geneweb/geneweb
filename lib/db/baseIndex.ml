@@ -30,10 +30,11 @@ let code d =
   | Dict.Title -> 10
   | Dict.Domain -> 11
   | Dict.Place_last -> 12
+  | Dict.Surname_search -> 13
 
 let keeps_empty d =
   match d with
-  | Dict.First_name | Dict.Surname -> true
+  | Dict.First_name | Dict.Surname | Dict.Surname_search -> true
   | Dict.(
       ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
       | Occupation | Place | Source | Title | Domain | Place_last )) ->

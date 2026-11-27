@@ -119,7 +119,10 @@ let with_base name budget k =
 let scan base d =
   let tbl = Hashtbl.create 16 in
   let add r istr =
-    if istr <> 0 || d = Dict.First_name || d = Dict.Surname then
+    if
+      istr <> 0 || d = Dict.First_name || d = Dict.Surname
+      || d = Dict.Surname_search
+    then
       Hashtbl.replace tbl istr
         (r :: Option.value ~default:[] (Hashtbl.find_opt tbl istr))
   in
@@ -266,7 +269,8 @@ let check_dict base d =
   | Dict.Surname -> check_spi (Driver.persons_of_surname base)
   | Dict.(
       ( First_name_alias | Surname_alias | Public_name | Qualifier | Alias
-      | Occupation | Place | Source | Title | Domain | Place_last )) ->
+      | Occupation | Place | Source | Title | Domain | Place_last
+      | Surname_search )) ->
       ()
 
 let index name budget () =
