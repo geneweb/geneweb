@@ -55,8 +55,9 @@
             .content.firstElementChild.cloneNode(true);
         const pick = node.querySelector('.pp-pick');
         pick.ariaLabel = pick.title + ', ' + p.name;
-        // a relative without key fields cannot be picked
-        if (p.fn === undefined) pick.remove();
+        // a relative without key fields cannot be picked, nor any person
+        // when browsing (no callback)
+        if (p.fn === undefined || !onPicked) pick.remove();
         else pick.addEventListener('click', () => {
             picked = p;
             bootstrap.Modal.getOrCreateInstance(dialog).hide();
@@ -89,7 +90,7 @@
         dialog.querySelector('.pp-truncated').classList.toggle('d-none',
             !res.truncated);
         dialog.querySelector('.pp-help').classList.toggle('d-none',
-            res.persons.length === 0);
+            res.persons.length === 0 || !onPicked);
     }
 
     function search() {
