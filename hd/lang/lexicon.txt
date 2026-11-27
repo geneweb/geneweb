@@ -8380,11 +8380,11 @@ en: data quality
 fr: qualité des données
 
     data typographic checker
-co: verificadore tipograficu di i dati
-de: Typografischer Daten-Checker
-en: data typographic checker
-es: verificador tipográfico de los datos
-fr: vérificateur typographique des données
+co: verificadore di i dati
+de: Daten-Checker
+en: data checker
+es: verificador de los datos
+fr: vérificateur des données
 
     database
 af: stamboom

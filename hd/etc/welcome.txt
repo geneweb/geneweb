@@ -14,8 +14,7 @@
 <body%body_prop;>
 <main class="container" id="welcome">
 %include;hed
-%define;book_of(xx)[book of %s:::xx]%end;
-%define;book_of_cap(xx)[*book of %s:::xx]%end;
+%define;book_of(xx)[*book of %s:::xx]%end;
 %define;connect_with(xx)[*connect with %s:::xx]%end;
 %define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%end;
 %apply;dl("fnames")
@@ -50,7 +49,7 @@
 %define;book_button(xxx,yyy,zzz,dd)
   %if;("dd"="1")
     <a class="btn btn-outline-primary" data-bs-toggle="tooltip"
-      href="%prefix;m=MOD_DATA&data=xxx" title="%if;wizard;[*modify] %apply;book_of%with;[yyy]1%end;%else;%apply;book_of_cap%with;[yyy]1%end;%end;">%nn;
+      href="%prefix;m=MOD_DATA&data=xxx" title="%apply;book_of%with;[yyy]1%end;">%nn;
       <i class="fa fa-zzz me-1" aria-hidden="true"></i>[*yyy]1</a>
   %else;
     <span class="btn btn-outline-primary pe-none">%nn;
@@ -215,7 +214,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     <i class="fa fa-triangle-exclamation fa-fw" aria-hidden="true"></i>
   </div>
 %elseif;(nb_persons.v!=0)
-  <div id="welcome-search" class="col-12 col-md-10 col-xl-8 mx-auto mt-3 px-2">
+  <div id="welcome-search" class="col-12 col-md-10 col-xl-8 mx-auto m-3 px-2">
     <form id="main-search" method="get" action="%prefix;">
       %hidden_no_senv;
       <input type="hidden" name="m" value="S" class="has_validation">
@@ -239,7 +238,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         </div>
       </div>
       <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-2 mt-2">
-        <button type="button" class="btn btn-link p-0 border-0" aria-label="[*search format]"
+        <button type="button" class="btn btn-link p-0 border-0 ms-4" aria-label="[*search format]"
           data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" data-bs-trigger="hover focus"
           title="<div class='text-start fw-bold'><div class='h5'>[*search format][:]</div>
                               1. [*person/persons]0[:]<br>
@@ -266,7 +265,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <input class="form-check-input" type="checkbox" name="p_exact" id="p_exact" value="off">
           <label class="form-check-label" for="p_exact">[not exact]0</label>
         </div>
-        <div class="d-flex flex-wrap gap-2 ms-auto">
+        <div class="d-flex flex-wrap gap-4 ms-auto me-4">
           <button type="button" class="btn btn-outline-primary" onclick="PersonPicker.open(undefined, null)">
             <i class="fa fa-user-plus me-2" aria-hidden="true"></i>[*person picker title]
           </button>
@@ -295,15 +294,15 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       </div>%)
     </form>
     %if;(b.propose_titles!="no")
-      <form id="title-search" class="row g-2 mt-2" method="get" action="%action;">
+      <form id="title-search" class="row g-2 mt-3 justify-content-center" method="get" action="%action;">
         %hidden_no_senv;
         <input type="hidden" name="m" value="TT">
-        <div class="col-sm-6">
+        <div class="col-sm-5">
           <label for="titles" class="visually-hidden">[*title/titles]0</label>
           <input type="search" class="form-control" name="t" id="titles" placeholder="[*title/titles]0"
             %if;(b.datalist_titles=1 or b.rpc_datalist=1) list="datalist_titles"%end; data-book="title">
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-5">
           <label for="estates" class="visually-hidden">[*estate]0</label>
           <input type="search" class="form-control" name="p" id="estates" placeholder="[*estate]0"
             %if;(b.datalist_estates=1 or b.rpc_datalist=1) list="datalist_estates"%end; data-book="domain">
@@ -313,20 +312,16 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     %end;
   </div>
 %end;
-<div class="d-flex flex-column justify-content-start justify-content-md-center mt-4 col-12 col-md-11 col-lg-10 mx-auto">
-  <h2 class="h4 text-md-center"><i class="fas fa-screwdriver-wrench fa-sm fa-fw text-secondary" aria-hidden="true"></i>
+%( Sections of buttons, wider than the search block, their title centered
+   between two rules; the wizard buttons on their own lines. %)
+<section class="col-10 col-md-9 col-xl-8 mx-auto px-2 mt-4" aria-labelledby="welcome-tools">
+  <h2 class="h5 section-title mb-2" id="welcome-tools">%nn;
     %if;roglo;[
 en: Around the tree
 fr: Autour de l’arbre
-]
-    %else;[*tools]%end;
-  </h2>
-  <div class="d-flex flex-wrap justify-content-md-center">
-    %if;(wizard and not base.has_notes)
-      <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES">
-        <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add base notes]
-      </a>
-    %end;
+]%nn;
+    %else;[*tools]%end;</h2>
+  <div class="d-flex flex-wrap justify-content-center">
     %if;base.has_notes;
       <a class="btn btn-outline-primary" href="%prefix;m=NOTES">%nn;
         <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>%apply;notes_title(lang)
@@ -345,7 +340,15 @@ fr: Autour de l’arbre
        <a class="btn btn-outline-primary" href="%prefix;m=WIZNOTES">%nn;
          <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*base wizard notes]</a>
     %end;
+    %if;(b.hide_advanced_request="no")
+      <a class="btn btn-outline-primary" href="%prefix;m=AS">%nn;
+        <i class="fa fa-magnifying-glass-plus fa-fw me-1" aria-hidden="true"></i>[*advanced request]0</a>
+    %end;
     %if;(nb_persons.v!=0)
+      %if;(has_history and b.history="yes")
+        <a class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">%nn;
+          <i class="fas fa-clock-rotate-left fa-fw me-1" aria-hidden="true"></i>[*history]</a>
+      %end;
       <a class="btn btn-outline-primary" href="%prefix;m=ISOLATED">%nn;
         <i class="fa fa-user fa-fw me-1" aria-hidden="true"></i>%nn;
         [*isolated persons/totally isolated/linked by relation/witness to an event]0</a>
@@ -353,10 +356,6 @@ fr: Autour de l’arbre
         <i class="far fa-chart-bar fa-fw me-1" aria-hidden="true"></i>[*statistics]</a>
       <a class="btn btn-outline-primary" href="%prefix;m=ANM">%nn;
         <i class="fa fa-cake-candles fa-fw me-1" aria-hidden="true"></i>[*anniversaries]</a>
-      %if;(has_history and b.history="yes")
-        <a class="btn btn-outline-primary" href="%prefix;m=HIST&k=20">%nn;
-          <i class="fas fa-clock-rotate-left fa-fw me-1" aria-hidden="true"></i>[*history]</a>
-      %end;
     %end;
     %if;((plugin.forum or roglo) and b.disable_forum!="yes")
       <a class="btn btn-outline-primary"
@@ -367,38 +366,39 @@ fr: Autour de l’arbre
       <a class="btn btn-outline-primary" href="%prefix;m=PS&bi=on&ba=on&ma=on&de=on&bu=on">%nn;
         <i class="fas fa-globe fa-fw me-1" aria-hidden="true"></i>[*place/places]1/[surname/surnames]0</a>
     %end;
-    %if;(b.hide_advanced_request="no")
-      <a class="btn btn-outline-primary" href="%prefix;m=AS">%nn;
-        <i class="fa fa-magnifying-glass-plus fa-fw me-1" aria-hidden="true"></i>[*advanced request]0</a>
-    %end;
     <a class="btn btn-outline-primary" href="%prefix;m=CAL">%nn;
       <i class="far fa-calendar-days fa-fw me-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
+    %if;(wizard or (roglo and user.ident!="" and user.ident in b.superwizard))
+      <div class="w-100"></div>
+    %end;
     %if;((roglo and user.ident!="" and (user.ident in b.superwizard or (b.superwizard="all" and wizard)))
       or (not roglo and wizard))
       <a class="btn btn-outline-success" href="%prefix;m=H&v=conf">%nn;
         <i class="fas fa-gear fa-fw me-1" aria-hidden="true"></i>[*configuration]1</a>
     %end;
     %if;wizard;
+      %if;(not base.has_notes)
+        <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES">%nn;
+          <i class="far fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add base notes]</a>
+      %end;
       <a class="btn btn-outline-success" href="%prefix;m=MOD_NOTES&new">%nn;
         <i class="fa fa-file-lines fa-fw me-1" aria-hidden="true"></i>[*add::note/notes]0</a>
       %if;(b.propose_add_family!="no")
       <a class="btn btn-outline-success" href="%prefix;m=ADD_FAM">%nn;
         <i class="fas fa-user-plus fa-fw me-1" aria-hidden="true"></i>[*add::family/families]0</a>
       %end;
-      %if;has_anomalies;
-        <a class="btn btn-outline-success" href="%prefix;m=ANOMA">%nn;
-          <i class="fas fa-triangle-exclamation fa-fw me-1" aria-hidden="true"></i>[*anomalies]</a>
+      %if;(b.can_send_image!="no")
+        <a href="%prefix;m=MEDIA" class="btn btn-outline-success">%nn;
+          <i class="fas fa-images fa-fw me-1" aria-hidden="true"></i>[*add::image/images]1</a>
       %end;
     %end;
   </div>
-</div>
+</section>
 %if;roglo;
-  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-10 mx-auto">
-    <h2 class="h4 text-md-center">
-      <img src="%images_prefix;logo-roglo.png" alt="" width="30">
-      Association Roglo
-    </h2>
-    <div class="d-flex flex-wrap justify-content-md-center">
+  <section class="col-12 col-md-11 col-xl-10 mx-auto px-2 mt-4" aria-labelledby="welcome-roglo">
+    <h2 class="h5 section-title mb-2" id="welcome-roglo">%nn;
+      <span><img src="%images_prefix;logo-roglo.png" alt="" width="24" class="me-2">Association Roglo</span></h2>
+    <div class="d-flex flex-wrap justify-content-center">
       %if;((wizard or friend) and b.alt_serv_base!="" and not cgi)
         <a class="btn btn-outline-primary"%sp;
           href="%if;(b.alt_serv_adr!="")%b.alt_serv_adr;%end;%b.alt_serv_base?w=%nn;
@@ -437,7 +437,7 @@ fr: Mon compte associatif
         <a class="btn btn-outline-success" href="https://roglo.eu/wizard_w?lang=fr;m=NOTES;f=GeneWeb:Trucs">Trucs et astuces</a>
       %end;
     </div>
-  </div>
+  </section>
 %end;
 
 %( Dictionaries (friends and wizards) and lists of first names, surnames,
@@ -445,11 +445,9 @@ fr: Mon compte associatif
 %if;(nb_persons.v!=0 and (b.visitor_access!="no" or wizard or friend))
   %let;dico;%if;(friend or ((not roglo) and wizard) or (roglo and user.ident!=""
     and (user.ident in b.superwizard or b.superwizard="all")))1%end;%in;
-  <div class="d-flex flex-column justify-content-start justify-content-md-center mt-3 col-12 col-md-9 mx-auto">
-    <h2 class="h4 text-md-center">
-      <i class="fas fa-book fa-sm fa-fw text-secondary me-1" aria-hidden="true"></i>[*book/books]1%nn;
-    </h2>
-    <div class="d-flex flex-wrap justify-content-md-center gap-1">
+  <section class="col-12 col-md-11 col-xl-10 mx-auto px-2 mt-4" aria-labelledby="welcome-books">
+    <h2 class="h5 section-title mb-2" id="welcome-books">[*book/books]1</h2>
+    <div class="d-flex flex-wrap justify-content-center gap-1 mx-2">
       <div class="btn-group" role="group" aria-label="[*first name/first names]1">
         %apply;book_button("fn","first name/first names","child",dico)
         <a class="btn btn-outline-primary" href="%prefix;m=P&tri=A" data-bs-toggle="tooltip"
@@ -495,20 +493,18 @@ fr: Mon compte associatif
         </div>
       %end;
       %if;wizard;
-        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success ms-2"
-          title="[*data typographic checker]"><i class="fas fa-spell-check" aria-hidden="true"></i>
-        </a>
-        <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success ms-2"
-          title="[*unknown persons]"><i class="fas fa-user-xmark" aria-hidden="true"></i>
-        </a>
-        %if;(b.can_send_image!="no")
-          <a href="%prefix;m=MEDIA" class="btn btn-outline-success ms-2"
-            title="[*media page]"><i class="fas fa-images" aria-hidden="true"></i>
-          </a>
+        <div class="w-100"></div>
+        <a href="%prefix;m=CHK_DATA" class="btn btn-outline-success">%nn;
+          <i class="fas fa-spell-check fa-fw me-1" aria-hidden="true"></i>[*data typographic checker]</a>
+        <a href="%prefix;m=UNKNOWN" class="btn btn-outline-success">%nn;
+          <i class="fas fa-user-xmark fa-fw me-1" aria-hidden="true"></i>[*unknown persons]</a>
+        %if;has_anomalies;
+          <a class="btn btn-outline-success" href="%prefix;m=ANOMA">%nn;
+            <i class="fas fa-triangle-exclamation fa-fw me-1" aria-hidden="true"></i>[*anomalies]</a>
         %end;
       %end;
     </div>
-  </div>
+  </section>
 %end;
 <div class="d-flex mt-3">
   <div class="col-11 col-md-auto mx-auto">

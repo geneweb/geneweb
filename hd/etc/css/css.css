@@ -1751,6 +1751,19 @@ a:hover.date
  background-color: #e7edb3;
 }
 
+/* Title of a section of buttons, centered between two rules. Page welcome.txt */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.section-title::before,
+.section-title::after {
+  content: "";
+  flex: 1;
+  border-top: var(--bs-border-width) solid var(--bs-border-color);
+}
+
 /* Properties of the lang block. Page welcome.txt */
 #lang
 {
