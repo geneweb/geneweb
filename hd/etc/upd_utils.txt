@@ -205,6 +205,15 @@
   </div>
 %end;
 
+%( Person picker button of the selector [xvar]_p_selct, appended to it in an
+   input group: the person picked fills the fields [xvar]_fn, _sn and _occ
+   and sets the selector on "link" (person_picker.js, bindGroup). %)
+%define;pick_button(xvar)
+  <button type="button" class="btn btn-outline-secondary px-2" id="xvar_p_selct_pick"
+    title="[*person picker title]" aria-label="[*person picker title]">%nn;
+    <i class="fa fa-user-plus" aria-hidden="true"></i></button>
+%end;
+
 %( Witness of an event: xcnt: event number; wcnt: witness number (0 before
    the first); evt_name: event name ("#bapt", "#deat", "buri_or_crem"...) or
    ""; ww: template variable of the witness (fwitness or witness). %)
@@ -231,10 +240,13 @@
     <div class="row">
       <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt</h5>
       <div class="col-2">
-        <select class="form-select" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct"%if;(ww.index!="-1") data-pnoc-checked="%ww.first_name;|%ww.surname;|%if;(ww.occ!="" and ww.occ!="0")%ww.occ;%else;0%end;"%end;>
-          <option value="create"%if;((ww.surname="" and ww.first_name="") or not ww.link) selected%end;>[*create]0</option>
-          <option value="link"%if;(ww.link) selected%end;>[*link]0</option>
-        </select>
+        <div class="input-group flex-nowrap">
+          <select class="form-select" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct"%if;(ww.index!="-1") data-pnoc-checked="%ww.first_name;|%ww.surname;|%if;(ww.occ!="" and ww.occ!="0")%ww.occ;%else;0%end;"%end;>
+            <option value="create"%if;((ww.surname="" and ww.first_name="") or not ww.link) selected%end;>[*create]0</option>
+            <option value="link"%if;(ww.link) selected%end;>[*link]0</option>
+          </select>
+          %apply;pick_button("excnt_witnwcnt")
+        </div>
       </div>
       <div class="col-4">
         <select class="form-select" name="excnt_witnwcnt_kind">

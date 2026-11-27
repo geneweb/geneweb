@@ -133,7 +133,7 @@
     }
 
     function bindGroup(opts) {
-        const { fn, sn, oc, gate, link } = opts;
+        const { fn, sn, oc, gate, link, pick } = opts;
         if (!fn || !sn || !oc) return;
         if (gate && gate.dataset.pnocBound) return;
         if (gate) gate.dataset.pnocBound = '1';
@@ -183,6 +183,25 @@
         inputs.forEach(el =>
             el.addEventListener('focusout', () => run(true)));
         if (gate) gate.addEventListener('change', e => run(e.isTrusted));
+        // the surname and first names typed as query, else the last one
+        if (pick) pick.addEventListener('click', () => {
+            const s = sn.value.trim();
+            open(s ? s + '/' + fn.value.trim() : undefined, p => {
+                fn.value = p.fn;
+                sn.value = p.sn;
+                oc.value = p.oc;
+                inputs.forEach(el => el.dispatchEvent(new Event('change')));
+                if (gate) {
+                    gate.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + p.oc;
+                    if (gate.value !== 'link') {
+                        gate.value = 'link';
+                        gate.dispatchEvent(new Event('change'));
+                    }
+                }
+                if (link) link.href = url('m=MOD_IND&i=' + p.i);
+                paint('flash');
+            });
+        });
         run(false);
     }
 
@@ -195,7 +214,8 @@
                 oc: document.getElementById(pre + '_occ'),
                 gate,
                 link: document.querySelector(
-                    '#' + pre + '_p_selct_mod a')
+                    '#' + pre + '_p_selct_mod a'),
+                pick: document.getElementById(pre + '_p_selct_pick')
             });
         });
     }
