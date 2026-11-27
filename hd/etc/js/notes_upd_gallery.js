@@ -897,6 +897,8 @@ function initializeHandlers() {
                 tr.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + (p.oc || '0');
                 tr.classList.remove('row-invalid');
                 table.row(tr).data(rowData).draw(false);
+                tr.classList.add('row-valid-flash');
+                setTimeout(() => tr.classList.remove('row-valid-flash'), 900);
                 addKeyToPicker(p);
             });
         });

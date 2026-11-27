@@ -478,6 +478,8 @@ function validateRow(row, opts) {
     row.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + oc;
     row.classList.remove('row-invalid');
     if (!empty) tbody.appendChild(row);
+    row.classList.add('row-valid-flash');
+    setTimeout(() => row.classList.remove('row-valid-flash'), 900);
     updateArrowVisibility();
     checkFormValidity();
   }
