@@ -673,16 +673,25 @@ const UPD = {
 })();
 (function () {
   let loaded = false;
-  document.addEventListener('click', ev => {
-    if (!ev.target.closest('.upd-wand')) return;
-    ev.preventDefault();
-    if (loaded) { if (window.InplaceEdit) InplaceEdit.toggle(); return; }
+  const load = () => {
     loaded = true;
     const s = document.createElement('script');
     s.src = "%etc_prefix;js/updateField.js?hash=%apply;hash%with;%etc_prefix;js/updateField.js%end;";
     s.onload = () => { InplaceEdit.init(); InplaceEdit.toggle(); };
     document.head.appendChild(s);
+  };
+  document.addEventListener('click', ev => {
+    if (!ev.target.closest('.upd-wand')) return;
+    ev.preventDefault();
+    if (loaded) { if (window.InplaceEdit) InplaceEdit.toggle(); return; }
+    load();
   });
+  %( bvar in_place_edit=on: edit mode active when the page opens %)
+  %if;(bvar.in_place_edit="on")
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', load, { once: true });
+  else load();
+  %end;
 })();
 </script>
 %end;
