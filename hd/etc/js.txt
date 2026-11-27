@@ -107,7 +107,7 @@
 %end;
 %if;(e.v="updRLM" or e.m="MRG" or upd_form=1)
 <script>
-window.GW = { prefix: "%prefix;", i18n: { noResult: `[*no match]` } };
+window.GW = { prefix: "%prefix;" };
 </script>
 <script src="%etc_prefix;js/person_picker.js?hash=%apply;hash%with;%etc_prefix;js/person_picker.js%end;"></script>
 %end;

@@ -11,11 +11,15 @@
         };
     }
 
-    function endpoint(qs) {
-        const base = (window.GW && GW.prefix || '').replace(/\?$/, '?');
+    function url(qs) {
+        const base = window.GW && GW.prefix || '';
         const sep = base.endsWith('?') || base.endsWith('&') ? '' :
                     base.indexOf('?') >= 0 ? '&' : '?';
-        return fetch(base + sep + 'm=PNOC_LOOKUP&' + qs)
+        return base + sep + qs;
+    }
+
+    function endpoint(qs) {
+        return fetch(url('m=PNOC_LOOKUP&' + qs))
             .then(r => r.ok && (r.headers.get('content-type') || '').indexOf('json') >= 0
                 ? r.json() : [])
             .catch(() => []);
@@ -23,7 +27,8 @@
 
     function lookup(q, limit) {
         return endpoint('q=' + encodeURIComponent(q) +
-            '&n=' + (limit || 20));
+            '&n=' + (limit || 20))
+            .then(r => Array.isArray(r) ? { persons: [], truncated: false } : r);
     }
 
     function checkExact(fn, sn, oc) {
@@ -33,38 +38,92 @@
             .then(arr => arr.length > 0 ? arr[0] : null);
     }
 
+    function wikiKey(p) {
+        return '[[' + p.fn + '/' + p.sn + (p.oc ? '/' + p.oc : '') + ']]';
+    }
+
+    // Search dialog of person_picker.txt
+    let dialog = null;
+    let onPicked = null;
+    let picked = null;
+    let seq = 0;
+
+    function ind(p) {
+        const node = document.getElementById('pp-ind')
+            .content.firstElementChild.cloneNode(true);
+        const name = node.querySelector('.pp-name');
+        name.textContent = p.name;
+        name.href = url(p.acc);
+        const dates = node.querySelector('.pp-dates');
+        if (!p.dates) dates.remove();
+        else {
+            dates.textContent = p.dates;
+            if (dates.tagName === 'A') dates.href = url('m=MOD_IND&i=' + p.i);
+        }
+        return node;
+    }
+
+    function render(res, short) {
+        const row = document.getElementById('pp-row').content.firstElementChild;
+        dialog.querySelector('tbody').replaceChildren(...res.persons.map(p => {
+            const tr = row.cloneNode(true);
+            tr.querySelector('.pp-self').append(ind(p));
+            if (p.father) tr.querySelector('.pp-father').append(ind(p.father));
+            if (p.mother) tr.querySelector('.pp-mother').append(ind(p.mother));
+            tr.querySelector('.pp-spouses').append(...p.spouses.map(ind));
+            tr.querySelector('.pp-pick').addEventListener('click', () => {
+                picked = p;
+                bootstrap.Modal.getOrCreateInstance(dialog).hide();
+            });
+            return tr;
+        }));
+        dialog.querySelector('.pp-results').classList.toggle('d-none', short);
+        dialog.querySelector('.pp-none').classList.toggle('d-none',
+            short || res.persons.length > 0);
+        dialog.querySelector('.pp-truncated').classList.toggle('d-none',
+            !res.truncated);
+    }
+
+    function search() {
+        const q = dialog.querySelector('.pp-query').value.trim();
+        const n = ++seq;
+        // a link key is searched once complete
+        if (q.length < 2 || q.startsWith('[[') && !q.endsWith(']]')) {
+            render({ persons: [], truncated: false }, true);
+            return;
+        }
+        lookup(q, 200).then(res => { if (n === seq) render(res, false); });
+    }
+
+    function open(query, onPick) {
+        if (!dialog) {
+            dialog = document.getElementById('pp-modal');
+            if (!dialog) return;
+            const input = dialog.querySelector('.pp-query');
+            input.addEventListener('input', debounce(search, 250));
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    search();
+                }
+            });
+            dialog.addEventListener('shown.bs.modal', () => input.select());
+            // after the focus trap of the dialog is released
+            dialog.addEventListener('hidden.bs.modal', () => {
+                if (picked && onPicked) onPicked(picked);
+                picked = null;
+            });
+        }
+        onPicked = onPick;
+        picked = null;
+        if (query !== undefined) dialog.querySelector('.pp-query').value = query;
+        search();
+        bootstrap.Modal.getOrCreateInstance(dialog).show();
+    }
+
     function flashValid(el) {
         el.classList.add('row-valid-flash');
         setTimeout(() => el.classList.remove('row-valid-flash'), 900);
-    }
-
-    function create(el, opts) {
-        if (!el || typeof TomSelect === 'undefined') return null;
-        opts = opts || {};
-        return new TomSelect(el, {
-            valueField: 'key',
-            labelField: 'label',
-            searchField: ['label'],
-            create: opts.create !== false,
-            maxItems: opts.maxItems || 1,
-            preload: false,
-            load: debounce((q, cb) => {
-                if (!q || q.length < 2) { cb([]); return; }
-                lookup(q, opts.limit)
-                    .then(arr => arr.map(p => Object.assign({}, p, {
-                        key: p.fn + '/' + p.sn + '/' + (p.oc || 0)
-                    })))
-                    .then(cb).catch(() => cb([]));
-            }, 200),
-            render: {
-                option: (data, escape) =>
-                    '<div>' + escape(data.label) + '</div>',
-                no_results: () =>
-                    '<div class="no-results">' +
-                    ((window.GW && GW.i18n && GW.i18n.noResult)
-                        || 'No results found') + '</div>'
-            }
-        });
     }
 
     function bindGroup(opts) {
@@ -192,7 +251,8 @@
     }
 
     window.PersonPicker = {
-        create, lookup, checkExact, bindInput, parseGeneWebKey, bindGroup
+        open, lookup, checkExact, wikiKey, bindInput, parseGeneWebKey,
+        bindGroup
     };
 
     function autoBind() {
