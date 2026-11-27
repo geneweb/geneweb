@@ -472,6 +472,11 @@
 # Width of each thumbnail in the documents grid in pixels. Default 150.
 #documents_width=180
 
+# In-place edit mode of the individual page (wizards only):
+# when "on", the mode is active when the page opens
+# (the wand button still toggles it off and on).
+#in_place_edit=on
+
 # Customise the individual page.
 # Full documentation https://geneweb.tuxfamily.org/wiki/templates
 # Each module is defined by a unique letter between a-z.
