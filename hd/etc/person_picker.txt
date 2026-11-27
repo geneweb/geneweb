@@ -13,10 +13,10 @@
       <div class="modal-body pp-results d-none mt-2">
         <div class="pp-none d-none mb-2">[*no match]</div>
         <div class="pp-truncated d-none mb-2 text-warning-emphasis">[*person picker truncated]</div>
-        <table class="table table-sm table-striped table-hover align-middle mb-0">
+        <div class="pp-help d-none ps-4 mb-2 form-text">[*person picker help]</div>
+        <table class="table table-sm table-striped align-middle mb-0">
           <thead>
             <tr>
-              <th scope="col"><span class="visually-hidden">[*select]</span></th>
               <th scope="col">[*person/persons]0</th>
               <th scope="col">[*father/mother]0</th>
               <th scope="col">[*father/mother]1</th>
@@ -30,8 +30,7 @@
   </div>
 </div>
 <template id="pp-row">
-  <tr class="position-relative">
-    <td class="text-center"><button type="button" class="btn btn-primary btn-sm stretched-link mx-1 pp-pick" title="[*person picker pick]">[*select]</button></td>
+  <tr>
     <td class="pp-self fw-bold"></td>
     <td class="pp-father"></td>
     <td class="pp-mother"></td>
@@ -39,5 +38,5 @@
   </tr>
 </template>
 <template id="pp-ind">
-  <div><a class="pp-name" target="_blank" title="[*person picker see]"></a> %if;wizard;<a class="pp-dates text-nowrap" target="_blank" title="[*person picker modify]"></a>%else;<span class="pp-dates text-nowrap"></span>%end;</div>
+  <div class="pp-ind"><button type="button" class="btn p-0 border-0 align-baseline stretched-link pp-pick" title="[*person picker pick]"></button><a class="pp-name" target="_blank" title="[*person picker see]"></a> %if;wizard;<a class="pp-dates text-nowrap" target="_blank" title="[*person picker modify]"></a>%else;<span class="pp-dates text-nowrap"></span>%end;</div>
 </template>

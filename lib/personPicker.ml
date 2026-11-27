@@ -165,11 +165,18 @@ let slash_dates ?(rest = []) conf base p =
   in
   ("birth", `String (slash birth)) :: ("death", `String (slash death)) :: rest
 
+let pick_json ?(rest = []) conf base p =
+  person_json
+    ~rest:(ind_fields ~rest:(slash_dates ~rest conf base p) conf base p)
+    conf base p
+
 let relatives conf base p =
   let ind ip =
     match Util.pget_opt conf base ip with
     | Some r when not (Util.is_empty_name r) ->
-        Some (`Assoc (ind_fields conf base r))
+        Some
+          (if pickable conf base r then pick_json conf base r
+           else `Assoc (ind_fields conf base r))
     | Some _ | None -> None
   in
   let father, mother =
@@ -209,11 +216,7 @@ let search_json conf base =
       ( "persons",
         `List
           (List.map
-             (fun p ->
-               let rest =
-                 slash_dates ~rest:(relatives conf base p) conf base p
-               in
-               person_json ~rest:(ind_fields ~rest conf base p) conf base p)
+             (fun p -> pick_json ~rest:(relatives conf base p) conf base p)
              persons) );
       ("truncated", `Bool truncated);
     ]

@@ -18504,6 +18504,15 @@ sl: oseba spremenjena
 sv: person ändrad
 tr: kişi değiştirildi
 
+    person picker help
+de: Eine Person durch Klicken auf den Hintergrund hinter ihrem Namen auswählen
+en: Select an individual by clicking the background behind their name
+es: Elegir una persona haciendo clic en el fondo detrás de su nombre
+fr: Choisir un individu en cliquant sur le fond derrière son nom
+it: Scegliere una persona cliccando sullo sfondo dietro il suo nome
+nl: Kies een persoon door op de achtergrond achter de naam te klikken
+pt: Escolher uma pessoa clicando no fundo atrás do seu nome
+
     person picker modify
 de: in einem neuen Tab bearbeiten
 en: modify in a new tab

@@ -2807,8 +2807,9 @@ input.row-valid-flash {
     border-color: var(--bs-success-border-subtle);
 }
 /* person picker dialog (person_picker.txt): a search bar of fixed width,
-   the results below as wide as their table; the links of the results above
-   the stretched link of the rows */
+   the results below as wide as their table; each person picked by the
+   stretched link of its cell, or of its line among several spouses, the
+   links of the results above it */
 .modal-dialog.pp-dialog {
     --bs-modal-bg: transparent;
     --bs-modal-border-width: 0;
@@ -2833,10 +2834,29 @@ input.row-valid-flash {
     position: relative;
     z-index: 2;
 }
+#pp-modal td,
+#pp-modal .pp-ind:not(:only-child) {
+    position: relative;
+}
+#pp-modal .pp-ind:not(:only-child) {
+    margin-inline: -.75rem -1.5rem;
+    padding-inline: .75rem 1.5rem;
+}
+#pp-modal td:has(> .pp-ind:only-child .pp-pick):is(:hover, :focus-within) {
+    --bs-table-bg-state: var(--bs-table-hover-bg);
+}
+#pp-modal .pp-ind:not(:only-child):has(.pp-pick):is(:hover, :focus-within) {
+    background-color: var(--bs-table-hover-bg);
+}
+#pp-modal :is(th, td) {
+    padding: .5rem 1.5rem .5rem .75rem;
+}
 #pp-modal :is(th, td):nth-child(n+2) {
-  padding-right: .75rem;
-  padding-left: .75rem;
-  border-left: 1px solid var(--bs-border-color-translucent);
+    border-left: 1px solid var(--bs-border-color-translucent);
+}
+#pp-modal .pp-pick:focus-visible::after {
+  outline: var(--bs-focus-ring-width) solid var(--bs-focus-ring-color);
+  outline-offset: calc(-1 * var(--bs-focus-ring-width));
 }
 a.disabled {
     pointer-events: none;

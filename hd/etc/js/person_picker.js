@@ -51,6 +51,14 @@
     function ind(p) {
         const node = document.getElementById('pp-ind')
             .content.firstElementChild.cloneNode(true);
+        const pick = node.querySelector('.pp-pick');
+        pick.ariaLabel = pick.title + ', ' + p.name;
+        // a relative without key fields cannot be picked
+        if (p.fn === undefined) pick.remove();
+        else pick.addEventListener('click', () => {
+            picked = p;
+            bootstrap.Modal.getOrCreateInstance(dialog).hide();
+        });
         const name = node.querySelector('.pp-name');
         name.textContent = p.name;
         name.href = url(p.acc);
@@ -71,10 +79,6 @@
             if (p.father) tr.querySelector('.pp-father').append(ind(p.father));
             if (p.mother) tr.querySelector('.pp-mother').append(ind(p.mother));
             tr.querySelector('.pp-spouses').append(...p.spouses.map(ind));
-            tr.querySelector('.pp-pick').addEventListener('click', () => {
-                picked = p;
-                bootstrap.Modal.getOrCreateInstance(dialog).hide();
-            });
             return tr;
         }));
         dialog.querySelector('.pp-results').classList.toggle('d-none', short);
@@ -82,6 +86,8 @@
             short || res.persons.length > 0);
         dialog.querySelector('.pp-truncated').classList.toggle('d-none',
             !res.truncated);
+        dialog.querySelector('.pp-help').classList.toggle('d-none',
+            res.persons.length === 0);
     }
 
     function search() {

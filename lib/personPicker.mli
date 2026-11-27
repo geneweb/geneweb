@@ -20,7 +20,8 @@ val lookup_print : config -> Driver.base -> unit
       others match. Each person has also ["i"], ["acc"] (its URL parameters),
       ["name"], ["dates"] (years), ["birth"] and ["death"] (short dates, HTML),
       ["father"] and ["mother"] ([null] if unknown) and ["spouses"], these
-      relatives with the first four fields. Hidden persons are left out and
-      relatives masked as anywhere else.
+      relatives with the same fields but their own relatives, only ["i"],
+      ["acc"], ["name"] and ["dates"] when they cannot be picked. Hidden persons
+      are left out and relatives masked as anywhere else.
 
     Response [Content-type: application/json; charset=utf-8]. *)
