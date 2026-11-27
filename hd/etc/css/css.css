@@ -2806,6 +2806,38 @@ input.row-valid-flash {
     background-color: var(--bs-success-bg-subtle);
     border-color: var(--bs-success-border-subtle);
 }
+/* person picker dialog (person_picker.txt): a search bar of fixed width,
+   the results below as wide as their table; the links of the results above
+   the stretched link of the rows */
+.modal-dialog.pp-dialog {
+    --bs-modal-bg: transparent;
+    --bs-modal-border-width: 0;
+}
+@media (min-width: 992px) {
+    .modal-dialog.pp-dialog {
+        --bs-modal-width: 96vw;
+    }
+}
+.pp-head,
+.pp-results {
+    align-self: center;
+    min-width: min(48rem, 100%);
+    max-width: 100%;
+    background-color: var(--bs-body-bg);
+    border-radius: var(--bs-border-radius-lg);
+}
+.pp-results {
+    width: fit-content;
+}
+#pp-modal td a {
+    position: relative;
+    z-index: 2;
+}
+#pp-modal :is(th, td):nth-child(n+2) {
+  padding-right: .75rem;
+  padding-left: .75rem;
+  border-left: 1px solid var(--bs-border-color-translucent);
+}
 a.disabled {
     pointer-events: none;
 }

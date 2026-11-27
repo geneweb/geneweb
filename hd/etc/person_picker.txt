@@ -1,0 +1,43 @@
+<!-- $Id: person_picker v7.1 27/11/2026 $ -->
+<div class="modal fade" id="pp-modal" tabindex="-1" aria-labelledby="pp-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-lg-down pp-dialog">
+    <div class="modal-content">
+      <div class="pp-head p-3">
+        <div class="d-flex align-items-center gap-2">
+          <label for="pp-query" class="col-form-label fw-bold text-nowrap me-1" id="pp-title">[*person picker title]</label>
+          <input type="search" class="form-control pp-query no-clear-button" id="pp-query"
+            placeholder="[*person picker placeholder] %[%[[first name/first names]0/[surname/surnames]0/occ…%]%]">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="[*close]"></button>
+        </div>
+      </div>
+      <div class="modal-body pp-results d-none mt-2">
+        <div class="pp-none d-none mb-2">[*no match]</div>
+        <div class="pp-truncated d-none mb-2 text-warning-emphasis">[*person picker truncated]</div>
+        <table class="table table-sm table-striped table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">[*select]</span></th>
+              <th scope="col">[*person/persons]0</th>
+              <th scope="col">[*father/mother]0</th>
+              <th scope="col">[*father/mother]1</th>
+              <th scope="col">[*spouse/spouses]1</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<template id="pp-row">
+  <tr class="position-relative">
+    <td class="text-center"><button type="button" class="btn btn-primary btn-sm stretched-link mx-1 pp-pick" title="[*person picker pick]">[*select]</button></td>
+    <td class="pp-self fw-bold"></td>
+    <td class="pp-father"></td>
+    <td class="pp-mother"></td>
+    <td class="pp-spouses"></td>
+  </tr>
+</template>
+<template id="pp-ind">
+  <div><a class="pp-name" target="_blank" title="[*person picker see]"></a> %if;wizard;<a class="pp-dates text-nowrap" target="_blank" title="[*person picker modify]"></a>%else;<span class="pp-dates text-nowrap"></span>%end;</div>
+</template>

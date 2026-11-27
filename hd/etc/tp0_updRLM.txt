@@ -138,6 +138,10 @@
           <i class="fas fa-plus me-2" aria-hidden="true"></i>%nn;
           [*add/insert/delete/up/down row aria-label]0
         </button>
+        <button type="button" class="btn btn-success me-3" id="pp_open">
+          <i class="fas fa-user-plus me-2" aria-hidden="true"></i>%nn;
+          [*person picker title]
+        </button>
         <script id="rlm-data" type="application/json">%[%apply;one_pvar_json(1)%]</script>
         <button type="button" class="btn btn-primary me-3" id="saveRLM"
                 title="[*RLM update data/save data/show graph]1" disabled>
@@ -158,6 +162,12 @@
     </tfoot>
   </table>
   </div>
+  <template id="bd_tpl">
+    <div class="d-flex flex-column justify-content-center lh-1">
+      <div class="bd_birth" aria-label="[*birth date]">° <span></span></div>
+      <div class="bd_death" aria-label="[*death date]">† <span></span></div>
+    </div>
+  </template>
   </form>
 %if;(not cancel_links)
   %include;trl
@@ -165,6 +175,7 @@
 %end;
 </div>
 %include;overlay
+%include;person_picker
 %include;js
 %query_time;
 <script>
@@ -419,6 +430,45 @@ function validateRow(row, opts) {
     });
     row.classList.add('row-active');
   });
+
+  // ---------- person picker ----------
+  function fillDate(bd, sel, date) {
+    const el = bd.querySelector(sel);
+    if (date) el.querySelector('span').innerHTML = date;
+    else el.remove();
+  }
+
+  const isEmpty = (row) => { const k = rowKey(row); return !k.fn && !k.sn; };
+
+  function addPerson(p) {
+    const oc = String(p.oc || 0);
+    const rows = visibleRows();
+    const empty = rows.find(isEmpty);
+    const filled = rows.slice(0, empty ? rows.indexOf(empty) : rows.length)
+      .filter(r => !isEmpty(r));
+    const prev = filled.pop();
+    if (prev) {
+      const k = rowKey(prev);
+      if (k.fn === p.fn && k.sn === p.sn && k.oc === oc) return;
+    }
+    const row = empty || cloneTemplate();
+    row.querySelector("input[name='p']").value = p.fn;
+    row.querySelector("input[name='n']").value = p.sn;
+    row.querySelector("input[name='oc']").value = p.oc ? p.oc : '';
+    const bd = $('#bd_tpl').content.firstElementChild.cloneNode(true);
+    fillDate(bd, '.bd_birth', p.birth);
+    fillDate(bd, '.bd_death', p.death);
+    row.querySelector('.bd_text').replaceChildren(bd);
+    row.dataset.pnocChecked = p.fn + '|' + p.sn + '|' + oc;
+    row.classList.remove('row-invalid');
+    if (!empty) tbody.appendChild(row);
+    updateArrowVisibility();
+    checkFormValidity();
+  }
+
+  const ppOpen = $('#pp_open');
+  if (ppOpen) ppOpen.addEventListener('click', () =>
+    PersonPicker.open(undefined, addPerson));
 
   // init
 function init() {

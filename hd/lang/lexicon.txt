@@ -18504,6 +18504,60 @@ sl: oseba spremenjena
 sv: person ändrad
 tr: kişi değiştirildi
 
+    person picker modify
+de: in einem neuen Tab bearbeiten
+en: modify in a new tab
+es: modificar en una pestaña nueva
+fr: modifier dans un nouvel onglet
+it: modificare in una nuova scheda
+nl: in een nieuw tabblad wijzigen
+pt: modificar num novo separador
+
+    person picker pick
+de: diese Person auswählen
+en: select this individual
+es: elegir esta persona
+fr: choisir cet individu
+it: scegliere questa persona
+nl: deze persoon kiezen
+pt: escolher esta pessoa
+
+    person picker placeholder
+de: Nachname/Vornamen Jahr oder Wiki-Schlüssel
+en: surname/first names year or wiki key
+es: apellido/nombres año o clave wiki
+fr: patronyme/prénoms année ou clé wiki
+it: cognome/nomi anno o chiave wiki
+nl: familienaam/voornamen jaar of wikisleutel
+pt: apelido/nomes ano ou chave wiki
+
+    person picker see
+de: die Seite in einem neuen Tab öffnen
+en: open the page in a new tab
+es: abrir la ficha en una pestaña nueva
+fr: ouvrir la fiche dans un nouvel onglet
+it: aprire la pagina in una nuova scheda
+nl: de pagina in een nieuw tabblad openen
+pt: abrir a ficha num novo separador
+
+    person picker title
+de: eine Person auswählen
+en: select an individual
+es: elegir una persona
+fr: choisir un individu
+it: scegliere una persona
+nl: een persoon kiezen
+pt: escolher uma pessoa
+
+    person picker truncated
+de: nur die ersten Ergebnisse werden angezeigt: verfeinern Sie die Suche
+en: only the first results are shown: refine the search
+es: solo se muestran los primeros resultados: precise la búsqueda
+fr: seuls les premiers résultats sont affichés : précisez la recherche
+it: sono mostrati solo i primi risultati: affinare la ricerca
+nl: alleen de eerste resultaten worden getoond: verfijn de zoekopdracht
+pt: só são mostrados os primeiros resultados: refine a pesquisa
+
     person source
 co: fonte di l’individuu
 de: Quellenangabe-Person
