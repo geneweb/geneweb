@@ -385,11 +385,7 @@ let print_shortest_path conf base p1 p2 =
         let s1 = Util.gen_person_title_text Util.reference conf base p1 in
         let s2 = Util.gen_person_title_text Util.reference conf base p2 in
         Hutil.header conf title;
-        (match Util.p_getenv conf.env "cgl" with
-        | Some "on" -> ()
-        | _ ->
-            let conf = { conf with is_printed_by_template = false } in
-            Templ.output_simple conf Templ.Env.empty "buttons_rel");
+        RelationLink.print_buttons_rel conf base;
         if excl_faml = [] then print_no_relationship_link conf base p1 p2
         else
           Output.printf conf "<ul><li>%s</li><li>%s</li></ul>"
@@ -980,11 +976,7 @@ let print_main_relationship conf base long p1 p2 rel =
       Output.print_sstring conf ")")
   in
   Hutil.header conf title;
-  (match Util.p_getenv conf.env "cgl" with
-  | Some "on" -> ()
-  | _ ->
-      let conf = { conf with is_printed_by_template = false } in
-      Templ.output_simple conf Templ.Env.empty "buttons_rel");
+  RelationLink.print_buttons_rel conf base;
   let extras =
     List.filter_map
       (fun x -> x)

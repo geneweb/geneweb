@@ -72,6 +72,11 @@ val find_first_branch :
     table from [make_dist_tab]. Returns the path as a sequence of [(iper, sex)]
     pairs, or [None] when no path of the requested length exists. *)
 
+val print_buttons_rel : config -> Geneweb_db.Driver.base -> unit
+(** [print_buttons_rel conf base] renders the [buttons_rel] toolbar (unless
+    [cgl=on]), resolving [%person_index;] and [%person_index.x;] from the
+    request parameters. *)
+
 val print_relation_path : config -> Geneweb_db.Driver.base -> info -> unit
 (** [print_relation_path conf base info] renders the relation path described by
     [info] as HTML. Switches between a single-branch display (when one of

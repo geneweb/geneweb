@@ -456,6 +456,45 @@ let print_two_branches_with_table conf base info =
 |});
   Output.print_sstring conf "</table>\n"
 
+(* [buttons_rel] is rendered outside the person template evaluator, so
+   [Templ.output_simple] alone cannot resolve [%person_index.x;]: provide it
+   here (with [link_next], meaningless outside the DAG templates). *)
+let print_buttons_rel conf base =
+  match Util.p_getenv conf.env "cgl" with
+  | Some "on" -> ()
+  | _ ->
+      let conf = { conf with is_printed_by_template = false } in
+      let person_index x =
+        let find_person =
+          if x = "e" then Util.find_person_in_env_pref
+          else Util.find_person_in_env
+        in
+        let s = if x = "x" then "" else x in
+        match find_person conf base s with
+        | Some p -> Iper.to_string (Driver.get_iper p)
+        | None -> ""
+      in
+      let ifun =
+        {
+          Templ.eval_var =
+            (fun env _ _ -> function
+              | [ "person_index" ] -> Templ.VVstring (person_index "x")
+              | [ "person_index"; x ] -> Templ.VVstring (person_index x)
+              | [ "link_next" ] -> Templ.VVstring ""
+              | [ s ] -> (
+                  match Templ.Env.find s env with
+                  | Templ.Vstring s -> Templ.VVstring (s :> string)
+                  | _ -> raise Not_found)
+              | _ -> raise Not_found);
+          eval_transl = (fun _ -> Templ.eval_transl conf);
+          eval_predefined_apply = (fun _ -> raise Not_found);
+          get_vother = (function Templ.Vother x -> Some x | _ -> None);
+          set_vother = (fun x -> Templ.Vother x);
+          print_foreach = (fun _ -> raise Not_found);
+        }
+      in
+      Templ.output conf ifun Templ.Env.empty () "buttons_rel"
+
 let print_relation_path conf base info =
   if info.b1 = [] || info.b2 = [] then (
     print_one_branch conf base info;
@@ -487,11 +526,7 @@ let print_relation_ok conf base info =
         Output.print_sstring conf (string_of_int info.c2)
   in
   Hutil.header conf title;
-  (match Util.p_getenv conf.env "cgl" with
-  | Some "on" -> ()
-  | _ ->
-      let conf = { conf with is_printed_by_template = false } in
-      Templ.output_simple conf Templ.Env.empty "buttons_rel");
+  print_buttons_rel conf base;
   print_relation_path conf base info;
   Hutil.trailer conf
 
