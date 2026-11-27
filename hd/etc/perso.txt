@@ -106,24 +106,33 @@ reducePlaces();
 %end;
 <script>
 %( Hide what the time line already shows: an element whose data-dup key is
-   also found in #timeline is hidden (its whole list item inside a .dup-box),
-   then any .dup-box left without a visible item. %)
+   also found in a visible row of #timeline is hidden (its whole list item
+   inside a .dup-box), then any .dup-box left without a visible item.
+   Run again after each time line toggle; dup=on shows everything. %)
 function hideTimelineDuplicates() {
   const timeline = document.getElementById('timeline');
   if (!timeline) return;
+  const showDup = new URLSearchParams(location.search).get('dup') === 'on';
   const keys = new Set();
-  timeline.querySelectorAll('%[data-dup%]').forEach(el => keys.add(el.dataset.dup));
+  if (!showDup)
+    timeline.querySelectorAll('%[data-dup%]').forEach(el => {
+      if (!el.closest('tr%[hidden%]')) keys.add(el.dataset.dup);
+    });
+  const seen = new Set();
+  const hide = new Set();
   document.querySelectorAll('%[data-dup%]').forEach(el => {
-    if (timeline.contains(el) || !keys.has(el.dataset.dup)) return;
+    if (timeline.contains(el)) return;
     const target = el.closest('.dup-box li') || el;
-    target.hidden = true;
+    seen.add(target);
+    if (keys.has(el.dataset.dup)) hide.add(target);
   });
+  seen.forEach(t => { t.hidden = hide.has(t); });
   document.querySelectorAll('%[data-dup-alt%]').forEach(el => {
-    if (keys.has(el.dataset.dupAlt)) el.hidden = false;
+    el.hidden = !keys.has(el.dataset.dupAlt);
   });
   document.querySelectorAll('.dup-box').forEach(box => {
     const items = Array.from(box.querySelectorAll(':scope > ul > li'));
-    if (items.every(li => li.hidden)) box.hidden = true;
+    box.hidden = items.length > 0 && items.every(li => li.hidden);
   });
 }
 hideTimelineDuplicates();
@@ -144,6 +153,7 @@ function setupTimelineToggles() {
       if (on) url.searchParams.set(key, 'on');
       else url.searchParams.delete(key);
       history.replaceState(null, '', url);
+      hideTimelineDuplicates();
     });
   });
 }

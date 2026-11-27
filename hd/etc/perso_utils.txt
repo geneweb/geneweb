@@ -466,6 +466,12 @@
   %end;
 %end;
 
+%( Witness at an event without a grammatical form ("at" form) for its
+   name: falls back on the plain name of the event. %)
+%define;witness_at(p_kind,p_evt)
+  [*witness at %s of:::p_kind:p_evt]
+%end;
+
 %( Descendance : cercle sans union, disque avec des unions sans enfant,
    carré avec au moins un enfant %)
 %define;li_desc(xx)

@@ -61,10 +61,6 @@
 %foreach;event_witness_relation;%incr_count;%end;
 %let;rel_nbr;%count;%in;
 
-%define;witness_at(xxx,yyy)
-  [*witness at %s of:::xxx:yyy]
-%end;
-
 %if;(op_m=1 and has_relations)
   %reset_count;
   %foreach;relation;%if;(has_relation_him or has_relation_her)%incr_count;%end;%end;
