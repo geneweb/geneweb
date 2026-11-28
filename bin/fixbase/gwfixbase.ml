@@ -164,15 +164,18 @@ let check_fevents_witnesses =
 let fix_marriage_divorce =
   aux "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
 
+let fix_missing_spouses =
+  aux "Fix families' missing spouses" Fixbase.fix_missing_spouses
+
 let fix_utf8_sequence =
   aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
 
 let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
 let fix_children_order = aux "Fix children order" Fixbase.fix_children_order
 
-let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
-    ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key ~children_order =
+let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
+    ~p_parents ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses
+    ~marriage_divorce ~invalid_utf8 ~key ~children_order =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -183,6 +186,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if fast then (
     Driver.load_strings_array base;
     Driver.load_persons_array base);
+  if !f_spouses then fix_missing_spouses ~v1 ~v2 base nb_fam fix;
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
   if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
@@ -219,6 +223,7 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
 let bname = ref None
 let verbosity = ref 2
 let fast = ref false
+let f_spouses = ref false
 let f_parents = ref false
 let f_children = ref false
 let p_parents = ref false
@@ -246,6 +251,9 @@ let speclist =
     ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
     ("-families-parents", Arg.Set f_parents, " fix families’ parents links");
     ("-families-children", Arg.Set f_children, " fix families’ children links");
+    ( "-families-spouses",
+      Arg.Set f_spouses,
+      " restore the deleted persons still parents of a family" );
     ( "-persons-NBDS",
       Arg.Set p_NBDS,
       " fix persons' birth, baptism, death and burial events" );
@@ -306,12 +314,13 @@ let main () =
 
       Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
       let fixes =
-        !f_parents || !f_children || !p_parents || !p_families
+        !f_spouses || !f_parents || !f_children || !p_parents || !p_families
         || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
         || !p_NBDS || !invalid_utf8 || !key || !index || !children_order
       in
       if fixes || !history then ()
       else (
+        f_spouses := true;
         f_parents := true;
         f_children := true;
         p_parents := true;
@@ -323,8 +332,8 @@ let main () =
         invalid_utf8 := true;
         key := true);
       if fixes || not !history then
-        check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS
-          ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
+        check base ~dry_run ~fast ~verbosity ~f_spouses ~f_parents ~f_children
+          ~p_NBDS ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
           ~marriage_divorce ~invalid_utf8 ~key ~children_order;
       (if !history then
          let layout = Layout.of_bname ~mode:Layout.Detect bname in

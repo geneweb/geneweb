@@ -529,18 +529,29 @@ let fix_marriage_divorce ?report progress base =
 
 let fix_missing_spouses ?report progress base =
   let nb_fam = Driver.nb_of_families base in
+  let restored = Driver.Iper.Table.create 16 in
   Collection.iteri
     (fun i fam ->
       progress i nb_fam;
+      let ifam = Driver.get_ifam fam in
       let aux i =
         let p = Driver.poi base i in
         if Driver.get_iper p = Driver.Iper.dummy then (
-          Driver.patch_union base i { family = [| Driver.get_ifam fam |] };
+          Driver.patch_union base i { family = [| ifam |] };
           Driver.patch_person base i
             { (Driver.gen_person_of_person p) with key_index = i };
+          Driver.Iper.Table.replace restored i ();
           match report with
-          | Some fn -> fn (Fix_MissingSpouse (Driver.get_ifam fam, i))
+          | Some fn -> fn (Fix_MissingSpouse (ifam, i))
           | None -> ())
+        else if Driver.Iper.Table.mem restored i then
+          let family = Driver.get_family p in
+          if not (Array.exists (Driver.Ifam.equal ifam) family) then (
+            Driver.patch_union base i
+              { family = Array.append family [| ifam |] };
+            match report with
+            | Some fn -> fn (Fix_MissingSpouse (ifam, i))
+            | None -> ())
       in
       aux @@ Driver.get_father fam;
       aux @@ Driver.get_mother fam)

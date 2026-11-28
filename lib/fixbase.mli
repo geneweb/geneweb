@@ -125,10 +125,10 @@ val fix_missing_spouses :
   (int -> int -> unit) ->
   Geneweb_db.Driver.base ->
   unit
-(** For every family, if a parent refers to a person dummy person (with dummy
-    iper). Fix this person and add the family to their union list. If this
-    situation happens, an explaination is that the person has been incorrectly
-    deleted, instead of just erasing their personal details. *)
+(** For every family whose parent is a deleted person (with the dummy iper),
+    restores this person, with the families it is a parent of as union list.
+    This happens when a person was deleted instead of having their personal
+    details erased. *)
 
 val fix_utf8_sequence :
   ?report:(patch -> unit) ->
