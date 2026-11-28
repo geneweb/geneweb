@@ -170,7 +170,9 @@ let fix_missing_spouses =
 let fix_utf8_sequence =
   aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
 
-let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
+let fix_key =
+  aux "Fix duplicate keys and negative occurrence numbers" Fixbase.fix_key
+
 let fix_children_order = aux "Fix children order" Fixbase.fix_children_order
 
 let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
@@ -270,7 +272,9 @@ let speclist =
     ( "-marriage-divorce",
       Arg.Set marriage_divorce,
       " fix marriage and divorce events" );
-    ("-person-key", Arg.Set key, " fix duplicate person keys");
+    ( "-person-key",
+      Arg.Set key,
+      " fix duplicate person keys and negative occurrence numbers" );
     ( "-children-order",
       Arg.Set children_order,
       " put dated children in birth order (undated ones are not moved; not \

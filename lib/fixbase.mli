@@ -143,6 +143,9 @@ val fix_key :
   (int -> int -> unit) ->
   Geneweb_db.Driver.base ->
   unit
-(** For every person in the base, update their occurence number if someone with
-    same key (normalized first name and last name, and occurence number) already
-    exists. *)
+(** For every key (first name and surname folded by [Name.lower]) held by
+    several persons with the same occurrence number, the oldest person (lowest
+    iper) keeps it and the others get the first free ones; a negative occurrence
+    number is replaced the same way. The persons are grouped in one pass over
+    the base, without its name index, which may not match the current folding of
+    the names; the groups take a few tens of bytes per person. *)

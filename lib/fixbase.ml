@@ -610,71 +610,62 @@ let fix_utf8_sequence ?report progress base =
 
 let fix_key ?report progress base =
   let nb_ind = Driver.nb_of_persons base in
-  let ipers = Driver.ipers base in
-  let skip = Driver.iper_marker ipers false in
+  let names = Hashtbl.create 1024 in
+  let ids = Driver.Istr.Table.create 1024 in
+  let name_id istr =
+    match Driver.Istr.Table.find_opt ids istr with
+    | Some id -> id
+    | None ->
+        let s = Name.lower (Driver.sou base istr) in
+        let id =
+          match Hashtbl.find_opt names s with
+          | Some id -> id
+          | None ->
+              let id = Hashtbl.length names in
+              Hashtbl.replace names s id;
+              id
+        in
+        Driver.Istr.Table.replace ids istr id;
+        id
+  in
+  let blank = name_id Driver.Istr.empty in
+  let groups = Hashtbl.create 1024 in
   Collection.iteri
-    (fun i ip ->
+    (fun i p ->
       progress i nb_ind;
-      let p = Driver.poi base ip in
-      let f = Driver.p_first_name base p in
-      let s = Driver.p_surname base p in
-      if f <> "?" && s <> "?" then
-        let key = Name.concat f s in
-        let ipers = Driver.persons_of_name base key in
-        let f = Name.lower f in
-        let s = Name.lower s in
-        let list =
-          let rec loop acc = function
-            | ip :: tl ->
-                let p = Driver.poi base ip in
-                if
-                  Name.lower @@ Driver.p_first_name base p = f
-                  && Name.lower @@ Driver.p_surname base p = s
-                then loop ((Driver.get_iper p, Driver.get_occ p) :: acc) tl
-                else loop acc tl
-            | [] -> acc
-          in
-          loop [] ipers
-        in
-        let rev_list = List.sort (fun a b -> compare b a) list in
-        let cnt = ref 0 in
-        let mem_occ occ acc list =
-          List.exists (fun (_, o) -> o = occ) acc
-          || List.exists (fun (_, o) -> o = occ) list
-        in
-        let rec new_occ acc list =
-          if mem_occ !cnt acc list then (
-            incr cnt;
-            new_occ acc list)
-          else !cnt
-        in
-        let rec loop acc list =
-          match acc with
-          | [] -> (
-              match list with
-              | [] -> failwith key
-              | (ip, occ) :: tl ->
-                  Collection.Marker.set skip ip true;
-                  loop [ (ip, occ) ] tl)
-          | acc -> (
-              match list with
-              | [] -> acc
-              | (ip, occ) :: tl ->
-                  if not @@ Collection.Marker.get skip ip then (
-                    Collection.Marker.set skip ip true;
-                    if mem_occ occ acc tl then (
-                      let occ' = new_occ acc list in
-                      Driver.patch_person base ip
-                        {
-                          (Driver.gen_person_of_person (Driver.poi base ip)) with
-                          occ = occ';
-                        };
-                      (match report with
-                      | Some fn -> fn (Fix_UpdatedOcc (ip, occ, occ'))
-                      | None -> ());
-                      loop ((ip, occ') :: acc) tl)
-                    else loop ((ip, occ) :: acc) tl)
-                  else loop ((ip, occ) :: acc) tl)
-        in
-        ignore @@ loop [] rev_list)
-    ipers
+      let f = name_id (Driver.get_first_name p) in
+      let s = name_id (Driver.get_surname p) in
+      if f <> blank && s <> blank then
+        let l = Option.value ~default:[] (Hashtbl.find_opt groups (f, s)) in
+        Hashtbl.replace groups (f, s)
+          ((Driver.get_occ p, Driver.get_iper p) :: l))
+    (Driver.persons base);
+  let renumber l =
+    let l = List.sort (fun (_, a) (_, b) -> Driver.Iper.compare a b) l in
+    let kept = Hashtbl.create 8 in
+    let moved =
+      List.fold_left
+        (fun moved (occ, ip) ->
+          if occ >= 0 && not (Hashtbl.mem kept occ) then (
+            Hashtbl.replace kept occ ();
+            moved)
+          else (occ, ip) :: moved)
+        [] l
+    in
+    let rec free occ = if Hashtbl.mem kept occ then free (occ + 1) else occ in
+    ignore
+    @@ List.fold_left
+         (fun occ (old_occ, ip) ->
+           let occ = free occ in
+           Driver.patch_person base ip
+             { (Driver.gen_person_of_person (Driver.poi base ip)) with occ };
+           Option.iter (fun fn -> fn (Fix_UpdatedOcc (ip, old_occ, occ))) report;
+           occ + 1)
+         0 (List.rev moved)
+  in
+  Hashtbl.iter
+    (fun _ l ->
+      match l with
+      | [ (occ, _) ] when occ >= 0 -> ()
+      | [] | _ :: _ -> renumber l)
+    groups
