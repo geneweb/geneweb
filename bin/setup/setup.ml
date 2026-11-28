@@ -1071,7 +1071,9 @@ let gwdiff ok_file conn conf =
 let gwfixbase_check = print_file "confirm.htm"
 
 let gwfixbase ok_file conn conf =
-  let rc = exec_f conf ~path:(!bin_dir // conf.comm) @@ parameters conf.env in
+  let args = parameters conf.env in
+  let args = if List.mem "-dry-run" args then args else "-apply" :: args in
+  let rc = exec_f conf ~path:(!bin_dir // conf.comm) args in
   Printf.eprintf "\n";
   flush stderr;
   if Command.is_failure rc then print_file "err_standard.htm" conn conf

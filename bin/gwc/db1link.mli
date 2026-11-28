@@ -27,6 +27,16 @@ type file_info = {
 }
 (** Information about current .gwo file. *)
 
+val folding_collision : bool ref
+(** Set by [link] when two persons get the same key with the current folding of
+    the names, and different keys with the former one ([Unidecode.former]). *)
+
+val duplicates : (string * string * int * int) list ref
+(** Set by [link]: first name, surname, occurrence number in the [.gw] and
+    occurrence number given of each person defined with the key of another one
+    (not explained by the former folding of the names), renumbered with the
+    first free occurrence number. *)
+
 val link :
   ?no_warn:bool ->
   (file_info -> unit -> Gwcomp.gw_syntax option) ->

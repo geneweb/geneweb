@@ -23,6 +23,21 @@
 > older `gwc`; export it with `gwu -old_gw` to write those notes as plain
 > text instead.
 
+> [!WARNING]
+> **New keys for some persons.** The folding of the names into keys
+> (Unidecode table) is corrected: ß and ẞ give ss, wrong entries are
+> fixed and the characters missing from the table are decoded. The keys,
+> URLs and file names (portraits, blasons, carrousels, history) of the
+> persons whose names hold these characters change. Rebuilding a base
+> with `gwu` then `gwc` moves it to the new keys: `gwc` renames these
+> files and, when two persons get the same key, renumbers the second
+> one, rewrites the links of the notes to it and lists it in the note
+> `gwfixbase` (`m=NOTES&f=gwfixbase`), to be verified. A base that is not
+> rebuilt (format `GnWb0026`, or `GnWb0025` updated by `gwc -reindex`)
+> must be moved once with `gwfixbase -unidecode-keys -apply`, right after
+> the upgrade and before any edit: until then, the search misses these
+> persons.
+
 ## Gwd
 - The names of notes and galleries may contain accented letters and
   other UTF-8 characters (`[[[Séjour_à_Évian]]]`, `m=NOTES&f=Été`).
@@ -370,6 +385,36 @@
   order (birth date, else baptism date), moving few of them; undated
   children keep their place relative to the others. Not part of the
   default set of fixes (#3196).
+- `gwfixbase` only reports its fixes unless `-apply` is given (`-index`
+  implies it); the gwsetup page still applies them unless its dry run
+  box is checked. Each fix names the changed fields or texts. The
+  marriage and divorce fix keeps the no sex check of a relation, leaves
+  a family without marriage event unchanged and no longer patches a
+  family whose data is the same; the burial is no longer set from a
+  burial event without date nor place, which is reported instead;
+  `-invalid-utf8` is faster.
+- `gwfixbase -persons-not-dead` reports, without fixing them, the persons
+  not dead having a death event without date, a burial or a cremation.
+- `gwfixbase -unidecode-keys` moves a base built before the corrections of
+  the Unidecode table (2026-11) to the new keys: a person whose new key is
+  held by another one gets the first free occurrence number, and the links
+  of the notes to it are rewritten; the portraits, blasons, carrousels and
+  history files are renamed after the new keys, and the notes links
+  database is rebuilt.
+  To be run once, before `update_nldb`; not part of the default set of
+  fixes. When two persons of a `.gw` get the same key with the new
+  folding only, `gwc` builds the base again with the former folding,
+  then migrates it the same way. A person of a `.gw` defined with the
+  key of another one, for any other reason, no longer stops `gwc`: it
+  gets the first free occurrence number, with a warning, and is listed
+  with a link to the other one in the note `gwfixbase`, as are the
+  persons renumbered by `gwfixbase -person-key`. `-person-key` no longer
+  renumbers a person whose key is shared only with the new folding, and
+  reports it instead.
+- With `-apply`, `gwfixbase` (and `gwc` after a migration) appends to the
+  note `gwfixbase` a dated section listing with links the renumbered
+  persons and the cases to verify (burials, deaths, keys, links and files
+  left unchanged).
 - The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM

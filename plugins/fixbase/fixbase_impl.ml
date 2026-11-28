@@ -129,7 +129,7 @@ let fixbase_ok conf base =
     let ifams = ref [] in
     let istrs = ref [] in
     let report = function
-      | Fixbase.Fix_NBDS ip
+      | Fixbase.Fix_NBDS (ip, _)
       | Fix_AddedUnion ip
       | Fix_AddedParents ip
       | Fix_ParentDeleted ip
@@ -143,12 +143,16 @@ let fixbase_ok conf base =
       | Fix_MissingSpouse (ifam, iper) ->
           ifams := ifam :: !ifams;
           ipers := iper :: !ipers
-      | Fix_MarriageDivorce ifam
+      | Fix_MarriageDivorce (ifam, _, _, _)
       | Fix_AddedChild ifam
       | Fix_ChildrenOrder (ifam, _, _) ->
           ifams := ifam :: !ifams
-      | Fix_WrongUTF8Encoding (ifam, iper, istr) ->
-          istrs := (ifam, iper, istr) :: !istrs
+      | Fix_WrongUTF8Encoding (ifam, iper, texts) ->
+          istrs := (ifam, iper, texts) :: !istrs
+      | Unfixed_UnknownBurial _ | Unfixed_NotDead _ | Fix_UnidecodeKey _
+      | Fix_RenamedFile _ | Unfixed_RenamedFile _ | Fix_NotesLinks _
+      | Unfixed_AmbiguousLinks _ | Unfixed_FoldingCollision _ ->
+          ()
     in
     let progress (_ : int) (_ : int) = () in
     let enabled = List.exists (UI.enabled conf) in
@@ -337,21 +341,16 @@ let fixbase_ok conf base =
     dump string_of_p dump_p Driver.poi !ipers;
     dump string_of_f dump_f Driver.foi !ifams;
     List.iter
-      (fun (ifam_opt, iper_opt, opt) ->
-        let aux, sou =
-          match opt with
-          | Some (i, i') -> (ifneq i i', Driver.sou base)
-          | None -> (ifneq Driver.Istr.empty Driver.Istr.quest, fun _ -> "Dtext")
-        in
+      (fun (ifam_opt, iper_opt, (s, s')) ->
         Output.print_sstring conf "<table>";
-        aux
+        ifneq s s'
           (match ifam_opt with
           | Some i -> string_of_f i
           | None -> (
               match iper_opt with
               | Some i -> string_of_p i
               | None -> assert false))
-          sou;
+          Fun.id;
         Output.print_sstring conf "</table>")
       !istrs;
     let repost dry txt =

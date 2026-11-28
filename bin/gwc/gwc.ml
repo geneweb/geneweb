@@ -1,5 +1,8 @@
 (* Copyright (c) 1998-2007 INRIA *)
 module GWPARAM = Geneweb.GWPARAM
+module Config = Geneweb.Config
+module Fixbase = Geneweb.Fixbase
+module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
 
 let ( // ) = Filename.concat
@@ -51,15 +54,12 @@ let iterator_gwo_file file_info input =
   in
   (ic, next)
 
-(* FIXME: File descriptor could leak if an exception is raised by the code
-   using this iterator. This is not a big issue as these exceptions are
-   not catch in the current code and file descriptors are released by the
-   operating system at the end of the current process. *)
-let iterator_gwo_files bar inputs file_info =
+let iterator_gwo_files opened bar inputs file_info =
   let queue = Queue.of_seq @@ List.to_seq inputs in
   if Queue.is_empty queue then fun _ -> None
   else
     let curr = ref (iterator_gwo_file file_info @@ Queue.pop queue) in
+    opened := Some (fst !curr);
     let len = Queue.length queue in
     let cnt = ref 0 in
     let rec next () =
@@ -78,19 +78,40 @@ let iterator_gwo_files bar inputs file_info =
               incr cnt;
               ProgrBar.progress bar !cnt len;
               curr := iterator_gwo_file file_info gwo;
+              opened := Some (fst !curr);
               next ())
     in
     next
 
 let generate_database ~no_warn ~bpath bar gwo_files =
-  let iterator = iterator_gwo_files bar gwo_files in
-  match Db1link.link ~no_warn iterator bpath with
-  | exception Db1link.Critical_import_error msg ->
-      Fmt.epr "CRITICAL ERROR: %s@." msg;
-      exit 2
-  | true -> ()
-  | false ->
-      Fmt.epr "Database not created.@.";
+  let link () =
+    let opened = ref None in
+    Fun.protect ~finally:(fun () -> Option.iter close_in_noerr !opened)
+    @@ fun () ->
+    match
+      Db1link.link ~no_warn (iterator_gwo_files opened bar gwo_files) bpath
+    with
+    | exception Db1link.Critical_import_error msg ->
+        Error ("CRITICAL ERROR: " ^ msg)
+    | true -> Ok ()
+    | false -> Error "Database not created."
+  in
+  let result =
+    match link () with
+    | Error _ when !Db1link.folding_collision ->
+        flush stdout;
+        Fmt.epr
+          "@.The errors above come from persons whose keys became the same \
+           with the current folding of the names (as WEIẞ and WEISS): the base \
+           is built with the former folding, then moved to the current one.@.";
+        Unidecode.former := true;
+        link ()
+    | r -> r
+  in
+  match result with
+  | Ok () -> ()
+  | Error msg ->
+      Fmt.epr "%s@." msg;
       exit 2
 
 let compile_gw_files ~bname bar inputs =
@@ -300,6 +321,72 @@ let cleanup gwo_files =
     (fun (fname, _, _, _, was_gw) -> if was_gw then Mutil.rm fname)
     gwo_files
 
+let finish_base bname bpath =
+  Driver.with_database bpath @@ fun base ->
+  let layout = Layout.of_bname ~mode:Layout.Detect bname in
+  let conf =
+    {
+      Config.empty with
+      Config.bname;
+      layout;
+      base_env = Geneweb.Util.read_base_env layout "" false;
+    }
+  in
+  let entries = ref [] in
+  let note patch =
+    Option.iter
+      (fun e -> entries := e :: !entries)
+      (Fixbase.note_entry base patch)
+  in
+  let renumbered = Hashtbl.create 8 in
+  List.iter
+    (fun (fn, sn, o, n) -> Hashtbl.replace renumbered (fn, sn, n) o)
+    !Db1link.duplicates;
+  if Hashtbl.length renumbered > 0 then
+    Geneweb_db.Collection.iter
+      (fun p ->
+        let occ = Driver.get_occ p in
+        match
+          Hashtbl.find_opt renumbered
+            (Driver.p_first_name base p, Driver.p_surname base p, occ)
+        with
+        | Some o -> note (Fixbase.Fix_UpdatedOcc (Driver.get_iper p, o, occ))
+        | None -> ())
+      (Driver.persons base);
+  let former = !Unidecode.former in
+  Unidecode.former := false;
+  let keys = ref 0 in
+  let moved = ref 0 in
+  let files = ref 0 in
+  let report patch =
+    (match patch with
+    | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
+        incr keys;
+        if Option.is_some kip then incr moved
+    | Fix_RenamedFile _ -> incr files
+    | _ -> ());
+    note patch
+  in
+  Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base;
+  Fixbase.write_note conf base "gwc" (List.rev !entries);
+  if !moved > 0 then (
+    Driver.commit_patches base;
+    Driver.sync base);
+  if former || !files > 0 then
+    Format.eprintf
+      "Keys changed by the current folding of the names: %d, %d renumbered, %d \
+       files renamed@."
+      !keys !moved !files;
+  if Hashtbl.length renumbered > 0 then
+    Format.eprintf
+      "Persons defined with the key of another one, renumbered: %d@."
+      (Hashtbl.length renumbered);
+  if !entries <> [] then
+    Format.eprintf
+      "Cases to verify: %d, listed in the note gwfixbase \
+       (m=NOTES&f=gwfixbase)@."
+      (List.length !entries)
+
 let reindex_database bname =
   let bpath = GWPARAM.bpath bname in
   if not (Sys.file_exists bpath) then (
@@ -359,4 +446,5 @@ let () =
       generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
+    finish_base bname bpath;
     if !kill_gwo then cleanup gwo_files)

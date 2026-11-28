@@ -20,6 +20,9 @@ let do_consang = ref false
 (** Print base's statistics *)
 let pr_stats = ref false
 
+let folding_collision = ref false
+let duplicates = ref []
+
 type person = (int, int, int) Def.gen_person
 (** Extended person's entry in the base *)
 
@@ -135,6 +138,18 @@ type gen = {
 (** Global linker state *)
 
 exception Critical_import_error of string
+
+(** [folds_apart fn sn fn' sn'] tells if the persons named [fn] [sn] and [fn']
+    [sn'], of the same key, have different keys with the former folding of the
+    names. *)
+let folds_apart fn sn fn' sn' =
+  (not !Unidecode.former)
+  && (Name.former_lower fn <> Name.former_lower fn'
+     || Name.former_lower sn <> Name.former_lower sn')
+
+(** Set [folding_collision] if [folds_apart fn sn fn' sn']. *)
+let check_folding fn sn fn' sn' =
+  if folds_apart fn sn fn' sn' then folding_collision := true
 
 (** Set [gen.g_errored] telling that an error was occured *)
 let check_error ?(critical = false) gen msg =
@@ -487,6 +502,9 @@ let insert_undefined gen key =
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
+      check_folding key.pk_first_name key.pk_surname
+        (p_first_name gen.g_base x)
+        (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error gen "");
   (x, ip)
@@ -520,44 +538,64 @@ let insert_undefined gen key =
 let insert_person gen so =
   (* shift person's occurence *)
   let occ = so.occ + gen.g_file_info.f_shift in
+  let named = so.first_name <> "?" && so.surname <> "?" in
+  let create new_occ =
+    (* person's entry index *)
+    let i = gen.g_pcnt in
+    let x, a, u = make_person gen so.first_name so.surname new_occ in
+    (* strore names globally *)
+    if named then add_person_by_name gen so.first_name so.surname i
+    else if !Gwcomp.create_all_keys then
+      add_person_by_name gen so.first_name so.surname i;
+    (* extend arrays if needed *)
+    new_iper gen;
+    (* add person to array *)
+    gen.g_base.c_persons.(i) <- x;
+    (* add associated to person ascendants to array *)
+    gen.g_base.c_ascends.(i) <- a;
+    (* add associated to person union to array *)
+    gen.g_base.c_unions.(i) <- u;
+    gen.g_pcnt <- gen.g_pcnt + 1;
+    (* strore names locally *)
+    (if named then
+       let h = person_hash so.first_name so.surname in
+       Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
+    (x, i)
+  in
+  let found =
+    if named then
+      try Some (find_person_by_name gen so.first_name so.surname occ)
+      with Not_found -> None
+    else None
+  in
   (* person with its position in the base *)
   let x, ip =
-    try
-      if so.first_name = "?" || so.surname = "?" then raise Not_found
-      else
-        let ip = find_person_by_name gen so.first_name so.surname occ in
-        (poi gen.g_base ip, ip) (* if person not found *)
-    with Not_found ->
-      (* available occurence number *)
-      let new_occ =
-        if
-          gen.g_file_info.f_separate && so.first_name <> "?"
-          && so.surname <> "?"
-        then find_first_available_occ gen so.first_name so.surname occ
-        else occ
-      in
-      (* person's entry index *)
-      let i = gen.g_pcnt in
-      let x, a, u = make_person gen so.first_name so.surname new_occ in
-      (* strore names globally *)
-      if so.first_name <> "?" && so.surname <> "?" then
-        add_person_by_name gen so.first_name so.surname i
-      else if !Gwcomp.create_all_keys then
-        add_person_by_name gen so.first_name so.surname i;
-      (* extend arrays if needed *)
-      new_iper gen;
-      (* add person to array *)
-      gen.g_base.c_persons.(i) <- x;
-      (* add associated to person ascendants to array *)
-      gen.g_base.c_ascends.(i) <- a;
-      (* add associated to person union to array *)
-      gen.g_base.c_unions.(i) <- u;
-      gen.g_pcnt <- gen.g_pcnt + 1;
-      (* strore names locally *)
-      (if so.first_name <> "?" && so.surname <> "?" then
-         let h = person_hash so.first_name so.surname in
-         Hashtbl.add gen.g_file_info.f_local_names (h, occ) i);
-      (x, i)
+    match found with
+    | Some ip
+      when gen.g_def.(ip)
+           &&
+           let x = poi gen.g_base ip in
+           not
+             (folds_apart so.first_name so.surname
+                (p_first_name gen.g_base x)
+                (p_surname gen.g_base x)) ->
+        let new_occ =
+          find_first_available_occ gen so.first_name so.surname occ
+        in
+        Printf.printf
+          "\n\
+           Warning: Person already defined: \"%s.%d %s\", this one becomes \
+           \"%s.%d %s\"\n"
+          so.first_name occ so.surname so.first_name new_occ so.surname;
+        flush stdout;
+        duplicates := (so.first_name, so.surname, occ, new_occ) :: !duplicates;
+        create new_occ
+    | Some ip -> (poi gen.g_base ip, ip)
+    | None ->
+        create
+          (if gen.g_file_info.f_separate && named then
+             find_first_available_occ gen so.first_name so.surname occ
+           else occ)
   in
   (* if person wad defined before (not just referenced) *)
   if gen.g_def.(ip) then (
@@ -570,11 +608,14 @@ let insert_person gen so =
     if
       p_first_name gen.g_base x <> so.first_name
       || p_surname gen.g_base x <> so.surname
-    then
+    then (
       Printf.printf "as name: \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
+      check_folding so.first_name so.surname
+        (p_first_name gen.g_base x)
+        (p_surname gen.g_base x));
     flush stdout;
     check_error gen "")
   else (* else set it as defined *)
@@ -600,6 +641,9 @@ let insert_person gen so =
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (p_surname gen.g_base x);
+      check_folding so.first_name so.surname
+        (p_first_name gen.g_base x)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error ~critical:true gen msg);
@@ -1530,7 +1574,7 @@ let input_particles = function
   | file -> Mutil.input_particles file
 
 (** Empty base *)
-let empty_base : cbase =
+let empty_base () : cbase =
   {
     c_persons = [||];
     c_ascends = [||];
@@ -1635,6 +1679,8 @@ let output_command_line bpath =
 
 (** Link .gwo files and create a database. *)
 let link ?(no_warn = false) next_family_fun bpath =
+  folding_collision := false;
+  duplicates := [];
   let tmp_dir = Filename.concat bpath "gw_tmp" in
   Mutil.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
@@ -1659,7 +1705,7 @@ let link ?(no_warn = false) next_family_fun bpath =
       g_fcnt = 0;
       g_scnt = 0;
       g_file_info = fi;
-      g_base = empty_base;
+      g_base = empty_base ();
       g_patch_p = Hashtbl.create 20011;
       g_wiznotes = [];
       g_def = [||];
@@ -1685,7 +1731,15 @@ let link ?(no_warn = false) next_family_fun bpath =
         loop ()
     | None -> ()
   in
-  loop ();
+  (try loop ()
+   with e ->
+     let bt = Printexc.get_raw_backtrace () in
+     List.iter close_out_noerr
+       [ gen.g_per_index; gen.g_per; gen.g_fam_index; gen.g_fam ];
+     close_in_noerr per_index_ic;
+     close_in_noerr per_ic;
+     Mutil.rm_rf tmp_dir;
+     Printexc.raise_with_backtrace e bt);
   close_out gen.g_per_index;
   close_out gen.g_per;
   close_out gen.g_fam_index;

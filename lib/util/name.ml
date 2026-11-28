@@ -50,6 +50,13 @@ let lower s =
   in
   copy false 0 0
 
+let former_lower s =
+  let former = !Unidecode.former in
+  Unidecode.former := true;
+  Fun.protect
+    ~finally:(fun () -> Unidecode.former := former)
+    (fun () -> lower s)
+
 let title s =
   let t = ref true in
   let cmap u =
