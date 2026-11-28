@@ -370,6 +370,14 @@
   order (birth date, else baptism date), moving few of them; undated
   children keep their place relative to the others. Not part of the
   default set of fixes (#3196).
+- `gwfixbase` only reports its fixes unless `-apply` is given (`-index`
+  implies it); the gwsetup page still applies them unless its dry run
+  box is checked. Each fix names the changed fields or texts. The
+  marriage and divorce fix keeps the no sex check of a relation, leaves
+  a family without marriage event unchanged and no longer patches a
+  family whose data is the same; the burial is no longer set from a
+  burial event without date nor place, which is reported instead;
+  `-invalid-utf8` is faster.
 - The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM
