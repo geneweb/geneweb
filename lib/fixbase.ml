@@ -3,7 +3,8 @@ module Driver = Geneweb_db.Driver
 module Collection = Geneweb_db.Collection
 
 type patch =
-  | Fix_NBDS of Driver.iper
+  | Fix_NBDS of Driver.iper * string list
+  | Unfixed_UnknownBurial of Driver.iper
   | Fix_AddedUnion of Driver.iper
   | Fix_AddedParents of Driver.iper
   | Fix_ParentDeleted of Driver.iper
@@ -113,10 +114,9 @@ let fix_pevents ?report base pp =
     match p.burial with
     | UnknownBurial -> (
         match find_pevent [ Epers_Burial; Epers_Cremation ] pevents with
-        | None ->
-            ( (UnknownBurial, p.burial_place, p.burial_note, p.burial_src),
-              pevents )
-        | Some e ->
+        | Some e
+          when e.epers_date <> Date.cdate_None
+               || not (Driver.Istr.is_empty e.epers_place) ->
             let bu, bu_place, bu_note, bu_src = of_pevent e in
             ( ( (match e.epers_name with
                 | Epers_Burial -> Buried bu
@@ -125,6 +125,13 @@ let fix_pevents ?report base pp =
                 bu_place,
                 bu_note,
                 bu_src ),
+              pevents )
+        | e ->
+            if Option.is_some e then
+              Option.iter
+                (fun fn -> fn (Unfixed_UnknownBurial p.key_index))
+                report;
+            ( (UnknownBurial, p.burial_place, p.burial_note, p.burial_src),
               pevents ))
     | Buried d ->
         let (d, bu_place, bu_note, bu_src), pevents =
@@ -139,31 +146,52 @@ let fix_pevents ?report base pp =
         in
         ((Cremated d, bu_place, bu_note, bu_src), pevents)
   in
-  let p' =
-    {
-      p with
-      birth;
-      birth_place;
-      birth_note;
-      birth_src;
-      baptism;
-      baptism_place;
-      baptism_note;
-      baptism_src;
-      death;
-      death_place;
-      death_note;
-      death_src;
-      burial;
-      burial_place;
-      burial_note;
-      burial_src;
-      pevents;
-    }
+  let fields =
+    List.filter_map
+      (fun (name, changed) -> if changed then Some name else None)
+      [
+        ( "birth",
+          (p.birth, p.birth_place, p.birth_note, p.birth_src)
+          <> (birth, birth_place, birth_note, birth_src) );
+        ( "baptism",
+          (p.baptism, p.baptism_place, p.baptism_note, p.baptism_src)
+          <> (baptism, baptism_place, baptism_note, baptism_src) );
+        ( "death",
+          (p.death, p.death_place, p.death_note, p.death_src)
+          <> (death, death_place, death_note, death_src) );
+        ( "burial",
+          (p.burial, p.burial_place, p.burial_note, p.burial_src)
+          <> (burial, burial_place, burial_note, burial_src) );
+        ("events", p.pevents <> pevents);
+      ]
   in
-  if p <> p' then (
+  if fields <> [] then (
+    let p' =
+      {
+        p with
+        birth;
+        birth_place;
+        birth_note;
+        birth_src;
+        baptism;
+        baptism_place;
+        baptism_note;
+        baptism_src;
+        death;
+        death_place;
+        death_note;
+        death_src;
+        burial;
+        burial_place;
+        burial_note;
+        burial_src;
+        pevents;
+      }
+    in
     Driver.patch_person base p.key_index p';
-    match report with Some fn -> fn (Fix_NBDS p.key_index) | None -> ())
+    match report with
+    | Some fn -> fn (Fix_NBDS (p.key_index, fields))
+    | None -> ())
 
 let check_NBDS ?report progress base =
   let nb_ind = Driver.nb_of_persons base in

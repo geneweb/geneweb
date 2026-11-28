@@ -56,8 +56,15 @@ let aux txt
         (string_of_p @@ Driver.get_mother fam)
     in
     function
-    | Fixbase.Fix_NBDS ip ->
-        Printf.sprintf "Fixed pevents for: %s" (string_of_p ip)
+    | Fixbase.Fix_NBDS (ip, fields) ->
+        Printf.sprintf "Synchronized %s of %s"
+          (String.concat ", " fields)
+          (string_of_p ip)
+    | Unfixed_UnknownBurial ip ->
+        Printf.sprintf
+          "Not fixed, to verify manually: burial or cremation event without \
+           date nor place for %s"
+          (string_of_p ip)
     | Fix_AddedUnion ip -> Printf.sprintf "Added union for: %s" (string_of_p ip)
     | Fix_AddedParents ip ->
         Printf.sprintf "Fixed missing parents for: %s" (string_of_p ip)
@@ -136,16 +143,20 @@ let aux txt
     else if v1 then ProgrBar.run
     else fun _ _ -> ()
   in
+  let count = function
+    | Fixbase.Unfixed_UnknownBurial _ -> ()
+    | _ -> incr cnt
+  in
   let report =
     if v2 then
       Some
         (fun s ->
-          incr cnt;
+          count s;
           ProgrBar.suspend ();
           print_endline @@ "\t" ^ string_of_patch s;
           flush stdout;
           ProgrBar.restart !i' n)
-    else Some (fun _ -> incr cnt)
+    else Some count
   in
   fn ?report progress base;
   if v1 then ProgrBar.finish ()

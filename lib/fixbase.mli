@@ -15,7 +15,12 @@
 (** All possible patches that could be automatically deducted from inconsistent
     or absent information in the database *)
 type patch =
-  | Fix_NBDS of Geneweb_db.Driver.iper
+  | Fix_NBDS of Geneweb_db.Driver.iper * string list
+      (** person, synchronized fields among [birth], [baptism], [death],
+          [burial] and [events] *)
+  | Unfixed_UnknownBurial of Geneweb_db.Driver.iper
+      (** person whose burial is unknown while he has a burial or cremation
+          event with neither date nor place; reported, not fixed *)
   | Fix_AddedUnion of Geneweb_db.Driver.iper
   | Fix_AddedParents of Geneweb_db.Driver.iper
   | Fix_ParentDeleted of Geneweb_db.Driver.iper
@@ -52,7 +57,9 @@ val check_NBDS :
   Geneweb_db.Driver.base ->
   unit
 (** For every person in the base synchronise his birth, death, baptism and
-    burial events with his fields and vice versa. *)
+    burial events with his fields and vice versa. An unknown burial is set from
+    a burial or cremation event only when this event has a date or a place;
+    otherwise it is reported with [Unfixed_UnknownBurial]. *)
 
 val check_families_parents :
   ?report:(patch -> unit) ->

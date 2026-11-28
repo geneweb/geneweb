@@ -129,7 +129,7 @@ let fixbase_ok conf base =
     let ifams = ref [] in
     let istrs = ref [] in
     let report = function
-      | Fixbase.Fix_NBDS ip
+      | Fixbase.Fix_NBDS (ip, _)
       | Fix_AddedUnion ip
       | Fix_AddedParents ip
       | Fix_ParentDeleted ip
@@ -149,6 +149,7 @@ let fixbase_ok conf base =
           ifams := ifam :: !ifams
       | Fix_WrongUTF8Encoding (ifam, iper, istr) ->
           istrs := (ifam, iper, istr) :: !istrs
+      | Unfixed_UnknownBurial _ -> ()
     in
     let progress (_ : int) (_ : int) = () in
     let enabled = List.exists (UI.enabled conf) in
