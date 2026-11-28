@@ -901,6 +901,7 @@ let note_sections =
     "Files not renamed by -unidecode-keys";
     "Burials to verify (-persons-NBDS)";
     "Deaths to verify (-persons-not-dead)";
+    "Duplicate keys renumbered (-person-key, gwc)";
   |]
 
 let note_entry base patch =
@@ -925,6 +926,15 @@ let note_entry base patch =
       Some (4, link ip ^ ": burial event without date nor place")
   | Unfixed_NotDead ip ->
       Some (5, link ip ^ ": not dead, with a death, burial or cremation event")
+  | Fix_UpdatedOcc (ip, o, _) ->
+      let p = Driver.poi base ip in
+      Some
+        ( 6,
+          if o < 0 then Printf.sprintf "%s, formerly %d" (link ip) o
+          else
+            Printf.sprintf "%s, same key as [[%s/%s/%d]]" (link ip)
+              (Driver.p_first_name base p)
+              (Driver.p_surname base p) o )
   | _ -> None
 
 let write_note conf base origin entries =

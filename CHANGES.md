@@ -389,9 +389,13 @@
   To be run once, before `update_nldb`; not part of the default set of
   fixes. When two persons of a `.gw` get the same key with the new
   folding only, `gwc` builds the base again with the former folding,
-  then migrates it the same way. `-person-key` no longer renumbers a
-  person whose key is shared only with the new folding, and reports it
-  instead.
+  then migrates it the same way. A person of a `.gw` defined with the
+  key of another one, for any other reason, no longer stops `gwc`: it
+  gets the first free occurrence number, with a warning, and is listed
+  with a link to the other one in the note `gwfixbase`, as are the
+  persons renumbered by `gwfixbase -person-key`. `-person-key` no longer
+  renumbers a person whose key is shared only with the new folding, and
+  reports it instead.
 - With `-apply`, `gwfixbase` (and `gwc` after a migration) appends to the
   note `gwfixbase` a dated section listing with links the renumbered
   persons and the cases to verify (burials, deaths, keys, links and files

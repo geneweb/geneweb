@@ -2,6 +2,7 @@
 module GWPARAM = Geneweb.GWPARAM
 module Config = Geneweb.Config
 module Fixbase = Geneweb.Fixbase
+module Driver = Geneweb_db.Driver
 module Dirs = Geneweb_dirs
 
 let ( // ) = Filename.concat
@@ -320,8 +321,8 @@ let cleanup gwo_files =
     (fun (fname, _, _, _, was_gw) -> if was_gw then Mutil.rm fname)
     gwo_files
 
-let migrate_keys bname bpath =
-  Geneweb_db.Driver.with_database bpath @@ fun base ->
+let finish_base bname bpath =
+  Driver.with_database bpath @@ fun base ->
   let layout = Layout.of_bname ~mode:Layout.Detect bname in
   let conf =
     {
@@ -331,26 +332,51 @@ let migrate_keys bname bpath =
       base_env = Geneweb.Util.read_base_env layout "" false;
     }
   in
-  let keys = ref 0 in
-  let renumbered = ref 0 in
   let entries = ref [] in
-  let report patch =
-    (match patch with
-    | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
-        incr keys;
-        if Option.is_some kip then incr renumbered
-    | _ -> ());
+  let note patch =
     Option.iter
       (fun e -> entries := e :: !entries)
       (Fixbase.note_entry base patch)
   in
-  Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base;
+  let renumbered = Hashtbl.create 8 in
+  List.iter
+    (fun (fn, sn, o, n) -> Hashtbl.replace renumbered (fn, sn, n) o)
+    !Db1link.duplicates;
+  if Hashtbl.length renumbered > 0 then
+    Geneweb_db.Collection.iter
+      (fun p ->
+        let occ = Driver.get_occ p in
+        match
+          Hashtbl.find_opt renumbered
+            (Driver.p_first_name base p, Driver.p_surname base p, occ)
+        with
+        | Some o -> note (Fixbase.Fix_UpdatedOcc (Driver.get_iper p, o, occ))
+        | None -> ())
+      (Driver.persons base);
+  let keys = ref 0 in
+  let moved = ref 0 in
+  if !Unidecode.former then (
+    Unidecode.former := false;
+    let report patch =
+      (match patch with
+      | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
+          incr keys;
+          if Option.is_some kip then incr moved
+      | _ -> ());
+      note patch
+    in
+    Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base);
   Fixbase.write_note conf base "gwc" (List.rev !entries);
-  Geneweb_db.Driver.commit_patches base;
-  Geneweb_db.Driver.sync base;
-  Format.eprintf
-    "Keys moved to the current folding of the names: %d, %d renumbered@." !keys
-    !renumbered;
+  if !keys > 0 then (
+    Driver.commit_patches base;
+    Driver.sync base;
+    Format.eprintf
+      "Keys moved to the current folding of the names: %d, %d renumbered@."
+      !keys !moved);
+  if Hashtbl.length renumbered > 0 then
+    Format.eprintf
+      "Persons defined with the key of another one, renumbered: %d@."
+      (Hashtbl.length renumbered);
   if !entries <> [] then
     Format.eprintf
       "Cases to verify: %d, listed in the note gwfixbase \
@@ -416,8 +442,7 @@ let () =
       generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
-    if !Unidecode.former then (
-      Unidecode.former := false;
-      let (), duration = with_timer @@ fun () -> migrate_keys bname bpath in
-      Format.eprintf "Key migration: %a@." pp_duration duration);
+    (if !Unidecode.former || !Db1link.duplicates <> [] then
+       let (), duration = with_timer @@ fun () -> finish_base bname bpath in
+       Format.eprintf "Keys check: %a@." pp_duration duration);
     if !kill_gwo then cleanup gwo_files)
