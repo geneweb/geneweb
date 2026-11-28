@@ -1,6 +1,11 @@
 open Alcotest
 
 let lower expected s () = (check string) s expected (Name.lower s)
+let former expected s () = (check string) s expected (Name.former_lower s)
+
+let restored () =
+  ignore (Name.former_lower "Weiß");
+  (check string) "Weiß" "weiss" (Name.lower "Weiß")
 
 let v =
   [
@@ -24,5 +29,16 @@ let v =
         test_case "が" `Quick (lower "が" "が");
         test_case "no-break space" `Quick
           (lower "jean\u{00A0}ii" "Jean\u{00A0}II");
+      ] );
+    ( "former",
+      [
+        test_case "ß" `Quick (former "weisz" "Weiß");
+        test_case "ẞ" `Quick (former "weis" "WEIẞ");
+        test_case "Ḣ" `Quick (former "gugh" "Ḣugh");
+        test_case "Ή" `Quick (former "hra" "Ήρα");
+        test_case "ю" `Quick (former "kryuger" "Крюгер");
+        test_case "Ș" `Quick (former "Ștefan" "Ștefan");
+        test_case "unchanged" `Quick (former "muller" "Müller");
+        test_case "restored" `Quick restored;
       ] );
   ]
