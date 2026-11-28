@@ -23,6 +23,21 @@
 > older `gwc`; export it with `gwu -old_gw` to write those notes as plain
 > text instead.
 
+> [!WARNING]
+> **New keys for some persons.** The folding of the names into keys
+> (Unidecode table) is corrected: ß and ẞ give ss, wrong entries are
+> fixed and the characters missing from the table are decoded. The keys,
+> URLs and file names (portraits, blasons, carrousels, history) of the
+> persons whose names hold these characters change. Rebuilding a base
+> with `gwu` then `gwc` moves it to the new keys: `gwc` renames these
+> files and, when two persons get the same key, renumbers the second
+> one, rewrites the links of the notes to it and lists it in the note
+> `gwfixbase` (`m=NOTES&f=gwfixbase`), to be verified. A base that is not
+> rebuilt (format `GnWb0026`, or `GnWb0025` updated by `gwc -reindex`)
+> must be moved once with `gwfixbase -unidecode-keys -apply`, right after
+> the upgrade and before any edit: until then, the search misses these
+> persons.
+
 ## Gwd
 - The names of notes and galleries may contain accented letters and
   other UTF-8 characters (`[[[Séjour_à_Évian]]]`, `m=NOTES&f=Été`).
