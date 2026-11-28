@@ -43,7 +43,8 @@ type patch =
   | Fix_WrongUTF8Encoding of
       Geneweb_db.Driver.ifam option
       * Geneweb_db.Driver.iper option
-      * (Geneweb_db.Driver.istr * Geneweb_db.Driver.istr) option
+      * (string * string)
+      (** family or person, text before and after normalization *)
   | Fix_UpdatedOcc of Geneweb_db.Driver.iper * int * int
   | Fix_ChildrenOrder of
       Geneweb_db.Driver.ifam
@@ -154,8 +155,9 @@ val fix_utf8_sequence :
   (int -> int -> unit) ->
   Geneweb_db.Driver.base ->
   unit
-(** For every person's and family's field, remplace it with normalized UTF8
-    version. *)
+(** For every person's and family's string and text date, replace it with its
+    NFC normalization, invalid UTF-8 sequences becoming U+FFFD. ASCII strings
+    are skipped and only the changed strings are inserted. *)
 
 val fix_key :
   ?report:(patch -> unit) ->

@@ -18,9 +18,7 @@ type patch =
       Driver.ifam * relation_kind * relation_kind * string list
   | Fix_MissingSpouse of Driver.ifam * Driver.iper
   | Fix_WrongUTF8Encoding of
-      Driver.ifam option
-      * Driver.iper option
-      * (Driver.istr * Driver.istr) option
+      Driver.ifam option * Driver.iper option * (string * string)
   | Fix_UpdatedOcc of Driver.iper * int * int
   | Fix_ChildrenOrder of Driver.ifam * Driver.iper array * Driver.iper array
 
@@ -609,32 +607,30 @@ let fix_missing_spouses ?report progress base =
     (Driver.families base)
 
 let fix_utf8_sequence ?report progress base =
-  let normalize_utf_8_date ifam iper s =
-    let s' = Mutil.normalize_utf_8 s in
-    (if s <> s' then
-       match report with
-       | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
-       | None -> ());
-    s'
-  in
-  let normalize_utf_8 ifam iper i =
-    let s = Driver.sou base i in
-    let s' = Mutil.normalize_utf_8 s in
-    let i' = Driver.insert_string base s' in
-    (if i <> i' then
-       match report with
-       | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, Some (i, i')))
-       | None -> ());
-    i'
+  let normalize ifam iper s =
+    if String.for_all (fun c -> Char.code c < 0x80) s then None
+    else
+      let s' = Mutil.normalize_utf_8 s in
+      if s' = s then None
+      else (
+        Option.iter
+          (fun fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, (s, s'))))
+          report;
+        Some s')
   in
   let nbf = Driver.nb_of_families base in
   let nbp = Driver.nb_of_persons base in
   let nb = nbp + nbf in
   let fp i = i in
   let ff i = i in
-  let fs ifam iper i = normalize_utf_8 ifam iper i in
+  let fs ifam iper i =
+    match normalize ifam iper (Driver.sou base i) with
+    | Some s -> Driver.insert_string base s
+    | None -> i
+  in
   let fd ifam iper = function
-    | Adef.Dtext d -> Adef.Dtext (normalize_utf_8_date ifam iper d)
+    | Adef.Dtext d as x -> (
+        match normalize ifam iper d with Some d -> Adef.Dtext d | None -> x)
     | d -> d
   in
   Collection.iteri

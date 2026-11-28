@@ -41,6 +41,31 @@ let dump_persons bpath ofile =
   Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
     real_count !undef real_count !undef check !nb_ind_init
 
+let changed_part s s' =
+  let n = String.length s and n' = String.length s' in
+  let cont s i = Char.code s.[i] land 0xC0 = 0x80 in
+  let rec prefix i =
+    if i < n && i < n' && s.[i] = s'.[i] then prefix (i + 1) else i
+  in
+  let rec back i =
+    if i > 0 && ((i < n && cont s i) || (i < n' && cont s' i)) then back (i - 1)
+    else i
+  in
+  let p = back (prefix 0) in
+  let rec suffix j =
+    if j < n - p && j < n' - p && s.[n - 1 - j] = s'.[n' - 1 - j] then
+      suffix (j + 1)
+    else j
+  in
+  let rec forth j = if j > 0 && cont s (n - j) then forth (j - 1) else j in
+  let e = n - forth (suffix 0) in
+  let rec cut i k =
+    if i >= e then String.sub s p (e - p)
+    else if k = 0 then String.sub s p (i - p) ^ "…"
+    else cut (i + Uchar.utf_decode_length (String.get_utf_8_uchar s i)) (k - 1)
+  in
+  cut p 40
+
 let aux txt
     (fn :
       ?report:(Fixbase.patch -> unit) ->
@@ -102,18 +127,15 @@ let aux txt
     | Fix_MissingSpouse (ifam, iper) ->
         Printf.sprintf "Fixed missing spouse (%s) in family %s"
           (string_of_p iper) (string_of_f ifam)
-    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
-        Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
-          (match ifam_opt with
-          | Some i -> "ifam " ^ Driver.Ifam.to_string i
-          | None -> (
-              match iper_opt with
-              | Some i -> "iper " ^ Driver.Iper.to_string i
-              | None -> assert false))
-          (match opt with
-          | Some (i, i') ->
-              Driver.Istr.to_string i ^ " -> " ^ Driver.Istr.to_string i'
-          | None -> "Dtext")
+    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, (s, s')) ->
+        Printf.sprintf "%s in %s: \"%s\""
+          (if String.is_valid_utf_8 s then "NFC normalization"
+           else "Invalid UTF-8 replaced")
+          (match (ifam_opt, iper_opt) with
+          | Some i, _ -> string_of_f i
+          | None, Some i -> string_of_p i
+          | None, None -> assert false)
+          (changed_part s s')
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
           nocc
@@ -218,7 +240,7 @@ let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
   if !pevents_witnesses then check_pevents_witnesses ~v1 ~v2 base nb_ind fix;
   if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
-  if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
+  if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base (nb_fam + nb_ind) fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if !children_order then fix_children_order ~v1 ~v2 base nb_fam fix;
   if not !dry_run then (
