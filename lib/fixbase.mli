@@ -21,6 +21,9 @@ type patch =
   | Unfixed_UnknownBurial of Geneweb_db.Driver.iper
       (** person whose burial is unknown while he has a burial or cremation
           event with neither date nor place; reported, not fixed *)
+  | Unfixed_NotDead of Geneweb_db.Driver.iper
+      (** person not dead while he has a death event without date, a burial or a
+          cremation event; reported, not fixed *)
   | Fix_AddedUnion of Geneweb_db.Driver.iper
   | Fix_AddedParents of Geneweb_db.Driver.iper
   | Fix_ParentDeleted of Geneweb_db.Driver.iper
@@ -61,6 +64,15 @@ val check_NBDS :
     burial events with his fields and vice versa. An unknown burial is set from
     a burial or cremation event only when this event has a date or a place;
     otherwise it is reported with [Unfixed_UnknownBurial]. *)
+
+val check_not_dead :
+  ?report:(patch -> unit) ->
+  (int -> int -> unit) ->
+  Geneweb_db.Driver.base ->
+  unit
+(** For every person not dead having a death event without date, a burial or a
+    cremation event, report [Unfixed_NotDead]. Nothing is patched. A dated death
+    event is left to [check_NBDS], which sets the death from it. *)
 
 val check_families_parents :
   ?report:(patch -> unit) ->

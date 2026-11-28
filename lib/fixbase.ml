@@ -5,6 +5,7 @@ module Collection = Geneweb_db.Collection
 type patch =
   | Fix_NBDS of Driver.iper * string list
   | Unfixed_UnknownBurial of Driver.iper
+  | Unfixed_NotDead of Driver.iper
   | Fix_AddedUnion of Driver.iper
   | Fix_AddedParents of Driver.iper
   | Fix_ParentDeleted of Driver.iper
@@ -197,6 +198,22 @@ let check_NBDS ?report progress base =
     (fun i p ->
       progress i nb_ind;
       fix_pevents ?report base p)
+    (Driver.persons base)
+
+let check_not_dead ?report progress base =
+  let nb_ind = Driver.nb_of_persons base in
+  let dead e =
+    match e.epers_name with
+    | Epers_Death -> e.epers_date = Date.cdate_None
+    | Epers_Burial | Epers_Cremation -> true
+    | _ -> false
+  in
+  Collection.iteri
+    (fun i p ->
+      progress i nb_ind;
+      if Driver.get_death p = NotDead && List.exists dead (Driver.get_pevents p)
+      then
+        Option.iter (fun fn -> fn (Unfixed_NotDead (Driver.get_iper p))) report)
     (Driver.persons base)
 
 let check_families_parents ?report progress base =

@@ -85,6 +85,11 @@ let aux txt
         Printf.sprintf "Synchronized %s of %s"
           (String.concat ", " fields)
           (string_of_p ip)
+    | Unfixed_NotDead ip ->
+        Printf.sprintf
+          "Not fixed, to verify manually: not dead but death event without \
+           date, burial or cremation event for %s"
+          (string_of_p ip)
     | Unfixed_UnknownBurial ip ->
         Printf.sprintf
           "Not fixed, to verify manually: burial or cremation event without \
@@ -166,7 +171,7 @@ let aux txt
     else fun _ _ -> ()
   in
   let count = function
-    | Fixbase.Unfixed_UnknownBurial _ -> ()
+    | Fixbase.Unfixed_UnknownBurial _ | Unfixed_NotDead _ -> ()
     | _ -> incr cnt
   in
   let report =
@@ -184,6 +189,7 @@ let aux txt
   if v1 then ProgrBar.finish ()
 
 let check_NBDS = aux "Check persons' NBDS" Fixbase.check_NBDS
+let check_not_dead = aux "Check persons not dead" Fixbase.check_not_dead
 
 let check_families_parents =
   aux "Check families' parents" Fixbase.check_families_parents
@@ -218,8 +224,8 @@ let fix_key =
 let fix_children_order = aux "Fix children order" Fixbase.fix_children_order
 
 let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
-    ~p_parents ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses
-    ~marriage_divorce ~invalid_utf8 ~key ~children_order =
+    ~p_parents ~p_families ~p_NBDS ~p_not_dead ~pevents_witnesses
+    ~fevents_witnesses ~marriage_divorce ~invalid_utf8 ~key ~children_order =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -236,6 +242,7 @@ let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
   if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
   if !p_NBDS then check_NBDS base ~v1 ~v2 nb_ind fix;
+  if !p_not_dead then check_not_dead ~v1 ~v2 base nb_ind fix;
   if !p_families then check_persons_families ~v1 ~v2 base nb_ind fix;
   if !pevents_witnesses then check_pevents_witnesses ~v1 ~v2 base nb_ind fix;
   if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
@@ -278,6 +285,7 @@ let f_children = ref false
 let p_parents = ref false
 let p_families = ref false
 let p_NBDS = ref false
+let p_not_dead = ref false
 let pevents_witnesses = ref false
 let fevents_witnesses = ref false
 let marriage_divorce = ref false
@@ -307,6 +315,10 @@ let speclist =
     ( "-persons-NBDS",
       Arg.Set p_NBDS,
       " fix persons' birth, baptism, death and burial events" );
+    ( "-persons-not-dead",
+      Arg.Set p_not_dead,
+      " report the persons not dead having a death event without date, a \
+       burial or a cremation" );
     ("-persons-parents", Arg.Set p_parents, " fix persons’ parents links");
     ("-persons-families", Arg.Set p_families, " fix persons’ families links");
     ( "-pevents-witnesses",
@@ -373,6 +385,7 @@ let main () =
         !f_spouses || !f_parents || !f_children || !p_parents || !p_families
         || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
         || !p_NBDS || !invalid_utf8 || !key || !index || !children_order
+        || !p_not_dead
       in
       if fixes || !history then ()
       else (
@@ -385,12 +398,14 @@ let main () =
         fevents_witnesses := true;
         marriage_divorce := true;
         p_NBDS := true;
+        p_not_dead := true;
         invalid_utf8 := true;
         key := true);
       if fixes || not !history then
         check base ~apply ~fast ~verbosity ~f_spouses ~f_parents ~f_children
-          ~p_NBDS ~p_parents ~p_families ~pevents_witnesses ~fevents_witnesses
-          ~marriage_divorce ~invalid_utf8 ~key ~children_order;
+          ~p_NBDS ~p_not_dead ~p_parents ~p_families ~pevents_witnesses
+          ~fevents_witnesses ~marriage_divorce ~invalid_utf8 ~key
+          ~children_order;
       (if !history then
          let layout = Layout.of_bname ~mode:Layout.Detect bname in
          let conf =

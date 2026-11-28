@@ -378,6 +378,8 @@
   family whose data is the same; the burial is no longer set from a
   burial event without date nor place, which is reported instead;
   `-invalid-utf8` is faster.
+- `gwfixbase -persons-not-dead` reports, without fixing them, the persons
+  not dead having a death event without date, a burial or a cremation.
 - The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM
