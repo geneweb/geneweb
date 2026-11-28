@@ -149,7 +149,10 @@ let fixbase_ok conf base =
           ifams := ifam :: !ifams
       | Fix_WrongUTF8Encoding (ifam, iper, texts) ->
           istrs := (ifam, iper, texts) :: !istrs
-      | Unfixed_UnknownBurial _ | Unfixed_NotDead _ -> ()
+      | Unfixed_UnknownBurial _ | Unfixed_NotDead _ | Fix_UnidecodeKey _
+      | Fix_RenamedFile _ | Unfixed_RenamedFile _ | Fix_NotesLinks _
+      | Unfixed_AmbiguousLinks _ | Unfixed_FoldingCollision _ ->
+          ()
     in
     let progress (_ : int) (_ : int) = () in
     let enabled = List.exists (UI.enabled conf) in

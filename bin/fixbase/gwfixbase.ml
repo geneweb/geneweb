@@ -5,6 +5,7 @@ module Gutil = Geneweb_db.Gutil
 module Collection = Geneweb_db.Collection
 
 let nb_ind_init = ref 0
+let note_entries = ref []
 
 let dump_persons bpath ofile =
   Driver.with_database bpath @@ fun base ->
@@ -157,6 +158,24 @@ let aux txt
         let ranks a = Array.to_list a |> List.map rank |> String.concat " " in
         Printf.sprintf "Reordered children of %s: %s -> %s" (string_of_f ifam)
           (ranks before) (ranks after)
+    | Fix_UnidecodeKey (ip, o, n, _) ->
+        Printf.sprintf "Key of %s: %s -> %s" (string_of_p ip) o n
+    | Fix_RenamedFile (o, n) -> Printf.sprintf "Renamed %s -> %s" o n
+    | Unfixed_RenamedFile (o, n, why) ->
+        Printf.sprintf "Not fixed, to verify manually: %s not renamed %s (%s)" o
+          n why
+    | Fix_NotesLinks (ip, n) ->
+        Printf.sprintf "Rewrote the links to %s in %d pages" (string_of_p ip) n
+    | Unfixed_FoldingCollision (ip, kip) ->
+        Printf.sprintf
+          "Not fixed: %s has the key of %s with the current folding of the \
+           names only, use -unidecode-keys"
+          (string_of_p ip) (string_of_p kip)
+    | Unfixed_AmbiguousLinks (ip, kip, n) ->
+        Printf.sprintf
+          "Not fixed, to verify manually: links of %d pages to %s or %s, not \
+           rewritten"
+          n (string_of_p ip) (string_of_p kip)
   in
   let i' = ref 0 in
   if v1 then (
@@ -170,8 +189,15 @@ let aux txt
     else if v1 then ProgrBar.run
     else fun _ _ -> ()
   in
-  let count = function
-    | Fixbase.Unfixed_UnknownBurial _ | Unfixed_NotDead _ -> ()
+  let count s =
+    Option.iter
+      (fun e -> note_entries := e :: !note_entries)
+      (Fixbase.note_entry base s);
+    match s with
+    | Fixbase.Unfixed_UnknownBurial _ | Unfixed_NotDead _
+    | Unfixed_RenamedFile _ | Unfixed_AmbiguousLinks _
+    | Unfixed_FoldingCollision _ ->
+        ()
     | _ -> incr cnt
   in
   let report =
@@ -223,9 +249,14 @@ let fix_key =
 
 let fix_children_order = aux "Fix children order" Fixbase.fix_children_order
 
-let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
-    ~p_parents ~p_families ~p_NBDS ~p_not_dead ~pevents_witnesses
-    ~fevents_witnesses ~marriage_divorce ~invalid_utf8 ~key ~children_order =
+let fix_unidecode_keys ~apply conf =
+  aux "Fix the keys changed by the current folding of the names"
+    (Fixbase.fix_unidecode_keys ~apply conf)
+
+let check base conf ~apply ~verbosity ~fast ~unidecode_keys ~f_spouses
+    ~f_parents ~f_children ~p_parents ~p_families ~p_NBDS ~p_not_dead
+    ~pevents_witnesses ~fevents_witnesses ~marriage_divorce ~invalid_utf8 ~key
+    ~children_order =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -237,6 +268,8 @@ let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
     Driver.load_strings_array base;
     Driver.load_persons_array base;
     Driver.load_families_array base);
+  if !unidecode_keys then
+    fix_unidecode_keys ~apply:!apply conf ~v1 ~v2 base (2 * nb_ind) fix;
   if !f_spouses then fix_missing_spouses ~v1 ~v2 base nb_fam fix;
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
@@ -254,6 +287,7 @@ let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
     if v1 then
       Printf.printf "%d changes found, not committed (use -apply)\n%!" !fix)
   else (
+    Fixbase.write_note conf base "gwfixbase" (List.rev !note_entries);
     if !fix <> 0 then (
       Driver.commit_patches base;
       if v1 then (
@@ -279,6 +313,7 @@ let check base ~apply ~verbosity ~fast ~f_spouses ~f_parents ~f_children
 let bname = ref None
 let verbosity = ref 2
 let fast = ref false
+let unidecode_keys = ref false
 let f_spouses = ref false
 let f_parents = ref false
 let f_children = ref false
@@ -319,6 +354,13 @@ let speclist =
       Arg.Set p_not_dead,
       " report the persons not dead having a death event without date, a \
        burial or a cremation" );
+    ( "-unidecode-keys",
+      Arg.Set unidecode_keys,
+      " move a base built with the former folding of the names (before the \
+       corrections of the Unidecode table) to the current one: renumber the \
+       colliding keys, rename the files named after the keys, rewrite the \
+       links of the notes; run it once, before any other fix and before \
+       update_nldb (not included in the default set)" );
     ("-persons-parents", Arg.Set p_parents, " fix persons’ parents links");
     ("-persons-families", Arg.Set p_families, " fix persons’ families links");
     ( "-pevents-witnesses",
@@ -385,7 +427,7 @@ let main () =
         !f_spouses || !f_parents || !f_children || !p_parents || !p_families
         || !pevents_witnesses || !fevents_witnesses || !marriage_divorce
         || !p_NBDS || !invalid_utf8 || !key || !index || !children_order
-        || !p_not_dead
+        || !p_not_dead || !unidecode_keys
       in
       if fixes || !history then ()
       else (
@@ -401,20 +443,21 @@ let main () =
         p_not_dead := true;
         invalid_utf8 := true;
         key := true);
+      let layout = Layout.of_bname ~mode:Layout.Detect bname in
+      let conf =
+        {
+          Config.empty with
+          Config.bname;
+          layout;
+          base_env = Util.read_base_env layout "" false;
+        }
+      in
       if fixes || not !history then
-        check base ~apply ~fast ~verbosity ~f_spouses ~f_parents ~f_children
-          ~p_NBDS ~p_not_dead ~p_parents ~p_families ~pevents_witnesses
-          ~fevents_witnesses ~marriage_divorce ~invalid_utf8 ~key
-          ~children_order;
+        check base conf ~apply ~fast ~verbosity ~unidecode_keys ~f_spouses
+          ~f_parents ~f_children ~p_NBDS ~p_not_dead ~p_parents ~p_families
+          ~pevents_witnesses ~fevents_witnesses ~marriage_divorce ~invalid_utf8
+          ~key ~children_order;
       (if !history then
-         let layout = Layout.of_bname ~mode:Layout.Detect bname in
-         let conf =
-           {
-             Config.empty with
-             Config.bname;
-             base_env = Util.read_base_env layout "" false;
-           }
-         in
          let n = HistoryDiff.convert ~dry_run:(not !apply) conf base in
          Printf.eprintf "%d history files converted\n%!" n);
       if !dump then dump_persons bpath !ofile

@@ -380,6 +380,18 @@
   `-invalid-utf8` is faster.
 - `gwfixbase -persons-not-dead` reports, without fixing them, the persons
   not dead having a death event without date, a burial or a cremation.
+- `gwfixbase -unidecode-keys` moves a base built before the corrections of
+  the Unidecode table (2026-11) to the new keys: a person whose new key is
+  held by another one gets the first free occurrence number, and the links
+  of the notes to it are rewritten; the portraits, blasons, carrousels and
+  history files are renamed after the new keys, and the notes links
+  database is rebuilt.
+  To be run once, before `update_nldb`; not part of the default set of
+  fixes. `-person-key` no longer renumbers a person whose key is shared
+  only with the new folding, and reports it instead.
+- With `-apply`, `gwfixbase` lists the renumbered persons and the cases to
+  verify (burials, deaths, keys, links and files left unchanged) with
+  links in the note `gwfixbase`.
 - The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM

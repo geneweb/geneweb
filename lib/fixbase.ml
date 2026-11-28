@@ -22,6 +22,12 @@ type patch =
       Driver.ifam option * Driver.iper option * (string * string)
   | Fix_UpdatedOcc of Driver.iper * int * int
   | Fix_ChildrenOrder of Driver.ifam * Driver.iper array * Driver.iper array
+  | Fix_UnidecodeKey of Driver.iper * string * string * Driver.iper option
+  | Fix_RenamedFile of string * string
+  | Unfixed_RenamedFile of string * string * string
+  | Fix_NotesLinks of Driver.iper * int
+  | Unfixed_AmbiguousLinks of Driver.iper * Driver.iper * int
+  | Unfixed_FoldingCollision of Driver.iper * Driver.iper
 
 let mk_pevent name date place note src =
   {
@@ -693,6 +699,15 @@ let fix_key ?report progress base =
         id
   in
   let blank = name_id Driver.Istr.empty in
+  let formers = Driver.Istr.Table.create 1024 in
+  let former istr =
+    match Driver.Istr.Table.find_opt formers istr with
+    | Some s -> s
+    | None ->
+        let s = Name.former_lower (Driver.sou base istr) in
+        Driver.Istr.Table.replace formers istr s;
+        s
+  in
   let groups = Hashtbl.create 1024 in
   Collection.iteri
     (fun i p ->
@@ -704,16 +719,26 @@ let fix_key ?report progress base =
         Hashtbl.replace groups (f, s)
           ((Driver.get_occ p, Driver.get_iper p) :: l))
     (Driver.persons base);
+  let former_key ip =
+    let p = Driver.poi base ip in
+    (former (Driver.get_first_name p), former (Driver.get_surname p))
+  in
   let renumber l =
     let l = List.sort (fun (_, a) (_, b) -> Driver.Iper.compare a b) l in
     let kept = Hashtbl.create 8 in
     let moved =
       List.fold_left
         (fun moved (occ, ip) ->
-          if occ >= 0 && not (Hashtbl.mem kept occ) then (
-            Hashtbl.replace kept occ ();
-            moved)
-          else (occ, ip) :: moved)
+          match Hashtbl.find_opt kept occ with
+          | None when occ >= 0 ->
+              Hashtbl.replace kept occ ip;
+              moved
+          | Some kip when former_key kip <> former_key ip ->
+              Option.iter
+                (fun fn -> fn (Unfixed_FoldingCollision (ip, kip)))
+                report;
+              moved
+          | Some _ | None -> (occ, ip) :: moved)
         [] l
     in
     let rec free occ = if Hashtbl.mem kept occ then free (occ + 1) else occ in
@@ -733,3 +758,193 @@ let fix_key ?report progress base =
       | [ (occ, _) ] when occ >= 0 -> ()
       | [] | _ :: _ -> renumber l)
     groups
+
+let fix_unidecode_keys ~apply conf ?report progress base =
+  let report x = Option.iter (fun fn -> fn x) report in
+  let nb_ind = Driver.nb_of_persons base in
+  let folds = Driver.Istr.Table.create 1024 in
+  let fold istr =
+    match Driver.Istr.Table.find_opt folds istr with
+    | Some r -> r
+    | None ->
+        let s = Driver.sou base istr in
+        let lower = Name.lower s in
+        let r =
+          if String.for_all (fun c -> Char.code c < 0x80) s then (lower, lower)
+          else (lower, Name.former_lower s)
+        in
+        Driver.Istr.Table.replace folds istr r;
+        r
+  in
+  let groups = Hashtbl.create 64 in
+  let scan pass f =
+    Collection.iteri
+      (fun i p ->
+        progress ((pass * nb_ind) + i) (2 * nb_ind);
+        let fn, ofn = fold (Driver.get_first_name p) in
+        let sn, osn = fold (Driver.get_surname p) in
+        if fn <> "" && sn <> "" then f p (fn, sn) (ofn, osn))
+      (Driver.persons base)
+  in
+  scan 0 (fun _ key (ofn, osn) ->
+      if (ofn, osn) <> key then Hashtbl.replace groups key []);
+  scan 1 (fun p key (ofn, osn) ->
+      match Hashtbl.find_opt groups key with
+      | Some l ->
+          Hashtbl.replace groups key
+            ((Driver.get_iper p, Driver.get_occ p, ofn, osn) :: l)
+      | None -> ());
+  let db =
+    if Hashtbl.length groups = 0 then []
+    else Notes.merge_possible_aliases conf (Driver.read_nldb base)
+  in
+  let pages key =
+    List.filter_map
+      (fun (pg, (_, il)) ->
+        if List.exists (fun (k, _) -> Def.NLDB.equal_key k key) il then Some pg
+        else None)
+      db
+  in
+  let rename src dst =
+    if Sys.file_exists src then
+      if Sys.file_exists dst then
+        report (Unfixed_RenamedFile (src, dst, "target exists"))
+      else if not apply then report (Fix_RenamedFile (src, dst))
+      else
+        try
+          Filesystem.create_dir ~parent:true (Filename.dirname dst);
+          Sys.rename src dst;
+          report (Fix_RenamedFile (src, dst))
+        with Sys_error e | Filesystem.File_error e ->
+          report (Unfixed_RenamedFile (src, dst, e))
+  in
+  let portraits = Layout.portraits conf.Config.layout in
+  let images = Layout.images conf.Config.layout in
+  let key_basename fn sn occ =
+    Printf.sprintf "%s.%d.%s" (Mutil.tr ' ' '_' fn) occ (Mutil.tr ' ' '_' sn)
+  in
+  let changed = ref false in
+  let migrate (fn, sn) (ip, occ, ofn, osn) occ' keeper =
+    let p = Driver.poi base ip in
+    let first_name = Driver.p_first_name base p in
+    let surname = Driver.p_surname base p in
+    let old_name = key_basename ofn osn occ in
+    let new_name = Image.key_dir_basename first_name surname occ' in
+    changed := true;
+    (match keeper with
+    | Some (kip, _, kfn, ksn) when occ' <> occ ->
+        Driver.patch_person base ip
+          { (Driver.gen_person_of_person p) with occ = occ' };
+        report (Fix_UnidecodeKey (ip, old_name, new_name, Some kip));
+        let theirs = pages (kfn, ksn, occ) in
+        let shared, own =
+          List.partition (fun pg -> List.mem pg theirs) (pages (ofn, osn, occ))
+        in
+        if shared <> [] then
+          report (Unfixed_AmbiguousLinks (ip, kip, List.length shared));
+        if own <> [] then (
+          if apply then
+            ignore
+              (Notes.update_ind_key conf base own (fn, sn, occ)
+                 (first_name, surname, occ'));
+          report (Fix_NotesLinks (ip, List.length own)))
+    | Some _ | None -> report (Fix_UnidecodeKey (ip, old_name, new_name, None)));
+    List.iter
+      (fun dir ->
+        List.iter
+          (fun suffix ->
+            Array.iter
+              (fun ext ->
+                rename
+                  (Filename.concat dir (old_name ^ suffix ^ ext))
+                  (Filename.concat dir (new_name ^ suffix ^ ext)))
+              Image.ext_list_2)
+          [ ""; ".blason" ])
+      [ portraits; Filename.concat portraits "saved" ];
+    rename (Filename.concat images old_name) (Filename.concat images new_name);
+    rename
+      (HistoryDiff.history_path conf old_name)
+      (HistoryDiff.history_path conf new_name)
+  in
+  Hashtbl.iter
+    (fun key members ->
+      let affected (_, _, ofn, osn) = (ofn, osn) <> key in
+      let used = Hashtbl.create 8 in
+      List.iter (fun (_, occ, _, _) -> Hashtbl.replace used occ ()) members;
+      let rec free n =
+        if Hashtbl.mem used n then free (n + 1)
+        else (
+          Hashtbl.replace used n ();
+          n)
+      in
+      let held = Hashtbl.create 8 in
+      List.sort
+        (fun ((ip1, _, _, _) as a) ((ip2, _, _, _) as b) ->
+          match Bool.compare (affected a) (affected b) with
+          | 0 -> Driver.Iper.compare ip1 ip2
+          | c -> c)
+        members
+      |> List.iter (fun ((_, occ, _, _) as m) ->
+          let keeper = Hashtbl.find_opt held occ in
+          if Option.is_none keeper then Hashtbl.replace held occ m;
+          if affected m then
+            migrate key m (if Option.is_some keeper then free 0 else occ) keeper))
+    groups;
+  if apply && !changed then
+    Notes.rebuild_links_db base (GWPARAM.bpath conf.Config.bname)
+
+let note_sections =
+  [|
+    "Keys renumbered by -unidecode-keys";
+    "Keys left to -unidecode-keys by -person-key";
+    "Links of notes not rewritten by -unidecode-keys";
+    "Files not renamed by -unidecode-keys";
+    "Burials to verify (-persons-NBDS)";
+    "Deaths to verify (-persons-not-dead)";
+  |]
+
+let note_entry base patch =
+  let link ip =
+    let p = Driver.poi base ip in
+    Printf.sprintf "[[%s/%s/%d]]"
+      (Driver.p_first_name base p)
+      (Driver.p_surname base p) (Driver.get_occ p)
+  in
+  match patch with
+  | Fix_UnidecodeKey (ip, o, _, Some kip) ->
+      Some
+        (0, Printf.sprintf "%s (formerly %s), key of %s" (link ip) o (link kip))
+  | Unfixed_FoldingCollision (ip, kip) ->
+      Some (1, Printf.sprintf "%s, key of %s" (link ip) (link kip))
+  | Unfixed_AmbiguousLinks (ip, kip, n) ->
+      Some
+        (2, Printf.sprintf "%d pages linking %s and %s" n (link ip) (link kip))
+  | Unfixed_RenamedFile (o, n, why) ->
+      Some (3, Printf.sprintf "%s to %s (%s)" o n why)
+  | Unfixed_UnknownBurial ip ->
+      Some (4, link ip ^ ": burial event without date nor place")
+  | Unfixed_NotDead ip ->
+      Some (5, link ip ^ ": not dead, with a death, burial or cremation event")
+  | _ -> None
+
+let write_note conf base origin entries =
+  if entries <> [] then
+    let tm = Unix.localtime (Unix.time ()) in
+    let section i title =
+      match
+        List.filter_map
+          (fun (j, l) -> if j = i then Some ("* " ^ l) else None)
+          entries
+      with
+      | [] -> []
+      | lines -> "" :: ("=== " ^ title ^ " ===") :: "" :: lines
+    in
+    let previous = String.trim (Driver.base_notes_read base "gwfixbase") in
+    Notes.commit_notes conf base "gwfixbase"
+      (String.concat "\n"
+         ((if previous = "" then "TITLE=gwfixbase" else previous)
+         :: ""
+         :: Printf.sprintf "== %s, %d-%02d-%02d %02d:%02d ==" origin
+              (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+              tm.Unix.tm_hour tm.Unix.tm_min
+         :: List.concat (List.mapi section (Array.to_list note_sections))))

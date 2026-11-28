@@ -54,6 +54,23 @@ type patch =
       * Geneweb_db.Driver.iper array
       * Geneweb_db.Driver.iper array
       (** family, children before and after reordering *)
+  | Fix_UnidecodeKey of
+      Geneweb_db.Driver.iper * string * string * Geneweb_db.Driver.iper option
+      (** person, former and new names of its files (see
+          [Image.key_dir_basename]), person keeping its former occurrence number
+          if renumbered *)
+  | Fix_RenamedFile of string * string  (** former and new paths *)
+  | Unfixed_RenamedFile of string * string * string
+      (** former and new paths, reason why the file is not renamed *)
+  | Fix_NotesLinks of Geneweb_db.Driver.iper * int
+      (** person, number of pages whose links to it are rewritten *)
+  | Unfixed_AmbiguousLinks of
+      Geneweb_db.Driver.iper * Geneweb_db.Driver.iper * int
+      (** renumbered person, person keeping the key, number of pages linking
+          both, not rewritten *)
+  | Unfixed_FoldingCollision of Geneweb_db.Driver.iper * Geneweb_db.Driver.iper
+      (** person and person keeping its key, whose keys differ with the folding
+          of the names prior to 2026-11; left to [fix_unidecode_keys] *)
 
 val check_NBDS :
   ?report:(patch -> unit) ->
@@ -171,6 +188,46 @@ val fix_utf8_sequence :
     NFC normalization, invalid UTF-8 sequences becoming U+FFFD. ASCII strings
     are skipped and only the changed strings are inserted. *)
 
+val fix_unidecode_keys :
+  apply:bool ->
+  Config.config ->
+  ?report:(patch -> unit) ->
+  (int -> int -> unit) ->
+  Geneweb_db.Driver.base ->
+  unit
+(** [fix_unidecode_keys ~apply conf] moves a base built with the folding of the
+    names prior to 2026-11 ([Unidecode.former]), by its former version or by gwc
+    for a [.gw] whose persons collide, to the current [Name.lower]. For every
+    person whose key changes:
+    - if another person holds the new key, the person whose key does not change
+      (else the oldest one) keeps it, and the others get the first free
+      occurrence numbers; the links of the notes to a renumbered person are
+      rewritten ([Notes.update_ind_key]), except in the pages also linking the
+      person keeping the key, which are reported;
+    - its portraits, blasons, carrousel and history file are renamed after the
+      new key, unless the target exists.
+
+    With [apply], the files and the notes are written and the notes links
+    database is rebuilt; otherwise only the person patches are made, and the
+    rest is reported. The notes links database must be the one built with the
+    former folding. *)
+
+val note_entry : Geneweb_db.Driver.base -> patch -> (int * string) option
+(** [note_entry base patch] is, for a renumbered person or a case to verify, its
+    section in the note written by [write_note] and its line, with links to the
+    persons; [None] for the other patches. *)
+
+val write_note :
+  Config.config ->
+  Geneweb_db.Driver.base ->
+  string ->
+  (int * string) list ->
+  unit
+(** [write_note conf base origin entries] appends to the note [gwfixbase]
+    (created with its title) a heading with [origin] and the date, and a section
+    per kind of [entries] (from [note_entry]), in their order; nothing if
+    [entries] is empty. *)
+
 val fix_key :
   ?report:(patch -> unit) ->
   (int -> int -> unit) ->
@@ -179,6 +236,10 @@ val fix_key :
 (** For every key (first name and surname folded by [Name.lower]) held by
     several persons with the same occurrence number, the oldest person (lowest
     iper) keeps it and the others get the first free ones; a negative occurrence
-    number is replaced the same way. The persons are grouped in one pass over
-    the base, without its name index, which may not match the current folding of
-    the names; the groups take a few tens of bytes per person. *)
+    number is replaced the same way. A person whose key differs from the one of
+    the person keeping it with the folding of the names prior to 2026-11 is not
+    renumbered but reported with [Unfixed_FoldingCollision], since only
+    [fix_unidecode_keys] follows its files and the links of the notes. The
+    persons are grouped in one pass over the base, without its name index, which
+    may not match the current folding of the names; the groups take a few tens
+    of bytes per person. *)
