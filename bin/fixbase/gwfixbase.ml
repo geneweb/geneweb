@@ -185,7 +185,8 @@ let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
   let nb_ind = Driver.nb_of_persons base in
   if fast then (
     Driver.load_strings_array base;
-    Driver.load_persons_array base);
+    Driver.load_persons_array base;
+    Driver.load_families_array base);
   if !f_spouses then fix_missing_spouses ~v1 ~v2 base nb_fam fix;
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
@@ -198,9 +199,6 @@ let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if !children_order then fix_children_order ~v1 ~v2 base nb_fam fix;
-  if fast then (
-    Driver.clear_strings_array base;
-    Driver.clear_persons_array base);
   if not !dry_run then (
     if !fix <> 0 then (
       Driver.commit_patches base;
@@ -216,7 +214,11 @@ let check base ~dry_run ~verbosity ~fast ~f_spouses ~f_parents ~f_children
     Driver.sync base;
     if v1 then (
       Printf.printf "Done\n";
-      flush stdout))
+      flush stdout));
+  if fast then (
+    Driver.clear_strings_array base;
+    Driver.clear_persons_array base;
+    Driver.clear_families_array base)
 
 (**/**)
 
