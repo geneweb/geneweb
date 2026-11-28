@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 module GWPARAM = Geneweb.GWPARAM
+module Config = Geneweb.Config
+module Fixbase = Geneweb.Fixbase
 module Dirs = Geneweb_dirs
 
 let ( // ) = Filename.concat
@@ -51,15 +53,12 @@ let iterator_gwo_file file_info input =
   in
   (ic, next)
 
-(* FIXME: File descriptor could leak if an exception is raised by the code
-   using this iterator. This is not a big issue as these exceptions are
-   not catch in the current code and file descriptors are released by the
-   operating system at the end of the current process. *)
-let iterator_gwo_files bar inputs file_info =
+let iterator_gwo_files opened bar inputs file_info =
   let queue = Queue.of_seq @@ List.to_seq inputs in
   if Queue.is_empty queue then fun _ -> None
   else
     let curr = ref (iterator_gwo_file file_info @@ Queue.pop queue) in
+    opened := Some (fst !curr);
     let len = Queue.length queue in
     let cnt = ref 0 in
     let rec next () =
@@ -78,19 +77,40 @@ let iterator_gwo_files bar inputs file_info =
               incr cnt;
               ProgrBar.progress bar !cnt len;
               curr := iterator_gwo_file file_info gwo;
+              opened := Some (fst !curr);
               next ())
     in
     next
 
 let generate_database ~no_warn ~bpath bar gwo_files =
-  let iterator = iterator_gwo_files bar gwo_files in
-  match Db1link.link ~no_warn iterator bpath with
-  | exception Db1link.Critical_import_error msg ->
-      Fmt.epr "CRITICAL ERROR: %s@." msg;
-      exit 2
-  | true -> ()
-  | false ->
-      Fmt.epr "Database not created.@.";
+  let link () =
+    let opened = ref None in
+    Fun.protect ~finally:(fun () -> Option.iter close_in_noerr !opened)
+    @@ fun () ->
+    match
+      Db1link.link ~no_warn (iterator_gwo_files opened bar gwo_files) bpath
+    with
+    | exception Db1link.Critical_import_error msg ->
+        Error ("CRITICAL ERROR: " ^ msg)
+    | true -> Ok ()
+    | false -> Error "Database not created."
+  in
+  let result =
+    match link () with
+    | Error _ when !Db1link.folding_collision ->
+        flush stdout;
+        Fmt.epr
+          "@.The errors above come from persons whose keys became the same \
+           with the current folding of the names (as WEIẞ and WEISS): the base \
+           is built with the former folding, then moved to the current one.@.";
+        Unidecode.former := true;
+        link ()
+    | r -> r
+  in
+  match result with
+  | Ok () -> ()
+  | Error msg ->
+      Fmt.epr "%s@." msg;
       exit 2
 
 let compile_gw_files ~bname bar inputs =
@@ -300,6 +320,43 @@ let cleanup gwo_files =
     (fun (fname, _, _, _, was_gw) -> if was_gw then Mutil.rm fname)
     gwo_files
 
+let migrate_keys bname bpath =
+  Geneweb_db.Driver.with_database bpath @@ fun base ->
+  let layout = Layout.of_bname ~mode:Layout.Detect bname in
+  let conf =
+    {
+      Config.empty with
+      Config.bname;
+      layout;
+      base_env = Geneweb.Util.read_base_env layout "" false;
+    }
+  in
+  let keys = ref 0 in
+  let renumbered = ref 0 in
+  let entries = ref [] in
+  let report patch =
+    (match patch with
+    | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
+        incr keys;
+        if Option.is_some kip then incr renumbered
+    | _ -> ());
+    Option.iter
+      (fun e -> entries := e :: !entries)
+      (Fixbase.note_entry base patch)
+  in
+  Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base;
+  Fixbase.write_note conf base "gwc" (List.rev !entries);
+  Geneweb_db.Driver.commit_patches base;
+  Geneweb_db.Driver.sync base;
+  Format.eprintf
+    "Keys moved to the current folding of the names: %d, %d renumbered@." !keys
+    !renumbered;
+  if !entries <> [] then
+    Format.eprintf
+      "Cases to verify: %d, listed in the note gwfixbase \
+       (m=NOTES&f=gwfixbase)@."
+      (List.length !entries)
+
 let reindex_database bname =
   let bpath = GWPARAM.bpath bname in
   if not (Sys.file_exists bpath) then (
@@ -359,4 +416,8 @@ let () =
       generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
+    if !Unidecode.former then (
+      Unidecode.former := false;
+      let (), duration = with_timer @@ fun () -> migrate_keys bname bpath in
+      Format.eprintf "Key migration: %a@." pp_duration duration);
     if !kill_gwo then cleanup gwo_files)

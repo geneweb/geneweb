@@ -387,11 +387,15 @@
   history files are renamed after the new keys, and the notes links
   database is rebuilt.
   To be run once, before `update_nldb`; not part of the default set of
-  fixes. `-person-key` no longer renumbers a person whose key is shared
-  only with the new folding, and reports it instead.
-- With `-apply`, `gwfixbase` lists the renumbered persons and the cases to
-  verify (burials, deaths, keys, links and files left unchanged) with
-  links in the note `gwfixbase`.
+  fixes. When two persons of a `.gw` get the same key with the new
+  folding only, `gwc` builds the base again with the former folding,
+  then migrates it the same way. `-person-key` no longer renumbers a
+  person whose key is shared only with the new folding, and reports it
+  instead.
+- With `-apply`, `gwfixbase` (and `gwc` after a migration) appends to the
+  note `gwfixbase` a dated section listing with links the renumbered
+  persons and the cases to verify (burials, deaths, keys, links and files
+  left unchanged).
 - The base cleanup no longer runs `update_nldb` after `gwc`.
 
 ## Gwc, gwu and GEDCOM

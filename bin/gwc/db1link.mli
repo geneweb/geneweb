@@ -27,6 +27,10 @@ type file_info = {
 }
 (** Information about current .gwo file. *)
 
+val folding_collision : bool ref
+(** Set by [link] when two persons get the same key with the current folding of
+    the names, and different keys with the former one ([Unidecode.former]). *)
+
 val link :
   ?no_warn:bool ->
   (file_info -> unit -> Gwcomp.gw_syntax option) ->

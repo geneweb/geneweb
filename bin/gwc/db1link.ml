@@ -20,6 +20,8 @@ let do_consang = ref false
 (** Print base's statistics *)
 let pr_stats = ref false
 
+let folding_collision = ref false
+
 type person = (int, int, int) Def.gen_person
 (** Extended person's entry in the base *)
 
@@ -135,6 +137,15 @@ type gen = {
 (** Global linker state *)
 
 exception Critical_import_error of string
+
+(** Set [folding_collision] if the persons named [fn] [sn] and [fn'] [sn'], of
+    the same key, have different keys with the former folding of the names. *)
+let check_folding fn sn fn' sn' =
+  if
+    (not !Unidecode.former)
+    && (Name.former_lower fn <> Name.former_lower fn'
+       || Name.former_lower sn <> Name.former_lower sn')
+  then folding_collision := true
 
 (** Set [gen.g_errored] telling that an error was occured *)
 let check_error ?(critical = false) gen msg =
@@ -487,6 +498,9 @@ let insert_undefined gen key =
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
+      check_folding key.pk_first_name key.pk_surname
+        (p_first_name gen.g_base x)
+        (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error gen "");
   (x, ip)
@@ -570,11 +584,14 @@ let insert_person gen so =
     if
       p_first_name gen.g_base x <> so.first_name
       || p_surname gen.g_base x <> so.surname
-    then
+    then (
       Printf.printf "as name: \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
+      check_folding so.first_name so.surname
+        (p_first_name gen.g_base x)
+        (p_surname gen.g_base x));
     flush stdout;
     check_error gen "")
   else (* else set it as defined *)
@@ -600,6 +617,9 @@ let insert_person gen so =
       Printf.printf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
+        (p_surname gen.g_base x);
+      check_folding so.first_name so.surname
+        (p_first_name gen.g_base x)
         (p_surname gen.g_base x);
       gen.g_def.(ip) <- true;
       check_error ~critical:true gen msg);
@@ -1530,7 +1550,7 @@ let input_particles = function
   | file -> Mutil.input_particles file
 
 (** Empty base *)
-let empty_base : cbase =
+let empty_base () : cbase =
   {
     c_persons = [||];
     c_ascends = [||];
@@ -1659,7 +1679,7 @@ let link ?(no_warn = false) next_family_fun bpath =
       g_fcnt = 0;
       g_scnt = 0;
       g_file_info = fi;
-      g_base = empty_base;
+      g_base = empty_base ();
       g_patch_p = Hashtbl.create 20011;
       g_wiznotes = [];
       g_def = [||];
@@ -1685,7 +1705,15 @@ let link ?(no_warn = false) next_family_fun bpath =
         loop ()
     | None -> ()
   in
-  loop ();
+  (try loop ()
+   with e ->
+     let bt = Printexc.get_raw_backtrace () in
+     List.iter close_out_noerr
+       [ gen.g_per_index; gen.g_per; gen.g_fam_index; gen.g_fam ];
+     close_in_noerr per_index_ic;
+     close_in_noerr per_ic;
+     Mutil.rm_rf tmp_dir;
+     Printexc.raise_with_backtrace e bt);
   close_out gen.g_per_index;
   close_out gen.g_per;
   close_out gen.g_fam_index;
