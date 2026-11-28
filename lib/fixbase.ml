@@ -788,15 +788,31 @@ let fix_unidecode_keys ~apply conf ?report progress base =
   in
   scan 0 (fun _ key (ofn, osn) ->
       if (ofn, osn) <> key then Hashtbl.replace groups key []);
-  scan 1 (fun p key (ofn, osn) ->
-      match Hashtbl.find_opt groups key with
-      | Some l ->
-          Hashtbl.replace groups key
-            ((Driver.get_iper p, Driver.get_occ p, ofn, osn) :: l)
-      | None -> ());
+  if Hashtbl.length groups > 0 then
+    scan 1 (fun p key (ofn, osn) ->
+        match Hashtbl.find_opt groups key with
+        | Some l ->
+            Hashtbl.replace groups key
+              ((Driver.get_iper p, Driver.get_occ p, ofn, osn) :: l)
+        | None -> ());
   let db =
     if Hashtbl.length groups = 0 then []
     else Notes.merge_possible_aliases conf (Driver.read_nldb base)
+  in
+  let former_keys = Hashtbl.create 64 in
+  Hashtbl.iter
+    (fun key members ->
+      List.iter
+        (fun (_, occ, ofn, osn) ->
+          if (ofn, osn) <> key then
+            Hashtbl.replace former_keys (ofn, osn, occ) ())
+        members)
+    groups;
+  let former_db =
+    List.exists
+      (fun (_, (_, il)) ->
+        List.exists (fun (k, _) -> Hashtbl.mem former_keys k) il)
+      db
   in
   let pages key =
     List.filter_map
@@ -823,14 +839,12 @@ let fix_unidecode_keys ~apply conf ?report progress base =
   let key_basename fn sn occ =
     Printf.sprintf "%s.%d.%s" (Mutil.tr ' ' '_' fn) occ (Mutil.tr ' ' '_' sn)
   in
-  let changed = ref false in
   let migrate (fn, sn) (ip, occ, ofn, osn) occ' keeper =
     let p = Driver.poi base ip in
     let first_name = Driver.p_first_name base p in
     let surname = Driver.p_surname base p in
     let old_name = key_basename ofn osn occ in
     let new_name = Image.key_dir_basename first_name surname occ' in
-    changed := true;
     (match keeper with
     | Some (kip, _, kfn, ksn) when occ' <> occ ->
         Driver.patch_person base ip
@@ -890,7 +904,7 @@ let fix_unidecode_keys ~apply conf ?report progress base =
           if affected m then
             migrate key m (if Option.is_some keeper then free 0 else occ) keeper))
     groups;
-  if apply && !changed then
+  if apply && former_db then
     Notes.rebuild_links_db base (GWPARAM.bpath conf.Config.bname)
 
 let note_sections =

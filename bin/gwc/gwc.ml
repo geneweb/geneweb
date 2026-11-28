@@ -353,26 +353,30 @@ let finish_base bname bpath =
         | Some o -> note (Fixbase.Fix_UpdatedOcc (Driver.get_iper p, o, occ))
         | None -> ())
       (Driver.persons base);
+  let former = !Unidecode.former in
+  Unidecode.former := false;
   let keys = ref 0 in
   let moved = ref 0 in
-  if !Unidecode.former then (
-    Unidecode.former := false;
-    let report patch =
-      (match patch with
-      | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
-          incr keys;
-          if Option.is_some kip then incr moved
-      | _ -> ());
-      note patch
-    in
-    Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base);
+  let files = ref 0 in
+  let report patch =
+    (match patch with
+    | Fixbase.Fix_UnidecodeKey (_, _, _, kip) ->
+        incr keys;
+        if Option.is_some kip then incr moved
+    | Fix_RenamedFile _ -> incr files
+    | _ -> ());
+    note patch
+  in
+  Fixbase.fix_unidecode_keys ~apply:true conf ~report (fun _ _ -> ()) base;
   Fixbase.write_note conf base "gwc" (List.rev !entries);
-  if !keys > 0 then (
+  if !moved > 0 then (
     Driver.commit_patches base;
-    Driver.sync base;
+    Driver.sync base);
+  if former || !files > 0 then
     Format.eprintf
-      "Keys moved to the current folding of the names: %d, %d renumbered@."
-      !keys !moved);
+      "Keys changed by the current folding of the names: %d, %d renumbered, %d \
+       files renamed@."
+      !keys !moved !files;
   if Hashtbl.length renumbered > 0 then
     Format.eprintf
       "Persons defined with the key of another one, renumbered: %d@."
@@ -442,7 +446,5 @@ let () =
       generate_database ~no_warn:!no_warn ~bpath bar gwo_files
     in
     Format.eprintf "Database generation: %a@." pp_duration duration;
-    (if !Unidecode.former || !Db1link.duplicates <> [] then
-       let (), duration = with_timer @@ fun () -> finish_base bname bpath in
-       Format.eprintf "Keys check: %a@." pp_duration duration);
+    finish_base bname bpath;
     if !kill_gwo then cleanup gwo_files)

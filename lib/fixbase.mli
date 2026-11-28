@@ -207,10 +207,11 @@ val fix_unidecode_keys :
     - its portraits, blasons, carrousel and history file are renamed after the
       new key, unless the target exists.
 
-    With [apply], the files and the notes are written and the notes links
-    database is rebuilt; otherwise only the person patches are made, and the
-    rest is reported. The notes links database must be the one built with the
-    former folding. *)
+    With [apply], the files and the notes are written, and the notes links
+    database is rebuilt if it holds former keys; otherwise only the person
+    patches are made, and the rest is reported. The links to a renumbered person
+    are found only in a notes links database built with the former folding. On a
+    base built with the current folding, only the files are renamed. *)
 
 val note_entry : Geneweb_db.Driver.base -> patch -> (int * string) option
 (** [note_entry base patch] is, for a renumbered person or a case to verify, its
