@@ -13,7 +13,8 @@ type patch =
   | Fix_RemovedDuplicateChild of Driver.ifam * Driver.iper
   | Fix_AddedRelatedFromPevent of Driver.iper * Driver.iper
   | Fix_AddedRelatedFromFevent of Driver.iper * Driver.iper
-  | Fix_MarriageDivorce of Driver.ifam
+  | Fix_MarriageDivorce of
+      Driver.ifam * relation_kind * relation_kind * string list
   | Fix_MissingSpouse of Driver.ifam * Driver.iper
   | Fix_WrongUTF8Encoding of
       Driver.ifam option
@@ -487,44 +488,66 @@ let check_fevents_witnesses ?report progress base =
 
 let fix_marriage_divorce ?report progress base =
   let nb_fam = Driver.nb_of_families base in
+  let same_string i i' =
+    Driver.Istr.equal i i' || Driver.sou base i = Driver.sou base i'
+  in
+  let is_marriage_kind e =
+    match e.efam_name with
+    | Efam_Divorce | Efam_Separated | Efam_Name _ -> false
+    | Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
+    | Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract
+    | Efam_MarriageLicense | Efam_PACS | Efam_Residence ->
+        true
+  in
   Collection.iteri
     (fun i fam ->
       progress i nb_fam;
       let fevents = Driver.get_fevents fam in
-      let relation0 = Driver.get_relation fam in
-      let marriage0 = Driver.get_marriage fam in
-      let marriage_place0 = Driver.get_marriage_place fam in
-      let marriage_note0 = Driver.get_marriage_note fam in
-      let marriage_src0 = Driver.get_marriage_src fam in
-      (* TODO is divorce treated as fevent! *)
-      let divorce0 = Driver.get_divorce fam in
-      let marr_data0 =
-        (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0)
-      in
-      let ( ((relation, marriage, marriage_place, marriage_note, marriage_src)
-             as marr_data),
-            divorce,
-            _ ) =
-        UpdateFamOk.reconstitute_from_fevents false
-          (Driver.insert_string base "")
-          fevents
-      in
-      if marr_data0 <> marr_data || divorce0 <> divorce then (
-        let fam' =
-          {
-            (Driver.gen_family_of_family fam) with
-            relation;
-            marriage;
-            marriage_place;
-            marriage_note;
-            marriage_src;
-            divorce;
-          }
+      if List.exists is_marriage_kind fevents then
+        let relation0 = Driver.get_relation fam in
+        let nsck =
+          match relation0 with
+          | NoSexesCheckMarried | NoSexesCheckNotMarried -> true
+          | _ -> false
         in
-        Driver.patch_family base (Driver.get_ifam fam) fam';
-        match report with
-        | Some fn -> fn (Fix_MarriageDivorce (Driver.get_ifam fam))
-        | None -> ()))
+        let ( (relation, marriage, marriage_place, marriage_note, marriage_src),
+              divorce,
+              _ ) =
+          UpdateFamOk.reconstitute_from_fevents nsck Driver.Istr.empty fevents
+        in
+        let fields =
+          List.filter_map
+            (fun (name, changed) -> if changed then Some name else None)
+            [
+              ( "marriage",
+                Date.od_of_cdate (Driver.get_marriage fam)
+                <> Date.od_of_cdate marriage );
+              ( "marriage_place",
+                not (same_string (Driver.get_marriage_place fam) marriage_place)
+              );
+              ( "marriage_note",
+                not (same_string (Driver.get_marriage_note fam) marriage_note)
+              );
+              ( "marriage_src",
+                not (same_string (Driver.get_marriage_src fam) marriage_src) );
+            ]
+        in
+        if relation0 <> relation || fields <> [] then (
+          let ifam = Driver.get_ifam fam in
+          Driver.patch_family base ifam
+            {
+              (Driver.gen_family_of_family fam) with
+              relation;
+              marriage;
+              marriage_place;
+              marriage_note;
+              marriage_src;
+              divorce;
+            };
+          match report with
+          | Some fn ->
+              fn (Fix_MarriageDivorce (ifam, relation0, relation, fields))
+          | None -> ()))
     (Driver.families base)
 
 let fix_missing_spouses ?report progress base =

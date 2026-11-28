@@ -80,8 +80,17 @@ let aux txt
       ->
         Printf.sprintf "Added related %s to %s" (string_of_p ip2)
           (string_of_p ip)
-    | Fix_MarriageDivorce ifam ->
-        Printf.sprintf "Fixed marriage and/or divorce info of %s"
+    | Fix_MarriageDivorce (ifam, r, r', fields) ->
+        let relation =
+          if r = r' then []
+          else
+            [
+              Printf.sprintf "relation %s -> %s" (Def.show_relation_kind r)
+                (Def.show_relation_kind r');
+            ]
+        in
+        Printf.sprintf "Fixed %s of %s"
+          (String.concat ", " (relation @ fields))
           (string_of_f ifam)
     | Fix_MissingSpouse (ifam, iper) ->
         Printf.sprintf "Fixed missing spouse (%s) in family %s"

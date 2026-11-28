@@ -27,7 +27,13 @@ type patch =
       Geneweb_db.Driver.iper * Geneweb_db.Driver.iper
   | Fix_AddedRelatedFromFevent of
       Geneweb_db.Driver.iper * Geneweb_db.Driver.iper
-  | Fix_MarriageDivorce of Geneweb_db.Driver.ifam
+  | Fix_MarriageDivorce of
+      Geneweb_db.Driver.ifam
+      * Def.relation_kind
+      * Def.relation_kind
+      * string list
+      (** family, relation before and after, other changed fields among
+          [marriage], [marriage_place], [marriage_note] and [marriage_src] *)
   | Fix_MissingSpouse of Geneweb_db.Driver.ifam * Geneweb_db.Driver.iper
   | Fix_WrongUTF8Encoding of
       Geneweb_db.Driver.ifam option
@@ -117,8 +123,14 @@ val fix_marriage_divorce :
   (int -> int -> unit) ->
   Geneweb_db.Driver.base ->
   unit
-(** For every family in the base synchronise its fields with marriage and
-    divorce events. *)
+(** For every family having a marriage, no marriage, no mention, engagement,
+    annulment, banns, contract, licence, PACS or residence event, set its
+    relation and marriage fields from its events, as the family edition does. A
+    family without such an event is left unchanged. The no sex check of a
+    [NoSexesCheckMarried] or [NoSexesCheckNotMarried] relation is kept. Dates
+    are compared as dates and strings as texts, so that a family is patched only
+    when its data changes. The divorce field is rewritten with the family, but
+    not compared, since [Driver.get_divorce] reads the events. *)
 
 val fix_missing_spouses :
   ?report:(patch -> unit) ->

@@ -143,7 +143,7 @@ let fixbase_ok conf base =
       | Fix_MissingSpouse (ifam, iper) ->
           ifams := ifam :: !ifams;
           ipers := iper :: !ipers
-      | Fix_MarriageDivorce ifam
+      | Fix_MarriageDivorce (ifam, _, _, _)
       | Fix_AddedChild ifam
       | Fix_ChildrenOrder (ifam, _, _) ->
           ifams := ifam :: !ifams
