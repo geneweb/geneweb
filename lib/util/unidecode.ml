@@ -832,20 +832,76 @@ let fallback u =
     in
     match base with Some _ as t -> t | None -> case_output u
 
+let former_outputs =
+  [
+    (0x00DF, Some "sz");
+    (0x0191, None);
+    (0x0192, None);
+    (0x026A, None);
+    (0x026E, Some "i");
+    (0x0284, Some "u");
+    (0x0389, Some "H");
+    (0x038E, Some "Y");
+    (0x0390, Some "I");
+    (0x03AB, Some "Y");
+    (0x03AE, Some "n");
+    (0x03B0, Some "a");
+    (0x0402, None);
+    (0x0405, None);
+    (0x0408, None);
+    (0x0409, None);
+    (0x040A, None);
+    (0x040B, None);
+    (0x040F, None);
+    (0x044E, Some "yu");
+    (0x0452, None);
+    (0x0455, None);
+    (0x0458, None);
+    (0x0459, None);
+    (0x045A, None);
+    (0x045B, None);
+    (0x045F, None);
+    (0x0490, None);
+    (0x0491, None);
+    (0x1E20, Some "F");
+    (0x1E21, Some "f");
+    (0x1E22, Some "G");
+    (0x1E23, Some "g");
+    (0x1E9D, Some "r");
+    (0x1E9E, Some "s");
+  ]
+  |> List.to_seq |> Hashtbl.of_seq
+
+let former = ref false
+
+let decode_former fns fnc unsupported s i len =
+  let d = String.get_utf_8_uchar s i in
+  match
+    if Uchar.utf_decode_is_valid d then
+      Hashtbl.find_opt former_outputs (Uchar.to_int (Uchar.utf_decode_uchar d))
+    else None
+  with
+  | Some t -> (
+      let n = i + Uchar.utf_decode_length d in
+      match t with Some t -> fns n t | None -> unsupported n)
+  | None -> decode_table fns fnc unsupported s i len
+
 let decode fns fnc unsupported s i len =
-  decode_table fns fnc
-    (fun n ->
-      let d = String.get_utf_8_uchar s i in
-      if
-        Char.code (String.unsafe_get s i) < 0x80
-        || (not (Uchar.utf_decode_is_valid d))
-        || i + Uchar.utf_decode_length d <> n
-      then unsupported n
-      else
-        match fallback (Uchar.utf_decode_uchar d) with
-        | Some t -> fns n t
-        | None -> unsupported n)
-    s i len
+  if !former then decode_former fns fnc unsupported s i len
+  else
+    decode_table fns fnc
+      (fun n ->
+        let d = String.get_utf_8_uchar s i in
+        if
+          Char.code (String.unsafe_get s i) < 0x80
+          || (not (Uchar.utf_decode_is_valid d))
+          || i + Uchar.utf_decode_length d <> n
+        then unsupported n
+        else
+          match fallback (Uchar.utf_decode_uchar d) with
+          | Some t -> fns n t
+          | None -> unsupported n)
+      s i len
 
 (* [string_forall fn s] is [true] iff [fn] holds for every byte of [s]
    (vacuously [true] for [""]). Used as an ASCII fast path in

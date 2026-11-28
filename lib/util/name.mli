@@ -22,6 +22,10 @@ val lower : string -> string
     unicode characters with ASCII. Non-alphanumeric characters (except '.') are
     remplaced by space. *)
 
+val former_lower : string -> string
+(** [lower] with the former decoding of [Unidecode] ([Unidecode.former]), giving
+    the keys of a base made before the corrections of its table. *)
+
 val title : string -> string
 (** Apply uppercasing to the first letter of each name (sequence of alphabetic
     characters) part, and lowercasing to the rest of the text. *)

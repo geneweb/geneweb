@@ -11,6 +11,14 @@
 val nbc : char -> int
 (** For a given byte, returns how many bytes compose the UTF8 character. *)
 
+val former : bool ref
+(** When set, [decode] decodes as before the corrections of 2026-11: by the
+    table alone, without the decoding of the characters missing from it, and
+    with the former outputs of the corrected entries (e.g. ß as "sz"). It lets
+    gwc build a base from a [.gw] whose persons get the same key with the
+    current decoding, and [gwfixbase -unidecode-keys] compute the former keys.
+*)
+
 val decode :
   (int -> string -> 'a) ->
   (int -> char -> 'a) ->
